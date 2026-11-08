@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 17:14 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 17:33 AEDT.
 
 ## Events
 
@@ -57,6 +57,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 17:06 | Round 2 noteheads owner finished: challenge set 0.745 → 0.784 from the front end alone (pitch 0.785 → 0.841), challenge files with no staves 19 → 4, benchmark 0.905 → 0.918. Only the symbols owner and the integrator remain in round 2. |
 | 17:12 | Round 2 symbols owner finished: tuplets read and represented exactly (L3c resolved), key signatures right on every real scan but one (L2 resolved), mid-piece clef and key changes detected, slurs no longer mistaken for beams. Live tree 0.919, real scans 0.902. All five owners done; the round 2 integrator is running. |
 | 17:14 | Release 0.4.0 (17:13 AEDT) regression-tested against 0.3.0: no regression on the benchmark (0.918 → 0.919, real scans 0.900 → 0.902) or the challenge set (0.784, no item worse). |
+| 17:33 | User reported rests are not transcribed. Confirmed: 70 of 256 benchmark rests produced, the rest left as invisible gaps. A dedicated rests hotfix agent started (new src/rests.js: all rest values, multi-bar rests, rests on piano staves, visible rests instead of gaps). |
 
 ## Accuracy by round
 
@@ -77,7 +78,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 |---|---|---|---|---|
 | L1 | Hollow noteheads sometimes missed (main source of rhythm errors) | Noteheads and staves | Partial (round 1) | Hollow heads: wider insides filled, broken outlines closed, outline eaten by staff removal restored. Missed half notes 81 → 28, false whole notes 156 → 3. On the faint 1867 Haupt scan heads found 54 → 105. Beamed 8ths/16ths are now the largest miss source (598) — round 2. Round 2: thin-walled half notes filled on thin-line prints, false hollow heads from flag holes removed; notehead recall 0.867 → 0.888, precision 0.917 → 0.932. |
 | L2 | Key signatures unreliable on old engraving | Symbols | Resolved (round 2) | Every real-scan header now reads right except an old-style bass clef (Sharp 1911) and one Haupt staff: St. Anselm 4 sharps on all staves, Tappan-Dennis +1 and −1, Haupt 1 sharp, America 1 sharp. |
-| L3a | Rests not detected | Symbols | Partial (round 1) | Printed rests now detected (whole, half, quarter, eighth) and placed; rests F1 0.14 → 0.41. Over-full voice-measures 259 → 0. |
+| L3a | Rests not detected | Symbols | Open, hotfix in progress | User reported no rests. Measured: 256 rests in the benchmark answers, 70 in the output; gaps written as invisible <forward> instead of rests; piano staves never searched; only 4 rest shapes recognised. Rests F1 0.436. |
 | L3b | Ties and slurs not detected; a stray slur can create a false 16th | Symbols | Partial (round 2) | Slurs no longer read as beams (Lindenbaum false 16ths 35 → 23); ties not yet detected. |
 | L3c | Triplets and other tuplets not detected | Symbols | Resolved (round 2) | Tuplet numbers read (3, 5, 6, 7, with or without brackets); divisions raised to 840 per quarter so every tuplet duration is exact. Tuplet étude duration +0.31 to +0.39. MusicXML <type> for tuplet notes still to add. |
 | L3d | Mid-piece clef and key changes not detected | Symbols | Partial (round 2) | Mid-piece clef and key changes detected on every staff (all six key changes in the challenge item read correctly); the voices owner must apply them in MusicXML. |
@@ -111,7 +112,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | Run 5 | Challenge test set (edge cases + scan damage) | running | 7 of 7 |  |
 | Run 3 | Max-parallel main workflow (research) | stopped | 7 of 10 | Stopped at 16:30 AEDT once all 7 research items returned, as planned; its 3 design-proposal agents had just started and were stopped with it. The full rebuild was replaced by fix-forward rounds on v1. |
 | Run 6 | Fix-forward round 2 | running | 5 of 6 |  |
-| Side | Agents launched directly from the session | running | 3 of 3 |  |
+| Side | Agents launched directly from the session | running | 3 of 4 |  |
 
 ## Agents
 
@@ -156,7 +157,8 @@ Every agent started for this build, including stopped runs. Outcomes are on the 
 | Run 6 | Fix | fix:r2:score | done | 16:21 | 17:00 | 39 | 170 |
 | Run 6 | Fix | fix:r2:lyrics | done | 16:21 | 16:41 | 20 | 109 |
 | Run 6 | Fix | fix:r2:ui | done | 16:21 | 16:45 | 24 | 87 |
-| Run 6 | Integrate | integrate:r2 | run | 17:12 |  | 2 | 24 |
+| Run 6 | Integrate | integrate:r2 | run | 17:12 |  | 21 | 86 |
 | Side | ML demo | copista-2m demo page for GitHub Pages | done | 16:38 | 16:41 | 3 | 21 |
 | Side | Fast track | First version build (mvp/) | done | 15:19 | 15:29 | 10 | 69 |
+| Side | Hotfix | Rests fix (L3a, user-reported) | run | 17:33 |  | 0 | 3 |
 | Side | Fast track | Software design document | done | 15:20 | 15:22 | 2 | 16 |

@@ -236,6 +236,12 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
     else if (ownNames(k, ['vocal', 'instrument']).length || ownNames(k + 1, ['vocal', 'instrument']).length) kb = false;
     link.push(kb);
   }
+  // organ: a pedal staff (bass clef, no text, no name of its own) under a
+  // keyboard pair belongs to it; its barlines are often not drawn through
+  if (nSt === 3 && link[0] && !link[1] && clefs[2] === 'F' && lyr[2] < 0.15 && !ownNames(2, ['vocal', 'instrument']).length) {
+    link[1] = true;
+    notes.push('Staff 3: read as the pedal staff of the keyboard above it (no text, bass clef), kept in the same part.');
+  }
   // groups: runs of linked staves (max 3: organ) are one keyboard part
   const groups = [];
   for (let i = 0; i < nSt;) {
@@ -274,7 +280,9 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
     if (g.keyboard) {
       kbi++;
       const kbName = g.staves.flatMap(k => labels[k]).flatMap(l => l.names).find(n => n.kind === 'keyboard');
-      parts.push({ name: kbName ? kbName.name : nKb > 1 ? `Piano ${kbi}` : 'Piano', nameRead: !!kbName, kind: 'keyboard', src: g.staves.map(s => ({ staff: s, voice: 'chordal' })),
+      // three linked staves are manuals and pedal: an organ
+      const kbDefault = g.staves.length === 3 ? 'Organ' : 'Piano';
+      parts.push({ name: kbName ? kbName.name : nKb > 1 ? `${kbDefault} ${kbi}` : kbDefault, nameRead: !!kbName, kind: 'keyboard', src: g.staves.map(s => ({ staff: s, voice: 'chordal' })),
         layout: `Staves ${g.staves[0] + 1}\u2013${g.staves[g.staves.length - 1] + 1}: keyboard grand staff, one part` });
       notes.push(`Staves ${g.staves.map(s => s + 1).join('+')}: read as a keyboard grand staff (barlines joined or chords without lyrics under a sung line), kept together as one part and never split.`);
       continue;
@@ -397,7 +405,7 @@ function placeRests(evs, rests, gap) {
 function searchRepair(evs, target, anchors, sp, over) {
   const U = DIV, T = Math.round(target * U);
   const near = evs.map(e => (e.rest || e.x == null) ? null : anchors.filter(a => Math.abs(a.x - e.x) <= 0.8 * sp).map(a => Math.round(a.t * U)));
-  const opts = evs.map(e => {
+  const opts = evs.map((e, i) => {
     const q = e.q, d = e.dots || 0, o = [[q, 0]];
     if (!e.rest) {
       if (!d) o.push([q * 1.5, 1.0]);
@@ -405,9 +413,12 @@ function searchRepair(evs, target, anchors, sp, over) {
       o.push([q / 2, 1.5]);
       if (q * 2 <= 4 + EPS) o.push([q * 2, 1.6]);
       // a note that took a syllable is printed for sure: dropping it costs more
-      if (over) o.push([0, e.lyrics ? 3.5 : 1.8]);
+      // ties go to the earliest event: header leftovers and barline debris
+      // come first in a bar
+      if (over) o.push([0, (e.lyrics ? 3.5 : 1.8) + 0.001 * i]);
     }
-    return o.filter(([nq]) => nq === 0 || qToType(nq)).map(([nq, c]) => [Math.round(nq * U), nq, c]);
+    // the value as read is always an option (a tuplet note has no plain type)
+    return o.filter(([nq, c]) => c === 0 || nq === 0 || valueOk(e, nq)).map(([nq, c]) => [Math.round(nq * U), nq, c]);
   });
   const layers = [new Map([[0, { c: 0, from: 0, q: null }]])];
   for (let i = 0; i < evs.length; i++) {
@@ -443,7 +454,7 @@ function repairStream(evs, target, anchors, sp) {
     evs.forEach((e, i) => {
       const nq = best.qs[i];
       if (nq === 0) return;
-      if (Math.abs(nq - e.q) > EPS) { e.q = nq; e.dots = qToType(nq).dots; }
+      if (Math.abs(nq - e.q) > EPS) { e.q = nq; e.dots = (qToType(nq) || { dots: 0 }).dots; }
       out.push(e);
     });
     return { events: out, ok: true };
@@ -513,7 +524,6 @@ function splitTwoVoices(chordal, sp, trust) {
     slots.push({ x: ev.x, x1: ev.x, heads: ev.heads.slice(), dirs });
   }
   const out = { 1: [], 2: [] }, cur = { 1: 0, 2: 0 };
-  const mk = (sl, h) => ({ x: sl.x, heads: [h], q: h.dur.q, dots: h.dur.dots });
   for (const sl of slots) {
     const hs = sl.heads.slice().sort((a, b) => a.y - b.y);
     const v1 = hs.filter(h => h.stemDir === 1 || h.stemDir === 2), v2 = hs.filter(h => h.stemDir === -1 || h.stemDir === 2);
@@ -541,12 +551,20 @@ function splitTwoVoices(chordal, sp, trust) {
         else for (const q of restsFor(gap)) out[v].push({ rest: true, q, dots: 0, x: sl.x });
       }
       cur[v] = t;
-      out[v].push(mk(sl, h));
-      cur[v] += h.dur.q;
+      // a head with both stems: the lower voice's value is read on its own
+      // stem (assemble.js h.dur.down)
+      const d = (v === 2 && h.stemDir === 2 && h.dur.down) || h.dur;
+      out[v].push({ x: sl.x, heads: [h], q: d.q, dots: d.dots });
+      cur[v] += d.q;
     }
   }
   return out;
 }
+
+// printed value of a note inside a tuplet (assemble.js h.dur.tuplet {actual,
+// normal}): q * actual / normal is the plain value it is drawn as
+const tupletOf = (e) => (!e.rest && e.heads && e.heads[0] && e.heads[0].dur && e.heads[0].dur.tuplet) || null;
+const valueOk = (e, q) => !!(qToType(q) || (tupletOf(e) && qToType(q * tupletOf(e).actual / tupletOf(e).normal)));
 
 function qToType(q) {
   const table = [[4, 'whole', 0], [3, 'half', 1], [2, 'half', 0], [1.5, 'quarter', 1], [1, 'quarter', 0], [0.75, 'eighth', 1],
@@ -1019,14 +1037,21 @@ function alignSyllables(verse, evs, sp) {
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
+// no staves found: still a schema-valid score (the schema asks for at least
+// one part with one measure), so the file opens and the warnings explain it
 function emptyXML() {
-  return '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">\n<score-partwise version="4.0"><part-list/></score-partwise>\n';
+  return '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">\n' +
+    '<score-partwise version="4.0">\n  <work><work-title>Scanned score (no staves found)</work-title></work>\n' +
+    '  <part-list><score-part id="P1"><part-name>Music</part-name></score-part></part-list>\n' +
+    '  <part id="P1"><measure number="1"><attributes><divisions>1</divisions></attributes></measure></part>\n</score-partwise>\n';
 }
 
 function clefXML(c, n) {
   const num = n ? ` number="${n}"` : '';
   if (c === 'F') return `<clef${num}><sign>F</sign><line>4</line></clef>`;
   if (c === 'G8') return `<clef${num}><sign>G</sign><line>2</line><clef-octave-change>-1</clef-octave-change></clef>`;
+  if (c === 'G8va') return `<clef${num}><sign>G</sign><line>2</line><clef-octave-change>1</clef-octave-change></clef>`;
+  if (/^C[1-5]$/.test(c)) return `<clef${num}><sign>C</sign><line>${c[1]}</line></clef>`;
   return `<clef${num}><sign>G</sign><line>2</line></clef>`;
 }
 
@@ -1040,6 +1065,25 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
   for (const sy of new Set(unitSys || [])) if (sy) sy.staves.forEach((st, k) => {
     if (!st.hdr.clefGuessed && st.hdr.clef) { const key = k + ':' + st.hdr.clef; seenClef[key] = (seenClef[key] || 0) + 1; }
   });
+  // the same for keys: a system whose staves all read one key signature
+  // uses it (a key change at a system break) when that key is read so on two
+  // systems or more; otherwise the piece's key. Faded or broken signatures
+  // lose accidentals, so a key with fewer accidentals than the piece's (same
+  // side, or none) counts only on a clear majority of the systems
+  const sysKeyOf = new Map(), seenKey = {};
+  const allSys = new Set((unitSys || []).filter(Boolean));
+  for (const sy of allSys) if (sy.staves.length) {
+    const ks = sy.staves.map(st => st.hdr.fifths | 0);
+    if (ks.every(k => k === ks[0])) { sysKeyOf.set(sy, ks[0]); seenKey[ks[0]] = (seenKey[ks[0]] || 0) + 1; }
+  }
+  const dropout = (k) => (k === 0 || Math.sign(k) === Math.sign(fifths)) && Math.abs(k) < Math.abs(fifths);
+  const keyOk = (k) => seenKey[k] >= 2 && (!dropout(k) || (seenKey[k] >= 3 && seenKey[k] > 0.5 * allSys.size));
+  const keyAt = (mi) => {
+    const sy = unitSys && unitSys[mi], k = sy != null ? sysKeyOf.get(sy) : undefined;
+    return k != null && keyOk(k) ? k : fifths;
+  };
+  const altsOf = new Map();
+  const altsFor = (f) => { if (!altsOf.has(f)) altsOf.set(f, keyAlters(f)); return altsOf.get(f); };
   const clefAt = (mi, staff) => {
     const sy = unitSys && unitSys[mi], st = sy && sy.staves[staff];
     if (st && !st.hdr.clefGuessed && st.hdr.clef && (seenClef[staff + ':' + st.hdr.clef] || 0) >= 2) return st.hdr.clef;
@@ -1057,7 +1101,9 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
     for (const e of st.events) {
       if (!e.rest && !e.forward && e.heads) for (const h of e.heads) {
         if (!h.acc || e.tieStop) continue;
-        const pk = pitchOf(clef, h.p, kAlt, {});
+        // a clef or key change read inside the staff (assemble.js marks the
+        // heads after it with h.clef / h.fifths) overrides the staff's own
+        const pk = pitchOf(h.clef || clef, h.p, altsFor(h.fifths != null ? h.fifths : keyAt(mi)), {});
         accLine.get(key).push({ t, k: pk.step + pk.octave, a: h.acc === 'sharp' ? 1 : h.acc === 'flat' ? -1 : h.acc === 'double-sharp' ? 2 : h.acc === 'flat-flat' ? -2 : 0 });
       }
       t += e.q;
@@ -1089,16 +1135,29 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
     const nStaves = p.src.length;
     const multi = nStaves > 1;
     const curClef = [];
+    let curKey = fifths;
+    // clef / key in force at a stream's first note: a change read inside a
+    // staff (h.clef / h.fifths from assemble.js) carries on into later bars
+    const firstHead = (st) => { for (const e of st.events) if (!e.rest && !e.forward && e.heads && e.heads.length) return e.heads[0]; return null; };
     partMeasures[pi].forEach((streams, mi) => {
       const implicit = streams.every(s => s.implicit);
       L.push(`    <measure number="${implicit ? 0 : mi + (partMeasures[pi][0].every(s => s.implicit) ? 0 : 1)}"${implicit ? ' implicit="yes"' : ''}>`);
       if (mi === 0) {
-        L.push(`      <attributes><divisions>${DIV}</divisions><key><fifths>${fifths}</fifths></key><time><beats>${time.beats}</beats><beat-type>${time.type}</beat-type></time>` +
+        const fh0 = streams.map(firstHead).find(Boolean);
+        curKey = fh0 && fh0.fifths != null ? fh0.fifths : keyAt(0);
+        L.push(`      <attributes><divisions>${DIV}</divisions><key><fifths>${curKey}</fifths></key><time><beats>${time.beats}</beats><beat-type>${time.type}</beat-type></time>` +
           (multi ? `<staves>${nStaves}</staves>${p.src.map((s, k) => clefXML(clefAt(0, s.staff), k + 1)).join('')}` : clefXML(clefAt(0, p.src[0].staff))) + '</attributes>');
         p.src.forEach((s, k) => { curClef[k] = clefAt(0, s.staff); });
       } else {
         const ch = [];
-        p.src.forEach((s, k) => { const c = clefAt(mi, s.staff); if (c !== curClef[k]) { ch.push(clefXML(c, multi ? k + 1 : 0)); curClef[k] = c; } });
+        const fh = streams.map(firstHead).find(Boolean);
+        const key = fh && fh.fifths != null ? fh.fifths : keyAt(mi);
+        if (key !== curKey) { ch.push(`<key><fifths>${key}</fifths></key>`); curKey = key; }
+        p.src.forEach((s, k) => {
+          const h0 = streams[k] ? firstHead(streams[k]) : null;
+          const c = (h0 && h0.clef) || clefAt(mi, s.staff);
+          if (c !== curClef[k]) { ch.push(clefXML(c, multi ? k + 1 : 0)); curClef[k] = c; }
+        });
         if (ch.length) L.push(`      <attributes>${ch.join('')}</attributes>`);
       }
       streams.forEach((s, si) => {
@@ -1115,7 +1174,13 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
           const t0 = et;
           et += e.q;
           const dur = Math.max(1, Math.round(e.q * DIV));
-          const tt = qToType(e.q);
+          let tt = qToType(e.q), tmod = '';
+          const tu = tupletOf(e);
+          if (!tt && tu) {
+            // a tuplet note: drawn as its plain value, scaled by the ratio
+            tt = qToType(e.q * tu.actual / tu.normal);
+            if (tt) tmod = `<time-modification><actual-notes>${tu.actual}</actual-notes><normal-notes>${tu.normal}</normal-notes></time-modification>`;
+          }
           const typeXML = tt ? `<type>${tt.type}</type>${'<dot/>'.repeat(tt.dots)}` : '';
           if (e.forward) {
             L.push(`      <forward><duration>${dur}</duration><voice>${voice}</voice>${staffTag}</forward>`);
@@ -1126,12 +1191,15 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
             else L.push(`      <note><rest/><duration>${dur}</duration><voice>${voice}</voice>${typeXML}${staffTag}</note>`);
             continue;
           }
+          const hc = e.heads[0].clef || clef;
+          if (curClef[si] !== undefined && hc !== curClef[si]) { L.push(`      <attributes>${clefXML(hc, multi ? si + 1 : 0)}</attributes>`); curClef[si] = hc; }
           e.heads.forEach((h, hi) => {
             const pos = h.p;
-            const pk = pitchOf(clef, pos, kAlt, {}), kk = pk.step + pk.octave;
+            const hClef = h.clef || clef, hAlt = altsFor(h.fifths != null ? h.fifths : keyAt(mi));
+            const pk = pitchOf(hClef, pos, hAlt, {}), kk = pk.step + pk.octave;
             let alt = null;
             for (const a of line) { if (a.t > t0 + 1e-6) break; if (a.k === kk) alt = a.a; }
-            const pt = pitchOf(clef, pos, kAlt, alt == null ? {} : { [kk]: alt });
+            const pt = pitchOf(hClef, pos, hAlt, alt == null ? {} : { [kk]: alt });
             h.pitch = pt;
             const acc = h.acc && !e.tieStop ? `<accidental>${h.acc}</accidental>` : '';
             const tie = (e.tieStop ? '<tie type="stop"/>' : '') + (e.tieStart ? '<tie type="start"/>' : '');
@@ -1147,7 +1215,7 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
               }
             }
             L.push(`      <note>${hi > 0 ? '<chord/>' : ''}<pitch><step>${pt.step}</step>${pt.alter ? `<alter>${pt.alter}</alter>` : ''}<octave>${pt.octave}</octave></pitch>` +
-              `<duration>${dur}</duration>${tie}<voice>${voice}</voice>${typeXML}${acc}${stem}${staffTag}${tied}${lyr}</note>`);
+              `<duration>${dur}</duration>${tie}<voice>${voice}</voice>${typeXML}${acc}${tmod}${stem}${staffTag}${tied}${lyr}</note>`);
           });
         }
       });

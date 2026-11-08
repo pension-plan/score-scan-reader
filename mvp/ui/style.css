@@ -38,6 +38,8 @@
   --syn-tag:#a3acff; --syn-attr:#dcaaeb; --syn-val:#8fd6a8; --shadow:none; color-scheme:dark}
 
 *{box-sizing:border-box}
+/* the hidden attribute wins over component display rules (.btn is inline-flex) */
+[hidden]{display:none!important}
 html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--sans)}
 body{-webkit-text-size-adjust:100%}
 button,input,textarea{font:inherit;color:inherit}
