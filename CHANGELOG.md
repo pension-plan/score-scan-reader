@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.11.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.10.0...score-scan-reader-v0.11.0) (2026-11-08)
+
+
+### Features
+
+* **ui:** mark for repair: draw over the page, note each mark, export repair notes ([b10c817](https://github.com/pension-plan/score-scan-reader/commit/b10c8176136dcd91c7d927a5be0d59eafea61b4f))
+
 ## [0.10.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.9.0...score-scan-reader-v0.10.0) (2026-11-08)
 
 
