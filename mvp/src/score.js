@@ -730,19 +730,36 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   // marks first (text.js via symbols.js): braces inform the layout
   for (const p of pages) { try { pageMarks(p.fr, p.asm); } catch (e) { /* layout reads without them */ } }
   // a stemless 'head' inside a word read as text over or between the staves (the o of
-  // "Moderato" read as a whole note) is a letter, not a note
+  // "Moderato" read as a whole note), or inside a dynamic, is a letter, not a note
   for (const p of pages) {
     const m = p.fr && p.fr._marks && p.fr._marks.marks;
     if (!m || !p.asm || p.asm.lettersDropped) continue;
     p.asm.lettersDropped = true;
     // (word boxes from the layout of the ink: the text itself may be read later)
     const boxes = m.text.filter(t => ['tempo', 'expression', 'text', 'title', 'subtitle', 'composer', 'lyricist', 'arranger', 'credit'].includes(t.role) && (t.words || 0) >= 1 && t.box[2] - t.box[0] >= 2 * (p.fr.ss || 16)).map(t => t.box);
-    if (!boxes.length) continue;
+    // a dynamic's letters (the bowl of a p read as a whole note under the staff)
+    const dyn = (m.dyns || []).map(d => d.box);
+    for (const sy of p.asm.systems) for (const s of sy.staves) {
+      // a stemless hollow 'head' a space or more beyond the staff with no ledger line between it
+      // and the staff (a ledger line sticks out past both sides of the head) is a letter: the bowl
+      // of a p
+      const st = s.st, spS = st.space || p.fr.ss, R = p.fr.R;
+      const ink = (x, y) => x >= 0 && y >= 0 && x < R.width && y < R.height && R.data[y * R.width + x];
+      const ledgered = (h) => {
+        const k = h.p > 0 ? -1 : 5, y = Math.round(st.yAt(0, h.x) + k * (st.yAt(4, h.x) - st.yAt(0, h.x)) / 4);
+        const side = (dx) => { for (let yy = y - Math.round(0.25 * spS); yy <= y + Math.round(0.25 * spS); yy++) if (ink(Math.round(h.x + dx), yy)) return true; return false; };
+        return side(-0.85 * spS) && side(0.85 * spS);
+      };
+      const bare = (h) => h.stemDir === 0 && h.kind === 'hollow' && Math.abs(h.p) >= 7 && !ledgered(h);
+      if (s.chords.some(c => c.heads.some(bare))) s.chords = s.chords.map(c => (c.heads.some(bare) ? { ...c, heads: c.heads.filter(h => !bare(h)) } : c)).filter(c => c.heads.length);
+    }
+    if (!boxes.length && !dyn.length) continue;
     for (const sy of p.asm.systems) for (const s of sy.staves) {
       // (in the word's row, within three spaces before it or six after: the letters taken for
       // notes are not in the word's box)
       const sp = s.st.space || p.fr.ss;
-      const inWord = (h) => h.stemDir === 0 && boxes.some(b => h.x > b[0] - 3 * sp && h.x < b[2] + 6 * sp && h.y > b[1] - 0.2 * sp && h.y < b[3] + 0.2 * sp);
+      const inWord = (h) => h.stemDir === 0 && (boxes.some(b => h.x > b[0] - 3 * sp && h.x < b[2] + 6 * sp && h.y > b[1] - 0.2 * sp && h.y < b[3] + 0.2 * sp) ||
+        dyn.some(b => h.x > b[0] - 0.3 * sp && h.x < b[2] + 0.3 * sp && h.y > b[1] - 0.3 * sp && h.y < b[3] + 0.3 * sp));
       if (!s.chords.some(c => c.heads.some(inWord))) continue;
       s.chords = s.chords.map(c => (c.heads.some(inWord) ? { ...c, heads: c.heads.filter(h => !inWord(h)) } : c)).filter(c => c.heads.length);
     }

@@ -1791,6 +1791,10 @@ interface OcrEngine {
   [
    "03:45",
    "uiux ac87b5a (release 0.34.1 merged): Lyrics panel lists stanzas set as verses; live-checked Aus meines 3/3 and America 2/2. Screenshot shows lyric OCR errors on old print: L36 queued (lexicon post-correction)."
+  ],
+  [
+   "03:45",
+   "perf progressive first result (notes at 19 s vs 46 s on phone; identical output). textsym 60f451c (missed word spaces) and 06fc092 (chords by shape, 2nd font family: 92/92/56% without OCR); its SDD overwrite restored in f401938; push.sh now merges docs too. perf deleted an untracked omr.js.orig (owner unknown)."
   ]
  ],
  "research": [
@@ -2258,14 +2262,14 @@ interface OcrEngine {
    "On a slow phone the first result takes ~49 s, bound by the ~7 MB the first conversion needs (OCR models ~4 MB)",
    "Performance (load)",
    "Partial (34dad95)",
-   "34dad95: conversion starts while OCR loads, split Tesseract core, lazy OSMD; page 1 renders at 15.8 s instead of 48.9 s; result 54.5 to 48.8 s. Next: progressive result (notes before OCR)."
+   "34dad95: conversion starts while OCR loads, split Tesseract core, lazy OSMD; page 1 renders at 15.8 s instead of 48.9 s; result 54.5 to 48.8 s. Next: progressive result (notes before OCR). 031a2cf/f04634e: progressive result (deferText): notes shown at ~19 s instead of 45.6 s on the phone profile; complete result ~48.5 s (OCR download-bound); output identical. Next: smaller OCR models if identical."
   ],
   [
    "L35",
    "Whole-file copies from private worktrees based on an older main reverted newer work on main three times (411aade, f091328, d176663 sweep)",
    "Integration (push tooling)",
    "Resolved (9e5c95a)",
-   "push.sh requires PUSH_BASE for code paths and three-way merges (base->copy, base->HEAD), refusing on conflict; tested with a 15-commit-stale score.js: merge = HEAD + the new line."
+   "push.sh requires PUSH_BASE for code paths and three-way merges (base->copy, base->HEAD), refusing on conflict; tested with a 15-commit-stale score.js: merge = HEAD + the new line. Extended to docs/*.md and README.md after 06fc092 replaced SDD.md from an older base (restored f401938)."
   ],
   [
    "L36",
