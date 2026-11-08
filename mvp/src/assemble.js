@@ -707,7 +707,10 @@ function keyChangeAt(R, comps, st, xStart, xLimit, clef, sp, heads, lone = false
   const signs = [];
   for (let gi = 0; gi < glyphs.length; gi++) {
     let g = glyphs[gi];
-    if ((g.x1 - g.x0) < 0.25 * sp && (g.y1 - g.y0) < 0.4 * sp) continue;
+    // (specks, and flat slivers a worn staff line leaves between the signs)
+    if ((g.y1 - g.y0) < 0.4 * sp && (g.x1 - g.x0) < 1.6 * sp) continue;
+    // (the second stroke of the double barline before the signs)
+    if (!signs.length && (g.x1 - g.x0) <= 0.6 * sp && (g.y1 - g.y0) >= 3.2 * sp) { end = g.x1; continue; }
     if (g.x0 - end > 1.6 * sp) break;
     let k = classifyAccidental(R, g, sp);
     if (!k && kind !== 'flat') {
@@ -1518,9 +1521,27 @@ function assemblePage(fr, pageIndex = 0) {
     });
     // clef / key changes inside the staves
     for (const s of staves) {
+      try { s.changes = staffChanges(R, comps, s, s.st.space || fr.ss, barX); } catch (e) { warnings.push(`Clef / key change reading failed on a staff (${e.message}).`); s.changes = []; }
+    }
+    // a key changes in every staff of the system at once: a staff whose signs could not be read
+    // (run together on a worn scan) where another staff's change stands, with ink of signs at the
+    // same place, changes to the same key; a transposing part (its key two or more fifths from the
+    // other's) by as many fifths. (Keys one fifth apart are a misread signature, not a transposition)
+    for (const s of staves) for (const ch of s.changes.filter(c => c.fifths != null && c.box)) {
+      for (const o of staves) {
+        if (o === s || o.changes.some(c => c.fifths != null && Math.abs(c.x - ch.x) < 4 * fr.ss)) continue;
+        const osp = o.st.space || fr.ss, ya = o.st.yAt(0, ch.x) - 1.6 * osp, yb = o.st.yAt(4, ch.x) + 1.6 * osp;
+        const ink = comps.filter(c => c.x0 >= ch.box.x0 - osp && c.x1 <= ch.box.x1 + osp && c.y0 > ya && c.y1 < yb && c.y1 - c.y0 >= 1.5 * osp);
+        if (ink.length < 2 && !ink.some(c => c.x1 - c.x0 >= 1.5 * osp)) continue;
+        const d = attrsAt(o, ch.box.x0 - 1).fifths - attrsAt(s, ch.box.x0 - 1).fifths, f = ch.fifths + (Math.abs(d) >= 2 ? d : 0);
+        if (Math.abs(f) > 7) continue;
+        o.changes.push({ x: ch.x, fifths: f, box: { x0: ch.box.x0, x1: ch.box.x1, y0: ya, y1: yb } });
+        o.changes.sort((a, b) => a.x - b.x);
+      }
+    }
+    for (const s of staves) {
       try {
         const sp = s.st.space || fr.ss;
-        s.changes = staffChanges(R, comps, s, sp, barX);
         const boxes = s.changes.filter(ch => ch.box).map(ch => ch.box);
         // 'heads' found on a clef glyph are not notes
         if (boxes.length) {
