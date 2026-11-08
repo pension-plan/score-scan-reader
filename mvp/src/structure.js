@@ -16,6 +16,7 @@
 
 const { holes } = require('./ottava');
 const { matcher, crop, heal } = require('./meter');
+const { detectRests } = require('./rests');
 
 const lineY = (st, k, x) => st.yAt(0, x) + k * (st.yAt(4, x) - st.yAt(0, x)) / 4;
 
@@ -180,6 +181,15 @@ function readSigns(fr, asm, sy) {
   const s = sy.staves[0];
   if (!s) return [];
   const st = s.st, sp = st.space || fr.ss, R = fr.R, out = [];
+  // the bar count over a church rest or an H-bar (a 2 or a 4) is no segno; a 3 stands over
+  // the gap between a breve rest and a whole rest
+  let blocks = null;
+  const overRest = (c) => {
+    if (!blocks) try { blocks = detectRests({ R, comps: asm.comps, s, xa: st.left, xb: st.right }).filter(r => r.bars >= 1); } catch (e) { blocks = []; }
+    const big = blocks.filter(r => r.bars >= 2 || r.kind === 'multi');
+    return big.some(r => r.box.x0 < c.x1 + sp && r.box.x1 > c.x0 - sp) ||
+      (big.some(r => r.box.x1 <= c.x0 + sp && r.box.x1 > c.x0 - 5 * sp) && blocks.some(r => r.box.x0 >= c.x1 - sp && r.box.x0 < c.x1 + 5 * sp));
+  };
   for (const c of asm.comps) {
     const top = lineY(st, 0, c.x0), w = (c.x1 - c.x0 + 1) / sp, h = (c.y1 - c.y0 + 1) / sp;
     if (c.y1 > top - 0.2 * sp || c.y0 < top - 7 * sp || h < 1.5 || h > 3.2 || w < 0.9 || w > 2.6) continue;
@@ -193,7 +203,7 @@ function readSigns(fr, asm, sy) {
       // no full stop at its foot
       const word = asm.comps.some(o => o !== c && o.y0 < c.y1 && o.y1 > c.y0 && o.x0 < c.x1 + 1.5 * sp && o.x1 > c.x0 - 1.5 * sp &&
         (o.y1 - o.y0 >= 0.5 * sp || (o.x0 > c.x1 - 0.2 * sp && o.y1 > c.y1 - 0.5 * sp && o.area >= 0.06 * sp * sp)));
-      if (!word) out.push({ x: (c.x0 + c.x1) / 2, kind: 'segno' });
+      if (!word && !overRest(c)) out.push({ x: (c.x0 + c.x1) / 2, kind: 'segno' });
     }
   }
   return out.sort((a, b) => a.x - b.x);
