@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 18:14 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 18:15 AEDT.
 
 ## Events
 
@@ -74,6 +74,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 18:05 | Coverage suite: all 8 families generated (structure 8 items, layouts 20, perf 21 incl. 100–600 dpi, A4/Letter/A3 and 1–40 pages) and the harness built (--set coverage, per-symbol support matrix, per-page time and peak memory). First pass on 76 items: 20 symbol tags supported, 40 partial, 90 unsupported; 16 of 19 layouts supported. Validation and the full baseline are running. |
 | 18:08 | Round 3 voices owner finished: two voices inside piano parts (L17 resolved), small instrument staves above a piano kept as separate parts (L18 partial), key changes carried across systems, single-staff pieces no longer wrongly split. Live tree: benchmark 0.946 (pitch 0.940, duration 0.910, rests 0.800, real scans 0.922); challenge 0.898. |
 | 18:14 | Release 0.7.0 (18:09 AEDT) and regression test: benchmark no regression (0.925 → 0.946, rests 0.436 → 0.800, real scans 0.907 → 0.922); challenge 0.788 → 0.802 with 18 items better and 3 severe scans worse, added to L19. |
+| 18:15 | Round 3 noteheads owner finished: benchmark 0.935 → 0.946, challenge 0.891 → 0.899; Maple Leaf Rag 0.897 → 0.955; thin-photocopy pages that found no staves now read. A duplicate copy of this agent (started by mistake when I messaged it) wrote a regressing change in a scratch folder; it never reached the live code. |
 
 ## Accuracy by round
 
@@ -94,7 +95,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 
 | ID | Limit | Owner | Status | Evidence |
 |---|---|---|---|---|
-| L1 | Hollow noteheads sometimes missed (main source of rhythm errors) | Noteheads and staves | Partial (round 1) | Hollow heads: wider insides filled, broken outlines closed, outline eaten by staff removal restored. Missed half notes 81 → 28, false whole notes 156 → 3. On the faint 1867 Haupt scan heads found 54 → 105. Beamed 8ths/16ths are now the largest miss source (598) — round 2. Round 2: thin-walled half notes filled on thin-line prints, false hollow heads from flag holes removed; notehead recall 0.867 → 0.888, precision 0.917 → 0.932. |
+| L1 | Hollow noteheads sometimes missed (main source of rhythm errors) | Noteheads and staves | Partial (round 1) | Hollow heads: wider insides filled, broken outlines closed, outline eaten by staff removal restored. Missed half notes 81 → 28, false whole notes 156 → 3. On the faint 1867 Haupt scan heads found 54 → 105. Beamed 8ths/16ths are now the largest miss source (598) — round 2. Round 2: thin-walled half notes filled on thin-line prints, false hollow heads from flag holes removed; notehead recall 0.867 → 0.888, precision 0.917 → 0.932. Round 3: paper strips between accidental and head no longer read as hollow heads (Maple +0.058, BWV5 +0.034). |
 | L2 | Key signatures unreliable on old engraving | Symbols | Resolved (round 2) | Every real-scan header now reads right except an old-style bass clef (Sharp 1911) and one Haupt staff: St. Anselm 4 sharps on all staves, Tappan-Dennis +1 and −1, Haupt 1 sharp, America 1 sharp. |
 | L3a | Rests not detected | Symbols | Partial (round 3) | Benchmark rests F1 0.436 → 0.800 with the rests hotfix plus the voices owner’s change. |
 | L3b | Ties and slurs not detected; a stray slur can create a false 16th | Symbols | Partial (round 2) | Slurs no longer read as beams (Lindenbaum false 16ths 35 → 23); ties not yet detected. |
@@ -110,7 +111,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | L8 | Lyric text or other glyphs read as noteheads on single-melody pages | Noteheads and staves | Resolved (round 1) | A notehead outside the staff must sit on or next to ledger lines, which removes lyric letters, tuplet numbers and dynamics. Jeanie 0.48 → 0.88, Silent Night 0.56 → 0.96. |
 | L9 | Part names generic or wrong (open score shows Staff N; TTBB named SATB, with an octave error) | Voices + lyrics | Resolved (round 1) | Part names from the clef pattern: SATB, TTBB (new treble-8vb clef), SSAA, SAB, solo above SATB, Voice. Reading printed name labels is still tracked under L3e. |
 | L10 | Pages rotated 90° produce nothing; 180° pages read badly (pitch 0.21) | Noteheads and staves (page orientation) | Queued for round 3 | Challenge baseline: rot90 0.15 (all 12 files empty), rot180 0.50. |
-| L11 | Halftone screens and heavy noise blank the page | Noteheads and staves (binarisation) | Partial (round 2) | Challenge files reporting no staves 19 → 4 after front-end fallbacks; challenge scan-severe 0.650 → 0.696. |
+| L11 | Halftone screens and heavy noise blank the page | Noteheads and staves (binarisation) | Partial (round 3) | Last-resort mode joins broken staff-line dots: thin-photocopy severe pages wind-melody 0.167 → 0.791, agrace 0.117 → 0.687, andantino 0.367 → 0.755, twinkle 0.464 → 0.609. |
 | L12 | Two-page spreads read as one wide system (8–13 parts) | Noteheads and staves (page split) | Queued for round 3 | Challenge: 2-up spread 0.56. |
 | L13 | Tuplets cannot be represented: 8 divisions per quarter | Symbols + voices + MusicXML | Partial (round 2) | Divisions now 840 per quarter and tuplets detected (see L3c). |
 | L14 | Double dots, multi-bar rests and whole-bar rests | Symbols + voices | Queued for round 3 | Challenge: double-dotted 0%; rh04 26 bars instead of 40; whole-bar rests 17%. |
@@ -132,7 +133,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | Run 6 | Fix-forward round 2 (shipped 0.925 as v0.5.0) | done | 6 of 6 |  |
 | Run 7 | Fix-forward round 3 (6 owners incl. ML) | running | 1 of 6 |  |
 | Run 8 | Coverage suite (every symbol and layout + speed) | running | 9 of 10 |  |
-| Side | Agents launched directly from the session | running | 3 of 5 |  |
+| Side | Agents launched directly from the session | running | 3 of 6 |  |
 
 ## Agents
 
@@ -178,10 +179,10 @@ Every agent started for this build, including stopped runs. Outcomes are on the 
 | Run 6 | Fix | fix:r2:lyrics | done | 16:21 | 16:41 | 20 | 109 |
 | Run 6 | Fix | fix:r2:ui | done | 16:21 | 16:45 | 24 | 87 |
 | Run 6 | Integrate | integrate:r2 | done | 17:12 | 17:34 | 22 | 93 |
-| Run 7 | Fix | fix:r3:heads | run | 17:36 |  | 38 | 187 |
+| Run 7 | Fix | fix:r3:heads | run | 17:36 |  | 39 | 187 |
 | Run 7 | Fix | fix:r3:symbols | run | 17:36 |  | 37 | 147 |
 | Run 7 | Fix | fix:r3:score | run | 17:36 |  | 31 | 134 |
-| Run 7 | Fix | fix:r3:lyrics | run | 17:36 |  | 38 | 140 |
+| Run 7 | Fix | fix:r3:lyrics | run | 17:36 |  | 39 | 141 |
 | Run 7 | Fix | fix:r3:ui | run | 17:36 |  | 23 | 91 |
 | Run 7 | Fix | fix:r3:ml | done | 17:36 | 18:08 | 32 | 192 |
 | Run 8 | Harness | harness:coverage | done | 17:34 | 17:50 | 16 | 98 |
@@ -193,8 +194,9 @@ Every agent started for this build, including stopped runs. Outcomes are on the 
 | Run 8 | Generate | gen:structure | done | 17:34 | 17:53 | 19 | 95 |
 | Run 8 | Generate | gen:layouts | done | 17:34 | 17:56 | 22 | 131 |
 | Run 8 | Generate | gen:perf | done | 17:34 | 18:05 | 31 | 92 |
-| Run 8 | Baseline | validate+baseline | run | 18:05 |  | 9 | 68 |
-| Side | Fast track | a5575cc38e20927a6 | run | 18:07 |  | 7 | 17 |
+| Run 8 | Baseline | validate+baseline | run | 18:05 |  | 10 | 73 |
+| Side | Fast track | a5575cc38e20927a6 | run | 18:07 |  | 7 | 18 |
+| Side | Fast track | ae52f1cf560b35868 | run | 18:15 |  | 0 | 5 |
 | Side | ML demo | copista-2m demo page for GitHub Pages | done | 16:38 | 16:41 | 3 | 21 |
 | Side | Fast track | First version build (mvp/) | done | 15:19 | 15:29 | 10 | 69 |
 | Side | Hotfix | Rests fix (L3a, user-reported) | run | 17:33 |  | 35 | 179 |
