@@ -1287,6 +1287,16 @@ to 0.593, scan 0.646 to 0.720; nothing dropped. A bottom treble/bass pair of a t
 with full chords (three heads on a stem) and no text is an accompaniment even when its joined barlines were
 not seen (voice + piano on a faded copy).
 
+**Staves on only some systems (L11).** A small staff (staff space at most 0.85 of its system's largest) that
+the fullest systems all carry and the other systems leave out keeps a part of its own: `score.js
+partialStaves()` gives every system without it an empty stand-in staff at its place (written as rests), and the
+staves below keep their layout staff. Lyrics bands, dynamics, grace notes and fermatas found on such a system are
+mapped through the same slots (`slotOf`). It applies only when every other system has exactly the remaining
+staves. A small treble staff above split choir staves is named Descant and is a vocal part. hymn-descant-cue-notes-
+amen-small: scan 0.567 to 0.768, mild 0.522 to 0.779 (parts 0.71 to 0.99); before, page 1's soprano and page 2's
+descant were one part and S/A/T/B shifted by a staff on page 2. The descant's cue-size notes in its first bars are
+still read as sung notes.
+
 **Instrument names without labels (L9).** When no voice name is read, no underlay is found and some
 staff has an instrument name or a C clef, the unnamed staves are instruments: four single staves in G, G,
 C3, F clefs are named Violin I, Violin II, Viola, Violoncello; an alto-clef staff is a Viola; two

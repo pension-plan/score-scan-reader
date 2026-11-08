@@ -364,6 +364,8 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
     let q = 0;
     vv.forEach(v => { const n = v.split ? 2 : 1; v.inf = vn.slice(q, q + n); q += n; });
     sm.forEach((v, i) => { v.inf = [sm.length > 1 ? `Instrument ${i + 1}` : 'Instrument']; });
+    // a small treble staff above split choir staves (closed score): a descant
+    if (sm.length === 1 && sm[0].clef === 'G' && sm[0].staff === 0 && vv.some(v => v.split) && !groups.some(g => g.keyboard)) { sm[0].inf = ['Descant']; sm[0].descant = true; }
     // two small staves, treble over bass, over a keyboard: a piano trio
     if (sm.length === 2 && sm[0].clef === 'G' && sm[1].clef === 'F' && groups.some(g => g.keyboard)) { sm[0].inf = ['Violin']; sm[1].inf = ['Violoncello']; }
   }
@@ -414,6 +416,9 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
       parts.push({ ...nm(0), kind: 'vocal', src: [{ staff: v.staff, voice: 1 }], layout: `Staff ${v.staff + 1}, stems up (split from a shared staff)` });
       parts.push({ ...nm(1), kind: 'vocal', src: [{ staff: v.staff, voice: 2 }], layout: `Staff ${v.staff + 1}, stems down (split from a shared staff)` });
       notes.push(`Staff ${v.staff + 1}: two voices on one staff, split by stem direction into ${parts[parts.length - 2].name} and ${parts[parts.length - 1].name}.`);
+    } else if (v.small && v.descant) {
+      parts.push({ ...nm(0), kind: 'vocal', src: [{ staff: v.staff, voice: 'chordal' }], layout: `Staff ${v.staff + 1} (small staff above the choir: a descant)` });
+      notes.push(`Staff ${v.staff + 1}: a small staff above the choir, read as a descant part of its own (rests where the systems leave it out).`);
     } else if (v.small) {
       parts.push({ ...nm(0), kind: 'instrument', src: [{ staff: v.staff, voice: 'chordal' }], layout: `Staff ${v.staff + 1} (small staff: a separate instrument)` });
       notes.push(`Staff ${v.staff + 1}: printed smaller than the staves below it, read as a separate instrument part (not part of the piano's grand staff).`);
@@ -423,6 +428,36 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
   if (read.length) notes.push(`Part names read from the page: ${read.join(', ')}.`);
   parts.forEach((p, i) => { p.id = 'P' + (i + 1); p.color = COLORS[i % COLORS.length]; });
   return { parts, nSt, notes, clefs, stats, link, evid };
+}
+
+// Systems that leave out the small staves the fullest systems carry get an
+// empty stand-in staff at their place (see buildScore). Applies when the
+// fullest systems all show the same small staves (staff space at most 0.85 of
+// the system's largest) and every other system has exactly the rest.
+// Returns a Map: original system -> layout slot per staff (only for systems changed).
+function partialStaves(systems) {
+  const out = new Map();
+  const L = Math.max(...systems.map(sy => sy.staves.length));
+  const full = systems.filter(sy => sy.staves.length === L);
+  if (full.length === systems.length || L < 2) return out;
+  const smallOf = (sy) => { const mx = Math.max(...sy.staves.map(s => s.st.space)); return sy.staves.map((s, k) => (s.st.space <= 0.85 * mx ? k : -1)).filter(k => k >= 0); };
+  const E = smallOf(full[0]);
+  if (!E.length || E.length >= L || full.some(sy => smallOf(sy).join() !== E.join())) return out;
+  if (systems.some(sy => sy.staves.length !== L && sy.staves.length !== L - E.length)) return out;
+  for (const sy of systems) {
+    if (sy.staves.length === L) continue;
+    const staves = [], slots = [];
+    let k = 0;
+    for (let t = 0; t < L; t++) {
+      if (E.includes(t)) {
+        const model = full[0].staves[t], near = sy.staves[Math.min(k, sy.staves.length - 1)];
+        staves.push({ fake: true, si: -1, st: near.st, chords: [], hdr: { ...model.hdr, clefGuessed: false } });
+      } else { slots[k] = t; staves.push(sy.staves[k++]); }
+    }
+    sy.staves = staves;
+    out.set(sy.orig, slots);
+  }
+  return out;
 }
 
 // Key signature: every staff carries the same key. A staff whose accidentals
@@ -725,7 +760,14 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     try { readOttavas(p.fr, p.asm); } catch (e) { /* no octave lines */ }
     p.asm.metersRead = true;
   }
-  const systems = pages.flatMap(p => p.asm.systems.map(s => ({ ...s, fr: p.fr, comps: p.asm.comps })));
+  const systems = pages.flatMap(p => p.asm.systems.map(s => ({ ...s, fr: p.fr, comps: p.asm.comps, orig: s })));
+  // staves of only some systems (L11): a small staff (a descant or solo
+  // printed at cue size) that the fullest systems carry and the others leave
+  // out keeps its own part; in the systems without it an empty stand-in staff
+  // takes its place (rests there), so the parts below it keep their staff.
+  // slotOf(origSystem, k): the layout staff of staff k of a page's system
+  const slotMap = partialStaves(systems);
+  const slotOf = (o, k) => { const sl = o && slotMap.get(o); return sl ? sl[k] : k; };
   if (!systems.length) return { parts: [], measures: 0, warnings: ['No music systems found.'], xml: emptyXML() };
   // marks first (text.js via symbols.js): braces inform the layout
   for (const p of pages) { try { pageMarks(p.fr, p.asm); } catch (e) { /* layout reads without them */ } }
@@ -792,7 +834,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     const cache = {}, restCache = {};
     return parts.map(p => p.streams.map(src => {
       const s = m.sy.staves[src.staff];
-      if (!s) return [];
+      if (!s || s.fake) return [];
       const c = (cache[src.staff] ||= staffMeasureEvents(m.sy.fr, m.sy.fr.R, m.sy.comps, s, m.xa, m.xb));
       const rs = (restCache[src.staff] ||= m.sy.fr.R ? detectRests({ R: m.sy.fr.R, comps: m.sy.comps || [], s, xa: m.xa, xb: m.xb }) : []);
       if (p.kind === 'keyboard') {
@@ -1094,22 +1136,22 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     const evCache = {};
     // sung notes of a part in this system (rests never take a syllable)
     const evOf = (pi) => (evCache[pi] ||= segs.flatMap((sg, si) => (sg.sy === sy ? segEv[si][pi][0] : [])).filter(e => !e.rest && !e.forward && e.heads && e.heads.length).map(e => { e.slurCont = slurred(sy, e); return e; }));
-    const fitOf = (v) => parts.map((p, pi) => ({ p, pi })).filter(({ p }) => p.kind !== 'keyboard' && p.src[0].staff === v.band)
+    const fitOf = (v) => parts.map((p, pi) => ({ p, pi })).filter(({ p }) => p.kind !== 'keyboard' && p.src[0].staff === slotOf(sy.orig, v.band))
       .map(c => { const evs = evOf(c.pi); return { ...c, evs, fit: lyricFit(v.syllables, evs, sp), soft: softFit(v.syllables, evs, sp) }; });
-    const sysLines = lyr.filter(v => v.syllables && v.syllables.length && !v.stanza).map(v => ({ sy, v, sp, cands: fitOf(v) })).filter(L => L.cands.length);
+    const sysLines = lyr.filter(v => v.syllables && v.syllables.length && !v.stanza).map(v => ({ sy, v, sp, band: slotOf(sy.orig, v.band), cands: fitOf(v) })).filter(L => L.cands.length);
     // verses stack under the same staff: once one line of a band clearly
     // follows the notes, its sibling lines (same band, same system) are
     // underlay too and need only a looser fit (unhyphenated multi-note words
     // and OCR-merged words pull a line's syllables off the onsets)
-    const bandOK = new Set(sysLines.filter(L => wordy(L.v.syllables) && L.cands.some(c => c.fit >= 0.5)).map(L => L.v.band));
-    sysLines.forEach(L => { L.minFit = bandOK.has(L.v.band) ? 0.3 : 0.5; });
+    const bandOK = new Set(sysLines.filter(L => wordy(L.v.syllables) && L.cands.some(c => c.fit >= 0.5)).map(L => L.band));
+    sysLines.forEach(L => { L.minFit = bandOK.has(L.band) ? 0.3 : 0.5; });
     lines.push(...sysLines);
   }
   // piece-wide evidence per text band: summed soft fit of each candidate part
   const bandEv = {};
   for (const L of lines) {
     if (L.cands.length < 2 || !wordy(L.v.syllables)) continue;
-    const b = (bandEv[L.v.band] ||= {});
+    const b = (bandEv[L.band] ||= {});
     for (const c of L.cands) b[c.pi] = (b[c.pi] || 0) + c.soft;
   }
   const bandVoice = {};
@@ -1137,7 +1179,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   for (const L of lines) { L.v.used = null; L.v.melismas = null; }
   for (const L of lines) {
     const { v, cands, sp } = L;
-    let best = cands.find(c => c.pi === bandVoice[v.band]) || cands[0];
+    let best = cands.find(c => c.pi === bandVoice[L.band]) || cands[0];
     // a clearly better local fit wins (a passage where the other voice sings the text)
     // (each voice with its own words and rhythm: the line sits under nearly
     // every onset of one voice and misses several of the other's)
@@ -1146,9 +1188,9 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
       if (c === best || c.soft < best.soft + margin) continue;
       if ((best.fit < 0.6 && c.fit >= 0.8) || (c.soft >= 0.88 * nSyl && best.soft < 0.8 * nSyl)) best = c;
     }
-    if (best.fit < L.minFit || !wordy(v.syllables)) { lyrNotes.add(`A text line under staff ${v.band + 1} does not follow the notes; not used as lyrics.`); continue; }
-    const take = opts.copyLyrics || bandVoice[v.band] === 'all' ? cands.filter(c => c.fit >= L.minFit) : [best];
-    if (opts.debug) opts.debug.push({ sys: L.sy.page + ':' + L.sy.index, band: v.band, n: v.number, nsyl: v.syllables.length, fits: cands.map(c => [c.p.name, +c.fit.toFixed(2), c.evs.length, +c.soft.toFixed(2)]), take: take.map(c => c.p.name) });
+    if (best.fit < L.minFit || !wordy(v.syllables)) { lyrNotes.add(`A text line under staff ${L.band + 1} does not follow the notes; not used as lyrics.`); continue; }
+    const take = opts.copyLyrics || bandVoice[L.band] === 'all' ? cands.filter(c => c.fit >= L.minFit) : [best];
+    if (opts.debug) opts.debug.push({ sys: L.sy.page + ':' + L.sy.index, band: L.band, n: v.number, nsyl: v.syllables.length, fits: cands.map(c => [c.p.name, +c.fit.toFixed(2), c.evs.length, +c.soft.toFixed(2)]), take: take.map(c => c.p.name) });
     for (const c of take) alignSyllables(v, c.evs, sp, L.sy && L.sy.comps, L.sy && L.sy.fr && L.sy.fr.R);
     v.used = take.map(c => c.p.name).join(', ');
   }
@@ -1356,7 +1398,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   // text and marks read on the page (symbols.js pageMarks -> text.js): title
   // and credits, part abbreviations, dynamics, hairpins, tempo and expression text
   let read = { dirs: parts.map(() => units.map(() => [])), head: {}, nDyn: 0, nWedge: 0, nWords: 0 };
-  try { read = readMarks(pages, segs, units, parts, partMeasures); } catch (e) { warnings.push(`Text and dynamics not placed (${e.message}).`); }
+  try { read = readMarks(pages, segs, units, parts, partMeasures, slotOf); } catch (e) { warnings.push(`Text and dynamics not placed (${e.message}).`); }
   if (read.nDyn || read.nWedge || read.nWords || read.nTie || read.nSlur || read.nGrace || read.nFermata || read.nPedal || read.nFinger || read.nRehearsal || read.nChord) warnings.push(`Read from the page: ${[read.nDyn && `${read.nDyn} dynamic${read.nDyn > 1 ? 's' : ''}`, read.nWedge && `${read.nWedge} hairpin${read.nWedge > 1 ? 's' : ''}`, read.nWords && `${read.nWords} tempo / expression text${read.nWords > 1 ? 's' : ''}`, read.nTie && `${read.nTie} tie${read.nTie > 1 ? 's' : ''}`, read.nSlur && `${read.nSlur} slur${read.nSlur > 1 ? 's' : ''}`, read.nGrace && `${read.nGrace} grace note${read.nGrace > 1 ? 's' : ''}`, read.nFermata && `${read.nFermata} fermata${read.nFermata > 1 ? 's' : ''}`, read.nPedal && `${read.nPedal} pedal mark${read.nPedal > 1 ? 's' : ''}`, read.nFinger && `${read.nFinger} fingering${read.nFinger > 1 ? 's' : ''}`, read.nRehearsal && `${read.nRehearsal} rehearsal mark${read.nRehearsal > 1 ? 's' : ''}`, read.nChord && `${read.nChord} chord symbol${read.nChord > 1 ? 's' : ''}`].filter(Boolean).join(', ')}.`);
   const unitTime = units.map(u => u.time), unitMulti = units.map(u => u.multi || 0);
   // barlines, repeats and voltas read on the page (structure.js: sy.bars, sy.voltas) at the ends of
@@ -1764,7 +1806,8 @@ function wordsOk(t) {
   return (t.conf || 0) >= 80 && ws.length >= 2 && ws.every(w => /^\p{L}{2,}[.,]?$/u.test(w));
 }
 
-function readMarks(pages, segs, units, parts, partMeasures) {
+// slotOf(system, k): the layout staff of staff k of a page's system (partial staves, L11)
+function readMarks(pages, segs, units, parts, partMeasures, slotOf = (o, k) => k) {
   const dirs = parts.map(() => units.map(() => []));
   const head = {};
   let nDyn = 0, nWedge = 0, nWords = 0, nPedal = 0, nFinger = 0, nRehearsal = 0, nChord = 0;
@@ -1805,8 +1848,9 @@ function readMarks(pages, segs, units, parts, partMeasures) {
       if (m.sys < 0 || m.k < 0) return;
       const st = pg.asm.systems[m.sys] && pg.asm.systems[m.sys].staves[m.k];
       const placement = st && (m.box[1] + m.box[3]) / 2 < st.st.yAt(0, x) ? 'above' : 'below';
-      for (const { pi, staffNo, multi } of partsOn(m.k)) {
-        const at = locate(fr, sysIdx(m.sys), m.k, x, pi);
+      const K = slotOf(pg.asm.systems[m.sys], m.k);
+      for (const { pi, staffNo, multi } of partsOn(K)) {
+        const at = locate(fr, sysIdx(m.sys), K, x, pi);
         if (!at) continue;
         const list = dirs[pi][at.mi];
         const xml = entry(placement);
@@ -2053,12 +2097,13 @@ function readMarks(pages, segs, units, parts, partMeasures) {
         const sy = pg.asm.systems[g.sys], s = sy && sy.staves[g.k];
         if (!s) continue;
         const st = s.st, sp = st.space || fr.ss;
-        for (const { pi } of partsOn(g.k)) {
-          const at = locate(fr, sy.index, g.k, Math.max(...g.heads.map(h => h.x)) + 2.5 * sp, pi);
+        const K = slotOf(sy, g.k);
+        for (const { pi } of partsOn(K)) {
+          const at = locate(fr, sy.index, K, Math.max(...g.heads.map(h => h.x)) + 2.5 * sp, pi);
           if (!at) continue;
           // the first written note right of the grace notes on that staff
           let target = null;
-          for (const sm of partMeasures[pi][at.mi] || []) if (sm && sm.staff === g.k) for (const e of sm.events) {
+          for (const sm of partMeasures[pi][at.mi] || []) if (sm && sm.staff === K) for (const e of sm.events) {
             if (e.rest || e.forward || e.x == null || e.x <= g.box[2] - 0.2 * sp || e.x > g.box[2] + 5 * sp) continue;
             if (!target || e.x < target.x) target = e;
           }
@@ -2085,11 +2130,12 @@ function readMarks(pages, segs, units, parts, partMeasures) {
         if (!s) continue;
         const cx = (f.box[0] + f.box[2]) / 2, sp = s.st.space || fr.ss;
         const inverted = (f.box[1] + f.box[3]) / 2 > s.st.yAt(4, cx);
-        for (const { pi } of partsOn(f.k)) {
-          const at = locate(fr, sy.index, f.k, cx, pi);
+        const K = slotOf(sy, f.k);
+        for (const { pi } of partsOn(K)) {
+          const at = locate(fr, sy.index, K, cx, pi);
           if (!at) continue;
           let target = null, bd = Infinity;
-          for (const sm of partMeasures[pi][at.mi] || []) if (sm && sm.staff === f.k) for (const e of sm.events) {
+          for (const sm of partMeasures[pi][at.mi] || []) if (sm && sm.staff === K) for (const e of sm.events) {
             if (e.forward || e.x == null) continue;
             const d = Math.abs(e.x - cx);
             if (d < bd && d <= 1.5 * sp) { bd = d; target = e; }
