@@ -117,6 +117,7 @@ srv.listen(0, async () => {
       ok('parts: summary line (parts, staves, key, time, measures)', /part.*staves?.*(major|key).*\d+\/\d+.*measure/i.test(await page.evaluate(() => (document.getElementById('partsSummary') || {}).textContent || '')));
       // code block
       const cb = await page.evaluate(() => {
+        const fold = document.getElementById('xmlFold'); if (fold) fold.open = true; // the source sits behind a disclosure
         const g = document.getElementById('gutter'), x = window.__omrResult.xmlLength;
         const ta = document.getElementById('xml');
         return { gutter: g ? g.textContent.split('\n').length : 0, first: g ? g.textContent.split('\n')[0] : '', lines: ta ? ta.value.split('\n').length : 0, full: ta ? ta.value.length : 0, x,
@@ -132,7 +133,7 @@ srv.listen(0, async () => {
       const c1 = await page.evaluate(async () => ({ label: document.getElementById('copy').textContent.trim(), clip: (await navigator.clipboard.readText()).length, x: window.__omrResult.xmlLength }));
       await page.waitForTimeout(1300);
       const c1b = await page.evaluate(() => document.getElementById('copy').textContent.trim());
-      ok('copy: writes full text, label flips to Copied then back', /Copied/.test(c1.label) && c1.clip === c1.x && /^Copy$/.test(c1b), { ...c1, after: c1b });
+      ok('copy: writes full text, label flips to Copied then back', /Copied/.test(c1.label) && c1.clip === c1.x && /^Copy MusicXML$/.test(c1b), { ...c1, after: c1b });
       // copy: fallback when the clipboard refuses
       await page.evaluate(() => { navigator.clipboard.writeText = () => Promise.reject(new Error('denied')); });
       await page.click('#copy');
@@ -185,13 +186,13 @@ srv.listen(0, async () => {
       }
       // second sample: the hymn (closed-score SATB with lyrics)
       let hres = null;
-      if (!(await page.$('#sampleHymn'))) hres = { err: 'no #sampleHymn button' };
+      if (!(await page.$('#sampleAll option[value="hymn"]'))) hres = { err: 'no St. Anselm entry in the Examples menu' };
       else try {
         await page.evaluate(() => { window.__omrResult = null; });
-        await page.click('#sampleHymn', { timeout: 5000 });
+        await page.selectOption('#sampleAll', 'hymn', { timeout: 5000 });
         await page.waitForFunction(() => window.__omrResult, null, { timeout: 120000 }); hres = await page.evaluate(() => ({ r: window.__omrResult, title: document.getElementById('dropTitle').textContent, verses: document.querySelectorAll('#lyrics .verse').length })); } catch (e) { hres = { err: e.message }; }
       info.hymn = hres && hres.r && { parts: hres.r.parts, lyrics: hres.r.lyrics, ocrLangs: hres.r.ocrLangs, secs: hres.r.secs, verses: hres.verses };
-      ok('sample: St. Anselm button gives four parts with lyrics', hres && hres.r && hres.r.file === 'sample-st-anselm.pdf' && hres.r.parts.length === 4 && hres.r.lyrics > 0 && hres.verses > 0 && /sample hymn converted/i.test(hres.title || ''), info.hymn || hres);
+      ok('sample: St. Anselm (Examples menu) gives four parts with lyrics', hres && hres.r && hres.r.file === 'sample-st-anselm.pdf' && hres.r.parts.length === 4 && hres.r.lyrics > 0 && hres.verses > 0 && /sample hymn converted/i.test(hres.title || ''), info.hymn || hres);
       ok('ocr: reads with the pipeline language set (eng+deu)', hres && hres.r && hres.r.ocrLangs === 'eng+deu', hres && hres.r && hres.r.ocrLangs);
       // a two-up spread: the caption says how the page was read and the heads take part colours
       await page.evaluate(() => { window.__omrResult = null; });
@@ -214,11 +215,13 @@ srv.listen(0, async () => {
       ok('spread: page caption says two book pages were read', sres && (sres.notes || []).some((t) => /two book pages/i.test(t)) && /2-up/.test(sres.clean || ''), sres);
       ok('spread: at least 90% of drawn heads carry a part colour', sres && sres.heads > 50 && sres.coloured >= 0.9, sres);
       // keyboard reachability
-      ok('keyboard: main controls are focusable buttons', await page.evaluate(() => ['choose', 'sample', 'sampleHymn', 'overlayToggle', 'copy'].every((id) => { const e = document.getElementById(id); return e && e.tagName === 'BUTTON' && e.tabIndex >= 0; })));
+      ok('keyboard: main controls are focusable buttons', await page.evaluate(() => ['choose', 'overlayToggle', 'copy', 'saveXml'].every((id) => { const e = document.getElementById(id); return e && e.tagName === 'BUTTON' && e.tabIndex >= 0; })));
+      ok('keyboard: Examples menu is a labelled select with both featured samples', await page.evaluate(() => { const e = document.getElementById('sampleAll'); return !!e && e.tagName === 'SELECT' && e.tabIndex >= 0 && !!document.querySelector('label[for="sampleAll"]') && !!e.querySelector('option[value="rag"]') && !!e.querySelector('option[value="hymn"]'); }));
       ok('status: aria-live progress region', await page.evaluate(() => { const s = document.getElementById('status'); return !!s && (s.getAttribute('aria-live') === 'polite' || s.getAttribute('role') === 'status'); }));
     }
     if (tag === '400') {
-      const cap = await page.evaluate(() => { const c = document.getElementById('stepCaption'); const t = document.querySelector('#steps .step-title'); return { cap: c ? c.offsetHeight > 0 : false, titleW: t ? t.getBoundingClientRect().width : 99, stepW: (document.getElementById('steps') || document.body).scrollWidth <= window.innerWidth }; });
+      // the stepper shows only while a scan is read: measure it in that state
+      const cap = await page.evaluate(() => { const d = document.getElementById('drop'), was = d.dataset.state; d.dataset.state = 'busy'; const c = document.getElementById('stepCaption'); const t = document.querySelector('#steps .step-title'); const r = { cap: c ? c.offsetHeight > 0 : false, titleW: t ? t.getBoundingClientRect().width : 99, stepW: (document.getElementById('steps') || document.body).scrollWidth <= window.innerWidth }; d.dataset.state = was; return r; });
       ok('400: stepper fits; only the current step title is shown', cap.cap && cap.titleW <= 1 && cap.stepW, cap);
     }
     if (scheme === 'dark' || tag === '1280') {

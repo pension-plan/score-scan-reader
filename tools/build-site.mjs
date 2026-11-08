@@ -147,9 +147,9 @@ console.log(`site/ built: app, status, ${docs.length} docs`);
   };
   const bar = `
 <div class="ssr-verbar" role="note" aria-label="Version" style="font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:6px max(16px,env(safe-area-inset-right,0px)) 6px max(16px,env(safe-area-inset-left,0px));border-bottom:1px solid rgba(127,127,127,.35);display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline;overflow-wrap:anywhere">
-<span>Version <a class="ssr-rel-link" href="${info.releaseUrl}" style="color:inherit"><b class="ssr-rel-ver">v${info.version}</b></a><span class="ssr-ahead"></span></span>
-<span class="ssr-rel-age" style="opacity:.8"></span>
-<span style="opacity:.8">build <a href="${REPO}/commit/${info.commit}" style="color:inherit">${info.commit}</a> <span class="ssr-build-age"></span></span>
+<span><a class="ssr-rel-link" href="${info.releaseUrl}" style="color:inherit"><b class="ssr-rel-ver">v${info.version}</b></a><span class="ssr-ahead-short"></span></span>
+<span class="ssr-rel-ago" style="opacity:.8"></span>
+<span style="opacity:.8">build <a href="${REPO}/commit/${info.commit}" style="color:inherit">${info.commit}</a></span>
 <span class="ssr-newer"></span>
 </div>`;
   const footer = `
@@ -174,6 +174,8 @@ console.log(`site/ built: app, status, ${docs.length} docs`);
     all('ssr-rel-ver', function (e) { e.textContent = 'v' + rel.ver; });
     all('ssr-rel-link', function (e) { e.href = rel.url; });
     all('ssr-ahead', function (e) { e.textContent = B.ahead > 0 ? ' + ' + B.ahead + ' commit' + (B.ahead === 1 ? '' : 's') + ' (unreleased build)' : (B.ahead === 0 ? ' (exact release)' : ''); });
+    all('ssr-ahead-short', function (e) { e.textContent = B.ahead > 0 ? ' +' + B.ahead : ''; e.title = B.ahead > 0 ? B.ahead + ' unreleased commit' + (B.ahead === 1 ? '' : 's') : ''; });
+    all('ssr-rel-ago', function (e) { e.textContent = rel.at ? 'released ' + ago(rel.at) : 'not released yet'; });
     all('ssr-rel-age', function (e) { e.textContent = rel.at ? 'released ' + ago(rel.at) + ' (' + syd(rel.at) + ')' : 'not released yet'; });
     all('ssr-build-age', function (e) { e.textContent = ago(B.builtAt); });
     all('ssr-newer', function (e) { e.textContent = newer ? ' · newer release v' + newer + ' is out' : ''; });
