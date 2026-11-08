@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.25.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.24.0...score-scan-reader-v0.25.0) (2026-11-08)
+
+
+### Features
+
+* grace notes from narrow detected heads on by default ([926ec3a](https://github.com/pension-plan/score-scan-reader/commit/926ec3a9c8bba94a1392bcc5af7e55f1b271776f))
+* **meter:** time signatures on every system, after barlines and at system ends (L16/L21) ([3d15815](https://github.com/pension-plan/score-scan-reader/commit/3d15815d631383b1eb4d6aaca35c03ae842111a8))
+* **structure:** repeats, voltas, barline styles, segno/coda, beams, articulations, octave lines, multi-bar rests, double dots (L22/L14/L15) ([d0f1105](https://github.com/pension-plan/score-scan-reader/commit/d0f1105ccc9d4950858479e1a484f25f077f688f))
+
+
+### Bug Fixes
+
+* **front:** drop beam pieces taken for filled heads ([c177285](https://github.com/pension-plan/score-scan-reader/commit/c1772858bb5a0b4e083b221ae141a2bf030fd9d4))
+
 ## [0.24.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.23.0...score-scan-reader-v0.24.0) (2026-11-08)
 
 
