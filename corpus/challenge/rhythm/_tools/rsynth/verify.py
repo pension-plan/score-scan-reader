@@ -265,8 +265,27 @@ def compare_midi(score: Score, midi_path: str):
     for tr in tracks:
         for t, p in tr['notes']:
             got[(t, p)] += 1
-    # compare on the MIDI tick grid (quintuplets etc. are not tick-exact)
-    exp = Counter((int(round(F(t) * div)), p) for t, p, _, _ in attacks(score))
+    # a grace note before the first beat makes LilyPond start the MIDI timeline earlier
+    lead = F(0)
+    for p_ in score.parts:
+        for v in p_.voices:
+            evs = p_.measures[0].get(v.key, []) if p_.measures else []
+            k = next((j for j, e in enumerate(evs) if e.kind != 'clef'), None)
+            if k is not None and evs[k].grace:
+                lead = max(lead, -grace_offsets(evs, k))
+    # compare on the MIDI tick grid (quintuplets etc. are not tick-exact).  With a leading
+    # grace LilyPond shifts the whole timeline by the grace's performed length: pick the
+    # constant shift that matches the most attacks (0 when there is no leading grace).
+    base = Counter((int(round(F(t) * div)), p) for t, p, _, _ in attacks(score))
+    shifts = {0}
+    if lead:
+        first = sorted(base)[:40]
+        for (gt, gp) in got:
+            for (et, ep) in first:
+                if gp == ep and 0 < gt - et <= lead * div:
+                    shifts.add(gt - et)
+    best = max(shifts, key=lambda sh: sum((Counter({(t + sh, p): n for (t, p), n in base.items()}) & got).values()))
+    exp = Counter({(t + best, p): n for (t, p), n in base.items()})
     fuzzy = Counter()
     for (t, p), n in list((exp - got).items()):
         for dt in (-1, 1):
@@ -290,7 +309,7 @@ def compare_midi(score: Score, midi_path: str):
         extra_by_p[p] += n
     unexplained = extra_by_p - grace_p
     return {'ok': not missing and not unexplained, 'expected_attacks': sum(exp.values()),
-            'tick_rounded': sum(fuzzy.values()),
+            'tick_rounded': sum(fuzzy.values()), 'leading_grace_offset_quarters': str(lead), 'midi_shift_ticks': best,
             'midi_attacks': sum(got.values()), 'grace_notes': sum(grace_p.values()),
             'missing': [str(x) for x in sorted(missing.elements())[:10]],
             'unexplained_extra': [str(x) for x in sorted(unexplained.elements())[:10]]}

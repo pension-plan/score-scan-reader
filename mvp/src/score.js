@@ -446,13 +446,29 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   else { mq = 4; warnings.push('Could not infer a time signature; using 4/4.'); }
   const mLen = (time.beats * 4) / time.type;
   warnings.push(`Time signature inferred from measure contents: ${time.beats}/${time.type}.`);
-  // merge consecutive short segments that together make one measure
-  const measures = []; // [{segIdx:[...]}]
-  for (let i = 0; i < segs.length; i++) {
-    if (i > 0 && segSum[i] < mLen - 1e-6 && i + 1 < segs.length && segSum[i] + segSum[i + 1] <= mLen + 1e-6 &&
-        Math.abs(segSum[i] + segSum[i + 1] - mLen) < 1e-6) { measures.push({ segs: [i, i + 1] }); i++; }
-    else measures.push({ segs: [i] });
+  // group barline segments into measures: a spurious barline (or a measure
+  // broken across systems / at a repeat sign) splits one measure into short
+  // segments. Dynamic programming over groups of 1-3 consecutive segments,
+  // cost = distance of the group length from the bar length + a merge charge;
+  // an opening pickup and a short closing bar are free-ish.
+  const nSeg = segs.length;
+  const dev = (S, i, j) => {
+    if (Math.abs(S - mLen) < 1e-6) return 0;
+    if (S < mLen && ((i === 0 && j < nSeg) || (j === nSeg && i > 0))) return 0.3;
+    return Math.min(2.5, 1.5 * Math.abs(S - mLen));
+  };
+  const best = new Array(nSeg + 1).fill(Infinity), from = new Array(nSeg + 1).fill(-1);
+  best[0] = 0;
+  for (let j = 1; j <= nSeg; j++) {
+    let S = 0;
+    for (let i = j - 1; i >= Math.max(0, j - 3); i--) {
+      S += segSum[i];
+      const c = best[i] + dev(S, i, j) + 0.8 * (j - 1 - i);
+      if (c < best[j] - 1e-9) { best[j] = c; from[j] = i; }
+    }
   }
+  const measures = []; // [{segs:[...]}]
+  for (let j = nSeg; j > 0; j = from[j]) measures.unshift({ segs: Array.from({ length: j - from[j] }, (_, t) => from[j] + t) });
   const perPart = parts.map((p, pi) => measures.map(m => p.src.map((src, k) => ({
     staff: src.staff, events: m.segs.flatMap(si => segEv[si][pi][k]),
   }))));
@@ -466,6 +482,10 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   // into two voices it goes to the voice whose onsets it follows (the upper one
   // when both fit). Keyboard staves never take underlay.
   const lyrNotes = new Set();
+  const vocalStaves = parts.filter(p => p.kind !== 'keyboard').map(p => p.src[0].staff);
+  const topVocal = vocalStaves.length ? Math.min(...vocalStaves) : -1;
+  const splitStaves = parts.filter(p => p.kind !== 'keyboard' && p.src[0].voice === 2).map(p => p.src[0].staff);
+  const lowestSplit = splitStaves.length ? Math.max(...splitStaves) : -1;
   for (const sy of systems) {
     const lyr = lyricsBySystem[sy.page + ':' + sy.index];
     if (!lyr || !lyr.length) continue;
@@ -479,12 +499,15 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
       const cand = parts.map((p, pi) => ({ p, pi })).filter(({ p }) => p.kind !== 'keyboard' && p.src[0].staff === v.band);
       if (!cand.length) continue;
       const scored = cand.map(c => { const evs = evOf(c.pi); return { ...c, evs, fit: lyricFit(v.syllables, evs, sp) }; });
-      // the upper voice of the staff above takes the line unless another voice
-      // follows it clearly better (a lower voice with its own rhythm)
+      // a line between staves serves the upper voice of the staff above it
+      // (the melody) unless another voice follows it clearly better; a further
+      // line under the lowest staff of a split vocal group is sung by both
+      // voices of that staff (research-voices.md section 7.2).
+      const lowest = scored.length === 2 && v.band === lowestSplit && v.band !== topVocal;
       let best = scored[0];
-      for (const c of scored.slice(1)) if (c.fit >= best.fit + 0.15) best = c;
+      for (const c of scored) if (c.fit >= best.fit + 0.15) best = c;
       if (best.fit < 0.5 || !wordy(v.syllables)) { lyrNotes.add(`A text line under staff ${v.band + 1} does not follow the notes; not used as lyrics.`); continue; }
-      const take = opts.copyLyrics ? scored.filter(c => c.fit >= 0.5) : [best];
+      const take = opts.copyLyrics || lowest ? scored.filter(c => c.fit >= 0.5) : [best];
       for (const c of take) alignSyllables(v, c.evs, sp);
       v.used = take.map(c => c.p.name).join(', ');
     }

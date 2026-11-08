@@ -291,13 +291,13 @@ def v_holes(pk, info, rng):
 def v_crop(pk, info, rng):
     x0, x1 = info['staff_x0_mm'], info['staff_x1_mm']
     lg, rg = info['left_gap_mm'], info['right_gap_mm']
-    W, H = info['size_mm']
+    lgm, rgm = info['left_gap_music_mm'], info['right_gap_music_mm']
     bx0, by0, bx1, by1 = info['ink_bbox_mm']
     cut_l = round(min(0.8, max(0.0, lg - 0.3)), 2)
     cut_r = round(min(0.8, max(0.0, rg - 0.3)), 2)
-    sev_l = round(max(0.0, lg - 0.2), 2)
-    sev_r = round(max(0.0, rg - 0.2), 2)
-    top_sev = round(info['music_top_mm'] - 4 * info['staves'][0]['space'], 1)
+    sev_l = round(max(0.0, lgm - 0.2), 2)
+    sev_r = round(max(0.0, rgm - 0.2), 2)
+    top_sev = round(info['header_cut_mm'], 1)
     mild = spec(content=base_content(crop={'left_mm': x0 - 0.4, 'right_mm': x1 + 0.4, 'top_mm': by0 - 2,
                                            'bottom_mm': by1 + 2}),
                 glob=[['noise', {'sigma': 2}]], out=L(80))
@@ -310,15 +310,15 @@ def v_crop(pk, info, rng):
     return {'tags': ['cropped_edges', 'cropped_staff_ends', 'no_margins', 'missing_system_barlines'],
             'files': {'scan-mild': mild, 'scan': scan, 'scan-severe': sev},
             'notes': f'Image edges cut through the staves. Mild: tight crop 0.4 mm outside the staff ends (braces/'
-                     f'brackets cut off). Scan: {cut_l} mm cut into the staff starts (start barline and brace gone) '
-                     f'and {cut_r} mm off the staff ends (end/final barlines thinned or gone). Severe: cut up to '
-                     f'{sev_l} mm into the staff start (to just before the clef) and {sev_r} mm off the ends '
-                     f'(to just after the last notehead/stem), and the header (title, credits) is cropped away. '
-                     f'Cut amounts were computed from the clean raster so that no clef, notehead, stem, accidental '
-                     f'or lyric is removed.',
-            'limits': 'Barlines at system ends (incl. the final barline) may be partly or completely cut off - '
-                      'they are still present in the truth (barline positions are implied by the time signature). '
-                      'Severe: title/composer header text is not visible; ignore work-title/creators when scoring.'}
+                     f'brackets cut off). Scan: {cut_l} mm cut into the staff starts and {cut_r} mm off the staff '
+                     f'ends (start barline / brace and end barlines thinned or gone where the cut allows). Severe: '
+                     f'header (title, credits) cropped away, {sev_l} mm cut into the staff starts (up to just '
+                     f'before the first clef / name / lyric) and {sev_r} mm off the ends. Cut amounts were computed '
+                     f'from the clean raster so that no clef, notehead, stem, accidental, lyric or part name is '
+                     f'removed (only staff-line ends, brackets/braces and barlines).',
+            'limits': 'Barlines at system starts/ends (incl. the final barline) may be partly or completely cut '
+                      'off - they are still present in the truth. Severe: title/composer header text is not '
+                      'visible; ignore work-title/creators when scoring.'}
 
 
 def v_halftone(pk, info, rng):

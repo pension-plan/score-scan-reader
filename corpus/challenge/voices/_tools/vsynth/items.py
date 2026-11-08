@@ -273,4 +273,107 @@ ITEM_B = dict(
     },
 )
 
-ITEMS = [ITEM_A, ITEM_B]
+
+# =====================================================================================
+# C  SAB: three parts on two staves; the alto drops onto the bass staff for a bar
+#    (\change Staff), labels "Soprano/Alto" + "Baritone"
+# =====================================================================================
+
+C_S = ("a'4 a' d'' a' | b'4 a' fis'2 | g'4 a' b' g' | a'4 fis'2. | a'4 b' cis'' d'' | b'4 a' g'2 | "
+       "b'4 a' g' b' | cis''4 d''2.")
+C_A = ("fis'4 fis' fis' e' | d'4 cis' d'2 | d'4 e' d' e' | @lower cis'4 a2. | @upper fis'4 g' e' d' | "
+       "d'4 cis' e'2 | d'4 d' e' g' | a'4 fis'2.")
+C_B = "d4 d b, cis | g4 a d2 | b,4 cis d cis | a,4 d2. | d4 g a b | g4 a e2 | g4 fis e d | a,4 d2."
+C_V = [
+    "All things bright and beau -- ti -- ful, All crea -- tures great and small, "
+    "All things wise and won -- der -- ful, The Lord God made them all.",
+    "Each lit -- tle flower that o -- pens, Each lit -- tle bird that sings, "
+    "He made their glow -- ing col -- ours, He made their ti -- ny wings.",
+]
+
+
+def mk_C():
+    def make():
+        spec = [{'id': 'S', 'name': 'Soprano', 'abbr': 'S.', 'clefs': ['treble'], 'voices': [('1', 1, C_S)]},
+                {'id': 'A', 'name': 'Alto', 'abbr': 'A.', 'clefs': ['treble'], 'voices': [('1', 1, C_A)]},
+                {'id': 'Bar', 'name': 'Baritone', 'abbr': 'Bar.', 'clefs': ['bass'], 'voices': [('1', 1, C_B)]}]
+        sc = assemble(spec, time=(4, 4), key=(2, 'major'))
+        set_verses(sc, 'S', '1', C_V, mode='attack')
+        sc.title = 'All Things Bright and Beautiful'
+        sc.composer = 'Tune: challenge corpus (CC0)'
+        sc.lyricist = 'Cecil Frances Alexander (1848)'
+        sc.rights = 'Text public domain; music CC0 1.0'
+        sc.groups = [{'first': 'S', 'last': 'Bar', 'symbol': 'bracket'}]
+        lay = {'groups': [{'type': 'ChoirStaff', 'staves': [
+            closed_staff('upper', 'treble', [('S', '1'), ('A', '1')], [(('S', '1'), [1, 2], 'below')],
+                         name=['Soprano', 'Alto'], short=['S.', 'A.']),
+            closed_staff('lower', 'bass', [('Bar', '1')], name='Baritone', short='Bar.')]}],
+            # m.4 (index 3): alto is on the bass staff -> soprano alone (\oneVoice) on the treble staff,
+            # alto stems up / baritone stems down on the bass staff
+            'role_override': {('S', '1', 3): 0, ('A', '1', 3): 1, ('Bar', '1', 3): 2}}
+        opts = base_opts('All Things Bright and Beautiful', poet='Cecil Frances Alexander, 1848',
+                         composer='for SAB choir', size=20, paper='letter', font='TeX Gyre Schola',
+                         extra_paper=['top-margin = 18\\mm', 'indent = 22\\mm'])
+        return sc, lay, opts
+    return make
+
+
+ITEM_C = dict(
+    id='sab-cross-staff-alto', title='All Things Bright and Beautiful (SAB: 3 parts on 2 staves, cross-staff alto)',
+    make=mk_C(), pages=1,
+    edge_cases=['sab_three_parts_two_staves', 'shared_staff_two_voices', 'single_voice_lower_staff',
+                'voice_moves_to_other_staff', 'cross_staff_alto_on_bass_staff', 'part_labels_full_then_abbrev',
+                'lyrics_only_under_treble_staff', 'multi_verse', 'key_signature_sharps'],
+    expected={
+        'parts': ['Soprano', 'Alto', 'Baritone'],
+        'must_not_split': False,
+        'shared_staves': [['Soprano', 'Alto']],
+        'notes': ('SAB closed score: Soprano (stems up) and Alto (stems down) share the treble staff; the Baritone '
+                  'is alone on the bass staff (its stems point both ways and must NOT be split into two parts). '
+                  'In m.4 the alto line moves down onto the bass staff (c#\' then a, stems up, above the '
+                  'baritone\'s down-stem notes) while the soprano is alone on the treble staff: those two alto '
+                  'notes belong to the Alto part, not to the Baritone and not to a new part. Expected output: '
+                  'exactly 3 parts. Two verses under the treble staff, aligned to the Soprano (truth: Soprano '
+                  'only).'),
+    },
+    truth_limitations=['Staff placement is not part of the truth (each vocal part is its own one-staff part); the '
+                       'cross-staff notes are simply Alto notes in m.4.'],
+    license='Text public domain (Cecil Frances Alexander, 1848); music and engraving CC0-1.0',
+    source='self-authored (challenge corpus); text: C. F. Alexander, "All things bright and beautiful", '
+           'Hymns for Little Children (1848), refrain + stanza 1',
+    attribution=('All Things Bright and Beautiful. Text: Cecil Frances Alexander (1848), public domain.\n'
+                 'Tune and SAB setting: composed for this challenge corpus (2026), CC0 1.0 (not the Monk or '
+                 'Hullah tunes).'),
+    scans={
+        'scan': dict(dpi=300, seed=7301, mode='gray', format='jpeg', quality=45,
+                     summary='office photocopy from a ring binder: 3 punch holes, staple, thick ink, right edge '
+                             'cropped through the staff ends, 1.2 deg skew',
+                     ops=[{'op': 'ink_weight', 'n': 1},
+                          {'op': 'paper', 'rgb': [243, 243, 241], 'texture': 4},
+                          {'op': 'punch_holes', 'n': 3, 'd_mm': 6.0, 'edge_mm': 10, 'spacing_mm': 80, 'bg': 30},
+                          {'op': 'staple', 'x_mm': 8, 'y_mm': 12, 'len_mm': 12, 'deg': 35},
+                          {'op': 'crop', 'cut_staff_right_mm': 2.5, 'top_mm': 3},
+                          {'op': 'rotate', 'deg': 1.2, 'fill': 250},
+                          {'op': 'blur', 'sigma': 0.7}, {'op': 'noise', 'sigma': 4},
+                          {'op': 'speckle', 'per_mpx': 25}]),
+        'scan-mild': dict(dpi=400, seed=7302, mode='gray', format='jpeg', quality=60,
+                          summary='high-resolution (400 dpi) flatbed scan, 0.4 deg skew',
+                          ops=[{'op': 'paper', 'rgb': [246, 246, 244], 'texture': 2},
+                               {'op': 'rotate', 'deg': -0.4, 'fill': 252},
+                               {'op': 'blur', 'sigma': 0.4}, {'op': 'noise', 'sigma': 2}]),
+        'scan-severe': dict(dpi=150, seed=7303, mode='bilevel', format='png',
+                            binarize={'thr': 200, 'noise': 18, 'pre_blur': 0.8},
+                            summary='page fed upside down (180 deg) into a fax-like thick binarized copier at '
+                                    '150 dpi, 3.5 deg skew, punch holes, dark scanner border',
+                            ops=[{'op': 'ink_weight', 'n': 1},
+                                 {'op': 'paper', 'rgb': [240, 240, 240], 'texture': 10},
+                                 {'op': 'punch_holes', 'n': 2, 'd_mm': 6.5, 'edge_mm': 11, 'spacing_mm': 80,
+                                  'bg': 15},
+                                 {'op': 'rot90', 'k': 2},
+                                 {'op': 'rotate', 'deg': 3.5, 'fill': 70, 'expand': True},
+                                 {'op': 'blur', 'sigma': 1.0}, {'op': 'speckle', 'per_mpx': 120},
+                                 {'op': 'saltpepper', 'amount': 0.002}]),
+    },
+)
+
+ITEMS = [ITEM_A, ITEM_B, ITEM_C]

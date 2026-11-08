@@ -41,9 +41,9 @@
     "Bass"
    ]
   ],
-  "notes": "Closed-score SATB: Soprano+Alto share the treble staff, Tenor+Bass share the bass staff. A correct conversion yields FOUR parts (Soprano, Alto, Tenor, Bass), each with its own notes; all three verses belong to the Soprano part (lyric numbers 1-3) and must stay attached to soprano notes, including melisma skips (e.g. \"pre - cious\" spans a slurred melisma). DAMAGE (crop): Image edges cut through the staves. Mild: tight crop 0.4 mm outside the staff ends (braces/brackets cut off). Scan: 0.8 mm cut into the staff starts (start barline and brace gone) and 0.8 mm off the staff ends (end/final barlines thinned or gone). Severe: cut up to 1.24 mm into the staff start (to just before the clef) and 10.3 mm off the ends (to just after the last notehead/stem), and the header (title, credits) is cropped away. Cut amounts were computed from the clean raster so that no clef, notehead, stem, accidental or lyric is removed. TRUTH LIMITATIONS: Barlines at system ends (incl. the final barline) may be partly or completely cut off - they are still present in the truth (barline positions are implied by the time signature). Severe: title/composer header text is not visible; ignore work-title/creators when scoring."
+  "notes": "Closed-score SATB: Soprano+Alto share the treble staff, Tenor+Bass share the bass staff. A correct conversion yields FOUR parts (Soprano, Alto, Tenor, Bass), each with its own notes; all three verses belong to the Soprano part (lyric numbers 1-3) and must stay attached to soprano notes, including melisma skips (e.g. \"pre - cious\" spans a slurred melisma). DAMAGE (crop): Image edges cut through the staves. Mild: tight crop 0.4 mm outside the staff ends (braces/brackets cut off). Scan: 0.0 mm cut into the staff starts and 0.0 mm off the staff ends (start barline / brace and end barlines thinned or gone where the cut allows). Severe: header (title, credits) cropped away, 1.24 mm cut into the staff starts (up to just before the first clef / name / lyric) and 0.05 mm off the ends. Cut amounts were computed from the clean raster so that no clef, notehead, stem, accidental, lyric or part name is removed (only staff-line ends, brackets/braces and barlines). TRUTH LIMITATIONS: Barlines at system starts/ends (incl. the final barline) may be partly or completely cut off - they are still present in the truth. Severe: title/composer header text is not visible; ignore work-title/creators when scoring."
  },
- "truth_limitations": "Barlines at system ends (incl. the final barline) may be partly or completely cut off - they are still present in the truth (barline positions are implied by the time signature). Severe: title/composer header text is not visible; ignore work-title/creators when scoring.",
+ "truth_limitations": "Barlines at system starts/ends (incl. the final barline) may be partly or completely cut off - they are still present in the truth. Severe: title/composer header text is not visible; ignore work-title/creators when scoring.",
  "degradations": {
   "scan.pdf": {
    "seed": 1132882181,
@@ -51,7 +51,7 @@
    "pages": 1,
    "image_px": [
     [
-     2085,
+     2103,
      3139
     ]
    ],
@@ -80,8 +80,8 @@
     {
      "op": "crop",
      "params": {
-      "left_mm": 16.717333333333332,
-      "right_mm": 193.17133333333334,
+      "left_mm": 15.917333333333334,
+      "right_mm": 193.97133333333335,
       "top_mm": 15.679333333333332,
       "bottom_mm": 281.416
      },
@@ -122,9 +122,9 @@
      {
       "type": "crop",
       "box_mm": [
-       16.717333333333332,
+       15.917333333333334,
        15.679333333333332,
-       193.17133333333334,
+       193.97133333333335,
        281.416
       ]
      }
@@ -223,8 +223,8 @@
    "pages": 1,
    "image_px": [
     [
-     1966,
-     2949
+     2087,
+     2963
     ]
    ],
    "image_mode": [
@@ -253,8 +253,8 @@
      "op": "crop",
      "params": {
       "left_mm": 17.157333333333334,
-      "right_mm": 183.67133333333334,
-      "top_mm": 31.3,
+      "right_mm": 193.92133333333334,
+      "top_mm": 30.1,
       "bottom_mm": 281.016
      },
      "stage": "content"
@@ -295,8 +295,8 @@
       "type": "crop",
       "box_mm": [
        17.157333333333334,
-       31.3,
-       183.67133333333334,
+       30.1,
+       193.92133333333334,
        281.016
       ]
      }

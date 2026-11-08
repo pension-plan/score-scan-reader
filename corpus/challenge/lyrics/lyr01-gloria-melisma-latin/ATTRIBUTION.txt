@@ -1,0 +1,4 @@
+Text: "Gloria in excelsis Deo ... Alleluia, Amen" - Latin liturgical text, public domain.
+Music: original CC0 composition (2026) for the OMR lyrics challenge set.
+
+Music (melody, harmonisation, accompaniment), engraving, rasterisation and damage were produced for this corpus by corpus/challenge/lyrics/_tools and are dedicated to the public domain (CC0 1.0).

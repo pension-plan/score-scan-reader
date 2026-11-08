@@ -71,6 +71,9 @@ class Lyric:
     # an elision tie (MusicXML <elision>, LilyPond "a~b")
     elided: List[Tuple[str, str]] = field(default_factory=list)
     name: Optional[str] = None      # MusicXML lyric/@name override (e.g. 'refrain')
+    # last syllable of a line that simply stops (e.g. a stanza line before a
+    # refrain printed on another line): never draw an extender
+    no_extend: bool = False
 
     @property
     def last_syllabic(self):
@@ -259,26 +262,27 @@ def compute_extenders(score: Score):
                 for ev in evs:
                     if ev.kind == 'rest':
                         if last is not None:
-                            last[1].extend = melisma and last[1].last_syllabic in ('single', 'end')
+                            last[1].extend = melisma and last[1].last_syllabic in ('single', 'end') and not last[1].no_extend
                         last, melisma = None, False
                         continue
                     if ev.kind != 'note':
                         continue
                     if verse in ev.lyrics:
                         if last is not None:
-                            last[1].extend = melisma and last[1].last_syllabic in ('single', 'end')
+                            last[1].extend = melisma and last[1].last_syllabic in ('single', 'end') and not last[1].no_extend
                         last, melisma = (ev, ev.lyrics[verse]), False
                     elif last is not None:
                         melisma = True
                 if last is not None:
-                    last[1].extend = melisma and last[1].last_syllabic in ('single', 'end')
+                    last[1].extend = melisma and last[1].last_syllabic in ('single', 'end') and not last[1].no_extend
 
 
 def parse_lyric_text(text: str):
     """'O sa -- cred Head, now _ wound -- ed' -> list of Lyric or None (skip).
     A token 'le~o' is an elision (two syllables on one note); '~' inside a
     word joins parts, '^' inside a token stands for a literal space."""
-    toks = text.split()
+    # split on ASCII whitespace only: U+00A0 (no-break space) belongs to the syllable
+    toks = [t for t in re.split(r'[ \t\r\n]+', text) if t]
     out = []
     hy_next = False
     for i, tk in enumerate(toks):

@@ -21,7 +21,7 @@ from fractions import Fraction as F
 from .model import Event, MeasureInfo, Part, Score, VoiceDef, display_ql, renumber
 
 DUR_TYPE = {'1': 'whole', '2': 'half', '4': 'quarter', '8': 'eighth', '16': '16th', '32': '32nd'}
-TOK = re.compile(r"^(?P<p>(?:<[^>]+>)|[a-g](?:isis|eses|is|es|s)?[',]*|r|s|R)(?P<d>1|2|4|8|16|32)?(?P<dots>\.*)(?P<suf>.*)$")
+TOK = re.compile(r"^(?P<p>(?:<[^>]+>)|[a-g](?:isis|eses|is|es|s)?[',]*|r|s|R)(?P<d>16|32|1|2|4|8)?(?P<dots>\.*)(?P<suf>.*)$")
 PIT = re.compile(r"^(?P<s>[a-g])(?P<a>isis|eses|is|es|s)?(?P<o>[',]*)$")
 ACC = {None: 0, 'is': 1, 'es': -1, 's': -1, 'isis': 2, 'eses': -2}
 WORDS = re.compile(r'([\^_])(!?)"([^"]*)"')

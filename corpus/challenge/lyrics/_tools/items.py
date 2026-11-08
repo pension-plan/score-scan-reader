@@ -191,15 +191,9 @@ def mk_mond():
     sc.rights = 'Text public domain; music CC0'
     lay = closed_layout([{'voice': ('S', '1'), 'verses': [1, 2, 3, 4, 5, 6], 'place': 'below'}],
                         names=[['Sopran', 'Alt'], ['Tenor', 'Bass']], shorts=[['S.', 'A.'], ['T.', 'B.']])
-    for st in lay['groups'][0]['staves']:
-        st['name'] = '\\markup'  # placeholder replaced below
-    lay['groups'][0]['staves'][0]['name'] = ['Sopran', 'Alt']
-    lay['groups'][0]['staves'][1]['name'] = ['Tenor', 'Bass']
-    lay['groups'][0]['staves'][0]['short'] = ['S.', 'A.']
-    lay['groups'][0]['staves'][1]['short'] = ['T.', 'B.']
     opts = {'header': {'title': 'Abendlied', 'subtitle': '„Der Mond ist aufgegangen“',
                        'poet': 'Text: Matthias Claudius, 1779', 'composer': 'Satz: anon. (CC0)'},
-            'staff_size': 20, 'paper': 'a4', 'font': 'TeX Gyre Pagella', 'breaks': [3, 7], 'page_breaks': [7],
+            'staff_size': 22, 'paper': 'a4', 'font': 'TeX Gyre Pagella', 'breaks': [3, 6, 9], 'page_breaks': [6],
             'paper_extra': ['indent = 14\\mm', 'system-system-spacing.basic-distance = #18'],
             'layout_extra': ['\\context { \\Lyrics \\override LyricText.font-size = #0.5 }']}
     return sc, lay, opts
@@ -209,11 +203,11 @@ def mk_mond():
 # 3. Les anges dans nos campagnes: 4 French stanzas + refrain on one line
 # ======================================================================
 ANGES_S = ("a'4 a'8 a' a'4 c'' | c''4. bes'8 a'2 | a'4 g'8 g' a'4 c'' | a'4. g'8 f'2 | "
-           "a'4 a'8 a' a'4 c'' | c''4. bes'8 a'2 | a'4 g'8 g' a'4 c'' | a'4. g'8 f'2 \\bar || "
+           "a'4 a'8 a' a'4 c'' | c''4. bes'8 a'2 | a'4 g'8 g' a'4 c'' | a'4. g'8 f'2 | "
            "c''2( d''8 c'' bes' a' | bes'2 c''8 bes' a' g' | a'2 bes'8 a' g' f' | g'4.) c'8 f'4 g' | "
            "a'4 bes' a' g' | f'1 | "
            "c''2( d''8 c'' bes' a' | bes'2 c''8 bes' a' g' | a'2 bes'8 a' g' f' | g'4.) c'8 f'4 g' | "
-           "a'4 bes' a' g' | f'1\\fermata").replace(' \\bar ||', '')
+           "a'4 bes' a' g' | f'1\\fermata")
 ANGES_V = [
     "Les an -- ges dans nos cam -- pa -- gnes ont en -- ton -- né l'hym -- ne des cieux, "
     "et l'é -- cho de nos mon -- ta -- gnes re -- dit ce chant mé -- lo -- di -- eux" + NB + ":",
@@ -231,7 +225,16 @@ def mk_anges():
     sc = mk_score({'M': ANGES_S}, (4, 4), (-1, 'major'), [{'id': 'V', 'name': 'Voice', 'voices': [('1', 1, 'M')]}])
     sc.measures[7].right_bar = 'double'
     verses = [ANGES_V[0] + ' ' + ANGES_REFRAIN] + ANGES_V[1:]
+    from synth.model import parse_lyric_text
+    n_verse = sum(1 for m in sc.part('V').measures[:8] for ev in m['1'] if ev.kind == 'note')
+    for k, v in enumerate(verses):
+        n = len(parse_lyric_text(v))
+        assert n == (n_verse + 48 if k == 0 else n_verse), (k, n, n_verse)
     set_verses(sc, 'V', '1', verses, mode='attack', strict=False)
+    # stanza lines 2-4 stop before the refrain: no extender after their last syllable
+    last = sc.part('V').measures[7]['1'][-1]
+    for vn in (2, 3, 4):
+        last.lyrics[vn].no_extend = True
     # refrain syllables (lyric line 1 only) are named 'refrain'
     for m in sc.part('V').measures[8:]:
         for ev in m['1']:
@@ -291,11 +294,9 @@ def mk_veni():
 CALON = {
     'S': "d''4. c''8 b'2 | c''4 e'' d''4. a'8 | b'2 r2 | r4 a' a' d'' | d''4. b'8 g'2 | c''2( a'2) | e''1 | d''1\\fermata",
     'A': "r4 g' g' g' | g' e' fis' fis' | g'4 e'2 e'4 | fis'2 fis'4 a' | g'2 e'2~ | e'2 fis'2 | g'1 | g'1\\fermata",
-    'T': "b4 d'8 d' d'4 b | c'4 c' a2( | b4) b8 b g4 g | a4 a a2( | b2 g2 | a1) | c'1 | b1\\fermata",
+    'T': "b4 d'8 d' d'4 b | c'4 c' a2 | b4 b8 b g2 | a4 a a2( | b2 g2 | a1) | c'1 | b1\\fermata",
     'B': "g,2 b,4 g, | c2 d2 | e4 e c2 | d4 d fis, a, | g,2 e,2 | a,2( d2) | c1 | g,1\\fermata",
 }
-CALON = dict(CALON)
-CALON['T'] = "b4 d'8 d' d'4 b | c'4 c' a2 | b4 b8 b g4 g | a4 a a2( | b2 g2 | a1) | c'1 | b1\\fermata"
 CALON_TXT = {
     'S': "Ca -- lon lân yn llawn da -- io -- ni, te -- cach yw na'r li -- li dlos: _ A -- men.",
     'A': "dim ond ca -- lon lân all ga -- nu, ca -- nu'r dydd a cha -- nu'r nos. _ A -- men.",
@@ -372,8 +373,9 @@ def mk_grace():
     lay = closed_layout([{'voice': ('S', '1'), 'verses': [1, 2, 3], 'place': 'below'}])
     opts = {'header': {'title': 'Amazing Grace', 'meter': 'C.M.', 'poet': 'John Newton, 1779',
                        'composer': 'NEW BRITAIN, Virginia Harmony, 1831; harm. anon. (CC0)'},
-            'staff_size': 20, 'paper': 'letter', 'font': 'Liberation Serif', 'breaks': [4, 8, 12],
-            'paper_extra': ['indent = 0', 'ragged-last = ##f', 'system-system-spacing.basic-distance = #15'],
+            'staff_size': 18, 'paper': 'letter', 'font': 'Liberation Serif', 'breaks': [4, 8, 12],
+            'paper_extra': ['indent = 0', 'ragged-last = ##f', 'page-count = #1',
+                            'system-system-spacing.basic-distance = #12'],
             'layout_extra': ['\\context { \\Score \\remove "Bar_number_engraver" }'],
             'auto_beam_off_vocal': True,
             'markup_after': stanza_block(AG_BLOCK, [[0, 1], [2]])}
@@ -458,8 +460,8 @@ def mk_dejlig():
                                                              'labels': {1: '1. EN', 2: '2. DA', 3: '3. SV',
                                                                         4: '4. NO', 5: '5. DA'}}]}]}]}
     opts = {'header': {'title': 'Dejlig er jorden', 'subtitle': 'Härlig är jorden · Deilig er jorden · Fairest Lord Jesus',
-                       'poet': 'B. S. Ingemann 1850 · C. Bååth-Holmberg 1884 · R. S. Willis 1850',
-                       'composer': 'Melodi: anon. (CC0)'},
+                       'poet': 'Ingemann 1850 · Bååth-Holmberg 1884 · Willis 1850',
+                       'composer': 'Melodi: CC0'},
             'staff_size': 19, 'paper': 'a4', 'font': 'TeX Gyre Heros', 'breaks': [5, 9, 15],
             'paper_extra': ['indent = 0', 'ragged-last = ##f', 'system-system-spacing.basic-distance = #16'],
             'auto_beam_off_vocal': True}

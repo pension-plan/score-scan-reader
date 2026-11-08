@@ -1,0 +1,313 @@
+{
+  "id": "sab-cross-staff-alto",
+  "category": "voices",
+  "title": "All Things Bright and Beautiful (SAB: 3 parts on 2 staves, cross-staff alto)",
+  "edge_cases": [
+    "sab_three_parts_two_staves",
+    "shared_staff_two_voices",
+    "single_voice_lower_staff",
+    "voice_moves_to_other_staff",
+    "cross_staff_alto_on_bass_staff",
+    "part_labels_full_then_abbrev",
+    "lyrics_only_under_treble_staff",
+    "multi_verse",
+    "key_signature_sharps"
+  ],
+  "expected": {
+    "parts": [
+      "Soprano",
+      "Alto",
+      "Baritone"
+    ],
+    "must_not_split": false,
+    "shared_staves": [
+      [
+        "Soprano",
+        "Alto"
+      ]
+    ],
+    "notes": "SAB closed score: Soprano (stems up) and Alto (stems down) share the treble staff; the Baritone is alone on the bass staff (its stems point both ways and must NOT be split into two parts). In m.4 the alto line moves down onto the bass staff (c#' then a, stems up, above the baritone's down-stem notes) while the soprano is alone on the treble staff: those two alto notes belong to the Alto part, not to the Baritone and not to a new part. Expected output: exactly 3 parts. Two verses under the treble staff, aligned to the Soprano (truth: Soprano only)."
+  },
+  "degradations": {
+    "scan.pdf": {
+      "seed": 7301,
+      "render_dpi": 300,
+      "output_dpi": 300,
+      "mode": "gray",
+      "format": "jpeg",
+      "jpeg_quality": 45,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "spread_2up": null,
+      "ops": [
+        {
+          "op": "ink_weight",
+          "n": 1
+        },
+        {
+          "op": "paper",
+          "rgb": [
+            243,
+            243,
+            241
+          ],
+          "texture": 4
+        },
+        {
+          "op": "punch_holes",
+          "n": 3,
+          "d_mm": 6.0,
+          "edge_mm": 10,
+          "spacing_mm": 80,
+          "bg": 30
+        },
+        {
+          "op": "staple",
+          "x_mm": 8,
+          "y_mm": 12,
+          "len_mm": 12,
+          "deg": 35
+        },
+        {
+          "op": "crop",
+          "cut_staff_right_mm": 2.5,
+          "top_mm": 3
+        },
+        {
+          "op": "rotate",
+          "deg": 1.2,
+          "fill": 250
+        },
+        {
+          "op": "blur",
+          "sigma": 0.7
+        },
+        {
+          "op": "noise",
+          "sigma": 4
+        },
+        {
+          "op": "speckle",
+          "per_mpx": 25
+        }
+      ],
+      "summary": "office photocopy from a ring binder: 3 punch holes, staple, thick ink, right edge cropped through the staff ends, 1.2 deg skew",
+      "pdf_pages": 1,
+      "events": [
+        {
+          "pages": [
+            0
+          ],
+          "size_px": [
+            2401,
+            3265
+          ],
+          "events": [
+            {
+              "op": "crop",
+              "staff_right_px": 2431,
+              "cut_at_px": 2401,
+              "cut_into_staff_mm": 2.54
+            }
+          ]
+        }
+      ]
+    },
+    "scan-mild.pdf": {
+      "seed": 7302,
+      "render_dpi": 400,
+      "output_dpi": 400,
+      "mode": "gray",
+      "format": "jpeg",
+      "jpeg_quality": 60,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "spread_2up": null,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            246,
+            246,
+            244
+          ],
+          "texture": 2
+        },
+        {
+          "op": "rotate",
+          "deg": -0.4,
+          "fill": 252
+        },
+        {
+          "op": "blur",
+          "sigma": 0.4
+        },
+        {
+          "op": "noise",
+          "sigma": 2
+        }
+      ],
+      "summary": "high-resolution (400 dpi) flatbed scan, 0.4 deg skew",
+      "pdf_pages": 1,
+      "events": [
+        {
+          "pages": [
+            0
+          ],
+          "size_px": [
+            3400,
+            4400
+          ],
+          "events": []
+        }
+      ]
+    },
+    "scan-severe.pdf": {
+      "seed": 7303,
+      "render_dpi": 150,
+      "output_dpi": 150,
+      "mode": "bilevel",
+      "format": "png",
+      "jpeg_quality": null,
+      "jpeg_passes": null,
+      "binarize": {
+        "thr": 200,
+        "noise": 18,
+        "pre_blur": 0.8
+      },
+      "spread_2up": null,
+      "ops": [
+        {
+          "op": "ink_weight",
+          "n": 1
+        },
+        {
+          "op": "paper",
+          "rgb": [
+            240,
+            240,
+            240
+          ],
+          "texture": 10
+        },
+        {
+          "op": "punch_holes",
+          "n": 2,
+          "d_mm": 6.5,
+          "edge_mm": 11,
+          "spacing_mm": 80,
+          "bg": 15
+        },
+        {
+          "op": "rot90",
+          "k": 2
+        },
+        {
+          "op": "rotate",
+          "deg": 3.5,
+          "fill": 70,
+          "expand": true
+        },
+        {
+          "op": "blur",
+          "sigma": 1.0
+        },
+        {
+          "op": "speckle",
+          "per_mpx": 120
+        },
+        {
+          "op": "saltpepper",
+          "amount": 0.002
+        }
+      ],
+      "summary": "page fed upside down (180 deg) into a fax-like thick binarized copier at 150 dpi, 3.5 deg skew, punch holes, dark scanner border",
+      "pdf_pages": 1,
+      "events": [
+        {
+          "pages": [
+            0
+          ],
+          "size_px": [
+            1375,
+            1726
+          ],
+          "events": []
+        }
+      ]
+    }
+  },
+  "dpi": 300,
+  "license": "Text public domain (Cecil Frances Alexander, 1848); music and engraving CC0-1.0",
+  "source": "self-authored (challenge corpus); text: C. F. Alexander, \"All things bright and beautiful\", Hymns for Little Children (1848), refrain + stanza 1",
+  "files": {
+    "truth": "truth.musicxml",
+    "engraving": "engraving.ly",
+    "clean": "clean.pdf",
+    "scans": [
+      "scan-mild.pdf",
+      "scan-severe.pdf",
+      "scan.pdf"
+    ]
+  },
+  "pages_engraved": 1,
+  "measures": 8,
+  "parts_truth": [
+    {
+      "id": "S",
+      "name": "Soprano",
+      "voices": 1,
+      "staves": 1
+    },
+    {
+      "id": "A",
+      "name": "Alto",
+      "voices": 1,
+      "staves": 1
+    },
+    {
+      "id": "Bar",
+      "name": "Baritone",
+      "voices": 1,
+      "staves": 1
+    }
+  ],
+  "lyric_lines_printed": [
+    {
+      "kind": "lyricsto",
+      "voice": [
+        "S",
+        "1"
+      ],
+      "verse": 1,
+      "syllables": 26
+    },
+    {
+      "kind": "lyricsto",
+      "voice": [
+        "S",
+        "1"
+      ],
+      "verse": 2,
+      "syllables": 26
+    }
+  ],
+  "validation": {
+    "xsd": "/Users/d.sloane/music/corpus/challenge/voices/_work/sab-cross-staff-alto/truth.musicxml validates",
+    "truth_reparsed_music21_matches_model": true,
+    "midi_per_voice_matches_printed_truth": true,
+    "midi_lyrics_match_truth": true,
+    "attacks_truth": 78,
+    "attacks_hidden_in_engraving_carried_by_other_voice": 0,
+    "lyric_text_found_in_vector_pdf": 1.0,
+    "lilypond_warnings": [],
+    "scan_files_image_only": {
+      "scan": true,
+      "scan-mild": true,
+      "scan-severe": true
+    }
+  },
+  "truth_limitations": [
+    "Staff placement is not part of the truth (each vocal part is its own one-staff part); the cross-staff notes are simply Alto notes in m.4."
+  ]
+}

@@ -1,5 +1,287 @@
 [
   {
+    "id": "variations-piano-12-pages",
+    "category": "layout",
+    "title": "Variations on \"Ah! vous dirai-je, maman\" - 12-page piano score with headers, voltas, key/time changes",
+    "edge_cases": [
+      "multi_page_10plus",
+      "page_numbers",
+      "running_headers",
+      "title_block_text",
+      "copyright_footer",
+      "tempo_text",
+      "section_heading_text",
+      "dynamics_text",
+      "repeats",
+      "volta_1st_2nd_endings",
+      "key_change",
+      "time_change",
+      "triplets",
+      "pedal_marks",
+      "piano_grand_staff",
+      "must_not_split",
+      "variation_starts_new_system",
+      "fermata",
+      "hairpin",
+      "cautionary_key_signature"
+    ],
+    "expected": {
+      "parts": [
+        "Piano"
+      ],
+      "must_not_split": true,
+      "shared_staves": [],
+      "staves_per_part": {
+        "Piano": 2
+      },
+      "lyrics": [],
+      "notes": "One part: Piano with 2 staves, the grand staff must stay ONE part on every one of the 12 pages. Measures are in notated order (repeats and 1st/2nd endings NOT unrolled): 232 measures. Running headers, page numbers, the title block, \"Var. ...\" headings, tempo words, \"cresc.\" and the copyright footer are text, not notes or lyrics. Key changes to C minor (Var. V) and back (Var. VI); time signature changes to 6/8 at Var. VIII. No lyrics."
+    },
+    "truth_limitations": "Beaming not encoded. Page headers/numbers are <credit> elements without coordinates. Repeats/voltas are encoded in notated order (<repeat>, <ending>), not unrolled.",
+    "layout": "A4 portrait, staff size 19, 4 systems on page 1 and 5 per following page, each variation starts a new system; headers on pages 2-12 alternate odd/even text with page numbers",
+    "pages": 12,
+    "measures": 232,
+    "notes_in_truth": 2455,
+    "hidden_staff_systems": [],
+    "dpi": 150,
+    "degradations": {
+      "scan.pdf": {
+        "seed": 1,
+        "render_dpi": 150,
+        "dpi": 150,
+        "format": "jpeg q60",
+        "colour": "gray",
+        "pdf_pages": [
+          {
+            "image": 1,
+            "source_pages": [
+              1
+            ],
+            "size_px": [
+              1241,
+              1754
+            ],
+            "ops": [
+              [
+                "skew_rotation_deg",
+                0.5
+              ]
+            ]
+          },
+          {
+            "image": 2,
+            "source_pages": [
+              2
+            ],
+            "size_px": [
+              1241,
+              1754
+            ],
+            "ops": [
+              [
+                "skew_rotation_deg",
+                0.5
+              ]
+            ]
+          },
+          {
+            "image": 3,
+            "source_pages": [
+              3
+            ],
+            "size_px": [
+              1241,
+              1754
+            ],
+            "ops": [
+              [
+                "skew_rotation_deg",
+                0.5
+              ]
+            ]
+          },
+          {
+            "image": 4,
+            "source_pages": [
+              4
+            ],
+            "size_px": [
+              1241,
+              1754
+            ],
+            "ops": [
+              [
+                "skew_rotation_deg",
+                0.5
+              ]
+            ]
+          },
+          {
+            "image": 5,
+            "source_pages": [
+              5
+            ],
+            "size_px": [
+              1241,
+              1754
+            ],
+            "ops": [
+              [
+                "skew_rotation_deg",
+                0.5
+              ]
+            ]
+          },
+          {
+            "image": 6,
+            "source_pages": [
+              6
+            ],
+            "size_px": [
+              1241,
+              1754
+            ],
+            "ops": [
+              [
+                "skew_rotation_deg",
+                0.5
+              ]
+            ]
+          },
+          {
+            "image": 7,
+            "source_pages": [
+              7
+            ],
+            "size_px": [
+              1241,
+              1754
+            ],
+            "ops": [
+              [
+                "skew_rotation_deg",
+                0.5
+              ]
+            ]
+          },
+          {
+            "image": 8,
+            "source_pages": [
+              8
+            ],
+            "size_px": [
+              1241,
+              1754
+            ],
+            "ops": [
+              [
+                "skew_rotation_deg",
+                0.5
+              ]
+            ]
+          },
+          {
+            "image": 9,
+            "source_pages": [
+              9
+            ],
+            "size_px": [
+              1241,
+              1754
+            ],
+            "ops": [
+              [
+                "skew_rotation_deg",
+                0.5
+              ]
+            ]
+          },
+          {
+            "image": 10,
+            "source_pages": [
+              10
+            ],
+            "size_px": [
+              1241,
+              1754
+            ],
+            "ops": [
+              [
+                "skew_rotation_deg",
+                0.5
+              ]
+            ]
+          },
+          {
+            "image": 11,
+            "source_pages": [
+              11
+            ],
+            "size_px": [
+              1241,
+              1754
+            ],
+            "ops": [
+              [
+                "skew_rotation_deg",
+                0.5
+              ]
+            ]
+          },
+          {
+            "image": 12,
+            "source_pages": [
+              12
+            ],
+            "size_px": [
+              1241,
+              1754
+            ],
+            "ops": [
+              [
+                "skew_rotation_deg",
+                0.5
+              ]
+            ]
+          }
+        ],
+        "params": {
+          "dpi": 150,
+          "mode": "gray",
+          "rotate": 0.5,
+          "jpeg": 60
+        },
+        "summary": "test",
+        "bytes": 1642391
+      }
+    },
+    "files": [
+      "ATTRIBUTION.txt",
+      "clean.pdf",
+      "engraving.ly",
+      "meta.json",
+      "scan.pdf",
+      "truth.musicxml"
+    ],
+    "license": "Public domain melody; variations, engraving and scans CC0-1.0",
+    "source": "self-authored (layout-challenge corpus); theme: French melody \"Ah! vous dirai-je, maman\" (1761)",
+    "engraver": "internal model -> LilyPond 2.24 (custom writer, layout-challenge edition)",
+    "validation": {
+      "xsd_valid": true,
+      "music21_parse": "2 1906",
+      "midi_attacks_match_truth": true,
+      "attacks": 2455,
+      "lilypond_warnings": [],
+      "lyric_syllables_found_in_engraving": null,
+      "lyric_syllables": 0,
+      "pages_planned": 12,
+      "image_only": {
+        "clean.pdf": true,
+        "scan.pdf": true
+      }
+    }
+  },
+  {
     "id": "song-one-system-poem-block",
     "category": "layout",
     "title": "A Red, Red Rose - a page with only one system, poem stanzas as a text block",

@@ -12,7 +12,8 @@ const srv = http.createServer((req, res) => {
   res.writeHead(200, { 'Content-Type': types[path.extname(f)] || 'application/octet-stream', 'Content-Security-Policy': CSP });
   fs.createReadStream(f).pipe(res);
 }).listen(18931, async () => {
-  const browser = await chromium.launch({ executablePath: process.env.HOME + '/.cache/ms-playwright/chromium_headless_shell-1208/chrome-linux/headless_shell' });
+  const cached = process.env.HOME + '/.cache/ms-playwright/chromium_headless_shell-1208/chrome-linux/headless_shell';
+  const browser = await chromium.launch(require('fs').existsSync(cached) ? { executablePath: cached } : {});
   const out = { errors: [] };
   for (const width of [1280, 400]) {
     const page = await browser.newPage({ viewport: { width, height: 900 } });

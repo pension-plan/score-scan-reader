@@ -1,0 +1,310 @@
+{
+  "id": "lyr02-abendlied-6-stanzas-de",
+  "category": "lyrics",
+  "title": "Abendlied (Der Mond ist aufgegangen) - 6 German stanzas, closed SATB",
+  "edge_cases": [
+    "stacked_verses_6",
+    "verse_numbers",
+    "german_umlauts",
+    "eszett",
+    "hyphenated_compounds",
+    "apostrophe_in_word",
+    "punctuation",
+    "satb_closed",
+    "lyrics_between_staves",
+    "extender_line",
+    "hyphen_across_melisma",
+    "pickup",
+    "multi_page",
+    "two_up_spread"
+  ],
+  "expected": {
+    "must_not_split": false,
+    "shared_staves": [
+      [
+        "Soprano",
+        "Alto"
+      ],
+      [
+        "Tenor",
+        "Bass"
+      ]
+    ],
+    "notes": "Closed score: split each staff into two parts -> Soprano, Alto, Tenor, Bass. The six stanza lines between the staves belong to the SOPRANO (truth puts lyric numbers 1-6 on the soprano only; alto/tenor/bass sing the same rhythm). Verse numbers \"1.\" .. \"6.\" are labels, not lyric text. Keep ä ö ü ß and the apostrophe in \"in'\" exactly. 2 engraved pages; scan.pdf and scan-severe.pdf put both pages side by side on ONE sheet (2-up), so the converter must read the left half then the right half.",
+    "parts": [
+      "Soprano",
+      "Alto",
+      "Tenor",
+      "Bass"
+    ]
+  },
+  "lyric_lines": [
+    {
+      "part": "Soprano",
+      "lyric_number": 1,
+      "syllables": 42,
+      "elisions": 0,
+      "extenders": 1
+    },
+    {
+      "part": "Soprano",
+      "lyric_number": 2,
+      "syllables": 42,
+      "elisions": 0,
+      "extenders": 2
+    },
+    {
+      "part": "Soprano",
+      "lyric_number": 3,
+      "syllables": 42,
+      "elisions": 0,
+      "extenders": 2
+    },
+    {
+      "part": "Soprano",
+      "lyric_number": 4,
+      "syllables": 42,
+      "elisions": 0,
+      "extenders": 2
+    },
+    {
+      "part": "Soprano",
+      "lyric_number": 5,
+      "syllables": 42,
+      "elisions": 0,
+      "extenders": 2
+    },
+    {
+      "part": "Soprano",
+      "lyric_number": 6,
+      "syllables": 42,
+      "elisions": 0,
+      "extenders": 2
+    }
+  ],
+  "text_block_stanzas": [],
+  "degradations": {
+    "scan.pdf": {
+      "seed": 5201,
+      "dpi": 300,
+      "mode": "gray",
+      "jpeg_quality": 50,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "page_ops": [
+        {
+          "op": "spread",
+          "reduce": 0.707,
+          "gap_mm": 4
+        }
+      ],
+      "ops": [
+        {
+          "op": "paper",
+          "color": [
+            243,
+            242,
+            236
+          ],
+          "texture": 5
+        },
+        {
+          "op": "gutter",
+          "side": "center",
+          "width": 0.05,
+          "dark": 0.5
+        },
+        {
+          "op": "rotate",
+          "deg": 0.8
+        },
+        {
+          "op": "blur",
+          "sigma": 0.6
+        },
+        {
+          "op": "noise",
+          "sigma": 5
+        }
+      ],
+      "tags": [
+        "two_up_spread",
+        "paper_texture",
+        "gutter_shadow",
+        "skew_0.8deg",
+        "focus_blur",
+        "gaussian_noise",
+        "jpeg_q50"
+      ],
+      "output_pages": 1,
+      "page_pixels": [
+        [
+          3541,
+          2480
+        ]
+      ],
+      "annotations": [],
+      "bytes": 582152
+    },
+    "scan-mild.pdf": {
+      "seed": 5202,
+      "dpi": 300,
+      "mode": "rgb",
+      "jpeg_quality": 60,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "page_ops": [
+        {
+          "op": "page_scale",
+          "factors": [
+            1.0,
+            0.965
+          ]
+        }
+      ],
+      "ops": [
+        {
+          "op": "paper",
+          "color": [
+            240,
+            232,
+            205
+          ],
+          "texture": 5,
+          "fibers": true
+        },
+        {
+          "op": "rotate",
+          "deg": -0.5,
+          "fill": [
+            240,
+            232,
+            205
+          ]
+        },
+        {
+          "op": "noise",
+          "sigma": 3
+        }
+      ],
+      "tags": [
+        "page_scale_mismatch",
+        "coloured_paper",
+        "skew_0.5deg",
+        "gaussian_noise",
+        "rgb_scan",
+        "jpeg_q60"
+      ],
+      "output_pages": 2,
+      "page_pixels": [
+        [
+          2481,
+          3508
+        ],
+        [
+          2481,
+          3508
+        ]
+      ],
+      "annotations": [],
+      "bytes": 1163474
+    },
+    "scan-severe.pdf": {
+      "seed": 5203,
+      "dpi": 300,
+      "mode": "bw",
+      "jpeg_quality": null,
+      "jpeg_passes": 1,
+      "binarize": {
+        "style": "thin_photocopy",
+        "threshold": 85,
+        "noise": 18,
+        "blur": 0.6
+      },
+      "page_ops": [
+        {
+          "op": "spread",
+          "reduce": 0.707,
+          "gap_mm": 4
+        }
+      ],
+      "ops": [
+        {
+          "op": "ink",
+          "weight": -1
+        },
+        {
+          "op": "paper",
+          "color": [
+            246,
+            246,
+            246
+          ],
+          "texture": 6
+        },
+        {
+          "op": "rotate",
+          "deg": 2.5
+        },
+        {
+          "op": "speckle",
+          "per_mpx": 200
+        },
+        {
+          "op": "saltpepper",
+          "amount": 0.001
+        }
+      ],
+      "tags": [
+        "two_up_spread",
+        "ink_thin",
+        "paper_texture",
+        "skew_2.5deg",
+        "speckles",
+        "salt_pepper",
+        "binarized_thin_photocopy"
+      ],
+      "output_pages": 1,
+      "page_pixels": [
+        [
+          3541,
+          2480
+        ]
+      ],
+      "annotations": [],
+      "bytes": 44588
+    }
+  },
+  "dpi": 300,
+  "license": "Text: public domain (M. Claudius, 1779). Music: CC0-1.0 (own melody and harmonisation).",
+  "source": "Own composition; text Matthias Claudius, \"Abendlied\" (1779), stanzas 1-6.",
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "scan-mild.pdf",
+    "scan-severe.pdf",
+    "scan.pdf",
+    "truth.musicxml"
+  ],
+  "measures": 13,
+  "engraved_pages": 2,
+  "validation": {
+    "truth_xsd_valid": true,
+    "midi_attacks_match_truth": true,
+    "attacks": 177,
+    "midi_lyrics_match_truth": true,
+    "lyric_lines_checked": 6,
+    "syllables_checked": 252,
+    "pdf_text_items_checked": 252,
+    "pdf_text_missing": 0,
+    "scans_image_only": {
+      "scan.pdf": true,
+      "scan-mild.pdf": true,
+      "scan-severe.pdf": true
+    },
+    "lilypond_warnings": []
+  },
+  "engraver": "model -> LilyPond 2.24 (custom writer, corpus/challenge/lyrics/_tools)"
+}

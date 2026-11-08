@@ -1,0 +1,230 @@
+{
+  "id": "lyr01-gloria-melisma-latin",
+  "category": "lyrics",
+  "title": "Gloria in excelsis - aria with very long melismas (Latin)",
+  "edge_cases": [
+    "long_melisma",
+    "melisma_21_notes",
+    "sixteenth_note_runs",
+    "extender_line",
+    "extender_across_system_break",
+    "extender_across_barline",
+    "hyphen_across_melisma",
+    "melisma_with_tie",
+    "slurred_melisma",
+    "latin_text",
+    "voice_piano",
+    "must_not_split",
+    "single_verse"
+  ],
+  "expected": {
+    "must_not_split": true,
+    "shared_staves": [],
+    "notes": "Two parts: Soprano (one staff, all lyrics) and Piano (ONE part with two staves - never split into RH/LH parts). 34 syllables, all lyric number 1. Melismas: \"a\" of Gloria (14 notes), \"o\" of Deo (21 notes, crosses a system break), \"pax\" (20 notes incl. a tie, crosses a system break), \"lu\" of the first Alleluia (9 notes, hyphenated melisma: syllabic middle, no extend). Word-final melismas carry <extend/>. Melisma notes must NOT receive lyric elements. Beams are left to LilyPond (truth has no <beam>).",
+    "parts": [
+      "Soprano",
+      "Piano"
+    ]
+  },
+  "lyric_lines": [
+    {
+      "part": "Soprano",
+      "lyric_number": 1,
+      "syllables": 34,
+      "elisions": 0,
+      "extenders": 7
+    }
+  ],
+  "text_block_stanzas": [],
+  "degradations": {
+    "scan.pdf": {
+      "seed": 5101,
+      "dpi": 300,
+      "mode": "gray",
+      "jpeg_quality": 45,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "page_ops": [],
+      "ops": [
+        {
+          "op": "paper",
+          "color": [
+            244,
+            243,
+            238
+          ],
+          "texture": 4
+        },
+        {
+          "op": "rotate",
+          "deg": 1.2
+        },
+        {
+          "op": "lighting",
+          "gradient": 0.1,
+          "angle": 20
+        },
+        {
+          "op": "blur",
+          "sigma": 0.8
+        },
+        {
+          "op": "noise",
+          "sigma": 6
+        }
+      ],
+      "tags": [
+        "paper_texture",
+        "skew_1.2deg",
+        "uneven_lighting",
+        "focus_blur",
+        "gaussian_noise",
+        "jpeg_q45"
+      ],
+      "output_pages": 1,
+      "page_pixels": [
+        [
+          2481,
+          3508
+        ]
+      ],
+      "annotations": [],
+      "bytes": 626929
+    },
+    "scan-mild.pdf": {
+      "seed": 5102,
+      "dpi": 300,
+      "mode": "gray",
+      "jpeg_quality": 60,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "page_ops": [],
+      "ops": [
+        {
+          "op": "paper",
+          "color": [
+            244,
+            243,
+            238
+          ],
+          "texture": 2
+        },
+        {
+          "op": "rotate",
+          "deg": 0.5
+        },
+        {
+          "op": "noise",
+          "sigma": 2
+        }
+      ],
+      "tags": [
+        "paper_texture",
+        "skew_0.5deg",
+        "gaussian_noise",
+        "jpeg_q60"
+      ],
+      "output_pages": 1,
+      "page_pixels": [
+        [
+          2481,
+          3508
+        ]
+      ],
+      "annotations": [],
+      "bytes": 551944
+    },
+    "scan-severe.pdf": {
+      "seed": 5103,
+      "dpi": 150,
+      "mode": "gray",
+      "jpeg_quality": 20,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "page_ops": [],
+      "ops": [
+        {
+          "op": "paper",
+          "color": [
+            238,
+            236,
+            228
+          ],
+          "texture": 6
+        },
+        {
+          "op": "rotate",
+          "deg": -3.5,
+          "fill": [
+            238,
+            236,
+            228
+          ]
+        },
+        {
+          "op": "motion",
+          "length": 6,
+          "angle": 20
+        },
+        {
+          "op": "noise",
+          "sigma": 10
+        },
+        {
+          "op": "saltpepper",
+          "amount": 0.002
+        }
+      ],
+      "tags": [
+        "paper_texture",
+        "skew_3.5deg",
+        "motion_blur",
+        "gaussian_noise",
+        "salt_pepper",
+        "jpeg_q20",
+        "low_dpi_150"
+      ],
+      "output_pages": 1,
+      "page_pixels": [
+        [
+          1241,
+          1754
+        ]
+      ],
+      "annotations": [],
+      "bytes": 170415
+    }
+  },
+  "dpi": 300,
+  "license": "Text: public domain (Latin liturgy, Luke 2:14). Music: CC0-1.0 (own composition).",
+  "source": "Own composition for this corpus; Latin liturgical text.",
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "scan-mild.pdf",
+    "scan-severe.pdf",
+    "scan.pdf",
+    "truth.musicxml"
+  ],
+  "measures": 18,
+  "engraved_pages": 1,
+  "validation": {
+    "truth_xsd_valid": true,
+    "midi_attacks_match_truth": true,
+    "attacks": 245,
+    "midi_lyrics_match_truth": true,
+    "lyric_lines_checked": 1,
+    "syllables_checked": 34,
+    "pdf_text_items_checked": 34,
+    "pdf_text_missing": 0,
+    "scans_image_only": {
+      "scan.pdf": true,
+      "scan-mild.pdf": true,
+      "scan-severe.pdf": true
+    },
+    "lilypond_warnings": []
+  },
+  "engraver": "model -> LilyPond 2.24 (custom writer, corpus/challenge/lyrics/_tools)"
+}

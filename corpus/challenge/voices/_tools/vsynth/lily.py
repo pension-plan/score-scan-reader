@@ -179,6 +179,8 @@ class LilyWriter:
             ovr = self.layout.get('role_override', {}).get((pid, vkey, i))
             if ovr is not None:
                 role = ovr
+            elif role is None and prev_role not in (None, 0):
+                role = 0          # single-voice staff after an override: back to \oneVoice
             if role is not None and (role != prev_role or self._raw_role_used):
                 line.append(ROLE_CMD[role])
                 prev_role = role

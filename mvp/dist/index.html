@@ -2652,7 +2652,6 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     }));
     return sums.length ? mode(sums) : 0;
   });
-  if (typeof global !== 'undefined' && global.__SEGDBG) segEv.forEach((e, i) => console.log('seg', i, 'sys', segs[i].sy.page + ':' + segs[i].sy.index, 'len', segSum[i], e.map(st => st.map(evs => evs.reduce((a, x) => a + x.q, 0)).join('+')).join(' | ')));
   // time signature: most common full-measure length, also counting pairs of
   // short segments (phrase barlines / measures split across systems)
   const votes = {};

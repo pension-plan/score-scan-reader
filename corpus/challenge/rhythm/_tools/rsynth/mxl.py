@@ -128,14 +128,11 @@ def _rest_between(evs, a, b):
 
 
 def tuplet_brackets(evs):
-    """dict index-of-tuplet-start -> 'yes'/'no' (LilyPond default: bracket only when
-    the tuplet is not completely covered by one beam)."""
+    """dict index-of-tuplet-start -> 'yes'/'no' (LilyPond default tupletBracketVisibility
+    'if-no-beam: the bracket is omitted only when one beam starts on the tuplet's first
+    note and ends on its last note)."""
     out = {}
-    groups = beam_groups(evs)
-    gid = {}
-    for n, g in enumerate(groups):
-        for k in range(g[0], g[-1] + 1):
-            gid[k] = n
+    spans = {(g[0], g[-1]) for g in beam_groups(evs)}
     k = 0
     while k < len(evs):
         ev = evs[k]
@@ -144,8 +141,7 @@ def tuplet_brackets(evs):
             while not evs[j].tuplet_stop:
                 j += 1
             members = [i for i in range(k, j + 1) if evs[i].kind in ('note', 'rest')]
-            ids = {gid.get(i) for i in members}
-            covered = (len(ids) == 1 and None not in ids)
+            covered = (members[0], members[-1]) in spans
             out[k] = 'no' if covered else 'yes'
             k = j + 1
             continue

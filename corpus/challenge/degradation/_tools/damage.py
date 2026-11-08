@@ -90,28 +90,80 @@ def analyse_page(gray, dpi):
             i += 5
         else:
             i += 1
-    # safe crop gaps: distance from staff start to first non-barline ink, and
-    # from last non-barline ink to staff end
+    # safe crop gaps (page-wide): distance from the global staff start/end to the
+    # nearest ink that is not a staff line, a barline or a piano span bar
+    # (lyrics, instrument names, clefs, notes all count)
     left_gaps, right_gaps = [], []
     cands = []
+    line_rows = np.zeros(h, bool)
+    for st in staves:
+        for cy in st['lines']:
+            r = int(round(cy))
+            line_rows[max(0, r - 2):r + 3] = True
+    excl = np.zeros_like(ink)
+    bars = []
     for st in staves:
         top, bot = int(round(st['top'])), int(round(st['bottom']))
-        band = ink[top:bot + 1].copy()
-        for cy in st['lines']:
-            r = int(round(cy)) - top
-            band[max(0, r - 2):r + 3] = False
-        n_rows = band.any(1).sum() if band.any() else 1
-        cnt = band.sum(0)
-        full = cnt >= 0.95 * max(1, (band.shape[0] - 5 * 5))
+        rows = np.arange(top, bot + 1)
+        rows = rows[~line_rows[rows]]
+        cnt = ink[rows].sum(0)
+        B = cnt >= 0.95 * len(rows)
+        excl[top:bot + 1, :] |= B[None, :]
+        bars.append((top, bot, B))
+    for (t1, b1, B1), (t2, b2, B2) in zip(bars, bars[1:]):
+        if t2 - b1 <= 1:
+            continue
+        gap = ink[b1 + 1:t2]
+        span = B1 & B2 & (gap.mean(0) >= 0.9)
+        excl[b1 + 1:t2, :] |= span[None, :]
+    if staves:
+        # bracket tips (ChoirStaff bracket hooks overhang the staff start): ignore
+        # ink within 2 staff spaces above / below a staff and < 1 mm right of the
+        # staff start (clefs start ~1.5 mm in; nothing else can sit there)
+        gx0_ = min(s['x0'] for s in staves)
+        zw = int(round(1.0 * dpi / 25.4))
+        for st in staves:
+            sp = st['space']
+            for r0, r1 in ((st['top'] - 2 * sp, st['top']), (st['bottom'], st['bottom'] + 2 * sp)):
+                excl[max(0, int(r0)):min(h, int(r1) + 1), gx0_:gx0_ + zw] = True
+    content = ink & ~line_rows[:, None] & ~excl
+    header_cut = None
+    music_gaps = (0, 0)
+    if staves:
+        gx0 = min(s['x0'] for s in staves)
+        gx1 = max(s['x1'] for s in staves)
+        cols = np.where(content.any(0))[0]
+        inside = cols[(cols >= gx0) & (cols <= gx1)]
+        if len(inside):
+            left_gaps.append(int(inside.min() - gx0))
+            right_gaps.append(int(gx1 - inside.max()))
+        # header / music separation: walking up from the first staff, the first
+        # empty band >= 2 mm tall; cut 0.5 mm above its lower edge
+        rowink = ink[:, gx0:gx1 + 1].any(1)
+        need = int(round(2.0 * dpi / 25.4))
+        r = int(round(staves[0]['top']))
+        while r > 0 and rowink[r]:
+            r -= 1
+        while r > 0:
+            run = 0
+            while r - run > 0 and not rowink[r - run]:
+                run += 1
+            if run >= need:
+                header_cut = r - int(round(0.5 * dpi / 25.4))
+                break
+            r -= run
+            while r > 0 and rowink[r]:
+                r -= 1
+        if header_cut is not None:
+            cm = content[header_cut:]
+            cols = np.where(cm.any(0))[0]
+            inside = cols[(cols >= gx0) & (cols <= gx1)]
+            if len(inside):
+                music_gaps = (int(inside.min() - gx0), int(gx1 - inside.max()))
+    del content, excl
+    for st in staves:
+        top, bot = int(round(st['top'])), int(round(st['bottom']))
         x0, x1 = st['x0'], st['x1']
-        x = x0
-        while x < x1 and (cnt[x] == 0 or full[x]):
-            x += 1
-        left_gaps.append(x - x0)
-        x = x1 - 1
-        while x > x0 and (cnt[x] == 0 or full[x]):
-            x -= 1
-        right_gaps.append(x1 - 1 - x)
         # notehead candidates: dense blobs ~ 1 x 1.2 staff spaces, staff lines removed
         sp = st['space']
         y0 = max(0, int(top - 2.5 * sp))
@@ -135,6 +187,8 @@ def analyse_page(gray, dpi):
            'staves': [{'top': s['top'] * k, 'bottom': s['bottom'] * k, 'space': s['space'] * k,
                        'lines': [x * k for x in s['lines']], 'x0': s['x0'] * k, 'x1': s['x1'] * k} for s in staves],
            'left_gap_mm': (min(left_gaps) * k) if left_gaps else 0.0,
+           'header_cut_mm': header_cut * k if header_cut is not None else None,
+           'left_gap_music_mm': music_gaps[0] * k, 'right_gap_music_mm': music_gaps[1] * k,
            'right_gap_mm': (min(right_gaps) * k) if right_gaps else 0.0,
            'notes_mm': [(x * k, y * k, sp * k) for x, y, sp in cands]}
     ys, xs = np.where(gray < 160)
