@@ -16,7 +16,7 @@ jobs:
       tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
       - id: release
-        uses: googleapis/release-please-action@v4
+        uses: googleapis/release-please-action@v5
         with:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
@@ -35,10 +35,12 @@ jobs:
       - name: Package downloadable copies
         run: |
           TAG=${{ needs.release-please.outputs.tag_name }}
+          NAME=score-scan-reader-v${TAG##*-v}
           mkdir -p out
-          (cd mvp/dist && zip -r ../../out/score-scan-reader-$TAG-web.zip .)
-          zip -r out/score-scan-reader-$TAG-source.zip . -x 'node_modules/*' '.git/*' 'out/*'
-          cp docs/SDD.md out/score-scan-reader-$TAG-design.md
+          (cd mvp/dist && zip -r ../../out/$NAME-web.zip .)
+          zip -r out/$NAME-source.zip . -x 'node_modules/*' '.git/*' 'out/*'
+          cp docs/SDD.md out/$NAME-design.md
+          cp docs/TIMELINE.md out/$NAME-timeline.md
       - name: Upload release assets
         env:
           GH_TOKEN: ${{ github.token }}
