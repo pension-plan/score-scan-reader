@@ -27,11 +27,14 @@
     "system-break",
     "tempo-mark",
     "time-4-4",
-    "x-clef-percussion0+0",
+    "x-clef-percussion",
     "x-measures",
+    "x-notehead-x",
     "x-noteheads",
     "x-parts",
-    "x-staves"
+    "x-staff-1-line",
+    "x-staves",
+    "x-unpitched"
   ],
   "counts": {
     "accent": 8,
@@ -57,11 +60,14 @@
     "system-break": 1,
     "tempo-mark": 1,
     "time-4-4": 1,
-    "x-clef-percussion0+0": 2,
+    "x-clef-percussion": 2,
     "x-measures": 8,
+    "x-notehead-x": 58,
     "x-noteheads": 33,
     "x-parts": 3,
-    "x-staves": 3
+    "x-staff-1-line": 1,
+    "x-staves": 3,
+    "x-unpitched": 139
   },
   "expected": {
     "parts": [

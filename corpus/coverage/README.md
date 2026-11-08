@@ -30,7 +30,7 @@ Validation (`_validate/validate.py`, re-run from the published files): **102/102
 | time | 10 | 30 | 11 | All simple, compound and irregular meters, C and cut time, meter changes, pickups, triplets to septuplets, duplets/quadruplets, nested tuplets, ties across barlines, systems and pages. | `time/_tools/` |
 | marks | 9 | 27 | 9 | Articulations, ornaments, fermatas, breath marks, every dynamic and hairpin, pedal, arpeggios, fingering, tempo/metronome marks, text expressions, rehearsal marks, chord symbols. | `marks/_tools/` |
 | structure | 8 | 24 | 24 | Double and final barlines, repeats, 1st/2nd/3rd endings, segno/coda/D.S./D.C./Fine, system and page breaks, multi-page scores up to 12 pages. | `structure/_tools/` |
-| lyrics | 2 | 6 | 2 | Lyric elisions (two syllables on one note), non-ASCII lyrics in five languages, numbered multi-verse lyrics, hyphens, extenders, melismas. | `lyrics/_tools/` |
+| lyrics | 2 | 6 | 2 | Lyric elisions (two syllables on one note), non-ASCII lyrics in four languages (German, French, Spanish, Czech), numbered multi-verse lyrics, hyphens, extenders, melismas. | `lyrics/_tools/` |
 | layouts | 20 | 60 | 22 | One exemplar per score layout: melody, song, piano, voice+piano, five choir layouts, choir+piano, organ, quartet, orchestra, lead sheet, hymnal, divisi, cross-staff, two voices on one staff. | `layouts/_tools/` |
 | percussion | 1 | 3 | 1 | Percussion layout (percussion-none): one-line snare staff and 5-line drum set (percussion clef, x noteheads, two voices) beside a pitched melody. | `percussion/_tools/` |
 | perf | 21 | 63 | 92 | Speed/memory sets: one hymn page and one piano page at 100-600 dpi and on Letter/A4/A3, and a piano book of 1, 5, 10, 20 and 40 pages (identical pages across books). | `perf/_tools/` |

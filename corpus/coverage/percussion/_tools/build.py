@@ -510,6 +510,18 @@ def midi_compare(truth, mid):
             'ok': not miss and not extra}
 
 
+def percussion_counts(counts, truth):
+    """count_symbols.py output + percussion extras: x-clef-percussion (its name for the clef is
+    x-clef-percussion0+0), x-staff-1-line, x-unpitched (unpitched note heads), x-notehead-x"""
+    import xml.etree.ElementTree as ET
+    c = {('x-clef-percussion' if k.startswith('x-clef-percussion') else k): v for k, v in counts.items()}
+    r = ET.parse(truth).getroot()
+    c['x-unpitched'] = sum(1 for n in r.iter('note') if n.find('unpitched') is not None)
+    c['x-notehead-x'] = sum(1 for n in r.iter('note') if (n.findtext('notehead') or '').strip() == 'x')
+    c['x-staff-1-line'] = sum(1 for sl in r.iter('staff-lines') if (sl.text or '').strip() == '1')
+    return dict(sorted(c.items()))
+
+
 def image_only(pdf, n_expected):
     rc, fonts, _ = run(['pdffonts', pdf])
     font_lines = [l for l in fonts.splitlines()[2:] if l.strip()]
@@ -616,7 +628,7 @@ def build(keep=False):
                          'times': {k[0] + ':' + k[1]: v for k, v in G['times'].items()}, 'mismatch': mism}
     if mism:
         raise RuntimeError('grob log vs truth: ' + json.dumps(mism)[:3000])
-    counts = count_all(truth)
+    counts = percussion_counts(count_all(truth), truth)
     shutil.copy(ly, os.path.join(out, 'engraving.ly'))
     pages300 = render_pages(pdf, 300, work)
     D.save_pdf([Image.fromarray(x) for x in pages300], 300, os.path.join(out, 'clean.pdf'), fmt='png')

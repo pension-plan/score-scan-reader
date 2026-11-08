@@ -82,7 +82,7 @@
    "ok": 2,
    "manifest": "lyrics/manifest.json",
    "tools": "lyrics/_tools/",
-   "description": "Lyric elisions (two syllables on one note), non-ASCII lyrics in five languages, numbered multi-verse lyrics, hyphens, extenders, melismas."
+   "description": "Lyric elisions (two syllables on one note), non-ASCII lyrics in four languages (German, French, Spanish, Czech), numbered multi-verse lyrics, hyphens, extenders, melismas."
   },
   {
    "family": "layouts",

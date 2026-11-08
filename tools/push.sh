@@ -21,6 +21,13 @@ if [ -n "$big" ]; then echo "refusing: files over 50 MB staged:"; echo "$big"; e
 if git diff --cached -U0 | grep -E '^\+' | grep -q -E 'gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|AKIA[0-9A-Z]{16}|-----BEGIN (RSA|OPENSSH|EC) PRIVATE KEY'; then
   echo "refusing: staged content looks like a credential"; exit 1; fi
 if git diff --cached --quiet; then echo "nothing to commit"; else
+  # the whole working tree is committed (ship first), so list every source/UI/tool file in it:
+  # commit titles describe the main change, this list shows everything that went in
+  FILES=$(git diff --cached --name-status -- mvp/src mvp/ui mvp/tools tools .github | sed 's/^/  /')
+  [ -n "$FILES" ] && BODY="$BODY
+
+Code files in this commit:
+$FILES"
   git commit -q -m "$SUBJECT" -m "$BODY" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 fi
 CRED=(-c credential.helper= -c credential.helper='!f(){ echo username=x-access-token; echo "password=$(tr -d " \n\r" < ~/github-amiga-exposed.txt)"; }; f')
