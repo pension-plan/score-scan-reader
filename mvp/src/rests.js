@@ -214,15 +214,16 @@ function detectRests({ R, comps, s, xa, xb, debug }) {
     // easily read as a notehead: one head at the top of a short glyph whose
     // thin tail slants down to the left (a stem is straight, and longer)
     const on = heads.filter(hd => hd.x + 0.6 * sp >= c.x0 && hd.x - 0.6 * sp <= c.x1 && hd.y + 0.5 * sp >= c.y0 && hd.y - 0.5 * sp <= c.y1);
-    let onHead = null;
+    let onHead = null, onHeads = null;
     // (a whole / half rest is a solid rectangle; a notehead an oval)
     let tpl = null;
     if (on.length && block && on.length === 1 && f.fill >= 0.92 && f.h <= 0.85) onHead = on[0];
-    // a 16th / 32nd / 64th rest's hooks also pass for a head: a tall glyph with one head on it is a
-    // rest when its template says so clearly (src/cv.js); the head is then dropped (mergeRests)
-    else if (on.length === 1 && f.h > 2.6 && f.h <= 5.4 && f.w <= 1.9) {
+    // a 16th / 32nd / 64th rest's hooks also pass for heads: a tall glyph with one head on it (or
+    // up to three filled ones about a space wide, narrower than a notehead) is a rest when its
+    // template says so clearly (src/cv.js); the heads are then dropped (mergeRests)
+    else if ((on.length === 1 || (on.length >= 2 && on.length <= 3 && on.every(hd => hd.kind === 'filled' && hd.w / hd.sp <= 1.05))) && f.h > 2.6 && f.h <= 5.4 && f.w <= 1.9) {
       tpl = readRestGlyph(R, c, sp);
-      if (tpl && /^flag[234]$/.test(tpl.kind)) onHead = on[0]; else continue;
+      if (tpl && /^flag[234]$/.test(tpl.kind)) { onHead = on[0]; onHeads = on; } else continue;
     }
     else if (on.length) {
       if (on.length > 1 || f.h < 1.4 || f.h > 2.6 || f.w > 1.5 || on[0].y > c.y0 + 0.9 * sp) continue;
@@ -301,7 +302,7 @@ function detectRests({ R, comps, s, xa, xb, debug }) {
     }
     if (dots) q *= dots === 1 ? 1.5 : 1.75;
     if (onHead && !/^flag/.test(kind) && kind !== 'whole' && kind !== 'half') continue;
-    out.push({ x: f.xc, pos: f.cy, q, dots, kind, box: c, bars, multi, onHead });
+    out.push({ x: f.xc, pos: f.cy, q, dots, kind, box: c, bars, multi, onHead, onHeads: onHeads || (onHead ? [onHead] : null) });
   }
   return out.sort((a, b) => a.x - b.x);
 }
@@ -319,10 +320,11 @@ function mergeRests(evs, rests, voice, sp) {
   let rs = rests;
   // a notehead read on a rest glyph goes
   for (const r of rs) {
-    if (!r.onHead || !evs.some(e => e.heads && e.heads.includes(r.onHead))) continue;
+    const on = r.onHeads || (r.onHead ? [r.onHead] : []);
+    if (!on.length || !evs.some(e => e.heads && e.heads.some(h => on.includes(h)))) continue;
     evs = evs.flatMap(e => {
-      if (!e.heads || !e.heads.includes(r.onHead)) return [e];
-      const heads = e.heads.filter(h => h !== r.onHead);
+      if (!e.heads || !e.heads.some(h => on.includes(h))) return [e];
+      const heads = e.heads.filter(h => !on.includes(h));
       if (!heads.length) return [];
       // a chord's value is its shortest head's
       const h0 = heads.reduce((a, h) => (h.dur.q < a.dur.q ? h : a));

@@ -2,6 +2,21 @@
 
 Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
 
+## Update: 32nd and 64th rests whose hooks read as heads (rest gaps)
+
+On scans a 32nd or 64th rest often carries two or three "heads" (its hooks), not one, and `rests.js` only asked the
+template reader about a tall glyph with a single head on it. Now a tall glyph with up to three filled heads, each at
+most 1.05 spaces wide (narrower than noteheads; real two-note chords on flagged stems are 1.2–1.3 wide and stay
+notes), goes to `readRestGlyph` as well, and all the heads on it are dropped when it is a 16th–64th rest. Coverage
+(no OCR, clean / scan / severe): `rest-64th` 25 / 10 / 7 → 26 / 22 / 12 of 30, `rest-32nd` 97 / 81 / 60 → 97 / 95 /
+79 of 102. A/B: coverage +0.0003 per item (`rst01` scan +0.043, severe +0.051), no item down; challenge and benchmark
+unchanged.
+
+Tried and not shipped: cue-size heads (`nt08-cue-notes`, 24 cue notes, all missed: they open to 0.65–0.72 space wide,
+under the 0.8 floor). Admitting small solid blobs finds them but adds false heads elsewhere and the cue notes are then
+written as ordinary notes in the bar: coverage −0.0026 (`nt08` −0.12, `perc01` −0.10, `nt07` −0.07). They need
+`score.js` to write them as `<cue/>` notes outside the bar's count before detection can be switched on.
+
 ## Update: upside-down pages whose staves end in keys
 
 `pitch-cov-keys-minor-sharps` severe is printed upside down. The front end did not turn it: its staves end in sharp
