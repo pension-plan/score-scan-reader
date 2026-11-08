@@ -87,10 +87,58 @@ function systemBars(fr, sy) {
   return cl.map(c => c.reduce((a, b) => a + b, 0) / c.length);
 }
 
+const DIGITS = ['digit-0', 'digit-1', 'digit-2', 'digit-3', 'digit-4', 'digit-5', 'digit-6', 'digit-7', 'digit-8', 'digit-9'];
+const NOT_DIGITS = ['rest-quarter', 'rest-8th', 'acc-sharp', 'acc-flat', 'acc-natural', 'head-filled', 'head-half', 'time-C'];
+const TYPES = new Set([1, 2, 4, 8, 16, 32]);
+
+// the number in one half of the staff read from all the ink in the band (not by components: on
+// a worn scan staff-line removal breaks the digits into pieces, and the two numbers run together
+// across the middle line). The number's columns: from the first ink column on, to a gap.
+function bandNumber(R, x0, x1, ya, yb, sp) {
+  const W = R.width, X0 = Math.max(0, Math.round(x0)), X1 = Math.min(W - 1, Math.round(x1)), Y0 = Math.max(0, Math.round(ya)), Y1 = Math.min(R.height - 1, Math.round(yb));
+  const col = (x) => { let n = 0; for (let y = Y0; y <= Y1; y++) n += R.data[y * W + x] ? 1 : 0; return n; };
+  // (past the barline's columns, ink from top to bottom of the band)
+  let a = X0;
+  while (a <= X1 && col(a) >= 0.85 * (Y1 - Y0 + 1)) a++;
+  while (a <= X1 && col(a) < 2) a++;
+  if (a > X1) return null;
+  let b = a, gap = 0;
+  for (let x = a; x <= X1 && x - a < 2.4 * sp; x++) { if (col(x) >= 1) { b = x; gap = 0; } else if (++gap > 0.3 * sp) break; }
+  const w = b - a + 1;
+  if (w < 0.4 * sp || w > 2.4 * sp) return null;
+  const read = (xa, xb) => {
+    const g = crop(R, { x0: xa, x1: xb, y0: Y0, y1: Y1 }, 2);
+    if (!g || g.y1 - g.y0 + 1 < 1.0 * sp) return null;
+    const sc = matcher().scores(heal(g.img, Math.max(2, Math.round(0.18 * sp))), sp, DIGITS.concat(NOT_DIGITS));
+    const d = DIGITS.reduce((p, n) => (sc[n] > sc[p] ? n : p), DIGITS[0]), o = Math.max(...NOT_DIGITS.map(n => sc[n]));
+    return sc[d] >= 0.5 && sc[d] > o + 0.02 ? { v: DIGITS.indexOf(d), score: sc[d] } : null;
+  };
+  // one digit, or two side by side (12): split at the emptiest column of the middle third
+  let best = null;
+  const one = read(a, b);
+  if (one) best = { n: one.v, score: one.score };
+  if (w >= 1.3 * sp) {
+    let cut = -1, cm = Infinity;
+    for (let x = a + Math.round(w / 3); x <= b - Math.round(w / 3); x++) { const c = col(x); if (c < cm) { cm = c; cut = x; } }
+    const l = read(a, cut), r = l && l.v > 0 ? read(cut + 1, b) : null;
+    if (l && r && Math.min(l.score, r.score) > (best ? best.score + 0.05 : 0)) best = { n: 10 * l.v + r.v, score: Math.min(l.score, r.score) };
+  }
+  return best ? { ...best, x0: a, x1: b } : null;
+}
+
+function bandTime(R, st, x, sp) {
+  const xm = x + sp, l0 = st.yAt(0, xm), l2 = st.yAt(2, xm), l4 = st.yAt(4, xm);
+  const top = bandNumber(R, x, x + 3 * sp, l0 - 0.3 * sp, l2 - 0.08 * sp, sp);
+  if (!top || top.n < 2 || top.n > 16) return null;
+  const bot = bandNumber(R, x, x + 3 * sp, l2 + 0.08 * sp, l4 + 0.3 * sp, sp);
+  if (!bot || !TYPES.has(bot.n) || Math.min(top.x1, bot.x1) - Math.max(top.x0, bot.x0) < 0.3 * sp) return null;
+  return { beats: top.n, type: bot.n, x0: Math.min(top.x0, bot.x0), x1: Math.max(top.x1, bot.x1), score: Math.min(top.score, bot.score) };
+}
+
 // a time signature on staff s starting at about x (after a barline or a key change)
 function meterAt(R, s, x, sp) {
   const st = s.st, api = matcher();
-  const t = readTime(api, R, st, x - 0.1 * sp, x + 3.4 * sp, sp, 0.55);
+  const t = readTime(api, R, st, x - 0.1 * sp, x + 3.4 * sp, sp, 0.55) || bandTime(R, st, x - 0.1 * sp, sp);
   if (t && t.x0 < x + 1.3 * sp && t.beats >= 1) return { beats: t.beats, type: t.type, symbol: '', x0: t.x0, x1: t.x1, score: t.score };
   const c = readCommon(R, st, x - 0.1 * sp, x + 1.3 * sp, sp);
   return c;
@@ -138,7 +186,21 @@ function readMeters(fr, asm, stats = {}) {
           const m = meterAt(R, s, x, sp);
           if (!m) continue;
           found.push({ x: bx, staff: s, m });
-          drop.push([m.x0 - 0.3 * sp, m.x1 + 0.3 * sp]);
+        }
+        // a signature after a barline that was missed: stacked digits whose top number fills the
+        // upper half of the staff, away from the barlines already looked at (it splits the bar)
+        const tops = (asm.comps || []).filter(c => {
+          const xm = (c.x0 + c.x1) / 2, w = (c.x1 - c.x0 + 1) / sp, hh = (c.y1 - c.y0 + 1) / sp;
+          // (the two numbers may touch once the middle line is removed: one glyph the staff's height)
+          const half = hh >= 1.4 && hh <= 2.5 && Math.abs(c.y1 - st.yAt(2, xm)) <= 0.45 * sp, full = hh >= 3.3 && hh <= 4.6 && Math.abs(c.y1 - st.yAt(4, xm)) <= 0.45 * sp;
+          return c.x0 > h.end + 2 * sp && c.x1 < st.right - 2 * sp && w >= 0.7 && w <= 2.3 && (half || full) &&
+            Math.abs(c.y0 - st.yAt(0, xm)) <= 0.8 * sp && !bars.some(b => c.x0 > b - sp && c.x0 < b + 3.5 * sp);
+        });
+        for (const c of tops) {
+          if (found.some(f => f.staff === s && !f.header && Math.abs(f.m.x0 - c.x0) < 2 * sp)) continue;
+          const t = readTime(matcher(), R, st, c.x0 - 0.3 * sp, c.x0 + 3.4 * sp, sp, 0.48);
+          if (!t || Math.abs(t.x0 - c.x0) > 0.5 * sp) continue;
+          found.push({ x: t.x0 - 0.6 * sp, staff: s, m: { beats: t.beats, type: t.type, symbol: '', x0: t.x0, x1: t.x1, score: t.score }, split: true });
         }
       } catch (e) { stats.errors = (stats.errors || 0) + 1; }
       if (drop.length) {
@@ -147,20 +209,41 @@ function readMeters(fr, asm, stats = {}) {
         stats.headsDropped = (stats.headsDropped || 0) + n - s.chords.length;
       }
     }
-    // one meter per barline: the value most staves read there (a lone reading
-    // on a system of three staves or more is not enough)
+    // one meter per barline (readings within a space and a half of each other): the value most
+    // staves read there (a lone reading on a system of three staves or more is not enough)
     const meters = [];
-    const xs = [...new Set(found.map(f => (f.header ? -1 : f.x)))];
-    for (const x of xs) {
-      const fs = found.filter(f => (f.header ? -1 : f.x) === x);
+    const groups = [];
+    for (const f of found.filter(f => !f.header).sort((a, b) => a.x - b.x)) {
+      const g = groups[groups.length - 1];
+      if (g && f.x - g[g.length - 1].x < 1.5 * fr.ss) g.push(f); else groups.push([f]);
+    }
+    const hdr = found.filter(f => f.header);
+    if (hdr.length) groups.unshift(hdr);
+    for (const fs of groups) {
       const cnt = {};
       for (const f of fs) cnt[valueOf(f.m)] = (cnt[valueOf(f.m)] || 0) + 1;
       const [v, n] = Object.entries(cnt).sort((a, b) => b[1] - a[1])[0];
       if (sy.staves.length >= 3 && n < 2) continue;
       const f = fs.find(g => valueOf(g.m) === v);
-      meters.push({ x: f.header ? Math.min(...sy.staves.map(s => s.st.left)) : x, beats: f.m.beats, type: f.m.type, symbol: f.m.symbol || '', header: !!f.header });
+      // with no barline before it: two staves agreeing, or one clear reading
+      if (fs.every(g => g.split) && n < 2 && !(f.m.score >= 0.6)) continue;
+      meters.push({ x: f.header ? Math.min(...sy.staves.map(s => s.st.left)) : Math.min(...fs.map(g => g.x)), beats: f.m.beats, type: f.m.type, symbol: f.m.symbol || '', header: !!f.header, split: fs.every(g => g.split) });
+      if (f.header) continue;
+      // the digits are no notes on any staff of the system (a staff that did not read them too)
+      const xa = Math.min(...fs.map(g => g.m.x0)) - 0.3 * fr.ss, xb = Math.max(...fs.map(g => g.m.x1)) + 0.3 * fr.ss;
+      for (const s of sy.staves) {
+        const n = s.chords.length;
+        s.chords = s.chords.filter(c => c.x < xa || c.x > xb);
+        stats.headsDropped = (stats.headsDropped || 0) + n - s.chords.length;
+      }
     }
     meters.sort((a, b) => a.x - b.x);
+    // a signature with no barline before it: the bar is split there
+    for (const m of meters) {
+      if (!m.split) continue;
+      const k = sy.measures.findIndex(([xa, xb]) => m.x - xa > 2 * fr.ss && xb - m.x > 2 * fr.ss);
+      if (k >= 0) { const [xa, xb] = sy.measures[k]; sy.measures.splice(k, 1, [xa, m.x], [m.x, xb]); stats.barsSplit = (stats.barsSplit || 0) + 1; }
+    }
     // a signature after the system's last barline with no notes after it announces the next
     // system's meter
     const right = Math.max(...sy.staves.map(s => s.st.right));

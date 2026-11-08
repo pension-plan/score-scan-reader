@@ -36,7 +36,8 @@ function inkRuns(R, b, row) {
 // the kind of mark component c is, or null
 function markKind(R, c, sp, above) {
   const w = (c.x1 - c.x0 + 1) / sp, h = (c.y1 - c.y0 + 1) / sp, fill = c.area / ((c.x1 - c.x0 + 1) * (c.y1 - c.y0 + 1));
-  if (w >= 0.2 && w <= 0.65 && h >= 0.2 && h <= 0.65 && w / h >= 0.6 && w / h <= 1.6 && fill >= 0.5) return 'staccato';
+  // (smaller specks are dust)
+  if (w >= 0.28 && w <= 0.65 && h >= 0.28 && h <= 0.65 && w / h >= 0.6 && w / h <= 1.6 && fill >= 0.55) return 'staccato';
   if (w >= 0.12 && w <= 0.5 && h >= 0.45 && h <= 1.1 && h / w >= 1.6 && fill >= 0.4) return 'staccatissimo';
   if (w >= 0.7 && w <= 1.5 && h >= 0.06 && h <= 0.36 && fill >= 0.6) return 'tenuto';
   if (w >= 0.75 && w <= 1.6 && h >= 0.4 && h <= 1.0 && w / h >= 1.2) {
@@ -48,7 +49,7 @@ function markKind(R, c, sp, above) {
     const mid = right.filter(rs => rs.length === 1 && Math.abs((rs[0][0] + rs[0][1]) / 2 - hh / 2) < 0.3 * hh).length;
     if (two >= 0.5 * k && mid >= 0.5 * k) return 'accent';
   }
-  if (w >= 0.5 && w <= 1.25 && h >= 0.5 && h <= 1.25) {
+  if (w >= 0.5 && w <= 1.25 && h >= 0.5 && h <= 1.25 && w / h >= 0.6 && w / h <= 1.5 && fill >= 0.2 && fill <= 0.65) {
     // '^' / 'v': one run in the rows at the point, two runs in the rows at the open end
     const rows = inkRuns(R, c, true), n = rows.length, k = Math.max(1, Math.round(0.25 * n));
     const tip = above ? rows.slice(0, k) : rows.slice(n - k), open = above ? rows.slice(n - k) : rows.slice(0, k);
@@ -102,11 +103,20 @@ function readArticulations(fr, asm, stats = {}) {
           }
           glyphs.push(g);
         }
+        // the dot of a fermata has its arc over (under) it
+        const inArc = (c) => near(c.x0 - 2 * sp, c.x1 + 2 * sp).some(o => o.x0 < c.x0 - 0.3 * sp && o.x1 > c.x1 + 0.3 * sp && o.x1 - o.x0 >= 1.2 * sp && o.x1 - o.x0 <= 3.8 * sp &&
+          (above ? o.y1 <= c.y0 + 0.3 * sp && o.y1 >= c.y0 - 1.4 * sp : o.y0 >= c.y1 - 0.3 * sp && o.y0 <= c.y1 + 1.4 * sp));
+        // a letter of a word (lyrics or text over the staff): ink of its size right beside it
+        const inWord = (c) => near(c.x0 - 1.5 * sp, c.x1 + 1.5 * sp).some(o => !(o.x0 >= c.x0 && o.x1 <= c.x1 && o.y0 >= c.y0 && o.y1 <= c.y1) && o.y0 < c.y1 && o.y1 > c.y0 &&
+          o.y1 - o.y0 >= 0.3 * sp && o.y1 - o.y0 <= 1.6 * sp && o.x1 - o.x0 <= 1.6 * sp && (Math.abs(o.x0 - c.x1) < 0.6 * sp || Math.abs(c.x0 - o.x1) < 0.6 * sp) &&
+          !hs.some(h => Math.abs(h.x - (o.x0 + o.x1) / 2) < 0.7 * sp && Math.abs(h.y - (o.y0 + o.y1) / 2) < 0.7 * sp));
         for (const c of glyphs) {
           const gap = above ? (last - c.y1) / sp : (c.y0 - last) / sp;
           if (gap > (found.length ? 1.2 : 2.6)) break;
           const k = markKind(R, c, sp, above);
-          if (!k) break;
+          if (!k || ((k === 'staccato' || k === 'marcato') && inArc(c)) || inWord(c)) break;
+          // a staccato dot stands close to the note (an accent or marcato may stand clear of the staff)
+          if (k === 'staccato' && !found.length && gap > 1.9) break;
           if (!found.includes(k)) found.push(k);
           last = above ? c.y0 : c.y1;
           if (found.length >= 2) break;
