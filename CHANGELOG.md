@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.44.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.43.0...score-scan-reader-v0.44.0) (2026-11-08)
+
+
+### Features
+
+* **text:** hairpins joined to barlines found and joined across them (hairpin recall 0.26 -&gt; 0.51) ([8001ad9](https://github.com/pension-plan/score-scan-reader/commit/8001ad94c9bb2a8e5343ec8fd007909a2892d546))
+
 ## [0.43.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.42.2...score-scan-reader-v0.43.0) (2026-11-08)
 
 
