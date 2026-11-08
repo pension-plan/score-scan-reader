@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 16:45 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 17:00 AEDT.
 
 ## Events
 
@@ -51,6 +51,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 16:42 | copista-2m ML demo published on GitHub Pages: https://pension-plan.github.io/score-scan-reader/ml-demo/ — runs the model in your browser on a sample hymn (124 noteheads split exactly S/A and T/B on the sample) or your own scan. Live check passed: 203 symbols in 7.0 s, no errors. On a real 1905 scan the model’s voice slots fail (208 of 213 in one slot), so the app keeps its own voice logic. |
 | 16:42 | Round 2 lyrics owner finished: words spanning several notes split into syllables, the trial’s line detector ported, part-name labels and stanza text now read. Lyrics 0.82 → 0.86 on its own; live tree with other owners’ work so far: aggregate 0.914, real scans 0.893. |
 | 16:45 | Round 2 UI owner finished: L5a resolved. Reads up to 40 pages (was 8), one page at a time with progress, a page strip and a Stop button; recognition moved to a Web Worker (main-thread freeze on an 8-page PDF 23.2 s → 2.2 s, memory 310 MB → 50 MB). 35 of 35 UI checks pass. |
+| 17:00 | Round 2 voices owner finished: lyric lines assigned to the right voice for the whole piece, melisma extenders written, printed part names read and applied (they also steer splitting), stanza text kept as MusicXML lyrics credits. Live tree: aggregate 0.918, real scans 0.900; challenge set 0.878 → 0.903. L3e, L4a, L4b resolved. |
 
 ## Accuracy by round
 
@@ -61,7 +62,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | v1 baseline | 0.589 | 0.493 | 0.542 | 0.439 | 0.727 | 1.000 | 0.618 |
 | Round 1 (shipped) | 0.884 | 0.863 | 0.822 | 0.817 | 0.987 | 1.000 | 0.865 |
 | Challenge set baseline (round 1 code, OCR) | 0.747 | – | – | – | – | – | – |
-| Round 2 (interim, lyrics owner) | 0.914 | – | – | 0.905 | – | – | 0.893 |
+| Round 2 (interim) | 0.918 | – | – | 0.911 | – | 1.000 | 0.900 |
 
 ## Known limits
 
@@ -73,11 +74,11 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | L3b | Ties and slurs not detected; a stray slur can create a false 16th | Symbols | In progress (round 1) |  |
 | L3c | Triplets and other tuplets not detected | Symbols | Queued for round 2 |  |
 | L3d | Mid-piece clef and key changes not detected | Symbols | Partial (round 1) | Treble-8vb clef detected; broken clefs re-joined; two treble clefs in a piano system kept as read. Per-system clef changes are read but not yet applied by score.js (round 2). |
-| L3e | Part names not read from the labels at the start of each system | Lyrics (OCR) + voices (apply) | Partial (round 2) | Part-name labels at system starts are now read by OCR (fr.partLabels); voices owner must apply them. |
-| L4a | Lyric alignment drifts when the note count is off | Voices + lyrics | Partial (round 1) | Syllables now matched to notes by left-to-right alignment instead of nearest note; a lyric line goes to the staff above it. |
-| L4b | No melisma or extender handling | Lyrics + voices | Partial (round 2) | Words spanning several notes are now split into one syllable per note (vowel groups, en/de/la rules); extenders and their end positions are reported. Lindenbaum lyrics 0.45 → 0.65. |
+| L3e | Part names not read from the labels at the start of each system | Lyrics (OCR) + voices (apply) | Resolved (round 2) | Part-name labels read by OCR and parsed against a multilingual lexicon (Sopran, Canto, Pianoforte, Tenor II…); labels also steer the layout. SAB item 4 → 3 parts. |
+| L4a | Lyric alignment drifts when the note count is off | Voices + lyrics | Resolved (round 2) | Each lyric line is assigned to one voice for the whole piece from syllable-to-onset evidence; alignment allows left-aligned melisma syllables and never uses rests. bwv3-6 +0.135, Beach +0.271 lyrics. |
+| L4b | No melisma or extender handling | Lyrics + voices | Resolved (round 2) | Words over several notes split into syllables (lyrics owner); melismas now carry <extend> start/stop bounded by the printed extender line; 189 extenders in the benchmark output, all schema-valid. |
 | L5a | At most 8 PDF pages processed | UI | Resolved (round 2) | Up to 40 PDF pages, read one at a time with per-page progress and a Stop button; recognition runs in a Web Worker. 8-page PDF: main thread blocked 23.2 s → 2.2 s, wall time 44.5 s → 27.1 s, memory 310 MB → 50 MB; 40 of 40 pages in 138 s. |
-| L5b | Stanza text printed below the last system dropped for SATB | Lyrics + voices | Partial (round 2) | Stanza text blocks below the music are now read (fr.stanzas); attaching them as verses is up to the voices owner. |
+| L5b | Stanza text printed below the last system dropped for SATB | Lyrics + voices | Partial (round 2) | Stanza text below the music is read and written as MusicXML lyrics credits, matching the truth files (lyr06 verses 4–6). Setting it under the notes is not attempted. |
 | L6 | Piano wrongly split: grand staves become S/A/T/B, voice+piano gets 4 parts instead of 2 (breaks the never-split-piano rule) | Voices (score.js) | Resolved (round 1) | All 20 benchmark items now get the right part count (was 13 of 20). Piano grand staves are recognised by barlines running through both staves and are never split; Bach bwv67, Clara Schumann, Lindenbaum, Dichterliebe, Beach and Aloha fixed. |
 | L7 | Lyrics attached to every part in closed score (3–4× too many syllables) | Voices + lyrics | Resolved (round 1) | Lyrics between staves go to the upper voice only; lines under the lowest split staff go to both its voices; copying to every voice is opt-in. Lyrics 0.60 → 0.82. |
 | L8 | Lyric text or other glyphs read as noteheads on single-melody pages | Noteheads and staves | Resolved (round 1) | A notehead outside the staff must sit on or next to ledger lines, which removes lyric letters, tuplet numbers and dynamics. Jeanie 0.48 → 0.88, Silent Night 0.56 → 0.96. |
@@ -100,7 +101,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | Run 2 | Scanned-PDF design | stopped | 0 of 4 | Stopped at 14:58 AEDT to restart with more agents in parallel. |
 | Run 4 | Fix-forward round 1 (shipped 0.884) | done | 7 of 7 |  |
 | Run 5 | Challenge test set (edge cases + scan damage) | running | 7 of 7 |  |
-| Run 6 | Fix-forward round 2 | running | 2 of 5 |  |
+| Run 6 | Fix-forward round 2 | running | 3 of 5 |  |
 | Run 3 | Max-parallel main workflow (research) | stopped | 7 of 10 | Stopped at 16:30 AEDT once all 7 research items returned, as planned; its 3 design-proposal agents had just started and were stopped with it. The full rebuild was replaced by fix-forward rounds on v1. |
 | Side | Agents launched directly from the session | running | 3 of 3 |  |
 
@@ -132,9 +133,9 @@ Every agent started for this build, including stopped runs. Outcomes are on the 
 | Run 5 | Generate | gen:layout | done | 15:55 | 16:18 | 23 | 120 |
 | Run 5 | Generate | gen:degradation | done | 15:55 | 16:12 | 17 | 87 |
 | Run 5 | Validate | validate+baseline | done | 16:18 | 16:28 | 10 | 70 |
-| Run 6 | Fix | fix:r2:heads | run | 16:21 |  | 32 | 205 |
-| Run 6 | Fix | fix:r2:symbols | run | 16:21 |  | 32 | 164 |
-| Run 6 | Fix | fix:r2:score | run | 16:21 |  | 31 | 147 |
+| Run 6 | Fix | fix:r2:heads | run | 16:21 |  | 39 | 229 |
+| Run 6 | Fix | fix:r2:symbols | run | 16:21 |  | 39 | 177 |
+| Run 6 | Fix | fix:r2:score | done | 16:21 | 17:00 | 39 | 170 |
 | Run 6 | Fix | fix:r2:lyrics | done | 16:21 | 16:41 | 20 | 109 |
 | Run 6 | Fix | fix:r2:ui | done | 16:21 | 16:45 | 24 | 87 |
 | Run 3 | Research | web:omr | done | 14:58 | 15:11 | 13 | 77 |

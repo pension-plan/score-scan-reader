@@ -116,8 +116,8 @@ function turn(g, quarter) {
   return out;
 }
 
-// Gray page -> binary, staff space, deskew and staves for one mode.
-function prepare(gray, mode) {
+// Gray page -> binary, staff space and deskew for one mode.
+function clean(gray, mode) {
   const bin = (g) => binarize(mode.blur ? boxBlur(g, mode.blur) : g, mode.denoise === false ? { denoise: false } : {});
   let bz = bin(gray);
   let sp = estimateStaffSpace(bz.binary);
@@ -138,8 +138,14 @@ function prepare(gray, mode) {
   let B = bz.binary;
   sp = estimateStaffSpace(B);
   if (mode.despeckle && bz.info.noise > 12) { B = despeckle(B, Math.max(2, Math.round(0.02 * sp.ss * sp.ss))); sp = estimateStaffSpace(B); }
-  // staves on the main binary and on a lenient one (faint / thin-ruled scans
-  // lose staff lines in B); keep the better-supported staff where they clash
+  return { gray, bz, B, sp, scale, skew, mode: mode.name };
+}
+
+// Staves on the main binary and on a lenient one (faint / thin-ruled scans
+// lose staff lines in B); the better-supported staff is kept where they clash.
+function findStaves(c) {
+  const { bz, B } = c;
+  let { sp } = c;
   const L0 = threshold(bz.gray, Math.min(235, (bz.info.threshold || 180) + 35));
   const spL = estimateStaffSpace(L0);
   const sB = detectStaves(B, sp.ss, sp.lt), sL = detectStaves(L0, spL.ss, spL.lt);
@@ -148,8 +154,10 @@ function prepare(gray, mode) {
   if (staves.filter(st => sL.includes(st)).length > staves.length / 2 && sB.length < staves.length) {
     sp = { ...sp, ss: spL.ss }; ltL = Math.max(sp.lt, spL.lt);
   }
-  return { gray, bz, B, L0, sp, ltL, scale, skew, staves, mode: mode.name };
+  return Object.assign(c, { L0, sp, ltL, staves });
 }
+
+const prepare = (gray, mode) => findStaves(clean(gray, mode));
 
 function transpose(b) {
   const { width: w, height: h, data } = b;
@@ -192,14 +200,16 @@ function invertedShare(R, staves) {
   return n ? inv / n : 0;
 }
 
-// Staged front end.  Yields the stage about to run ('clean', 'staves',
+// Staged front end.  Yields the stage about to run ('cleanup', 'staves',
 // 'notes') so a caller can report progress and let the page repaint between
-// stages; returns the result.  front() below runs it in one go.
+// stages; returns the result.  front() below runs it in one go, reporting
+// each stage to opts.onStage(stage) and opts.onProgress(message, { stage }).
 function* frontSteps(gray0, opts = {}) {
   const warnings = [];
-  yield 'clean';
-  let ctx = prepare(gray0, (opts.mode && MODES.find(m => m.name === opts.mode)) || MODES[0]);
+  yield 'cleanup';
+  let ctx = clean(gray0, (opts.mode && MODES.find(m => m.name === opts.mode)) || MODES[0]);
   yield 'staves';
+  findStaves(ctx);
   let quarter = 0;
   if (!ctx.staves.length && !opts.mode) {
     // fail over: other binarizations, then the page turned a quarter.  Only
@@ -221,7 +231,8 @@ function* frontSteps(gray0, opts = {}) {
   let { gray, B, L0, sp, ltL, scale, skew, staves } = ctx;
   if (!staves.length) {
     warnings.push('No staves found on this page.');
-    return { gray, B, R: B, scale, skew, ss: sp.ss, lt: sp.lt, staves: [], systems: [], heads: [], beams: [], barlines: [], warnings, orientation: 0, mode: ctx.mode };
+    // orientation left unset: nothing settled it, a caller may still try turns
+    return { gray, B, R: B, scale, skew, ss: sp.ss, lt: sp.lt, staves: [], systems: [], heads: [], beams: [], barlines: [], warnings, mode: ctx.mode };
   }
   let R = removeStaffLines(B, staves, sp.lt).binary;
   if (opts.orient !== false && invertedShare(R, staves) >= 0.6) {
@@ -270,10 +281,16 @@ function* frontSteps(gray0, opts = {}) {
     orientation: (quarter % 4) * 90, mode: ctx.mode };
 }
 
+const STAGE_TEXT = { cleanup: 'cleaning up the scan', staves: 'finding staves', notes: 'finding notes' };
+
 function front(gray, opts = {}) {
   const it = frontSteps(gray, opts);
   let r = it.next();
-  while (!r.done) { if (opts.onStage) opts.onStage(r.value); r = it.next(); }
+  while (!r.done) {
+    if (opts.onStage) opts.onStage(r.value);
+    if (opts.onProgress) opts.onProgress(STAGE_TEXT[r.value] || r.value, { stage: r.value });
+    r = it.next();
+  }
   return r.value;
 }
 
