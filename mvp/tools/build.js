@@ -15,7 +15,7 @@ const DIST = path.join(ROOT, 'dist');
 const UI = path.join(ROOT, 'ui');
 const quiet = process.argv.includes('--quiet');
 const MB = 1024 * 1024;
-const REQUIRED_ASSETS = ['tesseract-worker.min.js', 'tesseract-core-simd-lstm.wasm.js', 'eng.traineddata.gz', 'sample-st-anselm.pdf'];
+const REQUIRED_ASSETS = ['tesseract-worker.min.js', 'tesseract-core-simd-lstm.wasm.js', 'eng.traineddata.gz', 'sample-st-anselm.pdf', 'sample-maple-leaf-rag.pdf'];
 const SCRIPTS = [
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',

@@ -9,7 +9,7 @@
   const MAX_CODE_LINES = 3000;
   const PREVIEW_MEASURES = 48; // a longer score previews this many measures first
   const THUMB_W = 1400; // on-screen copy of each page (overlay keeps full-res coordinates)
-  const SAMPLE = { url: 'assets/sample-st-anselm.pdf', name: 'sample-st-anselm.pdf', label: 'St. Anselm (J. Barnby), Methodist Hymnal 1905' };
+  const SAMPLE = { url: 'assets/sample-maple-leaf-rag.pdf', name: 'sample-maple-leaf-rag.pdf', label: 'Maple Leaf Rag (Scott Joplin, 1899), scanned copy' };
   let busy = false;
   let stopAsked = false;
   let lastXML = '';
@@ -1037,7 +1037,7 @@
       const size = buf.length; // read before pdf.js transfers (detaches) the buffer
       const src = await pdfSource(buf, SAMPLE.name);
       return { pages: src.pages, size, close: src.close };
-    }, { name: SAMPLE.name, title: 'the sample hymn', label: 'sample: ' + SAMPLE.label, size: null });
+    }, { name: SAMPLE.name, title: 'the sample rag', label: 'sample: ' + SAMPLE.label, size: null });
   }
 
   // ---------------------------------------------------------------- wire ---
