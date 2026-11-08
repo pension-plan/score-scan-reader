@@ -63,8 +63,8 @@ function front(gray, opts = {}) {
   const { heads, beams } = detectHeads(B, R, staves, sp.ss, sp.lt);
   const { binary: L } = removeStaffLines(L0, staves, ltL);
   let hs = heads.filter(h => h.x > staves[h.staff].left + 3.0 * sp.ss && ledgerOK(L, staves, h, ltL));
-  const chords = chordStems(L, hs, { minLen: 1.5 });
-  hs = hs.filter(h => h.stemDir !== 0 || h.kind === 'hollow');
+  const chords = chordStems(L, hs, { minLen: 1.5, sides: true });
+  hs = hs.filter(h => (h.stemDir !== 0 || h.kind === 'hollow') && !(h.chord && h.chord.accidental));
   const barlines = detectBarlines(R, staves, hs, sp.ss);
   return { gray, B, R, L, scale, skew, ss: sp.ss, lt: sp.lt, staves, systems, heads: hs, chords, beams, barlines, warnings };
 }

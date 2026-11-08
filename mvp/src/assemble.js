@@ -13,17 +13,25 @@ function compIndex(R) {
   return comps.filter(c => c.area >= 4);
 }
 
-function strokes(R, c, minRun) {
+function strokes(R, c, minRun, strict) {
   // columns with a vertical run >= 0.55 * height (or minRun) -> clustered into strokes
   const { width: w, data } = R;
   const hgt = c.y1 - c.y0 + 1;
   const need = minRun || 0.55 * hgt;
   const cols = [];
+  // a stroke may be cut where a staff line was removed: runs are joined over
+  // short gaps as long as the gaps stay a small share of the stroke
+  const maxGap = strict ? 0 : Math.max(2, 0.22 * hgt);
   for (let x = c.x0; x <= c.x1; x++) {
-    let best = 0, run = 0, top = -1, bestTop = -1, bestBot = -1;
-    for (let y = c.y0; y <= c.y1; y++) {
-      if (data[y * w + x]) { if (!run) top = y; run++; if (run > best) { best = run; bestTop = top; bestBot = y; } }
-      else run = 0;
+    let best = 0, bestTop = -1, bestBot = -1, segTop = -1, segBot = -1, gaps = 0, y = c.y0;
+    while (y <= c.y1) {
+      if (!data[y * w + x]) { y++; continue; }
+      let y2 = y; while (y2 + 1 <= c.y1 && data[(y2 + 1) * w + x]) y2++;
+      const gap = segBot >= 0 ? y - segBot - 1 : 0;
+      if (segBot >= 0 && gap <= maxGap && (gaps + gap) <= 0.2 * (y2 - segTop + 1)) { gaps += gap; segBot = y2; }
+      else { segTop = y; segBot = y2; gaps = 0; }
+      if (segBot - segTop + 1 > best) { best = segBot - segTop + 1; bestTop = segTop; bestBot = segBot; }
+      y = y2 + 1;
     }
     cols.push(best >= need ? { x, top: bestTop, bot: bestBot } : null);
   }
@@ -34,6 +42,9 @@ function strokes(R, c, minRun) {
     if (last && c2.x - last.x1 <= 1) { last.x1 = c2.x; last.top = Math.min(last.top, c2.top); last.bot = Math.max(last.bot, c2.bot); }
     else out.push({ x0: c2.x, x1: c2.x, top: c2.top, bot: c2.bot });
   }
+  // heavy ink: bars joined across the sign look like one wide stroke; strokes
+  // are thin, so fall back to unbroken runs only
+  if (!strict && out.some(t => t.x1 - t.x0 + 1 > 0.25 * hgt)) return strokes(R, c, minRun, true);
   return out;
 }
 
@@ -106,7 +117,7 @@ function splitSharps(R, g, sp) {
   if (wid < 1.5 * sp || wid > 6 * sp || hgt > 7 * sp) return null;
   const img = glyphImage(R, g);
   const all = { x0: 0, y0: 0, x1: wid - 1, y1: hgt - 1 };
-  const st = strokes(img, all, 2.0 * sp);
+  const st = strokes(img, all, 2.0 * sp, true);
   if (st.length < 4 || st.length % 2) return null;
   const out = [];
   for (let i = 0; i < st.length; i += 2) {

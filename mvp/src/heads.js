@@ -9,20 +9,87 @@
 const { makeBinary } = require('./image');
 const { labelComponents, integral } = require('./cc');
 
-function fillHoles(B, R, ss) {
-  // background components of B that are small and enclosed -> ink in a copy of R
+function fillHoles(B, R, ss, lt = 2, opts = {}) {
+  // background components of B that are small and enclosed -> ink in a copy of R.
+  // Worn hollow heads (older engravings, light scans) have 1-2 px breaks in
+  // their outline: a second pass looks for holes after a 1-px dilation of B,
+  // restricted to the shape of a head's inside (flat, at most ~2/3 space high).
+  // Above / below every filled inside, the outline (and a staff line crossing
+  // it) is put back over the inside's columns: staff-line removal eats those
+  // thin horizontal pieces and would cut the head in two.
   const { width: w, height: h } = B;
-  const inv = makeBinary(w, h);
-  for (let i = 0; i < w * h; i++) inv.data[i] = B.data[i] ? 0 : 1;
-  const { labels, comps } = labelComponents(inv, { four: true });
-  const maxW = 1.5 * ss, maxH = 1.0 * ss, maxA = 0.6 * ss * ss;
-  const fill = new Uint8Array(comps.length + 1);
-  for (const c of comps) {
-    if (c.x0 === 0 || c.y0 === 0 || c.x1 === w - 1 || c.y1 === h - 1) continue;
-    if (c.x1 - c.x0 + 1 <= maxW && c.y1 - c.y0 + 1 <= maxH && c.area <= maxA && c.area >= 2) fill[c.id] = 1;
-  }
+  const src = B.data;
   const out = { width: w, height: h, data: new Uint8Array(R.data) };
-  for (let i = 0; i < w * h; i++) if (labels[i] && fill[labels[i]]) out.data[i] = 1;
+  const o = out.data;
+  const inner = (c) => !(c.x0 === 0 || c.y0 === 0 || c.x1 === w - 1 || c.y1 === h - 1);
+  const r = Math.max(2, Math.round(lt + 1));
+  const restore = (labels, c) => {
+    for (let x = c.x0; x <= c.x1; x++) {
+      let top = -1, bot = -1;
+      for (let y = c.y0; y <= c.y1; y++) if (labels[y * w + x] === c.id) { if (top < 0) top = y; bot = y; }
+      if (top < 0) continue;
+      for (let y = top - 1, k = 0; y >= 0 && k < r && src[y * w + x]; y--, k++) o[y * w + x] = 1;
+      for (let y = bot + 1, k = 0; y < h && k < r && src[y * w + x]; y++, k++) o[y * w + x] = 1;
+    }
+  };
+  const inv = makeBinary(w, h);
+  // a head's inside sits in a head-tall stack of ink (outline + inside >= 3/4
+  // space); the lens between a slur / tie and a staff line or beam is flat
+  const headTall = (labels, c) => {
+    const isIn = (i) => !inv.data[i] || labels[i] === c.id;  // ink (of the image searched) or the hole
+    let best = 0;
+    const xm = Math.round((c.x0 + c.x1) / 2);
+    for (let x = Math.max(c.x0, xm - 2); x <= Math.min(c.x1, xm + 2); x++) {
+      let y0 = -1;
+      for (let y = c.y0; y <= c.y1; y++) if (labels[y * w + x] === c.id) { y0 = y; break; }
+      if (y0 < 0) continue;
+      let a = y0, b = y0;
+      while (a > 0 && isIn((a - 1) * w + x)) a--;
+      while (b < h - 1 && isIn((b + 1) * w + x)) b++;
+      best = Math.max(best, b - a + 1);
+    }
+    return best >= 0.75 * ss;
+  };
+  for (let i = 0; i < w * h; i++) inv.data[i] = src[i] ? 0 : 1;
+  {
+    const { labels, comps } = labelComponents(inv, { four: true });
+    const maxW = 1.5 * ss, maxH = 1.0 * ss, maxA = 0.6 * ss * ss;
+    const fill = new Uint8Array(comps.length + 1);
+    for (const c of comps) {
+      if (!inner(c)) continue;
+      const cw = c.x1 - c.x0 + 1, ch = c.y1 - c.y0 + 1;
+      // wide, flat insides: hollow heads of older engravings run up to ~1.9
+      // spaces wide (taller regions that wide are gaps between lines and stems)
+      if (!(ch <= maxH && c.area <= maxA && c.area >= 2)) continue;
+      const flat = cw >= 0.4 * ss && cw >= ch && ch <= 0.65 * ss;
+      if (cw <= maxW) {
+        fill[c.id] = 1;
+        if (opts.walls !== false && flat && headTall(labels, c)) restore(labels, c);
+      } else if (cw <= 1.9 * ss && ch <= 0.6 * ss && headTall(labels, c)) {
+        fill[c.id] = 1;
+        if (opts.walls !== false) restore(labels, c);
+      }
+    }
+    for (let i = 0; i < w * h; i++) if (labels[i] && fill[labels[i]]) o[i] = 1;
+  }
+  if (opts.close === false) return out;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const i = y * w + x;
+    inv.data[i] = (src[i] || (x > 0 && src[i - 1]) || (x < w - 1 && src[i + 1]) || (y > 0 && src[i - w]) || (y < h - 1 && src[i + w])) ? 0 : 1;
+  }
+  const { labels, comps } = labelComponents(inv, { four: true });
+  const maxW = 1.9 * ss, maxH = 0.65 * ss, maxA = 0.5 * ss * ss, minA = 0.03 * ss * ss;
+  for (const c of comps) {
+    const cw = c.x1 - c.x0 + 1, ch = c.y1 - c.y0 + 1;
+    if (!(inner(c) && cw <= maxW && ch <= maxH && cw >= (opts.aspect ?? 3) * ch && cw >= 0.5 * ss && c.area <= maxA && c.area >= minA)) continue;
+    if (!headTall(labels, c)) continue;
+    // the hole and its 1-px rim (the dilation shrank it)
+    for (let y = Math.max(1, c.y0 - 1); y <= Math.min(h - 2, c.y1 + 1); y++) for (let x = Math.max(1, c.x0 - 1); x <= Math.min(w - 2, c.x1 + 1); x++) {
+      const i = y * w + x;
+      if (labels[i] === c.id || labels[i - 1] === c.id || labels[i + 1] === c.id || labels[i - w] === c.id || labels[i + w] === c.id) o[i] = 1;
+    }
+    if (opts.walls !== false) restore(labels, { ...c, x0: c.x0, x1: c.x1 });
+  }
   return out;
 }
 
@@ -111,7 +178,7 @@ function headWindows(c, labels, w, sp) {
 }
 
 function detectHeads(B, R, staves, ss, lt) {
-  const F = fillHoles(B, R, ss);
+  const F = fillHoles(B, R, ss, lt);
   const O1 = openRuns(F, Math.max(3, Math.round(0.55 * ss)), true);
   const O = openRuns(O1, Math.max(3, Math.round(0.42 * ss)), false);
   const { labels, comps } = labelComponents(O);
@@ -166,7 +233,7 @@ function detectHeads(B, R, staves, ss, lt) {
         const hollow = core < 0.5 && coreB < 0.75;
         const wid = xb - xa;
         if (wid < 0.9 * sp) continue;
-        heads.push({ x: xm, y: ycen, staff: ps.st.index, p, sp, kind: hollow ? 'hollow' : 'filled', score: 1, w: wid,
+        heads.push({ x: xm, y: ycen, staff: ps.st.index, p, sp, kind: hollow ? 'hollow' : 'filled', score: 1, w: wid, blob: c.id,
           x0: Math.round(xa), x1: Math.round(xb) });
       }
     }
@@ -245,7 +312,10 @@ function chordStems(L, heads, opts = {}) {
     const hs = byStaff[k].sort((a, b) => a.x - b.x);
     let cur = null;
     for (const hd of hs) {
-      if (cur && hd.x - cur.xs[cur.xs.length - 1] < 0.7 * hd.sp) { cur.heads.push(hd); cur.xs.push(hd.x); }
+      // same column, or the other head of a second (same blob, a position apart)
+      const join = cur && (hd.x - cur.xs[cur.xs.length - 1] < 0.7 * hd.sp ||
+        (opts.sides && cur.heads.some(o => o.blob === hd.blob && Math.abs(o.p - hd.p) === 1 && hd.x - o.x <= 1.6 * hd.sp)));
+      if (join) { cur.heads.push(hd); cur.xs.push(hd.x); }
       else { cur = { heads: [hd], xs: [hd.x], staff: +k }; chords.push(cur); }
     }
   }
@@ -256,7 +326,11 @@ function chordStems(L, heads, opts = {}) {
     const top = c.heads[0], bot = c.heads[c.heads.length - 1];
     const xa = Math.round(Math.min(...c.xs) - 0.85 * sp), xb = Math.round(Math.max(...c.xs) + 0.85 * sp);
     const maxGap = Math.max(2, Math.round(0.4 * sp));
-    let up = 0, upX = -1, down = 0, downX = -1;
+    // stems sit right of the heads going up and left going down; a stroke on
+    // the other side is an accidental's (flat: up on the left, natural: up on
+    // the left and down on the right)
+    const xl = Math.min(...c.xs) + 0.1 * sp, xr = Math.max(...c.xs) - 0.1 * sp;
+    let up = 0, upX = -1, down = 0, downX = -1, upIll = 0, downIll = 0;
     for (let x = xa; x <= xb; x++) {
       // upward run starting inside the top head band
       let y0 = -1;
@@ -266,7 +340,8 @@ function chordStems(L, heads, opts = {}) {
         for (let y = y0 - 1; y >= 0; y--) { if (ink(x, y)) { yt = y; gap = 0; } else if (++gap > maxGap) break; }
         // thin: the run's upper part must not be wide (not a beam/flag-free blob check, cheap)
         const len = (top.y - yt) / sp;
-        if (len > up) { up = len; upX = x; c.upEnd = yt; }
+        if (opts.sides && x < xl) { if (len > upIll) upIll = len; }
+        else if (len > up) { up = len; upX = x; c.upEnd = yt; }
       }
       y0 = -1;
       for (let y = Math.round(bot.y - 0.3 * sp); y <= Math.round(bot.y + 0.5 * sp); y++) if (ink(x, y)) { y0 = y; }
@@ -274,10 +349,18 @@ function chordStems(L, heads, opts = {}) {
         let yb = y0, gap = 0;
         for (let y = y0 + 1; y < h; y++) { if (ink(x, y)) { yb = y; gap = 0; } else if (++gap > maxGap) break; }
         const len = (yb - bot.y) / sp;
-        if (len > down) { down = len; downX = x; c.downEnd = yb; }
+        if (opts.sides && x > xr) { if (len > downIll) downIll = len; }
+        else if (len > down) { down = len; downX = x; c.downEnd = yb; }
       }
     }
     c.up = up >= minLen ? up : 0; c.down = down >= minLen ? down : 0;
+    if (opts.sides) {
+      // only wrong-side strokes, or two short strokes both ways (a sharp):
+      // an accidental, not a note
+      const ill = !c.up && !c.down && Math.max(upIll, downIll) >= minLen;
+      const sharp = c.heads.length === 1 && c.up && c.down && Math.max(c.up, c.down) < (opts.sharpLen ?? 2.2);
+      if (ill || sharp) { c.accidental = true; c.up = 0; c.down = 0; }
+    }
     c.upX = upX; c.downX = downX;
     c.x = c.xs.reduce((a, b) => a + b, 0) / c.xs.length;
     for (const hd of c.heads) hd.chord = c;
