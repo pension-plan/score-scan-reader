@@ -1047,7 +1047,10 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     for (const pi of pis) if (e[pi] > (lowest ? e[best] + 0.6 : 1.25 * e[best] + 2)) best = pi;
     bandVoice[band] = best;
     // under the lowest split staff with nothing to tell the voices apart (the
-    // same onsets throughout): the text serves both voices of that staff
+    // same onsets throughout): the text serves both voices of that staff.
+    // Transcriptions give such text to either voice (tenor in aloha-oe and the
+    // anthem, bass in bwv3-6 and the amen item), so one voice would be wrong
+    // as often as right; both is right in every case where both sing it (L7)
     const tie = lowest && best === prior && pis.every(pi => Math.abs(e[pi] - e[prior]) < 0.6);
     if (tie) bandVoice[band] = 'all';
     if (pis.length > 1) lyrNotes.add(`Lyrics under staff ${+band + 1} attached to ${tie ? pis.map(pi => parts[pi].name).join(' and ') + ' (same rhythm, text sung by both)' : parts[best].name + (best === prior ? ' (upper voice)' : ' (its rhythm fits the syllables best)')}.`);
@@ -1451,6 +1454,7 @@ function alignSyllables(verse, evs, sp, comps) {
     for (let t = b + 1; t <= last; t++) if (evs[t].lyrics && evs[t].lyrics[num]) return;
     evs[b].lyrics[num].extend = true;
     (evs[last].lyrExt ||= {})[num] = true;
+    (verse.melismas ||= []).push({ evs, b, last, num, printed: !!ext, s, next: k + 1 < placed.length ? syl[placed[k + 1][0]] : null });
   });
 }
 
