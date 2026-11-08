@@ -14,6 +14,10 @@
           <span class="samples-label" id="samplesLabel">Samples</span>
           <button class="btn" id="sample" type="button" title="Piano rag, two staves kept together (converted when the page opens)">Maple Leaf Rag</button>
           <button class="btn" id="sampleHymn" type="button" title="Real 1905 hymnal scan: closed-score SATB split into four parts, with lyrics">St. Anselm hymn</button>
+          <label class="sr-only" for="sampleAll">All example scans</label>
+          <select class="btn sample-all" id="sampleAll" title="Every example scan from the test set: real hymnal and songbook scans, and synthetic scans with known answers">
+            <option value="">All examples…</option>
+          </select>
         </div>
       </div>
       <input id="file" class="sr-only" type="file" accept="application/pdf,image/png,image/jpeg" multiple tabindex="-1" aria-hidden="true">
@@ -48,6 +52,12 @@
         </button>
       </div>
       <ul class="legend" id="legend" aria-label="Overlay key"></ul>
+      <ul class="layers" id="layers" aria-label="Overlay layers: switch each kind of mark on or off"></ul>
+      <div class="zoom" role="group" aria-label="Page zoom">
+        <button class="btn icon" id="zoomOut" type="button" aria-label="Zoom out" aria-controls="pages"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8h9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+        <output class="zoom-label" id="zoomLabel" aria-live="polite">Fit</output>
+        <button class="btn icon" id="zoomIn" type="button" aria-label="Zoom in" aria-controls="pages"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8h9M8 3.5v9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+      </div>
       <div class="pagenav" id="pageNav" hidden>
         <div class="pagenav-row">
           <button class="btn icon" id="pgPrev" type="button" aria-label="Previous page" aria-controls="pages"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>

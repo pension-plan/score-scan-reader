@@ -133,20 +133,52 @@ function __omrSessionModule() {
     return out;
   }
 
-  // Plain, cloneable overlay data for one page, in the deskewed frame.
-  function pageView(entry, index) {
+  // Every recognised symbol of a page (src/symbols.js), for the overlay. A
+  // spread's symbols are its halves' drawn back on the sheet: boxes by their
+  // mapped corners, stems and barlines by their ends.
+  function pageSymbols(entry, req, halves) {
+    let mod = null;
+    try { mod = req && req('./symbols'); } catch (e) { mod = null; }
+    if (!mod || !mod.pageSymbols) return null;
+    const r1 = (v) => Math.round(v * 10) / 10;
+    const read = (e) => { try { return mod.pageSymbols(e.fr, e.asm); } catch (err) { return null; } };
+    if (!halves) return read(entry);
+    const out = {};
+    for (const { hv, map } of halves) {
+      const sy = read(hv);
+      if (!sy) continue;
+      const f = hv.fr.scale || 1;
+      for (const k of Object.keys(sy)) {
+        out[k] = (out[k] || []).concat(sy[k].map((a) => {
+          if (k === 'stems') { const p = map(a[0], a[1]), q = map(a[0], a[2]); return [r1((p[0] + q[0]) / 2), r1(p[1]), r1(q[1])]; }
+          if (k === 'bars') { const p = map(a[0], a[1]), q = map(a[0], a[2]); return [r1((p[0] + q[0]) / 2), r1(p[1]), r1(q[1]), a[3], r1(map(a[4], a[1])[0]), r1(map(a[5], a[1])[0])]; }
+          if (k === 'dots') { const p = map(a[0], a[1]); return [r1(p[0]), r1(p[1]), r1(a[2] / f)]; }
+          const c = [map(a[0], a[1]), map(a[2], a[1]), map(a[0], a[3]), map(a[2], a[3])];
+          const xs = c.map((p) => p[0]), ys = c.map((p) => p[1]);
+          return [r1(Math.min(...xs)), r1(Math.min(...ys)), r1(Math.max(...xs)), r1(Math.max(...ys)), ...a.slice(4)];
+        }));
+      }
+    }
+    return out;
+  }
+
+  // Plain, cloneable overlay data for one page, in the deskewed frame. With
+  // the module loader (req), it also carries every symbol read (sym).
+  function pageView(entry, index, req) {
     const fr = entry.fr;
     const W = fr.gray.width, H = fr.gray.height;
     const r1 = (v) => Math.round(v * 10) / 10;
     // a spread's notes (and their parts) belong to its halves, so its heads
     // are the halves' heads drawn back on the whole sheet
     const halves = spreadHalves(entry);
+    // [x, y, r, stem direction, staff top and bottom at x] (labels sit outside the staff)
+    const edges = (f, h) => { const st = f.staves[h.staff]; return st ? [st.yAt(0, h.x), st.yAt(4, h.x)] : [h.y, h.y]; };
     const heads = halves
       ? halves.flatMap(({ hv, map }) => (hv.fr.heads || []).map((h) => {
-        const [x, y] = map(h.x, h.y);
-        return [r1(x), r1(y), r1(((h.sp || hv.fr.ss) * 0.62) / (hv.fr.scale || 1))];
+        const [x, y] = map(h.x, h.y), [t, b] = edges(hv.fr, h);
+        return [r1(x), r1(y), r1(((h.sp || hv.fr.ss) * 0.62) / (hv.fr.scale || 1)), h.stemDir || 0, r1(map(h.x, t)[1]), r1(map(h.x, b)[1])];
       }))
-      : (fr.heads || []).map((h) => [r1(h.x), r1(h.y), r1((h.sp || fr.ss) * 0.62)]);
+      : (fr.heads || []).map((h) => { const [t, b] = edges(fr, h); return [r1(h.x), r1(h.y), r1((h.sp || fr.ss) * 0.62), h.stemDir || 0, r1(t), r1(b)]; });
     const staves = fr.staves.map((st) => {
       const edge = (k) => {
         const pts = [];
@@ -171,6 +203,7 @@ function __omrSessionModule() {
       orientation: (((fr.orientation || 0) + 90 * (entry.turns || 0)) % 360 + 360) % 360,
       mode: fr.mode || 'default',
       spread: halves ? halves.length : 0,
+      sym: req ? pageSymbols(entry, req, halves) : null,
     };
   }
 
@@ -229,13 +262,20 @@ function __omrSessionModule() {
   // i and i + 0.5) are one page on screen, so their lists join in reading
   // order, the order pageView() draws their heads in.
   function pageParts(pages) {
-    const by = new Map();
+    const by = new Map(), notes = new Map();
     for (const p of pages.slice().sort((a, b) => a.index - b.index)) {
       const k = Math.floor(p.index);
       if (!by.has(k)) by.set(k, []);
       for (const h of p.fr.heads || []) by.get(k).push(h.parts ? h.parts.slice() : []);
+      // what each drawn head was written as: [step, alter, octave, quarters,
+      // type, dots, tuplet number], or 0 when no part wrote it
+      if (!notes.has(k)) notes.set(k, []);
+      for (const h of p.fr.heads || []) {
+        const pt = h.pitch, d = h.shown;
+        notes.get(k).push(pt && d ? [pt.step, pt.alter || 0, pt.octave, Math.round(d.q * 1000) / 1000, d.type || '', d.dots || 0, d.tuplet || 0] : 0);
+      }
     }
-    return [...by].map(([index, parts]) => ({ index, parts }));
+    return [...by].map(([index, parts]) => ({ index, parts, notes: notes.get(index) || [] }));
   }
 
   // ------------------------------------------------------------ worker side
@@ -275,7 +315,7 @@ function __omrSessionModule() {
         const entry = await session.addPage(m.gray, m.i, m.n);
         m.gray = null;
         if (!entry) { post({ t: 'page-done', i: m.i, ms: Date.now() - t0, view: null }); return; }
-        const view = pageView(entry, m.i);
+        const view = pageView(entry, m.i, req);
         const thumb = shrink(entry.fr.gray, m.maxW || 1400);
         // only a session that says what it can spare frees page buffers
         if (session.releasePage) { session.releasePage(entry); (entry.spread || []).forEach((h) => session.releasePage(h)); }

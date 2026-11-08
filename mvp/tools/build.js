@@ -19,7 +19,7 @@ const MB = 1024 * 1024;
 // licence / notice files that must ship with them (copy with node assets-src/ml/sync.js).
 const ML_ASSETS = ['copista2m-dense.int8w.onnx', 'copista2m-rel.int8w.onnx', 'copista2m-classes.json', 'ort-wasm-simd-threaded.wasm',
   'LICENSE.copista-Apache-2.0.txt', 'NOTICE.copista-2m', 'NOTICE.copisteria', 'LICENSE.onnxruntime-web-MIT.txt', 'NOTICE.ml.txt'];
-const REQUIRED_ASSETS = ['tesseract-worker.min.js', 'tesseract-core-simd-lstm.wasm.js', 'eng.traineddata.gz', 'deu.traineddata.gz', 'sample-st-anselm.pdf', 'sample-maple-leaf-rag.pdf', ...ML_ASSETS];
+const REQUIRED_ASSETS = ['tesseract-worker.min.js', 'tesseract-core-simd-lstm.wasm.js', 'eng.traineddata.gz', 'deu.traineddata.gz', 'sample-st-anselm.pdf', 'sample-maple-leaf-rag.pdf', 'samples.json', ...ML_ASSETS];
 const SCRIPTS = [
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',

@@ -27,6 +27,10 @@
   --display:"Bodoni Moda","Bodoni 72","Libre Bodoni",Didot,Georgia,serif;
   --sans:"Instrument Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  /* overlay marks: drawn on the scan, which stays paper in both themes, so
+     they keep paper-contrast values; the legend swatches sit on paper too */
+  --ov-rest:#00796b; --ov-clef:#8e24aa; --ov-key:#c25100; --ov-time:#2e7d32; --ov-mark:#c2185b;
+  --ov-stem:rgba(60,66,78,.55); --ov-lyric:#455a64; --ov-unknown:#e0001b; --ov-label:#15171b; --ov-label-dur:#4f5761; --ov-bar:#2b37b0; --ov-staff:#1e8c5a;
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
@@ -90,10 +94,12 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 .samples::before{top:0}
 .samples::after{bottom:0}
 .samples-label{font:italic 600 14px/1 var(--display);color:var(--muted);margin-right:2px}
+.sample-all{max-width:16rem;min-width:0;font:inherit;cursor:pointer;text-overflow:ellipsis}
 @media (max-width:480px){
   .samples{flex:1 1 100%}
   .samples-label{flex-basis:100%;padding-top:2px}
   .samples .btn{flex:1 1 0;justify-content:center;padding:7px 8px;white-space:nowrap}
+  .samples .sample-all{flex:1 1 100%;max-width:none;width:100%}
 }
 .filerow{flex:1 1 300px;min-width:0;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;
   gap:6px 12px;padding:10px 12px;border:1px solid var(--rule);background:var(--panel-2);border-radius:2px}
@@ -175,6 +181,32 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 .pageframe img{display:block;width:100%;height:auto}
 .pageframe .ov{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .pages.ov-off .ov{visibility:hidden}
+/* overlay layers (toggled in the legend; hide-<layer> on .pages) */
+.ov-rests{stroke:var(--ov-rest)} .ov-clefs{stroke:var(--ov-clef)} .ov-keys{stroke:var(--ov-key)} .ov-times{stroke:var(--ov-time)}
+.ov-marks{stroke:var(--ov-mark)} .ov-lyrics{stroke:var(--ov-lyric)} .ov-unknown{stroke:var(--ov-unknown)} .ov-hatch{stroke:var(--ov-unknown);opacity:.45}
+.ov-stem,.ov-beam{stroke:var(--ov-stem)}
+.ov-labels text{font-family:var(--sans);font-weight:600;fill:var(--ov-label);stroke:var(--paper);stroke-linejoin:round;paint-order:stroke}
+.ov-labels .ld{font-weight:500;font-style:italic;fill:var(--ov-label-dur)}
+.ov-labels .lr{fill:var(--ov-rest)} .ov-labels .lb{fill:var(--ov-bar)}
+.pages.hide-notes .ov-notes,.pages.hide-rests .ov-rests,.pages.hide-clefs .ov-clefs,.pages.hide-keys .ov-keys,.pages.hide-times .ov-times,
+.pages.hide-bars .ov-bars,.pages.hide-marks .ov-marks,.pages.hide-lyrics .ov-lyrics,.pages.hide-labels .ov-labels,.pages.hide-unknown .ov-unknown,
+.pages.lbl-small .ov-labels{display:none}
+.pages{overflow-x:auto}
+.pages>.pageframe{flex:none;width:calc(100% * var(--zoom, 1))}
+.layers{list-style:none;margin:0 0 10px;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.layer{appearance:none;display:inline-flex;align-items:center;gap:6px;min-height:30px;padding:3px 9px 3px 4px;border:1px solid var(--rule-strong);
+  border-radius:15px;background:transparent;font-size:12.5px;line-height:1.2;cursor:pointer;color:var(--ink)}
+.layer svg{width:20px;height:20px;flex:none;padding:2px;background:var(--paper);border-radius:50%;box-shadow:0 0 0 1px var(--rule)}
+.layer[aria-pressed="false"]{color:var(--muted);border-style:dashed;text-decoration:line-through;text-decoration-color:var(--rule-strong)}
+.layer[aria-pressed="false"] svg{opacity:.35}
+.layer-n{font:11px var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.layer-hint{display:none;font-size:11px;font-style:italic;color:var(--muted)}
+.layers.lbl-small .layer[data-layer="labels"][aria-pressed="true"] .layer-hint{display:inline}
+.ovk-notes{stroke:var(--ov-label)} .ovk-rests{stroke:var(--ov-rest)} .ovk-clefs{stroke:var(--ov-clef)} .ovk-keys{stroke:var(--ov-key)}
+.ovk-times{stroke:var(--ov-time)} .ovk-bars{stroke:var(--ov-bar)} .ovk-bars .ovk-staff{stroke:var(--ov-staff)} .ovk-marks{stroke:var(--ov-mark)}
+.ovk-lyrics{stroke:var(--ov-lyric)} .ovk-labels{color:var(--ov-label)} .ovk-unknown{stroke:var(--ov-unknown)}
+.zoom{display:inline-flex;align-items:center;gap:6px;margin:0 0 10px}
+.zoom-label{min-width:3.2em;text-align:center;font:12px var(--mono);color:var(--muted)}
 .pageframe.placeholder{aspect-ratio:1 / 1.29;display:grid;place-items:center;line-height:1.5;
   background:repeating-linear-gradient(to bottom,transparent 0 46px,#d6d9dd 46px 47px,transparent 47px 52px,#d6d9dd 52px 53px,transparent 53px 58px,#d6d9dd 58px 59px,transparent 59px 64px,#d6d9dd 64px 65px,transparent 65px 70px,#d6d9dd 70px 71px,transparent 71px 120px) var(--paper)}
 .pageframe.placeholder p{margin:0;padding:10px 14px;max-width:30ch;text-align:center;font:italic 15px/1.4 var(--display);color:#3f454d;background:var(--paper)}
@@ -303,6 +335,10 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
           <span class="samples-label" id="samplesLabel">Samples</span>
           <button class="btn" id="sample" type="button" title="Piano rag, two staves kept together (converted when the page opens)">Maple Leaf Rag</button>
           <button class="btn" id="sampleHymn" type="button" title="Real 1905 hymnal scan: closed-score SATB split into four parts, with lyrics">St. Anselm hymn</button>
+          <label class="sr-only" for="sampleAll">All example scans</label>
+          <select class="btn sample-all" id="sampleAll" title="Every example scan from the test set: real hymnal and songbook scans, and synthetic scans with known answers">
+            <option value="">All examples…</option>
+          </select>
         </div>
       </div>
       <input id="file" class="sr-only" type="file" accept="application/pdf,image/png,image/jpeg" multiple tabindex="-1" aria-hidden="true">
@@ -337,6 +373,12 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
         </button>
       </div>
       <ul class="legend" id="legend" aria-label="Overlay key"></ul>
+      <ul class="layers" id="layers" aria-label="Overlay layers: switch each kind of mark on or off"></ul>
+      <div class="zoom" role="group" aria-label="Page zoom">
+        <button class="btn icon" id="zoomOut" type="button" aria-label="Zoom out" aria-controls="pages"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8h9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+        <output class="zoom-label" id="zoomLabel" aria-live="polite">Fit</output>
+        <button class="btn icon" id="zoomIn" type="button" aria-label="Zoom in" aria-controls="pages"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8h9M8 3.5v9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+      </div>
       <div class="pagenav" id="pageNav" hidden>
         <div class="pagenav-row">
           <button class="btn icon" id="pgPrev" type="button" aria-label="Previous page" aria-controls="pages"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -956,6 +998,7 @@ function analyseHeader(R, comps, st, limitX, trace) {
   // expected accidental positions; both clefs stay possible when unread
   let kcs = clef ? [keyPosFor(clef)] : [KEY_POS.G, KEY_POS.F];
   let kind = null, n = 0, end = clefEnd, time = null;
+  const keySigns = []; // (overlay only: where the key signature's signs stand)
   for (let gi = 0; gi < glyphs.length; gi++) {
     let g = glyphs[gi];
     if ((g.x1 - g.x0) < 0.25 * sp && (g.y1 - g.y0) < 0.4 * sp) continue; // specks
@@ -1007,7 +1050,7 @@ function analyseHeader(R, comps, st, limitX, trace) {
     if ((k === 'sharp' || k === 'flat') && (kind === null || kind === k) && n < 7 && !far) {
       const p = accPos(st, g, k, sp);
       const ok = kcs.filter(kc => Math.abs(p - kc[k][n]) <= (g.lenient ? 0.8 : 1.2));
-      if (ok.length) { kcs = ok; kind = k; n++; end = g.x1; continue; }
+      if (ok.length) { kcs = ok; kind = k; n++; end = g.x1; keySigns.push({ x0: g.x0, y0: g.y0, x1: g.x1, y1: g.y1 }); continue; }
       break;
     }
     if (isTimeSig(R, st, g, sp)) { time = { x0: g.x0, x1: g.x1 }; end = g.x1; break; }
@@ -1022,7 +1065,8 @@ function analyseHeader(R, comps, st, limitX, trace) {
     }
     break;
   }
-  return { clef: clef === 'G' && clefOct === -1 ? 'G8' : clef, clefOct, fifths: kind === 'flat' ? -n : n, end: end + 0.2 * sp, keyN: n, time, mid: lineY(2) };
+  return { clef: clef === 'G' && clefOct === -1 ? 'G8' : clef, clefOct, fifths: kind === 'flat' ? -n : n, end: end + 0.2 * sp, keyN: n, time, mid: lineY(2),
+    clefEnd, keyBox: keySigns.length ? boxOf(keySigns) : null };
 }
 
 // ------------------------------------------------- changes inside a staff ---
@@ -1716,6 +1760,12 @@ function keyAlters(fifths) {
 
 // Find an accidental left of a head; returns 'sharp'|'flat'|'natural'|null
 function headAccidental(R, comps, hd, minX = -Infinity, reach = 1.9) {
+  const g = accidentalGlyph(R, comps, hd, minX, reach);
+  return g ? g.kind : null;
+}
+
+// headAccidental's sign with its box ({kind, x0, y0, x1, y1}), or null
+function accidentalGlyph(R, comps, hd, minX = -Infinity, reach = 1.9) {
   const sp = hd.sp;
   // candidate glyphs left of the head (pieces cut by staff-line removal
   // grouped); a chord's accidentals stagger further left
@@ -1744,7 +1794,7 @@ function headAccidental(R, comps, hd, minX = -Infinity, reach = 1.9) {
     const dy = Math.abs(yc - hd.y);
     if (dy > 0.55 * sp) continue;
     const d = (hd.x - g.x1) / sp + 2 * dy / sp;
-    if (d < bd) { bd = d; best = k; }
+    if (d < bd) { bd = d; best = { kind: k, x0: g.x0, y0: g.y0, x1: g.x1, y1: g.y1 }; }
   }
   return best;
 }
@@ -1867,7 +1917,7 @@ function staffMeasureEvents(fr, R, comps, s, xa, xb) {
   return v;
 }
 
-module.exports = { assemblePage, staffMeasureEvents, pitchOf, keyAlters, attrsAt, DIV, median, headDuration, _analyseHeader: analyseHeader, _compIndex: compIndex, _strokes: strokes, _classifyAccidental: classifyAccidental, _crossBands: crossBands, _glyphImage: glyphImage, _splitSharps: splitSharps, _detachedNear: detachedNear, _readClef: readClef, _beamCap: beamCap, _blobSign: blobSign, _splitSigns: splitSigns, _headAccidental: headAccidental, _groupGlyphs: groupGlyphs };
+module.exports = { assemblePage, staffMeasureEvents, pitchOf, keyAlters, attrsAt, DIV, median, headDuration, _analyseHeader: analyseHeader, _compIndex: compIndex, _strokes: strokes, _classifyAccidental: classifyAccidental, _crossBands: crossBands, _glyphImage: glyphImage, _splitSharps: splitSharps, _detachedNear: detachedNear, _readClef: readClef, _beamCap: beamCap, _blobSign: blobSign, _splitSigns: splitSigns, _headAccidental: headAccidental, accidentalGlyph, _groupGlyphs: groupGlyphs };
 
 };
 defs["barlines"]=function(require,module,exports){
@@ -7381,6 +7431,8 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
             for (const a of line) { if (a.t > t0 + 1e-6) break; if (a.k === kk) alt = a.a; }
             const pt = pitchOf(hClef, pos, hAlt, alt == null ? {} : { [kk]: alt });
             h.pitch = pt;
+            // (overlay only: the value written for this head, first part that writes it)
+            h.shown ||= { q: e.q, type: tt ? tt.type : null, dots: tt ? tt.dots : 0, tuplet: tmod ? tu.actual : 0 };
             const acc = h.acc && !e.tieStop ? `<accidental>${h.acc}</accidental>` : '';
             const tie = (e.tieStop ? '<tie type="stop"/>' : '') + (e.tieStart ? '<tie type="start"/>' : '');
             const tied = e.tieStop || e.tieStart ? `<notations>${e.tieStop ? '<tied type="stop"/>' : ''}${e.tieStart ? '<tied type="start"/>' : ''}</notations>` : '';
@@ -8102,6 +8154,156 @@ function applyStemRule(heads, opts = {}) {
 module.exports = { detectStems, applyStemRule, runExtent };
 
 };
+defs["symbols"]=function(require,module,exports){
+'use strict';
+// Overlay data: where every symbol the pipeline recognised on a page stands,
+// and the ink it did not explain. Read-only: it reads the page as front()
+// and assemblePage() left it and changes nothing they or buildScore use.
+// Boxes are [x0, y0, x1, y1] in the page's deskewed frame (the heads' frame).
+
+const { detectRests } = require('./rests');
+const { accidentalGlyph } = require('./assemble');
+
+const r1 = (v) => Math.round(v * 10) / 10;
+const box = (b) => [r1(b.x0), r1(b.y0), r1(b.x1), r1(b.y1)];
+// y of staff position k (0 top line .. 4 bottom line, fractions between)
+const lineY = (st, k, x) => st.yAt(0, x) + k * (st.yAt(4, x) - st.yAt(0, x)) / 4;
+
+function pageSymbols(fr, asm) {
+  const out = { clefs: [], keys: [], times: [], rests: [], accs: [], dots: [], stems: [], beams: [], tuplets: [], bars: [], unknown: [] };
+  if (!fr || !fr.R || !asm) return out;
+  const R = fr.R, comps = asm.comps || [], ss = fr.ss;
+  const known = []; // boxes that explain ink
+  const add = (b, pad = 0) => known.push([b[0] - pad, b[1] - pad, b[2] + pad, b[3] + pad]);
+  const dotOf = (h, sp, st) => {
+    // the augmentation dot's blob right of a dotted head (dotBlob's window)
+    let best = null, bd = Infinity;
+    for (const c of comps) {
+      const w = c.x1 - c.x0 + 1, hh = c.y1 - c.y0 + 1;
+      if (c.x0 < h.x + 0.5 * sp || c.x0 > h.x + 2.0 * sp || w < 0.15 * sp || w > 0.8 * sp || hh < 0.15 * sp || hh > 0.8 * sp) continue;
+      const cy = (c.y0 + c.y1) / 2;
+      if (Math.abs(cy - h.y) > 0.9 * sp) continue;
+      const d = c.x0 - h.x + Math.abs(cy - h.y);
+      if (d < bd) { bd = d; best = c; }
+    }
+    return best;
+  };
+  for (const sys of asm.systems || []) {
+    for (const s of sys.staves) {
+      const st = s.st, sp = st.space || ss, hdr = s.hdr || {}, left = st.left;
+      const yTop = lineY(st, 0, left + 4 * sp), yBot = lineY(st, 4, left + 4 * sp);
+      // header clef: the ink from the staff start to where the clef ends
+      if (hdr.clef && hdr.clefEnd != null && !hdr.clefGuessed) {
+        const cs = comps.filter(c => c.x0 >= left - 0.5 * sp && c.x1 <= hdr.clefEnd + 0.2 * sp && (c.x0 + c.x1) / 2 < hdr.clefEnd &&
+          (c.y0 + c.y1) / 2 > yTop - 1.5 * sp && (c.y0 + c.y1) / 2 < yBot + 1.5 * sp && c.y1 - c.y0 < 9 * sp && c.y0 > yTop - 3.5 * sp && c.y1 < yBot + 3.5 * sp &&
+          c.area >= 0.04 * sp * sp);
+        const b = cs.length ? [Math.min(...cs.map(c => c.x0)), Math.min(...cs.map(c => c.y0)), Math.max(...cs.map(c => c.x1)), Math.max(...cs.map(c => c.y1))]
+          : [left, yTop - 1.5 * sp, hdr.clefEnd, yBot + 1.5 * sp];
+        out.clefs.push([...b.map(r1), hdr.clef, 0]);
+        add(b);
+      } else if (hdr.clef) {
+        // assumed (not read): marked at the staff start, explains nothing
+        out.clefs.push([r1(left), r1(yTop), r1(left + 2.5 * sp), r1(yBot), hdr.clef, 2]);
+      }
+      if (hdr.keyBox) { const b = box(hdr.keyBox); out.keys.push([...b, hdr.fifths, 0]); add(b); }
+      if (hdr.time) {
+        const b = [r1(hdr.time.x0), r1(yTop), r1(hdr.time.x1), r1(yBot)];
+        out.times.push([...b, hdr.time.beats || 0, hdr.time.type || 0, hdr.time.symbol || '']);
+        add(b, 0.2 * sp);
+      }
+      for (const ch of s.changes || []) {
+        if (!ch.box) continue;
+        const b = box(ch.box);
+        if (ch.clef) out.clefs.push([...b, ch.clef, 1]);
+        else if (ch.fifths != null) out.keys.push([...b, ch.fifths, 1]);
+        add(b);
+      }
+      for (const t of s.tuplets || []) { const b = box(t); out.tuplets.push([...b, t.actual, t.normal]); add(b); }
+      // rests, read as buildScore reads them (each measure of the system)
+      for (const [xa, xb] of sys.measures || []) {
+        let rs = [];
+        try { rs = detectRests({ R, comps, s, xa, xb }); } catch (e) { rs = []; }
+        for (const r of rs) {
+          const b = box(r.box);
+          out.rests.push([...b, r.kind, r1(r.q * 100) / 100, r.dots, r.multi || 0]);
+          add(b);
+        }
+      }
+      // accidentals and dots of the notes on this staff
+      for (const c of s.chords) {
+        const hs = c.heads;
+        for (const h of hs) {
+          let g = null;
+          try { g = accidentalGlyph(R, comps, h, hdr.end != null ? hdr.end : -Infinity, hs.length > 1 ? 3.2 : 1.9); } catch (e) { g = null; }
+          if (g) { const b = box(g); out.accs.push([...b, g.kind]); add(b); }
+          if (h.dur && h.dur.dots) {
+            const d = dotOf(h, h.sp || sp, st);
+            if (d) { out.dots.push([r1((d.x0 + d.x1) / 2), r1((d.y0 + d.y1) / 2), r1(Math.max(d.x1 - d.x0, d.y1 - d.y0) / 2 + 1)]); add(box(d)); }
+          }
+        }
+      }
+    }
+  }
+  // stems (each chord's up / down stem from its outer head to the tip) and beams
+  for (const c of fr.chords || []) {
+    if (!c.heads || !c.heads.length) continue;
+    const ys = c.heads.map(h => h.y);
+    if (c.upX >= 0 && c.upEnd != null) { const s = [r1(c.upX), r1(c.upEnd), r1(Math.max(...ys))]; out.stems.push(s); add([s[0] - 1, s[1], s[0] + 1, s[2]], 1); }
+    if (c.downX >= 0 && c.downEnd != null) { const s = [r1(c.downX), r1(Math.min(...ys)), r1(c.downEnd)]; out.stems.push(s); add([s[0] - 1, s[1], s[0] + 1, s[2]], 1); }
+  }
+  for (const b of fr.beams || []) { const bb = box(b); out.beams.push(bb); add(bb); }
+  // barlines: double / final pairs (barlines.js merges them) and repeat dots
+  for (const b of fr.barlines || []) {
+    const st = fr.staves[b.staff];
+    let type = b.double ? 'double' : 'single';
+    add([b.x0 != null ? b.x0 : b.x - 1, b.top, b.x1 != null ? b.x1 : b.x + 1, b.bot], 1);
+    if (st) {
+      const sp = st.space || ss;
+      const isDot = (c, k) => {
+        const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1;
+        return w >= 0.2 * sp && w <= 0.75 * sp && h >= 0.2 * sp && h <= 0.75 * sp && Math.abs((c.y0 + c.y1) / 2 - lineY(st, k, b.x)) <= 0.3 * sp;
+      };
+      const x0 = b.x0 != null ? b.x0 : b.x, x1 = b.x1 != null ? b.x1 : b.x;
+      for (const side of [-1, 1]) {
+        const inWin = (c) => (side < 0 ? c.x1 < x0 && c.x1 >= x0 - 1.2 * sp : c.x0 > x1 && c.x0 <= x1 + 1.2 * sp);
+        const a = comps.find(c => inWin(c) && isDot(c, 1.5)), z = comps.find(c => inWin(c) && isDot(c, 2.5));
+        if (a && z) { type = side < 0 ? (type === 'repeat-start' ? 'repeat-both' : 'repeat-end') : (type === 'repeat-end' ? 'repeat-both' : 'repeat-start'); add(box(a)); add(box(z)); }
+      }
+    }
+    out.bars.push([r1(b.x), r1(b.top), r1(b.bot), type, r1(b.x0 != null ? b.x0 : b.x), r1(b.x1 != null ? b.x1 : b.x)]);
+  }
+  for (const h of fr.heads || []) { const sp = h.sp || ss; add([h.x - 0.65 * sp, h.y - 0.55 * sp, h.x + 0.65 * sp, h.y + 0.55 * sp]); }
+  // what is left: ink after staff-line removal that touches none of the above
+  // (specks and staff-line remnants aside)
+  const grid = new Map(), G = Math.max(16, Math.round(4 * ss));
+  known.forEach((k, i) => {
+    for (let gx = Math.floor(k[0] / G); gx <= Math.floor(k[2] / G); gx++) for (let gy = Math.floor(k[1] / G); gy <= Math.floor(k[3] / G); gy++) {
+      const key = gx * 65536 + gy;
+      if (!grid.has(key)) grid.set(key, []);
+      grid.get(key).push(i);
+    }
+  });
+  const minA = 0.1 * ss * ss;
+  for (const c of comps) {
+    const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1;
+    if (c.area < minA || Math.max(w, h) < 0.35 * ss) continue;
+    // a thin horizontal sliver along a staff line is what line removal left
+    if (h <= 0.25 * ss && w < 1.5 * ss) continue;
+    let hit = false;
+    for (let gx = Math.floor(c.x0 / G); gx <= Math.floor(c.x1 / G) && !hit; gx++) for (let gy = Math.floor(c.y0 / G); gy <= Math.floor(c.y1 / G) && !hit; gy++) {
+      for (const i of grid.get(gx * 65536 + gy) || []) {
+        const k = known[i];
+        if (c.x0 <= k[2] && c.x1 >= k[0] && c.y0 <= k[3] && c.y1 >= k[1]) { hit = true; break; }
+      }
+    }
+    if (!hit) out.unknown.push([c.x0, c.y0, c.x1, c.y1]);
+  }
+  return out;
+}
+
+module.exports = { pageSymbols };
+
+};
 (typeof self!=="undefined"?self:window).omrRequire=req;
 }
 __omrBundle();
@@ -8242,20 +8444,52 @@ function __omrSessionModule() {
     return out;
   }
 
-  // Plain, cloneable overlay data for one page, in the deskewed frame.
-  function pageView(entry, index) {
+  // Every recognised symbol of a page (src/symbols.js), for the overlay. A
+  // spread's symbols are its halves' drawn back on the sheet: boxes by their
+  // mapped corners, stems and barlines by their ends.
+  function pageSymbols(entry, req, halves) {
+    let mod = null;
+    try { mod = req && req('./symbols'); } catch (e) { mod = null; }
+    if (!mod || !mod.pageSymbols) return null;
+    const r1 = (v) => Math.round(v * 10) / 10;
+    const read = (e) => { try { return mod.pageSymbols(e.fr, e.asm); } catch (err) { return null; } };
+    if (!halves) return read(entry);
+    const out = {};
+    for (const { hv, map } of halves) {
+      const sy = read(hv);
+      if (!sy) continue;
+      const f = hv.fr.scale || 1;
+      for (const k of Object.keys(sy)) {
+        out[k] = (out[k] || []).concat(sy[k].map((a) => {
+          if (k === 'stems') { const p = map(a[0], a[1]), q = map(a[0], a[2]); return [r1((p[0] + q[0]) / 2), r1(p[1]), r1(q[1])]; }
+          if (k === 'bars') { const p = map(a[0], a[1]), q = map(a[0], a[2]); return [r1((p[0] + q[0]) / 2), r1(p[1]), r1(q[1]), a[3], r1(map(a[4], a[1])[0]), r1(map(a[5], a[1])[0])]; }
+          if (k === 'dots') { const p = map(a[0], a[1]); return [r1(p[0]), r1(p[1]), r1(a[2] / f)]; }
+          const c = [map(a[0], a[1]), map(a[2], a[1]), map(a[0], a[3]), map(a[2], a[3])];
+          const xs = c.map((p) => p[0]), ys = c.map((p) => p[1]);
+          return [r1(Math.min(...xs)), r1(Math.min(...ys)), r1(Math.max(...xs)), r1(Math.max(...ys)), ...a.slice(4)];
+        }));
+      }
+    }
+    return out;
+  }
+
+  // Plain, cloneable overlay data for one page, in the deskewed frame. With
+  // the module loader (req), it also carries every symbol read (sym).
+  function pageView(entry, index, req) {
     const fr = entry.fr;
     const W = fr.gray.width, H = fr.gray.height;
     const r1 = (v) => Math.round(v * 10) / 10;
     // a spread's notes (and their parts) belong to its halves, so its heads
     // are the halves' heads drawn back on the whole sheet
     const halves = spreadHalves(entry);
+    // [x, y, r, stem direction, staff top and bottom at x] (labels sit outside the staff)
+    const edges = (f, h) => { const st = f.staves[h.staff]; return st ? [st.yAt(0, h.x), st.yAt(4, h.x)] : [h.y, h.y]; };
     const heads = halves
       ? halves.flatMap(({ hv, map }) => (hv.fr.heads || []).map((h) => {
-        const [x, y] = map(h.x, h.y);
-        return [r1(x), r1(y), r1(((h.sp || hv.fr.ss) * 0.62) / (hv.fr.scale || 1))];
+        const [x, y] = map(h.x, h.y), [t, b] = edges(hv.fr, h);
+        return [r1(x), r1(y), r1(((h.sp || hv.fr.ss) * 0.62) / (hv.fr.scale || 1)), h.stemDir || 0, r1(map(h.x, t)[1]), r1(map(h.x, b)[1])];
       }))
-      : (fr.heads || []).map((h) => [r1(h.x), r1(h.y), r1((h.sp || fr.ss) * 0.62)]);
+      : (fr.heads || []).map((h) => { const [t, b] = edges(fr, h); return [r1(h.x), r1(h.y), r1((h.sp || fr.ss) * 0.62), h.stemDir || 0, r1(t), r1(b)]; });
     const staves = fr.staves.map((st) => {
       const edge = (k) => {
         const pts = [];
@@ -8280,6 +8514,7 @@ function __omrSessionModule() {
       orientation: (((fr.orientation || 0) + 90 * (entry.turns || 0)) % 360 + 360) % 360,
       mode: fr.mode || 'default',
       spread: halves ? halves.length : 0,
+      sym: req ? pageSymbols(entry, req, halves) : null,
     };
   }
 
@@ -8338,13 +8573,20 @@ function __omrSessionModule() {
   // i and i + 0.5) are one page on screen, so their lists join in reading
   // order, the order pageView() draws their heads in.
   function pageParts(pages) {
-    const by = new Map();
+    const by = new Map(), notes = new Map();
     for (const p of pages.slice().sort((a, b) => a.index - b.index)) {
       const k = Math.floor(p.index);
       if (!by.has(k)) by.set(k, []);
       for (const h of p.fr.heads || []) by.get(k).push(h.parts ? h.parts.slice() : []);
+      // what each drawn head was written as: [step, alter, octave, quarters,
+      // type, dots, tuplet number], or 0 when no part wrote it
+      if (!notes.has(k)) notes.set(k, []);
+      for (const h of p.fr.heads || []) {
+        const pt = h.pitch, d = h.shown;
+        notes.get(k).push(pt && d ? [pt.step, pt.alter || 0, pt.octave, Math.round(d.q * 1000) / 1000, d.type || '', d.dots || 0, d.tuplet || 0] : 0);
+      }
     }
-    return [...by].map(([index, parts]) => ({ index, parts }));
+    return [...by].map(([index, parts]) => ({ index, parts, notes: notes.get(index) || [] }));
   }
 
   // ------------------------------------------------------------ worker side
@@ -8384,7 +8626,7 @@ function __omrSessionModule() {
         const entry = await session.addPage(m.gray, m.i, m.n);
         m.gray = null;
         if (!entry) { post({ t: 'page-done', i: m.i, ms: Date.now() - t0, view: null }); return; }
-        const view = pageView(entry, m.i);
+        const view = pageView(entry, m.i, req);
         const thumb = shrink(entry.fr.gray, m.maxW || 1400);
         // only a session that says what it can spare frees page buffers
         if (session.releasePage) { session.releasePage(entry); (entry.spread || []).forEach((h) => session.releasePage(h)); }
@@ -8419,6 +8661,9 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
     rag: { url: 'assets/sample-maple-leaf-rag.pdf', name: 'sample-maple-leaf-rag.pdf', title: 'the sample rag', label: 'Maple Leaf Rag (Scott Joplin, 1899), engraved and aged like a scan' },
     hymn: { url: 'assets/sample-st-anselm.pdf', name: 'sample-st-anselm.pdf', title: 'the sample hymn', label: 'St. Anselm (Methodist Hymnal, 1905), a real scan' },
   };
+  // Every redistributable benchmark scan (assets/samples.json, written by
+  // tools/sync-samples.mjs), offered in the "All examples" picker.
+  let catalogue = [];
   let busy = false;
   let stopAsked = false;
   let lastXML = '';
@@ -8811,7 +9056,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
         const t0 = performance.now();
         const entry = await session.addPage(gray, i, n);
         if (!entry) return { view: null, ms: performance.now() - t0 };
-        const view = Sess.pageView(entry, i);
+        const view = Sess.pageView(entry, i, omrRequire);
         const thumb = Sess.shrink(entry.fr.gray, THUMB_W);
         if (session.releasePage) session.releasePage(entry);
         return { view, thumb, ms: performance.now() - t0 };
@@ -8933,9 +9178,12 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
         }[p.state] || '';
         ph.innerHTML = `<p>${esc(msg)}</p>`;
         host.appendChild(ph);
+        renderLayers(null);
         return;
       }
       host.appendChild(this.frame(p));
+      renderLayers(p.view);
+      fitLabels();
       // how the page was read: turned, smoothed, split as a spread, straightened
       const notes = Sess.pageNotes(p.view);
       if (notes.length) {
@@ -8961,17 +9209,32 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
     },
     overlay(p) {
       const v = p.view;
-      const sw = Math.max(1.5, v.ss / 8);
+      const ss = v.ss;
+      const sw = Math.max(1.5, ss / 8);
+      const f1 = (n) => (Math.round(n * 10) / 10).toString();
       const pts = (a) => a.map(([x, y]) => `${x},${y}`).join(' ');
+      const sy = v.sym || {};
+      const g = (layer, body, attrs) => (body ? `<g class="ov-l ov-${layer}"${attrs || ''}>${body}</g>` : '');
+      const rect = (b, pad, extra) => `<rect x="${f1(b[0] - pad)}" y="${f1(b[1] - pad)}" width="${f1(b[2] - b[0] + 2 * pad)}" height="${f1(b[3] - b[1] + 2 * pad)}"${extra || ''}/>`;
       let s = `<svg class="ov" viewBox="0 0 ${v.width} ${v.height}" preserveAspectRatio="none" aria-hidden="true" focusable="false">`;
-      s += `<g fill="none" stroke="${OV.staff}" stroke-width="${sw.toFixed(1)}">` + v.staves.map((st) => `<polyline points="${pts(st.top)}"/><polyline points="${pts(st.bot)}"/>`).join('') + '</g>';
-      s += `<g stroke="${OV.bar}" stroke-width="${sw.toFixed(1)}">` + v.barlines.map(([x, t, b]) => `<line x1="${x}" y1="${t}" x2="${x}" y2="${b}"/>`).join('') + '</g>';
+      const hatch = `ovh${p.i}`;
+      s += `<defs><pattern id="${hatch}" patternUnits="userSpaceOnUse" width="${f1(ss * 0.6)}" height="${f1(ss * 0.6)}" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="${f1(ss * 0.6)}" class="ov-hatch" stroke-width="${f1(ss * 0.18)}"/></pattern></defs>`;
+      // staves and barlines (double / final pairs drawn as two lines)
+      let bars = `<g class="ov-staff" fill="none" stroke="${OV.staff}" stroke-width="${f1(sw)}">` + v.staves.map((st) => `<polyline points="${pts(st.top)}"/><polyline points="${pts(st.bot)}"/>`).join('') + '</g>';
+      const barList = sy.bars || v.barlines.map(([x, t, b]) => [x, t, b, 'single', x, x]);
+      bars += `<g stroke="${OV.bar}" stroke-width="${f1(sw)}">` + barList.map(([x, t, b, type, x0, x1]) => (type === 'single' ? `<line x1="${x}" y1="${t}" x2="${x}" y2="${b}"/>`
+        : `<line x1="${x0}" y1="${t}" x2="${x0}" y2="${b}"/><line x1="${x1}" y1="${t}" x2="${x1}" y2="${b}" stroke-width="${f1(sw * 2)}"/>`)).join('') + '</g>';
+      s += g('bars', bars);
+      // stems and beams under the heads
+      let nb = '';
+      if (sy.stems && sy.stems.length) nb += `<path class="ov-stem" fill="none" stroke-width="${f1(sw)}" d="${sy.stems.map(([x, a, b]) => `M${x},${a}V${b}`).join('')}"/>`;
+      if (sy.beams && sy.beams.length) nb += `<g class="ov-beam" fill="none" stroke-width="${f1(sw)}">${sy.beams.map((b) => rect(b, 0)).join('')}</g>`;
       const hp = this.headParts && this.headParts.get(p.i);
       const parts = this.parts || [];
-      const hw = Math.max(2, v.ss / 7).toFixed(1);
+      const hw = Math.max(2, ss / 7).toFixed(1);
       if (!hp) {
         // still converting: heads are found but not yet assigned to parts
-        s += `<path class="ov-found" fill="none" stroke="${OV.found}" stroke-width="${hw}" d="${v.heads.map(([x, y, r]) => markPath('circle', x, y, r)).join('')}"/>`;
+        nb += `<path class="ov-found" fill="none" stroke="${OV.found}" stroke-width="${hw}" d="${v.heads.map(([x, y, r]) => markPath('circle', x, y, r)).join('')}"/>`;
       } else {
         const byPart = new Map();
         const none = [];
@@ -8980,20 +9243,174 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
           if (!idx.length) { none.push(markPath('circle', x, y, r)); return; }
           idx.forEach((pi, j) => { if (!byPart.has(pi)) byPart.set(pi, []); byPart.get(pi).push(markPath(partShape(pi), x, y, r * (1 + 0.38 * j))); });
         });
-        for (const [pi, d] of byPart) s += `<path fill="none" stroke="${esc(parts[pi] ? parts[pi].color : OV.none)}" stroke-width="${hw}" stroke-linejoin="round" d="${d.join('')}"/>`;
-        if (none.length) s += `<path fill="none" stroke="${OV.none}" stroke-width="${hw}" stroke-dasharray="3 3" d="${none.join('')}"/>`;
+        for (const [pi, d] of byPart) nb += `<path fill="none" stroke="${esc(parts[pi] ? parts[pi].color : OV.none)}" stroke-width="${hw}" stroke-linejoin="round" d="${d.join('')}"/>`;
+        if (none.length) nb += `<path fill="none" stroke="${OV.none}" stroke-width="${hw}" stroke-dasharray="3 3" d="${none.join('')}"/>`;
       }
+      s += g('notes', nb);
+      // rests: rounded boxes
+      s += g('rests', (sy.rests || []).map((b) => rect(b, ss * 0.15, ` rx="${f1(ss * 0.3)}"`)).join(''), ` fill="none" stroke-width="${f1(sw * 1.2)}"`);
+      // clefs: corner brackets (dashed when the clef was assumed, not read)
+      const corners = (b, pad) => {
+        const x0 = b[0] - pad, y0 = b[1] - pad, x1 = b[2] + pad, y1 = b[3] + pad, l = Math.min(ss * 0.8, (x1 - x0) / 2, (y1 - y0) / 2);
+        return `M${f1(x0)},${f1(y0 + l)}V${f1(y0)}H${f1(x0 + l)}M${f1(x1 - l)},${f1(y0)}H${f1(x1)}V${f1(y0 + l)}M${f1(x1)},${f1(y1 - l)}V${f1(y1)}H${f1(x1 - l)}M${f1(x0 + l)},${f1(y1)}H${f1(x0)}V${f1(y1 - l)}`;
+      };
+      const clefs = sy.clefs || [];
+      s += g('clefs', (clefs.some((c) => c[5] !== 2) ? `<path d="${clefs.filter((c) => c[5] !== 2).map((c) => corners(c, ss * 0.2)).join('')}"/>` : '') +
+        clefs.filter((c) => c[5] === 2).map((c) => rect(c, 0, ' stroke-dasharray="4 4"')).join(''), ` fill="none" stroke-width="${f1(sw * 1.6)}"`);
+      // key signatures: dashed boxes; time signatures: pills
+      s += g('keys', (sy.keys || []).map((b) => rect(b, ss * 0.2, ` stroke-dasharray="${f1(sw * 3)} ${f1(sw * 1.5)}"`)).join(''), ` fill="none" stroke-width="${f1(sw * 1.3)}"`);
+      s += g('times', (sy.times || []).map((b) => rect(b, ss * 0.25, ` rx="${f1(Math.min(b[2] - b[0], b[3] - b[1]) / 2 + ss * 0.25)}"`)).join(''), ` fill="none" stroke-width="${f1(sw * 1.3)}"`);
+      // accidentals (square boxes), augmentation dots (rings), tuplet numbers (dotted boxes)
+      s += g('marks', (sy.accs || []).map((b) => rect(b, ss * 0.1)).join('') +
+        (sy.dots || []).map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${f1(r + ss * 0.15)}"/>`).join('') +
+        (sy.tuplets || []).map((b) => rect(b, ss * 0.15, ` stroke-dasharray="${f1(sw)} ${f1(sw)}"`)).join(''), ` fill="none" stroke-width="${f1(sw)}"`);
+      // lyric syllables the score used: a bracket under each
+      const lyr = this.lyricBoxes(p);
+      s += g('lyrics', lyr.map(([x0, y0, x1, y1]) => `<path d="M${f1(x0)},${f1(y1 - ss * 0.3)}V${f1(y1 + ss * 0.15)}H${f1(x1)}V${f1(y1 - ss * 0.3)}"/>`).join(''), ` fill="none" stroke-width="${f1(sw)}"`);
+      // ink nothing explains: hatched, outlined in dashes
+      const unk = (sy.unknown || []).filter((b) => !lyr.some((l) => b[0] < l[2] && b[2] > l[0] && b[1] < l[3] && b[3] > l[1]));
+      s += g('unknown', unk.map((b) => rect(b, ss * 0.12)).join(''), ` fill="url(#${hatch})" stroke-width="${f1(sw)}" stroke-dasharray="${f1(sw * 2)} ${f1(sw * 1.2)}"`);
+      s += g('labels', this.labels(p));
       return s + '</svg>';
+    },
+    // syllable boxes of the lyric lines the score used on page p (not on a
+    // two-up spread, whose halves read their own text)
+    lyricBoxes(p) {
+      const out = [];
+      const by = (lastRes && lastRes.lyricsBySystem) || {};
+      if (!p.view || p.view.spread) return out;
+      for (const k of Object.keys(by)) {
+        if (Number(k.split(':')[0]) !== p.i) continue;
+        for (const v of by[k]) if (v.y != null && v.y1 != null) for (const sl of v.syllables || []) if (sl.x0 != null && sl.x1 != null) out.push([sl.x0, v.y, sl.x1, v.y1]);
+      }
+      return out;
+    },
+    // Text labels: each note's pitch and written value above the staff for
+    // the upper voice (stems up) and below it for the lower, a rest's value,
+    // each clef, key and time signature. Stacks move outwards until clear of
+    // the labels already placed.
+    labels(p) {
+      const v = p.view, ss = v.ss, sy = v.sym || {};
+      const fs = ss * 0.85, lh = fs * 1.1, cw = fs * 0.56;
+      const notes = this.headNotes && this.headNotes.get(p.i);
+      const items = []; // {x, y (anchor edge), side -1 up / 1 down, lines: [[text, cls]]}
+      if (notes) {
+        const cols = [];
+        v.heads.forEach((h, k) => {
+          const n = notes[k];
+          if (!n) return;
+          const [x, y, r, dir, top, bot] = h;
+          const side = dir === -1 ? 1 : -1;
+          let c = cols.find((o) => o.side === side && Math.abs(o.x - x) < 0.7 * ss && Math.abs(o.top - (top != null ? top : y)) < 2 * ss);
+          if (!c) { c = { x, side, top: top != null ? top : y - 2 * ss, bot: bot != null ? bot : y + 2 * ss, heads: [] }; cols.push(c); }
+          c.heads.push({ y, r, n });
+        });
+        for (const c of cols) {
+          const hs = c.heads.sort((a, b) => a.y - b.y);
+          const pitch = [...new Set(hs.map((h) => pitchText(h.n)))];
+          const durs = [...new Set(hs.map((h) => durText(h.n[3], h.n[4], h.n[5], h.n[6])))];
+          const pl = pitch.map((t) => [t, 'lp']), dl = [durs.join(' / '), 'ld'];
+          const y = c.side < 0 ? Math.min(c.top, hs[0].y - hs[0].r) - 0.4 * ss : Math.max(c.bot, hs[hs.length - 1].y + hs[hs.length - 1].r) + 0.4 * ss;
+          // the value outermost: above the pitches over the staff, below them under it
+          items.push({ x: c.x, y, side: c.side, lines: c.side < 0 ? [dl].concat(pl) : pl.concat([dl]) });
+        }
+      }
+      for (const r of sy.rests || []) items.push({ x: (r[0] + r[2]) / 2, y: r[1] - 0.3 * ss, side: -1, lines: [[restText(r[4], r[5], r[6], r[7]), 'lr']] });
+      for (const c of sy.clefs || []) items.push({ x: (c[0] + c[2]) / 2, y: c[1] - 0.3 * ss, side: -1, lines: [[clefLabel(c[4]) + (c[5] === 1 ? ' (change)' : c[5] === 2 ? ' (assumed)' : ''), 'ls']] });
+      for (const k of sy.keys || []) items.push({ x: (k[0] + k[2]) / 2, y: k[3] + 0.4 * ss, side: 1, lines: [[keyLabel(k[4]) + (k[5] ? ' (change)' : ''), 'ls']] });
+      const time = lastRes && lastRes.score && lastRes.score.time;
+      for (const t of sy.times || []) {
+        const txt = t[4] ? `${t[6] === 'common' ? 'C = ' : t[6] === 'cut' ? '¢ = ' : ''}${t[4]}/${t[5]}` : time && time.beats ? `${time.beats}/${time.type}` : 'time signature';
+        items.push({ x: (t[0] + t[2]) / 2, y: t[1] - 0.4 * ss, side: -1, lines: [[txt, 'ls']] });
+      }
+      for (const b of sy.bars || []) if (b[3] !== 'single') items.push({ x: b[0], y: b[1] - 0.3 * ss, side: -1, lines: [[{ double: 'double bar', 'repeat-start': 'repeat ‖:', 'repeat-end': 'repeat :‖', 'repeat-both': 'repeat :‖:' }[b[3]] || b[3], 'lb']] });
+      // place: outermost line first for stacks above, nearest first below
+      const placed = [];
+      const hit = (a) => placed.some((b) => a.x0 < b.x1 && a.x1 > b.x0 && a.y0 < b.y1 && a.y1 > b.y0);
+      let out = '';
+      items.sort((a, b) => a.x - b.x);
+      for (const it of items) {
+        const w = Math.max(...it.lines.map(([t]) => t.length)) * cw + 0.2 * ss, h = it.lines.length * lh;
+        const bx = { x0: it.x - w / 2, x1: it.x + w / 2, y0: it.side < 0 ? it.y - h : it.y, y1: it.side < 0 ? it.y : it.y + h };
+        for (let k = 0; k < 40 && hit(bx); k++) { const d = it.side * lh * 0.5; bx.y0 += d; bx.y1 += d; }
+        placed.push(bx);
+        it.lines.forEach(([t, cls], j) => {
+          out += `<text class="${cls}" x="${(Math.round(it.x * 10) / 10)}" y="${(Math.round((bx.y0 + (j + 0.82) * lh) * 10) / 10)}">${esc(t)}</text>`;
+        });
+      }
+      return out ? `<g font-size="${(Math.round(fs * 10) / 10)}" stroke-width="${(Math.round(fs * 0.3 * 10) / 10)}" text-anchor="middle">${out}</g>` : '';
     },
     applyResult(res) {
       this.parts = (res.score && res.score.parts) || [];
       this.headParts = new Map((res.pages || []).map((p) => [p.index, p.parts]));
+      this.headNotes = new Map((res.pages || []).map((p) => [p.index, p.notes || []]));
       this.show(this.sel);
     },
   };
+  // Label texts
+  const ACC = { 1: '♯', 2: '𝄪', '-1': '♭', '-2': '𝄫' };
+  const pitchText = (n) => `${n[0]}${ACC[n[1]] || ''}${n[2]}`;
+  const TYPE_FRAC = { maxima: '8/1', long: '4/1', breve: '2/1', whole: '1', half: '1/2', quarter: '1/4', eighth: '1/8', '16th': '1/16', '32nd': '1/32', '64th': '1/64', '128th': '1/128' };
+  function durText(q, type, dots, tuplet) {
+    let t = TYPE_FRAC[type];
+    if (!t) return `${+q.toFixed(2)} q`;
+    t += '.'.repeat(dots || 0);
+    return tuplet ? `${t} (${tuplet})` : t;
+  }
+  const REST_FRAC = { whole: '1', half: '1/2', quarter: '1/4', flag1: '1/8', flag2: '1/16', flag3: '1/32', flag4: '1/64', breve: '2 bars', long: '4 bars' };
+  function restText(kind, q, dots, multi) {
+    if (kind === 'multi') return `rest, ${multi || '?'} bars`;
+    return `rest ${REST_FRAC[kind] || kind}${'.'.repeat(dots || 0)}`;
+  }
+  const C_NAME = { C1: 'soprano', C2: 'mezzo', C3: 'alto', C4: 'tenor', C5: 'baritone' };
+  function clefLabel(c) {
+    c = String(c || '');
+    if (c === 'G8') return 'G clef 8vb';
+    if (c === 'G8va') return 'G clef 8va';
+    if (/^C[1-5]$/.test(c)) return `C clef (${C_NAME[c]})`;
+    return c ? `${c.charAt(0)} clef` : 'clef';
+  }
+  const keyLabel = (f) => (f ? `${Math.abs(f)}${f > 0 ? '♯' : '♭'}` : 'no ♯/♭');
+  // Overlay layers the reader can switch off one by one (remembered).
+  const LAYERS = [
+    ['notes', 'Notes, stems, beams'], ['rests', 'Rests'], ['clefs', 'Clefs'], ['keys', 'Key signatures'], ['times', 'Time signatures'],
+    ['bars', 'Staves, barlines'], ['marks', 'Accidentals, dots, tuplets'], ['lyrics', 'Lyric syllables'], ['labels', 'Pitch and value labels'], ['unknown', 'Not recognised'],
+  ];
+  const LAYER_ICON = {
+    notes: '<path d="M9 2v8" stroke-width="1.4"/><circle cx="6.5" cy="10" r="2.6" stroke-width="1.6"/>',
+    rests: '<rect x="2.5" y="3" width="9" height="8" rx="2.2" stroke-width="1.8"/>',
+    clefs: '<path d="M2 5V2h3M9 2h3v3M12 9v3H9M5 12H2V9" stroke-width="1.8"/>',
+    keys: '<rect x="2" y="2.5" width="10" height="9" stroke-width="1.6" stroke-dasharray="3 1.6"/>',
+    times: '<rect x="3.5" y="1.5" width="7" height="11" rx="3.5" stroke-width="1.6"/>',
+    bars: '<path d="M1 4h12M1 10h12" stroke-width="1.4" class="ovk-staff"/><path d="M7 1v12" stroke-width="2.2"/>',
+    marks: '<rect x="1.5" y="3" width="5" height="8" stroke-width="1.4"/><circle cx="10.5" cy="7" r="2" stroke-width="1.4"/>',
+    lyrics: '<path d="M2 8v3h10V8" stroke-width="1.6"/>',
+    labels: '<text x="7" y="10.5" font-size="9" text-anchor="middle" stroke="none" fill="currentColor">C5</text>',
+    unknown: '<rect x="2" y="2" width="10" height="10" stroke-width="1.4" stroke-dasharray="2.4 1.4"/><path d="M2 8l6-6M2 12l10-10M6 12l6-6" stroke-width="1.2" opacity=".6"/>',
+  };
+  const layerOff = new Set((() => { try { return JSON.parse(store.get('ssr.layers') || '[]'); } catch (e) { return []; } })());
+  function layerCounts(v) {
+    const sy = (v && v.sym) || {};
+    return {
+      notes: v ? v.heads.length : 0, rests: (sy.rests || []).length, clefs: (sy.clefs || []).length, keys: (sy.keys || []).length, times: (sy.times || []).length,
+      bars: v ? (sy.bars || v.barlines).length : 0, marks: (sy.accs || []).length + (sy.dots || []).length + (sy.tuplets || []).length,
+      lyrics: null, labels: null, unknown: (sy.unknown || []).length,
+    };
+  }
+  function renderLayers(v) {
+    const c = layerCounts(v);
+    $('layers').innerHTML = LAYERS.map(([k, name]) => {
+      const n = c[k];
+      const cnt = n == null || !v ? '' : ` <span class="layer-n">${n.toLocaleString('en')}</span>`;
+      return `<li><button type="button" class="layer" data-layer="${k}" aria-pressed="${!layerOff.has(k)}"><svg class="mark ovk-${k}" viewBox="0 0 14 14" aria-hidden="true" fill="none">${LAYER_ICON[k]}</svg><span>${esc(name)}${cnt}</span>${k === 'labels' ? '<span class="layer-hint">zoom in to read</span>' : ''}</button></li>`;
+    }).join('');
+  }
+  function applyLayers() {
+    const host = $('pages');
+    LAYERS.forEach(([k]) => host.classList.toggle('hide-' + k, layerOff.has(k)));
+  }
   function legend(parts) {
-    const aux = '<li class="aux"><svg class="mark" viewBox="0 0 14 14" aria-hidden="true"><path d="M1 4h12M1 10h12" stroke="' + OV.staff + '" stroke-width="2"/></svg><span>Staff edges</span></li>' +
-      '<li class="aux"><svg class="mark" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1v12" stroke="' + OV.bar + '" stroke-width="2.4"/></svg><span>Barline</span></li>';
+    const aux = '';
     if (!parts) {
       $('legend').innerHTML = '<li class="aux"><svg class="mark" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="' + OV.found + '" stroke-width="1.6"/></svg><span>Note head found</span></li>' + aux;
       return;
@@ -9004,6 +9421,31 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
   function applyOverlay() {
     const on = $('overlayToggle').getAttribute('aria-pressed') === 'true';
     $('pages').classList.toggle('ov-off', !on);
+    $('layers').hidden = !on;
+  }
+  // Labels are drawn only while they can be read: a staff space of at least
+  // 11 screen pixels (the page zoom times the browser's pinch zoom).
+  function fitLabels() {
+    const fr = $('pages').querySelector('.pageframe:not(.placeholder)');
+    const p = book.pages[book.sel];
+    let small = true;
+    if (fr && p && p.view) {
+      const img = fr.querySelector('img');
+      const vv = window.visualViewport;
+      const k = (img.clientWidth / p.view.width) * (vv && vv.scale ? vv.scale : 1);
+      small = p.view.ss * k < 11;
+    }
+    $('pages').classList.toggle('lbl-small', small);
+    $('layers').classList.toggle('lbl-small', small);
+  }
+  const ZOOMS = [1, 1.5, 2, 3, 4];
+  let zoom = Math.max(1, Math.min(4, +store.get('ssr.zoom') || 1));
+  function applyZoom() {
+    $('pages').style.setProperty('--zoom', String(zoom));
+    $('zoomLabel').textContent = zoom === 1 ? 'Fit' : `${zoom}×`;
+    $('zoomOut').disabled = zoom <= ZOOMS[0];
+    $('zoomIn').disabled = zoom >= ZOOMS[ZOOMS.length - 1];
+    fitLabels();
   }
   function thumbURL(t) {
     const c = grayToCanvas(t);
@@ -9250,6 +9692,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
     busy = b;
     $('sample').disabled = b;
     $('sampleHymn').disabled = b;
+    $('sampleAll').disabled = b;
     $('choose').disabled = b;
   }
   // the previous result stays visible but dimmed while a new scan is read
@@ -9474,7 +9917,9 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
   }
 
   function loadSample(kind) {
-    const S = SAMPLES[kind] || SAMPLES.rag;
+    const S = typeof kind === 'object' ? kind : SAMPLES[kind] || SAMPLES.rag;
+    const pick = catalogue.findIndex((c) => 'assets/' + c.file === S.url);
+    $('sampleAll').value = pick >= 0 ? String(pick) : '';
     run(async () => {
       const r = await fetch(S.url);
       if (!r.ok) throw new Error('the sample file was not found (' + r.status + ')');
@@ -9490,6 +9935,26 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
   $('choose').addEventListener('click', () => $('file').click());
   $('file').addEventListener('change', (e) => { const fs = Array.prototype.slice.call(e.target.files || []); e.target.value = ''; handleFiles(fs); });
   $('sample').addEventListener('click', () => loadSample('rag'));
+  fetch('assets/samples.json').then((r) => (r.ok ? r.json() : [])).then((list) => {
+    catalogue = Array.isArray(list) ? list : [];
+    const sel = $('sampleAll');
+    const groups = new Map();
+    catalogue.forEach((c, i) => {
+      if (!groups.has(c.group)) { const g = document.createElement('optgroup'); g.label = c.group; groups.set(c.group, g); sel.appendChild(g); }
+      const o = document.createElement('option');
+      o.value = String(i);
+      o.textContent = c.title;
+      o.title = c.license;
+      groups.get(c.group).appendChild(o);
+    });
+    const cur = catalogue.findIndex((c) => c.file === 'sample-maple-leaf-rag.pdf');
+    if (cur >= 0 && !sel.value) sel.value = String(cur);
+  }).catch(() => { $('sampleAll').hidden = true; });
+  $('sampleAll').addEventListener('change', (e) => {
+    const c = catalogue[+e.target.value];
+    if (!c || e.target.value === '') return;
+    loadSample({ url: 'assets/' + c.file, name: c.file, title: c.title, label: c.title + ' (' + c.group.toLowerCase().replace(/s$/, '') + ')' });
+  });
   $('sampleHymn').addEventListener('click', () => loadSample('hymn'));
   $('copy').addEventListener('click', copyXML);
   $('copy').disabled = true;
@@ -9522,6 +9987,28 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
     applyOverlay();
   });
   applyOverlay();
+  $('layers').addEventListener('click', (e) => {
+    const b = e.target.closest('button.layer');
+    if (!b) return;
+    const k = b.dataset.layer;
+    if (layerOff.has(k)) layerOff.delete(k); else layerOff.add(k);
+    b.setAttribute('aria-pressed', String(!layerOff.has(k)));
+    store.set('ssr.layers', JSON.stringify([...layerOff]));
+    applyLayers();
+  });
+  renderLayers(null);
+  applyLayers();
+  const setZoom = (dir) => {
+    const i = ZOOMS.indexOf(zoom);
+    zoom = ZOOMS[Math.max(0, Math.min(ZOOMS.length - 1, (i < 0 ? 0 : i) + dir))];
+    store.set('ssr.zoom', String(zoom));
+    applyZoom();
+  };
+  $('zoomIn').addEventListener('click', () => setZoom(1));
+  $('zoomOut').addEventListener('click', () => setZoom(-1));
+  applyZoom();
+  window.addEventListener('resize', fitLabels);
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', fitLabels);
 
   // Drag and drop anywhere on the page. dragenter/dragleave fire for every
   // child crossed, so count depth and leave the "over" state only at zero.

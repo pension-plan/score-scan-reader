@@ -24,6 +24,10 @@
   --display:"Bodoni Moda","Bodoni 72","Libre Bodoni",Didot,Georgia,serif;
   --sans:"Instrument Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  /* overlay marks: drawn on the scan, which stays paper in both themes, so
+     they keep paper-contrast values; the legend swatches sit on paper too */
+  --ov-rest:#00796b; --ov-clef:#8e24aa; --ov-key:#c25100; --ov-time:#2e7d32; --ov-mark:#c2185b;
+  --ov-stem:rgba(60,66,78,.55); --ov-lyric:#455a64; --ov-unknown:#e0001b; --ov-label:#15171b; --ov-label-dur:#4f5761; --ov-bar:#2b37b0; --ov-staff:#1e8c5a;
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
@@ -87,10 +91,12 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 .samples::before{top:0}
 .samples::after{bottom:0}
 .samples-label{font:italic 600 14px/1 var(--display);color:var(--muted);margin-right:2px}
+.sample-all{max-width:16rem;min-width:0;font:inherit;cursor:pointer;text-overflow:ellipsis}
 @media (max-width:480px){
   .samples{flex:1 1 100%}
   .samples-label{flex-basis:100%;padding-top:2px}
   .samples .btn{flex:1 1 0;justify-content:center;padding:7px 8px;white-space:nowrap}
+  .samples .sample-all{flex:1 1 100%;max-width:none;width:100%}
 }
 .filerow{flex:1 1 300px;min-width:0;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;
   gap:6px 12px;padding:10px 12px;border:1px solid var(--rule);background:var(--panel-2);border-radius:2px}
@@ -172,6 +178,32 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 .pageframe img{display:block;width:100%;height:auto}
 .pageframe .ov{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .pages.ov-off .ov{visibility:hidden}
+/* overlay layers (toggled in the legend; hide-<layer> on .pages) */
+.ov-rests{stroke:var(--ov-rest)} .ov-clefs{stroke:var(--ov-clef)} .ov-keys{stroke:var(--ov-key)} .ov-times{stroke:var(--ov-time)}
+.ov-marks{stroke:var(--ov-mark)} .ov-lyrics{stroke:var(--ov-lyric)} .ov-unknown{stroke:var(--ov-unknown)} .ov-hatch{stroke:var(--ov-unknown);opacity:.45}
+.ov-stem,.ov-beam{stroke:var(--ov-stem)}
+.ov-labels text{font-family:var(--sans);font-weight:600;fill:var(--ov-label);stroke:var(--paper);stroke-linejoin:round;paint-order:stroke}
+.ov-labels .ld{font-weight:500;font-style:italic;fill:var(--ov-label-dur)}
+.ov-labels .lr{fill:var(--ov-rest)} .ov-labels .lb{fill:var(--ov-bar)}
+.pages.hide-notes .ov-notes,.pages.hide-rests .ov-rests,.pages.hide-clefs .ov-clefs,.pages.hide-keys .ov-keys,.pages.hide-times .ov-times,
+.pages.hide-bars .ov-bars,.pages.hide-marks .ov-marks,.pages.hide-lyrics .ov-lyrics,.pages.hide-labels .ov-labels,.pages.hide-unknown .ov-unknown,
+.pages.lbl-small .ov-labels{display:none}
+.pages{overflow-x:auto}
+.pages>.pageframe{flex:none;width:calc(100% * var(--zoom, 1))}
+.layers{list-style:none;margin:0 0 10px;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.layer{appearance:none;display:inline-flex;align-items:center;gap:6px;min-height:30px;padding:3px 9px 3px 4px;border:1px solid var(--rule-strong);
+  border-radius:15px;background:transparent;font-size:12.5px;line-height:1.2;cursor:pointer;color:var(--ink)}
+.layer svg{width:20px;height:20px;flex:none;padding:2px;background:var(--paper);border-radius:50%;box-shadow:0 0 0 1px var(--rule)}
+.layer[aria-pressed="false"]{color:var(--muted);border-style:dashed;text-decoration:line-through;text-decoration-color:var(--rule-strong)}
+.layer[aria-pressed="false"] svg{opacity:.35}
+.layer-n{font:11px var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.layer-hint{display:none;font-size:11px;font-style:italic;color:var(--muted)}
+.layers.lbl-small .layer[data-layer="labels"][aria-pressed="true"] .layer-hint{display:inline}
+.ovk-notes{stroke:var(--ov-label)} .ovk-rests{stroke:var(--ov-rest)} .ovk-clefs{stroke:var(--ov-clef)} .ovk-keys{stroke:var(--ov-key)}
+.ovk-times{stroke:var(--ov-time)} .ovk-bars{stroke:var(--ov-bar)} .ovk-bars .ovk-staff{stroke:var(--ov-staff)} .ovk-marks{stroke:var(--ov-mark)}
+.ovk-lyrics{stroke:var(--ov-lyric)} .ovk-labels{color:var(--ov-label)} .ovk-unknown{stroke:var(--ov-unknown)}
+.zoom{display:inline-flex;align-items:center;gap:6px;margin:0 0 10px}
+.zoom-label{min-width:3.2em;text-align:center;font:12px var(--mono);color:var(--muted)}
 .pageframe.placeholder{aspect-ratio:1 / 1.29;display:grid;place-items:center;line-height:1.5;
   background:repeating-linear-gradient(to bottom,transparent 0 46px,#d6d9dd 46px 47px,transparent 47px 52px,#d6d9dd 52px 53px,transparent 53px 58px,#d6d9dd 58px 59px,transparent 59px 64px,#d6d9dd 64px 65px,transparent 65px 70px,#d6d9dd 70px 71px,transparent 71px 120px) var(--paper)}
 .pageframe.placeholder p{margin:0;padding:10px 14px;max-width:30ch;text-align:center;font:italic 15px/1.4 var(--display);color:#3f454d;background:var(--paper)}

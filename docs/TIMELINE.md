@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 19:28 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 19:36 AEDT.
 
 ## Events
 
@@ -80,6 +80,10 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 18:20 | User asked to investigate OpenCV as a fallback for identifying symbols: OpenCV.js trial started (template matching, contour features + kNN/SVM, HOG + SVM), as a fallback only, measured on and off, prototype behind an option if it wins. |
 | 18:24 | Coverage suite complete (18:22 AEDT): 102 items validated, all 139 symbol tags and 19 layouts covered. App baseline: 22 tags supported, 38 partial, 79 unsupported; 18 of 19 layouts supported. Speed ~2.3–3.7 s per page, flat with page count; memory grows ~46 MB per page. Seven new limits (L20–L26) queued for round 4. Report: docs/COVERAGE.md (also on Pages). |
 | 19:28 | Round 3 integrated and shipped: benchmark 0.948, real scans 0.926, challenge 0.910, rests 0.802, all outputs valid, browser check passed; nothing reverted. Limits L10, L12, L13 and L17 resolved this round. |
+| 19:34 | Round 3 pushed (7ae1200) after fixing a false-positive credential refusal (vendored OpenCV build now gitignored). Release 0.9.0 merged; regression check vs v0.8.0 running. |
+| 19:34 | Maple Leaf Rag (default sample) measured: aggregate 0.959, pitch 0.912, duration 0.929, rests 0.792, parts 1.000. |
+| 19:34 | Overlay agent started (Opus xhigh): marks for every recognised symbol class, pitch/duration labels, and highlighting of unrecognised ink. |
+| 19:36 | User asked to use OpenCV to pre-clean scans for the edge cases that break detection. Scope given to the opencv agent: a quality-gated pre-clean stage (mvp/src/cv.js) for halftone, noise, JPEG, phone, photocopy, stain, bleed and curl pages, targeting L11 and L19, measured per class on the challenge set. |
 
 ## Accuracy by round
 

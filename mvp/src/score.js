@@ -1321,6 +1321,8 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
             for (const a of line) { if (a.t > t0 + 1e-6) break; if (a.k === kk) alt = a.a; }
             const pt = pitchOf(hClef, pos, hAlt, alt == null ? {} : { [kk]: alt });
             h.pitch = pt;
+            // (overlay only: the value written for this head, first part that writes it)
+            h.shown ||= { q: e.q, type: tt ? tt.type : null, dots: tt ? tt.dots : 0, tuplet: tmod ? tu.actual : 0 };
             const acc = h.acc && !e.tieStop ? `<accidental>${h.acc}</accidental>` : '';
             const tie = (e.tieStop ? '<tie type="stop"/>' : '') + (e.tieStart ? '<tie type="start"/>' : '');
             const tied = e.tieStop || e.tieStart ? `<notations>${e.tieStop ? '<tied type="stop"/>' : ''}${e.tieStart ? '<tied type="start"/>' : ''}</notations>` : '';

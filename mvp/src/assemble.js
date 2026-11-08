@@ -540,6 +540,7 @@ function analyseHeader(R, comps, st, limitX, trace) {
   // expected accidental positions; both clefs stay possible when unread
   let kcs = clef ? [keyPosFor(clef)] : [KEY_POS.G, KEY_POS.F];
   let kind = null, n = 0, end = clefEnd, time = null;
+  const keySigns = []; // (overlay only: where the key signature's signs stand)
   for (let gi = 0; gi < glyphs.length; gi++) {
     let g = glyphs[gi];
     if ((g.x1 - g.x0) < 0.25 * sp && (g.y1 - g.y0) < 0.4 * sp) continue; // specks
@@ -591,7 +592,7 @@ function analyseHeader(R, comps, st, limitX, trace) {
     if ((k === 'sharp' || k === 'flat') && (kind === null || kind === k) && n < 7 && !far) {
       const p = accPos(st, g, k, sp);
       const ok = kcs.filter(kc => Math.abs(p - kc[k][n]) <= (g.lenient ? 0.8 : 1.2));
-      if (ok.length) { kcs = ok; kind = k; n++; end = g.x1; continue; }
+      if (ok.length) { kcs = ok; kind = k; n++; end = g.x1; keySigns.push({ x0: g.x0, y0: g.y0, x1: g.x1, y1: g.y1 }); continue; }
       break;
     }
     if (isTimeSig(R, st, g, sp)) { time = { x0: g.x0, x1: g.x1 }; end = g.x1; break; }
@@ -606,7 +607,8 @@ function analyseHeader(R, comps, st, limitX, trace) {
     }
     break;
   }
-  return { clef: clef === 'G' && clefOct === -1 ? 'G8' : clef, clefOct, fifths: kind === 'flat' ? -n : n, end: end + 0.2 * sp, keyN: n, time, mid: lineY(2) };
+  return { clef: clef === 'G' && clefOct === -1 ? 'G8' : clef, clefOct, fifths: kind === 'flat' ? -n : n, end: end + 0.2 * sp, keyN: n, time, mid: lineY(2),
+    clefEnd, keyBox: keySigns.length ? boxOf(keySigns) : null };
 }
 
 // ------------------------------------------------- changes inside a staff ---
@@ -1300,6 +1302,12 @@ function keyAlters(fifths) {
 
 // Find an accidental left of a head; returns 'sharp'|'flat'|'natural'|null
 function headAccidental(R, comps, hd, minX = -Infinity, reach = 1.9) {
+  const g = accidentalGlyph(R, comps, hd, minX, reach);
+  return g ? g.kind : null;
+}
+
+// headAccidental's sign with its box ({kind, x0, y0, x1, y1}), or null
+function accidentalGlyph(R, comps, hd, minX = -Infinity, reach = 1.9) {
   const sp = hd.sp;
   // candidate glyphs left of the head (pieces cut by staff-line removal
   // grouped); a chord's accidentals stagger further left
@@ -1328,7 +1336,7 @@ function headAccidental(R, comps, hd, minX = -Infinity, reach = 1.9) {
     const dy = Math.abs(yc - hd.y);
     if (dy > 0.55 * sp) continue;
     const d = (hd.x - g.x1) / sp + 2 * dy / sp;
-    if (d < bd) { bd = d; best = k; }
+    if (d < bd) { bd = d; best = { kind: k, x0: g.x0, y0: g.y0, x1: g.x1, y1: g.y1 }; }
   }
   return best;
 }
@@ -1451,4 +1459,4 @@ function staffMeasureEvents(fr, R, comps, s, xa, xb) {
   return v;
 }
 
-module.exports = { assemblePage, staffMeasureEvents, pitchOf, keyAlters, attrsAt, DIV, median, headDuration, _analyseHeader: analyseHeader, _compIndex: compIndex, _strokes: strokes, _classifyAccidental: classifyAccidental, _crossBands: crossBands, _glyphImage: glyphImage, _splitSharps: splitSharps, _detachedNear: detachedNear, _readClef: readClef, _beamCap: beamCap, _blobSign: blobSign, _splitSigns: splitSigns, _headAccidental: headAccidental, _groupGlyphs: groupGlyphs };
+module.exports = { assemblePage, staffMeasureEvents, pitchOf, keyAlters, attrsAt, DIV, median, headDuration, _analyseHeader: analyseHeader, _compIndex: compIndex, _strokes: strokes, _classifyAccidental: classifyAccidental, _crossBands: crossBands, _glyphImage: glyphImage, _splitSharps: splitSharps, _detachedNear: detachedNear, _readClef: readClef, _beamCap: beamCap, _blobSign: blobSign, _splitSigns: splitSigns, _headAccidental: headAccidental, accidentalGlyph, _groupGlyphs: groupGlyphs };
