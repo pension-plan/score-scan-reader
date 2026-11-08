@@ -1008,27 +1008,38 @@
         ver.words += (ver.words && !/-$/.test(ver.words) ? ' ' : '') + txt.trim();
       }
     }
-    if (!verses.size) {
+    // L5b: stanzas from the text below the music, set as verses (only when asked for)
+    const below = ((res.score && res.score.stanzas && res.score.stanzas.verses) || []).filter((v) => v && v.text);
+    if (!verses.size && !below.length) {
       const p = document.createElement('p');
       p.className = 'muted';
       p.textContent = res.ocrError ? `Not read: the text reader is unavailable (${res.ocrError})` : 'None found';
       host.appendChild(p);
       return;
     }
+    const row = (num, label, words, note) => {
+      const p = document.createElement('p');
+      p.className = 'verse' + (note ? ' from-below' : '');
+      const n = document.createElement('span');
+      n.className = 'verse-n';
+      n.textContent = num;
+      n.setAttribute('aria-label', label);
+      const t = document.createElement('span');
+      t.className = 'verse-t';
+      t.textContent = words;
+      if (note) { const m = document.createElement('span'); m.className = 'verse-src'; m.textContent = note; t.prepend(m); }
+      p.appendChild(n); p.appendChild(t);
+      host.appendChild(p);
+    };
     const bands = new Set([...verses.values()].map((v) => v.band));
     const sorted = [...verses.values()].sort((a, b) => a.band - b.band || a.number - b.number);
     for (const v of sorted) {
-      const p = document.createElement('p');
-      p.className = 'verse';
-      const n = document.createElement('span');
-      n.className = 'verse-n';
-      n.textContent = (bands.size > 1 ? `St.${v.band + 1} ` : '') + v.number + '.';
-      n.setAttribute('aria-label', (bands.size > 1 ? `Staff ${v.band + 1}, ` : '') + `verse ${v.number}`);
-      const t = document.createElement('span');
-      t.className = 'verse-t';
-      t.textContent = v.words;
-      p.appendChild(n); p.appendChild(t);
-      host.appendChild(p);
+      row((bands.size > 1 ? `St.${v.band + 1} ` : '') + v.number + '.', (bands.size > 1 ? `Staff ${v.band + 1}, ` : '') + `verse ${v.number}`, v.words);
+    }
+    for (const v of below.slice().sort((a, b) => a.number - b.number)) {
+      const ns = Array.isArray(v.numbers) && v.numbers.length > 1 ? v.numbers : [v.number];
+      const num = ns.length > 1 ? `${ns[0]}–${ns[ns.length - 1]}.` : `${ns[0]}.`;
+      row(num, `verse ${ns.join(' and ')}, from the text below the music`, String(v.text), 'From the text below the music');
     }
   }
 
