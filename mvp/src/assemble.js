@@ -668,7 +668,14 @@ function headDuration(R, hd, chord, ctx) {
   // the pixel test misses dots off the head's estimated height; the blob
   // test misses dots run into other ink: either will do
   const dot = hasDot(R, hd) || (!!ctx && dotBlob(hd, ctx));
-  return { q: dot ? q * 1.5 : q, dots: dot ? 1 : 0 };
+  const out = { q: dot ? q * 1.5 : q, dots: dot ? 1 : 0 };
+  // a black head on both stems (two voices sharing it): the lower voice's
+  // value is read on the down stem (a quarter under the upper voice's eighths)
+  if (dir === 2 && hd.kind !== 'hollow' && chord.downX >= 0 && chord.downEnd != null) {
+    const qd = 1 / Math.pow(2, countBeams(R, chord.downX, chord.downEnd, -1, sp, ctx && ctx.beamCap));
+    if (Math.abs(qd - q) > 1e-6) out.down = { q: dot ? qd * 1.5 : qd, dots: out.dots };
+  }
+  return out;
 }
 
 // ---------------------------------------------------------------- tuplets ---
@@ -686,17 +693,29 @@ function digitLike(c, sp) {
   return fill > 0.2 && fill < 0.92;
 }
 
-// thin horizontal piece: half of a tuplet bracket (with its end hook)
-function bracketLike(c, sp) {
+// thin horizontal piece: half of a tuplet bracket (with its end hook); most
+// of its columns hold only a line's thickness of ink (a word does not)
+function bracketLike(c, sp, R) {
   const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1;
-  return w >= 0.7 * sp && w <= 10 * sp && h <= 1.3 * sp && h < 0.8 * w && c.area <= 0.55 * w * h;
+  if (!(w >= 0.7 * sp && w <= 10 * sp && h <= 1.3 * sp && h < 0.8 * w && c.area <= 0.55 * w * h)) return false;
+  if (!R) return true;
+  const img = glyphImage(R, c);
+  let thin = 0;
+  for (let x = 0; x < img.width; x++) {
+    let a = -1, b = -1;
+    for (let y = 0; y < img.height; y++) if (img.data[y * img.width + x]) { if (a < 0) a = y; b = y; }
+    if (a >= 0 && b - a + 1 <= Math.max(2, 0.6 * sp)) thin++;
+  }
+  return thin >= 0.6 * img.width;
 }
+// a bracket half has its hook: a lyric extender or hyphen is a flat line
+const hooked = (c, sp) => c.y1 - c.y0 + 1 >= 0.4 * sp;
 
 // no glyph close beside it at its height: a lyric syllable or a word is a
 // row of letters, a tuplet number stands alone (bracket halves aside)
-function isolated(n, comps, sp) {
+function isolated(n, comps, sp, R) {
   const h = n.y1 - n.y0 + 1;
-  return !comps.some(c => c !== n && c.area >= 0.04 * sp * sp && (c.x1 - c.x0) < 3 * sp && !bracketLike(c, sp) &&
+  return !comps.some(c => c !== n && c.area >= 0.04 * sp * sp && (c.x1 - c.x0) < 3 * sp && !bracketLike(c, sp, R) &&
     c.y1 > n.y0 + 0.25 * h && c.y0 < n.y1 - 0.25 * h && c.x1 >= n.x0 - 0.45 * sp && c.x0 <= n.x1 + 0.45 * sp);
 }
 
@@ -818,14 +837,14 @@ function markTuplets(R, comps, s, sp, items, groups) {
   // 'hollow head' found on a number is the number)
   const nums = comps.filter(c => c.x0 > s.hdr.end && c.y1 > y0 - 7 * sp && c.y0 < y4 + 7 * sp && digitLike(c, sp) &&
     !allHeads.some(h => h.stemDir !== 0 && Math.abs(h.x - (c.x0 + c.x1) / 2) < 0.6 * sp && Math.abs(h.y - (c.y0 + c.y1) / 2) < 0.6 * sp) &&
-    isolated(c, comps, sp));
+    isolated(c, comps, sp, R));
   if (!nums.length) return;
   for (const n of nums) {
     const cy = (n.y0 + n.y1) / 2;
-    const side = comps.filter(c => c !== n && bracketLike(c, sp) && c.y0 < cy + 0.3 * sp && c.y1 > cy - 0.9 * sp && c.y1 < n.y1 + 0.9 * sp && c.y0 > n.y0 - 0.9 * sp);
+    const side = comps.filter(c => c !== n && bracketLike(c, sp, R) && c.y0 < cy + 0.3 * sp && c.y1 > cy - 0.9 * sp && c.y1 < n.y1 + 0.9 * sp && c.y0 > n.y0 - 0.9 * sp);
     const L = side.find(c => c.x1 <= n.x0 + 0.3 * sp && c.x1 >= n.x0 - 1.2 * sp);
     const Rt = side.find(c => c.x0 >= n.x1 - 0.3 * sp && c.x0 <= n.x1 + 1.2 * sp);
-    n.br = L && Rt ? { x0: L.x0, x1: Rt.x1 } : null;
+    n.br = L && Rt && hooked(L, sp) && hooked(Rt, sp) ? { x0: L.x0, x1: Rt.x1 } : null;
   }
   const used = new Set(), claimed = new Set();
   // its: the notes found under the number; total: notes counted there
@@ -836,7 +855,16 @@ function markTuplets(R, comps, s, sp, items, groups) {
     const minq = Math.min(...its.map(it => it.q));
     const u = its.reduce((a, it) => a + it.q, 0) / minq;
     if (Math.abs(u - Math.round(u)) > 0.01) return;
-    const U = Math.round(u) + Math.max(0, (total || 0) - its.length);
+    let U = Math.round(u) + Math.max(0, (total || 0) - its.length);
+    // three notes under one bracket, one of them read with a beam too few or
+    // too many: a triplet of the shortest value
+    if (U !== 3 && n.br && its.length === 3 && (!total || total === 3)) {
+      for (const it of its) if (Math.abs(it.q - minq) > 1e-6) {
+        for (const h of it.heads) h.dur = { q: h.dur.dots ? minq * 1.5 : minq, dots: h.dur.dots };
+        it.q = it.heads[0].dur.q;
+      }
+      U = 3;
+    }
     if (U < 2 || (U === 2 && its.length < 2)) return;
     const equal = its.every(it => Math.abs(it.q - minq) < 1e-6);
     const actual = U === 3 ? 3 : equal && TUPLET[U] ? U : 0;
@@ -847,6 +875,7 @@ function markTuplets(R, comps, s, sp, items, groups) {
       for (const h of it.heads) if (!h.dur.tuplet) h.dur = { q: h.dur.q * normal / actual, dots: h.dur.dots, tuplet: { actual, normal } };
     }
     used.add(n);
+    (s.tuplets ||= []).push({ x0: n.x0, y0: n.y0, x1: n.x1, y1: n.y1, actual, normal, bracket: !!n.br, notes: its.length });
   };
   for (const g of groups) {
     const dir = g[0].dir, gx0 = g[0].x, gx1 = g[g.length - 1].x;
@@ -1045,7 +1074,10 @@ function staffMeasureEvents(fr, R, comps, s, xa, xb) {
       else if (cur[1] < cur[2]) a1 = [h]; else a2 = [h];
     }
     if (a1.length) { v[1].push(ev([a1[0]])); cur[1] += a1[0].dur.q; }
-    if (a2.length) { v[2].push(ev([a2[a2.length - 1]])); cur[2] += a2[a2.length - 1].dur.q; }
+    if (a2.length) {
+      const h = a2[a2.length - 1], d = (h.stemDir === 2 && h.dur.down) || h.dur;
+      v[2].push({ x: c.x, heads: [h], q: d.q, dots: d.dots }); cur[2] += d.q;
+    }
   }
   return v;
 }

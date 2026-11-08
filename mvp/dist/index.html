@@ -571,6 +571,7 @@ function groupGlyphs(cs, sp) {
 function clefBase(clef) {
   if (clef === 'F') return 22;
   if (clef === 'G8') return 27;
+  if (clef === 'G8va') return 41;
   if (/^C[1-5]$/.test(clef || '')) return 28 - 2 * (+clef[1] - 3);
   return 34;
 }
@@ -807,6 +808,138 @@ function analyseHeader(R, comps, st, limitX, trace) {
   return { clef: clef === 'G' && clefOct === -1 ? 'G8' : clef, clefOct, fifths: kind === 'flat' ? -n : n, end: end + 0.2 * sp, keyN: n, time, mid: lineY(2) };
 }
 
+// ------------------------------------------------- changes inside a staff ---
+// Clef and key changes after the staff start.  s.changes lists them in x
+// order ({x, clef} / {x, fifths}); heads after a change carry h.clef /
+// h.fifths when those differ from the staff header (attrsAt gives both).
+
+// count of separate ink runs down column x of a glyph image
+function crossings(img, x) {
+  let n = 0, on = false;
+  for (let y = 0; y < img.height; y++) { const v = img.data[y * img.width + x]; if (v && !on) n++; on = !!v; }
+  return n;
+}
+
+// a clef printed inside the staff (usually smaller than at the start)
+function clefChangeAt(R, near, c0, st, sp, heads) {
+  const xm = (c0.x0 + c0.x1) / 2, lineY = (k) => st.yAt(k, xm);
+  const yTop = lineY(0) - 3.5 * sp, yBot = lineY(4) + 3.5 * sp;
+  const parts = [c0];
+  let cb = boxOf(parts), grew = true;
+  while (grew) {
+    grew = false;
+    for (const c of near) {
+      if (parts.includes(c) || c.x0 > cb.x1 - 0.1 * sp || c.x1 < cb.x0 + 0.1 * sp || (c.x1 - c.x0) > 3 * sp) continue;
+      if (c.y0 < yTop || c.y1 > yBot || c.y0 > cb.y1 + 0.5 * sp || c.y1 < cb.y0 - 0.5 * sp) continue;
+      parts.push(c); cb = boxOf(parts); grew = true;
+    }
+  }
+  const w = (cb.x1 - cb.x0 + 1) / sp, hgt = (cb.y1 - cb.y0) / sp;
+  const top = (cb.y0 - lineY(0)) / sp, bot = (cb.y1 - lineY(4)) / sp;
+  // a real note (a head with a stem) inside the box: not a clef
+  const inBox = heads.filter(h => h.x > cb.x0 && h.x < cb.x1 && h.y > cb.y0 && h.y < cb.y1);
+  const stemmedIn = inBox.some(h => h.stemDir !== 0);
+  // a clef's loops pass for hollow heads; black heads with stems are notes
+  if (inBox.filter(h => h.stemDir !== 0 && h.kind !== 'hollow').length > inBox.filter(h => h.kind === 'hollow').length) return null;
+  const area = parts.reduce((a, c) => a + c.area, 0), fill = area / ((cb.x1 - cb.x0 + 1) * (cb.y1 - cb.y0 + 1));
+  let clef = null;
+  // G: its tail ends about a space below the staff (a small clef) or up to
+  // two (a full-size one); a chord's lowest note or a stem reaches elsewhere
+  const gTail = hgt < 7 ? bot > 0.5 && bot < 1.3 && top > -2.1 && top < -0.5 : bot > 0.8 && bot < 2.3 && top > -3.0 && top < -1.0;
+  if (hgt > 4.2 && hgt < 8.5 && w > 1.2 && w < 3.0 && gTail && fill > 0.22 && fill < 0.6) {
+    // G clef: its loops cross the middle column several times
+    const img = glyphImage(R, { ...cb, parts });
+    const mx = Math.round(img.width / 2);
+    let run = 0;
+    for (let x = 0; x < img.width; x++) { let r = 0; for (let y = 0; y < img.height; y++) { if (img.data[y * img.width + x]) { r++; if (r > run) run = r; } else r = 0; } }
+    // and no column holds a long straight run (a stem with flags does)
+    if (Math.max(crossings(img, mx), crossings(img, Math.max(0, mx - 2)), crossings(img, Math.min(img.width - 1, mx + 2))) >= 5 && run < 0.6 * img.height) {
+      clef = 'G';
+      // a small 8 over / under it: an octave higher / lower
+      const eight = (above) => near.find(c => !parts.includes(c) && c.x0 >= cb.x0 - 0.3 * sp && c.x1 <= cb.x1 + 0.3 * sp &&
+        (c.y1 - c.y0) > 0.4 * sp && (c.y1 - c.y0) < 1.4 * sp && (c.x1 - c.x0) > 0.25 * sp && (c.x1 - c.x0) < 1.0 * sp &&
+        (above ? c.y1 < cb.y0 + 0.2 * sp && c.y1 > cb.y0 - 1.0 * sp : c.y0 > cb.y1 - 0.2 * sp && c.y0 < cb.y1 + 1.0 * sp));
+      if (eight(true)) clef = 'G8va'; else if (eight(false)) clef = 'G8';
+    }
+  } else if (!stemmedIn && hgt > 1.8 && hgt < 3.6 && w > 1.0 && w < 2.6 && top > -0.7 && top < 0.8 && fill > 0.2) {
+    // F clef: needs its two dots
+    const dots = near.filter(c => c.x0 > cb.x1 - 0.2 * sp && c.x0 < cb.x1 + 0.8 * sp && (c.x1 - c.x0) < 0.6 * sp && (c.y1 - c.y0) < 0.6 * sp &&
+      c.y0 > lineY(0) - 0.3 * sp && c.y1 < lineY(2) + 0.3 * sp);
+    if (dots.length === 2 && Math.abs(dots[0].x0 - dots[1].x0) < 0.4 * sp) { clef = 'F'; cb = boxOf(parts.concat(dots)); }
+  }
+  // (C clefs inside a staff are not read: a sharp or natural looks too alike)
+  return clef ? { clef, box: cb } : null;
+}
+
+// a key signature right after a barline: cancelling naturals and / or the
+// new signs in key-signature order, spread out left to right
+function keyChangeAt(R, comps, st, xStart, xLimit, clef, sp, heads) {
+  const lineY = (k) => st.yAt(k, xStart + 2 * sp);
+  const cand = comps.filter(c => c.x0 > xStart && c.x0 < xLimit && c.area >= 0.04 * sp * sp &&
+    (c.y0 + c.y1) / 2 > lineY(0) - 1.6 * sp && (c.y0 + c.y1) / 2 < lineY(4) + 1.6 * sp).sort((a, b) => a.x0 - b.x0);
+  const glyphs = groupGlyphs(cand, sp);
+  const kc = keyPosFor(clef);
+  let nat = 0, kind = null, n = 0, end = xStart, lastX = -Infinity, near = 0;
+  for (let gi = 0; gi < glyphs.length; gi++) {
+    let g = glyphs[gi];
+    if ((g.x1 - g.x0) < 0.25 * sp && (g.y1 - g.y0) < 0.4 * sp) continue;
+    if (g.x0 - end > 1.6 * sp) break;
+    let k = classifyAccidental(R, g, sp);
+    if (!k && kind !== 'flat') {
+      const pieces = splitSharps(R, g, sp);
+      if (pieces) { glyphs.splice(gi, 1, ...pieces); g = glyphs[gi]; k = g.kind; }
+    }
+    if (!k || g.x0 - lastX < 0.45 * sp) break; // stacked signs: a chord's accidentals
+    const yc = k === 'flat' ? g.y1 - 0.55 * sp : (g.y0 + g.y1) / 2;
+    if (heads.some(h => h.x > g.x1 && h.x - g.x1 < 1.6 * sp && Math.abs(h.y - yc) < 0.6 * sp)) near++;
+    if (k === 'natural' && kind === null) { nat++; end = g.x1; lastX = g.x0; continue; }
+    if ((k === 'sharp' || k === 'flat') && (kind === null || kind === k) && n < 7 && Math.abs(accPos(st, g, k, sp) - kc[k][n]) <= 1.0) {
+      kind = k; n++; end = g.x1; lastX = g.x0; continue;
+    }
+    break;
+  }
+  if (near > 1) return null;
+  if (n >= 2 || (nat >= 1 && n >= 1) || (nat >= 2 && n === 0)) return { fifths: kind === 'flat' ? -n : n, end };
+  return null;
+}
+
+function staffChanges(R, comps, s, sp, barX) {
+  const st = s.st, heads = s.chords.flatMap(c => c.heads);
+  const xa = s.hdr.end + 0.5 * sp, xb = st.right - 0.3 * sp;
+  const xm = (st.left + st.right) / 2, y0 = st.yAt(0, xm), y4 = st.yAt(4, xm);
+  const near = comps.filter(c => c.x1 > xa && c.x0 < xb && c.y1 > y0 - 4 * sp && c.y0 < y4 + 4 * sp);
+  const changes = [];
+  // clefs: tall glyphs centred on the staff
+  for (const c0 of near) {
+    const h = (c0.y1 - c0.y0) / sp, cy = (c0.y0 + c0.y1) / 2;
+    if (h < 1.8 || (c0.x1 - c0.x0) > 3 * sp || cy < st.yAt(0, c0.x0) - 1.5 * sp || cy > st.yAt(4, c0.x0) + 1.5 * sp) continue;
+    if (changes.some(ch => ch.box && c0.x0 <= ch.box.x1 && c0.x1 >= ch.box.x0)) continue;
+    const r = clefChangeAt(R, near, c0, st, sp, heads);
+    if (r) changes.push({ x: r.box.x1, clef: r.clef, box: r.box });
+  }
+  changes.sort((a, b) => a.x - b.x);
+  // keys: after barlines, read with the clef in force there
+  const clefAt = (x) => { let c = s.hdr.clef; for (const ch of changes) if (ch.clef && ch.x <= x) c = ch.clef; return c; };
+  for (const bx of barX) {
+    if (bx < xa || bx > xb - 1.5 * sp) continue;
+    const k = keyChangeAt(R, comps, st, bx + 0.2 * sp, Math.min(xb, bx + 16 * sp), clefAt(bx), sp, heads);
+    if (k) changes.push({ x: k.end, fifths: k.fifths });
+  }
+  changes.sort((a, b) => a.x - b.x);
+  return changes;
+}
+
+// clef and key in force at x on staff s
+function attrsAt(s, x) {
+  let clef = s.hdr.clef, fifths = s.hdr.fifths;
+  for (const ch of s.changes || []) {
+    if (ch.x > x) break;
+    if (ch.clef) clef = ch.clef;
+    if (ch.fifths != null) fifths = ch.fifths;
+  }
+  return { clef, fifths };
+}
+
 // --------------------------------------------------------------- duration ---
 // Runs of ink down column cx from just beyond a stem tip toward the head:
 // [{a, b, len, linked}] in pixels from the tip; linked when the run touches
@@ -832,12 +965,32 @@ function tipRuns(R, cx, nx, tip, dir, sp, spanSp = 1.6) {
 // Beams (or flags) on a stem: bars touching the stem beside its tip, all of
 // about one thickness (a slur or tie ending at the tip is much thinner than
 // the beams there, so it does not add a beam).
-function countBeams(R, x, tip, dir, sp) {
+// Typical beam thickness on a page (old prints have beams up to a space
+// thick): the first bar beside each stem tip whose ink runs on sideways.
+// Returns the most a single beam may measure along a stem (0.9 space at least).
+function beamCap(R, chords, sp) {
+  const lens = [];
+  for (const c of chords) for (const dir of [1, -1]) {
+    const x = dir === 1 ? c.upX : c.downX, tip = dir === 1 ? c.upEnd : c.downEnd;
+    if (!(x >= 0) || tip == null || !(dir === 1 ? c.up : c.down)) continue;
+    for (const side of [-1, 1]) {
+      const r = tipRuns(R, Math.round(x + side * 0.45 * sp), Math.round(x + side * 0.15 * sp), tip, dir, sp)[0];
+      if (!r || !r.linked || r.a > 0.3 * sp || r.len < 0.3 * sp || r.len > 1.5 * sp) continue;
+      // the same bar a space and more away: a beam, not a flag or a slur
+      const far = tipRuns(R, Math.round(x + side * 1.3 * sp), Math.round(x + side * 0.15 * sp), tip, dir, sp)[0];
+      if (far && Math.abs(far.a - r.a) < 0.4 * sp && Math.abs(far.len - r.len) < 0.3 * sp) lens.push(r.len);
+    }
+  }
+  if (lens.length < 6) return 0.9 * sp;
+  return Math.max(0.9 * sp, Math.min(1.25 * sp, 1.25 * median(lens)));
+}
+
+function countBeams(R, x, tip, dir, sp, cap = 0.9 * sp) {
   let best = 0;
   for (const side of [-1, 1]) {
     const nx = Math.round(x + side * 0.15 * sp);
     for (const off of [0.45, 0.7]) {
-      const bars = tipRuns(R, Math.round(x + side * off * sp), nx, tip, dir, sp).filter(r => r.linked && r.len >= 0.22 * sp && r.len <= 0.9 * sp);
+      const bars = tipRuns(R, Math.round(x + side * off * sp), nx, tip, dir, sp).filter(r => r.linked && r.len >= 0.22 * sp && r.len <= cap);
       if (!bars.length) continue;
       const thick = Math.max(...bars.map(r => r.len));
       best = Math.max(best, bars.filter(r => r.len >= 0.5 * thick).length);
@@ -900,14 +1053,21 @@ function headDuration(R, hd, chord, ctx) {
     const x = useUp ? chord.upX : chord.downX;
     const tip = useUp ? chord.upEnd : chord.downEnd;
     if (x >= 0 && tip != null) {
-      const nb = countBeams(R, x, tip, useUp ? 1 : -1, sp);
+      const nb = countBeams(R, x, tip, useUp ? 1 : -1, sp, ctx && ctx.beamCap);
       q = q / Math.pow(2, nb);
     }
   }
   // the pixel test misses dots off the head's estimated height; the blob
   // test misses dots run into other ink: either will do
   const dot = hasDot(R, hd) || (!!ctx && dotBlob(hd, ctx));
-  return { q: dot ? q * 1.5 : q, dots: dot ? 1 : 0 };
+  const out = { q: dot ? q * 1.5 : q, dots: dot ? 1 : 0 };
+  // a black head on both stems (two voices sharing it): the lower voice's
+  // value is read on the down stem (a quarter under the upper voice's eighths)
+  if (dir === 2 && hd.kind !== 'hollow' && chord.downX >= 0 && chord.downEnd != null) {
+    const qd = 1 / Math.pow(2, countBeams(R, chord.downX, chord.downEnd, -1, sp, ctx && ctx.beamCap));
+    if (Math.abs(qd - q) > 1e-6) out.down = { q: dot ? qd * 1.5 : qd, dots: out.dots };
+  }
+  return out;
 }
 
 // ---------------------------------------------------------------- tuplets ---
@@ -925,17 +1085,29 @@ function digitLike(c, sp) {
   return fill > 0.2 && fill < 0.92;
 }
 
-// thin horizontal piece: half of a tuplet bracket (with its end hook)
-function bracketLike(c, sp) {
+// thin horizontal piece: half of a tuplet bracket (with its end hook); most
+// of its columns hold only a line's thickness of ink (a word does not)
+function bracketLike(c, sp, R) {
   const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1;
-  return w >= 0.7 * sp && w <= 10 * sp && h <= 1.3 * sp && h < 0.8 * w && c.area <= 0.55 * w * h;
+  if (!(w >= 0.7 * sp && w <= 10 * sp && h <= 1.3 * sp && h < 0.8 * w && c.area <= 0.55 * w * h)) return false;
+  if (!R) return true;
+  const img = glyphImage(R, c);
+  let thin = 0;
+  for (let x = 0; x < img.width; x++) {
+    let a = -1, b = -1;
+    for (let y = 0; y < img.height; y++) if (img.data[y * img.width + x]) { if (a < 0) a = y; b = y; }
+    if (a >= 0 && b - a + 1 <= Math.max(2, 0.6 * sp)) thin++;
+  }
+  return thin >= 0.6 * img.width;
 }
+// a bracket half has its hook: a lyric extender or hyphen is a flat line
+const hooked = (c, sp) => c.y1 - c.y0 + 1 >= 0.4 * sp;
 
 // no glyph close beside it at its height: a lyric syllable or a word is a
 // row of letters, a tuplet number stands alone (bracket halves aside)
-function isolated(n, comps, sp) {
+function isolated(n, comps, sp, R) {
   const h = n.y1 - n.y0 + 1;
-  return !comps.some(c => c !== n && c.area >= 0.04 * sp * sp && (c.x1 - c.x0) < 3 * sp && !bracketLike(c, sp) &&
+  return !comps.some(c => c !== n && c.area >= 0.04 * sp * sp && (c.x1 - c.x0) < 3 * sp && !bracketLike(c, sp, R) &&
     c.y1 > n.y0 + 0.25 * h && c.y0 < n.y1 - 0.25 * h && c.x1 >= n.x0 - 0.45 * sp && c.x0 <= n.x1 + 0.45 * sp);
 }
 
@@ -968,7 +1140,7 @@ function stemsUnder(R, beamY, dir, xa, xb, sp) {
 // Beamed groups of a staff: stems whose tips touch one component (the beam).
 // A stem inside a group's span that ends at its beam but read no beam (cut
 // stem, faint beam) is a beamed note too: its value is read again at the beam.
-function beamGroups(R, labels, s, sp) {
+function beamGroups(R, labels, s, sp, cap) {
   const W = R.width;
   const items = [];
   for (const c of s.chords) {
@@ -1009,21 +1181,7 @@ function beamGroups(R, labels, s, sp) {
       }
       return g[0].tipY;
     };
-    const dir = g[0].dir, gx0 = g[0].x, gx1 = g[g.length - 1].x;
-    for (const it of items) {
-      if (inGroup.has(it) || it.dir !== dir || it.x <= gx0 + 0.3 * sp || it.x >= gx1 - 0.3 * sp || it.q < 1 - 1e-6) continue;
-      if (it.heads.some(h => h.kind === 'hollow')) continue;
-      const by = g.beamY(it.x);
-      // the stem stops short of the beam or runs into it
-      if (Math.abs(it.tipY - by) > 2.5 * sp) continue;
-      const nb = countBeams(R, it.x, by, dir, sp);
-      if (!nb) continue;
-      const q = 1 / Math.pow(2, nb);
-      for (const h of it.heads) h.dur = { q: h.dur.dots ? q * 1.5 : q, dots: h.dur.dots };
-      it.q = it.heads[0].dur.q; it.tipY = by;
-      inGroup.add(it); g.push(it);
-    }
-    g.sort((a, b) => a.x - b.x);
+    const dir = g[0].dir;
     // where the beam itself ends (a missed note at either end still has its
     // stem under it)
     const ink = (x) => {
@@ -1042,6 +1200,20 @@ function beamGroups(R, labels, s, sp) {
       return last;
     };
     g.x0 = walk(g[0].x, -1); g.x1 = walk(g[g.length - 1].x, 1);
+    for (const it of items) {
+      if (inGroup.has(it) || it.dir !== dir || it.x <= g.x0 - 0.2 * sp || it.x >= g.x1 + 0.2 * sp || it.q < 1 - 1e-6) continue;
+      if (it.heads.some(h => h.kind === 'hollow')) continue;
+      const by = g.beamY(it.x);
+      // the stem stops short of the beam or runs into it
+      if (Math.abs(it.tipY - by) > 2.5 * sp) continue;
+      const nb = countBeams(R, it.x, by, dir, sp, cap);
+      if (!nb) continue;
+      const q = 1 / Math.pow(2, nb);
+      for (const h of it.heads) h.dur = { q: h.dur.dots ? q * 1.5 : q, dots: h.dur.dots };
+      it.q = it.heads[0].dur.q; it.tipY = by;
+      inGroup.add(it); g.push(it);
+    }
+    g.sort((a, b) => a.x - b.x);
   }
   return { items, groups };
 }
@@ -1057,14 +1229,14 @@ function markTuplets(R, comps, s, sp, items, groups) {
   // 'hollow head' found on a number is the number)
   const nums = comps.filter(c => c.x0 > s.hdr.end && c.y1 > y0 - 7 * sp && c.y0 < y4 + 7 * sp && digitLike(c, sp) &&
     !allHeads.some(h => h.stemDir !== 0 && Math.abs(h.x - (c.x0 + c.x1) / 2) < 0.6 * sp && Math.abs(h.y - (c.y0 + c.y1) / 2) < 0.6 * sp) &&
-    isolated(c, comps, sp));
+    isolated(c, comps, sp, R));
   if (!nums.length) return;
   for (const n of nums) {
     const cy = (n.y0 + n.y1) / 2;
-    const side = comps.filter(c => c !== n && bracketLike(c, sp) && c.y0 < cy + 0.3 * sp && c.y1 > cy - 0.9 * sp && c.y1 < n.y1 + 0.9 * sp && c.y0 > n.y0 - 0.9 * sp);
+    const side = comps.filter(c => c !== n && bracketLike(c, sp, R) && c.y0 < cy + 0.3 * sp && c.y1 > cy - 0.9 * sp && c.y1 < n.y1 + 0.9 * sp && c.y0 > n.y0 - 0.9 * sp);
     const L = side.find(c => c.x1 <= n.x0 + 0.3 * sp && c.x1 >= n.x0 - 1.2 * sp);
     const Rt = side.find(c => c.x0 >= n.x1 - 0.3 * sp && c.x0 <= n.x1 + 1.2 * sp);
-    n.br = L && Rt ? { x0: L.x0, x1: Rt.x1 } : null;
+    n.br = L && Rt && hooked(L, sp) && hooked(Rt, sp) ? { x0: L.x0, x1: Rt.x1 } : null;
   }
   const used = new Set(), claimed = new Set();
   // its: the notes found under the number; total: notes counted there
@@ -1075,7 +1247,16 @@ function markTuplets(R, comps, s, sp, items, groups) {
     const minq = Math.min(...its.map(it => it.q));
     const u = its.reduce((a, it) => a + it.q, 0) / minq;
     if (Math.abs(u - Math.round(u)) > 0.01) return;
-    const U = Math.round(u) + Math.max(0, (total || 0) - its.length);
+    let U = Math.round(u) + Math.max(0, (total || 0) - its.length);
+    // three notes under one bracket, one of them read with a beam too few or
+    // too many: a triplet of the shortest value
+    if (U !== 3 && n.br && its.length === 3 && (!total || total === 3)) {
+      for (const it of its) if (Math.abs(it.q - minq) > 1e-6) {
+        for (const h of it.heads) h.dur = { q: h.dur.dots ? minq * 1.5 : minq, dots: h.dur.dots };
+        it.q = it.heads[0].dur.q;
+      }
+      U = 3;
+    }
     if (U < 2 || (U === 2 && its.length < 2)) return;
     const equal = its.every(it => Math.abs(it.q - minq) < 1e-6);
     const actual = U === 3 ? 3 : equal && TUPLET[U] ? U : 0;
@@ -1086,6 +1267,7 @@ function markTuplets(R, comps, s, sp, items, groups) {
       for (const h of it.heads) if (!h.dur.tuplet) h.dur = { q: h.dur.q * normal / actual, dots: h.dur.dots, tuplet: { actual, normal } };
     }
     used.add(n);
+    (s.tuplets ||= []).push({ x0: n.x0, y0: n.y0, x1: n.x1, y1: n.y1, actual, normal, bracket: !!n.br, notes: its.length });
   };
   for (const g of groups) {
     const dir = g[0].dir, gx0 = g[0].x, gx1 = g[g.length - 1].x;
@@ -1189,6 +1371,9 @@ function assemblePage(fr, pageIndex = 0) {
   const comps = allComps.filter(c => c.area >= 4);
   const warnings = [];
   const systems = [];
+  // how thick a single beam may be on this page
+  let cap = 0.9 * fr.ss;
+  try { cap = beamCap(R, (fr.chords || []).filter(c => c.heads.some(h => fr.heads.includes(h))), fr.ss); } catch (e) { /* keep the default */ }
   for (const sys of fr.systems) {
     const barX = systemBarlines(fr, sys);
     const staves = sys.map(si => {
@@ -1206,11 +1391,11 @@ function assemblePage(fr, pageIndex = 0) {
       const dots = comps.filter(c => c.y1 > ya && c.y0 < yb && c.x0 > hdr.end && (c.x1 - c.x0 + 1) >= 0.2 * spS && (c.x1 - c.x0 + 1) <= 0.8 * spS &&
         (c.y1 - c.y0 + 1) >= 0.2 * spS && (c.y1 - c.y0 + 1) <= 0.8 * spS && c.area >= 0.08 * spS * spS &&
         c.area >= 0.45 * (c.x1 - c.x0 + 1) * (c.y1 - c.y0 + 1) && Math.max(c.x1 - c.x0 + 1, c.y1 - c.y0 + 1) <= 1.8 * Math.min(c.x1 - c.x0 + 1, c.y1 - c.y0 + 1));
-      const dctx = { st, dots };
+      const dctx = { st, dots, beamCap: cap };
       for (const c of music) for (const h of c.heads) if (!h.dur) h.dur = headDuration(R, h, c, dctx);
       try {
         const sp = st.space || fr.ss;
-        const { items, groups } = beamGroups(R, labels, s, sp);
+        const { items, groups } = beamGroups(R, labels, s, sp, cap);
         markTuplets(R, comps, s, sp, items, groups);
       } catch (e) { warnings.push(`Beam / tuplet reading failed on a staff (${e.message}).`); }
       return s;
@@ -1225,6 +1410,26 @@ function assemblePage(fr, pageIndex = 0) {
         s.hdr.clefGuessed = true;
       }
     });
+    // clef / key changes inside the staves
+    for (const s of staves) {
+      try {
+        const sp = s.st.space || fr.ss;
+        s.changes = staffChanges(R, comps, s, sp, barX);
+        const boxes = s.changes.filter(ch => ch.box).map(ch => ch.box);
+        // 'heads' found on a clef glyph are not notes
+        if (boxes.length) {
+          const onClef = (h) => boxes.some(b => h.x > b.x0 - 0.2 * sp && h.x < b.x1 + 0.2 * sp && h.y > b.y0 && h.y < b.y1);
+          s.chords = s.chords.map(c => (c.heads.some(onClef) ? { ...c, heads: c.heads.filter(h => !onClef(h)) } : c)).filter(c => c.heads.length);
+        }
+        if (s.changes.length) for (const c of s.chords) {
+          const a = attrsAt(s, c.x);
+          for (const h of c.heads) {
+            if (a.clef !== s.hdr.clef) h.clef = a.clef;
+            if (a.fifths !== s.hdr.fifths) h.fifths = a.fifths;
+          }
+        }
+      } catch (e) { warnings.push(`Clef / key change reading failed on a staff (${e.message}).`); s.changes = []; }
+    }
     // measure boundaries
     const left = Math.min(...staves.map(s => s.st.left)), right = Math.max(...staves.map(s => s.st.right));
     const bounds = [left, ...barX.filter(x => x > left + 2 * fr.ss && x < right - 0.8 * fr.ss), right + 1];
@@ -1261,12 +1466,15 @@ function staffMeasureEvents(fr, R, comps, s, xa, xb) {
       else if (cur[1] < cur[2]) a1 = [h]; else a2 = [h];
     }
     if (a1.length) { v[1].push(ev([a1[0]])); cur[1] += a1[0].dur.q; }
-    if (a2.length) { v[2].push(ev([a2[a2.length - 1]])); cur[2] += a2[a2.length - 1].dur.q; }
+    if (a2.length) {
+      const h = a2[a2.length - 1], d = (h.stemDir === 2 && h.dur.down) || h.dur;
+      v[2].push({ x: c.x, heads: [h], q: d.q, dots: d.dots }); cur[2] += d.q;
+    }
   }
   return v;
 }
 
-module.exports = { assemblePage, staffMeasureEvents, pitchOf, keyAlters, DIV, median, headDuration, _analyseHeader: analyseHeader, _compIndex: compIndex, _strokes: strokes, _classifyAccidental: classifyAccidental, _crossBands: crossBands, _glyphImage: glyphImage, _splitSharps: splitSharps, _detachedNear: detachedNear, _readClef: readClef };
+module.exports = { assemblePage, staffMeasureEvents, pitchOf, keyAlters, attrsAt, DIV, median, headDuration, _analyseHeader: analyseHeader, _compIndex: compIndex, _strokes: strokes, _classifyAccidental: classifyAccidental, _crossBands: crossBands, _glyphImage: glyphImage, _splitSharps: splitSharps, _detachedNear: detachedNear, _readClef: readClef, _beamCap: beamCap };
 
 };
 defs["barlines"]=function(require,module,exports){
