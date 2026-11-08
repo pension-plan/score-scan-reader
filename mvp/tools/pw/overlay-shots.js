@@ -38,7 +38,7 @@ const srv = http.createServer((req, res) => {
           marks: q('.ov-marks > *'), unknown: q('.ov-unknown rect'), labels: q('.ov-labels text'), stems: q('.ov-stem'),
           labelsShown: !document.getElementById('pages').classList.contains('lbl-small'),
           layers: [...document.querySelectorAll('#layers .layer')].map(b => b.textContent.trim()),
-          hscroll: document.documentElement.scrollWidth > window.innerWidth,
+          hscroll: document.documentElement.scrollWidth > window.innerWidth, dbg: (() => { const im = document.querySelector('#pages .pageframe img'); return im ? [im.clientWidth, im.width, im.naturalWidth, document.querySelector('#pages svg.ov').viewBox.baseVal.width] : null; })(),
           sample: [...document.querySelectorAll('#pages .ov-labels text')].slice(0, 12).map(t => t.textContent),
         };
       });
@@ -49,7 +49,7 @@ const srv = http.createServer((req, res) => {
       const plate = await page.$('section.plate');
       await plate.screenshot({ path: path.join(OUT, `fit-${tag}.png`) });
       // zoom in until labels show, then a close-up of the first system
-      for (let k = 0; k < 4; k++) { if (await page.evaluate(() => !document.getElementById('pages').classList.contains('lbl-small'))) break; await page.click('#zoomIn'); await page.waitForTimeout(150); }
+      for (let k = 0; k < 6; k++) { if (await page.evaluate(() => !document.getElementById('pages').classList.contains('lbl-small'))) break; await page.click('#zoomIn'); await page.waitForTimeout(150); }
       const z = await info();
       out.runs[tag].zoom = { labelsShown: z.labelsShown, zoom: await page.textContent('#zoomLabel'), hscroll: z.hscroll, sample: z.sample };
       if (!z.labelsShown) out.failures.push(tag + ': labels never shown after zooming in');

@@ -677,7 +677,13 @@
         const txt = t[4] ? `${t[6] === 'common' ? 'C = ' : t[6] === 'cut' ? '¢ = ' : ''}${t[4]}/${t[5]}` : time && time.beats ? `${time.beats}/${time.type}` : 'time signature';
         items.push({ x: (t[0] + t[2]) / 2, y: t[1] - 0.4 * ss, side: -1, lines: [[txt, 'ls']] });
       }
-      for (const b of sy.bars || []) if (b[3] !== 'single') items.push({ x: b[0], y: b[1] - 0.3 * ss, side: -1, lines: [[{ double: 'double bar', 'repeat-start': 'repeat ‖:', 'repeat-end': 'repeat :‖', 'repeat-both': 'repeat :‖:' }[b[3]] || b[3], 'lb']] });
+      // a double bar or repeat once per system (barlines are found staff by staff)
+      const barSeen = [];
+      for (const b of (sy.bars || []).slice().sort((u, w) => u[1] - w[1])) {
+        if (b[3] === 'single' || barSeen.some((o) => Math.abs(o[0] - b[0]) < ss && b[1] - o[2] < 2.5 * ss && o[3] === b[3])) { if (b[3] !== 'single') barSeen.push(b); continue; }
+        barSeen.push(b);
+        items.push({ x: b[0], y: b[1] - 0.3 * ss, side: -1, lines: [[{ double: 'double bar', 'repeat-start': 'repeat ‖:', 'repeat-end': 'repeat :‖', 'repeat-both': 'repeat :‖:' }[b[3]] || b[3], 'lb']] });
+      }
       // place: outermost line first for stacks above, nearest first below
       const placed = [];
       const hit = (a) => placed.some((b) => a.x0 < b.x1 && a.x1 > b.x0 && a.y0 < b.y1 && a.y1 > b.y0);
@@ -792,8 +798,8 @@
     $('pages').classList.toggle('lbl-small', small);
     $('layers').classList.toggle('lbl-small', small);
   }
-  const ZOOMS = [1, 1.5, 2, 3, 4];
-  let zoom = Math.max(1, Math.min(4, +store.get('ssr.zoom') || 1));
+  const ZOOMS = [1, 1.5, 2, 3, 4, 6];
+  let zoom = ZOOMS.includes(+store.get('ssr.zoom')) ? +store.get('ssr.zoom') : 1;
   function applyZoom() {
     $('pages').style.setProperty('--zoom', String(zoom));
     $('zoomLabel').textContent = zoom === 1 ? 'Fit' : `${zoom}×`;

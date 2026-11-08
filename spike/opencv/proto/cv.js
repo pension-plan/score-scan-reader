@@ -1,20 +1,27 @@
 'use strict';
-// Optional OpenCV.js fallback symbol reader (default off). Runs after the classical page
-// assembly and only where that reading is missing:
-//   - numbered time signatures: the header finds the glyph but never reads its numbers; each
-//     digit is matched against Bravura templates (cv.matchTemplate, TM_CCOEFF_NORMED) scaled to
-//     the staff space. A time signature the header missed altogether (two stacked digits right
-//     after the clef / key) is read the same way, and "heads" found on it are dropped.
+// Optional fallback symbol reader (default off): SMuFL template matching (Bravura glyphs, best
+// TM_CCOEFF_NORMED over small shifts and three scales of the staff space). It runs after the
+// classical page assembly and only where that reading is missing:
+//   - numbered time signatures on the first system of a page: the header finds the glyph but
+//     never reads its numbers. A time signature the header missed altogether (two stacked digits
+//     right after the clef / key) is read the same way, and "heads" found on it are dropped.
 //   - clefs the header could not read (clef guessed): the glyph at the staff start is matched
-//     against the G / F / C clef templates; a C clef takes its line from its centre.
-// Measured in docs/spike-opencv.md (templates beat the shape/HOG classifiers on these glyphs and
-// need no training data). Usage, like ml.js:
-//   node:    conv = wrapConverter(omr.createConverter(opts), createNodeCv())
-//   browser: conv = wrapConverter(omr.createConverter(opts), createBrowserCv({ base: 'assets/' }))
-// OpenCV.js: @techstark/opencv-js 4.10.0-release.1 (Apache-2.0), patched so embind never calls
-// new Function (the artifact CSP has no unsafe-eval): spike/opencv/tools/patch-noeval.js.
+//     against the G / F / C templates; a C clef takes its line from its centre.
+//   - opts.rests: glyphs rests.js leaves unclassified, if rests.js has the setRestFallback hook
+//     (spike/opencv/hooks/rests-hook.patch; measured a net loss on the coverage set, so off).
+// Two interchangeable matchers give the same readings (docs/spike-opencv.md):
+//   createJsCv()                      plain JS, no asset; about 0.3 s per page
+//   createNodeCv() / createBrowserCv() OpenCV.js 4.10.0 (@techstark/opencv-js 4.10.0-release.1,
+//                                     Apache-2.0), patched so embind never calls new Function
+//                                     (the artifact CSP has no unsafe-eval; spike/opencv/tools/
+//                                     patch-noeval.js); 10.4 MB, ~0.2 s (node) / ~0.85 s (browser)
+//                                     to load, then about 0.04 s per page
+// Usage, like ml.js:
+//   conv = wrapConverter(omr.createConverter(opts), createJsCv())
+//   node:    wrapConverter(conv, createNodeCv())      (OPENCV_JS=path, or the default paths below)
+//   browser: wrapConverter(conv, createBrowserCv({ base: new URL('assets/', location.href).href }))
 // Templates: glyphs of the Bravura font (SIL OFL 1.1, Steinberg Media Technologies), rendered at
-// 24 px per staff space, 1 bit per pixel.
+// 24 px per staff space, 1 bit per pixel (BANK at the end; spike/opencv/tools/templates.js).
 const { labelComponents } = require('./cc');
 
 const BANK_SP = 24;

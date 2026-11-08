@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 19:36 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 19:38 AEDT.
 
 ## Events
 
@@ -84,6 +84,9 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 19:34 | Maple Leaf Rag (default sample) measured: aggregate 0.959, pitch 0.912, duration 0.929, rests 0.792, parts 1.000. |
 | 19:34 | Overlay agent started (Opus xhigh): marks for every recognised symbol class, pitch/duration labels, and highlighting of unrecognised ink. |
 | 19:36 | User asked to use OpenCV to pre-clean scans for the edge cases that break detection. Scope given to the opencv agent: a quality-gated pre-clean stage (mvp/src/cv.js) for halftone, noise, JPEG, phone, photocopy, stain, bleed and curl pages, targeting L11 and L19, measured per class on the challenge set. |
+| 19:38 | v0.9.0 regression check vs v0.8.0: no regression (benchmark+OCR 0.946 to 0.948, real scans 0.921 to 0.926; challenge 0.808 to 0.809, 0 items down more than 0.05). |
+| 19:38 | Pushed 184d5b5: All examples picker in /app/ (19 shareable benchmark scans, 8 real + 11 synthetic; restricted Bach excluded; assets 39.6 MB of 64). |
+| 19:38 | User asked for hand-drawn repair marks on the page after detection; added to the overlay agent's scope (freehand/line marks in page coordinates, notes, undo, per-document persistence, JSON + PNG export for a later repair pass). |
 
 ## Accuracy by round
 

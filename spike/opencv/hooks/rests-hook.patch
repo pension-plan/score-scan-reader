@@ -1,0 +1,27 @@
+--- a/mvp/src/rests.js	2026-11-08 08:40:54.258729378 +0000
++++ b/mvp/src/rests.js	2026-11-08 08:41:07.937153679 +0000
+@@ -194,6 +194,10 @@
+ // The rests printed on staff s between xa and xb:
+ // [{x, pos (centre), q, dots, kind, box, bars (bars it stands for, block
+ // rests), multi (bar count of a multi-bar rest)}] sorted by x.
++// set by src/cv.js while an opted-in converter runs; null otherwise
++let restFallback = null;
++function setRestFallback(f) { restFallback = f; }
++
+ function detectRests({ R, comps, s, xa, xb, debug }) {
+   const st = s.st, sp = st.space;
+   const xMin = Math.max(xa, (s.hdr && s.hdr.end) || -1e9) + 0.3 * sp;
+@@ -256,6 +260,8 @@
+       }
+     }
+     if (debug) debug('cand', Math.round(f.xc), Math.round(c.y0), 'w', f.w.toFixed(2), 'h', f.h.toFixed(2), 'top', f.top.toFixed(2), 'fill', f.fill.toFixed(2), '->', kind);
++    // optional fallback reader (src/cv.js wrapConverter with opts.rests) for glyphs left unclassified
++    if (!kind && restFallback && !on.length && f.h >= 1.3) { const fb = restFallback(R, c, st, sp); if (fb) { kind = fb.kind; q = fb.q; } }
+     if (!kind) continue;
+     // a block rest stands clear of other symbols (a detached flag, a clef or
+     // a beam fragment does not); dots aside
+@@ -350,3 +356,4 @@
+ 
+ module.exports.mergeRests = mergeRests;
+ module.exports.restBars = restBars;
++module.exports.setRestFallback = setRestFallback;

@@ -1,0 +1,37 @@
+--- a/mvp/tools/eval.mjs	2026-11-08 08:40:54.256982088 +0000
++++ b/mvp/tools/eval.mjs	2026-11-08 08:41:07.918488056 +0000
+@@ -74,6 +74,7 @@
+     else if (k === '--set') a.set = v();
+     else if (k === '--quiet') a.quiet = true;
+     else if (k === '--ml') a.ml = true;
++    else if (k === '--cv') a.cv = v(); // optional src/cv.js fallback reader: js | opencv
+     else if (k === '--ocr-lang') a.ocrLang = v();
+     else if (k === '--child') a.child = v();
+     else if (k === '-h' || k === '--help') { const L = fs.readFileSync(__filename, 'utf8').split('\n'); let e = 1; while (e < L.length && L[e].startsWith('//')) e++; console.log(L.slice(1, e).join('\n')); process.exit(0); }
+@@ -91,6 +92,17 @@
+   const { readGray } = req(path.join(spec.src, 'image.js'));
+   const omr = req(path.join(spec.src, 'omr.js'));
+   let convert = omr.convert;
++  if (spec.cv && !spec.ml) {
++    // the optional fallback reader (src/cv.js): time-signature digits / unread clefs by template
++    // matching; --cv js (plain JS) or --cv opencv (OpenCV.js, OPENCV_JS=path); not combined with --ml
++    const cvm = req(path.join(spec.src, 'cv.js'));
++    const getCv = spec.cv === 'opencv' ? cvm.createNodeCv() : cvm.createJsCv();
++    convert = async (pgs, o) => {
++      const c = cvm.wrapConverter(omr.createConverter(o), getCv, {});
++      for (let i = 0; i < pgs.length; i++) await c.addPage(pgs[i], i, pgs.length);
++      return c.finish();
++    };
++  }
+   if (spec.ml) {
+     // the app's ML path: omr.createConverter wrapped by ml.wrapConverter, pages in order
+     const ml = req(path.join(spec.src, 'ml.js'));
+@@ -578,7 +590,7 @@
+       const metaOut = path.join(outDir, it.key + '.meta.json');
+       const specPath = path.join(outDir, it.key + '.spec.json');
+       for (const f of [xmlOut, metaOut]) fs.rmSync(f, { force: true });
+-      fs.writeFileSync(specPath, JSON.stringify({ src: args.src, pages, ocr: args.ocr, ocrLang: args.ocrLang, ml: args.ml, xmlOut, metaOut }));
++      fs.writeFileSync(specPath, JSON.stringify({ src: args.src, pages, ocr: args.ocr, ocrLang: args.ocrLang, ml: args.ml, cv: args.cv || null, xmlOut, metaOut }));
+       const tChild = Date.now();
+       const r = await run(process.execPath, ['--max-old-space-size=8192', __filename, '--child', specPath], { timeoutMs: args.timeout * 1000, cwd: MVP, trackRss: true });
+       res.child_ms = Date.now() - tChild;
