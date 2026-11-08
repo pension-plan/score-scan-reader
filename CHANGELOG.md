@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.28.1](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.28.0...score-scan-reader-v0.28.1) (2026-11-08)
+
+
+### Bug Fixes
+
+* **spread:** a left-page staff overlapping the gutter by up to a staff space no longer hides a book spread ([f64bd71](https://github.com/pension-plan/score-scan-reader/commit/f64bd71b33509cd1501c5762bbcc0ceac07767a5))
+* **structure:** voltas over chord symbols and from a system's first bar ([69e30f1](https://github.com/pension-plan/score-scan-reader/commit/69e30f1930441dbafa20cfc1c852e44761edf6b2))
+
+
+### Performance Improvements
+
+* **ocr:** reads started together on a pool of two readers, PGM input, lazy rest scoring ([6ee5e2e](https://github.com/pension-plan/score-scan-reader/commit/6ee5e2e6c70bf222b09b12c70da5b3df566c1120))
+
 ## [0.28.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.27.1...score-scan-reader-v0.28.0) (2026-11-08)
 
 
