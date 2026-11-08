@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.36.2](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.36.1...score-scan-reader-v0.36.2) (2026-11-08)
+
+
+### Bug Fixes
+
+* **parts:** a small staff on only some systems keeps its own part (descant); stand-in staves elsewhere (L11) ([bb3cbf9](https://github.com/pension-plan/score-scan-reader/commit/bb3cbf9ab8d2ee52b64d0abda61941241fc171a0))
+* **rests:** 32nd/64th rests whose hooks read as two or three heads ([4468b51](https://github.com/pension-plan/score-scan-reader/commit/4468b51c13bc36be6a06b00b6ebbb85e8eae895d))
+
 ## [0.36.1](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.36.0...score-scan-reader-v0.36.1) (2026-11-08)
 
 
