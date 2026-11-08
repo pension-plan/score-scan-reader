@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.42.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.41.1...score-scan-reader-v0.42.0) (2026-11-08)
+
+
+### Features
+
+* **names:** instrument part names from the title and subtitle; lead sheets name their staff Melody (L9) ([ff375e0](https://github.com/pension-plan/score-scan-reader/commit/ff375e0de26575108f8c2aedf7f34bc03229eff2))
+
+
+### Bug Fixes
+
+* **assemble:** key changes after a double barline on worn scans, and in every staff of the system ([f59ce5f](https://github.com/pension-plan/score-scan-reader/commit/f59ce5f303bad22ccf7240a5dfa82eb1d64e615c))
+* **assemble:** key changes with signs run together; no partial or lone misreads ([3b65d04](https://github.com/pension-plan/score-scan-reader/commit/3b65d04848c65504d33f5adcea0f9b81186dc75d))
+* **cue:** cue staves allow up to three quarters small heads (cue passages can be half a part) ([eb287a1](https://github.com/pension-plan/score-scan-reader/commit/eb287a17519c1f26db48e1c3dc2bc15d23157a7e))
+* **cv:** key signatures filled in solid on heavy photocopies ([4273614](https://github.com/pension-plan/score-scan-reader/commit/4273614434305860225a1ad67a154dfe873029f4))
+* **score:** a key dropped by every staff of every later system is a key change (trio after a minuet) ([572d4d2](https://github.com/pension-plan/score-scan-reader/commit/572d4d2245bead4f6c3156f374aaaa2c407dc785))
+* **staves:** staves cut short where their lines fade are extended to the page margins ([0739024](https://github.com/pension-plan/score-scan-reader/commit/07390240dbdc34f1ea5ba43ddcae53822ad57d87))
+
 ## [0.41.1](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.41.0...score-scan-reader-v0.41.1) (2026-11-08)
 
 
