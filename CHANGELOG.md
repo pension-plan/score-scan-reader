@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.17.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.16.0...score-scan-reader-v0.17.0) (2026-11-08)
+
+
+### Features
+
+* bar numbers read by digit shape and checked against the bars read; braces classified ([0f00a0e](https://github.com/pension-plan/score-scan-reader/commit/0f00a0e1dbf9db2189c75e43e43467e2abd7c8c9))
+* **cv:** dewarp photographed and curled pages from their staves; flatten severe phone shots ([389d23b](https://github.com/pension-plan/score-scan-reader/commit/389d23beb22edf212a9f6d93d1493d37e8a115bb))
+* **ui:** shorter unrecognised-marks copy ([50decc0](https://github.com/pension-plan/score-scan-reader/commit/50decc0a5bd7f4e58ef8be13b8a8afe4ad747c09))
+
+
+### Bug Fixes
+
+* **ui:** scan and preview use the full page width again ([54eb7b3](https://github.com/pension-plan/score-scan-reader/commit/54eb7b36bfd3f9605dae6b3dfe096384e376ca33))
+
 ## [0.16.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.15.0...score-scan-reader-v0.16.0) (2026-11-08)
 
 
