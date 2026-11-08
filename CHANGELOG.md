@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.27.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.26.0...score-scan-reader-v0.27.0) (2026-11-08)
+
+
+### Features
+
+* **keys,voltas,meter:** one-sign key changes, upright pages with sharp courtesy keys, volta numbers read, implausible meters dropped ([f2e4a8b](https://github.com/pension-plan/score-scan-reader/commit/f2e4a8b19790c3418aed0209050b1a9dd2460a70))
+* pedal marks, fingering, rehearsal marks and chord symbols written; tempo/expression words snapped to terms ([411aade](https://github.com/pension-plan/score-scan-reader/commit/411aadeca20d9cd4101586d78911d404f8bd2353))
+* **rests:** 16th-64th rests from templates, also when a false head sits on them ([04e1879](https://github.com/pension-plan/score-scan-reader/commit/04e18798e792c08fdc7973ea3ea2349f31a49841))
+
+
+### Bug Fixes
+
+* **artic,ottava:** accent over a staccato, marcato pieces joined, 15ma read and continued ([8060286](https://github.com/pension-plan/score-scan-reader/commit/8060286a505f32fdc2fcb62ae01d209cccc42773))
+* **regress:** per-run output paths so concurrent runs don't overwrite each other ([c7607e2](https://github.com/pension-plan/score-scan-reader/commit/c7607e25ca8204b8ccded324dde0a495f97e6b10))
+* restore f2e4a8b's score.js hunks reverted by 411aade ([1b60f3b](https://github.com/pension-plan/score-scan-reader/commit/1b60f3bcff514bfc9effe58f86af43ce78d7564f))
+
+
+### Performance Improvements
+
+* faster template scoring and component labelling, identical output ([2851d4d](https://github.com/pension-plan/score-scan-reader/commit/2851d4debe57c4d5b8687f31ccbd59d1761056f3))
+
 ## [0.26.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.25.0...score-scan-reader-v0.26.0) (2026-11-08)
 
 
