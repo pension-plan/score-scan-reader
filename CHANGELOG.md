@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.42.1](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.42.0...score-scan-reader-v0.42.1) (2026-11-08)
+
+
+### Bug Fixes
+
+* **heads:** beamed cue heads ([244e8d5](https://github.com/pension-plan/score-scan-reader/commit/244e8d5ea34caa7520aaa973955f40455e984bac))
+
 ## [0.42.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.41.1...score-scan-reader-v0.42.0) (2026-11-08)
 
 
