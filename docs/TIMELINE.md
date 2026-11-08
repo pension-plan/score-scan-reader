@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 21:03 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 21:15 AEDT.
 
 ## Events
 
@@ -105,6 +105,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 21:01 | User couldn't see the examples menu (it looked like a third button). Fixed in the tree (chevron, reads 'All 19 examples'); ships with the overlay agent's next push. Changelog moved to the bottom of /app/, collapsed (e0c6c6b). |
 | 21:01 | User asked to improve the UI, cut verbiage and streamline usage: uiux agent started (Opus xhigh, design-uiux-canon), coordinating with overlay/playback/textsym on shared UI files. |
 | 21:03 | OpenCV agent confirmed the time-signature reader is in v0.14.0 (rag: both 2/4 read; coverage first time signature right 244 to 270/306). Next task for it: phone/book dewarp guided by staff lines, dashed-staff reconstruction (L11), and diagnosis of the German SATB severe scan (L19). |
+| 21:15 | Shipped 9d1b30b (release 0.15.0 merged): playback with General MIDI instruments (transport, mixer, follow-along on preview and scan, repeats/voltas/D.C./D.S., tempo, dynamics), MIDI file export, MusicXML midi-instrument per part; FluidR3_GM subset 4.98 MB (CC BY 3.0). Benchmark/challenge unchanged. CI and Pages green (Pages and release zips rebuild from committed source, so committed dist files carrying others' WIP don't reach users). |
 
 ## Accuracy by round
 
