@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.32.2](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.32.1...score-scan-reader-v0.32.2) (2026-11-08)
+
+
+### Bug Fixes
+
+* **heads:** hollow heads on ledger lines of plain scans ([ad89871](https://github.com/pension-plan/score-scan-reader/commit/ad898713f796a05a64dd746edd7fe3ee7140a617))
+* **lyrics:** stanza fit (retry push) ([1cc5d37](https://github.com/pension-plan/score-scan-reader/commit/1cc5d3717d1380f3be6a3127b5c2d106405e6d4c))
+* **lyrics:** stanzas below the music fit repeated first sections and set by syllable alignment (L5b) ([53e5402](https://github.com/pension-plan/score-scan-reader/commit/53e54021630bd4ef0cb6ffda0fab466698fe0230))
+* **ui:** stanzas set as verses are a note, not a warning ([f1d3725](https://github.com/pension-plan/score-scan-reader/commit/f1d3725188ade91ac5e8f3c5ee1353b5ebf31b8c))
+
 ## [0.32.1](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.32.0...score-scan-reader-v0.32.1) (2026-11-08)
 
 
