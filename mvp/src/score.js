@@ -247,7 +247,9 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
   // grand staff, whose two staves have one size (L18)
   const small = Array.from({ length: nSt }, (_, k) => {
     const r = sel.map(sy => (sy.staves[k] ? sy.staves[k].st.space / Math.max(...sy.staves.map(s => s.st.space)) : 1)).sort((a, b) => a - b);
-    return r.length > 0 && r[r.length >> 1] <= 0.85;
+    // at least two systems in five: a page whose staff spaces were misread
+    // (a turned or rescaled copy) does not outvote the others
+    return r.length > 0 && r.filter(x => x <= 0.85).length >= Math.max(1, 0.4 * r.length);
   });
   // keyboard links between adjacent staves (evid: the evidence per pair, for debugging)
   const link = [], evid = [];
@@ -1890,37 +1892,6 @@ function readMarks(pages, segs, units, parts, partMeasures) {
         }
       }
     }
-  }
-  // ties across a system break (L20): each half is read on its own (a curve running off the
-  // staff's end, or one coming in at its start), and often only one is found. The other end is
-  // the same pitch on the same voice's neighbouring note across the break: a tie start on a
-  // system's last note gets its stop on the next system's first note, and a stop found at a
-  // system's start gets its start on the last note before the break
-  {
-    const sysOf = (mi) => units[mi] && units[mi].m && units[mi].m.sy;
-    partMeasures.forEach(pm => {
-      const nStreams = Math.max(0, ...pm.map(m => (m ? m.length : 0)));
-      for (let k = 0; k < nStreams; k++) {
-        let last = null, lastSy = null;
-        pm.forEach((m, mi) => {
-          const st = m && m[k];
-          if (!st) return;
-          for (const e of st.events) {
-            if (e.rest || e.forward || !e.heads || !e.heads.length) continue;
-            const sy = sysOf(mi);
-            if (last && lastSy && sy && lastSy !== sy) {
-              for (const h of e.heads) {
-                const g = last.heads.find(o => o.p === h.p && (o.clef || '') === (h.clef || ''));
-                if (!g) continue;
-                if (h.tieOff && !g.tieOn) { g.tieOn = true; nTie++; }
-                else if (g.tieOn && !h.tieOff) { h.tieOff = true; }
-              }
-            }
-            last = e; lastSy = sy;
-          }
-        });
-      }
-    });
   }
   // fingering (text.js): the digits stacked over (or under) a note or chord go
   // to its heads in order, the digit nearest the chord on the head nearest it

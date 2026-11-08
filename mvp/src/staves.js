@@ -598,17 +598,26 @@ function regularSystems(staves, sys) {
   const linked = new Set();
   sys.forEach(g => g.slice(1).forEach(k => linked.add(k - 1)));
   const maxG = Math.max(...sys.map(g => g.length));
-  let best = null;
+  let best = null, alt = null;
   for (let p = Math.max(2, maxG); p <= n / 2; p++) {
     if (n % p) continue;
     let inside = 0, between = Infinity, ok = true;
+    const at = Array.from({ length: p - 1 }, () => []);
     for (let k = 0; k < n - 1; k++) {
-      if ((k + 1) % p) inside = Math.max(inside, gap[k]);
+      if ((k + 1) % p) { inside = Math.max(inside, gap[k]); at[k % p].push(gap[k]); }
       else { between = Math.min(between, gap[k]); if (linked.has(k)) ok = false; }
     }
+    if (!ok) continue;
     const margin = between / Math.max(1e-6, inside);
-    if (ok && margin > 1.08 && (!best || margin > best.margin)) best = { p, margin };
+    if (margin > 1.08 && (!best || margin > best.margin)) best = { p, margin };
+    // second test, when no p passes the first: each gap inside a block taken
+    // at its place in the block (the systems repeat one layout), as the lower
+    // median of the gaps there, so one misplaced staff end does not decide;
+    // of the p that pass it, the largest
+    const typical = Math.max(...at.map(v => v.slice().sort((a, b) => a - b)[(v.length - 1) >> 1]));
+    if (between > 1.08 * typical && (!alt || p > alt.p)) alt = { p, margin: between / typical };
   }
+  best = best || alt;
   if (!best) return sys;
   const out = Array.from({ length: n / best.p }, (_, i) => Array.from({ length: best.p }, (_, t) => i * best.p + t));
   out.forEach((g, i) => g.forEach(k => { staves[k].system = i; }));
