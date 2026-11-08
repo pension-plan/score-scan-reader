@@ -12,7 +12,10 @@ const { _gridOf: gridOf } = require('../src/text');
 const C = (id) => path.join(__dirname, '../work/cache', id, 'p-1.pgm');
 const MK03 = C('coverage__marks__mk03-dynamics-hairpins-cello__clean__r200');
 // [page, x, y (top-left of the glyph box), text]
+const MK04 = C('coverage__marks__mk04-piano-pedal-arpeggio-fingering__clean__r200');
 const SAMPLES = [
+  // piano pedal marks: "Ped." (the dot is its own speck) and the release star
+  [MK04, 291, 430, 'Ped'], [MK04, 623, 453, '*'],
   [MK03, 588, 561, 'f'], [MK03, 658, 228, 'p'], [MK03, 976, 571, 'm'], [MK03, 583, 571, 's'], [MK03, 196, 738, 'z'],
   [MK03, 1215, 395, 'ff'], [MK03, 1347, 561, 'fff'], [MK03, 317, 246, 'pp'], [MK03, 1317, 727, 'ppp'], [MK03, 170, 570, 'fp'],
 ];

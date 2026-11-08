@@ -3,7 +3,7 @@
 // signature inference, per-measure rhythm repair, lyrics alignment, MusicXML.
 const { staffMeasureEvents, pitchOf, keyAlters, DIV } = require('./assemble');
 const { detectRests, mergeRests, restBars } = require('./rests');
-const { readMeters, plausibleMeter } = require('./meter');
+const { readMeters } = require('./meter');
 const { readStructure } = require('./structure');
 const { readArticulations, readDoubleDots } = require('./artic');
 const { readOttavas } = require('./ottava');
@@ -788,7 +788,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   // fair support
   let timeRead = false;
   {
-    const hs = systems.flatMap(sy => sy.staves.map(s => s.hdr && s.hdr.time)).filter(t => t && plausibleMeter(t));
+    const hs = systems.flatMap(sy => sy.staves.map(s => s.hdr && s.hdr.time)).filter(t => t && t.beats > 0 && t.type > 0);
     if (hs.length >= Math.max(1, 0.3 * systems.filter(sy => sy.index === 0).reduce((a, sy) => a + sy.staves.length, 0))) {
       const key = mode(hs.map(t => `${t.beats}/${t.type}/${t.symbol || ''}`)), [b, ty] = key.split('/').map(Number), sym = key.split('/')[2], hq = (b * 4) / ty;
       const qNow = (time.beats * 4) / time.type;
@@ -1127,7 +1127,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   // and credits, part abbreviations, dynamics, hairpins, tempo and expression text
   let read = { dirs: parts.map(() => units.map(() => [])), head: {}, nDyn: 0, nWedge: 0, nWords: 0 };
   try { read = readMarks(pages, segs, units, parts, partMeasures); } catch (e) { warnings.push(`Text and dynamics not placed (${e.message}).`); }
-  if (read.nDyn || read.nWedge || read.nWords || read.nTie || read.nSlur || read.nGrace || read.nFermata) warnings.push(`Read from the page: ${[read.nDyn && `${read.nDyn} dynamic${read.nDyn > 1 ? 's' : ''}`, read.nWedge && `${read.nWedge} hairpin${read.nWedge > 1 ? 's' : ''}`, read.nWords && `${read.nWords} tempo / expression text${read.nWords > 1 ? 's' : ''}`, read.nTie && `${read.nTie} tie${read.nTie > 1 ? 's' : ''}`, read.nSlur && `${read.nSlur} slur${read.nSlur > 1 ? 's' : ''}`, read.nGrace && `${read.nGrace} grace note${read.nGrace > 1 ? 's' : ''}`, read.nFermata && `${read.nFermata} fermata${read.nFermata > 1 ? 's' : ''}`].filter(Boolean).join(', ')}.`);
+  if (read.nDyn || read.nWedge || read.nWords || read.nTie || read.nSlur || read.nGrace || read.nFermata || read.nPedal || read.nFinger || read.nRehearsal || read.nChord) warnings.push(`Read from the page: ${[read.nDyn && `${read.nDyn} dynamic${read.nDyn > 1 ? 's' : ''}`, read.nWedge && `${read.nWedge} hairpin${read.nWedge > 1 ? 's' : ''}`, read.nWords && `${read.nWords} tempo / expression text${read.nWords > 1 ? 's' : ''}`, read.nTie && `${read.nTie} tie${read.nTie > 1 ? 's' : ''}`, read.nSlur && `${read.nSlur} slur${read.nSlur > 1 ? 's' : ''}`, read.nGrace && `${read.nGrace} grace note${read.nGrace > 1 ? 's' : ''}`, read.nFermata && `${read.nFermata} fermata${read.nFermata > 1 ? 's' : ''}`, read.nPedal && `${read.nPedal} pedal mark${read.nPedal > 1 ? 's' : ''}`, read.nFinger && `${read.nFinger} fingering${read.nFinger > 1 ? 's' : ''}`, read.nRehearsal && `${read.nRehearsal} rehearsal mark${read.nRehearsal > 1 ? 's' : ''}`, read.nChord && `${read.nChord} chord symbol${read.nChord > 1 ? 's' : ''}`].filter(Boolean).join(', ')}.`);
   const unitTime = units.map(u => u.time), unitMulti = units.map(u => u.multi || 0);
   // barlines, repeats and voltas read on the page (structure.js: sy.bars, sy.voltas) at the ends of
   // each bar: {left, right} with {style, repeat, ending: {n, type}}
@@ -1161,16 +1161,13 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
       const prev = vs[vs.length - 1];
       if (v.cont && prev && prev.open && prev.k === k - 1) { prev.b = idx[idx.length - 1]; prev.open = v.open; prev.k = k; return; }
       if (v.cont) return;
-      vs.push({ a: idx[0], b: idx[idx.length - 1], open: v.open, k, nums: v.nums });
+      vs.push({ a: idx[0], b: idx[idx.length - 1], open: v.open, k });
     }));
-    // the numbers printed under the bracket (structure.js), else 1, 2, 3 ... along the run
     let n = 0;
     vs.forEach((v, j) => {
       n = j > 0 && vs[j - 1].b === v.a - 1 ? n + 1 : 1;
-      if (v.nums && v.nums.length) n = v.nums[v.nums.length - 1];
-      const num = v.nums && v.nums.length ? v.nums.join(', ') : String(n);
-      (unitBars[v.a].left ||= {}).ending = { n: num, type: 'start' };
-      (unitBars[v.b].right ||= {}).ending = { n: num, type: v.open ? 'discontinue' : 'stop' };
+      (unitBars[v.a].left ||= {}).ending = { n, type: 'start' };
+      (unitBars[v.b].right ||= {}).ending = { n, type: v.open ? 'discontinue' : 'stop' };
     });
     // segno and coda signs: a direction at the start of the bar they stand over (the first part)
     if (read.dirs && read.dirs[0]) sysOrder.forEach(sy => (sy.signs || []).forEach(g => {
@@ -1514,7 +1511,7 @@ function wordsOk(t) {
 function readMarks(pages, segs, units, parts, partMeasures) {
   const dirs = parts.map(() => units.map(() => []));
   const head = {};
-  let nDyn = 0, nWedge = 0, nWords = 0;
+  let nDyn = 0, nWedge = 0, nWords = 0, nPedal = 0, nFinger = 0, nRehearsal = 0, nChord = 0;
   const unitsOfSeg = new Map();
   units.forEach((u, mi) => u.m.segs.forEach(si => { if (!unitsOfSeg.has(si)) unitsOfSeg.set(si, []); unitsOfSeg.get(si).push(mi); }));
   // parts reading staff k of a system, with the staff number inside the part
@@ -1548,7 +1545,7 @@ function readMarks(pages, segs, units, parts, partMeasures) {
     const marks = pageMarks(fr, pg.asm);
     if (!marks) continue;
     const sysIdx = (k) => (pg.asm.systems[k] ? pg.asm.systems[k].index : -1);
-    const place = (m, x, entry, tail) => {
+    const place = (m, x, entry, tail, harmony) => {
       if (m.sys < 0 || m.k < 0) return;
       const st = pg.asm.systems[m.sys] && pg.asm.systems[m.sys].staves[m.k];
       const placement = st && (m.box[1] + m.box[3]) / 2 < st.st.yAt(0, x) ? 'above' : 'below';
@@ -1558,7 +1555,7 @@ function readMarks(pages, segs, units, parts, partMeasures) {
         const list = dirs[pi][at.mi];
         const xml = entry(placement);
         if (list.some(d => d.xml === xml && Math.abs(d.t - at.t) < 1e-6)) continue;
-        list.push({ t: at.t, staffNo: multi ? staffNo : 0, xml, tail: tail || '' });
+        list.push({ t: at.t, staffNo: multi ? staffNo : 0, xml, tail: tail || '', harmony: !!harmony });
       }
       return true;
     };
@@ -1568,12 +1565,27 @@ function readMarks(pages, segs, units, parts, partMeasures) {
       const sd = process.env.OMR_NO_MIDI ? null : soundDynamics(d.value);
       if (place(d, d.x, (pl) => `<direction placement="${pl}"><direction-type><dynamics>${tag}</dynamics></direction-type>`, sd != null ? `<sound dynamics="${sd}"/>` : '')) nDyn++;
     }
+    for (const r of marks.rehearsals || []) {
+      if (place(r, r.box[0] + 0.5 * (r.box[2] - r.box[0]), () => `<direction placement="above"><direction-type><rehearsal enclosure="square">${esc(r.text)}</rehearsal></direction-type>`)) nRehearsal++;
+    }
+    // piano pedal: "Ped." press, star release (a star then "Ped." is a change: release, press)
+    for (const pd of marks.pedals || []) {
+      if (place(pd, pd.box[0], (pl) => `<direction placement="below"><direction-type><pedal type="${pd.type}" line="no" sign="yes"/></direction-type>`) && pd.type === 'start') nPedal++;
+    }
     for (const w of marks.wedges) {
       const ok = place(w, w.box[0] + 0.1 * (w.box[2] - w.box[0]), (pl) => `<direction placement="${pl}"><direction-type><wedge type="${w.type}" number="1"/></direction-type>`);
       if (ok) { place(w, w.box[2], (pl) => `<direction placement="${pl}"><direction-type><wedge type="stop" number="1"/></direction-type>`); nWedge++; }
     }
     for (const t of marks.text) {
       if (!t.text && !t.metro) continue;
+      if (t.role === 'chord' && t.chord && t.sys >= 0) {
+        // a chord symbol: <harmony> (root, kind, bass) before the note it stands over
+        const c = t.chord, alt = (a) => (a ? `<root-alter>${a}</root-alter>` : '');
+        const xml = `<harmony><root><root-step>${c.step}</root-step>${alt(c.alter)}</root><kind text="${esc(c.text)}">${c.kind}</kind>` +
+          (c.bass ? `<bass><bass-step>${c.bass.step}</bass-step>${c.bass.alter ? `<bass-alter>${c.bass.alter}</bass-alter>` : ''}</bass>` : '');
+        if (place(t, t.box[0] + 0.3 * (t.box[2] - t.box[0]), () => xml, '', true)) nChord++;
+        continue;
+      }
       if (t.role === 'tempo' && t.metro && t.sys >= 0) {
         // a metronome mark, with its tempo word: words, metronome and the
         // tempo in quarter notes per minute (<sound tempo>) for players
@@ -1702,6 +1714,33 @@ function readMarks(pages, segs, units, parts, partMeasures) {
       }
     }
   }
+  // fingering (text.js): the digits stacked over (or under) a note or chord go
+  // to its heads in order, the digit nearest the chord on the head nearest it
+  {
+    const seen = new Set();
+    for (const pg of pages) {
+      const fr = pg.fr, m = fr && fr._marks && fr._marks.marks;
+      if (!m || seen.has(fr) || !m.fingerings || !m.fingerings.length) continue;
+      seen.add(fr);
+      const groups = new Map();
+      for (const f of m.fingerings) {
+        const sp = fr.ss;
+        const hs = (fr.heads || []).filter(h => h.staff === f.staff && Math.abs(h.x - f.x) <= 0.9 * sp);
+        if (!hs.length) continue;
+        const above = hs.every(h => f.y < h.y), below = hs.every(h => f.y > h.y);
+        if (!above && !below) continue;
+        const cx = hs.reduce((a, h) => a + h.x, 0) / hs.length;
+        const key = f.staff + ':' + Math.round(cx) + ':' + (above ? 'a' : 'b');
+        if (!groups.has(key)) groups.set(key, { above, hs, fs: [] });
+        groups.get(key).fs.push(f);
+      }
+      for (const g of groups.values()) {
+        const fs = g.fs.sort((p, q) => g.above ? q.y - p.y : p.y - q.y);
+        const hs = g.hs.slice().sort((p, q) => g.above ? p.y - q.y : q.y - p.y);
+        fs.forEach((f, i) => { const h = hs[i]; if (h && !h.fingering) { h.fingering = f.digit; nFinger++; } });
+      }
+    }
+  }
   // grace notes (text.js): each small head goes before the first note after
   // it on its staff, in each part reading that staff (e.graces)
   let nGrace = 0;
@@ -1771,7 +1810,7 @@ function readMarks(pages, segs, units, parts, partMeasures) {
     }
   }
   for (const pm of dirs) for (const l of pm) l.sort((a, b) => a.t - b.t);
-  return { dirs, head, nDyn, nWedge, nWords, nTie, nSlur, nGrace, nFermata };
+  return { dirs, head, nDyn, nWedge, nWords, nTie, nSlur, nGrace, nFermata, nPedal, nFinger, nRehearsal, nChord };
 }
 
 // a <barline> at one end of a bar (buildScore: unitBars)
@@ -1966,7 +2005,7 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, unitTime, unitBar
       // directions (dynamics, hairpins, words) go with the first voice written,
       // before the note they stand at (an offset when they fall inside it)
       const pend = ((dirs && dirs[pi] && dirs[pi][mi]) || []).slice();
-      const dirXML = (d, off) => `      ${d.xml}${off ? `<offset>${off}</offset>` : ''}${d.staffNo ? `<staff>${d.staffNo}</staff>` : ''}${d.tail || ''}</direction>`;
+      const dirXML = (d, off) => `      ${d.xml}${off ? `<offset>${off}</offset>` : ''}${d.staffNo ? `<staff>${d.staffNo}</staff>` : ''}${d.tail || ''}</${d.harmony ? 'harmony' : 'direction'}>`;
       const ottSeen = new Set();
       order.forEach((k, oi) => {
         const s = streams[k], si = ps[k].staffNo - 1;
@@ -2051,7 +2090,7 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, unitTime, unitBar
             const tStop = e.tieStop || h.tieOff, tStart = e.tieStart || h.tieOn;
             const tie = (tStop ? '<tie type="stop"/>' : '') + (tStart ? '<tie type="start"/>' : '');
             const slurs = hi === 0 ? (e.heads.some(x => x.slurOff) ? '<slur type="stop" number="1"/>' : '') + (e.heads.some(x => x.slurOn) ? '<slur type="start" number="1"/>' : '') : '';
-            const ferm = hi === 0 && e.fermata ? `<fermata type="${e.fermata}"/>` : '';
+            const ferm = (hi === 0 && e.fermata ? `<fermata type="${e.fermata}"/>` : '') + (h.fingering ? `<technical><fingering>${h.fingering}</fingering></technical>` : '');
             // articulations read over / under the chord (artic.js: h.artic), on the first note of a
             // chord and not again on the continuation of a note tied over a barline
             const ar = hi === 0 && !e.tieStop ? (e.heads.find(x => x.artic) || {}).artic : null;

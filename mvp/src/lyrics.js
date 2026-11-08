@@ -1274,7 +1274,8 @@ async function readLyrics(fr, ocr, onProgress, opts) {
       const other = toks.filter(t => /^(le|les|du|des|au|aux|et|est|une|sur|dans|pour|qui|que|el|los|las|y|en|con|por|mi|del|il|di|che|per|nel|della|je|se|ze|na|nad|pod|jsem|ty)$/.test(t)).length;
       const en = toks.filter(t => /^(the|and|of|to|my|thy|thee|with|is|that|for|our|all|thou|his|be|we|you|on|from|me|he)$/.test(t)).length;
       // (umlauts the first pass already read are marks too: such rows are German)
-      const german = words.some(w => /[äöüÄÖÜß]/.test(w.text));
+      // (German words without their umlauts read: "fur", "uber" ... the first pass handles them)
+      const german = words.some(w => /[äöüÄÖÜß]/.test(w.text)) || toks.filter(t => /^(und|der|die|das|den|dem|des|ich|du|er|wir|ihr|mein|dein|sein|nicht|mit|von|zu|auf|im|ist|ein|eine|wie|so|nun|herr|gott|fur|uber|schon|horen)$/.test(t)).length >= 1;
       if (words.length && (suspect || (other >= 2 && other > en) || (!german && en <= 1 && accentMarks(img) >= 2))) {
         let w2 = [];
         try { w2 = await ocr.extra(img); } catch (e) { w2 = []; }

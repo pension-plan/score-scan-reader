@@ -159,7 +159,7 @@ function pageMarks(fr, asm) {
   if (fr._marks && fr._marks.asm === asm) return fr._marks.marks;
   const { out, left } = explain(fr, asm);
   let marks;
-  try { marks = classifyMarks(fr, asm, left); } catch (e) { marks = { text: [], dyns: [], wedges: [], slurs: [], fermatas: [], braces: [], ledgers: [], grace: [], rest: left }; }
+  try { marks = classifyMarks(fr, asm, left); } catch (e) { marks = { text: [], dyns: [], wedges: [], slurs: [], fermatas: [], braces: [], ledgers: [], grace: [], pedals: [], fingerings: [], rehearsals: [], rest: left }; }
   Object.defineProperty(marks, 'sym', { value: out, enumerable: false, configurable: true });
   Object.defineProperty(fr, '_marks', { value: { asm, marks }, enumerable: false, configurable: true, writable: true });
   return marks;
@@ -173,21 +173,26 @@ function pageSymbols(fr, asm) {
   if (!marks) return explain(fr, asm).out;
   const out = { ...marks.sym };
   const b4 = (b) => b.map(Math.round);
-  out.text = marks.text.map(t => {
+  // an unread chord-symbol candidate is still ink nobody explained
+  const unreadChord = marks.text.filter(t => t.role === 'chordcand');
+  out.text = marks.text.filter(t => t.role !== 'chordcand').map(t => {
     const name = ROLE_LABEL[t.role] || 'Text';
     const mm = t.metro ? `${{ quarter: '♩', eighth: '♪', half: '𝅗𝅥', '16th': '𝅘𝅥𝅯' }[t.metro.unit] || '♩'}${t.metro.dotted ? '.' : ''} = ${t.metro.bpm || '?'}` : '';
     const body = [t.text, mm].filter(Boolean).join(' ');
     const label = t.role === 'measure' ? (t.text ? `Bar ${t.text}` : 'Bar ? (number not read)') : body ? `${name}: ${body}` : name;
     return [...b4(t.box), t.role, label];
   });
-  out.dyns = marks.dyns.map(d => [...b4(d.box), d.value]);
+  out.dyns = marks.dyns.map(d => [...b4(d.box), d.value]).concat((marks.pedals || []).map(p => [...b4(p.box), p.type === 'start' ? 'Ped.' : '✽ (pedal up)']));
+  out.text = out.text.concat((marks.rehearsals || []).map(r => [...b4(r.box), 'rehearsal', `Rehearsal ${r.text}${r.guessed ? ' (letter by order)' : ''}`]));
+  // fingering digits show with the text, labelled by their digit
+  out.text = out.text.concat((marks.fingerings || []).map(f => [...b4(f.box), 'fingering', `Finger ${f.digit}`]));
   out.wedges = marks.wedges.map(w => [...b4(w.box), w.type === 'crescendo' ? 'cresc.' : 'dim.']);
   out.slurs = marks.slurs.map(s => b4(s.box));
   out.fermatas = marks.fermatas.map(s => b4(s.box));
   out.braces = marks.braces.map(s => [...b4(s.box), s.kind]);
   out.ledgers = marks.ledgers.map(s => b4(s.box));
   out.grace = (marks.grace || []).map(g => [...b4(g.box), g.heads.length, g.slash ? 1 : 0]);
-  out.unknown = marks.rest.map(c => [c.x0, c.y0, c.x1, c.y1]);
+  out.unknown = marks.rest.concat(unreadChord.flatMap(t => t.comps || [])).map(c => [c.x0, c.y0, c.x1, c.y1]);
   return out;
 }
 

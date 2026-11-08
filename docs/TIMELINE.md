@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 01:12 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 01:28 AEDT.
 
 ## Events
 
@@ -130,6 +130,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 01:07 | textsym: graceHeads on (926ec3a) and lazy accented-lyrics OCR (42f3d40) confirmed. structure: its files are clean; the WIP tie drop and satb-open-divisi severe 0.453 to 0.386 trace to voices' uncommitted score.js/text.js; voices told to test in isolation. textsym next: chord symbols, pedal, fingering, rehearsal marks, expression/tempo recall. |
 | 01:08 | perf: L26 resolved (8b5d595, in 0.26.0): 40-page node 2124 to 724 MB, browser worker 695 to 257 MB, byte-identical outputs. Next: browser renderer growth and the 3.2 to 4.9 s/page slowdown (L29). |
 | 01:12 | Isolated regression of release 0.26.0 vs 0.25.0 (committed head): benchmark+OCR 0.951 to 0.951 (real scans 0.929), challenge 0.831 to 0.831, written elements steady (ties 3973, time 781); no regression. Reports in docs/regressions/v0.26.0-*.md. |
+| 01:28 | c7607e2: regress.mjs per-run output paths (L30), reported by structure; all agents told to pull. |
 
 ## Accuracy by round
 
@@ -186,6 +187,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | L27 | 0.21.0 shipped with every dynamic, wedge and text mark dropped (a whole-tree push swept in a call to a function not yet exported); graded metrics did not move, so the regression check passed | Integration (push hygiene) + regression check | Resolved (0.21.1) | 437afb3 restored the export (release 0.21.1); regress.mjs now counts written elements (dynamics, wedges, words, metronome, credits, ties, slurs, fermatas, grace, time, key, lyrics) and fails on a drop of more than 10%. Against 0.21.0 it shows dynamics 0 vs 32, ties 22 vs 99, slurs 10 vs 46. |
 | L28 | Regression checks scored the shared working tree, so one agent saw another agent unfinished edits (a challenge tie drop 4043 to 3583 that was not on main) | Integration (regression tooling) | Resolved (a262809) | regress.mjs --head <ref> scores a committed ref like the base; warns when mvp/src is dirty. Committed main d0f1105 vs v0.24.0: no regression, ties 4043 to 3966, grace 145 to 307, time 712 to 780. |
 | L29 | Time per page rose ~3.2 to 4.9 s (coverage perf) as recognition stages were added | Performance | Open | perf agent profiling per stage (OCR second-pass trigger rate, meter/artic/structure modules, tie arcs, grace heads, header templates). |
+| L30 | Concurrent regression runs wrote to the same output paths, so one run could report another run element counts (structure saw lyric 2050 to 1346, tie 119 to 26 that were not real) | Integration (regression tooling) | Resolved (c7607e2) | Outputs and --head checkouts tagged with the process id; base checkout extracted atomically; paths printed to stderr. |
 
 ## Runs
 

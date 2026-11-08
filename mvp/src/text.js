@@ -78,11 +78,13 @@ function templates() {
 }
 
 // best dynamics letter (or ligature) for one component: {text, score} or null
-function dynGlyph(R, c, sp) {
+const PEDAL = new Set(['Ped', '*']);
+function dynGlyph(R, c, sp, pedal = false) {
   const w = (c.x1 - c.x0 + 1) / sp, h = (c.y1 - c.y0 + 1) / sp;
   let best = null;
   let img = null;
   for (const t of templates()) {
+    if (PEDAL.has(t.text) !== pedal) continue;
     if (Math.abs(w - t.w) > 0.3 * t.w + 0.15 || Math.abs(h - t.h) > 0.25 * t.h + 0.15) continue;
     if (!img) img = glyphImage(R, c);
     const s = matchGrid(gridOf(img, t.gh, t.gw), t);
@@ -354,13 +356,13 @@ function groupLines(cs) {
 const ROLE_LABEL = {
   title: 'Title', subtitle: 'Subtitle', composer: 'Composer', lyricist: 'Lyricist', arranger: 'Arranger', credit: 'Credit',
   instrument: 'Instrument', abbrev: 'Instrument', measure: 'Bar', tempo: 'Tempo', expression: 'Expression', lyrics: 'Lyrics',
-  header: 'Header', footer: 'Footer', page: 'Page', copyright: 'Copyright', text: 'Text',
+  header: 'Header', footer: 'Footer', page: 'Page', copyright: 'Copyright', text: 'Text', chord: 'Chord',
 };
 
 // Sort leftover components (symbols.js) into marks.
 // left: [{x0,y0,x1,y1,area}], fr / asm as front() and assemblePage() left them.
 function classifyMarks(fr, asm, left) {
-  const out = { text: [], dyns: [], wedges: [], slurs: [], fermatas: [], braces: [], ledgers: [], grace: [], rest: [] };
+  const out = { text: [], dyns: [], wedges: [], slurs: [], fermatas: [], braces: [], ledgers: [], grace: [], pedals: [], fingerings: [], rehearsals: [], rest: [] };
   const R = fr.R, ss = fr.ss, W = fr.gray.width, H = fr.gray.height;
   const systems = (asm && asm.systems) || [];
   if (!R || !systems.length) { out.rest = left.slice(); return out; }
@@ -399,9 +401,56 @@ function classifyMarks(fr, asm, left) {
   const rest = [];
   const letters = [];
   const fermataDots = new Set();
+  // rehearsal marks: a letter or number in a box (a thin rectangular frame
+  // with ink along all four sides), above a staff
+  // (looked for among all components: a box near the staff start touches the
+  // clef or key boxes the leftover test uses)
+  const inBox = new Set();
+  const allComps = asm.comps || [];
+  // the staff a mark stands over: the first one whose top is below it, within 7 spaces
+  const staffUnder = (x, y1) => {
+    let best = null;
+    stv.forEach((sts, k) => sts.forEach((s, j) => { const t = s.top(Math.max(s.left, Math.min(s.right, x))); if (t > y1 && t - y1 <= 7 * s.sp && (!best || t < best.t)) best = { sys: k, k: j, s, t }; }));
+    return best;
+  };
+  for (const c of allComps) {
+    const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1, n = staffUnder((c.x0 + c.x1) / 2, c.y1);
+    if (!n) continue;
+    const sp = n.s.sp;
+    if (w < 1.2 * sp || h < 1.2 * sp || w > 4.5 * sp || h > 3.5 * sp || c.area > 0.6 * w * h) continue;
+    const img = glyphImage(R, c), d = img.data;
+    const rowInk = (y) => { let k = 0; for (let x = 0; x < w; x++) k += d[y * w + x]; return k; };
+    const colInk = (x) => { let k = 0; for (let y = 0; y < h; y++) k += d[y * w + x]; return k; };
+    const edge = (f, len, at) => Math.max(...at.map(f)) >= 0.8 * len;
+    if (!edge(rowInk, w, [0, 1, 2]) || !edge(rowInk, w, [h - 1, h - 2, h - 3]) || !edge(colInk, h, [0, 1, 2]) || !edge(colInk, h, [w - 1, w - 2, w - 3])) continue;
+    const inner = allComps.filter(q => q !== c && q.x0 > c.x0 && q.x1 < c.x1 && q.y0 > c.y0 && q.y1 < c.y1);
+    // the letter may touch the frame (one component): then the interior holds its ink
+    let interior = 0;
+    for (let y = 3; y < h - 3; y++) for (let x = 3; x < w - 3; x++) interior += d[y * w + x];
+    if (!inner.length && interior < 0.08 * (w - 6) * (h - 6)) continue;
+    inner.forEach(q => inBox.add(q)); inBox.add(c);
+    const num = readDigits(R, inner, sp, null, true);
+    out.rehearsals.push({ box: [c.x0, c.y0, c.x1, c.y1], text: num, inner, sys: n.sys, k: n.k, si: n.s.si, x: c.x0 });
+  }
+  // unread letters: the marks run A, B, C ... down the page
+  out.rehearsals.sort((a, b) => a.sys - b.sys || a.x - b.x).forEach((r, i) => { if (!r.text) { r.text = String.fromCharCode(65 + (i % 26)); r.guessed = true; } });
   for (const c of left) {
+    if (inBox.has(c)) continue;
     const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1, cx = (c.x0 + c.x1) / 2, cy = (c.y0 + c.y1) / 2;
     const n = nearest(cx, cy), sp = n ? n.s.sp : ss;
+    // piano pedal marks below the staff: "Ped." (press) and the star (release)
+    if (n && !n.inside && !n.above && n.k === stv[n.sys].length - 1 && h >= 1.1 * sp && h <= 2.8 * sp && w <= 4.2 * sp) {
+      const pg = dynGlyph(R, c, sp, true);
+      if (pg && pg.score >= (pg.text === '*' ? 0.82 : 0.72)) { out.pedals.push({ box: [c.x0, c.y0, c.x1, c.y1], type: pg.text === 'Ped' ? 'start' : 'stop', sys: n.sys, k: n.k, si: n.s.si, x: c.x0 }); continue; }
+    }
+    // fingering: a small digit just above or below a note head (stacked for a chord)
+    if (n && !n.inside && h >= 0.6 * sp && h <= 1.35 * sp && w >= 0.3 * sp && w <= 1.1 * sp) {
+      const hd = heads.filter(q => q.staff === n.s.si && Math.abs(q.x - cx) <= 0.9 * sp && Math.abs(q.y - cy) <= 7 * sp && Math.abs(q.y - cy) >= 0.9 * sp);
+      if (hd.length) {
+        const dg = readDigits(R, [c], sp, null, true);
+        if (/^[0-5]$/.test(dg)) { out.fingerings.push({ box: [c.x0, c.y0, c.x1, c.y1], digit: dg, x: cx, y: cy, staff: n.s.si }); continue; }
+      }
+    }
     // brace / system bracket: tall, narrow, at the staves' left edge
     if (h >= 3 * sp && w <= 1.6 * sp && n && cx <= n.s.left + 0.6 * sp && cx >= n.s.left - 2.5 * sp) {
       // the staves it spans (page staff indices) and its kind: a thin system
@@ -512,17 +561,23 @@ function classifyMarks(fr, asm, left) {
     else if (n && !n.above && l.words >= 4 && l.y0 - n.s.bot(cx) < 5 * sp) role = 'lyrics';
     else if (n && n.above && n.k === 0 && l.y1 > sysTop - 5 * sp && ((sysOf === 0 && l.x0 <= sysLeft + 0.3 * wMusic && l.h >= 1.0 * sp) || l.words >= 2)) role = 'tempo';
     else role = 'expression';
+    // a chord symbol? one short word standing just over a staff (C, Am7, G/B):
+    // read by OCR; one that does not read as a chord stays what it was (or unknown)
+    const top = n ? n.s.top(Math.max(n.s.left, Math.min(n.s.right, cx))) : 0;
+    const chordCand = !!n && n.above && l.words === 1 && l.mem.length <= 7 && l.h >= 0.8 * sp && l.y1 <= top + 0.3 * sp && l.y1 >= top - 4.5 * sp &&
+      ['expression', 'tempo', 'credit', 'subtitle', 'lyricist', 'lyrics', 'text'].includes(role) && !(sysOf === 0 && l.y1 < firstTop - 5 * ss);
+    if (chordCand && l.mem.length < 2) role = 'chordcand';
     // a lone glyph or specks among the music is more likely a symbol the
     // reader missed (a rest, a flag) than text: left unknown
     if ((role === 'expression' || role === 'text' || role === 'lyrics' || role === 'tempo') && (l.mem.length < 2 || l.h < 0.55 * sp)) { rest.push(...l.mem); continue; }
     // bar numbers are read from their digit shapes (OCR, when on, only where these fail)
     const digits = role === 'measure' ? readDigits(R, l.mem, sp) : '';
-    out.text.push({ box: [l.x0, l.y0, l.x1, l.y1], role, text: digits, shape: !!digits, h: l.h, words: l.words, sys: sysOf, k: n ? n.k : -1, si: n ? n.s.si : -1, x: l.x0, comps: l.mem });
+    out.text.push({ box: [l.x0, l.y0, l.x1, l.y1], role, chordCand, text: digits, shape: !!digits, h: l.h, words: l.words, sys: sysOf, k: n ? n.k : -1, si: n ? n.s.si : -1, x: l.x0, comps: l.mem });
   }
   out.text.push(...tempoItems);
   // lyrics: syllables spaced under the notes fall apart into many short
   // lines on one row; a row of three or more among the music is underlay
-  const inMusic = out.text.filter(t => ['expression', 'tempo', 'lyrics', 'text'].includes(t.role) && t.sys >= 0 && !t.metro);
+  const inMusic = out.text.filter(t => ['expression', 'tempo', 'lyrics', 'text'].includes(t.role) && t.sys >= 0 && !t.metro && !t.chordCand);
   for (const t of inMusic) {
     if (t.role === 'lyrics') continue;
     const row = inMusic.filter(u => u.sys === t.sys && Math.min(u.box[3], t.box[3]) - Math.max(u.box[1], t.box[1]) > 0.5 * Math.min(u.box[3] - u.box[1], t.box[3] - t.box[1]));
@@ -613,13 +668,61 @@ function extendDynamic(R, ln, dyn, sp, comps) {
   return dyn;
 }
 
+// A chord symbol as OCR reads it ("Am7", "F#m7b5", "G/B", "Cmaj7", "Bb", "C°7";
+// a superscript 7 often comes out as a quote): {step, alter, kind, text, bass} or null
+const CHORD_KINDS = [
+  [/^$/, 'major', ''], [/^(m|min|-)$/, 'minor', 'm'], [/^7$/, 'dominant', '7'], [/^(maj7|ma7|M7|Δ7?|j7)$/, 'major-seventh', 'maj7'],
+  [/^(m7|min7|-7)$/, 'minor-seventh', 'm7'], [/^6$/, 'major-sixth', '6'], [/^(m6|min6)$/, 'minor-sixth', 'm6'], [/^9$/, 'dominant-ninth', '9'],
+  [/^(maj9|M9)$/, 'major-ninth', 'maj9'], [/^(m9|min9)$/, 'minor-ninth', 'm9'], [/^11$/, 'dominant-11th', '11'], [/^13$/, 'dominant-13th', '13'],
+  [/^(sus4?|7sus4)$/, 'suspended-fourth', 'sus4'], [/^sus2$/, 'suspended-second', 'sus2'], [/^(dim|°|o)$/, 'diminished', 'dim'],
+  [/^(dim7|°7|o7)$/, 'diminished-seventh', 'dim7'], [/^(m7b5|m7-5|ø7?|Ø7?)$/, 'half-diminished', 'm7b5'], [/^(aug|\+|\+5)$/, 'augmented', 'aug'],
+];
+function parseChord(raw) {
+  const t = String(raw || '').trim().replace(/[’'`´]$/, '7').replace(/♯/g, '#').replace(/♭/g, 'b');
+  const m = t.match(/^([A-G])([#b]?)([^/\s]*)(?:\/([A-G])([#b]?))?$/);
+  if (!m) return null;
+  const k = CHORD_KINDS.find(([re]) => re.test(m[3]));
+  if (!k) return null;
+  return { step: m[1], alter: m[2] === '#' ? 1 : m[2] === 'b' ? -1 : 0, kind: k[1], text: k[2], bass: m[4] ? { step: m[4], alter: m[5] === '#' ? 1 : m[5] === 'b' ? -1 : 0 } : null };
+}
+
 // ---------------------------------------------------------------- OCR
 // What a role's text reads as; refines the role from its words.
 const TEMPO_RE = /^(tempo|allegr|andant|adagi|larg|lent|prest|vivac|modera|grave|maestos|allegrett|andantin|marcia|marcato|not fast|slow|fast|lively|moderately|brightly|gently|with|rubato|a tempo|tempo di|in time|langsam|schnell|mässig|massig|ruhig|bewegt|lebhaft|sehr|nicht|rasch|innig|zart|mouvement|lent|vif|modéré|anim|swing|ballad|march|waltz|valse|walzer)/i;
 const EXPR_RE = /^(cresc|decresc|dim|rit|rall|accel|poco|più|piu|meno|molto|sempre|subito|dolce|espr|leggiero|legato|stacc|sost|smorz|morendo|cantabile|sotto|mezza|con|senza|ten|marc|sfz|simile|una corda|tre corde|pizz|arco|div|unis|solo|tutti|loco|fine|d\.?\s?c|d\.?\s?s|da capo|dal segno|coda|to coda|segno)/i;
+// Words of tempo and expression marks: an OCR reading a letter or two off
+// one of these ("lolce", "Allegreto") is taken as that word
+const TERM_WORDS = ['Adagio', 'Adagietto', 'Allegro', 'Allegretto', 'Andante', 'Andantino', 'Grave', 'Largo', 'Larghetto', 'Lento', 'Moderato', 'Presto',
+  'Prestissimo', 'Vivace', 'Vivo', 'Maestoso', 'Tempo', 'Cantabile', 'Comodo', 'Scherzando', 'Misterioso', 'Pastorale', 'Siciliano', 'Grazioso', 'Agitato',
+  'Animato', 'Sostenuto', 'Tranquillo', 'Rubato', 'Fine', 'Coda', 'Segno', 'Gently', 'Slowly', 'Lively', 'Moderately', 'Brightly', 'Freely',
+  'dolce', 'leggiero', 'legato', 'staccato', 'espress.', 'espressivo', 'cantabile', 'cresc.', 'crescendo', 'decresc.', 'dim.', 'diminuendo', 'rit.', 'ritard.',
+  'ritardando', 'rall.', 'rallentando', 'accel.', 'accelerando', 'allargando', 'morendo', 'smorzando', 'calando', 'poco', 'molto', 'sempre', 'subito', 'più',
+  'meno', 'mosso', 'assai', 'non', 'troppo', 'con', 'fuoco', 'brio', 'moto', 'anima', 'sotto', 'voce', 'pizz.', 'arco', 'div.', 'unis.', 'simile', 'marcato',
+  'tenuto', 'sosten.', 'semplice', 'al', 'di', 'Minuetto', 'valse', 'marcia', 'Alla'];
+function edit(a, b) {
+  const m = a.length, n = b.length, d = Array.from({ length: m + 1 }, (_, i) => [i, ...Array(n).fill(0)]);
+  for (let j = 1; j <= n; j++) d[0][j] = j;
+  for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+  return d[m][n];
+}
+function snapTerms(text) {
+  return text.split(/\s+/).map(w => {
+    const core = w.replace(/^[^\p{L}]+/u, '');
+    if (core.length < 3) return w;
+    const lw = core.toLowerCase();
+    let best = null, bd = Infinity;
+    for (const t of TERM_WORDS) { const d = edit(lw, t.toLowerCase()); if (d < bd) { bd = d; best = t; } }
+    const tol = core.length >= 8 ? 2 : core.length >= 4 ? 1 : 0;
+    if (!best || bd > tol) return core;
+    // keep the reading's capitalisation of the first letter
+    return /^\p{Lu}/u.test(core) ? best.charAt(0).toUpperCase() + best.slice(1) : best.charAt(0).toLowerCase() + best.slice(1);
+  }).join(' ');
+}
+
 function refineRole(t) {
-  const s = t.text.trim();
+  let s = t.text.trim();
   if (!s) return;
+  if (t.chordCand) { const ch = parseChord(s); if (ch) { t.role = 'chord'; t.chord = ch; return; } if (t.role === 'chordcand') { t.role = 'expression'; t.text = ''; return; } }
   if (/©|\(c\)|copyright|all rights|public domain|creative commons|cc0|cc-by/i.test(s)) { t.role = 'copyright'; return; }
   if (t.metro) return;
   // a tempo word is a tempo mark wherever it stands above the music
@@ -638,6 +741,8 @@ function refineRole(t) {
   // a name or two in capitals above the first staff, no tempo word: a credit
   if (t.role === 'tempo' && t.sys === 0 && !TEMPO_RE.test(s) && !EXPR_RE.test(s) && /^(\p{Lu}[\p{L}.'’-]*\s*){2,4}$/u.test(s)) { t.role = 'lyricist'; return; }
   if (t.role === 'expression' || t.role === 'tempo' || t.role === 'text') {
+    t.text = snapTerms(t.text);
+    s = t.text.trim();
     if (TEMPO_RE.test(s) && !EXPR_RE.test(s)) t.role = 'tempo';
     else if (EXPR_RE.test(s)) t.role = 'expression';
   }
@@ -649,13 +754,15 @@ function refineRole(t) {
 async function readPageText(fr, marks, ocr, opts = {}) {
   if (!ocr || !marks || !fr.gray || !fr.gray.data) return 0;
   const maxLines = opts.maxLines || 16;
-  const order = { title: 0, composer: 1, instrument: 2, tempo: 3, measure: 4, abbrev: 5, subtitle: 6, lyricist: 7, arranger: 7, credit: 8, expression: 9, copyright: 10, footer: 11, header: 12, page: 13, text: 14 };
-  const todo = marks.text.filter(t => t.role !== 'lyrics').sort((a, b) => (order[a.role] ?? 20) - (order[b.role] ?? 20));
+  const order = { title: 0, composer: 1, instrument: 2, tempo: 3, measure: 4, chordcand: 4, abbrev: 5, subtitle: 6, lyricist: 7, arranger: 7, credit: 8, expression: 9, copyright: 10, footer: 11, header: 12, page: 13, text: 14 };
+  const todo = marks.text.filter(t => t.role !== 'lyrics' || t.chordCand).sort((a, b) => (a.chordCand ? 1 : 0) - (b.chordCand ? 1 : 0) || (order[a.role] ?? 20) - (order[b.role] ?? 20));
   // only one abbreviation line per staff is needed (they repeat on every system)
   const seenAbbr = new Set();
-  let n = 0;
+  // chord symbols are many short words: their own budget
+  let n = 0, nc = 0;
   for (const t of todo) {
-    if (n >= maxLines) break;
+    if (t.chordCand ? nc >= (opts.maxChords || 48) : n >= maxLines) continue;
+    if (t.chordCand) nc++;
     if (t.shape) continue;
     // a metronome mark: OCR reads the tempo word (the note glyph only confuses it),
     // and the number when its shapes did not read
@@ -731,4 +838,4 @@ function lineCrop(fr, b, h) {
   return img;
 }
 
-module.exports = { _readDigits: readDigits, classifyMarks, readPageText, refineRole, ROLE_LABEL, DYN_WORDS, _dynGlyph: dynGlyph, _gridOf: gridOf, _lineCrop: lineCrop, _hairpin: hairpin, _slurLike: slurLike, _groupLines: groupLines };
+module.exports = { snapTerms, parseChord, _readDigits: readDigits, classifyMarks, readPageText, refineRole, ROLE_LABEL, DYN_WORDS, _dynGlyph: dynGlyph, _gridOf: gridOf, _lineCrop: lineCrop, _hairpin: hairpin, _slurLike: slurLike, _groupLines: groupLines };

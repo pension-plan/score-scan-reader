@@ -1246,6 +1246,31 @@ adding fra+spa+ita+ces (6.7 MB more, 1.6x the OCR time) raises non-ASCII to 16-3
 syllables of these two items, but lowers elision recall (63 to 25% clean) and costs every page, so the
 language set is unchanged for now.
 
+**Pedal, fingering, rehearsal marks, chord symbols, term snapping.**
+- Piano pedal: "Ped." and the release star below a system's lowest staff, matched by shape (templates in
+  `src/dynglyphs.js` from coverage mk04), written as `<pedal type="start|stop" line="no" sign="yes">`
+  (a star then "Ped." is a release and a press). Coverage pedal 0 to 74 / 81 / 51% (clean / scan / severe).
+- Fingering: a small digit (0.6-1.35 staff spaces, read by the digit shapes at any size) just above or
+  below a note head; the digits stacked over a chord go to its heads in order, nearest digit to the
+  nearest head, as `<technical><fingering>`. They are taken before text grouping, so they no longer
+  become false bar numbers or text. Coverage fingering 0 to 63 / 48 / 20%.
+- Rehearsal marks: a thin rectangular frame (ink along all four sides) with a letter or number inside,
+  over the staff below it; numbers read by the digit shapes, letters (unread without OCR) taken as A, B,
+  C ... in page order; `<rehearsal enclosure="square">`. Coverage 0 to 91 / 87 / 64%.
+- Chord symbols: one short word standing just over a staff is a candidate (kept out of the lyric-row
+  rule; a one-glyph candidate stays unknown unless OCR reads it as a chord); OCR (own budget of 48 per
+  page) reads it and `parseChord` takes root, accidental, quality (major, m, 7, maj7/Δ, m7, 6, m6, 9,
+  maj9, m9, 11, 13, sus4, sus2, dim/°, dim7, m7b5/ø, aug/+; a trailing quote is a superscript 7) and
+  bass, written as `<harmony>` (root, kind with its printed text, bass) before the note under it.
+  Coverage chord-symbol 0 to 56 / 52 / 46%.
+- Tempo and expression OCR words within one letter (two for long words) of a term list (Allegretto,
+  dolce, leggiero, rit., poco, meno mosso ...) are taken as that term: text-expression 22 to 53 / 49 /
+  39%, tempo-mark 48 to 51 / 48 / 38%.
+- The second OCR pass no longer runs for rows with a German function word (umlauts read as plain
+  vowels made German rows look accented).
+No item's pitch, duration, rests, lyrics or parts changed on coverage; regress.mjs on the committed head
+passes on benchmark (0.951) and challenge (0.831).
+
 **Overlay colours.** Text `--ov-text` #5e35b1, bar numbers `--ov-barno` #263238, dynamics and hairpins
 `--ov-dyn` #0277bd, slurs / ties / fermatas `--ov-slur` #f06292, braces and brackets `--ov-brace`
 #8d6e63, grace notes `--ov-grace` #e040fb; ledger lines are drawn with the staff (`--ov-staff`). Each is a stroke plus a 0.26 multiplied
