@@ -1,11 +1,16 @@
 #!/bin/bash
 # Commit everything that is ready and push to pension-plan/score-scan-reader.
-# Usage: tools/push.sh "<conventional commit subject>" ["<body>"]
+# Usage: tools/push.sh "<conventional commit subject>" ["<body>"] [path ...]
+# With paths, only those paths (plus the status page, timeline, orchestration scripts
+# and .gitignore) are committed, so one agent's push does not sweep in another agent's
+# work in progress; other changes stay in the working tree (autostashed over the rebase).
+# Without paths, everything is committed, as before.
 set -euo pipefail
 ROOT=/Users/d.sloane/music
 SCRATCH=/tmp/claude-501/-Users-d-sloane-music/69a237da-a02e-40d9-a1a9-90390e5b5eb2/scratchpad
 cd "$ROOT"
 SUBJECT="${1:-chore: sync}"; BODY="${2:-}"
+shift $(( $# < 2 ? $# : 2 )); PATHS=("$@")
 # keep test-only corpus items out (ATTRIBUTION mentions restricted permission)
 sed -i '/^# -- restricted (auto) --$/q' .gitignore
 grep -rl -i -E "used by permission|greentree" corpus --include=ATTRIBUTION.txt 2>/dev/null | xargs -r -n1 dirname | sort -u | sed 's#$#/#' >> .gitignore
@@ -14,7 +19,11 @@ grep -rl -i -E "used by permission|greentree" corpus --include='*.py' 2>/dev/nul
 cp "$SCRATCH/omr-build.html" docs/status/omr-build.html 2>/dev/null || true
 python3 -I tools/timeline.py >/dev/null || echo 'timeline not written'
 cp /Users/d.sloane/.claude/projects/-Users-d-sloane-music/69a237da-a02e-40d9-a1a9-90390e5b5eb2/workflows/scripts/*.js orchestration/ 2>/dev/null || true
-git add -A
+if [ ${#PATHS[@]} -gt 0 ]; then
+  git add -A -- "${PATHS[@]}" docs/status docs/TIMELINE.md orchestration .gitignore
+else
+  git add -A
+fi
 # refuse oversize files and anything that looks like a credential
 big=$(git diff --cached --name-only --diff-filter=AM -z | xargs -0 -r du -k 2>/dev/null | awk '$1>51200{print $2}' || true)
 if [ -n "$big" ]; then echo "refusing: files over 50 MB staged:"; echo "$big"; exit 1; fi

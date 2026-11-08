@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 19:48 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 19:51 AEDT.
 
 ## Events
 
@@ -94,6 +94,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 19:46 | OpenCV investigation done: don't ship OpenCV.js for symbols (10.4 MB, needs an eval-free patch, ~170 MB heap); classical rests/clefs/accidentals already match learned classifiers. Real gap: time-signature digits are never read (0/182). A plain-JS Bravura template matcher reads 99.8% of digits on scans (90.9% severe); first time signature right 333 to 341 of 365 challenge, 246 to 269 of 306 coverage; +0.25 s per item. The OpenCV agent was told to ship it default-on, then build the quality-gated pre-clean stage. |
 | 19:47 | Sheet view now uses the full page width (plate 1888 px at 1920; side panels flow below as columns); verified at 1920/1280/400, no horizontal scroll. Ships with the overlay agent's repair-mode push; build is waiting on textsym's dynglyphs.js. |
 | 19:48 | User flagged bar numbers 5/10/15 as unrecognised; textsym told to recognise them (digit templates or digit-only OCR), label 'Bar N', and cross-check measure counts per system (warning, and fix single missed/extra barlines). Braces also to be recognised and tried as evidence for grand staves (L6, L18). |
+| 19:51 | Shipped b10c817 (release 0.11.0 merged): Mark for repair (pen/line/box/circle, notes, undo, per-document storage, JSON with the detections and bar numbers inside each mark; lime highlighter), plus the yellow-highlighter, per-type tints and full-width view. CI and Pages green; regression check: no regression (0 items down more than 0.05). |
 
 ## Accuracy by round
 
