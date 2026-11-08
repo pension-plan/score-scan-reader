@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.30.1](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.30.0...score-scan-reader-v0.30.1) (2026-11-08)
+
+
+### Bug Fixes
+
+* **meter:** a system's last real bar is not dropped with the courtesy signature after it ([b51ba25](https://github.com/pension-plan/score-scan-reader/commit/b51ba25ddc6a7efa615439a8fd06ea31ad84893c))
+
 ## [0.30.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.29.0...score-scan-reader-v0.30.0) (2026-11-08)
 
 
