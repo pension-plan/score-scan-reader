@@ -573,12 +573,32 @@ function tipRuns(R, cx, nx, tip, dir, sp, spanSp = 1.6) {
 // Beams (or flags) on a stem: bars touching the stem beside its tip, all of
 // about one thickness (a slur or tie ending at the tip is much thinner than
 // the beams there, so it does not add a beam).
-function countBeams(R, x, tip, dir, sp) {
+// Typical beam thickness on a page (old prints have beams up to a space
+// thick): the first bar beside each stem tip whose ink runs on sideways.
+// Returns the most a single beam may measure along a stem (0.9 space at least).
+function beamCap(R, chords, sp) {
+  const lens = [];
+  for (const c of chords) for (const dir of [1, -1]) {
+    const x = dir === 1 ? c.upX : c.downX, tip = dir === 1 ? c.upEnd : c.downEnd;
+    if (!(x >= 0) || tip == null || !(dir === 1 ? c.up : c.down)) continue;
+    for (const side of [-1, 1]) {
+      const r = tipRuns(R, Math.round(x + side * 0.45 * sp), Math.round(x + side * 0.15 * sp), tip, dir, sp)[0];
+      if (!r || !r.linked || r.a > 0.3 * sp || r.len < 0.3 * sp || r.len > 1.5 * sp) continue;
+      // the same bar a space and more away: a beam, not a flag or a slur
+      const far = tipRuns(R, Math.round(x + side * 1.3 * sp), Math.round(x + side * 0.15 * sp), tip, dir, sp)[0];
+      if (far && Math.abs(far.a - r.a) < 0.4 * sp && Math.abs(far.len - r.len) < 0.3 * sp) lens.push(r.len);
+    }
+  }
+  if (lens.length < 6) return 0.9 * sp;
+  return Math.max(0.9 * sp, Math.min(1.25 * sp, 1.25 * median(lens)));
+}
+
+function countBeams(R, x, tip, dir, sp, cap = 0.9 * sp) {
   let best = 0;
   for (const side of [-1, 1]) {
     const nx = Math.round(x + side * 0.15 * sp);
     for (const off of [0.45, 0.7]) {
-      const bars = tipRuns(R, Math.round(x + side * off * sp), nx, tip, dir, sp).filter(r => r.linked && r.len >= 0.22 * sp && r.len <= 0.9 * sp);
+      const bars = tipRuns(R, Math.round(x + side * off * sp), nx, tip, dir, sp).filter(r => r.linked && r.len >= 0.22 * sp && r.len <= cap);
       if (!bars.length) continue;
       const thick = Math.max(...bars.map(r => r.len));
       best = Math.max(best, bars.filter(r => r.len >= 0.5 * thick).length);
@@ -641,7 +661,7 @@ function headDuration(R, hd, chord, ctx) {
     const x = useUp ? chord.upX : chord.downX;
     const tip = useUp ? chord.upEnd : chord.downEnd;
     if (x >= 0 && tip != null) {
-      const nb = countBeams(R, x, tip, useUp ? 1 : -1, sp);
+      const nb = countBeams(R, x, tip, useUp ? 1 : -1, sp, ctx && ctx.beamCap);
       q = q / Math.pow(2, nb);
     }
   }
@@ -709,7 +729,7 @@ function stemsUnder(R, beamY, dir, xa, xb, sp) {
 // Beamed groups of a staff: stems whose tips touch one component (the beam).
 // A stem inside a group's span that ends at its beam but read no beam (cut
 // stem, faint beam) is a beamed note too: its value is read again at the beam.
-function beamGroups(R, labels, s, sp) {
+function beamGroups(R, labels, s, sp, cap) {
   const W = R.width;
   const items = [];
   for (const c of s.chords) {
@@ -750,21 +770,7 @@ function beamGroups(R, labels, s, sp) {
       }
       return g[0].tipY;
     };
-    const dir = g[0].dir, gx0 = g[0].x, gx1 = g[g.length - 1].x;
-    for (const it of items) {
-      if (inGroup.has(it) || it.dir !== dir || it.x <= gx0 + 0.3 * sp || it.x >= gx1 - 0.3 * sp || it.q < 1 - 1e-6) continue;
-      if (it.heads.some(h => h.kind === 'hollow')) continue;
-      const by = g.beamY(it.x);
-      // the stem stops short of the beam or runs into it
-      if (Math.abs(it.tipY - by) > 2.5 * sp) continue;
-      const nb = countBeams(R, it.x, by, dir, sp);
-      if (!nb) continue;
-      const q = 1 / Math.pow(2, nb);
-      for (const h of it.heads) h.dur = { q: h.dur.dots ? q * 1.5 : q, dots: h.dur.dots };
-      it.q = it.heads[0].dur.q; it.tipY = by;
-      inGroup.add(it); g.push(it);
-    }
-    g.sort((a, b) => a.x - b.x);
+    const dir = g[0].dir;
     // where the beam itself ends (a missed note at either end still has its
     // stem under it)
     const ink = (x) => {
@@ -783,6 +789,20 @@ function beamGroups(R, labels, s, sp) {
       return last;
     };
     g.x0 = walk(g[0].x, -1); g.x1 = walk(g[g.length - 1].x, 1);
+    for (const it of items) {
+      if (inGroup.has(it) || it.dir !== dir || it.x <= g.x0 - 0.2 * sp || it.x >= g.x1 + 0.2 * sp || it.q < 1 - 1e-6) continue;
+      if (it.heads.some(h => h.kind === 'hollow')) continue;
+      const by = g.beamY(it.x);
+      // the stem stops short of the beam or runs into it
+      if (Math.abs(it.tipY - by) > 2.5 * sp) continue;
+      const nb = countBeams(R, it.x, by, dir, sp, cap);
+      if (!nb) continue;
+      const q = 1 / Math.pow(2, nb);
+      for (const h of it.heads) h.dur = { q: h.dur.dots ? q * 1.5 : q, dots: h.dur.dots };
+      it.q = it.heads[0].dur.q; it.tipY = by;
+      inGroup.add(it); g.push(it);
+    }
+    g.sort((a, b) => a.x - b.x);
   }
   return { items, groups };
 }
@@ -930,6 +950,9 @@ function assemblePage(fr, pageIndex = 0) {
   const comps = allComps.filter(c => c.area >= 4);
   const warnings = [];
   const systems = [];
+  // how thick a single beam may be on this page
+  let cap = 0.9 * fr.ss;
+  try { cap = beamCap(R, (fr.chords || []).filter(c => c.heads.some(h => fr.heads.includes(h))), fr.ss); } catch (e) { /* keep the default */ }
   for (const sys of fr.systems) {
     const barX = systemBarlines(fr, sys);
     const staves = sys.map(si => {
@@ -947,11 +970,11 @@ function assemblePage(fr, pageIndex = 0) {
       const dots = comps.filter(c => c.y1 > ya && c.y0 < yb && c.x0 > hdr.end && (c.x1 - c.x0 + 1) >= 0.2 * spS && (c.x1 - c.x0 + 1) <= 0.8 * spS &&
         (c.y1 - c.y0 + 1) >= 0.2 * spS && (c.y1 - c.y0 + 1) <= 0.8 * spS && c.area >= 0.08 * spS * spS &&
         c.area >= 0.45 * (c.x1 - c.x0 + 1) * (c.y1 - c.y0 + 1) && Math.max(c.x1 - c.x0 + 1, c.y1 - c.y0 + 1) <= 1.8 * Math.min(c.x1 - c.x0 + 1, c.y1 - c.y0 + 1));
-      const dctx = { st, dots };
+      const dctx = { st, dots, beamCap: cap };
       for (const c of music) for (const h of c.heads) if (!h.dur) h.dur = headDuration(R, h, c, dctx);
       try {
         const sp = st.space || fr.ss;
-        const { items, groups } = beamGroups(R, labels, s, sp);
+        const { items, groups } = beamGroups(R, labels, s, sp, cap);
         markTuplets(R, comps, s, sp, items, groups);
       } catch (e) { warnings.push(`Beam / tuplet reading failed on a staff (${e.message}).`); }
       return s;
@@ -1027,4 +1050,4 @@ function staffMeasureEvents(fr, R, comps, s, xa, xb) {
   return v;
 }
 
-module.exports = { assemblePage, staffMeasureEvents, pitchOf, keyAlters, attrsAt, DIV, median, headDuration, _analyseHeader: analyseHeader, _compIndex: compIndex, _strokes: strokes, _classifyAccidental: classifyAccidental, _crossBands: crossBands, _glyphImage: glyphImage, _splitSharps: splitSharps, _detachedNear: detachedNear, _readClef: readClef };
+module.exports = { assemblePage, staffMeasureEvents, pitchOf, keyAlters, attrsAt, DIV, median, headDuration, _analyseHeader: analyseHeader, _compIndex: compIndex, _strokes: strokes, _classifyAccidental: classifyAccidental, _crossBands: crossBands, _glyphImage: glyphImage, _splitSharps: splitSharps, _detachedNear: detachedNear, _readClef: readClef, _beamCap: beamCap };
