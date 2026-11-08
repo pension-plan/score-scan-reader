@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.6.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.5.1...score-scan-reader-v0.6.0) (2026-11-08)
+
+
+### Features
+
+* **ui:** St. Anselm second sample, eng+deu OCR, per-page reading notes, spread overlays (round 3) ([2005ecd](https://github.com/pension-plan/score-scan-reader/commit/2005ecdad2d3c7dc2a8ead1cc6e61741159380fb))
+
+
+### Bug Fixes
+
+* **build:** commit the app's copista-2m model assets so CI and Pages builds stop failing ([648042b](https://github.com/pension-plan/score-scan-reader/commit/648042b615e443e3174c1db6e63dfd129f4ab609))
+* **eval:** busy-wait message no longer references log before it is defined ([0dd5e70](https://github.com/pension-plan/score-scan-reader/commit/0dd5e70c7edd4d89f0ad00b2424205f8598b5543))
+* **rests:** key-signature sharps and naturals no longer read as quarter rests (rests F1 0.726 benchmark, 0.729 challenge) ([2ad21bc](https://github.com/pension-plan/score-scan-reader/commit/2ad21bc894faead1b5e4a8be7c09ee6788dc7de6))
+
 ## [0.5.1](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.5.0...score-scan-reader-v0.5.1) (2026-11-08)
 
 
