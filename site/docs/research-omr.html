@@ -1,0 +1,1146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>OMR of scanned sheet music → MusicXML: research notes (Nov 2026)</title>
+<style>
+:root { --bg: #fbfbfa; --fg: #1b1e24; --muted: #5a6170; --rule: #dde1e7; --accent: #2456a6; --code: #f0f2f5; }
+@media (prefers-color-scheme: dark) { :root { --bg: #13161b; --fg: #e5e8ed; --muted: #a2aab7; --rule: #2b313b; --accent: #82a8ea; --code: #1c2028; color-scheme: dark; } }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.65 "Source Serif 4", Georgia, serif; padding: 32px max(16px, env(safe-area-inset-right, 0px)) 64px max(16px, env(safe-area-inset-left, 0px)); }
+main { max-width: 820px; margin: 0 auto; }
+h1, h2, h3, h4 { font-family: system-ui, sans-serif; line-height: 1.25; text-wrap: balance; }
+a { color: var(--accent); }
+code, pre { font-family: ui-monospace, Menlo, monospace; font-size: 0.86em; background: var(--code); border-radius: 4px; }
+code { padding: 1px 4px; } pre { padding: 12px 14px; overflow-x: auto; } pre code { padding: 0; background: none; }
+table { border-collapse: collapse; display: block; overflow-x: auto; font-size: 0.92em; }
+th, td { border: 1px solid var(--rule); padding: 6px 10px; text-align: left; vertical-align: top; }
+nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bottom: 24px; }
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+</head>
+<body>
+<main><nav class="crumbs"><a href="../">Score Scan Reader</a> / docs / research-omr.md · <a href="https://github.com/pension-plan/score-scan-reader/blob/main/docs/research-omr.md">source</a></nav>
+<h1>OMR of scanned sheet music → MusicXML: research notes (Nov 2026)</h1>
+<p>Scope: what current (2023–2026) work says about turning <strong>scanned/image</strong> sheet-music PDFs into MusicXML 4.0,
+with particular attention to (a) lyrics, (b) splitting multi-voice staves (closed-score SATB) into separate parts,
+and (c) running everything <strong>client-side in a claude.ai Artifact</strong> (CSP: no CDN fetch/WASM/worker loads; each
+binary asset ≤ 15 MB, total ≤ 64 MB). Every number below is sourced; numbers the source reports about itself
+(not independently reproduced) are marked <em>self-reported</em>. Sizes and versions were checked directly against
+npm / GitHub / Hugging Face APIs on 2026-11-08.</p>
+<hr>
+<h2>0. TL;DR</h2>
+<ul>
+<li><strong>No off-the-shelf system does what we need.</strong> None of the open systems outputs lyrics <em>and</em> voice-separated
+parts. Audiveris reads lyrics but is AGPL Java. homr is AGPL. copisteria (Apache-2.0, Oct 2026) explicitly says
+&quot;Lyrics are not written&quot;. LEGATO swaps all text for a <code>&lt;|text|&gt;</code> token. SMT/SMT++ and Zeus/OLiMPiC were trained on
+piano and quartet music and output <code>**kern</code>/LMX with no lyrics. <strong>Lyrics and SATB part-splitting have to be built
+by us.</strong></li>
+<li><strong>Recommended core: a deterministic classical pipeline in plain JS</strong>, with optional small ONNX models where they
+help: Sauvola binarisation using integral images → run-length staff metrics → staff detection from projections
+per strip with line tracking → run-length staff removal → connected components → notehead template/classifier →
+stem, beam, flag and dot assembly → time-slot rhythm solver with measure repair → voice and part separation →
+lyric OCR (tesseract.js) and syllable alignment → MusicXML writer. The same code runs in node, so the accuracy
+harness can use it.</li>
+<li><strong>Best ML candidate for later (licence-clean and small):</strong> <code>kobimusic/copista-2m</code>. Its symbol detector has 1.94M
+params (7.8 MB fp32 .pt) and its &quot;evidence&quot; transformer has 2.03M params (8.15 MB). Both code and weights are
+Apache-2.0 and the training data is PDMX (CC BY 4.0). The detector predicts <strong>stem direction (<code>up/down/both</code>)
+and a <code>voice_slot</code> for each notehead</strong>, which is exactly the signal SATB splitting needs. The project is new
+(Oct 2026, ~18 stars) and its benchmark numbers are <em>self-reported</em>: on scans it claims OMR-NED of 11.2 % on
+string quartets and 17.8 % on Lieder, against homr 42.3 % and Legato 58.2 %. It ships as PyTorch, so an ONNX
+export spike is needed.</li>
+<li><strong>Licence flags.</strong> The following are AGPL-3.0 or GPL: <strong>Audiveris, homr (code and weights), and the Ultralytics
+YOLOv8/YOLO11 code and weights.</strong> YOLOv7 and YOLOv9 are GPL-3.0. <strong>LEGATO</strong> code and weights are MIT, but it runs
+on a frozen <strong>Llama-3.2-11B-Vision</strong> encoder (Llama Community Licence, not OSI). <strong>homr transformer weights were
+trained partly on Camera-PrIMuS</strong> (its HF mirror says CC BY-NC). <strong>MUSCIMA++ is CC BY-NC-SA.</strong> <strong>Verovio is
+LGPL-3.0</strong>, so we prefer OSMD (BSD-3).</li>
+<li><strong>Browser runtime facts:</strong><ul>
+<li>onnxruntime-web 1.30.0 (on cdnjs) ships <code>ort-wasm-simd-threaded.wasm</code> at <strong>14.24 MB</strong>, just under the 15 MB
+cap. The WebGPU/JSEP binary is <strong>28.3 MB</strong>, so it cannot be one file. That makes <strong>WASM CPU, single-threaded</strong>
+the realistic EP, because threads need <code>crossOriginIsolated</code>.</li>
+<li>gzip cuts ORT wasm to about 26 % (11.2 MB → 2.87 MB gz, 1.80 MB brotli, measured on 1.22). The bytes can be
+passed in with <code>ort.env.wasm.wasmBinary</code> after <code>DecompressionStream</code>.</li>
+<li>tesseract.js 7.0.0 (Apache-2.0, on cdnjs) needs core <code>*-lstm.wasm.js</code> files of about 3.9 MB each.
+<code>tessdata_fast</code> traineddata sizes: eng 4.11 MB, lat 3.19 MB, deu 1.53 MB. <code>tessdata_best</code> eng is 15.4 MB, which
+is over the cap.</li>
+</ul>
+</li>
+<li><strong>Metrics:</strong><ul>
+<li><strong>OMR-NED</strong> = (I+D)/(N_pred+N_ref) over visual symbols (musicdiff-based; ISMIR 2025). This is now the common
+cross-system metric.</li>
+<li><strong>TEDn</strong> is tree edit distance on MusicXML (Hajič 2016; Mayer 2024).</li>
+<li><strong>SER/CER/LER</strong> are edit rates on tokens.</li>
+<li><strong>MV2H</strong> scores multi-pitch, voice, meter, value and harmony (McLeod 2018). Its <em>voice</em> sub-score directly
+measures our part-splitting.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2>1. Problem framing for this project</h2>
+<ul>
+<li>The input is page <strong>images</strong> (scans and photocopies at 150–600 dpi, from IMSLP/CPDL/Internet Archive or phone
+scans). Born-digital PDFs are only rasterised. The core takes <code>{width,height,data:Uint8ClampedArray}</code> grayscale.</li>
+<li>The target repertoire is <strong>hymn/chorale closed score</strong>: two staves per system with a brace, S+A on the treble
+staff and T+B on the bass staff. Lyrics sit between the staves, often 2–6 numbered verses. Notation is mostly
+homorhythmic and simple: quarters, halves, dotted values, eighth pairs, fermatas, and pickup measures.
+Secondary: open-score SATB (one voice per staff, lyrics under each staff), melody plus piano, and piano.</li>
+<li>Output: MusicXML 4.0 <code>score-partwise</code>.<ul>
+<li>A closed-score staff with two consistent stem-direction voices becomes <strong>two <code>&lt;part&gt;</code>s</strong> (S/A, T/B).</li>
+<li>A piano grand staff stays <strong>one part with two staves</strong> (<code>&lt;staves&gt;2&lt;/staves&gt;</code>), with voices kept as <code>&lt;voice&gt;</code> and
+<code>&lt;backup&gt;</code>.</li>
+<li>Lyrics are copied to every vocal part that sings them.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2>2. Classical (rule-based) pipeline: stage by stage</h2>
+<p>Classical OMR is still the backbone of Audiveris (5.11.0, Jul 2026) and of the front ends of oemer, homr and
+copisteria. Even copisteria, the strongest recent open system, decides <strong>staves, systems and bars with
+hand-written geometry rules over the ink</strong> and uses ML only for symbols and musical context
+(<a href="https://github.com/kobimusic/copisteria">copisteria ARCHITECTURE.md</a>).</p>
+<h3>2.1 Ingest and resolution normalisation</h3>
+<ul>
+<li><strong>Node:</strong> <code>pdfimages -list</code> / <code>pdfimages -png</code> extract the embedded scan at native resolution (no resampling).
+<code>pdftoppm -r 300 -gray</code> rasterises born-digital pages.</li>
+<li><strong>Browser:</strong> pdf.js 3.11.174 <code>page.render()</code> to a canvas. Scale so the page is about 300 dpi, or better, scale by
+measured staff space (below). For scanned PDFs the image XObject&#39;s native size is the right render scale.</li>
+<li><strong>Normalise by staff space, not dpi.</strong> Measure the staff-space height <code>s</code> (distance between line centres), then
+rescale so <code>s</code> is fixed. Learned detectors need this. copisteria rescales the page so the staff space is
+<strong>10.6 px</strong>, cross-checked against a first pass at 2048 px. Classical rules then work in staff-space units.
+Rule-based steps do better around <code>s</code> = 16–24 px, which is typical of 300 dpi hymnals.</li>
+</ul>
+<h3>2.2 Grayscale and binarisation</h3>
+<ul>
+<li><strong>Otsu</strong> (global, histogram-based) is fine for clean photocopies. It fails on uneven lighting, phone shadows and
+yellowed paper.</li>
+<li><strong>Sauvola</strong>: <code>T(x,y) = m·(1 + k·(σ/R − 1))</code> with R = 128 and k ≈ 0.2–0.4. Window ≈ 2–4 staff spaces (about 31–61
+px at 300 dpi). Compute it in O(1) per pixel with integral images of I and I²
+(Shafait, Keysers &amp; Breuel 2008, &quot;Efficient implementation of local adaptive thresholding techniques using
+integral images&quot;). Use it as the default for scans. A cheap safeguard: run Otsu as well and keep the result with
+the more plausible staff-line run-length histogram.</li>
+<li><strong>Shading normalisation first</strong> (divide by a large-kernel blur or a morphological closing of the background).
+copisteria runs its line finder on the original and on a &quot;paper&#39;s shading divided out&quot; copy, then keeps whichever
+the detector confirms.</li>
+<li><strong>Learned binarisation:</strong> selectional auto-encoders (Calvo-Zaragoza &amp; Gallego, <em>Pattern Recognition</em> 86, 2019;
+Castellanos et al., ISMIR 2018 for music documents) beat Sauvola on degraded manuscripts. They are not needed for
+printed hymnals.</li>
+<li>Keep <strong>both</strong> the gray and the binary image. Learned models and template matching work better on gray. Run-length
+analysis needs binary.</li>
+</ul>
+<h3>2.3 Deskew and dewarp</h3>
+<ul>
+<li><strong>Global skew:</strong> maximise the variance (sharpness) of the horizontal projection profile over angles in ±5°.
+Search coarsely, then refine to 0.05°. Alternatively, run a Hough transform on long horizontal black runs. Staff
+lines dominate the profile, which makes this very reliable for music.</li>
+<li><strong>Local curvature</strong> (book gutter, phone photos): handle per staff by tracking lines in vertical strips (2.5) and
+fitting a polyline or spline per line. Do not warp the image; map coordinates through the per-staff line model.
+oemer and homr dewarp the whole image before recognition, and the oemer README notes that deskewing itself
+causes errors and offers <code>--without-deskew</code>.</li>
+</ul>
+<h3>2.4 Staff metrics (line thickness <code>t</code>, space <code>s</code>)</h3>
+<ul>
+<li>Classic Fujinaga method: the <strong>most frequent vertical black run</strong> gives line thickness <code>t</code> (typically 2–4 px at
+300 dpi). The <strong>most frequent white run</strong> gives the space between lines.</li>
+<li>More robust (Cardoso &amp; Rebelo, ICPR 2010, &quot;Robust staffline thickness and distance estimation in binary and
+gray-level music scores&quot;): take the <strong>most common sum of a black run and the next white run</strong>. That gives
+<code>t+s</code> reliably; then split it with a 2D histogram.</li>
+<li>Every later threshold is expressed in <code>s</code> and <code>t</code>. Examples: notehead height ≈ 1 s; stem length ≈ 3.5 s; a beam is
+about 0.5 s thick; staff removal deletes vertical runs ≤ ~1.5–2 t.</li>
+</ul>
+<h3>2.5 Staff and system detection</h3>
+<ul>
+<li><strong>Projection per strip:</strong> split the page into about 8–16 vertical strips. In each strip, find peaks of the
+horizontal black projection. Group peaks into <strong>5 equally spaced lines</strong> (spacing ≈ t+s, tolerance ±20 %). Link
+the groups across strips into staves, which tolerates skew and curvature.</li>
+<li><strong>Line tracking / stable paths:</strong> Cardoso et al. (<em>IEEE TPAMI</em> 31(6), 2009, open access, CC BY) model staff lines
+as stable shortest paths across the page, which copes with curvature, breaks and slant. Capela et al. (SIGMAP<ol start="2008">
+<li>add removal on top of the same paths. This is a good fallback for warped scans.</li>
+</ol>
+</li>
+<li><strong>Systems:</strong> two adjacent staves belong to one system if a brace, a bracket or a vertical ink run joins them at
+the left edge, or if their <strong>barlines continue through the gap</strong>. copisteria uses both cues, plus a small
+logistic model. Hymnals put a brace on S/A + T/B. The gap between staves is large because it holds the lyrics.</li>
+<li>Output per staff: five line polylines, <code>s</code>, <code>t</code>, x-extent, and a system id.</li>
+</ul>
+<h3>2.6 Staff removal</h3>
+<ul>
+<li><strong>Run-length filter:</strong> along each detected line, delete black pixels whose vertical run is ≤ ~1.5–2 t and
+centred on the line. Keep pixels where a longer run passes through, because those belong to symbols. This is
+the &quot;line track height&quot; family in Dalitz, Droettboom, Pranzas &amp; Fujinaga, &quot;A Comparative Study of Staff Removal
+Algorithms&quot;, <em>IEEE TPAMI</em> 30(5), 2008. That paper also compares skeleton-based and vector-field methods.
+Audiveris 5.11 added &quot;smarter staff line removal in case of crossing curves&quot;.</li>
+<li><strong>Keep the un-removed image</strong> for notehead matching. Removal fragments hollow heads and whole notes, so template
+matching on the original gray image is more reliable for heads.</li>
+<li>Removal is less important if a learned detector is used. copisteria and homr segment symbols directly.</li>
+</ul>
+<h3>2.7 Connected components and segmentation</h3>
+<ul>
+<li>Use two-pass union-find, 8-connectivity, on the staff-removed binary image. Compute bbox, area, centroid,
+black-pixel density, and moments in staff-space units.</li>
+<li>Use an <strong>inverted</strong> CC pass to find enclosed white holes (hollow heads, whole notes, flats, natural/sharp
+bodies).</li>
+<li>Treat oversized CCs (beamed groups, chords with a shared stem, and barlines touching heads) as &quot;compound&quot;. Split
+them by removing stems (vertical runs ≥ 2.5 s with width ≤ ~0.3 s) and beams (thick near-horizontal runs ≥ 0.4 s
+tall), then re-labelling.</li>
+<li><strong>Text CCs</strong> (lyrics, titles, verse numbers) are found as rows of small CCs with x-height ~0.6–1.2 s on a common
+baseline, <strong>outside</strong> the staff band (between staves / below staff). Mask them out of music recognition and send
+them to OCR (§6).</li>
+</ul>
+<h3>2.8 Symbol classification</h3>
+<p>Options, from cheapest to most capable:</p>
+<ol>
+<li><strong>Template matching</strong> with normalised cross-correlation on gray at the normalised <code>s</code>.<ul>
+<li>Use it for filled, hollow and whole noteheads, clefs (G, F, C), accidentals (♯ ♭ ♮), rests and digits. Render
+templates from an open SMuFL font: <strong>Bravura</strong> and <strong>Leland</strong> are SIL OFL-1.1, so templates or synthetic data
+derived from them can be shipped.</li>
+<li>Restrict head search to staff positions: y = line or space, which gives 1/2-s quantisation.</li>
+<li>Hymnals are engraved in a small number of house styles, so templates do well there. Keep 2–3 template variants
+per class.</li>
+</ul>
+</li>
+<li><strong>Hand-crafted features + kNN/SVM.</strong> oemer classifies clefs, accidentals and rests with <strong>three SVMs</strong> trained
+on DeepScores-extended. Audiveris uses its own glyph classifier, and 5.11 added L2 regularisation to it.<ul>
+<li>Features: 16×16 or 20×20 zoned density, aspect ratio, area/s², hole count, and Hu moments.</li>
+<li>Easy to do in pure JS; small enough to inline as JSON weights.</li>
+</ul>
+</li>
+<li><strong>Small CNN classifier on CC crops</strong> (e.g., 32×32, 50–200k params, int8 ONNX ≈ 0.1 MB). Train it on crops
+rendered by LilyPond/Verovio from synthetic hymns with scan degradation, plus DeepScoresV2 crops (CC BY 4.0).</li>
+<li><strong>Full-page detector</strong> (YOLO/DETR family) on DeepScoresV2 or synthetic pages. Copisteria&#39;s detectors predict 270
+classes, with staff-position, stem-direction, dots, grace and voice attributes on every note and rest.<ul>
+<li>DeepScoresV2 notes: orthogonal boxes suit long, thin, possibly rotated objects badly (Tuggener et al., ICPR
+2020). Most papers use its <strong>dense subset (1,714 images)</strong>.</li>
+<li><strong>Licence trap:</strong> Ultralytics YOLOv8/YOLO11 code and trained weights are AGPL-3.0. Use Apache-2.0
+detectors: YOLOX, RT-DETR/RT-DETRv2, D-FINE, or RF-DETR base sizes (RF-DETR XL/2XL use a non-OSI licence).</li>
+</ul>
+</li>
+</ol>
+<h3>2.9 Notation assembly</h3>
+<ul>
+<li><strong>Stems:</strong> vertical runs ≥ ~2.5 s, attached to a head at its right edge (stem up) or left edge (stem down). A head
+with stems on <strong>both</strong> sides, or one head carrying an up stem and a down stem, is a <strong>unison of two voices</strong>.
+copisteria&#39;s detector has an explicit <code>stem_dir = both</code> value: &quot;one head, a stem each way (two voices)&quot;.</li>
+<li><strong>Beams:</strong> thick slanted bands between stem ends. The number of beam lines crossing a stem gives the beam level:
+1 = eighth, 2 = sixteenth. <strong>Flags</strong> are separate CCs attached to the stem end.</li>
+<li><strong>Augmentation dots:</strong> a small round CC about 0.5–1 s to the right of the head, in a <strong>space</strong> (a dot is lifted
+into the space above when the head is on a line). Distinguish them from staccato dots, which sit above or below
+the head on the stem-free side.</li>
+<li><strong>Accidentals:</strong> left of a head at the same y (a flat is anchored at its bowl). They hold until the barline at
+that step and octave. <strong>Key signature:</strong> accidentals right after the clef at the start of each staff.</li>
+<li><strong>Ties vs slurs:</strong> a curve between two heads of the same pitch is a tie. homr&#39;s changelog: &quot;Ties are recovered
+from slurs between notes of the same pitch.&quot;</li>
+<li>Formal model: the <strong>Music Notation Graph (MuNG)</strong> from MUSCIMA++ has primitives as nodes and syntactic relations
+as edges. Yang et al. 2024 (&quot;Toward a More Complete OMR Solution&quot;, arXiv 2409.00316) train notation assembly
+on detector output (YOLOv8 on MUSCIMA++ v2.0) instead of perfect detections.</li>
+</ul>
+<h3>2.10 Rhythm reconstruction and measure-timing repair</h3>
+<p>This is where classical OMR usually breaks: one missed dot or beam desynchronises every voice after it.
+Current practice:</p>
+<ul>
+<li><strong>Time-slot (onset column) model.</strong> Notes in different voices and staves of a system that share an x-position
+share an onset. Audiveris builds time slots per measure. In homorhythmic hymns this constraint is very strong:
+one wrong duration in a voice contradicts the onsets of the other three.</li>
+<li><strong>Joint decoding per voice and measure.</strong> Keep a short list of duration hypotheses per note: head type ×
+stem/beam/flag count × dot present? × tuplet. Pick the combination that (a) matches the measure length from the
+time signature, (b) places each note&#39;s onset at its x-column, and (c) maximises detector confidence.<ul>
+<li>copisteria does this as a <strong>Viterbi search over 48ths of a quarter note</strong>, with penalties for gaps, overlaps,
+two notes at one onset, and running past the barline. &quot;One misread duration does not shift the rest of the
+bar.&quot;</li>
+<li>For hymns, an exhaustive search over a few hypotheses per note is cheap (≤ ~16 notes per voice per measure).</li>
+</ul>
+</li>
+<li><strong>Missed barlines:</strong> if a voice holds ≥ 1.75 bars of duration, look for a full-height vertical stroke at the
+point where the running sum crosses a whole bar, insert a barline, and decode again (copisteria <code>revise.py</code>).</li>
+<li><strong>Missing time signature:</strong> pick the bar length that most measures fit. Hymnals usually print it, but some
+chorales omit it. <strong>Pickup and final measures:</strong> allow the first measure to be short (<code>implicit=&quot;yes&quot;</code>). In
+hymns, pickup + final measure ≈ one full measure.</li>
+<li><strong>Fallback when repair fails:</strong> pad with invisible rests (<code>print-object=&quot;no&quot;</code>) or a <code>&lt;forward&gt;</code> so every voice
+sums to the measure length, and <strong>flag the measure</strong> in the confidence report. Both oemer (&quot;beat adjustment only
+adds beats&quot;) and copisteria do this.</li>
+<li>The classic triplet failure: unmarked triplets (marked once, pages earlier) get read as plain notes.
+copisteria writes 65 % of tuplet notes as tuplets when every mark is removed, against 96 % with marks.</li>
+</ul>
+<h3>2.11 Pitch</h3>
+<ul>
+<li>Pitch = (clef, staff position of head relative to the line model) + key signature + accidentals in the measure,
+with ties carrying accidentals across barlines. Clef changes mid-staff apply from their x onward.</li>
+<li>Octave-treble (&quot;tenor&quot;) clef G2-8vb is common for tenor parts in open score. Write it as
+<code>&lt;clef&gt;&lt;sign&gt;G&lt;/sign&gt;&lt;line&gt;2&lt;/line&gt;&lt;clef-octave-change&gt;-1&lt;/clef-octave-change&gt;&lt;/clef&gt;</code>.</li>
+</ul>
+<hr>
+<h2>3. State-of-the-art systems (2023–2026)</h2>
+<h3>3.1 Comparison table</h3>
+<table>
+<thead>
+<tr>
+<th>System (latest)</th>
+<th>Approach</th>
+<th>Code / weights licence</th>
+<th>Weights (size)</th>
+<th>Lyrics?</th>
+<th>Voices→parts?</th>
+<th>Browser feasibility</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Audiveris 5.11.0</strong> (2026-07-11)</td>
+<td>Classical + glyph classifier, Java</td>
+<td><strong>AGPL-3.0</strong></td>
+<td>n/a (bundled)</td>
+<td><strong>Yes</strong>: Tesseract; lyric lines; verse numbers filtered since 5.10</td>
+<td>Voices per staff, not split into parts</td>
+<td>No (Java). Use only as an offline baseline in the harness</td>
+</tr>
+<tr>
+<td><strong>oemer 0.1.8</strong> (2024-11; last push 2025-04)</td>
+<td>2 UNets (staff/symbols; heads/clefs/stems) + SVMs + rules</td>
+<td><strong>MIT</strong></td>
+<td><code>1st_model.onnx</code> <strong>70.8 MB</strong>, <code>2nd_model.onnx</code> <strong>38.4 MB</strong> (fp32)</td>
+<td>No</td>
+<td>Groups chords by stem direction; no part split</td>
+<td>Possible only after int8/fp16 quantisation and chunking to ≤ 15 MB per file; single-thread WASM UNet on a full page is slow</td>
+</tr>
+<tr>
+<td><strong>homr</strong> (0.7 + unreleased; push 2026-11)</td>
+<td>oemer-style segnet + Polyphonic-TrOMR-style transformer per staff</td>
+<td><strong>AGPL-3.0 code <em>and</em> weights</strong>; transformer data includes Camera-PrIMuS (HF mirror says CC BY-NC)</td>
+<td>ONNX: segnet 53 MB (fp16 26.5), encoder 48 MB (fp16 24), decoder 37–47 MB</td>
+<td>No (title OCR via RapidOCR)</td>
+<td>&quot;Multiple voices per staff&quot; (unreleased)</td>
+<td>Licence-blocked for permissive shipping</td>
+</tr>
+<tr>
+<td><strong>copisteria 1.3.4 / copista</strong> (Oct 2026)</td>
+<td>Detector (270 classes + per-head attributes: staff pos, <strong>stem dir incl. both</strong>, dots, grace, <strong>voice slot</strong>) → geometric front end → 2.03M evidence transformer → Viterbi rhythm writer</td>
+<td><strong>Apache-2.0 code and weights</strong> (NOTICE file must be kept); trained on PDMX renders</td>
+<td>copista-2m detector <strong>7.8 MB</strong> (.pt fp32) + evidence <strong>8.15 MB</strong>; copista-28m detector 115 MB</td>
+<td><strong>No</strong> (&quot;Lyrics are not written&quot;; text needs external OCR boxes)</td>
+<td>Voice slots per note; parts = staves/braced pairs</td>
+<td><strong>Most promising ML option</strong> (about 4M params in total). Needs ONNX export of PyTorch; front end and writer would need porting to JS</td>
+</tr>
+<tr>
+<td><strong>Polyphonic-TrOMR</strong> (NetEase; push 2023-01)</td>
+<td>Patch-embedding transformer, single staff</td>
+<td>Apache-2.0</td>
+<td><code>img2score_epoch47.pth</code> 86.3 MB</td>
+<td>No</td>
+<td>Polyphonic tokens</td>
+<td>Stale; training code never released</td>
+</tr>
+<tr>
+<td><strong>SMT</strong> / <strong>SMT++</strong> (Ríos-Vila et al.; IJCV 2025)</td>
+<td>CNN/ConvNeXt encoder + 8-layer transformer decoder → <code>**bekern</code>, full page</td>
+<td>MIT code; MIT weights on HF</td>
+<td><code>PRAIG/smt-fp-grandstaff</code> 43.7 MB; <code>antoniorv6/smt-grandstaff</code> 85.5 MB</td>
+<td>No</td>
+<td>Piano spines</td>
+<td>Autoregressive; piano-only training; weak on real scans (see LEGATO table)</td>
+</tr>
+<tr>
+<td><strong>Zeus / OLiMPiC</strong> (Mayer et al., ICDAR 2024)</td>
+<td>ResNet-ish CNN + 2×BiLSTM + attention LSTM decoder → Linearised MusicXML (LMX), per system</td>
+<td>MIT code; data CC BY-SA</td>
+<td>not checked</td>
+<td>No</td>
+<td>Piano voices (LMX encodes voice/staff changes)</td>
+<td>Small RNN; per-system; piano-only</td>
+</tr>
+<tr>
+<td><strong>LEGATO</strong> (ICLR 2026)</td>
+<td>Frozen <strong>Llama-3.2-11B-Vision encoder (836M)</strong> + 101M decoder → ABC, multi-page</td>
+<td>MIT code and weights, but the <strong>encoder is under the Llama 3.2 Community Licence</strong></td>
+<td>legato decoder 429.5 MB; legato-small 43.7 MB (plus encoder)</td>
+<td>**Text replaced by `&lt;</td>
+<td>text</td>
+<td>&gt;`**</td>
+</tr>
+<tr>
+<td><strong>LEGATO 2</strong> (arXiv 2607.05769, Jul 2026)</td>
+<td>System-level segmentation + autoregressive VLM; embeds text (titles, annotations)</td>
+<td>not released</td>
+<td>not released</td>
+<td>Embedded text claimed</td>
+<td>n/a</td>
+<td>n/a</td>
+</tr>
+<tr>
+<td><strong>Transcoda</strong> (arXiv 2605.10835, May 2026)</td>
+<td>59M-param model; synthetic data + normalised <code>**kern</code> + grammar-constrained decoding</td>
+<td>release promised &quot;upon publication&quot;</td>
+<td>n/a</td>
+<td>No</td>
+<td>kern spines</td>
+<td>n/a</td>
+</tr>
+<tr>
+<td><strong>Bottleneck-ResNet + BiGRU + CTC</strong> (arXiv 2604.16446, Apr 2026)</td>
+<td>Monophonic CRNN-CTC</td>
+<td>no code</td>
+<td>n/a</td>
+<td>No</td>
+<td>Monophonic</td>
+<td>Illustrates small CTC models for monophonic staves</td>
+</tr>
+</tbody></table>
+<h3>3.2 Reported accuracy (all lower = better)</h3>
+<p><strong>LEGATO, Table 1 (TEDn / OMR-NED, %)</strong>. Source: <a href="https://arxiv.org/abs/2506.19065">arXiv 2506.19065</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Test set</th>
+<th>GPT-5</th>
+<th>SMT++</th>
+<th>Legato</th>
+<th>Legato-small</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Camera OpenScore String Quartets (252 pp.)</td>
+<td>90.5 / 97.6</td>
+<td>98.6 / 94.7</td>
+<td><strong>60.4 / 58.2</strong></td>
+<td>84.1 / 93.5</td>
+</tr>
+<tr>
+<td>Camera OpenScore Lieder (64 pp.)</td>
+<td>91.6 / 97.6</td>
+<td>98.4 / 84.1</td>
+<td><strong>36.4 / 44.9</strong></td>
+<td>82.6 / 83.5</td>
+</tr>
+<tr>
+<td>IMSLP piano scans (32 pp.)</td>
+<td>96.7 / 98.7</td>
+<td>97.7 / 91.9</td>
+<td><strong>29.7 / 44.3</strong></td>
+<td>76.9 / 86.7</td>
+</tr>
+</tbody></table>
+<p>The takeaways: frontier VLMs (GPT-5) are useless as OMR today (~97 % OMR-NED), and SMT++ collapses on real scans.</p>
+<p><strong>copisteria README / model card (OMR-NED via efficient-musicdiff, %, <em>self-reported</em>, scans)</strong>:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Quartet scans (252)</th>
+<th>Lieder scans (55)</th>
+<th>Polish piano scans (112)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>copista-28m</td>
+<td>8.6–8.7</td>
+<td>16.9–17.7</td>
+<td>31.5–34.4</td>
+</tr>
+<tr>
+<td>copista-2m</td>
+<td>11.1–11.2</td>
+<td>17.0–17.8</td>
+<td>34.3–38.7</td>
+</tr>
+<tr>
+<td>Legato 2 (paper)</td>
+<td>31.6</td>
+<td>n/a</td>
+<td>n/a</td>
+</tr>
+<tr>
+<td>Legato</td>
+<td>58.2</td>
+<td>n/a</td>
+<td>n/a</td>
+</tr>
+<tr>
+<td>homr 0.7</td>
+<td>piano only</td>
+<td>42.3</td>
+<td>48.3</td>
+</tr>
+<tr>
+<td>Audiveris 5.11</td>
+<td>66.9 (no output on 54/252)</td>
+<td>51.8</td>
+<td>62.6</td>
+</tr>
+<tr>
+<td>Transcoda</td>
+<td>piano only</td>
+<td>48.4</td>
+<td>55.1</td>
+</tr>
+</tbody></table>
+<p>The ranges are the README vs model-card numbers. Both are from the same authors.</p>
+<p><strong>Other reference points</strong></p>
+<ul>
+<li><strong>SMT++ (FP-GrandStaff, bekern):</strong> CER 5.6, SER 6.9, LER 12.9 (ConvNeXt encoder). Synthetic full pages only.</li>
+<li><strong>Zeus:</strong><ul>
+<li>GrandStaff SER 2.77 / Camera-GrandStaff 3.03.</li>
+<li>OLiMPiC <strong>scanned</strong>: TEDn 44.41 without augmentation, <strong>18.40 with augmentation</strong>. Augmentation is what makes
+real scans work.</li>
+</ul>
+</li>
+<li><strong>Transcoda:</strong> OMR-NED 63.97 % on 112 historical Polish scans, against SMT++ 80.16 % and Legato 86.73 %. On its
+synthetic benchmark it scores 18.46 %.</li>
+<li><strong>Sheet Music Benchmark (SMB, ISMIR 2025):</strong> an SMT baseline at region level reaches OMR-NED 57.4 % on pianoform
+and 94.1 % on monophony. The scanned KernScores pages are hard.</li>
+<li><strong>Camera-PrIMuS</strong> (monophonic incipits): the 2026 CRNN-CTC reports symbol error 0.45 % and sequence error
+7.52 %. Monophonic incipits are close to solved.</li>
+</ul>
+<h3>3.3 What to take from each system</h3>
+<ul>
+<li><strong>Audiveris:</strong> the lyric model.<ul>
+<li>A lyric line is a <em>sentence</em> with role <code>Lyrics</code>, made of syllables, each linked to a chord above or below.</li>
+<li>The handbook warns that it is &quot;not always clear which voice is concerned (if there is more than one voice per
+staff)&quot;.</li>
+<li>Lyrics are assumed below the staff, with an option for above.</li>
+<li>Since 5.10, verse numbers (&quot;1.&quot;, &quot;2.&quot;) are detected and filtered, and isolated punctuation is merged into the
+previous syllable.</li>
+<li>Single-character syllables (vowels) are hard for Tesseract.</li>
+</ul>
+</li>
+<li><strong>oemer:</strong> the rule set for staff peaks, <code>unit_size</code>, chord grouping by stem direction, beam/flag counting in a
+region near each note group, and dot finding by subtraction. Watch out: its <code>unet_big</code> ONNX has <strong>negative
+ConvTranspose pads that newer onnxruntime versions reject</strong>, and the omr-mcp package rewrites them.</li>
+<li><strong>homr:</strong><ul>
+<li>Its benchmark design (Benchmark.md) tokenises kern and MusicXML into one vocabulary and reports NED for each
+field (rhythm, pitch, lift, articulation, slur), with alignments stored in SQLite. That is a good template for
+our harness.</li>
+<li>Its changelog lists practical fixes: grand-staff pairing errors, staves joined across a book gutter, staves
+that hold only rests, and unnumbered triplets.</li>
+</ul>
+</li>
+<li><strong>copisteria:</strong><ul>
+<li>A geometry-only front end, with <strong>all musical decisions left to a model</strong> that adds log-probability
+&quot;evidence&quot; to the detector&#39;s outputs.</li>
+<li>Joint rhythm decoding for each voice.</li>
+<li>Part planning on the fullest system (a braced pair is one part).</li>
+<li>We would <strong>override</strong> that last rule: a braced pair <em>with lyrics between and two-voice stems</em> becomes <strong>four
+parts</strong>.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2>4. Datasets</h2>
+<table>
+<thead>
+<tr>
+<th>Dataset</th>
+<th>Content</th>
+<th>Size</th>
+<th>Licence</th>
+<th>Use for us</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>DeepScoresV2</strong> (Tuggener et al., ICPR 2020)</td>
+<td>Rendered pages with boxes (oriented and orthogonal) and segmentation</td>
+<td>255,385 images, 151M instances, 135 classes; dense subset 1,714</td>
+<td>CC BY 4.0 (Zenodo 4012193)</td>
+<td>Symbol detector / classifier training</td>
+</tr>
+<tr>
+<td><strong>MUSCIMA++ v2</strong></td>
+<td>Handwritten pages, MuNG graph</td>
+<td>140 pages, ~91k symbols (v0.9)</td>
+<td><strong>CC BY-NC-SA 4.0</strong></td>
+<td>Avoid for shipped weights</td>
+</tr>
+<tr>
+<td><strong>PrIMuS / Camera-PrIMuS</strong> (Calvo-Zaragoza &amp; Rizo 2018)</td>
+<td>Monophonic RISM incipits (Verovio renders, plus camera distortions)</td>
+<td>87,678</td>
+<td>Not stated at source; HF mirror CC BY-NC</td>
+<td>Avoid for shipped weights</td>
+</tr>
+<tr>
+<td><strong>GrandStaff</strong> (Ríos-Vila et al., IJDAR 2023)</td>
+<td>Single-system piano renders, <code>**kern</code></td>
+<td>53,882</td>
+<td>MIT (HF copy)</td>
+<td>Piano only</td>
+</tr>
+<tr>
+<td><strong>FP-GrandStaff</strong></td>
+<td>Full-page piano</td>
+<td>688 pages</td>
+<td>(SMT++ repo, MIT)</td>
+<td>Piano only</td>
+</tr>
+<tr>
+<td><strong>OLiMPiC</strong> (Mayer et al. 2024)</td>
+<td>Lieder systems (voice + piano), synthetic train; <strong>IMSLP scans</strong> for dev/test</td>
+<td>17,945 systems; dev 1,438 / test 1,493 scanned</td>
+<td>CC BY-SA</td>
+<td>Real-scan evaluation including vocal staves</td>
+</tr>
+<tr>
+<td><strong>OpenScore Lieder</strong></td>
+<td>MusicXML of 19th-c. songs</td>
+<td>~1,356 scores</td>
+<td><strong>CC0</strong></td>
+<td>Ground-truth MusicXML for synthetic rendering</td>
+</tr>
+<tr>
+<td><strong>PDMX</strong></td>
+<td>MuseScore public-domain scores → MusicXML</td>
+<td>~250k</td>
+<td>CC BY 4.0 (<code>no_license_conflict</code> subset)</td>
+<td>copisteria and homr training data; synthetic pages</td>
+</tr>
+<tr>
+<td><strong>Sheet Music Benchmark (SMB)</strong></td>
+<td>KernScores scans, region + page, <code>**kern</code></td>
+<td>685 pages, 4,039 regions</td>
+<td>Gated HF (<code>PRAIG/SMB</code>)</td>
+<td>External evaluation</td>
+</tr>
+<tr>
+<td><strong>polish-scores</strong> (<code>btrkeks/polish-scores</code>)</td>
+<td>Historical Polish scans, kern + MusicXML</td>
+<td>112 pages</td>
+<td>eval-only</td>
+<td>External evaluation</td>
+</tr>
+<tr>
+<td><strong>MusiCorpus</strong> (arXiv 2605.18436, 2026)</td>
+<td>Hand-annotated historical/handwritten pages, MusicXML at page and system level</td>
+<td>1,309 pages</td>
+<td>CC BY-NC-SA (arXiv)</td>
+<td>Manuscripts; not our target</td>
+</tr>
+<tr>
+<td><strong>AMNLT</strong> (Martinez-Sevilla et al., ICDAR 2023; arXiv 2412.04217)</td>
+<td><strong>Aligned music + lyrics</strong> (Gregorian chant)</td>
+<td>4 datasets</td>
+<td>academic</td>
+<td>Only lyric+music aligned benchmark family</td>
+</tr>
+<tr>
+<td><strong>Smashcima</strong> (OMR-Research)</td>
+<td>Synthetic handwritten music generator</td>
+<td>tool</td>
+<td>Apache-2.0</td>
+<td>Not needed (we target print)</td>
+</tr>
+</tbody></table>
+<p><strong>No public dataset covers closed-score SATB hymns with lyrics.</strong> We should <strong>synthesise one</strong>:</p>
+<ol>
+<li>Take public-domain hymns and chorales, from OpenScore (CC0), PDMX&#39;s PD subset, or our own LilyPond
+transcriptions of PD hymn tunes.</li>
+<li>Render them with LilyPond 2.24. LilyPond is GPL as a tool, but its output is not encumbered. Engrave in closed
+and open score with 1–4 verses.</li>
+<li>Degrade the renders: rotate ±2°, add page curl, Gaussian blur, salt-and-pepper noise, JPEG compression, and
+threshold artefacts at 150–300 dpi.</li>
+<li>Add a few real PD hymnal scans (IMSLP / Internet Archive) that we transcribe ourselves.</li>
+</ol>
+<hr>
+<h2>5. Detecting multiple voices on one staff and splitting them into parts</h2>
+<h3>5.1 What the literature and tools offer</h3>
+<ul>
+<li><strong>OMR systems keep voices inside a staff.</strong> Audiveris assigns voices per staff, oemer groups by stem direction
+(&quot;opposing stem directions can indicate separate melodic lines&quot;), and homr added &quot;multiple voices per staff&quot;.
+copisteria predicts a <code>voice_slot</code> (1–8) for each head plus <code>stem_dir ∈ {up, down, both}</code>, and then makes
+<strong>parts = staves or braced pairs</strong>. <strong>None of them promotes voices to separate <code>&lt;part&gt;</code>s.</strong></li>
+<li><strong>Symbolic voice separation:</strong><ul>
+<li>Foscarin, Karystinaios, Nakamura &amp; Widmer, &quot;Cluster and Separate: a GNN approach to voice and staff
+prediction for score engraving&quot; (ISMIR 2024). It treats voice assignment as edge prediction and handles chords
+and cross-staff voices. Code and models are MIT (<code>CPJKU/piano_svsep</code>), but it is piano-oriented.</li>
+<li>MV2H&#39;s voice dimension measures exactly this.</li>
+</ul>
+</li>
+<li><strong>Notation tools:</strong> splitting a closed SATB score is a manual &quot;voices → parts&quot; or &quot;explode&quot; step in MuseScore
+(MuseScore forum threads; MuseScore 3 &quot;Explode&quot;, MuseScore 4 part-voice visibility). music21 can do the same
+offline for testing.</li>
+</ul>
+<h3>5.2 Recommended rule-based voice/part logic (hymn-specific, deterministic)</h3>
+<p>For each staff and measure, after rhythm decoding:</p>
+<ol>
+<li><strong>Stem-direction voices.</strong> Up stems → voice 1 (upper), down stems → voice 2 (lower).<ul>
+<li>A head with both stems, or with <code>both</code>, is a <strong>unison</strong> shared by both voices: copy it into both.</li>
+<li><strong>Stemless whole notes:</strong> two heads at one onset go upper → v1, lower → v2. A single whole note is shared.
+Heads a second apart are offset horizontally.</li>
+<li><strong>Shared-stem chords:</strong> older hymnals often print S and A on one stem when the rhythms match. Split a 2-note
+chord by pitch (top → v1, bottom → v2). A 3+-note chord means divisi or piano; flag it.</li>
+<li><strong>Rests:</strong> vertical position (above the middle line → v1, below → v2). One centred rest is shared by both.</li>
+</ul>
+</li>
+<li><strong>Rhythmic independence check.</strong> Each voice must sum to the measure length on its own (§2.10). If the split
+voices don&#39;t balance and the unsplit chordal reading does, treat the staff as chordal (single voice).</li>
+<li><strong>Staff classification: &quot;closed-score vocal&quot; vs &quot;keyboard&quot;.</strong> Score each braced pair; split only if the score
+is high:<ul>
+<li><strong>+</strong> Lyrics text rows between the two staves, or under both.</li>
+<li><strong>+</strong> In ≥ 60–70 % of onsets, every staff has ≤ 2 heads per onset, with opposite stems when there are 2.</li>
+<li><strong>+</strong> Part labels found by OCR: <code>S</code>, <code>A</code>, <code>T</code>, <code>B</code>, <code>Soprano</code>, <code>Alto</code>, <code>Tenor</code>, <code>Bass</code>, <code>S.A.</code>, <code>T.B.</code>, <code>Choir</code>,
+<code>SATB</code>.</li>
+<li><strong>+</strong> Ranges: v1 above v2 on each staff. Treble-staff voices fit S (C4–A5) and A (G3–D5); bass-staff voices fit
+T (C3–G4) and B (E2–D4).</li>
+<li><strong>−</strong> Chords of 3+ heads, cross-staff beams, arpeggios, pedal marks, or <code>Piano</code>/<code>Organ</code>/<code>Pno.</code> labels.</li>
+<li><strong>−</strong> A second staff carrying a different, independent rhythm with no lyrics (accompaniment).</li>
+<li>A choir + piano system (vocal staves + braced piano pair) gets these rules on the vocal staves only. The piano
+braced pair stays one part with 2 staves.</li>
+</ul>
+</li>
+<li><strong>Emit parts.</strong><ul>
+<li>Closed SATB → P1 Soprano (treble clef), P2 Alto (treble), P3 Tenor (bass clef as printed, or optionally
+treble-8vb), P4 Bass (bass).</li>
+<li>A two-voice single staff → two parts (e.g., &quot;Soprano I/II&quot; for divisi).</li>
+<li>Record provenance for the UI: <code>splitFrom: {system staff index, stem: &#39;up&#39;|&#39;down&#39;}</code>.</li>
+<li>When splitting is ambiguous (low score), keep <strong>one part with <code>&lt;voice&gt;1/2</code> + <code>&lt;backup&gt;</code></strong> and warn.</li>
+</ul>
+</li>
+<li><strong>Consistency across systems.</strong> Decide the part layout once per page or movement, on the fullest system (as
+copisteria does). Then map every system&#39;s staves onto it, so a system where the alto drops out still yields 4
+parts. The missing voice gets rests.</li>
+</ol>
+<hr>
+<h2>6. Lyrics OCR under and between staves</h2>
+<h3>6.1 State of the art</h3>
+<ul>
+<li>The research community rarely addresses lyrics.<ul>
+<li><strong>AMNLT</strong> (Martinez-Sevilla, Ríos-Vila, Castellanos &amp; Calvo-Zaragoza, ICDAR 2023; Fuentes-Martínez et al.,
+arXiv 2412.04217) transcribes music and text in one pass with an implicitly aligned encoding, but only for
+chant.</li>
+<li><strong>OMMR4all / Hartelt, Eipert &amp; Puppe</strong> (<em>Applied Sciences</em> 14(16):7355, 2024) handle text recognition,
+<strong>syllabification by grammar rules + dictionary</strong>, and syllable-to-neume assignment. They report syllable
+alignment needing <strong>≈2.3 % interventions</strong>, for about <strong>9×</strong> efficiency over manual transcription.</li>
+<li>LEGATO 2 claims embedded text output but is unreleased.</li>
+<li>The SMB OMR-NED symbol categories <em>include</em> <code>lyric</code>, so lyrics count toward the error when present.</li>
+</ul>
+</li>
+<li><strong>Practical engines:</strong><ul>
+<li><strong>Audiveris</strong> uses Tesseract with lyric-specific word-gap handling (a separate <code>lyric</code> OCR button, &quot;because
+lyric word gaps can be much wider&quot;).</li>
+<li><strong>copisteria</strong> leaves text to external OCR boxes and says a vision-language OCR such as PaddleOCR-VL beats
+Tesseract on small print.</li>
+<li><strong>homr</strong> uses RapidOCR for titles.</li>
+</ul>
+</li>
+</ul>
+<h3>6.2 Engines usable in the artifact</h3>
+<table>
+<thead>
+<tr>
+<th>Engine</th>
+<th>Licence</th>
+<th>Files (self-hosted)</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>tesseract.js 7.0.0</strong> (Dec 2025; on cdnjs)</td>
+<td>Apache-2.0</td>
+<td><code>worker.min.js</code> 0.11 MB; core <code>tesseract-core-{relaxedsimd-,simd-,}lstm.wasm.js</code> ≈ 3.9 MB each (the <code>.wasm</code> alone is 2.86 MB); <code>tessdata_fast</code> eng <strong>4.11 MB</strong>, lat 3.19, deu 1.53, fra 1.13, ita 2.70</td>
+<td>v7 is 15–35 % faster than v6 (relaxed-SIMD build). Since <strong>v6 only <code>text</code> output is on by default</strong>, so request <code>{blocks:true}</code> to get word/line boxes. <code>corePath</code> must be a <em>directory</em> holding the variants. <code>langPath</code> + <code>gzip:false</code> serves raw <code>.traineddata</code>. Set <code>workerBlobURL:false</code> to load <code>workerPath</code> from our own origin. <code>tessdata_best</code> eng 15.4 MB is over the cap</td>
+</tr>
+<tr>
+<td><strong>PP-OCRv5 mobile via onnxruntime-web</strong></td>
+<td>Apache-2.0</td>
+<td>det 4.8 MB, Latin rec 8.0 MB (fp32 ONNX, <code>nakamura196/ppocrv5-mobile-web-onnx</code>)</td>
+<td>More robust on degraded scans. Needs DB post-processing + CTC decode in JS, and shares the ORT runtime. Use it as an upgrade path</td>
+</tr>
+</tbody></table>
+<h3>6.3 Recommended lyric pipeline</h3>
+<ol>
+<li><strong>Find lyric bands.</strong> After staff detection and music-symbol masking, look in each inter-staff gap and below the
+last staff. Find text rows by horizontal projection of the leftover small CCs: x-height ≈ 0.6–1.2 s, with a
+common baseline. Several stacked rows in one gap are <strong>verses 1..n</strong>, numbered top-down.<ul>
+<li>A leading <code>1.</code>, <code>2.</code> etc. at the row start gives the verse number. Strip it, as Audiveris does since 5.10.</li>
+<li>Text far below the last system (verses 4–6 printed as stanzas) is <strong>not underlay</strong>. Report it as unattached
+extra text and a warning.</li>
+</ul>
+</li>
+<li><strong>OCR each row.</strong> Crop with a margin of ~0.3 s, upscale so the x-height is ≥ 20 px, and binarise. Run
+tesseract.js with <code>tessedit_pageseg_mode = 7</code> (single line) and request <code>blocks</code> for word boxes and confidence.
+Restrict the character set to letters, punctuation, hyphen, apostrophe and digits.</li>
+<li><strong>Tokenise into syllables using the print.</strong><ul>
+<li>Engravers separate syllables with <strong>centred hyphens</strong> (&quot;glo - ry&quot;), which OCR returns as <code>-</code> tokens or as
+<code>glo-ry</code>. Words are separated by wider gaps.</li>
+<li><strong>Extenders</strong> are thin horizontal lines at baseline height after a word&#39;s last syllable. They often vanish in
+OCR, so detect them <strong>geometrically</strong> in the band: a long thin horizontal CC with height ≤ t·1.5 and length
+≥ 1 s.</li>
+<li>If OCR merged a hyphenated word, split it at the hyphen. Use Liang/TeX hyphenation patterns only as a last
+resort, because the score already shows the splits.</li>
+</ul>
+</li>
+<li><strong>Assign <code>syllabic</code></strong> from position in the word: no hyphens → <code>single</code>; first → <code>begin</code>; inner → <code>middle</code>;
+last → <code>end</code>. MusicXML 4.0 <code>&lt;lyric number=&quot;v&quot;&gt;</code> per verse holds <code>&lt;syllabic&gt;</code>, <code>&lt;text&gt;</code>, optional <code>&lt;elision&gt;</code>,
+and <code>&lt;extend type=&quot;start|stop|continue&quot;/&gt;</code>.</li>
+<li><strong>Align syllables to notes.</strong> Run a monotonic DP (DTW-like) over the note onsets of the target voice in that
+system.<ul>
+<li>Cost = |syllable centre − notehead centre| in staff spaces. Allow skipping a note (melisma); a syllable may
+not be skipped without a penalty.</li>
+<li>Lyrics are usually centred under the head. The first syllable of a word may be left-aligned.</li>
+<li><strong>Melisma cues:</strong> a slur or tie across notes, an extender after the syllable, or beamed notes with one
+syllable. Notes inside a melisma get no <code>&lt;text&gt;</code>. The syllable that starts the melisma gets
+<code>&lt;extend type=&quot;start&quot;/&gt;</code> and its last note <code>&lt;extend type=&quot;stop&quot;/&gt;</code> (MusicXML allows a standalone <code>&lt;extend&gt;</code>).</li>
+</ul>
+</li>
+<li><strong>Which voices get which lyric rows.</strong><ul>
+<li><strong>Closed SATB hymn</strong> (rows between the staves): attach to <strong>all four voices</strong>, aligning separately for each
+voice so rhythmic differences (e.g., an alto passing tone) become melismas or skips.</li>
+<li><strong>Open score</strong>: rows below a staff belong to that staff&#39;s part(s).</li>
+<li><strong>Rows above a staff</strong>: attach to the staff below, or above, by proximity. Audiveris treats &quot;lyrics above
+staff&quot; as a separate option.</li>
+<li>Report per-part, per-verse coverage (syllables attached / syllables OCR&#39;d) as a confidence signal.</li>
+</ul>
+</li>
+<li><strong>Hymn specifics:</strong> &quot;A-men&quot; codas; elisions (<code>‿</code> ligature between two syllables on one note → <code>&lt;elision&gt;</code>);
+apostrophes (&quot;pray&#39;r&quot;); italic refrains; small-caps or all-caps first words of a verse.</li>
+</ol>
+<hr>
+<h2>7. In-browser execution</h2>
+<h3>7.1 onnxruntime-web (MIT)</h3>
+<ul>
+<li><p><strong>Versions:</strong> npm latest is <strong>1.31.1</strong> (2026-11-05). cdnjs carries <strong>1.30.0</strong>.</p>
+</li>
+<li><p><strong>Loading under the artifact CSP:</strong></p>
+<ul>
+<li>Load the JS from cdnjs with a <code>&lt;script&gt;</code> tag, e.g. <code>ort.wasm.min.js</code> (0.05 MB) or <code>ort.min.js</code> (0.37 MB).
+Self-host the wasm from <strong>the exact same version</strong> under <code>assets/</code>, and set <code>ort.env.wasm.wasmPaths = &#39;assets/&#39;</code>. The docs warn that mixing versions makes initialisation fail.</li>
+<li>Alternatively, ship a compressed <code>.wasm.gz</code> and decompress it with <code>DecompressionStream(&#39;gzip&#39;)</code>. Pass the bytes
+in via <strong><code>ort.env.wasm.wasmBinary</code></strong> (typed in onnxruntime-common: &quot;a custom buffer which contains the
+WebAssembly binary&quot;).</li>
+</ul>
+</li>
+<li><p><strong>Binary sizes per version (simd-threaded wasm / JSEP-WebGPU wasm):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>simd-threaded wasm</th>
+<th>JSEP (WebGPU) wasm</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1.17.3</td>
+<td>10.65 MB</td>
+<td>19.5 MB</td>
+</tr>
+<tr>
+<td>1.20.1</td>
+<td>11.25 MB</td>
+<td>21.7 MB</td>
+</tr>
+<tr>
+<td>1.22.0</td>
+<td>11.21 MB</td>
+<td>21.9 MB</td>
+</tr>
+<tr>
+<td>1.24.1</td>
+<td>12.3 MB</td>
+<td>24.9 MB</td>
+</tr>
+<tr>
+<td><strong>1.30.0</strong></td>
+<td><strong>14.24 MB</strong></td>
+<td><strong>28.3 MB</strong></td>
+</tr>
+<tr>
+<td>1.31.1</td>
+<td>14.85 MB</td>
+<td>29.5 MB</td>
+</tr>
+</tbody></table>
+<p>Measured on 1.22.0: gzip −9 gives <strong>2.87 MB</strong>, brotli −q11 <strong>1.80 MB</strong>.</p>
+</li>
+<li><p><strong>Execution provider:</strong></p>
+<ul>
+<li>Every JSEP/WebGPU binary is &gt; 15 MB, so WebGPU would need chunked or compressed shipping, plus a capable GPU.
+Default to <strong><code>executionProviders: [&#39;wasm&#39;]</code></strong>.</li>
+<li>WebGPU on ORT-web gave large speed-ups (SAM encoder 19×, decoder 3.8× vs WASM; Microsoft, Feb 2024), but
+frequent CPU↔GPU transfers can slow it down.</li>
+</ul>
+</li>
+<li><p><strong>Threads:</strong> multithreading needs WebAssembly threads <strong>and <code>crossOriginIsolated</code></strong>. An artifact iframe almost
+certainly isn&#39;t cross-origin isolated, so plan for <strong><code>numThreads = 1</code></strong>. Parallelism comes from running pages or
+stages in our own Web Workers instead.</p>
+</li>
+<li><p><strong>Proxy worker:</strong> <code>env.wasm.proxy = true</code> creates the worker from a Blob and is documented as not working under
+CSP. Run our <strong>own</strong> worker file (<code>assets/omr-worker.js</code>) that imports ORT and the core.</p>
+</li>
+<li><p><strong>Model size cap:</strong> a model file must be ≤ 15 MB, or split into chunks (<code>model.onnx.part0..n</code>) concatenated into
+one <code>Uint8Array</code> before <code>InferenceSession.create(bytes)</code>. Total assets must stay ≤ 64 MB.</p>
+</li>
+<li><p><strong>Quantisation:</strong></p>
+<ul>
+<li>fp16 halves size. Dynamic int8 (<code>onnxruntime.quantization.quantize_dynamic</code>) gives ~¼ size for
+MatMul/Gemm-heavy transformers. Static QDQ int8 is best for CNNs; calibrate on our synthetic hymn pages.</li>
+<li>int8 on the WASM EP is fast with SIMD. Accuracy drift is model-specific: measure TEDn/NED before and after.</li>
+<li><code>freeDimensionOverrides</code> with fixed input sizes helps performance.</li>
+</ul>
+</li>
+<li><p><strong>Node parity:</strong> <code>onnxruntime-node@1.31.1</code> (MIT) runs the same <code>.onnx</code> in the harness.</p>
+</li>
+</ul>
+<h3>7.2 Classical image processing: opencv.js vs plain JS</h3>
+<ul>
+<li><strong>opencv.js</strong> (Apache-2.0 for OpenCV ≥ 4.5) has no package on cdnjs. <code>@techstark/opencv-js</code> 4.10 ships a single
+<strong>10.4 MB</strong> <code>opencv.js</code> with the wasm inlined as base64. That is heavy, and it brings its own memory management
+(<code>Mat.delete()</code>).</li>
+<li><strong>Recommendation: write the ~10 needed primitives in plain typed-array JS:</strong> integral image, Sauvola/Otsu,
+projection profiles, run-length encoding, union-find CC labelling, morphology with line structuring elements,
+distance transform, NCC template matching, and bilinear resampling. Each is O(N), runs in ~10–200 ms on an
+8 Mpx page in V8, works identically in node, and costs ~0 KB of assets.</li>
+</ul>
+<h3>7.3 PDF and rendering libraries</h3>
+<ul>
+<li><strong>pdf.js 3.11.174</strong> (Apache-2.0) is already in <code>package.json</code> as <code>pdfjs-dist ^3.11.174</code>, and is the version
+pinned for the artifact. Load <code>pdf.min.js</code> and <code>pdf.worker.min.js</code> from cdnjs as plain scripts; this makes pdf.js
+use a fake worker on the main thread. Render each page to <code>OffscreenCanvas</code>/canvas → <code>getImageData</code> → grayscale.</li>
+<li><strong>Notation preview:</strong> <strong>OpenSheetMusicDisplay 2.3.0</strong> (BSD-3-Clause; UMD on jsdelivr). Verovio 6.4.1 is
+<strong>LGPL-3.0</strong> and a 28 MB package, so avoid it.</li>
+</ul>
+<h3>7.4 Rough per-page budget (single-thread WASM, mid-range laptop; estimates to verify in the harness)</h3>
+<ul>
+<li>Pure-JS classical stages: ≈ 0.3–1.5 s per 300-dpi page.</li>
+<li>Tesseract, fast model: ≈ 0.1–0.3 s per lyric row. A hymn page with 4 systems × 3–4 verses is ≈ 2–5 s.</li>
+<li>Tiny classifier CNN on a few hundred crops: &lt; 0.5 s.</li>
+<li>A 2M-param detector at a 1536-px long side: ~1–3 s. copisteria quotes ~5 s per page on CPU in PyTorch, including
+the evidence model and start-up.</li>
+</ul>
+<hr>
+<h2>8. Evaluation metrics and harness</h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Definition</th>
+<th>Where</th>
+<th>Notes for us</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>SER / CER / LER</strong></td>
+<td>Edit distance ÷ reference length on symbols, characters, or lines of a sequence encoding</td>
+<td>PrIMuS, SMT, Zeus</td>
+<td>Depends on encoding (kern vs bekern vs LMX); not comparable across systems</td>
+</tr>
+<tr>
+<td><strong>TEDn</strong></td>
+<td>Zhang–Shasha tree edit distance on MusicXML with note-level costs, normalised by the gold tree; correlates with editor effort</td>
+<td>Hajič jr. et al., ISMIR 2016 (human preference corpus of 1,230 judgments); Mayer et al. 2024; LEGATO</td>
+<td>O(m²n²); LEGATO truncates trees to &lt; 6,000 nodes</td>
+</tr>
+<tr>
+<td><strong>OMR-NED</strong></td>
+<td>(I + D) / (N_pred + N_ref) over <strong>visual</strong> symbols. A substitution counts as delete + insert. Broken down by category (heads, pitch, accidentals, beams, dots, … <strong>lyric</strong>)</td>
+<td>Martinez-Sevilla et al., &quot;Sheet Music Benchmark&quot;, ISMIR 2025, built on <strong>musicdiff</strong> (MIT, v6.0)</td>
+<td>The de-facto cross-system metric in 2025–26: LEGATO, Transcoda, copisteria (<code>efficient-musicdiff</code>), homr (own token version)</td>
+</tr>
+<tr>
+<td><strong>MV2H</strong></td>
+<td>Joint multi-pitch / <strong>voice separation</strong> / meter / note value / harmony, with disjoint penalties; non-aligned variant via DTW</td>
+<td>McLeod &amp; Steedman, ISMIR 2018; <code>apmcleod/MV2H</code> (Java reference, MIT); pyMV2H</td>
+<td>The voice score directly measures SATB splitting quality</td>
+</tr>
+</tbody></table>
+<p><strong>Project harness (node) recommendation</strong></p>
+<ol>
+<li><strong>Ground truth</strong> is MusicXML from our synthetic hymn set (§4) plus a handful of real scans.</li>
+<li><strong>Our own JS metrics</strong> (fast, no Python):<ul>
+<li><strong>Note F1 per part:</strong> match on (onset, pitch, duration) after part alignment.</li>
+<li><strong>Part-assignment accuracy:</strong> the fraction of GT notes landing in the right S/A/T/B part. This is the key
+metric for requirement 2.</li>
+<li><strong>Lyrics:</strong> syllable CER, <code>syllabic</code> accuracy, <strong>syllable→note attachment accuracy</strong> per verse, and verse-count
+correctness.</li>
+<li><strong>Measure validity:</strong> the share of measures whose voices sum to the time signature.</li>
+<li><strong>Token NED</strong> per staff, in homr style.</li>
+</ul>
+</li>
+<li><strong>Optional reference scores</strong> run offline with the Python and Java tools on the machine: musicdiff OMR-NED (MIT)
+and MV2H (MIT). Audiveris (AGPL, run as a separate process, never shipped) can serve as a lyric-capable baseline.</li>
+</ol>
+<hr>
+<h2>9. Recommended pure-browser architecture</h2>
+<h3>9.1 Principles</h3>
+<ul>
+<li><strong>Deterministic classical core first.</strong> It is fast, tiny, and licence-clean, and it is debuggable through the
+overlay. Printed hymnals are the easy end of OMR, and a classical pipeline tuned to them plus strong musical
+constraints (homorhythm, time slots, measure sums) should beat generic ML that was never trained on SATB with
+lyrics.</li>
+<li><strong>ML only where it pays,</strong> behind interfaces that the classical code also implements: a symbol classifier, an
+optional detector, and an optional OCR upgrade.</li>
+<li><strong>One codebase for browser and node:</strong> ES modules with no DOM access in the core. The browser shell handles
+PDF/canvas/UI. Node handles pdftoppm/pdfimages + pngjs. ML backends are injected: <code>onnxruntime-web</code> or
+<code>onnxruntime-node</code>, and <code>tesseract.js</code> in both.</li>
+</ul>
+<h3>9.2 Pipeline (core, environment-agnostic)</h3>
+<pre><code>Page {w,h,data:Uint8ClampedArray gray}
+ └─ preprocess: shading-normalise → Sauvola(int. images) [+Otsu check] → deskew (projection variance)
+ └─ staffMetrics: run-length (t, s, t+s)
+ └─ staves: per-strip projection peaks → 5-line groups → line tracking (polylines) → systems (brace/bracket/barline continuity)
+ └─ scale-normalise to s≈20px (coordinates mapped back for overlay)
+ └─ staffRemoval: run-length ≤ ~1.75t on tracked lines (keep original for matching)
+ └─ components: union-find CC + hole CCs; text-row detection → lyric bands (masked from music)
+ └─ symbols:
+     heads (NCC templates from Bravura/Leland + optional tiny CNN), stems, beams (count), flags, dots,
+     accidentals, clefs, key/time sigs (digits), rests, barlines (staff-/system-height), ties/slurs, fermatas
+ └─ assembly: head↔stem↔beam graph, accidental/dot attachment, chords
+ └─ rhythm: per voice/measure hypothesis search + time-slot alignment across voices; pickup/final; repair + flags
+ └─ voices: stem-direction split, unisons, shared-stem chords, rests
+ └─ parts: staff classifier (closed-score vocal vs keyboard vs single voice) → part plan per page/movement
+ └─ lyrics: band→rows→tesseract(blocks)→syllables(hyphen/extender geometry)→verse numbers→DP alignment per voice
+ └─ musicxml: score-partwise 4.0 writer (parts, staves, voices/backup, lyrics with syllabic/extend, implicit pickup)
+ └─ report: per-stage timings, per-part summary (split provenance), per-measure confidence, warnings, overlay geometry
+</code></pre>
+<h3>9.3 Browser shell and assets (all relative, ≤ 15 MB per file)</h3>
+<table>
+<thead>
+<tr>
+<th>Asset</th>
+<th>Size</th>
+<th>Licence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>assets/omr-worker.js</code> (core bundle, module worker or classic)</td>
+<td>&lt; 0.5 MB</td>
+<td>ours</td>
+</tr>
+<tr>
+<td>tesseract.js <code>worker.min.js</code></td>
+<td>0.11 MB</td>
+<td>Apache-2.0</td>
+</tr>
+<tr>
+<td>tesseract core <code>tesseract-core-simd-lstm.wasm.js</code> + <code>tesseract-core-lstm.wasm.js</code> (+ relaxedsimd optional)</td>
+<td>2 × 3.9 MB (+3.9)</td>
+<td>Apache-2.0</td>
+</tr>
+<tr>
+<td><code>eng.traineddata</code> (tessdata_fast) (+ <code>lat</code> 3.19, <code>deu</code> 1.53 optional)</td>
+<td>4.11 MB</td>
+<td>Apache-2.0</td>
+</tr>
+<tr>
+<td>sample scanned SATB hymn PDF (PD)</td>
+<td>0.3–2 MB</td>
+<td>PD</td>
+</tr>
+<tr>
+<td><em>(phase 2)</em> ORT <code>ort-wasm-simd-threaded.wasm</code> 1.30.0 (or <code>.gz</code> + <code>wasmBinary</code>)</td>
+<td>14.24 MB (≈3.5 MB gz)</td>
+<td>MIT</td>
+</tr>
+<tr>
+<td><em>(phase 2)</em> tiny symbol CNN (int8) / copista-2m detector (fp16 ONNX ≈ 4 MB)</td>
+<td>0.1–8 MB</td>
+<td>ours / Apache-2.0 (+NOTICE)</td>
+</tr>
+<tr>
+<td>CDN <code>&lt;script&gt;</code>s: pdf.js 3.11.174 + worker (cdnjs), tesseract.js 7.0.0 (cdnjs), OSMD 2.3.0 (jsdelivr), ORT 1.30.0 JS (cdnjs, phase 2)</td>
+<td>n/a</td>
+<td>Apache/BSD/MIT</td>
+</tr>
+</tbody></table>
+<p>Phase 1 total ≈ 13–20 MB; phase 2 ≈ 30–40 MB. Both are well under 64 MB.</p>
+<h3>9.4 Phased plan</h3>
+<ol>
+<li><strong>Phase 1 (ship):</strong><ul>
+<li>Classical core, tesseract lyrics, SATB splitting rules, MusicXML writer, and the harness on synthetic hymn
+scans.</li>
+<li>Targets on clean synthetic closed-score hymns: note F1 ≥ 95 %, part assignment ≥ 97 %, lyric attachment
+≥ 90 %.</li>
+</ul>
+</li>
+<li><strong>Phase 2 (ML assist):</strong><ul>
+<li><strong>(a) Tiny CNN</strong> for head/rest/accidental/clef crops, trained on LilyPond/Verovio-rendered synthetic crops +
+DeepScoresV2 (CC BY 4.0), exported to int8 ONNX.</li>
+<li><strong>(b) Spike: copista-2m</strong> (Apache-2.0):<ol>
+<li>Export the 1.94M detector to ONNX in Python on this machine.</li>
+<li>Confirm that the detector source has no Ultralytics/AGPL code; <code>export.py</code> mentions ultralytics-format
+datasets and &quot;custom loops&quot;.</li>
+<li>Use its <code>stem_dir</code>/<code>voice_slot</code>/<code>staff_position</code> attributes as an additional vote in our assembly.</li>
+<li>Port its Viterbi rhythm idea, not its Python code.</li>
+<li>Keep its NOTICE file (Apache-2.0 §4(d)).</li>
+</ol>
+</li>
+<li><strong>(c) Optional</strong> PP-OCRv5 Latin recogniser for lyrics on degraded scans.</li>
+</ul>
+</li>
+<li><strong>Not recommended:</strong><ul>
+<li>End-to-end image→sequence models (SMT/SMT++, Zeus, LEGATO, TrOMR, homr transformer) in the browser. Their
+weights are 40–430 MB plus a gated Llama encoder for LEGATO. Autoregressive decoding is slow on single-thread
+WASM. They are trained on piano/quartet/Lieder with no SATB part semantics, and they drop lyrics.</li>
+<li>homr and Audiveris for licence reasons (AGPL).</li>
+</ul>
+</li>
+</ol>
+<h3>9.5 Key risks and mitigations</h3>
+<ul>
+<li><strong>Shared-stem S/A chords and unisons:</strong> explicit handling (§5.2), plus a confidence flag when chord size &gt; 2.</li>
+<li><strong>Lyric rows touching low notes or ledger lines:</strong> run text-row detection <em>after</em> masking assembled music
+symbols, and use x-height and baseline consistency checks.</li>
+<li><strong>Hymnals printing verses 3+ as stanzas below the music:</strong> detect them and report them as unattached text, with
+no hallucinated underlay.</li>
+<li><strong>Low-dpi scans (s &lt; 10 px):</strong> upscale 2× before recognition. Audiveris refuses small staff spacing, and
+copisteria&#39;s figures note that pages had to be upscaled for it.</li>
+<li><strong>Warped phone scans:</strong> per-strip line tracking plus stable-paths fallback, and coordinate mapping instead of
+image warping.</li>
+<li><strong>Licence hygiene:</strong> keep a <code>THIRD_PARTY.md</code> listing pdf.js (Apache-2.0), tesseract.js + core + tessdata_fast
+(Apache-2.0), OSMD (BSD-3), ORT (MIT), Bravura/Leland templates (OFL-1.1), and copista (Apache-2.0 + NOTICE) if
+used. Ship nothing AGPL, GPL or NC.</li>
+</ul>
+<hr>
+<h2>10. References (URLs)</h2>
+<p><strong>Systems / code / weights</strong></p>
+<ul>
+<li>Audiveris (AGPL-3.0), releases 5.10–5.11: <a href="https://github.com/Audiveris/audiveris">https://github.com/Audiveris/audiveris</a> · handbook text/lyrics: <a href="https://audiveris.github.io/audiveris/_pages/guides/ui/ui_tools/text">https://audiveris.github.io/audiveris/_pages/guides/ui/ui_tools/text</a> · updates: <a href="https://audiveris.github.io/audiveris/_pages/updates">https://audiveris.github.io/audiveris/_pages/updates</a></li>
+<li>oemer (MIT): <a href="https://github.com/BreezeWhite/oemer">https://github.com/BreezeWhite/oemer</a> · ONNX checkpoints: <a href="https://github.com/BreezeWhite/oemer/releases/tag/checkpoints">https://github.com/BreezeWhite/oemer/releases/tag/checkpoints</a> · omr-mcp note on ConvTranspose pads: <a href="https://pypi.org/project/omr-mcp/0.2.0/">https://pypi.org/project/omr-mcp/0.2.0/</a></li>
+<li>homr (AGPL-3.0): <a href="https://github.com/liebharc/homr">https://github.com/liebharc/homr</a> · Benchmark.md, LICENSE_FAQ.md, Changelog.md in repo · ONNX: <a href="https://github.com/liebharc/homr/releases/tag/onnx_checkpoints">https://github.com/liebharc/homr/releases/tag/onnx_checkpoints</a></li>
+<li>copisteria (Apache-2.0): <a href="https://github.com/kobimusic/copisteria">https://github.com/kobimusic/copisteria</a> · weights: <a href="https://huggingface.co/kobimusic/copista-2m">https://huggingface.co/kobimusic/copista-2m</a> , <a href="https://huggingface.co/kobimusic/copista-28m">https://huggingface.co/kobimusic/copista-28m</a></li>
+<li>Polyphonic-TrOMR (Apache-2.0): <a href="https://github.com/NetEase/Polyphonic-TrOMR">https://github.com/NetEase/Polyphonic-TrOMR</a> · paper <a href="https://arxiv.org/abs/2308.09370">https://arxiv.org/abs/2308.09370</a></li>
+<li>SMT: <a href="https://arxiv.org/abs/2402.07596">https://arxiv.org/abs/2402.07596</a> · <a href="https://github.com/antoniorv6/SMT">https://github.com/antoniorv6/SMT</a> · SMT++: <a href="https://arxiv.org/abs/2405.12105">https://arxiv.org/abs/2405.12105</a> · <a href="https://github.com/antoniorv6/SMT-plusplus">https://github.com/antoniorv6/SMT-plusplus</a> · IJCV: <a href="https://link.springer.com/article/10.1007/s11263-025-02654-6">https://link.springer.com/article/10.1007/s11263-025-02654-6</a> · weights <a href="https://huggingface.co/PRAIG/smt-fp-grandstaff">https://huggingface.co/PRAIG/smt-fp-grandstaff</a> , <a href="https://huggingface.co/antoniorv6/smt-grandstaff">https://huggingface.co/antoniorv6/smt-grandstaff</a></li>
+<li>Zeus / OLiMPiC / LMX: <a href="https://arxiv.org/abs/2403.13763">https://arxiv.org/abs/2403.13763</a> · <a href="https://github.com/ufal/olimpic-icdar24">https://github.com/ufal/olimpic-icdar24</a> · data <a href="http://hdl.handle.net/11234/1-5419">http://hdl.handle.net/11234/1-5419</a></li>
+<li>LEGATO: <a href="https://arxiv.org/abs/2506.19065">https://arxiv.org/abs/2506.19065</a> · <a href="https://github.com/guang-yng/legato">https://github.com/guang-yng/legato</a> · <a href="https://huggingface.co/guangyangmusic/legato">https://huggingface.co/guangyangmusic/legato</a> · LEGATO 2: <a href="https://arxiv.org/abs/2607.05769">https://arxiv.org/abs/2607.05769</a></li>
+<li>Transcoda: <a href="https://arxiv.org/abs/2605.10835">https://arxiv.org/abs/2605.10835</a> · polish-scores: <a href="https://huggingface.co/datasets/btrkeks/polish-scores">https://huggingface.co/datasets/btrkeks/polish-scores</a></li>
+<li>CRNN-CTC (2026): <a href="https://arxiv.org/abs/2604.16446">https://arxiv.org/abs/2604.16446</a></li>
+<li>Real-world manuscripts + Smashcima (ICDAR 2026): <a href="https://arxiv.org/abs/2606.09479">https://arxiv.org/abs/2606.09479</a> · <a href="https://github.com/OMR-Research/Smashcima">https://github.com/OMR-Research/Smashcima</a></li>
+<li>Toward a More Complete OMR Solution (YOLOv8 + assembly, MUSCIMA++): <a href="https://arxiv.org/abs/2409.00316">https://arxiv.org/abs/2409.00316</a></li>
+<li>Cluster and Separate (GNN voice/staff, MIT): <a href="https://arxiv.org/abs/2407.21030">https://arxiv.org/abs/2407.21030</a> · <a href="https://github.com/CPJKU/piano_svsep">https://github.com/CPJKU/piano_svsep</a></li>
+<li>Detector licences overview (Ultralytics AGPL vs Apache alternatives): <a href="https://lightly.ai/blog/best-ultralytics-alternatives-in-2026">https://lightly.ai/blog/best-ultralytics-alternatives-in-2026</a> · <a href="https://blog.roboflow.com/rf-detr-vs-alternatives/">https://blog.roboflow.com/rf-detr-vs-alternatives/</a></li>
+</ul>
+<p><strong>Datasets</strong></p>
+<ul>
+<li>DeepScoresV2: <a href="https://zenodo.org/records/4012193">https://zenodo.org/records/4012193</a> · paper <a href="https://srv-clst-301-data66.zhaw.ch/bitstream/11475/20647/3/2020_Tuggener-etal_DeepScoresV2-dataset-and-benchmark_ICPR.pdf">https://srv-clst-301-data66.zhaw.ch/bitstream/11475/20647/3/2020_Tuggener-etal_DeepScoresV2-dataset-and-benchmark_ICPR.pdf</a></li>
+<li>MUSCIMA++: <a href="https://ufal.mff.cuni.cz/muscima">https://ufal.mff.cuni.cz/muscima</a> · <a href="https://arxiv.org/abs/1703.04824">https://arxiv.org/abs/1703.04824</a></li>
+<li>PrIMuS / Camera-PrIMuS: <a href="https://grfia.dlsi.ua.es/primus/">https://grfia.dlsi.ua.es/primus/</a></li>
+<li>GrandStaff (IJDAR 2023): <a href="https://doi.org/10.1007/s10032-023-00432-z">https://doi.org/10.1007/s10032-023-00432-z</a> · <a href="https://github.com/multiscore/e2e-pianoform">https://github.com/multiscore/e2e-pianoform</a></li>
+<li>Sheet Music Benchmark + OMR-NED: <a href="https://arxiv.org/abs/2506.10488">https://arxiv.org/abs/2506.10488</a> · <a href="https://huggingface.co/datasets/PRAIG/SMB">https://huggingface.co/datasets/PRAIG/SMB</a></li>
+<li>OpenScore Lieder (CC0): <a href="https://github.com/OpenScore/Lieder">https://github.com/OpenScore/Lieder</a> · PDMX: <a href="https://zenodo.org/records/15571083">https://zenodo.org/records/15571083</a></li>
+<li>MusiCorpus: <a href="https://arxiv.org/abs/2605.18436">https://arxiv.org/abs/2605.18436</a></li>
+<li>AMNLT: <a href="https://arxiv.org/abs/2412.04217">https://arxiv.org/abs/2412.04217</a> · ICDAR 2023 paper: <a href="https://observatorio-cientifico.ua.es/documentos/6522c912ec1a10197ffdc19c">https://observatorio-cientifico.ua.es/documentos/6522c912ec1a10197ffdc19c</a></li>
+<li>Hartelt, Eipert, Puppe 2024 (chant pipeline incl. syllables): <a href="https://doi.org/10.3390/app14167355">https://doi.org/10.3390/app14167355</a> · OMMR4all revisited: <a href="https://arxiv.org/abs/2411.15741">https://arxiv.org/abs/2411.15741</a></li>
+</ul>
+<p><strong>Classical methods</strong></p>
+<ul>
+<li>Stable paths (TPAMI 2009): <a href="https://repositorio.upt.pt/entities/publication/090ea399-f415-42c2-b3fb-e980faf83c3f">https://repositorio.upt.pt/entities/publication/090ea399-f415-42c2-b3fb-e980faf83c3f</a> · staff removal w/ stable paths: <a href="https://www.scitepress.org/Papers/2008/19378/">https://www.scitepress.org/Papers/2008/19378/</a></li>
+<li>Dalitz et al. 2008, comparative study of staff removal: <a href="https://www.pubmed.gov/18369247/">https://www.pubmed.gov/18369247/</a></li>
+<li>Cardoso &amp; Rebelo, staffline thickness/distance estimation: <a href="https://repositorio.inesctec.pt/handle/123456789/1876">https://repositorio.inesctec.pt/handle/123456789/1876</a></li>
+<li>Selectional auto-encoders for binarisation / music document analysis: <a href="https://grfia.dlsi.ua.es/repositori/grfia/pubs/395/1706.10241.pdf">https://grfia.dlsi.ua.es/repositori/grfia/pubs/395/1706.10241.pdf</a> · <a href="https://ismir2018.ismir.net/doc/pdfs/93_Paper.pdf">https://ismir2018.ismir.net/doc/pdfs/93_Paper.pdf</a></li>
+<li>Shafait, Keysers, Breuel 2008 (integral-image Sauvola): DOI 10.1117/12.767755</li>
+</ul>
+<p><strong>Metrics</strong></p>
+<ul>
+<li>musicdiff (MIT): <a href="https://github.com/gregchapman-dev/musicdiff">https://github.com/gregchapman-dev/musicdiff</a> · efficient-musicdiff: <a href="https://github.com/guang-yng/efficient-musicdiff">https://github.com/guang-yng/efficient-musicdiff</a></li>
+<li>MV2H (MIT): <a href="https://github.com/apmcleod/MV2H">https://github.com/apmcleod/MV2H</a> · ISMIR 2018 paper <a href="https://ismir2018.ismir.net/doc/pdfs/148_Paper.pdf">https://ismir2018.ismir.net/doc/pdfs/148_Paper.pdf</a></li>
+<li>TEDn origin (Hajič et al., ISMIR 2016): <a href="https://bpb-us-e1.wpmucdn.com/wp.nyu.edu/dist/2/2294/files/2016/07/289_Paper.pdf">https://bpb-us-e1.wpmucdn.com/wp.nyu.edu/dist/2/2294/files/2016/07/289_Paper.pdf</a></li>
+</ul>
+<p><strong>Browser runtime</strong></p>
+<ul>
+<li>onnxruntime-web env flags: <a href="https://onnxruntime.ai/docs/tutorials/web/env-flags-and-session-options.html">https://onnxruntime.ai/docs/tutorials/web/env-flags-and-session-options.html</a> · WebGPU blog: <a href="https://opensource.microsoft.com/blog/2024/02/29/onnx-runtime-web-unleashes-generative-ai-in-the-browser-using-webgpu/">https://opensource.microsoft.com/blog/2024/02/29/onnx-runtime-web-unleashes-generative-ai-in-the-browser-using-webgpu/</a> · WebGPU EP issue: <a href="https://github.com/microsoft/onnxruntime/issues/15796">https://github.com/microsoft/onnxruntime/issues/15796</a></li>
+<li>tesseract.js (Apache-2.0): <a href="https://github.com/naptha/tesseract.js">https://github.com/naptha/tesseract.js</a> · local installation: <a href="https://github.com/naptha/tesseract.js/blob/master/docs/local-installation.md">https://github.com/naptha/tesseract.js/blob/master/docs/local-installation.md</a> · tessdata_fast: <a href="https://github.com/tesseract-ocr/tessdata_fast">https://github.com/tesseract-ocr/tessdata_fast</a></li>
+<li>PP-OCRv5 for the browser: <a href="https://huggingface.co/nakamura196/ppocrv5-mobile-web-onnx">https://huggingface.co/nakamura196/ppocrv5-mobile-web-onnx</a> · <a href="https://www.paddleocr.ai/latest/en/version3.x/deployment/browser.html">https://www.paddleocr.ai/latest/en/version3.x/deployment/browser.html</a></li>
+<li>OpenSheetMusicDisplay (BSD-3): <a href="https://github.com/opensheetmusicdisplay/opensheetmusicdisplay">https://github.com/opensheetmusicdisplay/opensheetmusicdisplay</a></li>
+<li>pdf.js 3.11.174 on cdnjs: <a href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js">https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js</a></li>
+<li>MusicXML 4.0 <code>&lt;lyric&gt;</code>: <a href="https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/lyric/">https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/lyric/</a></li>
+<li>SMuFL fonts (OFL-1.1): <a href="https://github.com/steinbergmedia/bravura">https://github.com/steinbergmedia/bravura</a> · <a href="https://github.com/MuseScoreFonts/Leland">https://github.com/MuseScoreFonts/Leland</a></li>
+<li>MuseScore closed-SATB → parts discussion: <a href="https://musescore.org/en/node/292464">https://musescore.org/en/node/292464</a></li>
+</ul>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+<script>window.mermaid && mermaid.initialize({ startOnLoad: true, theme: matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default' });</script>
+</body>
+</html>

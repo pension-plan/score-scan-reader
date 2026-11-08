@@ -8,13 +8,15 @@
     "build": "node mvp/tools/build.js",
     "test": "node mvp/tools/eval.mjs --no-ocr --jobs 4 --out mvp/work/eval-ci.json",
     "test:ocr": "node mvp/tools/eval.mjs --jobs 4 --out mvp/work/eval-ocr.json",
-    "test:browser": "node mvp/tools/pw/test.js"
+    "test:browser": "node mvp/tools/pw/test.js",
+    "site": "node tools/build-site.mjs"
   },
   "dependencies": {
     "pngjs": "7.0.0",
     "tesseract.js": "7.0.0"
   },
   "devDependencies": {
-    "playwright": "1.57.0"
+    "playwright": "1.57.0",
+    "marked": "15.0.12"
   }
 }

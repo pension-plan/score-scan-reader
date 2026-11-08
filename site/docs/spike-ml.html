@@ -1,0 +1,992 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spike: pretrained ML OMR models in the browser</title>
+<style>
+:root { --bg: #fbfbfa; --fg: #1b1e24; --muted: #5a6170; --rule: #dde1e7; --accent: #2456a6; --code: #f0f2f5; }
+@media (prefers-color-scheme: dark) { :root { --bg: #13161b; --fg: #e5e8ed; --muted: #a2aab7; --rule: #2b313b; --accent: #82a8ea; --code: #1c2028; color-scheme: dark; } }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.65 "Source Serif 4", Georgia, serif; padding: 32px max(16px, env(safe-area-inset-right, 0px)) 64px max(16px, env(safe-area-inset-left, 0px)); }
+main { max-width: 820px; margin: 0 auto; }
+h1, h2, h3, h4 { font-family: system-ui, sans-serif; line-height: 1.25; text-wrap: balance; }
+a { color: var(--accent); }
+code, pre { font-family: ui-monospace, Menlo, monospace; font-size: 0.86em; background: var(--code); border-radius: 4px; }
+code { padding: 1px 4px; } pre { padding: 12px 14px; overflow-x: auto; } pre code { padding: 0; background: none; }
+table { border-collapse: collapse; display: block; overflow-x: auto; font-size: 0.92em; }
+th, td { border: 1px solid var(--rule); padding: 6px 10px; text-align: left; vertical-align: top; }
+nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bottom: 24px; }
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+</head>
+<body>
+<main><nav class="crumbs"><a href="../">Score Scan Reader</a> / docs / spike-ml.md · <a href="https://github.com/pension-plan/score-scan-reader/blob/main/docs/spike-ml.md">source</a></nav>
+<h1>Spike: pretrained ML OMR models in the browser</h1>
+<p>Date: 2026-11-08. Scope: can a pretrained, permissively licensed optical-music-recognition model run client-side
+(onnxruntime-web, self-hosted wasm, artifact CSP, files of 15 MB or less, 64 MB in total) and help with the two hard
+requirements: scanned closed-score SATB with voice separation, and lyrics?
+Everything here was measured on this machine (Linux aarch64, 192 cores) unless a number is quoted from a model card.
+Code, data and raw logs are in <code>spike/ml/</code>, and every table can be regenerated (see &quot;Reproduce&quot;).</p>
+<h2>Recommendation (TL;DR)</h2>
+<ol>
+<li><strong>Use the copista-2m symbol detector</strong> (KobiMusic, <strong>Apache-2.0</strong> weights and code,
+<a href="https://huggingface.co/kobimusic/copista-2m">https://huggingface.co/kobimusic/copista-2m</a>, HF sha <code>c37d89e1e52edc95c1a73bda0aea5f2f71a9c763</code>).
+I exported it to ONNX as two graphs and stored the weights as int8 (<code>int8w</code>): <strong>1.77 MB + 0.29 MB = 2.06 MB</strong>
+(<code>spike/ml/assets/</code>). The page-level JS pipeline is <code>spike/ml/src/copista_core.mjs</code>: plain array code with no
+dependencies, and it runs unchanged in node and in the browser.<ul>
+<li>On the 36 test scans (3 pieces × 200/300 dpi × 6 degradations), run through <strong>onnxruntime-web wasm</strong>:
+notehead <strong>P 1.000 / R 0.991 / F1 0.996</strong>, staff-position accuracy <strong>1.000</strong> on everything except a harsh
+photocopy (0.65), stem direction 0.984, and <strong>voice-slot accuracy 0.991 on the closed-score SATB</strong>. The model
+itself says &quot;voice 1 (stem up) / voice 2 (stem down)&quot; for every notehead, which gives S/A and T/B part
+separation almost for free.</li>
+<li>Speed, one wasm thread (the realistic artifact case, since there is no cross-origin isolation): <strong>≈4.2–5.1 s per
+A4 page</strong> in headless Chromium, end to end (resample, dense CNN ≈4.0–4.7 s, verifier ≈0.1 s, decode).</li>
+<li>Quantization costs nothing. fp32, fp16-weight and int8-weight variants give identical scores. <strong>Do not</strong> use ORT
+dynamic int8 (<code>int8d</code>): it is 2× faster in native ORT but <strong>3× slower in wasm</strong> (12.2 s vs 4.1 s).</li>
+</ul>
+</li>
+<li><strong>Runtime: onnxruntime-web 1.30.0</strong> (MIT). Load <code>ort.wasm.bundle.min.mjs</code> from jsdelivr or cdnjs with a
+<strong>dynamic <code>import()</code> inside a blob: module worker</strong>, and set <code>ort.env.wasm.wasmPaths = { wasm: &lt;absolute URL of self-hosted ort-wasm-simd-threaded.wasm&gt; }</code> (14,239,897 bytes, which fits under 15 MB). This passes an
+artifact-like strict CSP (no <code>&#39;self&#39;</code> in script-src). Fallback: <strong>onnxruntime-web 1.18.0 UMD</strong>
+(<code>ort.wasm.min.js</code> via <code>&lt;script src&gt;</code> or <code>importScripts</code> in a blob worker, <code>wasmPaths = &#39;assets/&#39;</code>, self-host
+<code>ort-wasm-simd.wasm</code>, 10.6 MB). It is about 10–20 % slower but uses the simplest loading path.
+Things that <strong>fail</strong> under that CSP (measured): every ORT ≥ 1.19 UMD build, and an ESM bundle given a <em>string</em>
+<code>wasmPaths</code>. Both try to <code>import()</code> <code>ort-wasm-simd-threaded.mjs</code> from the same origin. A <em>static</em>
+<code>import … from &lt;CDN&gt;</code> inside a blob module worker also fails.</li>
+<li><strong>Do not use</strong> homr (AGPL-3.0; at least 75 MB of weights even after quantization; minutes per page in wasm; no
+voice separation, since closed score comes out as chords: voice accuracy 0.46). Do not use oemer (MIT but 109 MB
+fp32, which needs splitting; about 33 min/page of wasm compute; measure-pitch F1 0.20–0.44 on our scans; breaks
+with OpenCV 5). Do not use a YOLO/DeepScoresV2 detector: none with a permissive licence exists. The
+Ultralytics-trained ones carry AGPL-3.0, others have no licence, and DeepScoresV2 itself is CC BY 4.0.
+satb-line-omr (MIT, 6.4 MB, built for the browser) is excellent on <em>clean open-score</em> prints (100 % pitch), but by
+design it reads one voice per staff (closed score: 17 % notes), and its staff finder found <strong>0 staves on every
+rotated/scanned/photocopied page</strong>. At most it is an optional extra.</li>
+<li><strong>What ML does not give us</strong>:<ul>
+<li><strong>Lyrics.</strong> copista has no text classes. Lyrics still need the Tesseract path; the detector&#39;s notehead and
+system boxes give the text bands.</li>
+<li><strong>Rhythm and measure assembly into MusicXML.</strong> This must be written in JS from the detections (noteheads with
+duration class, dots, voice_slot, stem_dir and staff_position; plus barlines, measure boxes, clefs, key/meter
+signatures, rests, beams, ties/slurs). An alternative is to port copisteria&#39;s Apache-2.0 reader (about 4,000
+lines of Python plus a 2.03 M-param evidence transformer). On these hymn scans the detector&#39;s raw readings are
+already more accurate (F1 0.996) than copisteria&#39;s full reader output (measure-pitch F1 0.93 with the 2m
+detector), so a simple JS assembler is the right first step.</li>
+</ul>
+</li>
+<li><strong>Pitch from geometry, not only from the model.</strong> On broken-staff photocopies, copista&#39;s <code>staff_position</code> drops
+to 0.65 (2m) / 0.87 (28m), while notehead <em>detection</em> stays at F1 0.996. Compute pitch from the notehead&#39;s y
+relative to our own staff-line fit, and use the model&#39;s <code>staff_position</code> only as a cross-check.</li>
+<li>Optional <strong>&quot;accurate&quot; mode: copista-28m</strong> (Apache-2.0). Its int8 weights are 26.8 MB, so they must be split into
+two external-data files (13.7 + 13.0 MB; this loads in ort-web). It costs <strong>≈47–60 s/page</strong> in wasm, and on our
+scans it only helps on the photocopy (staff-position 0.87 vs 0.65). Not worth shipping by default.</li>
+</ol>
+<p>Budget for the recommended path: wasm 14.2 MB + models 2.1 MB + classes JSON 5 KB. That leaves about 47 MB of the
+64 MB for Tesseract core, traineddata, pdf.js and the sample.</p>
+<h2>Test material (<code>spike/ml/scans/</code>)</h2>
+<ul>
+<li>Generator: <code>spike/ml/src/make_scans.py</code>, with pieces defined in <code>src/pieces.py</code>. All music is public domain.<ul>
+<li><code>melody_lyrics</code>: <em>Amazing Grace</em> (NEW BRITAIN, text Newton 1779). G major, 3/4 with pickup, 2 verses,
+4 melismas with extenders.</li>
+<li><code>satb_closed</code>: <em>Old Hundredth</em> (Genevan 1551) in a 4-part setting written for the spike. Closed score: S+A on the
+treble staff (<code>\voiceOne</code>/<code>\voiceTwo</code>), T+B on the bass staff, 2 verses between the staves. 128 notes, 12 bars.</li>
+<li><code>satb_open</code>: the same setting on 4 staves.</li>
+</ul>
+</li>
+<li>Pipeline:<ol>
+<li>LilyPond 2.24 → PDF (A4, one page).</li>
+<li><code>pdftoppm -r 200|300 -gray</code>.</li>
+<li>Six variants per page: <code>clean</code>; <code>rot</code> (1.3°); <code>noiseblur</code> (σ 1.1 px at 300 dpi + noise σ 14); <code>jpeg</code> (q30);
+<code>scan</code> (−0.8° plus a shift, uneven lighting, blur, noise, JPEG q55); <code>photocopy</code> (0.5°, blur + noise σ 25,
+hard threshold, speckle, median: broken and thickened lines).</li>
+</ol>
+<ul>
+<li>Result: 36 images.</li>
+</ul>
+</li>
+<li>Ground truth:<ul>
+<li><code>scans/gt/&lt;piece&gt;.musicxml</code>: MusicXML 4.0 partwise, one <code>&lt;part&gt;</code> per voice, lyrics with syllabic and extend.</li>
+<li><code>scans/gt/&lt;piece&gt;.json</code>: note lists.</li>
+<li><code>scans/&lt;image&gt;.boxes.json</code>: one box per notehead, labelled with voice and note index. LilyPond <strong>point-and-click
+link annotations</strong> in the PDF (<code>\pointAndClickTypes #&#39;note-event</code>) are mapped through the textedit line:col back
+to the generated source, then pushed through the same affine transform as the degradation. 288/288 noteheads
+mapped, checked visually.</li>
+</ul>
+</li>
+<li>One <strong>real scan</strong>: <code>scans/real/be_thou_1919.jpg</code>, from Wikimedia Commons (public domain). <em>Church Hymnal with
+Accompanying Tunes</em> (1919), &quot;Slane&quot; in closed-score SATB, with show-through from the reverse page. No ground
+truth; used for a qualitative check only.</li>
+</ul>
+<h2>Candidates and licences</h2>
+<table>
+<thead>
+<tr>
+<th>Candidate</th>
+<th>Licence (code / weights)</th>
+<th>What it is</th>
+<th align="right">Params</th>
+<th align="right">fp32 size</th>
+<th align="right">Smallest working size</th>
+<th>Verdict</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>copista-2m</strong> (kobimusic/copisteria 1.3.4, HF <code>kobimusic/copista-2m</code>)</td>
+<td>Apache-2.0 / <strong>Apache-2.0</strong> (keep NOTICE, credit KobiMusic)</td>
+<td>custom CenterNet-style detector, 270 classes + note attributes (staff pos, stem, dots, grace, <strong>voice slot</strong>), stride-4 trunk + transformer verifier</td>
+<td align="right">1.92 M</td>
+<td align="right">7.7 MB (2 graphs)</td>
+<td align="right"><strong>2.06 MB</strong> int8w</td>
+<td><strong>recommended</strong></td>
+</tr>
+<tr>
+<td>copista-28m (HF <code>kobimusic/copista-28m</code>, sha <code>44464d11…</code>)</td>
+<td>Apache-2.0 / Apache-2.0</td>
+<td>same design, wider</td>
+<td align="right">28.7 M</td>
+<td align="right">114.8 MB</td>
+<td align="right">29.0 MB int8w (2 × ≤14 MB external data + 2.25 MB)</td>
+<td>optional, slow</td>
+</tr>
+<tr>
+<td>copisteria evidence model (<code>evidence-2m.pt</code>)</td>
+<td>Apache-2.0</td>
+<td>6-layer transformer that re-reads detections in context (part of the Python reader)</td>
+<td align="right">2.03 M</td>
+<td align="right">8.1 MB (.pt)</td>
+<td align="right">~2 MB expected</td>
+<td>not exported; needs the reader&#39;s tokenizer ported</td>
+</tr>
+<tr>
+<td>oemer 0.1.8 (BreezeWhite/oemer, release <code>checkpoints</code>)</td>
+<td>MIT / MIT</td>
+<td>2 tf2onnx U-Nets (opset 9, uint8 NHWC windows) + sklearn SVMs + heuristics</td>
+<td align="right">17.6 M + 9.6 M</td>
+<td align="right">70.8 + 38.4 MB</td>
+<td align="right">18.1 + 10.0 MB int8w (unet still &gt; 15 MB)</td>
+<td>rejected: slow, inaccurate here</td>
+</tr>
+<tr>
+<td>homr 0.7.0 (liebharc/homr; segnet_308, TrOMR enc/dec 396; main uses 509)</td>
+<td><strong>AGPL-3.0</strong> / AGPL-3.0 (same repo releases)</td>
+<td>U-Net segnet + per-staff transformer (encoder + autoregressive decoder with KV cache, contrib ops)</td>
+<td align="right">14.3 + 13.2 + 46.9 M</td>
+<td align="right">57.3 + 52.9 + 47.3 MB</td>
+<td align="right">14.4 + 13.5 + <strong>47.2</strong> MB (the decoder is already int8)</td>
+<td><strong>rejected: AGPL</strong>, size, speed</td>
+</tr>
+<tr>
+<td>homr <code>best.onnx</code> (release <code>checkpoints</code>)</td>
+<td>AGPL-3.0</td>
+<td>Ultralytics-style YOLO, 2 classes</td>
+<td align="right">1.76 M</td>
+<td align="right">7.1 MB</td>
+<td align="right">–</td>
+<td>AGPL; not a music-symbol detector we can use</td>
+</tr>
+<tr>
+<td>satb-line-omr (alexanderalber, <code>model-public-domain/</code>)</td>
+<td>MIT / <strong>MIT</strong> (PDMX-only training); sibling <code>model-cc-by-nc-sa/</code> is <strong>CC BY-NC-SA</strong> (Bach chorales) and must not be used</td>
+<td>CRNN+CTC, one staff line → kern tokens</td>
+<td align="right">3.2 M</td>
+<td align="right">12.8 MB</td>
+<td align="right">6.4 MB fp16 / 3.25 MB int8</td>
+<td>optional; clean open score only</td>
+</tr>
+<tr>
+<td>v-dvorak/omr-layout-analysis (nota / notax notehead, OLA layout)</td>
+<td>MIT repo, but <strong>Ultralytics YOLOv8</strong>-trained (Ultralytics asserts AGPL-3.0 on trained models); training data includes MUSCIMA++ (CC BY-NC-SA)</td>
+<td>YOLOv8 detectors</td>
+<td align="right">–</td>
+<td align="right">5.5 / 114 / 40 MB <code>.pt</code></td>
+<td align="right">–</td>
+<td>flagged: AGPL/NC risk; not evaluated</td>
+</tr>
+<tr>
+<td>fusiongodo/yolo-score (DeepScoresV2 YOLO)</td>
+<td><strong>no licence</strong></td>
+<td>ResNet-18 YOLO</td>
+<td align="right">–</td>
+<td align="right">–</td>
+<td align="right">–</td>
+<td>unusable (all rights reserved)</td>
+</tr>
+<tr>
+<td>Luckolite/Sheet-Music-Recognition v0.1.5</td>
+<td>Apache-2.0 / Apache-2.0 (own synthetic data)</td>
+<td>6-class U-Net segmentation (1.95 M), TFLite fp16 3.9 MB + PyTorch <code>best.pt</code></td>
+<td align="right">1.95 M</td>
+<td align="right">–</td>
+<td align="right">3.9 MB (tflite)</td>
+<td>not evaluated: TFLite only (tflite2onnx fails on ARG_MAX); needs a full classical decoder anyway</td>
+</tr>
+<tr>
+<td>Flova/omr_transformer, rokot-omr-2b</td>
+<td>Apache-2.0 / CC BY-NC</td>
+<td>seq2seq transformers</td>
+<td align="right">140 M+ / 2 B</td>
+<td align="right">574 MB / –</td>
+<td align="right">–</td>
+<td>far too big; NC</td>
+</tr>
+</tbody></table>
+<p>There is no permissively licensed DeepScoresV2-trained YOLO. Every YOLO I found was trained with Ultralytics
+(AGPL-3.0 claim), has no licence, or is part of AGPL homr. DeepScoresV2 itself is CC BY 4.0 (Zenodo 4012193), so
+training our own detector on it would be allowed. PDMX (the copista training scores) is CC BY 4.0 (Zenodo 15571083).
+The copista detector&#39;s own corpus is described only as &quot;87K pages&quot; in its card; the weights are released under
+Apache-2.0 by the authors.</p>
+<h2>Accuracy</h2>
+<h3>End-to-end, using each project&#39;s own Python pipeline (upper bound for what a port could do)</h3>
+<p>Metrics:</p>
+<ul>
+<li><strong>Measure-pitch F1</strong>: per-measure multiset of MIDI pitches, ignoring part and voice.</li>
+<li><strong>+duration F1</strong>: the same, with (pitch, duration) pairs.</li>
+<li><strong>Voice-assignment accuracy</strong>: predicted (part, staff, voice) streams are assigned one-to-one to the ground-truth
+voices (S/A/T/B or the melody), scoring LCS matches of (pitch, duration). A stream that holds chords can serve
+only one voice, so an unseparated closed score scores about 0.5.</li>
+</ul>
+<p>The scorer is <code>spike/ml/src/eval_xml.py</code>. The ground-truth file scores 1.000 on every metric.</p>
+<table>
+<thead>
+<tr>
+<th>system</th>
+<th>piece</th>
+<th align="right">images</th>
+<th align="right">measure-pitch F1</th>
+<th align="right">+duration F1</th>
+<th align="right">voice-assignment acc</th>
+<th>parts out</th>
+<th align="right">wall s/page (8 cores, shared box)</th>
+<th align="right">failures</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>copisteria + copista-28m</td>
+<td>melody_lyrics</td>
+<td align="right">12</td>
+<td align="right">0.953</td>
+<td align="right">0.945</td>
+<td align="right">0.945</td>
+<td>1</td>
+<td align="right">72</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td>copisteria + copista-28m</td>
+<td>satb_closed</td>
+<td align="right">12</td>
+<td align="right"><strong>0.969</strong></td>
+<td align="right">0.969</td>
+<td align="right"><strong>0.956</strong></td>
+<td><strong>2 (2 voices each)</strong></td>
+<td align="right">67</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td>copisteria + copista-28m</td>
+<td>satb_open</td>
+<td align="right">12</td>
+<td align="right">0.949</td>
+<td align="right">0.949</td>
+<td align="right">0.935</td>
+<td>4</td>
+<td align="right">63</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td>copisteria + copista-2m</td>
+<td>melody_lyrics</td>
+<td align="right">12</td>
+<td align="right">0.875</td>
+<td align="right">0.844</td>
+<td align="right">0.844</td>
+<td>1</td>
+<td align="right">27</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td>copisteria + copista-2m</td>
+<td>satb_closed</td>
+<td align="right">12</td>
+<td align="right">0.932</td>
+<td align="right">0.919</td>
+<td align="right">0.908</td>
+<td>2 (2 voices each)</td>
+<td align="right">27</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td>copisteria + copista-2m</td>
+<td>satb_open</td>
+<td align="right">12</td>
+<td align="right">0.911</td>
+<td align="right">0.907</td>
+<td align="right">0.898</td>
+<td>4</td>
+<td align="right">27</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td>homr 0.7.0</td>
+<td>melody_lyrics</td>
+<td align="right">12</td>
+<td align="right"><strong>1.000</strong></td>
+<td align="right">1.000</td>
+<td align="right">1.000</td>
+<td>1</td>
+<td align="right">284</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td>homr 0.7.0</td>
+<td>satb_closed</td>
+<td align="right">12</td>
+<td align="right">0.913</td>
+<td align="right">0.913</td>
+<td align="right"><strong>0.458</strong> (chords, no separation)</td>
+<td>1</td>
+<td align="right">214</td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td>homr 0.7.0</td>
+<td>satb_open</td>
+<td align="right">12</td>
+<td align="right">0.708</td>
+<td align="right">0.708</td>
+<td align="right">0.693</td>
+<td>1 or 4</td>
+<td align="right">259</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td>oemer 0.1.8</td>
+<td>melody_lyrics</td>
+<td align="right">1</td>
+<td align="right">0.438</td>
+<td align="right">0.281</td>
+<td align="right">0.281</td>
+<td>1</td>
+<td align="right">697</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td>oemer 0.1.8</td>
+<td>satb_closed</td>
+<td align="right">2</td>
+<td align="right">0.350</td>
+<td align="right">0.318</td>
+<td align="right">0.156</td>
+<td>1</td>
+<td align="right">579</td>
+<td align="right">0</td>
+</tr>
+<tr>
+<td>oemer 0.1.8</td>
+<td>satb_open</td>
+<td align="right">1</td>
+<td align="right">0.198</td>
+<td align="right">0.198</td>
+<td align="right">0.125</td>
+<td>1</td>
+<td align="right">685</td>
+<td align="right">0</td>
+</tr>
+</tbody></table>
+<p>The same results by degradation (all three pieces, 200 and 300 dpi; cells are measure-pitch F1 / voice-assignment
+accuracy):</p>
+<table>
+<thead>
+<tr>
+<th>system</th>
+<th>clean</th>
+<th>rot 1.3°</th>
+<th>noise+blur</th>
+<th>JPEG q30</th>
+<th>&quot;scan&quot;</th>
+<th>&quot;photocopy&quot;</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>copisteria + 28m</td>
+<td>0.997 / 0.994</td>
+<td>0.994 / 0.988</td>
+<td>0.997 / 0.994</td>
+<td>0.995 / 0.991</td>
+<td>0.992 / 0.984</td>
+<td>0.769 / 0.723</td>
+</tr>
+<tr>
+<td>copisteria + 2m</td>
+<td>0.994 / 0.990</td>
+<td>0.995 / 0.990</td>
+<td>0.995 / 0.990</td>
+<td>0.994 / 0.988</td>
+<td>0.996 / 0.992</td>
+<td>0.463 / 0.352</td>
+</tr>
+<tr>
+<td>homr</td>
+<td>0.915 / 0.750</td>
+<td>0.915 / 0.750</td>
+<td>0.915 / 0.750</td>
+<td>0.915 / 0.750</td>
+<td>0.915 / 0.750</td>
+<td>0.665 / 0.553 (1 crash: &quot;No staffs found&quot;)</td>
+</tr>
+<tr>
+<td>oemer</td>
+<td>0.330 / 0.190 (4 pages only, 8–11 min each)</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+</tr>
+</tbody></table>
+<p>Notes:</p>
+<ul>
+<li>The piece averages above include the photocopy column; on every other degradation copisteria is at
+0.99 / 0.99.</li>
+<li>Raw results: <code>spike/ml/out/e2e/results.jsonl</code>. Outputs: <code>spike/ml/out/e2e/&lt;system&gt;/&lt;image&gt;/</code>.</li>
+<li>oemer needed <code>opencv-python-headless&lt;5</code> (it crashes in <code>find_lines</code> with OpenCV 5), and ORT pinned to 8 threads.
+Unpinned, one page took 35 min and 4.5 CPU-hours.</li>
+</ul>
+<h3>Detector-level: copista through the browser-portable pipeline (<code>src/copista_core.mjs</code>)</h3>
+<p>Predicted <code>note_*</code> boxes are matched one-to-one to ground-truth noteheads (centre within 0.6 notehead widths).
+Attribute accuracies are computed on matched notes:</p>
+<ul>
+<li>staff position: half-spaces from the middle line, against ground-truth pitch and clef.</li>
+<li>stem: closed score only, whole notes excluded.</li>
+<li>voice slot: closed score only; S/T should be 1, A/B should be 2.</li>
+</ul>
+<p>Scorer: <code>src/eval_notes.py</code> and <code>src/score_dets.py</code>. &quot;web&quot; means onnxruntime-web 1.30.0 wasm (run in node; Chromium
+gives identical detections, see below). &quot;torch&quot; means the authors&#39; PyTorch detector inside copisteria. CPU ms is
+process CPU time per page, which is robust to the machine being shared (load average was often above 1000).</p>
+<table>
+<thead>
+<tr>
+<th>run (runtime-model-weights-threads)</th>
+<th align="right">images</th>
+<th align="right">notehead P</th>
+<th align="right">R</th>
+<th align="right">F1</th>
+<th align="right">staff-pos acc</th>
+<th align="right">stem acc</th>
+<th align="right">voice-slot acc</th>
+<th align="right">median CPU ms/page</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>torch-2m-fp32 (reference)</td>
+<td align="right">36</td>
+<td align="right">1.000</td>
+<td align="right">0.992</td>
+<td align="right">0.996</td>
+<td align="right">0.944</td>
+<td align="right">0.984</td>
+<td align="right">0.991</td>
+<td align="right">–</td>
+</tr>
+<tr>
+<td>node-2m-fp32-t1</td>
+<td align="right">36</td>
+<td align="right">1.000</td>
+<td align="right">0.992</td>
+<td align="right">0.996</td>
+<td align="right">0.943</td>
+<td align="right">0.984</td>
+<td align="right">0.991</td>
+<td align="right">2042</td>
+</tr>
+<tr>
+<td>node-2m-int8d-t1</td>
+<td align="right">36</td>
+<td align="right">1.000</td>
+<td align="right">0.992</td>
+<td align="right">0.996</td>
+<td align="right">0.939</td>
+<td align="right">0.984</td>
+<td align="right">0.991</td>
+<td align="right"><strong>982</strong></td>
+</tr>
+<tr>
+<td>web-2m-fp32-t1</td>
+<td align="right">36</td>
+<td align="right">1.000</td>
+<td align="right">0.992</td>
+<td align="right">0.996</td>
+<td align="right">0.943</td>
+<td align="right">0.984</td>
+<td align="right">0.991</td>
+<td align="right">4162</td>
+</tr>
+<tr>
+<td>web-2m-fp16w-t1</td>
+<td align="right">36</td>
+<td align="right">1.000</td>
+<td align="right">0.992</td>
+<td align="right">0.996</td>
+<td align="right">0.943</td>
+<td align="right">0.984</td>
+<td align="right">0.991</td>
+<td align="right">4179</td>
+</tr>
+<tr>
+<td><strong>web-2m-int8w-t1</strong></td>
+<td align="right">36</td>
+<td align="right">1.000</td>
+<td align="right">0.991</td>
+<td align="right"><strong>0.996</strong></td>
+<td align="right">0.941</td>
+<td align="right">0.984</td>
+<td align="right"><strong>0.991</strong></td>
+<td align="right"><strong>4178</strong></td>
+</tr>
+<tr>
+<td>web-2m-int8d-t1</td>
+<td align="right">36</td>
+<td align="right">1.000</td>
+<td align="right">0.993</td>
+<td align="right">0.996</td>
+<td align="right">0.938</td>
+<td align="right">0.984</td>
+<td align="right">0.991</td>
+<td align="right">12336</td>
+</tr>
+<tr>
+<td>torch-28m-fp32 (reference)</td>
+<td align="right">36</td>
+<td align="right">1.000</td>
+<td align="right">0.992</td>
+<td align="right">0.996</td>
+<td align="right">0.967</td>
+<td align="right">0.987</td>
+<td align="right">0.991</td>
+<td align="right">–</td>
+</tr>
+<tr>
+<td>node-28m-fp32-t1</td>
+<td align="right">24</td>
+<td align="right">1.000</td>
+<td align="right">0.990</td>
+<td align="right">0.995</td>
+<td align="right">0.970</td>
+<td align="right">0.984</td>
+<td align="right">0.991</td>
+<td align="right">18892</td>
+</tr>
+<tr>
+<td>node-28m-int8w-t1</td>
+<td align="right">24</td>
+<td align="right">1.000</td>
+<td align="right">0.989</td>
+<td align="right">0.995</td>
+<td align="right">0.968</td>
+<td align="right">0.984</td>
+<td align="right">0.991</td>
+<td align="right">18966</td>
+</tr>
+<tr>
+<td>node-28m-int8d-t1</td>
+<td align="right">24</td>
+<td align="right">1.000</td>
+<td align="right">0.990</td>
+<td align="right">0.995</td>
+<td align="right">0.958</td>
+<td align="right">0.984</td>
+<td align="right">0.991</td>
+<td align="right">6813</td>
+</tr>
+<tr>
+<td>web-28m-int8w-t1</td>
+<td align="right">3</td>
+<td align="right">1.000</td>
+<td align="right">0.997</td>
+<td align="right">0.999</td>
+<td align="right">0.831</td>
+<td align="right">0.991</td>
+<td align="right">0.991</td>
+<td align="right">48421</td>
+</tr>
+</tbody></table>
+<p>Staff-position accuracy is <strong>1.000 on clean, rot, noise+blur, JPEG and scan</strong> for every 2m and 28m variant. On the
+photocopy it drops to 0.63–0.66 (2m) and 0.83–0.88 (28m). Detection itself stays at F1 0.995–0.997 there, which is
+why pitch should come from staff-line geometry.</p>
+<p>Notes:</p>
+<ul>
+<li>My ONNX export plus JS decode reproduces the PyTorch reference (identical P/R/F1, staff-position 0.943 vs 0.944).</li>
+<li>The JS box-filter resample is used instead of PIL Lanczos and makes no measurable difference.</li>
+<li>Where the remaining voice-slot errors (0.9 %) come from:<ul>
+<li><strong>Stemless whole notes</strong> in the bass voice (two per page), where the model guesses voice 1. The assembler should
+resolve these from vertical order and rhythm: the lower whole note on a two-voice staff is voice 2.</li>
+<li><strong>One tight S/A second</strong>, read as <code>stem_dir=both</code>.</li>
+<li>In addition, 1–3 noteheads per page are missed, each one note of a two-note chord on a stem.</li>
+</ul>
+</li>
+</ul>
+<h3>satb-line-omr (MIT CRNN+CTC), using its own reference staff finder and decoder (<code>src/eval_satbline.py</code>)</h3>
+<table>
+<thead>
+<tr>
+<th>piece</th>
+<th>clean: notes / pitch</th>
+<th>JPEG q30 *</th>
+<th>noise+blur *</th>
+<th>rot / scan / photocopy</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>satb_open (300 / 200 dpi)</td>
+<td><strong>1.000 / 1.000</strong>, 0.992 / 1.000</td>
+<td>1.000, 0.992</td>
+<td>0.922, 0.734 (pitch 1.0 / 0.97)</td>
+<td>0 staves found → 0.0</td>
+</tr>
+<tr>
+<td>melody_lyrics</td>
+<td>0.938 / 1.000, 0.844 / 1.000</td>
+<td>0.938, 0.844</td>
+<td>0.813, 0.563</td>
+<td>0 staves found → 0.0</td>
+</tr>
+<tr>
+<td>satb_closed</td>
+<td>0.18 / 0.43 (reads one voice per staff, by design)</td>
+<td>0.17</td>
+<td>0.16</td>
+<td>0.0</td>
+</tr>
+</tbody></table>
+<p>* scored with the staff boxes found on the clean page; its own staff finder finds nothing on these.</p>
+<p>Timings are about 0.11 s per 1200-px line in native ORT and 0.26 s in wasm (fp32).</p>
+<p>The authors&#39; &quot;browser default&quot; full-fp16 file is <strong>2× slower in wasm</strong> (0.54 s) than fp32. My weight-only <code>fp16w</code>
+runs at fp32 speed (0.26 s) at the same 6.4 MB.</p>
+<h3>Real 1919 hymnal scan (qualitative)</h3>
+<p>copista-2m int8w ran in the wasm runtime on the left page (1600×2373, show-through, old-style clefs):</p>
+<ul>
+<li>2.86 s CPU.</li>
+<li>197 noteheads. Voice slots are consistently up=1/down=2 on both staves.</li>
+<li>Clefs (G2, F4), key (1♭) and meter (3/2) are all found.</li>
+<li>A handful of hollow notes are missed (visual inspection: <code>spike/ml/out/real/be_thou_1919_copista2m_overlay.png</code>).</li>
+</ul>
+<p>copisteria + 28m produces 2 parts × 2 voices with 196 notes. homr produces 1 part with 200 notes, as chords in a
+single voice.</p>
+<h2>Size and quantization (<code>src/quantize.py</code>)</h2>
+<p>Four variants were built for every model:</p>
+<ul>
+<li><strong>fp16w</strong>: initializers stored as fp16 with a Cast to fp32; compute stays fp32.</li>
+<li><strong>int8w</strong>: per-output-channel symmetric int8 initializers plus DequantizeLinear; compute stays fp32.</li>
+<li><strong>fp16</strong>: full fp16 graph via onnxconverter-common 1.16 with <code>keep_io_types</code>.</li>
+<li><strong>int8d</strong>: <code>onnxruntime.quantization.quantize_dynamic</code>, QInt8, per-channel.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>model</th>
+<th align="right">fp32</th>
+<th align="right">fp16w</th>
+<th align="right">int8w</th>
+<th align="right">fp16 (full)</th>
+<th align="right">int8d</th>
+<th>≤ 15 MB per file?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>copista2m dense / rel</td>
+<td align="right">6.71 / 1.01 MB</td>
+<td align="right">3.39 / 0.52</td>
+<td align="right"><strong>1.77 / 0.29</strong></td>
+<td align="right">3.38 / converter error</td>
+<td align="right">1.78 / 0.30</td>
+<td>yes (all variants)</td>
+</tr>
+<tr>
+<td>copista28m dense / rel</td>
+<td align="right">106.1 / 8.7 MB</td>
+<td align="right">53.1 / 4.4</td>
+<td align="right">26.8 / 2.25</td>
+<td align="right">53.1 / error</td>
+<td align="right">26.8 / 2.27</td>
+<td>only int8w split into 2 × ≤ 14 MB external data</td>
+</tr>
+<tr>
+<td>oemer unet / seg</td>
+<td align="right">70.8 / 38.4 MB</td>
+<td align="right">35.7 / 19.5</td>
+<td align="right">18.1 / 10.0</td>
+<td align="right">fails to load (Cast type error)</td>
+<td align="right">20.1 / 13.1</td>
+<td>no (unet ≥ 18 MB)</td>
+</tr>
+<tr>
+<td>homr segnet308</td>
+<td align="right">57.3 MB</td>
+<td align="right">28.7</td>
+<td align="right">14.4</td>
+<td align="right">28.7 (loads; ORT falls back)</td>
+<td align="right">14.4</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>homr encoder 396 / 509</td>
+<td align="right">52.9 MB</td>
+<td align="right">26.5</td>
+<td align="right">13.5</td>
+<td align="right">26.5</td>
+<td align="right">15.6</td>
+<td>int8w only</td>
+</tr>
+<tr>
+<td>homr decoder 396 / 509</td>
+<td align="right">47.3 MB (already int8, contrib ops)</td>
+<td align="right">47.2</td>
+<td align="right">47.2</td>
+<td align="right">error</td>
+<td align="right">47.3</td>
+<td>no; would need 4-bit plus splitting, and total ≥ 75 MB &gt; 64 MB</td>
+</tr>
+<tr>
+<td>satb-line MIT</td>
+<td align="right">12.8 MB</td>
+<td align="right">6.4</td>
+<td align="right">3.2</td>
+<td align="right">6.4 (authors&#39; file)</td>
+<td align="right">3.3</td>
+<td>yes</td>
+</tr>
+</tbody></table>
+<p>Findings:</p>
+<ul>
+<li>Weight-only storage (fp16w/int8w) is the right tool for wasm. It gives a ¼ size download at fp32 speed with no
+accuracy loss (copista: identical scores).</li>
+<li>ORT dynamic int8 is 2× faster in native ORT but 2.5–3× slower in wasm: copista2m 12.2 s vs 4.1 s, 28m 133 s vs
+47 s, oemer-seg 14.8 s vs 5.9 s, homr segnet 2.2 s vs 0.75 s.</li>
+<li>Full fp16 graphs are slower or broken on CPU/wasm.</li>
+<li>When opset-9 tf2onnx models (oemer) get weight-only transforms, they must first be upgraded with
+<code>onnx.version_converter</code> to opset 13; Slice changed from attributes to inputs.</li>
+</ul>
+<h2>Speed (<code>src/microbench.mjs</code>, one thread, process CPU ms; representative input)</h2>
+<table>
+<thead>
+<tr>
+<th>model</th>
+<th>input</th>
+<th align="right">ort-node 1.30.0</th>
+<th align="right">ort-web 1.30.0 wasm</th>
+<th>per-page estimate in wasm</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>copista-2m dense (fp32/fp16w/int8w)</td>
+<td>1×1×1760×1248 (300 dpi A4 at 10.6 px staff space)</td>
+<td align="right">1.82–1.86 s</td>
+<td align="right"><strong>4.09–4.10 s</strong></td>
+<td><strong>≈4.3 s</strong> (+0.1 s verifier, 0.1–0.3 s prep)</td>
+</tr>
+<tr>
+<td>copista-28m dense</td>
+<td>same</td>
+<td align="right">21.0 s</td>
+<td align="right">47.0 s</td>
+<td>≈48 s (Chromium: 60 s)</td>
+</tr>
+<tr>
+<td>oemer unet / seg</td>
+<td>one 256² / 288² u8 window; <strong>234 windows each</strong> per page</td>
+<td align="right">1.09 / 2.42 s</td>
+<td align="right">2.44 / 5.93 s</td>
+<td>≈ 234 × 8.4 s ≈ <strong>33 min</strong></td>
+</tr>
+<tr>
+<td>homr segnet</td>
+<td>one 320² patch</td>
+<td align="right">0.32 s</td>
+<td align="right">0.79 s</td>
+<td>tens of patches/page → 30–60 s</td>
+</tr>
+<tr>
+<td>homr encoder</td>
+<td>one staff 256×1280</td>
+<td align="right">1.15 s</td>
+<td align="right">2.52 s</td>
+<td>8 staves → 20 s</td>
+</tr>
+<tr>
+<td>homr decoder</td>
+<td>one token step</td>
+<td align="right">0.063 s</td>
+<td align="right">0.45 s</td>
+<td>~100 tokens × 8 staves → <strong>≈6 min</strong></td>
+</tr>
+<tr>
+<td>satb-line (fp32 / fp16w)</td>
+<td>one 1200-px line</td>
+<td align="right">0.11 s</td>
+<td align="right">0.26 s</td>
+<td>8–16 lines → 2–4 s (clean open score only)</td>
+</tr>
+</tbody></table>
+<p>On this aarch64 server, wasm runs at about 0.45× native. Headless Chromium matches the node-wasm numbers within
+about 10 %. A desktop x86 browser is probably faster: the satb-line authors report 176 ms/line on a Ryzen
+5800X3D, against our 260 ms.</p>
+<h2>onnxruntime-web in a browser under an artifact-like CSP (<code>src/web_bench.mjs</code>)</h2>
+<p>Setup:</p>
+<ul>
+<li>Browser: headless Chromium (Playwright chromium_headless_shell-1248, arm64).</li>
+<li>Page: copista-2m on <code>satb_closed_300_scan.png</code>, decoded via <code>createImageBitmap</code> → OffscreenCanvas → gray.</li>
+<li>Hosting: ORT JS comes from the public CDN. The <code>.wasm</code>, models and image are served same-origin.</li>
+<li>CSP, as an HTTP header (<code>strict</code>):<pre><code>default-src &#39;none&#39;; script-src https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com
+&#39;unsafe-inline&#39; &#39;wasm-unsafe-eval&#39;; connect-src &#39;self&#39; blob: data:; worker-src &#39;self&#39; blob:;
+img-src &#39;self&#39; blob: data:; style-src &#39;unsafe-inline&#39;
+</code></pre>
+</li>
+<li>Raw rows: <code>spike/ml/out/web/results.jsonl</code>; logs: <code>out/web/matrix{1,2,3}.log</code>.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>ort-web</th>
+<th>how it is loaded</th>
+<th>strict CSP result</th>
+<th>page time (warm)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1.18.0</td>
+<td><code>&lt;script src=…/ort.wasm.min.js&gt;</code> (UMD, jsdelivr or cdnjs), <code>wasmPaths=&#39;assets/&#39;</code> prefix</td>
+<td><strong>OK</strong>, main thread</td>
+<td>4.45–5.4 s</td>
+</tr>
+<tr>
+<td>1.18.0</td>
+<td>blob: classic worker + <code>importScripts(CDN ort.wasm.min.js)</code></td>
+<td><strong>OK</strong>, in worker</td>
+<td>5.36 s</td>
+</tr>
+<tr>
+<td>1.20.1 / 1.22.0 / 1.30.0</td>
+<td>UMD <code>ort.wasm.min.js</code> (main thread or <code>importScripts</code> worker)</td>
+<td><strong>FAIL</strong>: dynamic <code>import()</code> of same-origin <code>ort-wasm-simd-threaded.mjs</code> is blocked by script-src (works when CSP has <code>&#39;self&#39;</code>: 1.30.0 4.5 s)</td>
+<td>–</td>
+</tr>
+<tr>
+<td>1.22.0 / 1.30.0</td>
+<td>ESM <code>ort.wasm.bundle.min.mjs</code> from CDN, <code>wasmPaths</code> <strong>string</strong></td>
+<td><strong>FAIL</strong> (same <code>.mjs</code> import)</td>
+<td>–</td>
+</tr>
+<tr>
+<td>1.20.1</td>
+<td>ESM <code>ort.bundle.min.mjs</code>, string <code>wasmPaths</code></td>
+<td>OK (2 non-fatal &quot;script-src eval&quot; reports)</td>
+<td>5.1 s</td>
+</tr>
+<tr>
+<td>1.22.0 / <strong>1.30.0</strong></td>
+<td>ESM bundle from jsdelivr/cdnjs, <code>wasmPaths = { wasm: &#39;&lt;abs url&gt;/ort-wasm-simd-threaded.wasm&#39; }</code></td>
+<td><strong>OK</strong>, no CSP reports</td>
+<td>4.47–5.1 s</td>
+</tr>
+<tr>
+<td>1.20.1 / 1.22.0 / <strong>1.30.0</strong></td>
+<td><strong>blob: module worker + dynamic <code>import(CDN bundle)</code></strong> + <code>{ wasm }</code></td>
+<td><strong>OK</strong> (jsdelivr and cdnjs)</td>
+<td>best of 2: 4.2–4.7 s (single runs 4.2–11 s on the loaded box)</td>
+</tr>
+<tr>
+<td>any</td>
+<td>blob: module worker with <em>static</em> <code>import … from CDN</code></td>
+<td>FAIL (worker error, no message)</td>
+<td>–</td>
+</tr>
+</tbody></table>
+<p>Weights variants, multi-threading and external data on the working paths (strict CSP):</p>
+<ul>
+<li>Detections in Chromium are identical to node (124 note boxes on this page for every variant).</li>
+<li>Warm page times (1.30.0 ESM and 1.18.0 UMD): fp32 / fp16w / int8w are all 4.1–4.4 s; int8d is 11.6 s on 1.30.0.</li>
+<li><strong>int8d does not load at all on 1.18.0</strong>: &quot;Could not find an implementation for ConvInteger(10)&quot;.</li>
+<li><strong>Always set <code>ort.env.wasm.numThreads = 1</code>.</strong> With <code>numThreads=4</code>, the 1.30.0 bundle fetches
+<code>ort-wasm-simd-threaded.mjs</code> <em>from the CDN</em> to start its thread workers, and connect-src blocks that (&quot;no available
+backend&quot;). This happened even with COOP/COEP headers sent; in this harness <code>crossOriginIsolated</code> stayed false, so
+the multi-thread upside was not measured. The artifact host cannot be assumed to send those headers anyway.</li>
+<li>copista-28m int8w split into two external-data files loads via <code>externalData: [{path, data: url}]</code> and runs
+in ≈60 s.</li>
+<li>Full numbers are in the matrix logs; see the appendix table generated by <code>src/summarize.py</code> (<code>out/tables.md</code>).</li>
+</ul>
+<h3>Loader that worked (ORT 1.30.0, strict CSP, off the main thread)</h3>
+<pre><code class="language-js">const BASE = new URL(&#39;.&#39;, location.href).href;            // blob: workers can&#39;t resolve relative URLs
+const SRC = `
+const ortP = import(&#39;https://cdn.jsdelivr.net/npm/onnxruntime-web@1.30.0/dist/ort.wasm.bundle.min.mjs&#39;);
+self.onmessage = async ({ data }) =&gt; {
+  const ort = await ortP;
+  ort.env.wasm.numThreads = 1;
+  ort.env.wasm.wasmPaths = { wasm: data.base + &#39;assets/ort-wasm-simd-threaded.wasm&#39; };  // object form!
+  const get = async (f) =&gt; new Uint8Array(await (await fetch(data.base + &#39;assets/&#39; + f)).arrayBuffer());
+  const dense = await ort.InferenceSession.create(await get(&#39;copista2m-dense.int8w.onnx&#39;), { executionProviders: [&#39;wasm&#39;] });
+  const rel   = await ort.InferenceSession.create(await get(&#39;copista2m-rel.int8w.onnx&#39;),   { executionProviders: [&#39;wasm&#39;] });
+  // ... copista_core.detect(ort, {dense, rel}, meta, data.gray) -&gt; postMessage(dets)
+};`;
+const worker = new Worker(URL.createObjectURL(new Blob([SRC], { type: &#39;text/javascript&#39; })), { type: &#39;module&#39; });
+worker.postMessage({ base: BASE, gray /* {width,height,data} */ }, [gray.data.buffer]);
+</code></pre>
+<p>Fallback with ORT 1.18.0:</p>
+<pre><code class="language-html">&lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/onnxruntime-web/1.18.0/ort.wasm.min.js&quot;&gt;&lt;/script&gt;
+</code></pre>
+<p>then <code>ort.env.wasm.wasmPaths = &#39;assets/&#39;</code> and self-host <code>ort-wasm-simd.wasm</code>. For a worker, use
+<code>importScripts(&lt;same URL&gt;)</code> in a blob: classic worker with an absolute <code>wasmPaths</code>.</p>
+<h2>How the detector maps onto the product requirements</h2>
+<ul>
+<li><strong>Closed-score SATB → separate parts.</strong> For each staff, notes with <code>voice_slot=1</code> (stems up) become S (treble) or
+T (bass), and <code>voice_slot=2</code> become A or B. <code>stem_dir=both</code> on a shared head goes into both voices. A grand staff
+(brace, <code>grpSym_brace</code>) is not split. The bracket/brace class distinguishes choir staves from piano systems, which
+helps with the &quot;do not split piano&quot; rule.</li>
+<li><strong>Rhythm.</strong> Duration comes from the note class (<code>note_whole … note_16th</code>) plus the <code>dots</code> attribute, rests from
+the <code>rest_*</code> classes, and bar boundaries from <code>barLine_*</code> and <code>measure</code> boxes (one per staff per bar). Clefs,
+<code>keySig_*</code> and <code>meterSig_N_D</code> (82 meter classes) are all detected.</li>
+<li><strong>Pitch.</strong> Use our own staff-line fit with notehead y. Cross-check against <code>staff_position</code> and use it when the
+staff fit is unsure. Get the clef from the <code>clef_*</code> class.</li>
+<li><strong>Lyrics.</strong> Not covered. Run OCR on the band between the notehead boxes of adjacent staves, or below the system.
+Attach syllables by x to the voice that carries them: in a hymn the between-staves verses belong to S, and to A,
+T and B too when they are homorhythmic.</li>
+</ul>
+<h2>Reproduce</h2>
+<p>All commands run from <code>spike/ml/</code>. The venvs were created by the spike.</p>
+<pre><code>.venv/bin/python src/make_scans.py                                  # scans + ground truth (≈25 s)
+.venv-cop/bin/python src/export_copista.py                          # ONNX export + parity check
+.venv/bin/python src/quantize.py out/onnx/copista2m-dense.onnx out/onnx/copista2m-dense fp16w int8w int8d
+.venv/bin/python src/split_external.py out/onnx/copista28m-dense.int8w.onnx out/onnx/copista28m-dense.int8w.split.onnx 14
+node src/node_copista.mjs web 2m int8w 1 scans/*_*_*.png           # browser-equivalent run -&gt; out/nodedets/
+.venv/bin/python src/score_dets.py                                  # notehead P/R/attrs
+.venv/bin/python src/run_e2e.py homr cop2m cop28m                   # reference pipelines (+ oemer: see run_e2e.py)
+.venv/bin/python src/eval_satbline.py
+node src/microbench.mjs web 1 out/onnx/*.onnx
+node src/web_bench.mjs out/web/matrix2.json                        # Chromium, strict CSP
+.venv/bin/python src/summarize.py &gt; out/tables.md
+</code></pre>
+<p>Exact versions:</p>
+<ul>
+<li>Runtimes: onnxruntime-node 1.30.0, onnxruntime-web 1.30.0 / 1.22.0 / 1.20.1 / 1.18.0 (npm tarballs in
+<code>spike/ml/ortweb/</code>); Python onnxruntime 1.31.1.</li>
+<li>Tooling: onnx 1.23.x, onnxconverter-common 1.16.0, torch 2.15.0+cpu, torchvision 0.29.2, playwright-core 1.48.2,
+Chromium build 1248.</li>
+<li>Projects: copisteria commit <code>c685f280914d91a694494588d9f6a376d7917eba</code>, homr 0.7.0 (PyPI), oemer 0.1.8 (PyPI) with
+checkpoints from <code>https://github.com/BreezeWhite/oemer/releases/download/checkpoints/{1st,2nd}_model.onnx</code>,
+satb-line-omr commit <code>c60823117a5c92b0c29f921dbca023e94026d279</code>.</li>
+<li>Engraving and rendering: LilyPond 2.24, poppler <code>pdftoppm</code>.</li>
+</ul>
+<h2>Caveats</h2>
+<ul>
+<li><strong>Machine.</strong> The box was shared and heavily loaded (load average 500–1400 on 192 cores) while I measured. Wall
+times are noisy, which is why CPU ms is reported. Chromium numbers are single runs on aarch64.</li>
+<li><strong>Test data.</strong> The scans are synthetic, from LilyPond engraving, and the pieces are simple, homophonic hymn
+textures. copista was trained on varied engravings with scan effects, so the near-perfect detector numbers here
+are likely optimistic for 19th-century prints. The one real 1919 scan looked good, with a few misses, but it has no
+ground truth.</li>
+<li><strong>Python baselines.</strong> copisteria e2e numbers include its own Python reader. Our browser path would replace that
+with a JS assembler, so its accuracy is still to be built and measured.</li>
+<li><strong>Out of scope.</strong> Lyrics and OCR were not evaluated in this spike.</li>
+</ul>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+<script>window.mermaid && mermaid.initialize({ startOnLoad: true, theme: matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default' });</script>
+</body>
+</html>

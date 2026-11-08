@@ -1,0 +1,873 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spike: a classical (non-ML) OMR front end in plain JS</title>
+<style>
+:root { --bg: #fbfbfa; --fg: #1b1e24; --muted: #5a6170; --rule: #dde1e7; --accent: #2456a6; --code: #f0f2f5; }
+@media (prefers-color-scheme: dark) { :root { --bg: #13161b; --fg: #e5e8ed; --muted: #a2aab7; --rule: #2b313b; --accent: #82a8ea; --code: #1c2028; color-scheme: dark; } }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.65 "Source Serif 4", Georgia, serif; padding: 32px max(16px, env(safe-area-inset-right, 0px)) 64px max(16px, env(safe-area-inset-left, 0px)); }
+main { max-width: 820px; margin: 0 auto; }
+h1, h2, h3, h4 { font-family: system-ui, sans-serif; line-height: 1.25; text-wrap: balance; }
+a { color: var(--accent); }
+code, pre { font-family: ui-monospace, Menlo, monospace; font-size: 0.86em; background: var(--code); border-radius: 4px; }
+code { padding: 1px 4px; } pre { padding: 12px 14px; overflow-x: auto; } pre code { padding: 0; background: none; }
+table { border-collapse: collapse; display: block; overflow-x: auto; font-size: 0.92em; }
+th, td { border: 1px solid var(--rule); padding: 6px 10px; text-align: left; vertical-align: top; }
+nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bottom: 24px; }
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+</head>
+<body>
+<main><nav class="crumbs"><a href="../">Score Scan Reader</a> / docs / spike-classical.md · <a href="https://github.com/pension-plan/score-scan-reader/blob/main/docs/spike-classical.md">source</a></nav>
+<h1>Spike: a classical (non-ML) OMR front end in plain JS</h1>
+<p><strong>Question.</strong> Can rule-based image processing in plain JavaScript find the staves, noteheads, stems and barlines on <em>scanned</em> hymn and chorale pages well enough to sit at the core of the client-side OMR app? Specifically: binarization, deskew, staff-space estimation, staff detection, staff removal, connected components, filled and hollow noteheads, stem direction and barlines.</p>
+<p><strong>Answer: yes for the staff/geometry layer, and yes for filled noteheads and stem-based SATB voice splitting. Hollow notes, chords and symbol recognition are where hand rules run out.</strong> On 180 synthetic scans under realistic degradations (37 k noteheads in total, 31 k of them under realistic conditions):</p>
+<table>
+<thead>
+<tr>
+<th>stage</th>
+<th>result (15 realistic conditions, 150/200/300 dpi)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>staff detection</td>
+<td>recall 99.9 %, precision 100 %, mean line-position error 0.01–0.1 px</td>
+</tr>
+<tr>
+<td>staff-space estimate</td>
+<td>0.24 % mean error</td>
+</tr>
+<tr>
+<td>deskew (rotations up to 4°)</td>
+<td>≤ 0.01° error; 0.22° on the phone/perspective case</td>
+</tr>
+<tr>
+<td>noteheads (all kinds)</td>
+<td>P 99.7 / R 97.3 / <strong>F1 98.5</strong></td>
+</tr>
+<tr>
+<td>filled / half / whole heads</td>
+<td>F1 99.2 / 88.8 / 69.2</td>
+</tr>
+<tr>
+<td>pitch (staff position) of matched heads</td>
+<td>99.8 %</td>
+</tr>
+<tr>
+<td>stem direction</td>
+<td>98.5 %</td>
+</tr>
+<tr>
+<td><strong>SATB voice assignment from stem direction alone</strong></td>
+<td><strong>97.0 %</strong> (clean 98.6 %, flatbed &quot;scan&quot; 95.7 %, &quot;phone&quot; 83.0 %)</td>
+</tr>
+<tr>
+<td>unison heads shared by two voices (two stems)</td>
+<td>197/200 found as &quot;both voices&quot;</td>
+</tr>
+<tr>
+<td>barlines</td>
+<td>P 100 / R 99.9</td>
+</tr>
+<tr>
+<td>system grouping (which staves form a system)</td>
+<td>99.0 %</td>
+</tr>
+<tr>
+<td>runtime</td>
+<td>0.43 s/page at 150–200 dpi, 0.70 s at 300 dpi (1.0 s with deskew), single thread, node 24</td>
+</tr>
+</tbody></table>
+<p>On two real 1906 hymnal scans the geometry layer worked first time (all main staves, systems and barlines found). Notehead recall was only <strong>about 65–70 %</strong>, judged by eye on one system per page with a different engraving font. The rules were tuned on LilyPond&#39;s Emmentaler glyphs, and that is the main risk (see <em>Real scan</em>).</p>
+<p><strong>Recommendation.</strong></p>
+<ul>
+<li>Adopt this pipeline as the deterministic front end. The parts to keep are binarization, deskew, staff-space estimation, staff tracking and removal, and system grouping. Also keep staff-position-constrained candidate generation, stem search and barlines.</li>
+<li>Make the notehead/symbol <strong>classifier</strong> swappable. That means a small learned patch classifier (ONNX) over the candidates this pipeline proposes, or at least self-calibrating templates.</li>
+<li>Voice separation for closed score can be decided by stem direction plus staff role in the system. That rule scored 97 % here.</li>
+</ul>
+<hr>
+<h2>1. What was built</h2>
+<p>All code is in <code>spike/classical/</code>. The core in <code>src/</code> is environment-agnostic: it works on <code>{width, height, data: Uint8ClampedArray}</code> gray pages and returns plain objects. Only <code>image.js</code> file I/O touches node APIs. Entry point: <code>runOMR(gray, opts)</code> in <code>src/pipeline.js</code>.</p>
+<table>
+<thead>
+<tr>
+<th>stage</th>
+<th>method</th>
+<th>file</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>binarization</td>
+<td>Background normalisation: per-block 90th percentile, smoothed and bilinear-interpolated, then divided out. Then global Otsu. An <em>absolute contrast guard</em> (ink must be ≥ max(12, 2.5·σ_noise) grey levels below the local paper level) stops vignetted corners turning black. A lenient companion threshold is used only to recover faint hairline stems. Isolated-pixel removal, plus area-scaled despeckle when the page is noisy.</td>
+<td><code>binarize.js</code></td>
+</tr>
+<tr>
+<td>deskew</td>
+<td>Projection-profile sharpness (Σ bin²) of <code>y + x·tanθ</code> over ±8°: 0.25° coarse, then 0.02° fine. Rotate the grey image back and re-binarize.</td>
+<td><code>skew.js</code></td>
+</tr>
+<tr>
+<td>staff space / line thickness</td>
+<td>Vertical run-length &quot;combo&quot; histogram (black run + following white run; Fujinaga / Audiveris). Cross-checked by the autocorrelation of strip-wise row projections, which survives broken lines and blur.</td>
+<td><code>staffspace.js</code></td>
+</tr>
+<tr>
+<td>staff detection</td>
+<td>Thin-horizontal mask (vertical run ≤ 2·lt+1.5, horizontal run ≥ 0.8·ss, ±1-row jitter). Row projections in strips 6·ss wide, then a 5-equally-spaced-peaks search, then a 4-of-5 search with one inner line missing. Candidates are tracked across strips, so each line is a polyline, which tolerates curvature. Relaxed passes (gap-bridging, lower peak threshold) run only on rows not already explained. Extents are walked out while ≥ 4 lines have ink; barline-like columns are skipped.</td>
+<td><code>staves.js</code></td>
+</tr>
+<tr>
+<td>systems</td>
+<td>Staves are linked when a thin, near-vertical ink column (a bracket or system start bar) joins one staff&#39;s bottom line to the next staff&#39;s top line, with paper on one side so a dark blob doesn&#39;t count.</td>
+<td><code>staves.js</code></td>
+</tr>
+<tr>
+<td>staff removal</td>
+<td>Line tracking plus a vertical run-length test: erase the run through the line when it is ≤ 1.8·lt+1.</td>
+<td><code>staffremoval.js</code></td>
+</tr>
+<tr>
+<td>connected components</td>
+<td>Two-pass union-find, 8-connectivity; integral images.</td>
+<td><code>cc.js</code></td>
+</tr>
+<tr>
+<td>noteheads</td>
+<td>For every staff, every staff position p (−13…13) and every column: O(1) box-sum features on the original binary (B) and the staff-removed binary (R). <em>Filled</em>: solid core, wide enough, closed top/bottom, not inside a beam, not part of a staff-spanning bar. <em>Hollow</em>: white core (line rows excluded for heads on lines), ink walls left and right, closed top/bottom, no accidental-like strokes (column test), not a barline, and the tilted-hole check (ink upper-left and lower-right). Heads beyond the staff need their ledger lines. Clef, time-signature and header exclusion zones are found from components. NMS runs across x, p and staves, plus same-row NMS so dots don&#39;t count.</td>
+<td><code>noteheads.js</code></td>
+</tr>
+<tr>
+<td>stems</td>
+<td>For each head, scan columns on both sides for the longest vertical ink run through the head row (small gaps bridged); a stem must extend ≥ 2.2 ss. Direction is up, down, or both (two different columns: right-up plus left-down = a unison of two voices). Stem rule: filled and half notes need a stem; stemless hollow heads must be whole-note wide. Lenient-binary fallback for heads with no stem.</td>
+<td><code>stems.js</code></td>
+</tr>
+<tr>
+<td>barlines</td>
+<td>Thin columns covering ≥ 90 % of the staff height on R. The full vertical extent must end at the staff edges or continue to the neighbouring staff of the same system (span bar). Stems, the staff start and the header zone are rejected; thin+thick pairs are merged (final and double bars).</td>
+<td><code>barlines.js</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h2>2. Test data with pixel-exact ground truth</h2>
+<p><strong>Scores</strong> (<code>spike/classical/scores/</code>, all public domain or CC0):</p>
+<table>
+<thead>
+<tr>
+<th>piece</th>
+<th>content</th>
+<th>staff size → staff space at 150/200/300 dpi</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>satb20</code></td>
+<td>Closed-score SATB hymn (Wesley, <em>Love divine</em>, 4 verses; my tune, CC0), ChoirStaff, voiceOne/voiceTwo, 242 heads incl. 2 unisons</td>
+<td>20 pt → 10.4 / 13.9 / 20.8 px</td>
+</tr>
+<tr>
+<td><code>satb16</code></td>
+<td>Same music at hymnal size</td>
+<td>15 pt → <strong>7.8</strong> / 10.4 / 15.5 px</td>
+</tr>
+<tr>
+<td><code>melody</code></td>
+<td>Melody + 2 verses (Jonson, <em>To Celia</em>): slurs, ties, dots, accidentals, ledger lines, rests</td>
+<td>20 pt</td>
+</tr>
+<tr>
+<td><code>piano</code></td>
+<td>Grand staff: chords, seconds, beams, 2 voices, whole-note chords, ledger lines</td>
+<td>18 pt</td>
+</tr>
+</tbody></table>
+<p><strong>Truth method</strong> (<code>scores/omrtruth.ily</code>, <code>tools/truth.js</code>). Each score is rendered twice by LilyPond 2.24. The truth render paints every relevant grob in a unique colour: R = class (notehead filled/half/whole, stem up/down, barline, staff symbol, ledger, beam, accidental, clef, lyric text, …), (G,B) = a 16-bit object id. It is rasterized without anti-aliasing. A Scheme colour callback logs, for every id, the pitch, duration, staff position, stem direction and voice name, plus lyric text. Colour does not change layout: the clean and truth renders have pixel IoU 0.992 against each other. So every pixel of every notehead, stem, barline and staff line is known exactly at any DPI. Unisons where one head hides another are re-attached to the visible head, so it carries both voices. The truth JSON also contains lyric syllable boxes with their text, which the lyrics/OCR work can reuse.</p>
+<p><strong>Degradations</strong> (<code>tools/degrade.py</code>). All geometric warps are defined as inverse maps, and truth points are pushed forward by numerical inversion, so the truth stays exact after rotation and warping. Photometric parameters are in physical units.</p>
+<table>
+<thead>
+<tr>
+<th>condition</th>
+<th>definition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>clean</td>
+<td>pdftoppm anti-aliased grey</td>
+</tr>
+<tr>
+<td>rot+0.6 / rot-2 / rot+4</td>
+<td>rotation (deg)</td>
+</tr>
+<tr>
+<td>blur1 / blur2</td>
+<td>Gaussian σ = 1 / 2 px at 300 dpi (scaled with dpi)</td>
+</tr>
+<tr>
+<td>noise20 / noise45</td>
+<td>Gaussian noise σ = 20 / 45 grey levels</td>
+</tr>
+<tr>
+<td>jpeg25 / jpeg8</td>
+<td>JPEG quality 25 / 8</td>
+</tr>
+<tr>
+<td>light</td>
+<td>strong lamp vignette + gradient, paper 0.85, contrast 0.7</td>
+</tr>
+<tr>
+<td>speckle</td>
+<td>0.4 % salt &amp; pepper + dust blobs</td>
+</tr>
+<tr>
+<td>bin_thick / bin_faded / bin_thin</td>
+<td>1-bit photocopy: blur + noise + threshold 205 / 95 / 60 (bin_thin deletes 1–2 px lines entirely)</td>
+</tr>
+<tr>
+<td>warp</td>
+<td>page curl (0.4 % H bow) + keystone 0.03 + 0.8°</td>
+</tr>
+<tr>
+<td>scan</td>
+<td>flatbed: 0.9° + blur 0.7 + mild light + noise 8 + JPEG 60</td>
+</tr>
+<tr>
+<td>phone</td>
+<td>curl 0.6 % + keystone 0.04 − 1.4° + strong light + blur 1.2 + noise 10 + JPEG 45</td>
+</tr>
+</tbody></table>
+<p>That is 4 pieces × 3 DPIs × 18 conditions = <strong>216 page images, 37 422 truth noteheads</strong>. The rendered and degraded set (<code>data/set/*.png</code> + truth <code>*.json</code>) is reusable by the other workstreams.</p>
+<hr>
+<h2>3. Results</h2>
+<p>Matching rules: a head matches if its centre is within 0.5 ss. A barline matches on the same staff within 1 ss in x. A staff matches if its middle line is within 0.6 ss. &quot;Pitch&quot; = the detected staff position equals the truth staff position. &quot;SATB voice&quot; = the voice set from (upper/lower staff of the system) × (stem up/down/both) equals the truth voices. Full tables are in <code>spike/classical/results/by_*.md</code>; raw per-image records are in <code>results/final.jsonl</code>.</p>
+<h3>3.1 By condition (all pieces, all DPIs; percentages)</h3>
+<table>
+<thead>
+<tr>
+<th>condition</th>
+<th>staves R</th>
+<th>ss err</th>
+<th>skew err</th>
+<th>head P</th>
+<th>head R</th>
+<th>head F1</th>
+<th>half F1</th>
+<th>pitch</th>
+<th>stem dir</th>
+<th>SATB voice</th>
+<th>bar P</th>
+<th>bar R</th>
+<th>systems</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>clean</td>
+<td>100.0</td>
+<td>0.2%</td>
+<td>0.00°</td>
+<td>100.0</td>
+<td>98.2</td>
+<td><strong>99.1</strong></td>
+<td>93.6</td>
+<td>99.9</td>
+<td>98.9</td>
+<td>98.6</td>
+<td>100.0</td>
+<td>100.0</td>
+<td>100.0</td>
+</tr>
+<tr>
+<td>rot+0.6</td>
+<td>100.0</td>
+<td>0.2%</td>
+<td>0.01°</td>
+<td>99.7</td>
+<td>97.2</td>
+<td><strong>98.4</strong></td>
+<td>89.4</td>
+<td>99.9</td>
+<td>98.8</td>
+<td>97.8</td>
+<td>100.0</td>
+<td>100.0</td>
+<td>100.0</td>
+</tr>
+<tr>
+<td>rot-2</td>
+<td>100.0</td>
+<td>0.2%</td>
+<td>0.00°</td>
+<td>99.6</td>
+<td>97.4</td>
+<td><strong>98.5</strong></td>
+<td>90.0</td>
+<td>99.7</td>
+<td>99.2</td>
+<td>98.5</td>
+<td>100.0</td>
+<td>100.0</td>
+<td>100.0</td>
+</tr>
+<tr>
+<td>rot+4</td>
+<td>100.0</td>
+<td>0.2%</td>
+<td>0.01°</td>
+<td>99.9</td>
+<td>97.2</td>
+<td><strong>98.5</strong></td>
+<td>89.3</td>
+<td>99.9</td>
+<td>99.2</td>
+<td>98.5</td>
+<td>100.0</td>
+<td>100.0</td>
+<td>100.0</td>
+</tr>
+<tr>
+<td>blur1</td>
+<td>100.0</td>
+<td>0.2%</td>
+<td>0.00°</td>
+<td>99.8</td>
+<td>97.0</td>
+<td><strong>98.4</strong></td>
+<td>88.5</td>
+<td>99.9</td>
+<td>98.8</td>
+<td>97.8</td>
+<td>99.7</td>
+<td>100.0</td>
+<td>100.0</td>
+</tr>
+<tr>
+<td>blur2</td>
+<td>93.1</td>
+<td>8.8%</td>
+<td>0.00°</td>
+<td>94.7</td>
+<td>86.5</td>
+<td><strong>90.4</strong></td>
+<td>42.3</td>
+<td>98.6</td>
+<td>90.4</td>
+<td>83.3</td>
+<td>97.6</td>
+<td>91.5</td>
+<td>92.9</td>
+</tr>
+<tr>
+<td>noise20</td>
+<td>100.0</td>
+<td>0.2%</td>
+<td>0.00°</td>
+<td>100.0</td>
+<td>97.9</td>
+<td><strong>98.9</strong></td>
+<td>92.0</td>
+<td>99.9</td>
+<td>98.9</td>
+<td>98.5</td>
+<td>100.0</td>
+<td>100.0</td>
+<td>100.0</td>
+</tr>
+<tr>
+<td>noise45</td>
+<td>100.0</td>
+<td>0.2%</td>
+<td>0.00°</td>
+<td>99.9</td>
+<td>98.3</td>
+<td><strong>99.1</strong></td>
+<td>92.6</td>
+<td>100.0</td>
+<td>98.9</td>
+<td>98.5</td>
+<td>100.0</td>
+<td>100.0</td>
+<td>100.0</td>
+</tr>
+<tr>
+<td>jpeg25</td>
+<td>100.0</td>
+<td>0.2%</td>
+<td>0.00°</td>
+<td>100.0</td>
+<td>97.7</td>
+<td><strong>98.8</strong></td>
+<td>92.3</td>
+<td>99.9</td>
+<td>99.1</td>
+<td>98.6</td>
+<td>100.0</td>
+<td>100.0</td>
+<td>100.0</td>
+</tr>
+<tr>
+<td>jpeg8</td>
+<td>100.0</td>
+<td>0.2%</td>
+<td>0.00°</td>
+<td>99.8</td>
+<td>97.7</td>
+<td><strong>98.8</strong></td>
+<td>91.5</td>
+<td>99.9</td>
+<td>99.0</td>
+<td>98.5</td>
+<td>100.0</td>
+<td>100.0</td>
+<td>100.0</td>
+</tr>
+<tr>
+<td>light</td>
+<td>100.0</td>
+<td>0.2%</td>
+<td>0.00°</td>
+<td>100.0</td>
+<td>98.2</td>
+<td><strong>99.1</strong></td>
+<td>93.6</td>
+<td>99.9</td>
+<td>98.9</td>
+<td>98.6</td>
+<td>100.0</td>
+<td>100.0</td>
+<td>100.0</td>
+</tr>
+<tr>
+<td>speckle</td>
+<td>100.0</td>
+<td>0.2%</td>
+<td>0.00°</td>
+<td>100.0</td>
+<td>98.1</td>
+<td><strong>99.0</strong></td>
+<td>92.8</td>
+<td>99.9</td>
+<td>98.9</td>
+<td>98.6</td>
+<td>100.0</td>
+<td>100.0</td>
+<td>100.0</td>
+</tr>
+<tr>
+<td>bin_thick</td>
+<td>98.6</td>
+<td>0.6%</td>
+<td>0.00°</td>
+<td>98.5</td>
+<td>96.2</td>
+<td><strong>97.3</strong></td>
+<td>73.8</td>
+<td>97.0</td>
+<td>95.6</td>
+<td>91.6</td>
+<td>97.5</td>
+<td>98.1</td>
+<td>97.6</td>
+</tr>
+<tr>
+<td>bin_faded</td>
+<td>98.6</td>
+<td>0.2%</td>
+<td>0.00°</td>
+<td>100.0</td>
+<td>94.5</td>
+<td><strong>97.2</strong></td>
+<td>84.6</td>
+<td>99.9</td>
+<td>99.0</td>
+<td>98.6</td>
+<td>100.0</td>
+<td>98.9</td>
+<td>97.6</td>
+</tr>
+<tr>
+<td>bin_thin</td>
+<td>33.3</td>
+<td>78.2%</td>
+<td>0.00°</td>
+<td>100.0</td>
+<td>12.3</td>
+<td><strong>21.9</strong></td>
+<td>0.9</td>
+<td>99.4</td>
+<td>97.0</td>
+<td>76.8</td>
+<td>100.0</td>
+<td>17.4</td>
+<td>23.8</td>
+</tr>
+<tr>
+<td>warp</td>
+<td>100.0</td>
+<td>0.3%</td>
+<td>0.02°</td>
+<td>99.7</td>
+<td>97.1</td>
+<td><strong>98.4</strong></td>
+<td>87.1</td>
+<td>99.8</td>
+<td>97.5</td>
+<td>95.5</td>
+<td>100.0</td>
+<td>100.0</td>
+<td>100.0</td>
+</tr>
+<tr>
+<td>scan</td>
+<td>100.0</td>
+<td>0.3%</td>
+<td>0.01°</td>
+<td>99.4</td>
+<td>96.8</td>
+<td><strong>98.1</strong></td>
+<td>83.0</td>
+<td>99.7</td>
+<td>97.7</td>
+<td>95.7</td>
+<td>100.0</td>
+<td>100.0</td>
+<td>100.0</td>
+</tr>
+<tr>
+<td>phone</td>
+<td>100.0</td>
+<td>0.8%</td>
+<td>0.22°</td>
+<td>97.5</td>
+<td>95.7</td>
+<td><strong>96.6</strong></td>
+<td>68.2</td>
+<td>99.3</td>
+<td>94.2</td>
+<td>83.0</td>
+<td>99.7</td>
+<td>99.4</td>
+<td>88.1</td>
+</tr>
+<tr>
+<td><strong>realistic (15 conds)</strong></td>
+<td>99.9</td>
+<td>0.2%</td>
+<td>0.02°</td>
+<td>99.7</td>
+<td>97.3</td>
+<td><strong>98.5</strong></td>
+<td>88.8</td>
+<td>99.8</td>
+<td>98.5</td>
+<td>97.0</td>
+<td>100.0</td>
+<td>99.9</td>
+<td>99.0</td>
+</tr>
+<tr>
+<td><strong>stress (blur2, bin_thick, bin_thin)</strong></td>
+<td>75.0</td>
+<td>29.2%</td>
+<td>0.00°</td>
+<td>96.8</td>
+<td>65.0</td>
+<td><strong>77.8</strong></td>
+<td>45.2</td>
+<td>98.0</td>
+<td>93.7</td>
+<td>86.8</td>
+<td>97.8</td>
+<td>69.0</td>
+<td>71.4</td>
+</tr>
+<tr>
+<td><strong>all 216 pages</strong></td>
+<td>95.8</td>
+<td>5.1%</td>
+<td>0.01°</td>
+<td>99.3</td>
+<td>91.9</td>
+<td><strong>95.5</strong></td>
+<td>83.3</td>
+<td>99.6</td>
+<td>97.8</td>
+<td>95.8</td>
+<td>99.7</td>
+<td>94.7</td>
+<td>94.4</td>
+</tr>
+</tbody></table>
+<h3>3.2 By resolution (realistic conditions)</h3>
+<table>
+<thead>
+<tr>
+<th>DPI</th>
+<th>staves R</th>
+<th>head P</th>
+<th>head R</th>
+<th>head F1</th>
+<th>half F1</th>
+<th>stem dir</th>
+<th>SATB voice</th>
+<th>bar R</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>150</td>
+<td>100.0</td>
+<td>99.6</td>
+<td>95.9</td>
+<td>97.7</td>
+<td>82.6</td>
+<td>97.6</td>
+<td>94.8</td>
+<td>100.0</td>
+</tr>
+<tr>
+<td>200</td>
+<td>100.0</td>
+<td>99.5</td>
+<td>97.9</td>
+<td>98.7</td>
+<td>89.9</td>
+<td>98.6</td>
+<td>97.5</td>
+<td>100.0</td>
+</tr>
+<tr>
+<td>300</td>
+<td>99.7</td>
+<td>99.9</td>
+<td>98.0</td>
+<td>98.9</td>
+<td>93.4</td>
+<td>99.1</td>
+<td>98.7</td>
+<td>99.7</td>
+</tr>
+</tbody></table>
+<h3>3.3 By piece (realistic conditions)</h3>
+<table>
+<thead>
+<tr>
+<th>piece</th>
+<th>staff space px (150/200/300)</th>
+<th>head F1</th>
+<th>filled F1</th>
+<th>half F1</th>
+<th>whole F1</th>
+<th>stem dir</th>
+<th>SATB voice</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>satb20</td>
+<td>10.4 / 13.9 / 20.8</td>
+<td>99.8</td>
+<td>100.0</td>
+<td>96.4</td>
+<td>–</td>
+<td>99.3</td>
+<td>98.8</td>
+</tr>
+<tr>
+<td>satb16 (hymnal size)</td>
+<td>7.8 / 10.4 / 15.5</td>
+<td>98.9</td>
+<td>99.3</td>
+<td>88.4</td>
+<td>–</td>
+<td>95.5</td>
+<td>95.3</td>
+</tr>
+<tr>
+<td>melody</td>
+<td>10.4 / 13.9 / 20.8</td>
+<td>98.5</td>
+<td>99.5</td>
+<td>94.8</td>
+<td>–</td>
+<td>100.0</td>
+<td>–</td>
+</tr>
+<tr>
+<td>piano</td>
+<td>9.3 / 12.5 / 18.7</td>
+<td>95.1</td>
+<td>97.4</td>
+<td>75.3</td>
+<td>69.6</td>
+<td>99.1</td>
+<td>–</td>
+</tr>
+</tbody></table>
+<p>The hardest realistic case for hymnals is satb16 at 150 dpi (staff space 7.8 px, 1-px lines). It still reaches head F1 98.0, but half-note F1 falls to 74.3, stem direction to 91.9 % and SATB voice to 91.2 %. <strong>Ask for (or upsample to) ≥ 200 dpi equivalent</strong>: a staff space of at least ~10 px.</p>
+<hr>
+<h2>4. Findings per stage</h2>
+<p><strong>Binarization.</strong></p>
+<ul>
+<li>Background normalisation + Otsu beat Sauvola overall (window = page/60, k = 0.25, same pipeline otherwise): all-page head F1 95.5 vs 94.3, staff recall 95.8 vs 93.4. Sauvola lost a staff on clean pages (95.8 % staff recall, systems 92.9 %) and fell apart on the phone case (head recall 68 %, staff-space error 9 %). Raw per-image records are in <code>results/sauvola.jsonl</code>.</li>
+<li>The contrast guard was required for phone-style vignetting. Without it, the dark corner binarized to texture: staves extended into it and systems merged. With it, phone staff recall went from 94.4 to 100 %.</li>
+<li><strong>Do not median-filter</strong>: a 3×3 median erases 1-px staff lines at 150 dpi. That alone caused noise45 staff recall to drop to 28 % in an early run. Despeckling the binary by component area (scaled by ss²) is safe and fixed noise45 completely (F1 99.1).</li>
+</ul>
+<p><strong>Deskew.</strong></p>
+<ul>
+<li>The projection-profile estimate is essentially exact for rigid rotation: error ≤ 0.01° up to 4°. The residual is 0.22° when keystone and curl are present.</li>
+<li>Staff lines are tracked as polylines per strip (6 ss wide), so 0.6 % page curl costs nothing. Line-position error stayed ≤ 0.11 px mean and ≤ 0.12 ss max.</li>
+</ul>
+<p><strong>Staff space.</strong></p>
+<ul>
+<li>The run-length combo estimate is accurate to 0.2 % whenever lines survive binarization.</li>
+<li>It fails by a factor of 2–3 when lines are broken or very blurred. The autocorrelation cross-check fixed some of these cases. It returns &quot;no periodicity&quot; instead of a wrong value when lines are genuinely gone (bin_thin at 200/300 dpi: threshold 60 deletes the 1–2 px lines outright, which no staff-based method can recover).</li>
+</ul>
+<p><strong>Staff detection.</strong></p>
+<ul>
+<li>The strict pass (25 % of strip width) handles everything except faded copies.</li>
+<li>The cascade adds relaxed passes with gap bridging, applied only to rows not yet explained by a staff. Running relaxed passes everywhere produced phantom staves from lyric lines.</li>
+<li>A 4-of-5 pattern with a missing inner line rescued single staff lines lost to subpixel alignment in faded copies (satb16_300_bin_faded went from 4 to 7 of 8 staves). It must run only after complete staves have claimed their peaks, and only in the strict pass. Otherwise it locks onto text lines.</li>
+<li><strong>Assumes one staff size per page.</strong> The small &quot;Amen&quot; staves on the real scan were half-missed. Per-region staff space is needed for cue/ossia/Amen staves.</li>
+</ul>
+<p><strong>Staff removal.</strong> The simple run-length rule is good enough for detection, but it cuts hollow-note outlines that are tangent to a line. So hollow-head features read the <em>original</em> binary for the top/bottom closure and R for the walls. Requiring the two walls of a hollow head to be in the same R component broke half notes in spaces, and was dropped.</p>
+<p><strong>Noteheads.</strong></p>
+<ul>
+<li>Constraining the search to staff positions is very effective: pitch accuracy of matched heads is 99.8 % and essentially free.</li>
+<li>Filled heads are near-solved: F1 99.2 realistic, 99.7 clean.</li>
+<li>Every false-positive family seen had to be removed with a dedicated rule:<ul>
+<li>thick final barline (as filled or hollow)</li>
+<li>head+dot gap (as hollow)</li>
+<li>sharp/natural/flat interiors (as hollow)</li>
+<li>bass-clef dots and treble-clef loops</li>
+<li>time-signature &quot;C&quot; and digits</li>
+<li>beams</li>
+<li>duplicate detections between staves</li>
+</ul>
+</li>
+<li>Hollow heads remain the weak point: half F1 88.8 realistic, 68 phone, 42 under blur2, because blur and JPEG fill the hole. Whole notes reach 69 %, mostly from whole-note chords in the piano piece. Stacked heads in chords (thirds and seconds) also cause misses in the piano piece (half F1 75). Hymns in closed score rarely have three-note chords per stem, so satb20 half F1 is 96.4.</li>
+<li>These rules are tied to the glyph proportions they were tuned on (see Real scan).</li>
+</ul>
+<p><strong>Stems and voice separation (requirement 2).</strong></p>
+<ul>
+<li>Stem direction is 98.5 % correct (realistic). Closed-score voice assignment by rule reaches 97.0 % realistic and 98.6 % clean: upper staff up = S, down = A; lower staff up = T, down = B; two stems = both voices.</li>
+<li>Unisons, drawn by LilyPond as one head with two stems, are found as &quot;both voices&quot; in 197/200 cases.</li>
+<li>This is strong evidence that the &quot;split shared staves into parts&quot; requirement is decidable from stem geometry for hymn-style closed score, without ML. Grand staves don&#39;t need this: the same data shows piano chords with one stem per chord, i.e. a single voice.</li>
+<li>The faint hairline stems of old prints are lost by the main threshold. A lenient-threshold fallback, used only for heads without a stem, recovered them: +33 % detected heads on the real page, with no change on the synthetic set.</li>
+</ul>
+<p><strong>Barlines.</strong> P 100 / R 99.9 realistic, once stems, the staff start, the header zone, staff-spanning test columns and thin+thick merging were handled. Span bars (piano) are recognised as system-spanning.</p>
+<p><strong>Systems.</strong> 99.0 % realistic. The remaining phone errors come from the tolerant vertical-link test (bracket under keystone and shadow). Explicit bracket/brace component recognition would fix it.</p>
+<hr>
+<h2>5. Real scan check (no ground truth)</h2>
+<p>Two pages of <em>The English Hymnal</em> (1906, University of Toronto scan via archive.org, public domain), 1502×2233 px ≈ 190 dpi, yellowed paper with show-through. They are in <code>spike/classical/data/realscan/</code> (<code>*_overlay.jpg</code> = detections).</p>
+<table>
+<thead>
+<tr>
+<th>page</th>
+<th>staves</th>
+<th>systems</th>
+<th>barlines</th>
+<th>heads detected (stems up / down / both / none)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>p171 (keyboard-style SATB, chords)</td>
+<td>10/10</td>
+<td>5/5 correct</td>
+<td>all, visually</td>
+<td>148 (50 / 76 / 9 / 13)</td>
+</tr>
+<tr>
+<td>p269 (closed SATB + 2 small &quot;Amen&quot; systems + one 4-line chant staff)</td>
+<td>8 of 10 five-line staves (main 6/6, small Amen 2/4)</td>
+<td>4</td>
+<td>all main, visually</td>
+<td>94</td>
+</tr>
+</tbody></table>
+<ul>
+<li>Staff space came out as 18.2 px (consistent), skew −0.1°, and staff lines overlay exactly.</li>
+<li>Notehead recall, judged by eye on one system per page, is about <strong>65–70 %</strong>, with few false positives. The misses:<ul>
+<li>half notes in the period font: rounder, thicker outline, different hole tilt</li>
+<li>stacked chord heads</li>
+<li>heads on ledger lines</li>
+<li>breve-shaped whole notes</li>
+</ul>
+</li>
+<li>Before the lenient-stem fallback, many correct filled heads were dropped by the stem rule because the stems are hairlines.</li>
+<li><strong>Conclusion: the geometry layer transfers to real scans unchanged. The hand-tuned head classifier does not transfer fully.</strong></li>
+</ul>
+<hr>
+<h2>6. Runtime</h2>
+<p><code>tools/bench.js</code>, minimum of 5 runs, single thread, node 24, aarch64. The machine was heavily shared during the measurement (load average 400–1100), so treat these as upper bounds.</p>
+<table>
+<thead>
+<tr>
+<th>page</th>
+<th>total</th>
+<th>biggest stages</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1241×1754 (150 dpi)</td>
+<td>0.43 s</td>
+<td>heads 0.11, staves 0.09, binarize 0.07</td>
+</tr>
+<tr>
+<td>1654×2339 (200 dpi)</td>
+<td>0.43 s</td>
+<td>heads 0.09, staves 0.08, binarize 0.08</td>
+</tr>
+<tr>
+<td>2481×3508 (300 dpi)</td>
+<td>0.70 s</td>
+<td>binarize 0.17, staves 0.16, CC 0.11, heads 0.10</td>
+</tr>
+<tr>
+<td>2481×3508 phone (with deskew)</td>
+<td>1.0 s</td>
+<td>+ deskew rotation 0.27</td>
+</tr>
+</tbody></table>
+<p>That is fine for a browser worker. The obvious speedups are a downsampled skew search, a typed-array CC/despeckle, and computing the thin mask once per image. That is already done for the staff passes.</p>
+<hr>
+<h2>7. Limits of the classical approach</h2>
+<ol>
+<li><strong>Font and engraving dependence of the head rules.</strong> The box thresholds encode Emmentaler proportions: hole tilt, outline thickness, head width 1.18–1.4 ss. Fix: keep candidate generation (staff position × x) and the cheap rejections. Then classify candidates with either (a) templates learned on the fly from high-confidence heads of the same page, or (b) a tiny CNN on 2 ss × 2 ss patches. Option (b) is the better bet for IMSLP-style variety, and the candidate stream from this spike is the right input for it.</li>
+<li><strong>Symbol recognition is not done.</strong> That covers clefs, key and time signatures, accidentals, rests, flags/beams (durations), dots, ties/slurs and fermatas. The header-zone heuristics used here only suppress false positives. These need a component classifier: classical moments/templates are feasible for clefs, accidentals and rests; ML is more robust.</li>
+<li><strong>Hollow heads under blur/JPEG</strong> (blur2 half F1 42) and <strong>bin_thin</strong>-level line loss are effectively unrecoverable with rules.</li>
+<li><strong>One staff size per page</strong>: the small Amen/cue staves were partly missed. Only 5-line staves are handled (no 4-line chant).</li>
+<li><strong>Chords and seconds</strong>: 3+ stacked heads and displaced seconds lose recall. This matters for piano/keyboard-style hymnals (p171), less for closed-score SATB.</li>
+<li><strong>Lyrics are not handled here.</strong> They are cleanly separated, though: no phantom staves on 4-verse pages, and the truth JSON carries lyric boxes with text for the OCR work.</li>
+</ol>
+<hr>
+<h2>8. Reuse notes for the product pipeline</h2>
+<ul>
+<li><code>runOMR(gray)</code> returns everything in input-image coordinates (deskew undone):<ul>
+<li><code>staves[]</code>: 5 line polylines, left/right, system, space</li>
+<li><code>systems[]</code></li>
+<li><code>heads[]</code>: x, y, kind (filled/half/whole), staff, p (staff position), stem (+1 / −1 / 2 / 0), score</li>
+<li><code>barlines[]</code></li>
+<li><code>skew</code>, <code>staffSpace</code>, <code>lineThickness</code>, <code>timings</code></li>
+</ul>
+</li>
+<li>The modules are CommonJS without node dependencies (except <code>image.js</code> readers). For the artifact, bundle them with esbuild into an IIFE/worker; no WASM is needed.</li>
+<li>Suggested product flow: this front end → candidate patches → small ONNX symbol classifier (heads, rests, accidentals, clefs) → rhythm/measure assembly → voice split by stem direction + staff role → MusicXML.</li>
+<li>The truth generator (<code>omrtruth.ily</code> + <code>truth.js</code> + <code>degrade.py</code>) can produce unlimited labelled training patches for that classifier, from any LilyPond or MusicXML score converted with musicxml2ly.</li>
+</ul>
+<h2>9. Licensing</h2>
+<ul>
+<li>All spike code is original and MIT-licensable. The only runtime dependency is <code>pngjs</code> (MIT), used for node I/O only.</li>
+<li>LilyPond (GPL), poppler and ghostscript are used only offline to <em>generate</em> test data and are not shipped.</li>
+<li>Test scores: tunes CC0 (written for this spike), texts public domain (Wesley 1747, Jonson 1616).</li>
+<li>The real-scan pages are a 1906 public-domain edition.</li>
+</ul>
+<h2>10. Files</h2>
+<ul>
+<li><code>spike/classical/src/*.js</code>: pipeline (see §1)</li>
+<li><code>spike/classical/scores/</code>: <code>omrtruth.ily</code>, <code>satb_music.ily</code>, <code>satb20.ly</code>, <code>satb16.ly</code>, <code>melody.ly</code>, <code>piano.ly</code></li>
+<li><code>spike/classical/tools/</code>: <code>make_scores.sh</code>, <code>truth.js</code>, <code>degrade.py</code>, <code>make_dataset.sh</code>, <code>eval.js</code>, <code>run_all.js</code>, <code>report.js</code>, <code>omr.js</code>, <code>bench.js</code>, <code>debug_errors.js</code>, <code>probe.js</code></li>
+<li><code>spike/classical/data/set/</code>: 216 degraded pages + truth JSON. <code>data/truth/</code>: undistorted truth. <code>data/pdf/</code>: clean and truth PDFs + grob logs. <code>data/realscan/</code>: 1906 hymnal pages + overlays.</li>
+<li><code>spike/classical/results/final.jsonl</code> (per-image metrics), <code>by_cond.md</code>, <code>by_dpi.md</code>, <code>by_piece.md</code>, <code>by_cond_dpi.md</code></li>
+</ul>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+<script>window.mermaid && mermaid.initialize({ startOnLoad: true, theme: matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default' });</script>
+</body>
+</html>

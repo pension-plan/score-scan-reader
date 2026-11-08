@@ -1,0 +1,822 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spike: lyric OCR for scanned sheet music</title>
+<style>
+:root { --bg: #fbfbfa; --fg: #1b1e24; --muted: #5a6170; --rule: #dde1e7; --accent: #2456a6; --code: #f0f2f5; }
+@media (prefers-color-scheme: dark) { :root { --bg: #13161b; --fg: #e5e8ed; --muted: #a2aab7; --rule: #2b313b; --accent: #82a8ea; --code: #1c2028; color-scheme: dark; } }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.65 "Source Serif 4", Georgia, serif; padding: 32px max(16px, env(safe-area-inset-right, 0px)) 64px max(16px, env(safe-area-inset-left, 0px)); }
+main { max-width: 820px; margin: 0 auto; }
+h1, h2, h3, h4 { font-family: system-ui, sans-serif; line-height: 1.25; text-wrap: balance; }
+a { color: var(--accent); }
+code, pre { font-family: ui-monospace, Menlo, monospace; font-size: 0.86em; background: var(--code); border-radius: 4px; }
+code { padding: 1px 4px; } pre { padding: 12px 14px; overflow-x: auto; } pre code { padding: 0; background: none; }
+table { border-collapse: collapse; display: block; overflow-x: auto; font-size: 0.92em; }
+th, td { border: 1px solid var(--rule); padding: 6px 10px; text-align: left; vertical-align: top; }
+nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bottom: 24px; }
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+</head>
+<body>
+<main><nav class="crumbs"><a href="../">Score Scan Reader</a> / docs / spike-ocr.md · <a href="https://github.com/pension-plan/score-scan-reader/blob/main/docs/spike-ocr.md">source</a></nav>
+<h1>Spike: lyric OCR for scanned sheet music</h1>
+<p>Status: done (2026-11-08). Code, data generators and raw results are in <code>spike/ocr/</code>. Every number below can be reproduced with the commands in <a href="#reproduce">Reproduce</a>.</p>
+<h2>TL;DR</h2>
+<ul>
+<li><strong>Lyric OCR in the browser works well enough to ship.</strong> On detected and cleaned lyric strips from 280 synthetic scanned pages (5 degradations, English/German/Latin, 1–3 verses, 17 typefaces incl. italic verses), the best engines reach <strong>1.3–1.5 % character error rate (CER)</strong>. Syllable error rate is 10–12 %, and about 6 points of that come from hyphens the engraver did not print (see below). Hyphen detection reaches <strong>P 99.7–99.8 % and R 97–99 %</strong>.</li>
+<li><strong>Lyric strip isolation is solved with classical image processing</strong> (<code>spike/ocr/src/strips.js</code>, pure JS, about 300 lines, no ML). It finds <strong>100 % of the 1,920 ground-truth lyric lines with 99.2 % precision</strong> on all five degradations. Each line comes back with baseline, x-height, font size (median error 9 %), and geometric hyphens (<strong>P 96.6 % / R 97.8 %</strong>) and extenders (P 63 % / R 81 %) with x positions. It runs in 0.08–0.46 s per page in Node.</li>
+<li><strong>Recommendation:</strong><ol>
+<li>If the app ships <strong>onnxruntime-web</strong> anyway (for the OMR symbol models), use <strong>PaddleOCR PP-OCRv5 <code>latin_PP-OCRv5_mobile_rec</code> (ONNX, 8.0 MB, Apache-2.0)</strong>. It is the most accurate (e2e CER 1.3 %, oracle-crop CER 1.9 %, or 1.3 % with cleaning), has the best hyphen recall (99.3 %), covers eng/deu/lat with a single model, and needs no language choice. Cost: 142 ms per strip on 1 thread in Node (45 ms on 4 threads), 229–263 ms in headless Chromium.</li>
+<li>Otherwise use <strong>tesseract.js 7.0.0 with the <code>best_int</code> models</strong> (<code>eng</code>/<code>deu</code>/<code>lat</code> .traineddata.gz, 6.0 MB total) and the simd-lstm core (3.9 MB). Apply the <strong>gap-compression</strong> preprocessing described here (it cuts WER from 19.5 % to 11.5 %) with PSM 7. e2e CER is 1.5 %. If the language is unknown, <code>eng+deu+lat</code> gives the best syllable and word scores (SylER 10.2–10.7 %) at about 1.8× the time.</li>
+<li>In both cases, run OCR <strong>per detected strip</strong>, never on the whole page. Feed the engine the <em>masked</em> strip (only the text components kept). Use the geometric hyphen and extender detector to place syllables against notes and to find melismas.</li>
+</ol>
+</li>
+<li><strong>Gotchas found:</strong><ul>
+<li>tessdata_best <em>float</em> models crash tesseract.js 7 (<code>missing function DotProductSSE</code>), so use <code>best_int</code>.</li>
+<li>Disabling Tesseract dictionaries has no effect.</li>
+<li>PSM 6 is catastrophic on lyric strips (CER 15.9 %).</li>
+<li>PaddleOCR must <strong>not</strong> get gap-compressed strips: it needs at least 1 CTC frame per character, and CER rises to 11 %.</li>
+<li><code>ort.env.wasm.wasmPaths</code> must be an <strong>absolute</strong> URL.</li>
+<li>ORT 1.31.1&#39;s <code>ort-wasm-simd-threaded.wasm</code> is 14,848,852 B, just under the 15 MB per-file limit.</li>
+</ul>
+</li>
+</ul>
+<h2>1. Test data</h2>
+<p><code>spike/ocr/gen/</code> (Python 3.12 venv: pdfplumber 0.11.4, numpy, opencv-python-headless 5.0, pyyaml; LilyPond 2.24.3; poppler <code>pdftoppm</code>):</p>
+<ul>
+<li><p><code>texts.py</code>: 14 public-domain texts, pre-syllabified, 2–3 verses each.</p>
+<ul>
+<li><strong>English (5):</strong> Abide with Me, O God Our Help, Holy Holy Holy, Amazing Grace, Angels We Have Heard on High (with the Latin &quot;Gloria&quot; refrain).</li>
+<li><strong>German (4):</strong> Nun danket alle Gott, Ein feste Burg, Wer nur den lieben Gott, Lobe den Herren. These include ä/ö/ü/ß.</li>
+<li><strong>Latin (5):</strong> Pange lingua, Veni Creator, Stabat Mater, Adeste fideles, Ave verum.</li>
+</ul>
+</li>
+<li><p><code>make_ly.py</code>: 56 LilyPond scores built from random melodies with <strong>melismas</strong>: slurred groups with <code>__</code> extenders, plus ties from <code>Completion_heads_engraver</code>.</p>
+<ul>
+<li>Layouts:<ul>
+<li>closed-score SATB with lyrics between the staves (132 lines)</li>
+<li>melody plus 2–3 verses (84)</li>
+<li>open score with lyrics under all 4 staves (122)</li>
+<li>voice + piano (46)</li>
+</ul>
+</li>
+<li>Formatting: stanza numbers (&quot;1.&quot;) on 70 % of pieces, italic even verses on 30 %, staff size 16–20, lyric size −1…+1 steps.</li>
+<li>12 font families, which give 17 faces: TeX Gyre Schola/Termes/Bonum/Pagella/Heros, C059, P052, Liberation Serif, DejaVu Serif/Sans, Latin Modern, Charter. Pango falls back to DejaVu Sans for some.</li>
+</ul>
+</li>
+<li><p><code>gt.py</code>: renders each page at 300 dpi and extracts ground truth from the PDF with pdfplumber:</p>
+<ul>
+<li>lyric chars by baseline and size, with ligatures (<code>ﬁ</code>/<code>ﬂ</code>) and <code>(cid:N)</code> Latin-1 glyphs handled;</li>
+<li>an alignment to the logical syllables from the generator;</li>
+<li>a <strong>printed</strong> hyphen/extender flag per syllable gap, measured on the clean raster. LilyPond drops a hyphen when the gap is too small, and <strong>8.6 % of logical hyphens are not printed</strong>.</li>
+</ul>
+<p>Coverage check: every syllable of every verse was matched (0 mismatches).</p>
+</li>
+<li><p><code>degrade.py</code>: produces 5 variants per page, transforming the GT boxes and syllable x positions accordingly:</p>
+<table>
+<thead>
+<tr>
+<th>variant</th>
+<th>simulates</th>
+<th>details</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>clean300</code></td>
+<td>born-digital rasterised</td>
+<td>300 dpi gray</td>
+</tr>
+<tr>
+<td><code>scan300</code></td>
+<td>flatbed gray scan</td>
+<td>tilt ±0.35°, blur σ 0.5–0.9, paper tone 228–245, illumination ±8 %, noise σ 6, JPEG q70–85</td>
+</tr>
+<tr>
+<td><code>bilevel300</code></td>
+<td>IMSLP-style 1-bit</td>
+<td>blur + noise + threshold 105–165 (thin or fat strokes, <strong>faint staff lines drop out</strong>), salt/pepper</td>
+</tr>
+<tr>
+<td><code>copy200</code></td>
+<td>photocopy</td>
+<td>200 dpi, eroded/darker strokes, gutter shadow, toner specks, noise σ 9</td>
+</tr>
+<tr>
+<td><code>phone150</code></td>
+<td>phone / low-res scan</td>
+<td>150 dpi, blur σ 1, strong illumination gradient (25 %), low contrast, JPEG q55</td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<p>Totals: <strong>56 docs → 280 page images, 1,920 lyric-line strips</strong> (eng 158 / deu 103 / lat 123 lines per variant). Each variant has 6,885 syllables, 2,645 logical hyphens (2,418 printed), 876 melisma syllables and 170 printed extenders. Lyric font size is 35–51 px at 300 dpi.</p>
+<p>Limitations of the data: it is synthetic. It has no real paper texture, bleed-through or page curl, no Fraktur, no handwritten annotations, and only modern engraving fonts. Real IMSLP/CPDL scans should be added to the harness (see <a href="#9-risks-and-follow-ups">Follow-ups</a>).</p>
+<h2>2. Metrics</h2>
+<p><code>spike/ocr/src/metrics.js</code>. OCR text first goes through the filter the app would use: drop <code>|[]{}&lt;&gt;/\*#@=+</code> and similar, map ’→&#39;, all dashes to <code>-</code>, <code>_</code> to space.</p>
+<ul>
+<li><strong>CER</strong>: Levenshtein distance on the text with whitespace and hyphens removed (letters + punctuation), divided by GT length.</li>
+<li><strong>SylER</strong>: edit distance over syllable tokens (split on space and hyphen, punctuation stripped). This is what becomes one <code>&lt;lyric&gt;&lt;text&gt;</code> per note. <strong>Floor: a perfect OCR of the <em>printed</em> page still scores 6.1 % SylER (eng 3.2 / deu 4.4 / lat 10.0)</strong>, because hyphens the engraver omitted (&quot;Morgen&quot; instead of &quot;Mor-gen&quot;) can only be recovered by note alignment or hyphenation patterns.</li>
+<li><strong>WER</strong>: words after joining hyphenated syllables, punctuation stripped.</li>
+<li><strong>Hyphen P/R</strong>: computed per GT syllable gap after character alignment of OCR to GT. Only gaps where a hyphen was printed count as positives.</li>
+</ul>
+<h2>3. Lyric strip isolation (<code>src/strips.js</code>)</h2>
+<p>The input is a grayscale page <code>{width,height,data}</code>, so the same code runs in Node and in the browser. Steps:</p>
+<ol>
+<li><strong>Adaptive binarisation</strong>: local mean over a window of about W/45, k = 0.15, capped at Otsu + 40.</li>
+<li><strong>Staff-line thickness <code>lt</code> and spacing <code>ss</code></strong> from vertical run-length histograms: the most frequent black run, and the most frequent white run above 2·lt.</li>
+<li><strong>Skew</strong> from the projection-profile variance over ±1° in 0.05° steps, using 32-px column chunks. The image is then sheared, not rotated. Estimates matched the applied tilt to within the step size.</li>
+<li><strong>Staff lines</strong> from a row projection that counts only horizontal runs longer than 2·ss, smoothed over the line thickness, with a threshold of 0.25 × robust max. Candidates closer than 0.4·ss are merged.</li>
+<li><strong>Staves</strong> are grouped as 5 lines at spacing ss+lt (±30 %). The grouping <strong>tolerates one missing line</strong> (inner gap 2d, or an outer line inferred from the side with more long-run ink). Without this, the bilevel variant lost 3.4 % of lines.</li>
+<li>For every band between consecutive staves (and up to 14 staff spaces below the last staff), find connected components that <strong>do not touch the band edges</strong>. Touching components are attached to the staff: notes, stems, beams. Also drop components taller than 4·ss or wider than 30·ss.</li>
+<li><strong>Baselines</strong>: build a histogram of component bottoms for letter-sized components (0.45–3.2 ss high), smooth it, and take peaks at least 1.4·ss apart. Each peak needs at least 4 core letters, and the median core height must be at least 0.6·ss so that rows of toner specks are rejected. A line&#39;s members are all components inside [baseline − 1.9·cap, baseline + 0.6·cap].</li>
+<li><strong>Per line output</strong>:<ul>
+<li>bbox and baseline, mapped back through the shear;</li>
+<li>x-height, cap height and font size ≈ cap/0.70;</li>
+<li><strong>hyphens</strong>: flat components (h ≤ 0.4·xh, w ≥ 1.6·h) centred between 0.15 and 0.95 xh above the baseline;</li>
+<li><strong>extenders</strong>: flat components at the baseline that are at least 1.2·xh wide;</li>
+<li>a <strong>masked strip</strong> containing only member pixels from the deskewed gray image, which removes stems and noteheads that poke into the text band.</li>
+</ul>
+</li>
+</ol>
+<p>Results (<code>results/summary_det.json</code>, every page of every variant):</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>value</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>lyric-line recall</td>
+<td><strong>100.0 %</strong> (1920/1920)</td>
+</tr>
+<tr>
+<td>precision</td>
+<td><strong>99.2 %</strong> (15 false lines, mostly toner-speck rows in <code>copy200</code>; trivially filtered by &quot;OCR text has &lt; 2 letters&quot;)</td>
+</tr>
+<tr>
+<td>font-size estimate</td>
+<td>median rel. error 9.1 %, p90 26.5 %</td>
+</tr>
+<tr>
+<td>geometric hyphens (per variant set)</td>
+<td>P 96.6 %, R 97.8 % (tp 11958 / fp 418 / fn 267 over the 5 variants)</td>
+</tr>
+<tr>
+<td>geometric extenders</td>
+<td>P 63.5 %, R 81.3 % (usable as a melisma <em>hint</em>, combined with slurs/ties from the OMR)</td>
+</tr>
+<tr>
+<td>time (Node 24, 1 thread)</td>
+<td>461 ms/page at 300 dpi (2480×3508), 163 ms at 200 dpi, 79 ms at 150 dpi</td>
+</tr>
+</tbody></table>
+<p>An example overlay is in <code>spike/ocr/results/samples/detect_*.png</code>: staves in blue, lyric lines in red, hyphens in green, extenders in orange.</p>
+<p>Things that would break it, and are not in the test set:</p>
+<ul>
+<li>Lyrics touching notes or stems: very tight hymnals, or slurs crossing the text.</li>
+<li>Text above the staff: chord symbols, or lyrics placed above.</li>
+<li>Strongly curved page lines: phone photos of bound books need dewarping first.</li>
+<li>Dynamics or &quot;cresc.&quot; in the lyric band. They usually fail the &quot;≥ 4 letters spread over ≥ 20 % of the staff width&quot; test, but can merge into a lyric line.</li>
+</ul>
+<p>The OMR pipeline should reuse steps 1–5 (skew, staves) and step 6 (components) instead of re-running them.</p>
+<h2>4. Engines evaluated</h2>
+<p>All engines run in Node through the same harness. Tesseract runs as tesseract.js (WASM), not native.</p>
+<table>
+<thead>
+<tr>
+<th>engine</th>
+<th>version / source</th>
+<th>files &amp; sizes (bytes)</th>
+<th>licence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>tesseract.js</td>
+<td><code>tesseract.js@7.0.0</code> (2025-12-15) — <code>dist/tesseract.min.js</code> 62,961, <code>dist/worker.min.js</code> 111,307</td>
+<td></td>
+<td>Apache-2.0</td>
+</tr>
+<tr>
+<td>tesseract.js-core</td>
+<td><code>tesseract.js-core@7.0.0</code> — LSTM-only builds <code>tesseract-core-simd-lstm.wasm.js</code> 3,899,472 (1.46 MB gz), <code>-relaxedsimd-lstm.wasm.js</code> 3,905,767, <code>-lstm.wasm.js</code> (no SIMD) 3,896,484</td>
+<td></td>
+<td>Apache-2.0</td>
+</tr>
+<tr>
+<td>traineddata <code>best_int</code> (tesseract.js default)</td>
+<td><code>https://cdn.jsdelivr.net/npm/@tesseract.js-data/{eng,deu,lat}/4.0.0_best_int/{lang}.traineddata.gz</code></td>
+<td>eng 2,952,873 · deu 1,333,102 · lat 1,739,234 (gz)</td>
+<td>Apache-2.0</td>
+</tr>
+<tr>
+<td>traineddata <code>fast</code></td>
+<td><code>https://github.com/tesseract-ocr/tessdata_fast/raw/main/{lang}.traineddata</code></td>
+<td>eng 4,113,088 (gz 1,976,309) · deu 1,525,436 (gz 853,431) · lat 3,187,463 (gz 1,739,991)</td>
+<td>Apache-2.0</td>
+</tr>
+<tr>
+<td>traineddata <code>best</code> (float)</td>
+<td><code>https://github.com/tesseract-ocr/tessdata_best/raw/main/{lang}.traineddata</code></td>
+<td>eng 15,400,601 · deu 8,628,461 · lat 9,705,145</td>
+<td>Apache-2.0 — <strong>does not run in tesseract.js 7</strong> (abort: <code>missing function _ZN9tesseract13DotProductSSEEPKfS1_i</code>, in both the LSTM and full cores). <code>best_int</code> is the int8 conversion of the same nets.</td>
+</tr>
+<tr>
+<td>PaddleOCR PP-OCRv5 latin mobile rec</td>
+<td><code>https://huggingface.co/PaddlePaddle/latin_PP-OCRv5_mobile_rec_onnx</code> (<code>inference.onnx</code> + <code>inference.yml</code> with the 836-char dict; official PaddlePaddle export, modified 2026-05-26)</td>
+<td>8,042,023</td>
+<td>Apache-2.0</td>
+</tr>
+<tr>
+<td>PaddleOCR PP-OCRv5 en mobile rec</td>
+<td><code>https://huggingface.co/PaddlePaddle/en_PP-OCRv5_mobile_rec_onnx</code></td>
+<td>7,848,423 (436-char dict, <strong>no ß/œ</strong>)</td>
+<td>Apache-2.0</td>
+</tr>
+<tr>
+<td>onnxruntime</td>
+<td><code>onnxruntime-node@1.31.1</code> (harness); <code>onnxruntime-web@1.31.1</code>: <code>dist/ort.wasm.min.js</code> 53,796 + <code>ort-wasm-simd-threaded.mjs</code> 24,738 + <code>ort-wasm-simd-threaded.wasm</code> <strong>14,848,852</strong> (just under the 15 MB/file limit; the <code>.jsep</code>/<code>.asyncify</code> variants are 28–30 MB and do not fit)</td>
+<td></td>
+<td>MIT</td>
+</tr>
+</tbody></table>
+<p>Alternatives that were looked at but not run (and why):</p>
+<table>
+<thead>
+<tr>
+<th>candidate</th>
+<th>size</th>
+<th>licence</th>
+<th>verdict</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>PP-OCRv5 multilingual mobile rec (<code>PaddlePaddle/PP-OCRv5_mobile_rec_onnx</code>)</td>
+<td>16,534,782</td>
+<td>Apache-2.0</td>
+<td>Over the 15 MB per-file limit, and its CJK vocabulary is useless here.</td>
+</tr>
+<tr>
+<td>PP-OCRv5 server rec</td>
+<td>84,503,027</td>
+<td>Apache-2.0</td>
+<td>Too big.</td>
+</tr>
+<tr>
+<td>docTR / OnnxTR <code>crnn_mobilenet_v3_small</code> (8-bit 5,657,454; fp32 8,331,378), <code>parseq</code> (8-bit 34.5 MB), <code>vitstr_small</code> (22 MB)</td>
+<td></td>
+<td>Apache-2.0</td>
+<td>Fixed 32×128 input, so long lyric lines would need chunking. PP-OCRv5 latin is already near the ceiling here.</td>
+</tr>
+<tr>
+<td>ocrs (robertknight/ocrs, Rust + WASM, rten models)</td>
+<td>~10 MB</td>
+<td>Apache-2.0/MIT</td>
+<td>Model bucket returned 403 at test time. English/Latin alphabet only.</td>
+</tr>
+<tr>
+<td>Tesseract Fraktur: <code>tessdata_best/deu_latf</code> 12,938,047; <code>tessdata_fast/deu_latf</code> 6,423,052; <code>tessdata_fast/script/Fraktur</code> 10,915,632</td>
+<td></td>
+<td>Apache-2.0</td>
+<td>Relevant for old German hymnals; untested (no Fraktur test data).</td>
+</tr>
+<tr>
+<td>Calamari OCR</td>
+<td></td>
+<td><strong>GPL-3.0</strong></td>
+<td>Do not ship.</td>
+</tr>
+<tr>
+<td>Kraken</td>
+<td></td>
+<td>Apache-2.0 code, models vary</td>
+<td>Python only.</td>
+</tr>
+<tr>
+<td>TrOCR / Donut-class models</td>
+<td></td>
+<td></td>
+<td>Far too big for the 64 MB budget.</td>
+</tr>
+</tbody></table>
+<p>Licence flags:</p>
+<ul>
+<li>Nothing in the recommended runtime stack is GPL/AGPL.</li>
+<li><strong>LilyPond (GPL-3.0)</strong> and <strong>pdfplumber/pdfminer.six (MIT)</strong> are used only offline, to generate test data. They are not shipped.</li>
+<li>PyMuPDF (AGPL) was deliberately avoided.</li>
+</ul>
+<h2>5. Results</h2>
+<h3>5a. End-to-end: detected and masked strips (<code>results/table_e2e.md</code>, <code>results/summary_e2e.json</code>)</h3>
+<p>&quot;fused&quot; = OCR tokens with hyphens from OCR <strong>or</strong> geometry. It did not beat OCR-only hyphens, so CER/SylER/WER are effectively the OCR-only numbers.</p>
+<table>
+<thead>
+<tr>
+<th>config</th>
+<th>CER %</th>
+<th>SylER %</th>
+<th>WER %</th>
+<th>hyphen P/R %</th>
+<th>clean300</th>
+<th>scan300</th>
+<th>bilevel300</th>
+<th>copy200</th>
+<th>phone150 (CER %)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Paddle latin_v5</strong>, font 40 px → height 48</td>
+<td><strong>1.3</strong></td>
+<td>12.0</td>
+<td>11.7</td>
+<td><strong>99.8 / 99.3</strong></td>
+<td>1.1</td>
+<td>1.3</td>
+<td>1.1</td>
+<td>1.9</td>
+<td>1.2</td>
+</tr>
+<tr>
+<td>tess best_int <strong>matched lang</strong>, PSM 7, <strong>gap-compress</strong></td>
+<td>1.5</td>
+<td>11.5</td>
+<td>11.5</td>
+<td>99.7 / 96.9</td>
+<td>1.3</td>
+<td>1.2</td>
+<td>2.0</td>
+<td>1.4</td>
+<td>1.8</td>
+</tr>
+<tr>
+<td>tess best_int matched, PSM 13 (raw line), compress</td>
+<td>1.4</td>
+<td>12.7</td>
+<td>11.6</td>
+<td>99.3 / 96.7</td>
+<td>1.2</td>
+<td>1.2</td>
+<td>2.0</td>
+<td>1.2</td>
+<td>1.6</td>
+</tr>
+<tr>
+<td>tess fast matched, PSM 7, compress</td>
+<td>1.5</td>
+<td>12.2</td>
+<td>12.6</td>
+<td>99.3 / 97.2</td>
+<td>1.2</td>
+<td>1.2</td>
+<td>2.1</td>
+<td>1.4</td>
+<td>1.7</td>
+</tr>
+<tr>
+<td>tess best_int <strong>eng only</strong> (all languages), compress</td>
+<td>1.5</td>
+<td>12.5</td>
+<td>13.4</td>
+<td>99.8 / 97.2</td>
+<td>1.4</td>
+<td>1.2</td>
+<td>1.9</td>
+<td>1.4</td>
+<td>1.6</td>
+</tr>
+<tr>
+<td>tess fast <strong>eng+deu+lat</strong>, compress</td>
+<td>1.7</td>
+<td><strong>10.2</strong></td>
+<td><strong>10.2</strong></td>
+<td>99.4 / 98.7</td>
+<td>1.5</td>
+<td>1.6</td>
+<td>2.4</td>
+<td>1.5</td>
+<td>1.7</td>
+</tr>
+<tr>
+<td>tess best_int eng+deu+lat, compress</td>
+<td>2.3</td>
+<td>10.7</td>
+<td>10.6</td>
+<td>99.3 / 97.9</td>
+<td>2.0</td>
+<td>2.1</td>
+<td>2.7</td>
+<td>2.2</td>
+<td>2.3</td>
+</tr>
+<tr>
+<td>tess best_int matched, PSM 7, <em>no</em> compress</td>
+<td>1.7</td>
+<td>16.2</td>
+<td>19.5</td>
+<td>99.3 / 96.4</td>
+<td>1.4</td>
+<td>1.3</td>
+<td>2.3</td>
+<td>1.5</td>
+<td>1.9</td>
+</tr>
+<tr>
+<td>Paddle en_v5</td>
+<td>1.8</td>
+<td>11.9</td>
+<td>12.1</td>
+<td>99.3 / 99.0</td>
+<td>1.4</td>
+<td>1.8</td>
+<td>1.3</td>
+<td>2.4</td>
+<td>2.2</td>
+</tr>
+</tbody></table>
+<p>Per language (CER / SylER / WER %; remember the SylER floors of 3.2 / 4.4 / 10.0):</p>
+<table>
+<thead>
+<tr>
+<th>config</th>
+<th>eng</th>
+<th>deu</th>
+<th>lat</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Paddle latin_v5</td>
+<td>1.0 / 11.0 / 10.4</td>
+<td>2.3 / 12.7 / 12.1</td>
+<td><strong>0.8</strong> / 12.4 / <strong>7.9</strong></td>
+</tr>
+<tr>
+<td>tess best_int matched, compress</td>
+<td>1.1 / 8.5 / 7.2</td>
+<td><strong>1.1 / 7.8 / 6.3</strong></td>
+<td>2.4 / 16.9 / 13.1</td>
+</tr>
+<tr>
+<td>tess fast eng+deu+lat, compress</td>
+<td>2.2 / 8.4 / 7.2</td>
+<td>1.9 / 8.9 / 6.8</td>
+<td>1.0 / 12.8 / 6.2</td>
+</tr>
+<tr>
+<td>tess best_int eng only, compress</td>
+<td>1.1 / 8.5 / 7.2</td>
+<td>2.5 / 12.1 / 12.6</td>
+<td>1.1 / 16.6 / 12.7</td>
+</tr>
+</tbody></table>
+<p>Observations:</p>
+<ul>
+<li>The Tesseract <strong><code>lat</code> model is the weak spot</strong>: on Latin text it does worse than <code>eng</code> (oracle CER 5.3 % vs 3.4 %), and it turns short syllables like &quot;ti&quot; into &quot;ü&quot;.</li>
+<li>The German <code>deu</code> model is best on German, because of the umlauts.</li>
+<li>Paddle latin is uniformly good and needs no language decision. Its weakest case is German (ß/umlauts, 2.3 %).</li>
+</ul>
+<h3>5b. Oracle crops: GT box + padding, no masking (<code>results/table_oracle.md</code>)</h3>
+<p>These isolate the recogniser from the detector. Stems and notes are still in the crop, so CER is higher than end-to-end. Each row covers 1,920 strips.</p>
+<table>
+<thead>
+<tr>
+<th>config</th>
+<th>CER %</th>
+<th>SylER %</th>
+<th>WER %</th>
+<th>hyphen P/R %</th>
+<th>clean / scan / bilevel / copy / phone CER %</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Paddle latin_v5, crop masked to GT bbox (&quot;clean&quot;)</td>
+<td><strong>1.3</strong></td>
+<td>14.1</td>
+<td>12.7</td>
+<td>99.8 / 99.4</td>
+<td>0.6 / 1.2 / 1.2 / 2.5 / 0.9</td>
+</tr>
+<tr>
+<td>Paddle latin_v5, crop rescaled to 40 px font</td>
+<td>1.9</td>
+<td>13.1</td>
+<td>10.4</td>
+<td>99.7 / 98.8</td>
+<td>0.6 / 1.8 / 1.5 / 3.4 / 2.0</td>
+</tr>
+<tr>
+<td>tess fast matched, compress</td>
+<td>2.1</td>
+<td>13.4</td>
+<td>13.2</td>
+<td>98.6 / 94.7</td>
+<td>1.3 / 2.3 / 2.8 / 2.2 / 2.1</td>
+</tr>
+<tr>
+<td>tess best_int matched, compress</td>
+<td>2.2</td>
+<td>12.5</td>
+<td>11.6</td>
+<td>99.1 / 94.5</td>
+<td>1.2 / 2.4 / 2.7 / 2.3 / 2.2</td>
+</tr>
+<tr>
+<td>tess best_int matched, PSM 7, rescaled to 40 px font (no compress)</td>
+<td>3.2</td>
+<td>16.6</td>
+<td>18.3</td>
+<td>98.4 / 92.9</td>
+<td>1.6 / 4.0 / 3.1 / 4.0 / 3.3</td>
+</tr>
+<tr>
+<td>… same, raw resolution (no rescale)</td>
+<td>3.1</td>
+<td>17.0</td>
+<td>18.4</td>
+<td>98.4 / 92.9</td>
+<td></td>
+</tr>
+<tr>
+<td>… same, rescaled to 30 px / 56 px font</td>
+<td>3.0 / 3.6</td>
+<td>16.5 / 16.6</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>… same, dictionaries disabled (<code>load_system_dawg=0</code>, <code>load_freq_dawg=0</code> at init)</td>
+<td>3.2</td>
+<td>16.6</td>
+<td>18.3</td>
+<td>identical output</td>
+<td></td>
+</tr>
+<tr>
+<td>tess fast matched, rescaled to 40 px font (no compress)</td>
+<td>3.2</td>
+<td>18.2</td>
+<td>21.1</td>
+<td>97.6 / 93.1</td>
+<td></td>
+</tr>
+<tr>
+<td>tess best_int, <strong>PSM 6</strong> (block)</td>
+<td><strong>15.9</strong></td>
+<td>33.6</td>
+<td>42.7</td>
+<td></td>
+<td>3.3 / 22.0 / 10.1 / 20.3 / 23.8</td>
+</tr>
+<tr>
+<td>Paddle latin_v5 <strong>on gap-compressed strips</strong></td>
+<td>11.0</td>
+<td>28.2</td>
+<td>27.9</td>
+<td></td>
+<td>1.1 / 14.8 / 4.3 / 17.3 / 17.7</td>
+</tr>
+</tbody></table>
+<p>What matters:</p>
+<ul>
+<li><strong>Gap compression (Tesseract only).</strong><ul>
+<li>What it does: inside the text band, every all-white column run wider than 0.5 × font size is shrunk to 0.5 × font size, which turns &quot;Glo    -    ri    -    a&quot; back into normally spaced text. An x-map is kept so that word boxes can be mapped back to page x.</li>
+<li>Effect: CER 3.2 → 2.2 % on oracle crops, and <strong>WER 19.5 → 11.5 %, SylER 16.2 → 11.5 %</strong> end-to-end. Without it, Tesseract&#39;s word segmentation and LSTM context suffer from widely spread syllables.</li>
+<li>Do not use it for Paddle: its CTC head emits one frame per 8 input px, so dense text gets fewer than 1.5 frames per glyph and characters are dropped.</li>
+</ul>
+</li>
+<li><strong>Masking</strong> (keeping only the text components) is the biggest single win for both engines. Strips from the detector beat oracle crops: Paddle 1.3 % vs 1.9 %, Tesseract 1.5 % vs 2.2 %.</li>
+<li><strong>Rescaling</strong>: normalising to a font size of about 40 px (cap height about 28 px) is right for Tesseract. Pure upscaling of 150 dpi input made little difference, because Tesseract rescales internally.</li>
+<li>Typeface sensitivity (oracle CER for Paddle latin, norm): 0.2–1.6 % for most faces. Outliers are <strong>C059 (6.6 %) and Liberation Serif (8.0 %)</strong>, both fixed by masking (4.7 % / 2.6 %). Tesseract with compress: 0.8–3.4 % across faces.</li>
+</ul>
+<h3>5c. Hyphens, extenders, melismas, verses</h3>
+<ul>
+<li><strong>Hyphens</strong>:<ul>
+<li>Both engines read printed lyric hyphens reliably. Paddle gets P 99.8 / R 99.3. Tesseract with compress gets P 99.7 / R 96.9; it sometimes glues a tight hyphen into a word (&quot;dark-ness&quot;, which is still correct) or reads it as &quot;—&quot; or &quot;-.&quot;.</li>
+<li>The geometric detector (P 96.6 / R 97.8) adds <strong>x positions</strong> for each hyphen. It did not improve OCR hyphen recall when fused naively, but it gives an independent check and handles hyphens at line start and line end. LilyPond repeats the hyphen at the start of the next system: 18 cases.</li>
+</ul>
+</li>
+<li><strong>Unprinted hyphens</strong> (8.6 % of logical hyphens, about 3 % of all syllable boundaries) are invisible to any OCR. They cause the SylER floor of 6.1 % (Latin 10 %).<ul>
+<li>Recovering them needs note alignment: a lyric token spanning two noteheads that have no slur, tie or extender between them must be split.</li>
+<li>Hyphenation patterns (Liang/TeX patterns for en/de/la) then choose the split point. This belongs in the OMR lyric-attachment stage, not in OCR.</li>
+</ul>
+</li>
+<li><strong>Extenders / melismas</strong>:<ul>
+<li>OCR output for extenders is inconsistent: Paddle sometimes emits <code>_</code>, Tesseract <code>—</code> or <code>___</code>. The post-filter maps them to spaces.</li>
+<li>Use the geometric extender list instead (R 81 %, P 63 %) together with OMR slurs and ties to mark melismas, i.e. <code>&lt;extend/&gt;</code> on the syllable.</li>
+<li>Many melismas have no extender at all (word-internal melismas only show as a hyphen spanning several notes).</li>
+</ul>
+</li>
+<li><strong>Verses</strong>: each verse is its own strip, ordered top to bottom inside a band, so verse number = line index in the band. LilyPond-style stanza labels (&quot;1.&quot;, bold) come out as a leading <code>1.</code> token (Tesseract occasionally reads &quot;L&quot;). Strip <code>^\d+\.</code> and use it to confirm the verse index.</li>
+<li><strong>Language</strong>: unknown at input. Options:<ul>
+<li>Paddle latin needs none.</li>
+<li>With Tesseract, either load <code>eng+deu+lat</code> (best SylER/WER, about 1.8× the time), or OCR the first strips with <code>eng</code> and switch to <code>deu</code> or <code>lat</code> from a cheap detector. Signals: ä/ö/ü/ß plus German function words; -us/-um/-ae/-is endings plus Latin function words (et, in, de, cum).</li>
+</ul>
+</li>
+</ul>
+<h2>6. Speed</h2>
+<p>Node 24.11.1 on a Neoverse-V2 (aarch64) host, <strong>shared and heavily loaded (load average 280–550 on 192 cores)</strong>, so absolute numbers are pessimistic. Single-threaded, sequential, 40 strips (<code>results/bench_node.json</code>):</p>
+<table>
+<thead>
+<tr>
+<th>engine</th>
+<th>init (load model)</th>
+<th>ms / strip</th>
+<th>ms / 1000 px of strip width</th>
+<th>RSS</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>tess fast eng</td>
+<td>327 ms</td>
+<td><strong>79</strong></td>
+<td>48</td>
+<td>351 MB</td>
+</tr>
+<tr>
+<td>tess best_int eng</td>
+<td>291 ms</td>
+<td>122</td>
+<td>74</td>
+<td>442 MB</td>
+</tr>
+<tr>
+<td>tess fast eng+deu+lat</td>
+<td>394 ms</td>
+<td>144</td>
+<td>88</td>
+<td>544 MB</td>
+</tr>
+<tr>
+<td>tess best_int eng+deu+lat</td>
+<td>666 ms</td>
+<td>223</td>
+<td>135</td>
+<td>528 MB</td>
+</tr>
+<tr>
+<td>Paddle latin_v5, ORT 1 thread</td>
+<td>112 ms</td>
+<td>142</td>
+<td>70</td>
+<td>510 MB</td>
+</tr>
+<tr>
+<td>Paddle latin_v5, ORT 4 threads</td>
+<td>72 ms</td>
+<td><strong>45</strong></td>
+<td>22</td>
+<td>500 MB</td>
+</tr>
+<tr>
+<td>strip detection (<code>strips.js</code>)</td>
+<td>—</td>
+<td>461 ms/page (300 dpi) · 79 ms/page (150 dpi)</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>A page has about 7 lyric lines on average, so lyric OCR costs <strong>about 0.6–1.6 s per page on one thread</strong>. Detection adds 0.1–0.5 s. Both can run in a Web Worker.</p>
+<p><strong>Browser check</strong> (<code>spike/ocr/browser/index.html</code>): everything was self-hosted and loaded by relative URL, to mirror the artifact CSP. It ran with Playwright 1.56.1 headless on the same loaded host, over 40 strips.</p>
+<ul>
+<li><strong>Chromium 141</strong> (3 runs):<ul>
+<li>tesseract.js best_int <code>eng</code>: init 0.3–0.8 s, <strong>119–175 ms/strip</strong>.</li>
+<li><code>eng+deu+lat</code>: init 0.6–2.1 s, 194–231 ms/strip.</li>
+<li>Paddle latin_v5 on onnxruntime-web (wasm EP, 1 thread, <code>crossOriginIsolated=false</code>): init 0.7–1.3 s, <strong>229–263 ms/strip</strong>.</li>
+<li>Accuracy on this 40-strip sample: tesseract <code>eng</code> 1.4 % CER, <code>eng+deu+lat</code> 1.9 %. Paddle scored 3.8 %, but only because the test strips are gap-compressed, which Paddle must not get (see 5b); the outputs are the same as in Node.</li>
+<li>An earlier run exposed an Otsu bug in gap compression on all-0/255 (bilevel) images. It was fixed in <code>jobs.js</code>, and all compress results in this document come from the fixed code.</li>
+</ul>
+</li>
+<li><strong>Firefox 142</strong> (headless, Linux aarch64): it works, but tesseract ran at 1.4–3.5 s/strip and Paddle at 3.9 s/strip, 8–17× slower than Chromium on the same machine. This looks like a WASM-SIMD performance problem specific to this aarch64 build. <strong>Re-measure on desktop x86 Firefox and Safari before deciding</strong>: Safari has no relaxed-SIMD, so tesseract.js picks the simd-lstm core there.</li>
+<li>WebKit could not be launched here (missing system libraries).</li>
+</ul>
+<h2>7. Integration notes for the artifact</h2>
+<p><strong>tesseract.js (works under the artifact CSP model; verified in Chromium):</strong></p>
+<pre><code class="language-js">// &lt;script src=&quot;assets/tesseract/tesseract.min.js&quot;&gt; (self-hosted; or cdnjs/jsdelivr tag for this file only)
+const worker = await Tesseract.createWorker(&#39;eng+deu+lat&#39;, 1 /* OEM.LSTM_ONLY */, {
+  workerPath: &#39;assets/tesseract/worker.min.js&#39;,      // own origin; resolved against window.location.href
+  corePath:   &#39;assets/tesseract/tesseract-core-simd-lstm.wasm.js&#39;, // pin ONE core file (3.9 MB; a path ending in .js is used as-is per getCore.js - the browser test used the directory form) - every
+                                                     // browser with WASM SIMD (Chrome 91+, FF 89+, Safari 16.4+)
+  langPath:   &#39;assets/tessdata&#39;,                     // {lang}.traineddata.gz (best_int)
+  workerBlobURL: false, cacheMethod: &#39;none&#39;, gzip: true,
+});
+await worker.setParameters({ tessedit_pageseg_mode: &#39;7&#39;, user_defined_dpi: &#39;300&#39; });
+const { data } = await worker.recognize(canvasOrImageData, {}, { text: true, blocks: true }); // word bboxes
+</code></pre>
+<ul>
+<li>If <code>corePath</code> is a directory, tesseract.js picks between <code>relaxedsimd-lstm</code>, <code>simd-lstm</code> and <code>lstm</code>. Ship all three (11.7 MB) only if pre-SIMD browsers matter.</li>
+<li><code>cacheMethod:&#39;none&#39;</code> avoids IndexedDB, which may be unavailable or throw in the sandbox.</li>
+<li>tesseract.js resolves relative paths with <code>new URL(p, window.location.href)</code>. If the page is ever served from <code>about:srcdoc</code>, pass absolute URLs built from <code>document.baseURI</code>.</li>
+</ul>
+<p><strong>onnxruntime-web + Paddle (verified in Chromium):</strong></p>
+<pre><code class="language-js">// &lt;script src=&quot;https://cdn.jsdelivr.net/npm/onnxruntime-web@1.31.1/dist/ort.wasm.min.js&quot;&gt; or self-host (53,796 B)
+ort.env.wasm.wasmPaths = new URL(&#39;assets/ort/&#39;, document.baseURI).href; // MUST be absolute: the .mjs is loaded by
+ort.env.wasm.numThreads = 1;               // dynamic import(); a bare &#39;assets/ort/&#39; fails (&quot;Failed to resolve module
+                                           // specifier&quot;). Threads need crossOriginIsolated, which is not available.
+const sess = await ort.InferenceSession.create(&#39;assets/paddle/latin_v5.onnx&#39;, { executionProviders: [&#39;wasm&#39;] });
+// input: float32 [1,3,48,W] (W = ceil(48*w/h / 8)*8, right-pad white), (v/255-0.5)/0.5, gray replicated to 3 ch
+// output [1, W/8, 838]: greedy CTC, index 0 = blank, 1..836 = inference.yml character_dict, 837 = space
+</code></pre>
+<p>Self-host <code>ort-wasm-simd-threaded.wasm</code> (14,848,852 B) and <code>.mjs</code> (24,738 B) in <code>assets/ort/</code>. Ship the dictionary as a small JSON file extracted from <code>inference.yml</code>; see <code>models/paddle/latin_v5/dict.json</code>. CTC frame index × 8 / scale gives each character&#39;s x, which is enough to place syllables under notes.</p>
+<p><strong>Budget:</strong></p>
+<table>
+<thead>
+<tr>
+<th>option</th>
+<th>files</th>
+<th>total</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A (tesseract)</td>
+<td>core 3.90 MB + js 0.17 MB + <code>best_int</code> eng/deu/lat 6.03 MB</td>
+<td><strong>≈ 10.1 MB</strong> (with <code>fast</code> traineddata: 4.57 MB → ≈ 8.6 MB)</td>
+</tr>
+<tr>
+<td>B (Paddle)</td>
+<td>ORT wasm 14.85 MB + .mjs/.js 0.08 MB + model 8.04 MB</td>
+<td><strong>≈ 23 MB</strong>, of which only <strong>8 MB is incremental</strong> if ORT is already shipped for the OMR models</td>
+</tr>
+</tbody></table>
+<p>Both fit under the 64 MB total and the per-file limits.</p>
+<p><strong>Pipeline per page:</strong></p>
+<ol>
+<li>Grayscale page (pdf.js render or decode).</li>
+<li><code>detectLyricLines(page)</code>.</li>
+<li>For each line: masked strip → scale to font ≈ 40 px. For Tesseract, apply <code>compressGaps</code> and keep <code>xmap</code>. Then OCR.</li>
+<li>Tokens with x positions → split into syllables on spaces and hyphens. Hyphen flags come from OCR and are confirmed by geometry; extender spans come from geometry.</li>
+<li>Hand over to the OMR lyric-attachment stage: nearest notehead x per syllable, verse = line order in the band, staff above = voice candidates; split tokens that span several notes (unprinted hyphens).</li>
+</ol>
+<h2>8. Answers to the spike questions</h2>
+<table>
+<thead>
+<tr>
+<th>question</th>
+<th>answer</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Character / word accuracy</td>
+<td>e2e CER <strong>1.3 %</strong> (Paddle) / <strong>1.5 %</strong> (tess best_int + compress). WER 10–12 %, SylER 10–12 % (floor 6.1 % from unprinted hyphens). Clean 300 dpi: 1.1–1.3 % CER; worst variant: bilevel for Tesseract (2.0 %), photocopy for Paddle (1.9 %).</td>
+</tr>
+<tr>
+<td>Hyphen detection</td>
+<td>OCR: P 99.7–99.8 % / R 96.9–99.3 %. Geometry: P 96.6 % / R 97.8 % with x positions. Extenders via geometry only: R 81 %.</td>
+</tr>
+<tr>
+<td>Speed</td>
+<td>79–223 ms per strip (Tesseract, depending on model and languages); 142 ms on 1 thread / 45 ms on 4 threads (Paddle) in Node; 120–260 ms per strip in Chromium. About 1 s per page of lyrics.</td>
+</tr>
+<tr>
+<td>fast vs best sizes</td>
+<td><code>fast</code> ≈ <code>best_int</code> on CER (1.5 vs 1.5 % e2e; 2.1 vs 2.2 % oracle), slightly worse WER (12.6 vs 11.5 %), 35 % faster. <code>fast</code> is also smaller once gzipped: eng 1.98 vs 2.95 MB, deu 0.85 vs 1.33 MB, lat 1.74 vs 1.74 MB. Float <code>best</code> (eng 15.4 MB) does not run in tesseract.js 7.</td>
+</tr>
+<tr>
+<td>Isolating lyric strips</td>
+<td>Staff detection plus inter-staff bands, with connected components that do not touch the staff, baseline clustering and a speck filter: 100 % recall / 99.2 % precision across all degradations (section 3).</td>
+</tr>
+<tr>
+<td>Recommendation</td>
+<td>Paddle latin_v5 on ORT-web if ORT is in the bundle; otherwise tesseract.js 7 best_int with gap compression. Run OCR on masked per-line strips from <code>strips.js</code> in both cases.</td>
+</tr>
+</tbody></table>
+<h2>9. Risks and follow-ups</h2>
+<ol>
+<li><strong>Real scans.</strong> Add 10–20 real IMSLP/CPDL hymnal pages with hand-typed lyric ground truth to the harness. Expect a higher CER than on this synthetic data: old typefaces, broken glyphs, bleed-through.</li>
+<li><strong>Fraktur</strong> (pre-1940 German hymnals): evaluate <code>deu_latf</code> (fast 6.4 MB) against Paddle latin, which has no Fraktur training.</li>
+<li><strong>Firefox and Safari performance</strong> must be re-measured on real desktop and iOS hardware (section 6).</li>
+<li><strong>Unprinted hyphens</strong>: implement note-aligned token splitting with hyphenation patterns. Check that the pattern licences are compatible with distribution; TeX hyph-utf8 patterns are mostly LPPL/MIT-style.</li>
+<li><strong>Lyrics touching music, chord symbols and dynamics in the lyric band</strong>: extend the component classifier, for example with a tiny CNN text/non-text classifier if needed.</li>
+<li>Detection runs at 0.46 s/page at 300 dpi in Node. Binarisation and the skew search dominate, and both can share work with the OMR staff detection.</li>
+</ol>
+<h2>Reproduce</h2>
+<pre><code class="language-bash">cd spike/ocr
+npm ci                                   # tesseract.js 7.0.0, tesseract.js-core 7.0.0, onnxruntime-node/web 1.31.1, pngjs 7.0.0
+python3 -m venv .venv &amp;&amp; .venv/bin/pip install pdfplumber==0.11.4 numpy pillow opencv-python-headless pyyaml
+# models: see URLs in section 4 -&gt; models/tessdata/{fast,best_int,best}/, models/paddle/{latin_v5,en_v5}/ (+ dict.json from inference.yml)
+.venv/bin/python gen/make_ly.py data/ly 56 &amp;&amp; ./gen/render_all.sh          # LilyPond -&gt; 300 dpi PNG + GT -&gt; 4 degradations
+node src/grid.js tess1 176 16                                              # oracle-crop Tesseract grid
+node src/grid.js results/raw/ora2.json 120 16                              # oracle-crop compress / Paddle grid
+node src/grid.js results/raw/e2e3.json 150 16                              # end-to-end (strips.js + OCR)
+node src/score.js &gt; results/summary_oracle.json &amp;&amp; node src/table.js results/summary_oracle.json
+node src/score_e2e.js e2e_ &gt; results/summary_e2e.json &amp;&amp; node src/table_e2e.js results/summary_e2e.json
+node src/bench.js 8 &gt; results/bench_node.json                              # timing
+(cd browser &amp;&amp; python3 -m http.server 8765)   # then open http://127.0.0.1:8765/?n=40&amp;tests=eng,combined,paddle
+</code></pre>
+<h2>Files</h2>
+<ul>
+<li><code>spike/ocr/src/strips.js</code>: lyric strip isolation (environment-agnostic; candidate for the real core).</li>
+<li><code>spike/ocr/src/img.js</code>: gray bitmap helpers (crop, resize, Otsu, adaptive binarise, connected components).</li>
+<li><code>spike/ocr/src/jobs.js</code>: oracle crops, <code>compressGaps</code> (gap compression with x-map).</li>
+<li><code>spike/ocr/src/engines.js</code>: tesseract.js and Paddle-ONNX adapters (CTC decode with x positions).</li>
+<li><code>spike/ocr/src/metrics.js</code>, <code>score.js</code>, <code>score_e2e.js</code>, <code>table*.js</code>: metrics and reports.</li>
+<li><code>spike/ocr/src/tess_eval.js</code>, <code>paddle_eval.js</code>, <code>e2e_eval.js</code>, <code>grid.js</code>, <code>bench.js</code>: runners.</li>
+<li><code>spike/ocr/gen/*</code>: test-data generation (LilyPond → PDF → GT → degradations).</li>
+<li><code>spike/ocr/browser/index.html</code> + <code>assets/</code>: self-hosted browser check.</li>
+<li><code>spike/ocr/results/</code>: <code>summary_oracle.json</code>, <code>summary_e2e.json</code>, <code>summary_det.json</code>, <code>table_oracle.md</code>, <code>table_e2e.md</code>, <code>bench_node.json</code>, <code>browser_chromium141.json</code>, <code>browser_firefox142_subset.json</code>, <code>samples/*.png</code>.</li>
+</ul>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+<script>window.mermaid && mermaid.initialize({ startOnLoad: true, theme: matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default' });</script>
+</body>
+</html>

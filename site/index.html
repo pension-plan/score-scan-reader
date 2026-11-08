@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Score Scan Reader</title>
+<style>
+:root { --bg: #fbfbfa; --fg: #1b1e24; --muted: #5a6170; --rule: #dde1e7; --accent: #2456a6; --code: #f0f2f5; }
+@media (prefers-color-scheme: dark) { :root { --bg: #13161b; --fg: #e5e8ed; --muted: #a2aab7; --rule: #2b313b; --accent: #82a8ea; --code: #1c2028; color-scheme: dark; } }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.65 "Source Serif 4", Georgia, serif; padding: 32px max(16px, env(safe-area-inset-right, 0px)) 64px max(16px, env(safe-area-inset-left, 0px)); }
+main { max-width: 820px; margin: 0 auto; }
+h1, h2, h3, h4 { font-family: system-ui, sans-serif; line-height: 1.25; text-wrap: balance; }
+a { color: var(--accent); }
+code, pre { font-family: ui-monospace, Menlo, monospace; font-size: 0.86em; background: var(--code); border-radius: 4px; }
+code { padding: 1px 4px; } pre { padding: 12px 14px; overflow-x: auto; } pre code { padding: 0; background: none; }
+table { border-collapse: collapse; display: block; overflow-x: auto; font-size: 0.92em; }
+th, td { border: 1px solid var(--rule); padding: 6px 10px; text-align: left; vertical-align: top; }
+nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bottom: 24px; }
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+</head>
+<body>
+<main>
+<h1>Score Scan Reader</h1>
+<p>Converts scanned sheet music (image-only PDFs, PNG or JPG) into MusicXML 4.0 in your browser. Lyrics are kept, closed-score SATB is split into separate parts, and piano grand staves stay together. Your file never leaves the browser.</p>
+<ul>
+<li><a href="app/"><strong>Open the converter</strong></a></li>
+<li><a href="status/">Build log, plan, research findings and accuracy tracker</a></li>
+<li><a href="https://github.com/pension-plan/score-scan-reader">Source code</a> · <a href="https://github.com/pension-plan/score-scan-reader/releases">Releases and downloads</a> · <a href="https://github.com/pension-plan/score-scan-reader/actions">CI</a></li>
+</ul>
+<h2>Documents</h2>
+<ul>
+<li><a href="docs/SDD.html">Software design document</a></li>
+<li><a href="docs/research-omr.html">Research: current OMR methods</a></li>
+<li><a href="docs/research-voices.html">Research: voice and part separation</a></li>
+<li><a href="docs/spike-classical.html">Trial: plain-JS image pipeline</a></li>
+<li><a href="docs/spike-ml.html">Trial: pretrained ML models</a></li>
+<li><a href="docs/spike-ocr.html">Trial: lyric OCR</a></li>
+</ul>
+</main>
+</body>
+</html>

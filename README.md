@@ -6,9 +6,11 @@ Converts **scanned sheet music** (image-only PDFs, PNG or JPG) into **MusicXML 4
 - When one staff carries two voices, as in closed-score SATB hymns, the voices are split into separate parts (Soprano, Alto, Tenor, Bass).
 - Piano grand staves are kept as one part.
 
-Live app: https://claude.ai/artifact/6LdzqJaeeVRkJiRPgn9ozv
-Build log, plan and accuracy tracker: https://claude.ai/artifact/ETew3a3LisBiqZaMWpju7R
-Software design document: [docs/SDD.md](docs/SDD.md)
+- **Live app:** https://pension-plan.github.io/score-scan-reader/app/
+- **Build log, plan, research and accuracy tracker:** https://pension-plan.github.io/score-scan-reader/status/
+- **Software design document:** https://pension-plan.github.io/score-scan-reader/docs/SDD.html (source: [docs/SDD.md](docs/SDD.md))
+
+All three are deployed to GitHub Pages from this repository on every push to `main` (`.github/workflows/pages.yml`).
 
 ## Quick start
 
@@ -22,6 +24,13 @@ python3 -m http.server -d mvp/dist 8080   # then open http://localhost:8080
 
 The page must be served over HTTP (not opened as a file) because it loads its OCR worker,
 WebAssembly and sample scan from `mvp/dist/assets/` by relative URL.
+
+Build the GitHub Pages site (app, status page and rendered docs) into `site/`:
+
+```sh
+npm run build && npm run site
+python3 -m http.server -d site 8080
+```
 
 ## Test
 
@@ -54,11 +63,12 @@ node mvp/tools/run.js page-1.pgm out.musicxml --no-ocr
 | `corpus/` | Test scores: `synthetic/` (engraved + degraded, exact truth), `real/` (public-domain scans), `challenge/` (edge cases) |
 | `docs/` | Software design document, research, feasibility trials, UI references, status page source |
 | `spike/` | Feasibility-trial code (data, models and results are not committed) |
+| `tools/` | `build-site.mjs` (GitHub Pages site), `push.sh` (commit and push) |
 | `orchestration/` | The multi-agent workflow scripts that built and improve the app |
 
 ## Releases
 
-Commits on `main` use Conventional Commits. release-please opens a release PR; merging it tags a
+Commits on `main` use Conventional Commits. Every push to `main` runs CI and redeploys GitHub Pages. release-please opens a release PR; merging it tags a
 release and the workflow attaches downloadable copies: the built web app (zip), the full source
 (zip) and the design document.
 

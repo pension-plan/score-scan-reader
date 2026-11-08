@@ -1,0 +1,843 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Voice and part separation for scanned-score OMR: research notes</title>
+<style>
+:root { --bg: #fbfbfa; --fg: #1b1e24; --muted: #5a6170; --rule: #dde1e7; --accent: #2456a6; --code: #f0f2f5; }
+@media (prefers-color-scheme: dark) { :root { --bg: #13161b; --fg: #e5e8ed; --muted: #a2aab7; --rule: #2b313b; --accent: #82a8ea; --code: #1c2028; color-scheme: dark; } }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.65 "Source Serif 4", Georgia, serif; padding: 32px max(16px, env(safe-area-inset-right, 0px)) 64px max(16px, env(safe-area-inset-left, 0px)); }
+main { max-width: 820px; margin: 0 auto; }
+h1, h2, h3, h4 { font-family: system-ui, sans-serif; line-height: 1.25; text-wrap: balance; }
+a { color: var(--accent); }
+code, pre { font-family: ui-monospace, Menlo, monospace; font-size: 0.86em; background: var(--code); border-radius: 4px; }
+code { padding: 1px 4px; } pre { padding: 12px 14px; overflow-x: auto; } pre code { padding: 0; background: none; }
+table { border-collapse: collapse; display: block; overflow-x: auto; font-size: 0.92em; }
+th, td { border: 1px solid var(--rule); padding: 6px 10px; text-align: left; vertical-align: top; }
+nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bottom: 24px; }
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+</head>
+<body>
+<main><nav class="crumbs"><a href="../">Score Scan Reader</a> / docs / research-voices.md · <a href="https://github.com/pension-plan/score-scan-reader/blob/main/docs/research-voices.md">source</a></nav>
+<h1>Voice and part separation for scanned-score OMR: research notes</h1>
+<p>Scope: how to detect several voices or parts printed on one staff, mainly closed-score SATB hymns and chorales, and divisi, from page images. Covers when to split them into separate MusicXML <code>&lt;part&gt;</code>s, when to keep them as <code>&lt;voice&gt;</code>s in one part (piano grand staves, organ, local divisi), how lyrics follow the split, and how to handle uncertain cases. Written for an environment-agnostic JS OMR core that runs in the browser and in node.</p>
+<p>Status: research and design input, compiled 2026-11-08. Sources are cited inline and listed in full in section 14. &quot;Recommendation&quot; marks this project&#39;s own engineering choices, as opposed to what a source says.</p>
+<hr>
+<h2>0. Summary</h2>
+<ol>
+<li><strong>On a printed staff, stem direction is the main evidence for voices.</strong> It beats pitch. Engraving convention puts the upper voice stems up and the lower voice stems down on a shared staff, with voice-1 rests moved up and voice-2 rests moved down (<a href="https://handbook.musescore.org/basics/working-with-multiple-voices">MuseScore handbook</a>). Every image-based system examined uses stems, beams and ties first and treats pitch proximity as secondary: Audiveris (<a href="https://github.com/Audiveris/audiveris/tree/development/app/src/main/java/org/audiveris/omr">source</a>), Jin &amp; Raphael 2015 (<a href="https://archives.ismir.net/ismir2015/paper/000226.pdf">paper</a>) and BeadSolver 2026 (<a href="https://arxiv.org/abs/2604.20522">paper</a>). Symbolic (MIDI-style) voice-separation algorithms have no stems to work with, so in OMR they serve only as <strong>fallbacks</strong>, for stemless whole notes or broken detections.</li>
+<li><strong>The difficult part is consistency, not the first guess.</strong> In BeadSolver&#39;s piano test set, a greedy rule baseline that groups x-aligned columns and chains them forward gets only <strong>55.1 % of measures with all voices matching</strong> and <strong>50.5 % fully correct measures</strong>. Probability-guided search raises this to <strong>92.4 % / 86.8 %</strong> (<a href="https://arxiv.org/abs/2604.20522">BeadSolver Table 7</a>). On Rachmaninoff with corrected symbols, Jin &amp; Raphael&#39;s graph optimisation (voice edges plus coincidence edges, hard bar-length constraints) interprets <strong>355/371 = 95.7 %</strong> of system measures correctly (<a href="https://archives.ismir.net/ismir2015/paper/000226.pdf">paper</a>). Closed-score hymns are far easier than piano music, but the same tool applies: <strong>a hard constraint that each voice fills the bar exactly, plus repair search.</strong></li>
+<li><strong>Closed-score SATB statistics (measured here)</strong> over <strong>368 four-part Bach chorales</strong> in the music21 10.5.2 corpus (<a href="#appendix-a-chorale-statistics-script">script</a>):<ul>
+<li>S/A unisons at <strong>2.46 %</strong> of onset slots, T/B unisons at <strong>3.58 %</strong>. Shared noteheads are common enough that they must be handled.</li>
+<li>Voice crossings at only <strong>0.24 %</strong> (S/A) and <strong>0.78 %</strong> (T/B). Splitting by pitch order almost never contradicts the true voices, but stem direction should still decide.</li>
+<li>At about <strong>31 %</strong> of slots only one voice of a pair has an onset (passing notes, suspensions, melismas). Lyric copying therefore has to align by time slot, not by note index.</li>
+<li>Lyrics appear <strong>only on the soprano part in 320/368</strong> files, and never on A/T/B. Ground truth for lower-voice lyrics has to be derived.</li>
+</ul>
+</li>
+<li><strong>When to split:</strong><ul>
+<li>Split a staff group into one part per voice when it is classified as <strong>vocal closed score</strong>. The strongest cues are lyrics between or under the staves, vocal labels (&quot;S A&quot;, &quot;T B&quot;, &quot;Soprano/Alto&quot;, &quot;Women/Men&quot;), every voice monophonic (at most 2 heads per stem), two stem directions present throughout, and SATB ranges.</li>
+<li><strong>Never split a keyboard group.</strong> Cues: &quot;Piano/Pno./Organ&quot; labels, chords of 3 or more notes per stem, pedal marks, cross-staff beams, and lyrics present only on a <em>different</em> staff.</li>
+<li>Braces are weak evidence because hymnals often brace their SATB staves (an observation; see §5). Brackets point towards separate performers.</li>
+<li>Make the decision <strong>once per logical part for the whole piece</strong>, never per measure. Unison passages written with single stems are copied into both voices.</li>
+<li>When the evidence is ambiguous, keep one part with <code>&lt;voice&gt;</code>s. This loses nothing. Show a warning and offer a one-click split (§11).</li>
+</ul>
+</li>
+<li><strong>MusicXML output:</strong><ul>
+<li>Split vocal parts: one <code>&lt;score-part&gt;</code> per voice inside <code>&lt;part-group type=&quot;start&quot;&gt;&lt;group-symbol&gt;bracket&lt;/group-symbol&gt;&lt;group-barline&gt;yes&lt;/group-barline&gt;</code>, each part monophonic in <code>&lt;voice&gt;1&lt;/voice&gt;</code>, and lyrics <strong>copied</strong> to every voice that sings them.</li>
+<li>Unsplit keyboard: one part with <code>&lt;staves&gt;2&lt;/staves&gt;</code>, <code>&lt;staff&gt;</code> on every note, and <code>&lt;backup&gt;</code> between voices. Voice IDs 1–4 go on staff 1 and 5–8 on staff 2, the convention used by Audiveris (<a href="https://github.com/Audiveris/audiveris/blob/development/app/src/main/java/org/audiveris/omr/sheet/rhythm/Voice.java"><code>Voice.VoiceKind</code></a>), Finale and MuseScore. Sibelius numbers voices per staff (<a href="https://musescore.org/en/node/345293">MuseScore forum</a>). <code>&lt;voice&gt;</code> is just a string with no defined semantics (<a href="https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/voice/">W3C</a>).</li>
+</ul>
+</li>
+<li><strong>Licensing:</strong><ul>
+<li>Audiveris and homr are <strong>AGPL-3.0</strong>. Take ideas only and do not port code.</li>
+<li>music21 (BSD-3), partitura (Apache-2.0), piano_svsep, vocsep_ijcai2023, voice-splitting and MV2H (all MIT), oemer (MIT) and OSMD (BSD-3) are all compatible.</li>
+<li>OpenScore Lieder and OpenScore String Quartets are <strong>CC0</strong>, which makes them good negative and positive test sets.</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2>1. Terms</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning here</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Voice</strong></td>
+<td>A monophonic (or homophonic-chord) sequence of events moving linearly in time. MusicXML: &quot;A voice is a sequence of musical events (e.g. notes, chords, rests) that proceeds linearly in time&quot; (<a href="https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/voice/">W3C <code>&lt;voice&gt;</code></a>).</td>
+</tr>
+<tr>
+<td><strong>Part</strong></td>
+<td>One performer or section, in MusicXML a <code>&lt;part&gt;</code> with a <code>&lt;score-part&gt;</code> entry. It may have several staves (<code>&lt;staves&gt;</code>) and several voices.</td>
+</tr>
+<tr>
+<td><strong>Staff group</strong></td>
+<td>Staves joined by a brace or bracket and/or connected barlines within a system.</td>
+</tr>
+<tr>
+<td><strong>Closed (close) score</strong></td>
+<td>Two or more vocal parts sharing a staff. SATB on two staves, &quot;as in hymnals&quot; (<a href="https://musescore.org/en/handbook/3/voices">MuseScore 3 handbook</a>). Merriam-Webster gives &quot;close score&quot; (<a href="https://www.merriam-webster.com/dictionary/close%20score">M-W</a>).</td>
+</tr>
+<tr>
+<td><strong>Open score</strong></td>
+<td>One staff per part.</td>
+</tr>
+<tr>
+<td><strong>Divisi</strong></td>
+<td>One section temporarily divided (S1/S2, Vln I div.), often on one staff with two stem directions or as a chord on one stem.</td>
+</tr>
+<tr>
+<td><strong>Slot</strong></td>
+<td>A set of chords and rests on a system that share an onset time and are roughly x-aligned (Audiveris terminology, <a href="https://github.com/Audiveris/audiveris/tree/development/app/src/main/java/org/audiveris/omr">SlotsRetriever</a>).</td>
+</tr>
+<tr>
+<td><strong>Logical part</strong></td>
+<td>The same instrument followed across systems and pages, even when its physical staves differ per system (Audiveris &quot;logical parts&quot;, <a href="https://audiveris.github.io/audiveris/_pages/guides/specific/logical_parts">handbook</a>).</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>2. Visual evidence for several voices on one staff</h2>
+<h3>2.1 Stem direction (primary)</h3>
+<ul>
+<li>Convention: &quot;Two voices on the same staff are normally indicated using opposing stems&quot;. In MuseScore, voices 1 and 3 are stems up and voices 2 and 4 stems down (<a href="https://handbook.musescore.org/basics/working-with-multiple-voices">MuseScore handbook</a>). For closed SATB, &quot;use Voice 1 and Voice 2 only, for both upper and lower staves&quot;: soprano and tenor in voice 1, alto and bass in voice 2 (<a href="https://musescore.org/en/handbook/3/voices">MuseScore 3 handbook</a>).</li>
+<li>Jin &amp; Raphael&#39;s edge-plausibility rule 6: &quot;Vertices connected by a voice edge usually have the same stem direction and tend to appear at similar staff height&quot; (<a href="https://archives.ismir.net/ismir2015/paper/000226.pdf">ISMIR 2015</a>).</li>
+<li>In Audiveris&#39; <code>VoiceDistance.Separated</code>, the cost of linking two chords into one voice is: opposite stems +6, different staff +20, voice &quot;new in staff&quot; +10, +4 per head chord (so rests are cheap &quot;placeholders&quot;), plus the pitch difference. A different part or a different assigned voice counts as incompatible (10000), and leaving a chord unlinked costs 60 (<a href="https://github.com/Audiveris/audiveris/tree/development/app/src/main/java/org/audiveris/omr"><code>VoiceDistance.java</code></a>). These numbers come from AGPL code and are listed only for the cost <em>structure</em>. Re-derive the weights; do not copy them.</li>
+<li>Audiveris also has a &quot;Merged&quot; mode for lute-style staves whose middle line is physically shared. There, &quot;chords with upward stem are considered as part of high voices, and chords with downward stem as part of low voices&quot;, and staff membership is &quot;rather secondary&quot; (same file).</li>
+<li>Stem direction <strong>overrides pitch order</strong>, which preserves real voice crossings. Crossings occur in 0.24–0.78 % of chorale slots (§0). Pitch order decides only for stemless notes (whole notes, breves) and for several heads on one stem.</li>
+</ul>
+<h3>2.2 Shared noteheads and unisons</h3>
+<ul>
+<li>A head with <strong>one stem on each side</strong> serves both voices. Audiveris accepts the canonical layout (&quot;stem down on the left side of the head and stem up on the right side&quot;) and splits the head logically into two halves, each linked to its own stem and joined by a mirror relation (<a href="https://audiveris.github.io/audiveris/_pages/ui_tools/shared_head">Audiveris shared head</a>). Mirrored heads go into the same slot (<a href="https://github.com/Audiveris/audiveris/tree/development/app/src/main/java/org/audiveris/omr">SlotsRetriever</a>).</li>
+<li>Unison heads can be shared only when they are the same type: both filled, or both open with stems. A half against a quarter, or a dotted against an undotted note, is printed offset side by side, usually with the lower voice moved to the right. Gould&#39;s <em>Behind Bars</em> covers this (pp. 50, 53, 307, quoted second-hand in <a href="https://musescore.org/en/node/290420">MuseScore forum 290420</a>, <a href="https://musescore.org/en/node/25454">25454</a>). An OMR system will therefore see either one head with two stems, or two heads touching horizontally at the same staff position.</li>
+<li>Failure mode: when the two stems line up, the engine &quot;may detect just one long stem, instead of two aligned ones&quot; (<a href="https://audiveris.github.io/audiveris/_pages/reference/limitations">Audiveris limitations</a>). Check for a single stem that has heads at its middle, or a head at both ends.</li>
+<li>Hymnals often print S+A or T+B on <strong>one stem as a 2-note chord</strong> when the rhythms coincide, and print a single-stem note when both voices sing a unison (an observation from common hymnal engraving; see also LilyPond&#39;s part-combiner rules below). On a staff known to carry two voices, a single-stem chord with two heads therefore means <em>top head to the upper voice, bottom head to the lower voice</em>. A single-stem single head with no opposite-stem event in the same time span means <em>unison: copy to both voices</em>.</li>
+<li>LilyPond&#39;s <code>\partCombine</code> documents the inverse transform that engravers apply. Same pitch becomes one &quot;a2&quot; note. Same rhythm less than a ninth apart becomes a chord. Wider intervals or crossings become separate stems (<a href="https://lilypond.org/doc/v2.25/Documentation/notation/automatic-part-combining">LilyPond automatic part combining</a>). This is a good <strong>generative model of closed-score layouts</strong> for synthetic test data, and the de-combining logic is its inverse.</li>
+</ul>
+<h3>2.3 Rests: displaced versus shared</h3>
+<ul>
+<li>Rests of voice 1 are moved up at least one staff space and rests of voice 2 down at least one (<a href="https://handbook.musescore.org/basics/working-with-multiple-voices">MuseScore handbook</a>).</li>
+<li>Gould, quoted on the MuseScore forum: &quot;Separately stemmed parts share rests wherever possible&quot; (p. 528), with vertical placement on pp. 36–37 (<a href="https://musescore.org/en/node/34511">MuseScore forum 34511</a>).</li>
+<li>Interpretation: a rest at least one space above the middle line belongs to the upper voice and one at least one space below belongs to the lower voice. A <strong>centred rest</strong> is <strong>shared by both voices</strong>, unless one voice already has events covering that time, in which case it belongs to the other voice. A centred whole-measure rest is shared.</li>
+<li>A rest <em>inside</em> a beamed group takes the beam&#39;s voice. Audiveris records this as a <code>BeamRestRelation</code> (&quot;rests embraced between two beamed chords … inherit voice and time information&quot;, <a href="https://github.com/Audiveris/audiveris/tree/development/app/src/main/java/org/audiveris/omr"><code>MeasureRhythm</code></a>).</li>
+</ul>
+<h3>2.4 Chord versus two voices</h3>
+<table>
+<thead>
+<tr>
+<th>Visual</th>
+<th>Interpretation on a 2-voice (closed) staff</th>
+<th>On a keyboard staff</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>N heads on one stem</td>
+<td>Split: top head to upper voice, bottom head to lower voice. If N ≥ 3, the extra heads are divisi or an error: warn</td>
+<td>One chord in one voice</td>
+</tr>
+<tr>
+<td>Two stems in opposite directions at the same x</td>
+<td>Two voices, by stem direction</td>
+<td>Two voices</td>
+</tr>
+<tr>
+<td>One head with stems both sides</td>
+<td>Unison: both voices</td>
+<td>Two voices sharing a head</td>
+</tr>
+<tr>
+<td>One stemmed head, no opposite-stem event during its span</td>
+<td>Unison: both voices (copy)</td>
+<td>One voice</td>
+</tr>
+<tr>
+<td>Two stemless heads in one slot</td>
+<td>Pitch order: higher to upper voice</td>
+<td>Chord, or two voices</td>
+</tr>
+</tbody></table>
+<p>Symbolic research handles the same tension. Kilian &amp; Hoos allow chords inside a voice and penalise &quot;chords with a large pitch interval between the highest and the lowest note, as well as irregular chords containing notes with different onset times&quot; (<a href="https://www.cs.ubc.ca/~hoos/Publ/KilHoo02.pdf">ISMIR 2002</a>). Foscarin et al. cluster synchronous notes into chords with a learned chord-edge predictor before linking voices (<a href="https://arxiv.org/abs/2407.21030">arXiv 2407.21030</a>). The chord-level model of Gray &amp; Bunescu lets one note belong to several voices (convergence and divergence), which is exactly the unison case. On the Bach-chorale notes involved in such many-to-many links, an envelope baseline reaches only F = 56.7 against 87.2 for the chord-level model (<a href="https://arxiv.org/abs/2011.03028">arXiv 2011.03028</a>).</p>
+<h3>2.5 Beams and ties within a voice</h3>
+<ul>
+<li>All chords in one beam group belong to the same voice. Chords that are &quot;within the same beam group, but not on the same stem, cannot belong to the same slot&quot;. Chords &quot;that share a common stem belong to the same slot&quot;, and &quot;similar abscissa is only an indication&quot; (<a href="https://github.com/Audiveris/audiveris/tree/development/app/src/main/java/org/audiveris/omr">Audiveris <code>SlotsRetriever</code></a>).</li>
+<li>Audiveris propagates voice and time through &quot;tie and beam, plus the &#39;Next in Voice&#39; manual relation&quot; (<a href="https://github.com/Audiveris/audiveris/tree/development/app/src/main/java/org/audiveris/omr"><code>MeasureRhythm</code></a>). Jin &amp; Raphael rule 5: beamed notes are &quot;usually connected by voice edges, while we penalize voices that exit a beamed group before it is completed&quot; (<a href="https://archives.ismir.net/ismir2015/paper/000226.pdf">ISMIR 2015</a>).</li>
+<li>Use the majority stem direction of a beam group as its voice key. Treat a beam group whose stems point both ways (a cross-staff or kneed beam) as <strong>keyboard evidence</strong>. It is almost never vocal.</li>
+</ul>
+<h3>2.6 Rhythm as a global constraint</h3>
+<p>Jin &amp; Raphael&#39;s hard constraints: the left barline is at onset 0 and the right barline at the meter. Onsets never decrease with x. Each vertex has a unique onset, so several paths into a vertex must agree. Coincident x implies the same onset (<a href="https://archives.ismir.net/ismir2015/paper/000226.pdf">ISMIR 2015</a>). Audiveris assigns voices slot by slot by mapping incoming &quot;rookie&quot; chords to active voices, using <code>VoiceDistance</code> and a NextInVoice blacklist. It assumes &quot;all chords in a given narrow slot share the same time&quot;. When slot times disagree it &quot;select[s] the smallest time value&quot; and rejects the inconsistent mappings. Unmapped chords start new voices (<a href="https://github.com/Audiveris/audiveris/tree/development/app/src/main/java/org/audiveris/omr"><code>MeasureRhythm.mapRookies</code></a>). Its handbook warns that the engine &quot;tries to reconcile different heuristics&quot; and that &quot;the time and voice algorithms are tightly coupled&quot;. In release 5.11 &quot;a chord can be assigned to exactly one voice&quot;, and sharing rests between voices is still &quot;debated&quot; (<a href="https://audiveris.github.io/audiveris/_pages/guides/ui/ui_tools/chords">Audiveris chords UI</a>).</p>
+<p>Recommendation: solve voices and onsets together per staff and measure. Use a small beam or branch-and-bound search over the ambiguous decisions: shared or private rests, unison copy, divisi head placement, ambiguous dots. Score each candidate by summed link costs plus a hard penalty when any voice&#39;s durations do not fill the bar (or the pickup length).</p>
+<h3>2.7 Known image-side failure modes</h3>
+<ul>
+<li>Aligned opposed stems merged into one stem (<a href="https://audiveris.github.io/audiveris/_pages/reference/limitations">Audiveris limitations</a>).</li>
+<li>Voices overlapping at nearly the same x, local partial voices, cross-staff voices, and tuplets coupled with rests merged across voices (<a href="https://arxiv.org/abs/2604.20522">BeadSolver §1.3</a>).</li>
+<li>Lyric hyphens and extenders mistaken for ledger lines or ties, and verse numbers mistaken for fingering. These are text-layer issues; see §7.</li>
+</ul>
+<hr>
+<h2>3. Closed-score SATB specifics</h2>
+<ul>
+<li>Layout: S+A on a treble staff and T+B on a bass staff. S and T are stems up, A and B stems down (<a href="https://musescore.org/en/handbook/3/voices">MuseScore 3 handbook</a>). Lyrics sit between the staves (<a href="https://usermanuals.finalemusic.com/FinaleWin/Content/Finale/Hymns.htm">Finale hymns</a>; LilyPond&#39;s SATB vocal-score template &quot;regroups the four voices onto only two staves&quot; with lyrics between them, <a href="https://lilypond.org/doc/v2.24/Documentation/learning/satb-vocal-score">LilyPond SATB vocal score</a>).</li>
+<li>Variants to recognise:<ul>
+<li><strong>SAB</strong>: S+A on the treble staff and one baritone voice on the bass staff.</li>
+<li><strong>TTBB</strong>: treble-8 clef with Tenor I/II, bass clef with Baritone/Bass.</li>
+<li><strong>SSAA</strong>: two treble staves.</li>
+<li><strong>SATB with divisi</strong>: three heads on a staff in places.</li>
+<li><strong>Unison sections</strong>: one voice per staff, or both staves in octaves.</li>
+</ul>
+</li>
+<li>Measured phenomena in 368 Bach chorales (§0): unisons 2.5–3.6 % of slots, crossings below 0.8 %, rhythmic divergence about 31 %. Gray &amp; Bunescu (2020), on the first 50 chorales, count 846 many-to-many (shared-note) pairs among 12,282 notes. Across their two datasets there are only 82 synchronous crossings among about 30,000 within-voice pairs (<a href="https://arxiv.org/abs/2011.03028">arXiv 2011.03028</a>).</li>
+<li>A closed score usually keeps <strong>two voices on every staff for the whole piece</strong>, even where a passage is printed with single stems. Splitting therefore needs a fixed 4-part output with <em>unison copying</em>, not a per-measure voice count.</li>
+</ul>
+<hr>
+<h2>4. Divisi</h2>
+<ul>
+<li>Choral and string practice puts two players or sub-sections on one staff with separate stems, often with &quot;div.&quot; and &quot;unis.&quot; labels. A return to a single line on its own implies unison (<a href="https://forums.steinberg.net/t/divisi-on-same-staff/136606">Steinberg forum: divisi on same staff</a>). Gould is quoted as saying single-stem divisi belongs in scores, not parts (second-hand, same thread).</li>
+<li>Dorico allows condensing for vocal section players such as an SATB choir, unlike other section players (<a href="https://steinberg.help/dorico/v4/en/dorico/topics/page_formatting/page_formatting_condensing_enabling_disabling_t.html">Dorico condensing</a>). Forum users report that choral condensing still handles lyrics poorly (<a href="https://forums.steinberg.net/t/choral-condensing-vs-divisi-lyrics-and-xml-export-a-major-workflow-gap/1038392">Steinberg forum</a>).</li>
+<li>LilyPond&#39;s <code>\partCombine</code> labels &quot;Solo&quot;, &quot;Solo II&quot; and &quot;a2&quot;, and for vocal scores it suggests turning those texts off (<a href="https://lilypond.org/doc/v2.25/Documentation/notation/automatic-part-combining">LilyPond</a>).</li>
+<li>Recommendation:<ul>
+<li>Local divisi inside an otherwise single-voice staff: keep <strong>one part</strong> with voices 1 and 2 (or chords) and add a warning.</li>
+<li>Promote divisi to separate parts only if (a) the label names two performers (&quot;S1 S2&quot;, &quot;Soprano I/II&quot;, &quot;1.2&quot;, &quot;I II&quot;, &quot;div.&quot; across a whole section), or (b) two-voice texture covers at least 50 % of the measures in which that staff has notes, with each stream monophonic.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2>5. Piano grand staff versus vocal parts; brace versus bracket</h2>
+<ul>
+<li>Convention: a <strong>brace</strong> joins the staves of one instrument (piano, harp, organ). A <strong>bracket</strong> groups different instruments or voices, such as choir parts or an instrument family (<a href="https://notation.com/MusicianDocs5/brackets_and_braces.htm">Notation.com</a>, <a href="https://steinberg.help/dorico/v4/en/dorico/topics/notation_reference/notation_reference_brackets_braces/notation_reference_brackets_braces_c.html">Dorico brackets/braces</a>). Exceptions exist: Dorico uses sub-braces for identical instruments, and older editions sometimes bracketed piano staves (<a href="https://musescore.org/en/node/345919">MuseScore forum</a>).</li>
+<li>Hymnals often join their SA/TB staves with a <strong>brace</strong>, because the short score doubles as an organ part (<a href="https://usermanuals.finalemusic.com/FinaleWin/Content/Finale/Hymns.htm">Finale hymns</a>: &quot;may be Soprano/Alto and Tenor/Bass and double as an organ part&quot;). <strong>A brace alone must not veto a split.</strong> A bracket around two 2-voice staves is strong closed-choir evidence.</li>
+<li>Audiveris groups staves into physical parts by staff count (&quot;one stave, or two staves (piano example), or even 3 staves (organ)&quot;). Before release 5.6 it assigned MIDI programs by staff count, 1 → voice, 2 → piano, 3 → organ (<a href="https://audiveris.github.io/audiveris/_pages/guides/specific/logical_parts">Audiveris logical parts</a>). That is exactly the heuristic that <strong>mis-handles closed SATB</strong>, which comes out as &quot;piano&quot;. Our classifier must do better.</li>
+</ul>
+<p>Discriminating features (weights are this project&#39;s recommendation; tune them on test data):</p>
+<table>
+<thead>
+<tr>
+<th>Feature (per staff group, aggregated over all systems)</th>
+<th>Weight</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Vocal label tokens at system start (S, A, T, B, Soprano, Alto, Tenor, Bass, Sopran, Alt, Contralto, Basso, Cantus, Altus, Bassus, Women, Men, Choir, Chorus, Coro, Chor, SATB)</td>
+<td>+3</td>
+</tr>
+<tr>
+<td>Lyric lines adjacent to the group (below staff 1, or between its staves)</td>
+<td>+2.5</td>
+</tr>
+<tr>
+<td>Each staff: both stem directions co-occur in ≥ 30 % of measures</td>
+<td>+1.5 per staff</td>
+</tr>
+<tr>
+<td>≥ 98 % of stems have ≤ 2 heads</td>
+<td>+1</td>
+</tr>
+<tr>
+<td>Stream ranges fit SATB (S ≈ C4–A5, A ≈ F3–D5, T ≈ C3–G4, B ≈ E2–D4)</td>
+<td>+1</td>
+</tr>
+<tr>
+<td>Treble-8 clef present</td>
+<td>+0.5</td>
+</tr>
+<tr>
+<td>Bracket (rather than brace)</td>
+<td>+0.5</td>
+</tr>
+<tr>
+<td>Keyboard label (Piano, Pno., Pf., Klavier, Organ, Org., Orgel, Manual, Ped., Harmonium, Harp, Accomp.)</td>
+<td>−3</td>
+</tr>
+<tr>
+<td>Lyrics present in the system but only on a <em>different</em> staff (song or anthem accompaniment)</td>
+<td>−2.5</td>
+</tr>
+<tr>
+<td>Pedal marks (Ped., ✱), arpeggio lines, fingering digits, cross-staff or kneed beams, 8va lines</td>
+<td>−2</td>
+</tr>
+<tr>
+<td>≥ 5 % of stems with ≥ 3 heads; octave doublings in the bottom stream</td>
+<td>−1.5</td>
+</tr>
+<tr>
+<td>Brace, and no lyrics anywhere near</td>
+<td>−0.5</td>
+</tr>
+</tbody></table>
+<p>Thresholds:</p>
+<ul>
+<li><strong>Score ≥ 3: vocal closed score, split.</strong></li>
+<li><strong>Score ≤ −1: keyboard, keep.</strong></li>
+<li><strong>In between: ambiguous.</strong> Keep as voices, flag it, and offer a toggle (§11).</li>
+</ul>
+<p>A typical hymn without labels scores about 2.5 + 3 + 1 + 1 − 0.5 = 7. A song accompaniment scores about −2.5 − 1.5 − 3 = −7.</p>
+<hr>
+<h2>6. Part naming from system-start labels</h2>
+<ul>
+<li>Audiveris OCRs the whole sheet and assigns text roles, one of which is <code>PartName</code>, using heuristics. A recognised name is &quot;compared, ignoring case, with logical name or logical abbreviation&quot;. Parts are collated across systems only when &quot;physical configurations … match (number of staves, staff-line counts, …)&quot; (<a href="https://audiveris.github.io/audiveris/_pages/guides/specific/logical_parts">Audiveris logical parts</a>, <a href="https://audiveris.github.io/audiveris/_pages/guides/ui/ui_tools/text">text UI</a>).</li>
+<li>Recommended procedure:<ol>
+<li><strong>Find label regions.</strong> Take text boxes to the left of the system&#39;s first barline that overlap a staff vertically or sit centred on a 2-staff brace or bracket. The first system usually has full names. Later systems have abbreviations (&quot;S. A.&quot;, &quot;T. B.&quot;) or nothing.</li>
+<li><strong>Normalise.</strong> Lowercase, strip diacritics and punctuation, and split on whitespace, <code>/</code>, <code>&amp;</code>, <code>,</code>, <code>+</code>, <code>.</code> and newlines. One label box can stack several names (&quot;Soprano↵Alto&quot;).</li>
+<li><strong>Look up tokens in a lexicon</strong> (multilingual):<ul>
+<li>soprano: s, sop, sopr, soprano/i/s, sopran, treble, cantus, superius, discantus</li>
+<li>alto: a, alt, alto/i/s, contralto, altus</li>
+<li>tenor: t, ten, tenor/e/i/s, ténor</li>
+<li>baritone: bar, bari, baritone, baritono</li>
+<li>bass: b, bs, bass, basso/i, basse(s), bassus</li>
+<li>collectives: women/ladies/frauen/femmes → S+A; men/männer/hommes → T+B; satb/choir/chorus/coro/chor → group name</li>
+<li>divisi markers: 1, 2, i, ii, div, divisi, unis, a2</li>
+<li>keyboard tokens: as in §5</li>
+</ul>
+</li>
+<li><strong>Map names to voices.</strong> List the names in order. On a 2-voice staff the first name goes to the upper (stem-up) voice. On a 2-staff group with four names, assign (1, 2) to staff 1 and (3, 4) to staff 2. A collective (&quot;Women&quot;) expands to two names.</li>
+<li><strong>Match later systems.</strong> Match each name to logical parts by case-insensitive prefix (s → Soprano). Never let an abbreviation change the part count.</li>
+<li><strong>Fallback when unlabelled.</strong> A vocal group with treble + bass staves gives S, A, T, B. Treble-8 + bass gives Tenor I, Tenor II, Baritone, Bass. A single-voice bottom staff gives SAB.</li>
+<li><strong>Emit names.</strong> Use <code>&lt;part-name&gt;</code> for the full name and <code>&lt;part-abbreviation&gt;</code> for &quot;S.&quot;, &quot;A.&quot;, &quot;T.&quot;, &quot;B.&quot;. The part group gets <code>&lt;group-name&gt;</code> &quot;Choir&quot; (or the printed label, e.g. &quot;SATB&quot;).</li>
+</ol>
+</li>
+<li>Report names that were inferred rather than read in the UI (&quot;Alto (inferred from layout)&quot;).</li>
+</ul>
+<hr>
+<h2>7. Lyrics: placement and which voices they apply to</h2>
+<h3>7.1 What sources say</h3>
+<ul>
+<li>Audiveris &quot;connects single syllables to chords above or below, but it is not always evident which staff or voice the text concerns&quot;. By default it assumes lyrics sit below their staff (<a href="https://audiveris.github.io/audiveris/_pages/guides/ui/ui_tools/text">Audiveris handbook/text</a>).</li>
+<li>Its <code>LyricItemInter.lookupLink</code> picks the head chord with the <strong>smallest Euclidean distance</strong> to the syllable, within a maximum dx, on the staff above or below (<a href="https://github.com/Audiveris/audiveris/tree/development/app/src/main/java/org/audiveris/omr">source</a>). On a closed staff this tends to bind to the <strong>lower voice</strong> (alto), whose heads are nearer the text. Avoid that approach.</li>
+<li>LilyPond: when two voices with different rhythms share one lyric line, attaching it to one voice misaligns the other. The documented fix is a hidden <code>NullVoice</code> that merges both rhythms and carries the lyrics. For SATB on two staves each voice can get its own lyric context via <code>\lyricsto</code>, and lyrics placed between staves use <code>staff-affinity</code> (<a href="https://lilypond.org/doc/v2.24/Documentation/notation/techniques-specific-to-lyrics">LilyPond lyrics techniques</a>, <a href="https://wiki.lilypond.community/wiki/LSR_177">LSR 177</a>).</li>
+<li>Hymnal convention: one block of verses between the staves serves all four voices (<a href="https://usermanuals.finalemusic.com/FinaleWin/Content/Finale/Hymns.htm">Finale hymns</a>, <a href="https://lilypond.org/doc/v2.24/Documentation/learning/satb-vocal-score">LilyPond SATB vocal score</a>). No source states this outright as a rule; it is implied by every hymnal template.</li>
+<li>When converting closed to open score by hand, MuseScore users copy and paste lyrics from one staff to the other; Explode does not copy them (<a href="https://musescore.org/en/node/358567">MuseScore forum</a>).</li>
+<li>Ground-truth caveat: the music21 Bach chorales carry lyrics on the soprano only (320/368 files, §0).</li>
+</ul>
+<h3>7.2 Recommended algorithm</h3>
+<ol>
+<li><strong>Lyric line to staff.</strong> Each lyric line (a band of OCR words at a common baseline) belongs to the nearest staff <em>above</em> it in the same system. If there is no staff above, or the gap to the staff above is more than twice the gap to the staff below, it belongs to the staff below. Stacked lines under one staff are verses 1…n, ordered top to bottom. Strip leading verse numbers (&quot;1.&quot;, &quot;2.&quot;) and use them as <code>number</code>. Audiveris also isolates initial numbers (<a href="https://github.com/Audiveris/audiveris/tree/development/app/src/main/java/org/audiveris/omr">source</a>).</li>
+<li><strong>Staff to voices.</strong><ul>
+<li>A line under a 2-voice staff applies to <strong>both</strong> voices of that staff.</li>
+<li>In a closed SATB group with lyrics <strong>only</strong> between the staves (nothing under the bass staff), the block applies to <strong>all four</strong> voices.</li>
+<li>If a separate block exists under the bass staff, T and B take that block instead.</li>
+<li>In open score each staff carries its own text.</li>
+</ul>
+</li>
+<li><strong>Syllables to time slots.</strong> Run a monotonic alignment (DP, like sequence alignment) between the syllables of one verse line and the onset slots of the <em>reference voice</em>, which is the upper voice of the staff above. Costs: x-distance between syllable centre and notehead centre (with a left-aligned variant for melisma starts); skipped onsets (melisma) are cheap after a syllable ending in an extender or hyphen and dearer otherwise; unmatched syllables are expensive. Alignment recovers from OCR splits and merges.</li>
+<li><strong>Copy to each receiving voice.</strong><ul>
+<li>If the voice has an onset at the syllable&#39;s slot, attach a copy with the same <code>syllabic</code> and verse <code>number</code>.</li>
+<li>If the voice is sustaining a note there, it does not take that syllable. Count a <em>conflict</em>.</li>
+<li>If the voice has onsets with no syllable after a syllable, those notes are a <strong>melisma</strong> for that voice: add <code>&lt;extend type=&quot;start&quot;/&gt;</code> on the syllable note (after word-final syllables only) and <code>&lt;extend type=&quot;stop&quot;/&gt;</code> on the last melisma note, or a plain <code>&lt;extend/&gt;</code> for maximum importer compatibility (<a href="https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/lyric/">W3C <code>&lt;lyric&gt;</code></a>).</li>
+<li>Tied continuations never get syllables.</li>
+</ul>
+</li>
+<li><strong>Conflict check per voice.</strong> If more than 15 % of a verse&#39;s syllables conflict for a voice, that voice probably has its own text, or the text is not meant for it. Keep the lyric on the reference voice only and warn: &quot;Lyrics not applied to Alto: rhythm differs in N places&quot;.</li>
+<li><strong>Record provenance</strong> (read versus copied) per part, for the UI lyrics preview.</li>
+</ol>
+<hr>
+<h2>8. MusicXML representation</h2>
+<p>Reference points (MusicXML 4.0):</p>
+<ul>
+<li><code>&lt;backup&gt;</code> and <code>&lt;forward&gt;</code> &quot;are required to coordinate multiple voices in one part&quot;. <code>&lt;backup&gt;</code> has no <code>&lt;voice&gt;</code> or <code>&lt;staff&gt;</code> children. Its duration must be positive and must not cross a measure boundary or a mid-measure change of divisions (<a href="https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/backup/">W3C <code>&lt;backup&gt;</code></a>, <a href="https://usermanuals.musicxml.com/MusicXML/Content/EL-MusicXML-backup.htm">usermanuals</a>).</li>
+<li><code>&lt;staff&gt;</code>: &quot;Staff assignment is only needed for music notated on multiple staves&quot;, numbered from 1 at the top of the part (<a href="https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/staff/">W3C <code>&lt;staff&gt;</code></a>).</li>
+<li><code>&lt;voice&gt;</code> is a free string with no attributes and no numbering semantics (<a href="https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/voice/">W3C</a>). Conventions differ: Finale and MuseScore number voices across the whole multi-staff part, Sibelius per staff (<a href="https://musescore.org/en/node/345293">MuseScore forum</a>). Audiveris uses 1–4 for voices starting on staff 1, 5–8 for staff 2, and 9–12 for staff 3 (<a href="https://github.com/Audiveris/audiveris/blob/development/app/src/main/java/org/audiveris/omr/sheet/rhythm/Voice.java"><code>Voice.VoiceKind</code></a>).</li>
+<li><code>&lt;part-group type=&quot;start|stop&quot; number&gt;</code> wraps <code>&lt;score-part&gt;</code>s. Its children are group-name, group-abbreviation, <code>group-symbol</code> (brace | bracket | line | square | none) and <code>group-barline</code> (<a href="https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/part-group/">W3C part-group</a>, <a href="https://www.w3.org/2021/06/musicxml40/musicxml-reference/data-types/group-symbol-value/">group-symbol values</a>). Multi-staff parts get a brace by default (<a href="https://usermanuals.musicxml.com/MusicXML/Content/EL-MusicXML-part-group.htm">usermanuals</a>).</li>
+<li><code>&lt;lyric number name&gt;</code> with <code>syllabic</code> (single | begin | middle | end), <code>text</code>, <code>elision</code>, <code>extend</code> (whose <code>type</code> attribute dates from 3.0) and <code>end-line</code>/<code>end-paragraph</code>. <code>number</code> selects the line or verse; <code>name</code> holds labels such as verse or chorus (<a href="https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/lyric/">W3C <code>&lt;lyric&gt;</code></a>).</li>
+</ul>
+<h3>8.1 Output A: split choir (default for vocal closed score)</h3>
+<pre><code class="language-xml">&lt;part-list&gt;
+  &lt;part-group number=&quot;1&quot; type=&quot;start&quot;&gt;
+    &lt;group-name&gt;Choir&lt;/group-name&gt;
+    &lt;group-symbol&gt;bracket&lt;/group-symbol&gt;
+    &lt;group-barline&gt;yes&lt;/group-barline&gt;
+  &lt;/part-group&gt;
+  &lt;score-part id=&quot;P1&quot;&gt;&lt;part-name&gt;Soprano&lt;/part-name&gt;&lt;part-abbreviation&gt;S.&lt;/part-abbreviation&gt;&lt;/score-part&gt;
+  &lt;score-part id=&quot;P2&quot;&gt;&lt;part-name&gt;Alto&lt;/part-name&gt;&lt;part-abbreviation&gt;A.&lt;/part-abbreviation&gt;&lt;/score-part&gt;
+  &lt;score-part id=&quot;P3&quot;&gt;&lt;part-name&gt;Tenor&lt;/part-name&gt;&lt;part-abbreviation&gt;T.&lt;/part-abbreviation&gt;&lt;/score-part&gt;
+  &lt;score-part id=&quot;P4&quot;&gt;&lt;part-name&gt;Bass&lt;/part-name&gt;&lt;part-abbreviation&gt;B.&lt;/part-abbreviation&gt;&lt;/score-part&gt;
+  &lt;part-group number=&quot;1&quot; type=&quot;stop&quot;/&gt;
+&lt;/part-list&gt;
+</code></pre>
+<ul>
+<li>Each part is monophonic, with <code>&lt;voice&gt;1&lt;/voice&gt;</code>. Omit <code>&lt;stem&gt;</code> so the renderer chooses.</li>
+<li>Tenor clef: either keep the printed bass clef or use the open-score convention <code>&lt;clef&gt;&lt;sign&gt;G&lt;/sign&gt;&lt;line&gt;2&lt;/line&gt;&lt;clef-octave-change&gt;-1&lt;/clef-octave-change&gt;&lt;/clef&gt;</code>. Pitches are absolute, so both are valid. Recommendation: treble-8, with a setting to change it.</li>
+<li>Unison notes and shared rests are <strong>duplicated</strong> into each part. Lyrics are copied as in §7.</li>
+</ul>
+<h3>8.2 Output B: closed score kept (ambiguous or user choice)</h3>
+<p>Use two parts, each with one staff and voices 1 and 2. This mirrors the MuseScore closed-SATB convention (<a href="https://musescore.org/en/handbook/3/voices">MuseScore 3 handbook</a>).</p>
+<pre><code class="language-xml">&lt;measure number=&quot;1&quot;&gt;
+  &lt;attributes&gt;&lt;divisions&gt;2&lt;/divisions&gt;&lt;time&gt;&lt;beats&gt;4&lt;/beats&gt;&lt;beat-type&gt;4&lt;/beat-type&gt;&lt;/time&gt;
+    &lt;clef&gt;&lt;sign&gt;G&lt;/sign&gt;&lt;line&gt;2&lt;/line&gt;&lt;/clef&gt;&lt;/attributes&gt;
+  &lt;note&gt;&lt;pitch&gt;&lt;step&gt;E&lt;/step&gt;&lt;octave&gt;5&lt;/octave&gt;&lt;/pitch&gt;&lt;duration&gt;4&lt;/duration&gt;&lt;voice&gt;1&lt;/voice&gt;
+    &lt;type&gt;half&lt;/type&gt;&lt;stem&gt;up&lt;/stem&gt;
+    &lt;lyric number=&quot;1&quot;&gt;&lt;syllabic&gt;single&lt;/syllabic&gt;&lt;text&gt;Praise&lt;/text&gt;&lt;/lyric&gt;&lt;/note&gt;
+  &lt;note&gt;&lt;pitch&gt;&lt;step&gt;D&lt;/step&gt;&lt;octave&gt;5&lt;/octave&gt;&lt;/pitch&gt;&lt;duration&gt;4&lt;/duration&gt;&lt;voice&gt;1&lt;/voice&gt;
+    &lt;type&gt;half&lt;/type&gt;&lt;stem&gt;up&lt;/stem&gt;
+    &lt;lyric number=&quot;1&quot;&gt;&lt;syllabic&gt;single&lt;/syllabic&gt;&lt;text&gt;God&lt;/text&gt;&lt;/lyric&gt;&lt;/note&gt;
+  &lt;backup&gt;&lt;duration&gt;8&lt;/duration&gt;&lt;/backup&gt;
+  &lt;note&gt;&lt;pitch&gt;&lt;step&gt;C&lt;/step&gt;&lt;octave&gt;5&lt;/octave&gt;&lt;/pitch&gt;&lt;duration&gt;4&lt;/duration&gt;&lt;voice&gt;2&lt;/voice&gt;
+    &lt;type&gt;half&lt;/type&gt;&lt;stem&gt;down&lt;/stem&gt;&lt;/note&gt;
+  &lt;note&gt;&lt;pitch&gt;&lt;step&gt;B&lt;/step&gt;&lt;octave&gt;4&lt;/octave&gt;&lt;/pitch&gt;&lt;duration&gt;4&lt;/duration&gt;&lt;voice&gt;2&lt;/voice&gt;
+    &lt;type&gt;half&lt;/type&gt;&lt;stem&gt;down&lt;/stem&gt;&lt;/note&gt;
+&lt;/measure&gt;
+</code></pre>
+<ul>
+<li>Unison: two <code>&lt;note&gt;</code>s with the same pitch, one per voice.</li>
+<li>Shared rest: a rest in voice 1, and in voice 2 either a rest with <code>print-object=&quot;no&quot;</code> or a <code>&lt;forward&gt;</code> with <code>&lt;voice&gt;2&lt;/voice&gt;</code>.</li>
+</ul>
+<h3>8.3 Output C: keyboard grand staff (never split)</h3>
+<pre><code class="language-xml">&lt;attributes&gt;&lt;divisions&gt;2&lt;/divisions&gt;&lt;staves&gt;2&lt;/staves&gt;
+  &lt;clef number=&quot;1&quot;&gt;&lt;sign&gt;G&lt;/sign&gt;&lt;line&gt;2&lt;/line&gt;&lt;/clef&gt;
+  &lt;clef number=&quot;2&quot;&gt;&lt;sign&gt;F&lt;/sign&gt;&lt;line&gt;4&lt;/line&gt;&lt;/clef&gt;&lt;/attributes&gt;
+&lt;!-- staff 1: voices 1 (stem up) and 2 (stem down) separated by &lt;backup&gt; --&gt;
+&lt;!-- staff 2: voices 5 and 6 --&gt;
+&lt;note&gt;...&lt;voice&gt;5&lt;/voice&gt;&lt;staff&gt;2&lt;/staff&gt;&lt;/note&gt;
+</code></pre>
+<hr>
+<h2>9. Algorithms survey</h2>
+<h3>9.1 Image-side OMR</h3>
+<table>
+<thead>
+<tr>
+<th>System / paper</th>
+<th>How voices are formed</th>
+<th>Numbers</th>
+<th>Licence and use</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Audiveris</strong> 5.x (<a href="https://github.com/Audiveris/audiveris/tree/development/app/src/main/java/org/audiveris/omr">code</a>, <a href="https://audiveris.github.io/audiveris/_pages/guides/ui/ui_tools/chords">handbook</a>)</td>
+<td>(1) Chords into <strong>slots</strong>: shared stem → same slot, mirrored heads → same slot, same beam group on different stems → different slots, x only a hint. (2) Per slot, map new chords to active voices by <code>VoiceDistance</code> cost (stems, staff, rest bonus, pitch) with NextInVoice and SeparateVoices constraints. (3) Propagate through beams and ties. (4) Check slot times; take the lowest time on disagreement; unmapped chords start new voices. (5) Voice IDs 1–4 / 5–8 / 9–12 by starting staff. (6) Lyrics go to the nearest chord. (7) Parts come from staff counts, names from OCR <code>PartName</code>. <strong>No automatic splitting of voices into parts.</strong></td>
+<td>Not published</td>
+<td>AGPL-3.0: ideas only</td>
+</tr>
+<tr>
+<td><strong>Jin &amp; Raphael</strong> 2012/2015 (<a href="https://archives.ismir.net/ismir2015/paper/000226.pdf">2015</a>)</td>
+<td>Graph per system measure. Voice edges (&quot;onset of receiver = sender onset + duration&quot;) and coincidence edges (same x → same onset). Hard constraints: bar length, x-monotonic onsets, unique onset per vertex. Soft: beams, stem direction, staff height. Search with re-interpretation (implicit tuplets)</td>
+<td>355/371 (95.7 %) system measures on Rachmaninoff PC2. 100 % on a 180-measure score with triplets</td>
+<td>Paper only</td>
+</tr>
+<tr>
+<td><strong>BeadSolver</strong> 2026 (<a href="https://arxiv.org/abs/2604.20522">arXiv 2604.20522</a>)</td>
+<td>Measure events as &quot;beads&quot; threaded into one chain (BOS…EOS per voice). A 16-layer Transformer (3.24 M parameters) proposes next node, division and dots. MCTS-like search with structural loss</td>
+<td>Greedy rule baseline: 55.09 % voice match, 50.54 % perfect measures. BeadSolver multipass: 92.42 % / 86.83 % (5,317 measures from a 107-score LilyPond test set, mostly piano: Bach, Chopin and Czerny are about 79 % of measures)</td>
+<td>Paper; code repo has no stated licence</td>
+</tr>
+<tr>
+<td><strong>SMT / SMT++</strong> (Ríos-Vila et al., <a href="https://arxiv.org/abs/2402.07596">arXiv 2402.07596</a>, <a href="https://arxiv.org/abs/2405.12105">2405.12105</a>)</td>
+<td>End to end, image to bekern (Humdrum spines encode voices) for pianoform and quartets</td>
+<td>CER 1.3 on quartets, 3.9 on GrandStaff (repo README)</td>
+<td>MIT (<a href="https://github.com/Jamesprocode/SMT">repo</a>); needs a large model</td>
+</tr>
+<tr>
+<td><strong>LMX</strong> (Mayer et al. 2024, <a href="https://arxiv.org/abs/2403.13763">arXiv 2403.13763</a>)</td>
+<td>End to end to linearized MusicXML (a depth-first token sequence close to MusicXML, so voices and staves survive into the output; see the paper for details). TEDn metric</td>
+<td>OpenScore Lieder test sets: 1,438/1,493 systems</td>
+<td>Paper and dataset</td>
+</tr>
+<tr>
+<td><strong>homr</strong> / <strong>oemer</strong> (<a href="https://github.com/liebharc/homr">homr</a>)</td>
+<td>Segmentation (oemer UNet) plus a transformer (Polyphonic-TrOMR). Focus on pitch and rhythm</td>
+<td>—</td>
+<td>homr AGPL-3.0, oemer MIT</td>
+</tr>
+</tbody></table>
+<h3>9.2 Symbolic voice separation (fallbacks and offline checks)</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Idea</th>
+<th>Numbers</th>
+<th>Licence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Contig mapping</strong>, Chew &amp; Wu 2004 (<a href="https://infolab.usc.edu/imsc/research/project/vosa/vosa.pdf">summary</a>); partitura implementation (<a href="https://partitura.readthedocs.io/en/latest/_modules/partitura/musicanalysis/voice_separation.html">code</a>)</td>
+<td>Cut the piece into <em>contigs</em> with a constant number of sounding notes. Inside a contig, voices are ordered by pitch. Seed from maximal contigs and connect fragments outward with a greedy minimum cost (pitch distance; −MAX for the same note, +MAX for skips). Chords are treated as their highest note</td>
+<td>99.75 % fragment consistency, 94.50 % correct connections, 88.98 % average voice consistency</td>
+<td>partitura Apache-2.0</td>
+</tr>
+<tr>
+<td><strong>Better contig connection</strong>, Guiomard-Kagan et al. 2016 (<a href="https://archives.ismir.net/ismir2016/paper/000129.pdf">ISMIR</a>)</td>
+<td>Use the whole fragment content to score connections; leave doubtful ones unconnected</td>
+<td>Transition precision &gt; 99 % on fugues if 25 % of links are left open (GA1-75 %)</td>
+<td>Paper</td>
+</tr>
+<tr>
+<td><strong>Voice vs. stream comparison</strong> (<a href="https://hal.archives-ouvertes.fr/hal-01246693v1">ISMIR 2015</a>)</td>
+<td>Benchmark of voice and stream segmentation in one framework</td>
+<td>—</td>
+<td>CC-BY paper</td>
+</tr>
+<tr>
+<td><strong>VISA</strong>, Karydis/Cambouropoulos 2007 (<a href="https://archives.ismir.net/ismir2007/paper/000445.pdf">ISMIR</a>), revisited 2009 and VISA3 2016</td>
+<td>Perceptual <em>stream</em> separation: a stream may contain synchronous notes (chords). Sweep line plus bipartite matching; the number of voices need not be known</td>
+<td>Precision 87.3–100 % on 10 works</td>
+<td>Paper</td>
+</tr>
+<tr>
+<td><strong>Kilian &amp; Hoos</strong> 2002 (<a href="https://www.cs.ubc.ca/~hoos/Publ/KilHoo02.pdf">PDF</a>)</td>
+<td>Stochastic local search over slices. Penalties for pitch distance, gaps, chord spread and irregular chords, and overlaps. <strong>Chords allowed inside a voice</strong>; user-tunable</td>
+<td>—</td>
+<td>Paper</td>
+</tr>
+<tr>
+<td><strong>Perceptual principles</strong>: Bregman ASA (<a href="https://en.wikipedia.org/wiki/Auditory_scene_analysis">Wikipedia</a>), Huron 2001 (<a href="https://doi.org/10.1525/mp.2001.19.1.1">DOI</a>)</td>
+<td>Pitch proximity, temporal continuity, avoid crossing, tonal fusion: the source of the cost terms above</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>HMM</strong>, McLeod &amp; Steedman 2016 (<a href="https://apmcleod.github.io/pdf/VoiceSeparation.pdf">PDF</a>, <a href="https://github.com/apmcleod/voice-splitting">code</a>)</td>
+<td>States are sets of monophonic voices. Voice pitch is a weighted average of recent notes; beam search (b = 25)</td>
+<td>Average voice consistency 91.53 (Chew &amp; Wu: 88.98). F-measure: WTC 0.97, Haydn 0.79</td>
+<td>MIT</td>
+</tr>
+<tr>
+<td><strong>Neural greedy</strong>, Gray &amp; Bunescu 2016 (<a href="https://archives.ismir.net/ismir2016/paper/000296.pdf">ISMIR</a>)</td>
+<td>One-hidden-layer network scoring note–voice pairs from perceptual features, applied left to right</td>
+<td>Bach chorales F = 95.47 (baseline 93.18); pop 91.03</td>
+<td>Paper</td>
+</tr>
+<tr>
+<td><strong>Chord-level model</strong>, Gray &amp; Bunescu 2020 (<a href="https://arxiv.org/abs/2011.03028">arXiv 2011.03028</a>)</td>
+<td>A note may belong to several voices (convergence and divergence = unisons). Scores joint assignments for a whole chord</td>
+<td>Chorales F = 97.30; &quot;Chords Many&quot; F = 87.24 against a baseline of 56.72</td>
+<td>Paper</td>
+</tr>
+<tr>
+<td><strong>DNN for lute and keyboard</strong>, de Valk &amp; Weyde (<a href="https://ismir2018.ismir.net/doc/pdfs/304_Paper.pdf">ISMIR 2018</a>)</td>
+<td>Feed-forward network with voice-entry heuristics</td>
+<td>Lute tablature voice prediction ≈ 80–90 %</td>
+<td>Paper</td>
+</tr>
+<tr>
+<td><strong>GNN link prediction</strong>, Karystinaios et al. IJCAI 2023 (<a href="https://arxiv.org/abs/2304.14848">arXiv</a>, <a href="https://github.com/manoskary/vocsep_ijcai2023">code</a>)</td>
+<td>Heterogeneous GNN predicts note-to-next-note links, with a 1-in/1-out regulariser and linear assignment. Monophonic voices only</td>
+<td>Link F1: Inventions 0.997, WTC I 0.976, Haydn quartets 0.872 (McLeod: 0.781)</td>
+<td>MIT</td>
+</tr>
+<tr>
+<td><strong>piano_svsep</strong>, Foscarin et al. ISMIR 2024 (<a href="https://arxiv.org/abs/2407.21030">arXiv</a>, <a href="https://github.com/CPJKU/piano_svsep">code</a>)</td>
+<td>GNN with chord clustering, voice edges and staff classifier; chord pooling plus linear assignment</td>
+<td>Voice F1 96.6 (J-Pop) / 89.9 (DCML); staff accuracy 96.3 / 91.0; rule baseline 85.4 / 78.2</td>
+<td>MIT</td>
+</tr>
+</tbody></table>
+<h3>9.3 Tools that split voices into parts in notation software</h3>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Behaviour</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>music21</strong> <code>Stream.voicesToParts(separateById=False)</code> / <code>explode()</code> (<a href="https://www.music21.org/music21docs/moduleReference/moduleStreamBase.html">source, music21 10.5.2</a>)</td>
+<td>For each measure, the k-th <code>Voice</code> goes to part k (<code>&lt;id&gt;-v0</code>, <code>-v1</code>, …). Missing voices get empty measures. Clefs, key and time are copied. With <code>separateById=True</code> voices are matched by id in order of first appearance. <strong>It does nothing for single-stem chords or unisons, and lyrics stay on whichever voice held them.</strong> <code>explode()</code> &quot;currently just runs voicesToParts()&quot;. The inverse is <code>Score.partsToVoices(voiceAllocation=2)</code>, the ideal generator for synthetic closed scores. <code>makeVoices()</code> isolates overlaps into voices; <code>chordify()</code> produces a reduction.</td>
+</tr>
+<tr>
+<td><strong>MuseScore Explode</strong> (<a href="https://handbook.musescore.org/notation/instruments-staves-and-systems/implode-and-explode">handbook</a>)</td>
+<td>Splits voices, or chord notes, of a selection onto the staves below; the staff count is the number of voices, or the largest chord. Extra notes are dropped when staves run out. Lyrics are not copied (<a href="https://musescore.org/en/node/358567">forum</a>).</td>
+</tr>
+<tr>
+<td><strong>Dorico condensing</strong> (<a href="https://steinberg.help/dorico/v4/en/dorico/topics/page_formatting/page_formatting_condensing_enabling_disabling_t.html">docs</a>)</td>
+<td>The opposite direction (open to closed) with divisi-aware layout. Lyrics are a known weak spot (<a href="https://forums.steinberg.net/t/choral-condensing-vs-divisi-lyrics-and-xml-export-a-major-workflow-gap/1038392">forum</a>).</td>
+</tr>
+<tr>
+<td><strong>LilyPond <code>\partCombine</code></strong> (<a href="https://lilypond.org/doc/v2.25/Documentation/notation/automatic-part-combining">docs</a>)</td>
+<td>Open to closed rules: a2, chords, apart, solo. Only two voices; it &quot;only detects where notes start&quot;.</td>
+</tr>
+</tbody></table>
+<p><strong>What this means for the project.</strong> No reviewed tool does what we need end to end: detect a closed score from an image, de-combine single-stem chords and unisons, split into parts, and copy lyrics by rhythm. Audiveris (no part splitting, nearest-chord lyrics) and music21 (voices only) each cover a piece. The pipeline in §10 combines Audiveris-style slot and voice building (re-implemented from scratch), Jin &amp; Raphael-style bar-length constraints, partCombine-inverse de-combining, and the slot-based lyric copy from §7.</p>
+<hr>
+<h2>10. Recommended pipeline (environment-agnostic JS core)</h2>
+<p>Input is detected primitives per system: staves, barlines, brace/bracket glyphs, noteheads (filled, open, whole), stems with direction, beams, flags, dots, rests with y-offset, ties and slurs, accidentals, clefs, key and time, and OCR text boxes. The core runs in browser and node.</p>
+<ol>
+<li><strong>Staff grouping.</strong> Group staves by brace/bracket glyphs and barline connectivity. Collate groups across systems into logical groups by staff count, clefs and labels (Audiveris-like collation).</li>
+<li><strong>Chords and slots</strong> per system measure. A stem plus its heads makes a chord. Split heads with stems on both sides into two mirrored chords. Group whole notes by x. Build slots: a shared stem means the same slot; the same beam group on different stems means different slots; otherwise use an x-overlap tolerance of about 0.6 staff space.</li>
+<li><strong>Per-staff voice assignment</strong> (two keys: U = upper, L = lower):<ul>
+<li>Stem up goes to U, stem down to L. Each beam group takes the majority direction of its stems.</li>
+<li>On a 2-voice staff, a single-stem chord with ≥ 2 heads is split top → U, bottom → L. Middle heads are flagged divisi and attached as a chord to the nearer voice.</li>
+<li>A single-stem single head with no opposite-stem event overlapping its span is a unison: copy to U and L.</li>
+<li>Stemless heads: two in one slot go by pitch order. A single one goes to whichever voice lacks events in that span, otherwise to both.</li>
+<li>Rests by y-offset: ≥ +1 space → U, ≤ −1 space → L, centred → shared unless one voice already covers that time.</li>
+<li>Ties and beams keep the voice.</li>
+<li>Keyboard staves use the same steps without de-combining chords. Allow up to 4 voices per staff; if a staff has no two-direction co-occurrence, it is one voice with chords.</li>
+</ul>
+</li>
+<li><strong>Rhythm solve and repair.</strong> Compute per-voice onsets from durations, with x-monotonic onsets and coincident slots forced equal. Each voice must sum to the bar (or pickup) length. When it fails, search over the ambiguous choices (shared or private rest, unison copy, divisi placement, dot or flag misreads, implicit triplets) with a budget of 200 states per measure. Still failing: pad with <code>&lt;forward&gt;</code>, warn with the measure number, and lower the confidence.</li>
+<li><strong>Staff-group classification</strong> (§5 score) per logical group, aggregated over systems.</li>
+<li><strong>Split decision and naming</strong> (§11, §6).</li>
+<li><strong>Lyrics</strong> (§7).</li>
+<li><strong>MusicXML emission</strong> (§8): output A, B or C per group, plus a provenance record per part (source staff, voice key, split reason, confidence, lyric source) for the UI&#39;s per-part summary.</li>
+</ol>
+<p>Symbolic fallback: when stem detection on a staff is unreliable (stem confidence below threshold in more than 20 % of chords), run a contig or linear-assignment separator (pitch-proximity cost) on that staff&#39;s notes for k = 2 streams and compare its result with the stem-based one. Disagreement lowers confidence.</p>
+<hr>
+<h2>11. Decision procedure: split or keep, and uncertain cases</h2>
+<pre><code class="language-text">for each logical staff group G (whole piece):
+  s = vocalScore(G)                       # §5 table, summed over systems
+  if G.staves == 1:
+     twoVoice = fraction of measures (where staff has notes) with ≥2 concurrent streams
+     names    = labelNames(G)              # §6
+     if names.count &gt;= 2 and (s &gt;= 1 or twoVoice &gt;= 0.2):  split into names
+     elif twoVoice &gt;= 0.5 and allStreamsMonophonic and s &gt;= 3: split into &quot;&lt;Name&gt; 1&quot;, &quot;&lt;Name&gt; 2&quot;
+     else: keep one part, voices 1/2 (warn if twoVoice &gt; 0)
+  elif G.staves == 2:
+     if s &gt;= 3:   SPLIT  -&gt; per staff: k voices (k = max concurrent streams, usually 2; SAB → 2+1)
+     elif s &lt;= -1: KEEP as keyboard part, &lt;staves&gt;2&lt;/staves&gt;, voices 1-4 / 5-8
+     else:        KEEP as closed score (output B) + flag &quot;ambiguous: split available&quot;
+  elif G.staves &gt;= 3: KEEP (organ: 3 staves) unless every staff individually qualifies as vocal
+  consistency: part count is fixed for the piece; measures with fewer visible voices
+               duplicate unison material; never split per measure.
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Uncertain case</th>
+<th>Action</th>
+<th>User-facing note</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Hymn staves braced, no labels, lyrics between staves</td>
+<td>Split (score is high from lyrics plus stems)</td>
+<td>&quot;Split from shared staves: lyrics between staves, opposite stems in N % of bars&quot;</td>
+</tr>
+<tr>
+<td>Single-stem 2-note chords throughout one passage of a closed staff</td>
+<td>De-combine top/bottom</td>
+<td>Silent unless a chord has ≥ 3 heads</td>
+</tr>
+<tr>
+<td>3 or more heads on a closed staff (local divisi)</td>
+<td>Keep the extra head as a chord in the nearer voice</td>
+<td>&quot;Divisi in bar N kept as chord in Alto&quot;</td>
+</tr>
+<tr>
+<td>Two-voice texture on a single open-score staff in &lt; 50 % of bars, no label</td>
+<td>Keep one part with voices</td>
+<td>&quot;Soprano has divisi in bars …&quot;</td>
+</tr>
+<tr>
+<td>Voice count differs between systems</td>
+<td>Use the maximum for the piece and fill with unison copies or rests</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Lyric rhythm conflicts in &gt; 15 % of syllables for a voice</td>
+<td>Do not copy the lyrics to that voice</td>
+<td>&quot;Lyrics not applied to Tenor (N conflicts)&quot;</td>
+</tr>
+<tr>
+<td>Bar-length failure after repair</td>
+<td><code>&lt;forward&gt;</code> padding, confidence &lt; 0.5 for the measure</td>
+<td>Bar highlighted in the overlay</td>
+</tr>
+<tr>
+<td>Score in the ambiguous band (−1, 3)</td>
+<td>Output B (lossless), toggle offered</td>
+<td>&quot;Could be piano or choir: currently kept together&quot;</td>
+</tr>
+<tr>
+<td>Vocal score with separate piano reduction below</td>
+<td>Choir group split; piano kept</td>
+<td>&quot;Piano reduction kept as one part&quot;</td>
+</tr>
+<tr>
+<td>Instrumental shared staff labelled &quot;1.2&quot; or &quot;a2&quot;</td>
+<td>Keep by default; split only if labelled with two names and monophonic</td>
+<td>&quot;Flutes 1.2 kept as one part (two voices)&quot;</td>
+</tr>
+</tbody></table>
+<p>Report confidence as one number per output part: the minimum of the classification confidence (a sigmoid of the §5 score), the voice-assignment confidence (the share of measures passing the bar check without repair) and the stem-detection confidence.</p>
+<hr>
+<h2>12. Evaluation plan (node harness)</h2>
+<ul>
+<li><strong>Positive set (synthetic).</strong> Take the music21 Bach chorales: 368 four-part, BSD code, with corpus terms per music21 (<a href="https://music21.org/music21docs/_sources/about/about.rst.txt">about</a>). Convert them to closed score with <code>partsToVoices(voiceAllocation=2)</code> and soprano lyrics. Export MusicXML, render with LilyPond <code>musicxml2ly</code> (available locally) to PDF/PNG, degrade (blur, noise, rotation, JPEG artefacts) to look scanned, and run the OMR core. Compare against the original 4-part score.</li>
+<li><strong>Positive set (real).</strong> Public-domain hymnal scans from IMSLP or CPDL, hand-annotated, about 20 pages.</li>
+<li><strong>Negative set.</strong> OpenScore Lieder (CC0, voice plus piano) rendered: the piano must never split and the voice staff must not split. Add DCML or other piano pieces for keyboard grand staves.</li>
+<li><strong>Metrics:</strong><ul>
+<li>Split-decision accuracy per staff group (target 100 % on hymns and Lieder).</li>
+<li>Per-voice note accuracy after alignment.</li>
+<li>Within-voice-pair F-measure, as in Gray &amp; Bunescu and McLeod (<a href="https://archives.ismir.net/ismir2016/paper/000296.pdf">ISMIR 2016</a>).</li>
+<li>The voice component of MV2H (<a href="https://github.com/apmcleod/MV2H">MV2H</a>, MIT; v2.1 supports homophonic voices).</li>
+<li>Bar-check pass rate.</li>
+<li>Lyric syllable accuracy on the soprano, plus copy correctness on A/T/B against rhythm-derived ground truth.</li>
+<li>Part-name accuracy.</li>
+</ul>
+</li>
+<li><strong>Target</strong> with ground-truth symbols (isolating the voice logic): ≥ 99 % of notes in the correct voice on chorales. This is plausible: crossings are below 0.8 % and stems are explicit.</li>
+</ul>
+<hr>
+<h2>13. Licensing notes</h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Licence</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Audiveris (<a href="https://github.com/Audiveris/audiveris">repo</a>)</td>
+<td><strong>AGPL-3.0</strong></td>
+<td>Read for ideas; <strong>no code or constants ported</strong>. The algorithms are re-implemented from public descriptions</td>
+</tr>
+<tr>
+<td>homr (<a href="https://github.com/liebharc/homr">repo</a>)</td>
+<td><strong>AGPL-3.0</strong></td>
+<td>Do not ship</td>
+</tr>
+<tr>
+<td>oemer</td>
+<td>MIT</td>
+<td>Possible segmentation model source (check model weight terms separately)</td>
+</tr>
+<tr>
+<td>music21</td>
+<td>BSD-3-Clause</td>
+<td>Harness only (Python)</td>
+</tr>
+<tr>
+<td>partitura</td>
+<td>Apache-2.0</td>
+<td>Reference for the contig algorithm</td>
+</tr>
+<tr>
+<td>piano_svsep, vocsep_ijcai2023, apmcleod/voice-splitting, MV2H</td>
+<td>MIT</td>
+<td>Reference or evaluation</td>
+</tr>
+<tr>
+<td>SMT</td>
+<td>MIT</td>
+<td>Reference</td>
+</tr>
+<tr>
+<td>OpenSheetMusicDisplay</td>
+<td>BSD-3-Clause</td>
+<td>Preview renderer</td>
+</tr>
+<tr>
+<td>OpenScore Lieder / String Quartets</td>
+<td>CC0-1.0</td>
+<td>Test data</td>
+</tr>
+<tr>
+<td>BeadSolver &quot;lotus&quot; repo</td>
+<td>No licence stated</td>
+<td>Paper ideas only</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>14. References</h2>
+<ul>
+<li><a href="https://github.com/Audiveris/audiveris/tree/development/app/src/main/java/org/audiveris/omr">aud-src</a>: Audiveris source (AGPL-3.0), <code>sheet/rhythm/{MeasureRhythm,SlotsRetriever,VoiceDistance,ChordsMapper,Voices}.java</code>, <code>sig/inter/LyricItemInter.java</code>: <a href="https://github.com/Audiveris/audiveris/tree/development/app/src/main/java/org/audiveris/omr">https://github.com/Audiveris/audiveris/tree/development/app/src/main/java/org/audiveris/omr</a></li>
+<li><a href="https://github.com/Audiveris/audiveris/blob/development/app/src/main/java/org/audiveris/omr/sheet/rhythm/Voice.java">aud-voice</a>: Audiveris <code>Voice.java</code> (VoiceKind ID families): <a href="https://github.com/Audiveris/audiveris/blob/development/app/src/main/java/org/audiveris/omr/sheet/rhythm/Voice.java">https://github.com/Audiveris/audiveris/blob/development/app/src/main/java/org/audiveris/omr/sheet/rhythm/Voice.java</a></li>
+<li></li>
+<li><a href="https://audiveris.github.io/audiveris/_pages/guides/ui/ui_tools/chords">aud-chords</a>: Audiveris handbook, chord and voice tools: <a href="https://audiveris.github.io/audiveris/_pages/guides/ui/ui_tools/chords">https://audiveris.github.io/audiveris/_pages/guides/ui/ui_tools/chords</a></li>
+<li><a href="https://audiveris.github.io/audiveris/_pages/ui_tools/shared_head">aud-shared</a>: Audiveris handbook, shared head: <a href="https://audiveris.github.io/audiveris/_pages/ui_tools/shared_head">https://audiveris.github.io/audiveris/_pages/ui_tools/shared_head</a></li>
+<li><a href="https://audiveris.github.io/audiveris/_pages/reference/limitations">aud-limits</a>: Audiveris handbook, limitations: <a href="https://audiveris.github.io/audiveris/_pages/reference/limitations">https://audiveris.github.io/audiveris/_pages/reference/limitations</a></li>
+<li><a href="https://audiveris.github.io/audiveris/_pages/guides/specific/logical_parts">aud-logical</a>: Audiveris handbook, logical parts: <a href="https://audiveris.github.io/audiveris/_pages/guides/specific/logical_parts">https://audiveris.github.io/audiveris/_pages/guides/specific/logical_parts</a></li>
+<li><a href="https://audiveris.github.io/audiveris/_pages/guides/ui/ui_tools/text">aud-text</a>: Audiveris handbook, text tools: <a href="https://audiveris.github.io/audiveris/_pages/guides/ui/ui_tools/text">https://audiveris.github.io/audiveris/_pages/guides/ui/ui_tools/text</a></li>
+<li>Audiveris example &quot;O lux beata Trinitas&quot;: <a href="https://audiveris.github.io/audiveris/_pages/ui_examples/trinitas/README">https://audiveris.github.io/audiveris/_pages/ui_examples/trinitas/README</a></li>
+<li><a href="https://archives.ismir.net/ismir2015/paper/000226.pdf">jin15</a>: R. Jin, C. Raphael, &quot;Graph-Based Rhythm Interpretation&quot;, ISMIR 2015: <a href="https://archives.ismir.net/ismir2015/paper/000226.pdf">https://archives.ismir.net/ismir2015/paper/000226.pdf</a> (2012 predecessor &quot;Interpreting Rhythm in OMR&quot;: <a href="https://archives.ismir.net/ismir2012/paper/000151.pdf">https://archives.ismir.net/ismir2012/paper/000151.pdf</a>)</li>
+<li><a href="https://arxiv.org/abs/2604.20522">bead</a>: N. Xu et al., &quot;From Image to Music Language: A Two-Stage Structure Decoding Approach for Complex Polyphonic OMR&quot; (BeadSolver), arXiv 2604.20522: <a href="https://arxiv.org/abs/2604.20522">https://arxiv.org/abs/2604.20522</a></li>
+<li><a href="https://arxiv.org/abs/2402.07596">smt</a>: Ríos-Vila et al., Sheet Music Transformer: <a href="https://arxiv.org/abs/2402.07596">https://arxiv.org/abs/2402.07596</a> · <a href="https://arxiv.org/abs/2405.12105">smtpp</a> SMT++: <a href="https://arxiv.org/abs/2405.12105">https://arxiv.org/abs/2405.12105</a> · <a href="https://github.com/Jamesprocode/SMT">smt-repo</a> <a href="https://github.com/Jamesprocode/SMT">https://github.com/Jamesprocode/SMT</a></li>
+<li><a href="https://arxiv.org/abs/2403.13763">lmx</a>: Mayer, Straka, Hajič, Pecina, &quot;Practical End-to-End OMR for Pianoform Music&quot;: <a href="https://arxiv.org/abs/2403.13763">https://arxiv.org/abs/2403.13763</a></li>
+<li>Edirisooriya et al., polyphonic OMR: <a href="https://arxiv.org/abs/2108.01769">https://arxiv.org/abs/2108.01769</a></li>
+<li>Sheet Music Benchmark / OMR-NED: <a href="https://arxiv.org/abs/2506.10488">https://arxiv.org/abs/2506.10488</a></li>
+<li>Calvo-Zaragoza, Hajič, Pacha, &quot;Understanding OMR&quot; (ACM CSUR 2020): <a href="https://arxiv.org/abs/1908.03608">https://arxiv.org/abs/1908.03608</a></li>
+<li></li>
+<li><a href="https://infolab.usc.edu/imsc/research/project/vosa/vosa.pdf">vosa</a>: Chew &amp; Wu, contig mapping (VoSA): <a href="https://infolab.usc.edu/imsc/research/project/vosa/vosa.pdf">https://infolab.usc.edu/imsc/research/project/vosa/vosa.pdf</a></li>
+<li><a href="https://partitura.readthedocs.io/en/latest/_modules/partitura/musicanalysis/voice_separation.html">partitura-vs</a>: partitura voice separation: <a href="https://partitura.readthedocs.io/en/latest/_modules/partitura/musicanalysis/voice_separation.html">https://partitura.readthedocs.io/en/latest/_modules/partitura/musicanalysis/voice_separation.html</a></li>
+<li><a href="https://archives.ismir.net/ismir2016/paper/000129.pdf">contig16</a>: Guiomard-Kagan et al., &quot;Improving Voice Separation by Better Connecting Contigs&quot;, ISMIR 2016: <a href="https://archives.ismir.net/ismir2016/paper/000129.pdf">https://archives.ismir.net/ismir2016/paper/000129.pdf</a></li>
+<li><a href="https://hal.archives-ouvertes.fr/hal-01246693v1">cmp15</a>: Guiomard-Kagan et al., &quot;Comparing Voice and Stream Segmentation Algorithms&quot;, ISMIR 2015: <a href="https://hal.archives-ouvertes.fr/hal-01246693v1">https://hal.archives-ouvertes.fr/hal-01246693v1</a></li>
+<li><a href="https://archives.ismir.net/ismir2007/paper/000445.pdf">visa</a>: Karydis et al., &quot;VISA&quot;, ISMIR 2007: <a href="https://archives.ismir.net/ismir2007/paper/000445.pdf">https://archives.ismir.net/ismir2007/paper/000445.pdf</a> · revisit SMC 2009: <a href="https://datalab-old.csd.auth.gr/wp-content/uploads/publications/SMC09rcm.pdf">https://datalab-old.csd.auth.gr/wp-content/uploads/publications/SMC09rcm.pdf</a> · VISA3: <a href="https://zenodo.org/record/851251">https://zenodo.org/record/851251</a></li>
+<li><a href="https://www.cs.ubc.ca/~hoos/Publ/KilHoo02.pdf">kilian</a>: Kilian &amp; Hoos, &quot;Voice Separation: A Local Optimisation Approach&quot;, ISMIR 2002: <a href="https://www.cs.ubc.ca/~hoos/Publ/KilHoo02.pdf">https://www.cs.ubc.ca/~hoos/Publ/KilHoo02.pdf</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Auditory_scene_analysis">asa</a>: Auditory scene analysis: <a href="https://en.wikipedia.org/wiki/Auditory_scene_analysis">https://en.wikipedia.org/wiki/Auditory_scene_analysis</a></li>
+<li><a href="https://doi.org/10.1525/mp.2001.19.1.1">huron</a>: D. Huron, &quot;Tone and Voice&quot;, Music Perception 19(1), 2001: <a href="https://doi.org/10.1525/mp.2001.19.1.1">https://doi.org/10.1525/mp.2001.19.1.1</a></li>
+<li><a href="https://apmcleod.github.io/pdf/VoiceSeparation.pdf">mcleod</a>: McLeod &amp; Steedman, &quot;HMM-Based Voice Separation of MIDI Performance&quot;, JNMR 2016: <a href="https://apmcleod.github.io/pdf/VoiceSeparation.pdf">https://apmcleod.github.io/pdf/VoiceSeparation.pdf</a> · <a href="https://github.com/apmcleod/voice-splitting">mcleod-code</a> <a href="https://github.com/apmcleod/voice-splitting">https://github.com/apmcleod/voice-splitting</a></li>
+<li><a href="https://github.com/apmcleod/MV2H">mv2h</a>: MV2H metric: <a href="https://github.com/apmcleod/MV2H">https://github.com/apmcleod/MV2H</a> · paper: <a href="https://ismir2018.ismir.net/doc/pdfs/148_Paper.pdf">https://ismir2018.ismir.net/doc/pdfs/148_Paper.pdf</a></li>
+<li><a href="https://archives.ismir.net/ismir2016/paper/000296.pdf">gray16</a>: Gray &amp; Bunescu, &quot;A Neural Greedy Model for Voice Separation in Symbolic Music&quot;, ISMIR 2016: <a href="https://archives.ismir.net/ismir2016/paper/000296.pdf">https://archives.ismir.net/ismir2016/paper/000296.pdf</a></li>
+<li><a href="https://arxiv.org/abs/2011.03028">chordlevel</a>: &quot;From Note-Level to Chord-Level Neural Network Models for Voice Separation in Symbolic Music&quot;: <a href="https://arxiv.org/abs/2011.03028">https://arxiv.org/abs/2011.03028</a></li>
+<li><a href="https://ismir2018.ismir.net/doc/pdfs/304_Paper.pdf">devalk</a>: de Valk &amp; Weyde, ISMIR 2018: <a href="https://ismir2018.ismir.net/doc/pdfs/304_Paper.pdf">https://ismir2018.ismir.net/doc/pdfs/304_Paper.pdf</a></li>
+<li><a href="https://arxiv.org/abs/2304.14848">gmtt</a>: Karystinaios, Foscarin, Widmer, &quot;Musical Voice Separation as Link Prediction&quot;, IJCAI 2023: <a href="https://arxiv.org/abs/2304.14848">https://arxiv.org/abs/2304.14848</a> · <a href="https://github.com/manoskary/vocsep_ijcai2023">gmtt-code</a> <a href="https://github.com/manoskary/vocsep_ijcai2023">https://github.com/manoskary/vocsep_ijcai2023</a></li>
+<li><a href="https://arxiv.org/abs/2407.21030">svsep</a>: Foscarin et al., &quot;Cluster and Separate: a GNN Approach to Voice and Staff Prediction for Score Engraving&quot;, ISMIR 2024: <a href="https://arxiv.org/abs/2407.21030">https://arxiv.org/abs/2407.21030</a> · <a href="https://github.com/CPJKU/piano_svsep">svsep-code</a> <a href="https://github.com/CPJKU/piano_svsep">https://github.com/CPJKU/piano_svsep</a></li>
+<li><a href="https://www.music21.org/music21docs/moduleReference/moduleStreamBase.html">m21</a>: music21 <code>Stream.voicesToParts</code> / <code>explode</code> / <code>Score.partsToVoices</code> (docs): <a href="https://www.music21.org/music21docs/moduleReference/moduleStreamBase.html">https://www.music21.org/music21docs/moduleReference/moduleStreamBase.html</a> · <a href="https://music21.org/music21docs/_sources/about/about.rst.txt">m21-about</a> corpus terms: <a href="https://music21.org/music21docs/_sources/about/about.rst.txt">https://music21.org/music21docs/_sources/about/about.rst.txt</a></li>
+<li><a href="https://handbook.musescore.org/basics/working-with-multiple-voices">ms-voices</a>: MuseScore handbook, working with multiple voices: <a href="https://handbook.musescore.org/basics/working-with-multiple-voices">https://handbook.musescore.org/basics/working-with-multiple-voices</a></li>
+<li><a href="https://musescore.org/en/handbook/3/voices">ms3-voices</a>: MuseScore 3 handbook, voices (closed SATB): <a href="https://musescore.org/en/handbook/3/voices">https://musescore.org/en/handbook/3/voices</a></li>
+<li><a href="https://handbook.musescore.org/notation/instruments-staves-and-systems/implode-and-explode">ms-explode</a>: MuseScore handbook, implode and explode: <a href="https://handbook.musescore.org/notation/instruments-staves-and-systems/implode-and-explode">https://handbook.musescore.org/notation/instruments-staves-and-systems/implode-and-explode</a></li>
+<li><a href="https://musescore.org/en/node/358567">ms-explode-lyrics</a>: MuseScore forum, splitting SATB and copying lyrics: <a href="https://musescore.org/en/node/358567">https://musescore.org/en/node/358567</a> and <a href="https://musescore.org/en/node/327471">https://musescore.org/en/node/327471</a></li>
+<li><a href="https://musescore.org/en/node/290420">ms-shared</a>: MuseScore forum, shared noteheads (Gould pp. 50/307 quoted): <a href="https://musescore.org/en/node/290420">https://musescore.org/en/node/290420</a> · <a href="https://musescore.org/en/node/25454">ms-unison</a>: <a href="https://musescore.org/en/node/25454">https://musescore.org/en/node/25454</a></li>
+<li><a href="https://musescore.org/en/node/34511">ms-rests</a>: MuseScore forum, rests shared by two voices (Gould p. 528 quoted): <a href="https://musescore.org/en/node/34511">https://musescore.org/en/node/34511</a></li>
+<li><a href="https://musescore.org/en/node/345293">ms-voicenum</a>: MuseScore forum, voice numbering in MusicXML (Sibelius per staff): <a href="https://musescore.org/en/node/345293">https://musescore.org/en/node/345293</a> and <a href="https://musescore.org/en/node/267588">https://musescore.org/en/node/267588</a></li>
+<li><a href="https://musescore.org/en/node/345919">ms-brace</a>: MuseScore forum, brace and bracket usage: <a href="https://musescore.org/en/node/345919">https://musescore.org/en/node/345919</a></li>
+<li>Gould, <em>Behind Bars</em>, table of contents: <a href="https://behindbarsnotation.co.uk/contents/toc.pdf">https://behindbarsnotation.co.uk/contents/toc.pdf</a></li>
+<li><a href="https://lilypond.org/doc/v2.25/Documentation/notation/automatic-part-combining">ly-pc</a>: LilyPond automatic part combining: <a href="https://lilypond.org/doc/v2.25/Documentation/notation/automatic-part-combining">https://lilypond.org/doc/v2.25/Documentation/notation/automatic-part-combining</a></li>
+<li><a href="https://lilypond.org/doc/v2.24/Documentation/notation/techniques-specific-to-lyrics">ly-lyr</a>: LilyPond techniques specific to lyrics (NullVoice, divisi lyrics): <a href="https://lilypond.org/doc/v2.24/Documentation/notation/techniques-specific-to-lyrics">https://lilypond.org/doc/v2.24/Documentation/notation/techniques-specific-to-lyrics</a></li>
+<li><a href="https://lilypond.org/doc/v2.24/Documentation/learning/satb-vocal-score">ly-satb</a>: LilyPond SATB vocal score template: <a href="https://lilypond.org/doc/v2.24/Documentation/learning/satb-vocal-score">https://lilypond.org/doc/v2.24/Documentation/learning/satb-vocal-score</a></li>
+<li><a href="https://wiki.lilypond.community/wiki/LSR_177">ly-lsr177</a>: LSR 177, SATB on two staves with one text per voice: <a href="https://wiki.lilypond.community/wiki/LSR_177">https://wiki.lilypond.community/wiki/LSR_177</a></li>
+<li><a href="https://usermanuals.finalemusic.com/FinaleWin/Content/Finale/Hymns.htm">finale-hymns</a>: Finale manual, Hymns: <a href="https://usermanuals.finalemusic.com/FinaleWin/Content/Finale/Hymns.htm">https://usermanuals.finalemusic.com/FinaleWin/Content/Finale/Hymns.htm</a></li>
+<li><a href="https://steinberg.help/dorico/v4/en/dorico/topics/page_formatting/page_formatting_condensing_enabling_disabling_t.html">dorico-cond</a>: Dorico condensing: <a href="https://steinberg.help/dorico/v4/en/dorico/topics/page_formatting/page_formatting_condensing_enabling_disabling_t.html">https://steinberg.help/dorico/v4/en/dorico/topics/page_formatting/page_formatting_condensing_enabling_disabling_t.html</a> (and calculations: <a href="https://steinberg.help/dorico/v3/en/dorico/topics/page_formatting/page_formatting_condensing_calculations_considerations_c.html">https://steinberg.help/dorico/v3/en/dorico/topics/page_formatting/page_formatting_condensing_calculations_considerations_c.html</a>)</li>
+<li><a href="https://steinberg.help/dorico/v4/en/dorico/topics/notation_reference/notation_reference_brackets_braces/notation_reference_brackets_braces_c.html">dorico-brace</a>: Dorico brackets and braces: <a href="https://steinberg.help/dorico/v4/en/dorico/topics/notation_reference/notation_reference_brackets_braces/notation_reference_brackets_braces_c.html">https://steinberg.help/dorico/v4/en/dorico/topics/notation_reference/notation_reference_brackets_braces/notation_reference_brackets_braces_c.html</a></li>
+<li><a href="https://forums.steinberg.net/t/divisi-on-same-staff/136606">st-div</a>: Steinberg forum, divisi on same staff: <a href="https://forums.steinberg.net/t/divisi-on-same-staff/136606">https://forums.steinberg.net/t/divisi-on-same-staff/136606</a></li>
+<li><a href="https://forums.steinberg.net/t/choral-condensing-vs-divisi-lyrics-and-xml-export-a-major-workflow-gap/1038392">st-condense-lyrics</a>: Steinberg forum, choral condensing, divisi, lyrics and XML export: <a href="https://forums.steinberg.net/t/choral-condensing-vs-divisi-lyrics-and-xml-export-a-major-workflow-gap/1038392">https://forums.steinberg.net/t/choral-condensing-vs-divisi-lyrics-and-xml-export-a-major-workflow-gap/1038392</a></li>
+<li><a href="https://notation.com/MusicianDocs5/brackets_and_braces.htm">brace-nc</a>: Notation.com, brackets and braces: <a href="https://notation.com/MusicianDocs5/brackets_and_braces.htm">https://notation.com/MusicianDocs5/brackets_and_braces.htm</a></li>
+<li><a href="https://www.merriam-webster.com/dictionary/close%20score">mw-close</a>: Merriam-Webster, close score: <a href="https://www.merriam-webster.com/dictionary/close%20score">https://www.merriam-webster.com/dictionary/close%20score</a></li>
+<li><a href="https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/backup/">mx-backup</a>: W3C MusicXML 4.0 <code>&lt;backup&gt;</code>: <a href="https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/backup/">https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/backup/</a> (example: <a href="https://www.w3.org/2021/06/musicxml40/musicxml-reference/examples/backup-element/">https://www.w3.org/2021/06/musicxml40/musicxml-reference/examples/backup-element/</a>) · <a href="https://usermanuals.musicxml.com/MusicXML/Content/EL-MusicXML-backup.htm">mx-backup-um</a>: <a href="https://usermanuals.musicxml.com/MusicXML/Content/EL-MusicXML-backup.htm">https://usermanuals.musicxml.com/MusicXML/Content/EL-MusicXML-backup.htm</a></li>
+<li><a href="https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/voice/">mx-voice</a>: W3C <code>&lt;voice&gt;</code>: <a href="https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/voice/">https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/voice/</a></li>
+<li><a href="https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/staff/">mx-staff</a>: W3C <code>&lt;staff&gt;</code>: <a href="https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/staff/">https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/staff/</a></li>
+<li><a href="https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/part-group/">mx-pg</a>: W3C <code>&lt;part-group&gt;</code>: <a href="https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/part-group/">https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/part-group/</a> · <a href="https://www.w3.org/2021/06/musicxml40/musicxml-reference/data-types/group-symbol-value/">mx-gsv</a> group-symbol-value: <a href="https://www.w3.org/2021/06/musicxml40/musicxml-reference/data-types/group-symbol-value/">https://www.w3.org/2021/06/musicxml40/musicxml-reference/data-types/group-symbol-value/</a> · <a href="https://usermanuals.musicxml.com/MusicXML/Content/EL-MusicXML-part-group.htm">mx-pg-um</a>: <a href="https://usermanuals.musicxml.com/MusicXML/Content/EL-MusicXML-part-group.htm">https://usermanuals.musicxml.com/MusicXML/Content/EL-MusicXML-part-group.htm</a></li>
+<li><a href="https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/lyric/">mx-lyric</a>: W3C <code>&lt;lyric&gt;</code>: <a href="https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/lyric/">https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/lyric/</a></li>
+<li>OpenScore Lieder (CC0): <a href="https://github.com/OpenScore/Lieder">https://github.com/OpenScore/Lieder</a> · String Quartets (CC0): <a href="https://github.com/OpenScore/StringQuartets">https://github.com/OpenScore/StringQuartets</a></li>
+<li>PlayScore 2 (commercial; isolates SATB voices from scans, for comparison only): <a href="https://apps.apple.com/app/playscore2/id1449591118">https://apps.apple.com/app/playscore2/id1449591118</a></li>
+</ul>
+<hr>
+<h2>Appendix A: chorale statistics script</h2>
+<p>Run with the project venv (<code>.venv/bin/python</code>, music21 10.5.2) over <code>corpus.getComposer(&#39;bach&#39;)</code>, keeping the 368 files that have exactly four parts. A &quot;slot&quot; is any onset time in either voice of the pair (S/A or T/B). <em>Unison</em> means both voices sound the same MIDI pitch at the slot. <em>Crossing</em> means the upper voice is below the lower. <em>Rhythm-diverge</em> means only one of the two voices has an onset at that slot.</p>
+<table>
+<thead>
+<tr>
+<th>Pair</th>
+<th>Slots</th>
+<th>Unison</th>
+<th>Crossing</th>
+<th>Rhythm diverges</th>
+<th>One voice resting</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>S/A</td>
+<td>24,381</td>
+<td>2.46 %</td>
+<td>0.24 %</td>
+<td>31.76 %</td>
+<td>0.82 %</td>
+</tr>
+<tr>
+<td>T/B</td>
+<td>27,182</td>
+<td>3.58 %</td>
+<td>0.78 %</td>
+<td>30.58 %</td>
+<td>0.80 %</td>
+</tr>
+</tbody></table>
+<p>Lyrics present in part 0 (soprano) of 320 files and in no other part.</p>
+<pre><code class="language-python"># chorale_stats.py (abridged): per pair, walk the union of onsets and compare sounding pitches
+from music21 import corpus, note, chord
+def events(part):
+    out = []
+    for n in part.recurse().notesAndRests:
+        p = (max(x.midi for x in n.pitches) if isinstance(n, chord.Chord)
+             else n.pitch.midi if isinstance(n, note.Note) else None)
+        out.append((float(n.getOffsetInHierarchy(part)), float(n.quarterLength), p))
+    return out
+# for each (upper, lower) in ((S,A),(T,B)): for t in sorted onsets of both:
+#   pa/pb = pitch sounding at t; count unison (pa==pb), crossing (pa&lt;pb),
+#   rhythm-diverge (exactly one voice has an onset at t)
+</code></pre>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+<script>window.mermaid && mermaid.initialize({ startOnLoad: true, theme: matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default' });</script>
+</body>
+</html>

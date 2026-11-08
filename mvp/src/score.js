@@ -525,23 +525,59 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   // most voices agree on. Voices that do not fit are repaired by the cheapest
   // duration edits that make them fit and keep their onsets in step with the
   // voices that already fit; failing that the gap is left as <forward>.
-  let mismatch = 0, repaired = 0, restsFound = 0;
-  const partMeasures = parts.map(() => []);
+  let mismatch = 0, repaired = 0, restsFound = 0, splitBars = 0;
+  // a missed barline leaves two (or more) bars in one segment: when the voices
+  // agree on about k bar lengths, cut every voice at the bar boundaries (notes
+  // crossing a boundary are split and tied)
+  const units = [];
   measures.forEach((m, mi) => {
+    const byPart = perPart.map(pm => pm[mi]);
+    const sums = [];
+    byPart.forEach(sts => sts.forEach(st => { const q = qsum(st.events); if (q > 1e-6) sums.push(Math.round(q * 4) / 4); }));
+    const S = sums.length ? mode(sums) : 0;
+    const k = Math.round(S / mLen);
+    const agree = sums.filter(x => Math.abs(x - S) <= 0.25 * mLen).length;
+    if (k >= 2 && Math.abs(S - k * mLen) <= 0.25 * mLen && agree >= Math.max(1, 0.5 * sums.length)) {
+      splitBars += k - 1;
+      const chunks = Array.from({ length: k }, () => byPart.map(sts => sts.map(st => ({ staff: st.staff, events: [] }))));
+      byPart.forEach((sts, pi) => sts.forEach((st, si) => {
+        let t = 0;
+        for (const e of st.events) {
+          let left = e.q, cur = e, first = true;
+          while (left > 1e-6) {
+            const c = Math.min(k - 1, Math.floor((t + 1e-6) / mLen));
+            const room = (c + 1) * mLen - t;
+            const take = c === k - 1 ? left : Math.min(left, room);
+            const piece = take === e.q ? e : { ...cur, q: take, dots: qToType(take) ? qToType(take).dots : 0 };
+            if (piece !== e) {
+              if (!first) { piece.tieStop = true; piece.lyrics = undefined; }
+              if (left - take > 1e-6 && !e.rest) piece.tieStart = true;
+            }
+            chunks[c][pi][si].events.push(piece);
+            t += take; left -= take; first = false;
+          }
+        }
+      }));
+      chunks.forEach((ch, c) => units.push({ m, streams: ch, split: true, first: mi === 0 && c === 0 }));
+    } else units.push({ m, streams: byPart, split: false, first: mi === 0 });
+  });
+  const partMeasures = parts.map(() => []);
+  units.forEach((u, mi) => {
+    const m = u.m;
     const streams = [];
-    parts.forEach((p, pi) => perPart[pi][mi].forEach((st, k) => streams.push({ pi, k, staff: st.staff, events: st.events.slice() })));
+    parts.forEach((p, pi) => u.streams[pi].forEach((st, k) => streams.push({ pi, k, staff: st.staff, events: st.events.slice() })));
     const sums = streams.map(st => qsum(st.events));
     const nz = sums.filter(x => x > 1e-6).map(x => Math.round(x * DIV) / DIV);
     let target = mLen;
     const ms = nz.length ? mode(nz) : 0;
     const agree = nz.filter(x => Math.abs(x - ms) < 1e-6).length;
-    const edge = mi === 0 || mi === measures.length - 1;
+    const edge = mi === 0 || mi === units.length - 1;
     if (edge && ms > 1e-6 && ms < mLen - 1e-6 && agree >= Math.max(2, 0.5 * nz.length)) target = ms;
     else if (edge && ms > 1e-6 && ms < mLen - 1e-6 && nz.length === 1) target = ms;
     // rests printed in the voices of a measure (looked up only when needed)
     const restCache = new Map();
     const restsOf = (st) => {
-      if (m.segs.length !== 1) return [];
+      if (m.segs.length !== 1 || u.split) return [];
       if (!restCache.has(st)) {
         const seg = segs[m.segs[0]], sv = seg.sy.staves[st.staff];
         restCache.set(st, sv ? findRests(seg, sv, parts[st.pi].src[st.k].voice) : []);
@@ -579,6 +615,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
       (partMeasures[st.pi][mi] ||= [])[st.k] = { staff: st.staff, events: evs, implicit };
     });
   });
+  if (splitBars) warnings.push(`${splitBars} barlines were missing on the page; bars were split by their contents.`);
   if (restsFound) warnings.push(`${restsFound} voice-measures completed with rests read from the page.`);
   if (repaired) warnings.push(`${repaired} voice-measures repaired to fit ${time.beats}/${time.type} (likely misread dots, flags or beams).`);
   if (mismatch) warnings.push(`${mismatch} voice-measures still did not add up to ${time.beats}/${time.type}; gaps left empty, notes past the barline cut.`);
@@ -594,7 +631,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     return lo ? `${lo.step}${lo.octave}–${hi.step}${hi.octave}` : '-';
   });
   // UI compares clefs with 'F'; 'G8' stays a treble clef there
-  return { parts, layout, fifths, time, clefs, ranges, measures: measures.length, nNotes, warnings: warnings.concat(layout.notes), xml };
+  return { parts, layout, fifths, time, clefs, ranges, measures: units.length, nNotes, warnings: warnings.concat(layout.notes), xml };
 }
 
 // share of syllables that sit under an onset of the stream
@@ -721,7 +758,9 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title }) {
             if (h.acc) measAcc[pk.step + pk.octave] = h.acc === 'sharp' ? 1 : h.acc === 'flat' ? -1 : 0;
             const pt = pitchOf(clef, pos, kAlt, measAcc);
             h.pitch = pt;
-            const acc = h.acc ? `<accidental>${h.acc}</accidental>` : '';
+            const acc = h.acc && !e.tieStop ? `<accidental>${h.acc}</accidental>` : '';
+            const tie = (e.tieStop ? '<tie type="stop"/>' : '') + (e.tieStart ? '<tie type="start"/>' : '');
+            const tied = e.tieStop || e.tieStart ? `<notations>${e.tieStop ? '<tied type="stop"/>' : ''}${e.tieStart ? '<tied type="start"/>' : ''}</notations>` : '';
             const stem = h.stemDir === 1 ? '<stem>up</stem>' : h.stemDir === -1 ? '<stem>down</stem>' : '';
             let lyr = '';
             if (hi === 0 && e.lyrics) {
@@ -730,7 +769,7 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title }) {
               }
             }
             L.push(`      <note>${hi > 0 ? '<chord/>' : ''}<pitch><step>${pt.step}</step>${pt.alter ? `<alter>${pt.alter}</alter>` : ''}<octave>${pt.octave}</octave></pitch>` +
-              `<duration>${dur}</duration><voice>${voice}</voice>${typeXML}${acc}${stem}${staffTag}${lyr}</note>`);
+              `<duration>${dur}</duration>${tie}<voice>${voice}</voice>${typeXML}${acc}${stem}${staffTag}${tied}${lyr}</note>`);
           });
         }
       });

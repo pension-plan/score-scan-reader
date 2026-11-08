@@ -1,24 +1,28 @@
 'use strict';
 // Lyric text rows: find them under each staff of a system (between staves and
 // below the last one), crop, OCR (injected engine), split into syllables.
+// Rows are screened twice: by their ink (stems, ties, fermatas are not text)
+// and by what OCR reads (lyric rows are mostly confident lower-case words).
+// Verses are numbered top-down per staff; a stack under the bottom staff that
+// starts with a printed "2." is stanza text set after the music and dropped.
 const { makeGray } = require('./image');
 
 const DEFAULTS = {
   widen: true,        // stretch word gaps before OCR (stops "workswith" merges)
   gapSp: 0.3,         // min blank run (staff spaces) that counts as a word gap
   addSp: 0.8,         // blank columns inserted into each word gap (staff spaces)
+  hyGaps: true,       // also open up the gaps either side of a tight hyphen ("Her-ze-leid")
   rules: true,        // erase vertical rules (barlines, brackets, stems) crossing the text row
   targetH: 56,        // OCR crop height in px (incl. padding)
-  bilinear: false,    // smooth upscaling of the crop
   norm: true,         // contrast-stretch the crop (paper -> white, ink -> black)
-  minWordConf: 20,    // words below this are kept only when they look like clean words
+  minWordConf: 20,    // words below this confidence are dropped ...
+  relaxLow: true,     // ... unless they look like clean words on a confident row
   minLineConf: 50,
-  relaxLow: true,     // keep clean-looking low-confidence words on confident rows
   geomCheck: true,    // reject rows whose ink does not look like a text line (stems, fermatas, ties)
   goodFrac: 0.4,      // share of tokens that must be confident word-like tokens ...
-  goodAbs: 6,
-  lastStaffSp: 14,    // how far below the last staff of a system verse rows may reach
-  maxRowGapSp: 1.5,   // ... provided each row follows the previous one within this gap         // ... or at least this many of them
+  goodAbs: 6,         // ... or at least this many of them
+  lastStaffSp: 14,    // how far below the last staff of a system verse rows may reach ...
+  maxRowGapSp: 1.5,   // ... provided each row follows the previous one within this gap
 };
 
 // Returns [{band, sys, y0, y1, x0, x1}] text-line boxes in deskewed page coords.
@@ -117,11 +121,22 @@ function analyseRow(B, ln, pad) {
     i = j;
   }
   let cov = 0; for (const [a, b] of clusters) cov += b - a;
-  return { xa, ya, yb, n, ink, rule, clusters, cov: cov / n };
+  // hyphen-like clusters: a short thin dash in the middle band of the row
+  const hy = clusters.map(([a, b]) => {
+    const wdt = b - a;
+    if (wdt < 0.25 * ln.sp || wdt > 1.3 * ln.sp) return false;
+    let top = Infinity, bot = -1;
+    for (let x = xa + a; x < xa + b; x++) for (let y = ya; y <= yb; y++) if (B.data[y * w + x]) { if (y < top) top = y; if (y > bot) bot = y; }
+    if (bot < 0) return false;
+    const mid = (top + bot) / 2, rel = (mid - ln.y0) / Math.max(1, ln.y1 - ln.y0);
+    return bot - top + 1 <= Math.max(3, 0.22 * ln.sp) && rel > 0.3 && rel < 0.85;
+  });
+  return { xa, ya, yb, n, ink, rule, clusters, hy, cov: cov / n };
 }
 
-// Build the OCR crop: blank vertical rules, stretch word gaps, scale.
-// Returns {img, toPage(xCrop) -> page x}.
+// Build the OCR crop: blank vertical rules, stretch word gaps (tesseract
+// otherwise glues tightly set underlay words together), contrast-stretch,
+// scale. Returns {img, toPage(xCrop) -> page x}.
 function buildCrop(g, row, ln, o) {
   const gapMin = Math.max(3, o.gapSp * ln.sp);
   const add = o.widen ? Math.round(o.addSp * ln.sp) : 0;
@@ -133,7 +148,7 @@ function buildCrop(g, row, ln, o) {
     let start = 0;
     for (let c = 1; c < clusters.length; c++) {
       const gap = clusters[c][0] - clusters[c - 1][1];
-      if (gap >= gapMin) {
+      if (gap >= gapMin || (o.hyGaps && (row.hy[c] || row.hy[c - 1]))) {
         const cut = clusters[c - 1][1] + Math.floor(gap / 2);
         segs.push({ sx: start, len: cut - start, before: segs.length ? add : 0 });
         start = cut;
@@ -163,30 +178,14 @@ function buildCrop(g, row, ln, o) {
   for (let i = 0; i < 256; i++) lut[i] = stretch ? Math.round(255 * (i - dk) / (bg - dk)) : i;
   const W = Math.max(1, Math.round(srcW * scale)), Hh = Math.max(1, Math.round(srcH * scale));
   const img = makeGray(W, Hh, stretch ? 255 : bg);
-  const blank = stretch ? 255 : bg;
-  const real = (v) => v >= 0 && v < srcW && vcol[v] >= 0 && !(o.rules && row.rule[vcol[v]]);
+  const real = (v) => vcol[v] >= 0 && !(o.rules && row.rule[vcol[v]]);
   for (let x = 0; x < W; x++) {
-    if (!o.bilinear) {
-      const vi = Math.min(srcW - 1, Math.floor(x / scale));
-      if (!real(vi)) continue;
-      const sx = row.xa + vcol[vi];
-      for (let y = 0; y < Hh; y++) {
-        const sy = Math.min(g.height - 1, row.ya + Math.floor(y / scale));
-        img.data[y * W + x] = lut[g.data[sy * g.width + sx]];
-      }
-      continue;
-    }
-    // bilinear: blend neighbouring virtual columns (inserted / erased ones are paper)
-    const fx = Math.max(0, (x + 0.5) / scale - 0.5), v0 = Math.floor(fx), tx = fx - v0;
-    const r0 = real(v0), r1 = real(v0 + 1);
-    if (!r0 && !r1) continue;
-    const sx0 = r0 ? row.xa + vcol[v0] : -1, sx1 = r1 ? row.xa + vcol[v0 + 1] : -1;
+    const vi = Math.min(srcW - 1, Math.floor(x / scale));
+    if (!real(vi)) continue;
+    const sx = row.xa + vcol[vi];
     for (let y = 0; y < Hh; y++) {
-      const fy = Math.max(0, (y + 0.5) / scale - 0.5), y0 = Math.floor(fy), ty = fy - y0;
-      const ya = Math.min(g.height - 1, row.ya + y0), yb = Math.min(g.height - 1, row.ya + y0 + 1);
-      const at = (sx, yy) => (sx < 0 ? blank : lut[g.data[yy * g.width + sx]]);
-      const top = at(sx0, ya) * (1 - tx) + at(sx1, ya) * tx, bot = at(sx0, yb) * (1 - tx) + at(sx1, yb) * tx;
-      img.data[y * W + x] = Math.round(top * (1 - ty) + bot * ty);
+      const sy = Math.min(g.height - 1, row.ya + Math.floor(y / scale));
+      img.data[y * W + x] = lut[g.data[sy * g.width + sx]];
     }
   }
   const toPage = (xc) => {
@@ -277,6 +276,7 @@ function toSyllables(words) {
       wx += sw;
     }
   }
+
   // drop leading verse number like "1." / "2" / "3.O" (number glued to the first word)
   // (scan noise such as a bracket read as "Wi" may precede it: drop that too)
   let number = null;
@@ -317,18 +317,11 @@ async function readLyrics(fr, ocr, onProgress, opts) {
     const step = () => { done++; if (onProgress) onProgress(done, all.length); };
     const pad = Math.round(0.3 * ln.sp);
     const row = analyseRow(fr.B, ln, pad);
-    ln.cov = row.cov; ln.nClusters = row.clusters.length;
+    // opts.debug (an array) collects per-row decisions for tuning tools
+    const dbg = o.debug ? { sys: ln.sys, band: ln.band, y: ln.y0, h: ln.y1 - ln.y0, sp: +ln.sp.toFixed(1), cov: +row.cov.toFixed(3), ncl: row.clusters.length } : null;
+    if (dbg) o.debug.push(dbg);
     // text rows have many glyph clusters and a fair share of inked columns;
     // rows of stems, ties or fermatas have few, thin ones
-    const dbg = o.debug ? { sys: ln.sys, band: ln.band, y: ln.y0, h: ln.y1 - ln.y0, sp: +ln.sp.toFixed(1), cov: +row.cov.toFixed(3), ncl: row.clusters.length } : null;
-    // word-gap statistics: underlay is spread out to follow the notes; stanza
-    // text printed below the music is set with ordinary word spacing
-    const wg = [];
-    for (let c = 1; c < row.clusters.length; c++) { const gp = row.clusters[c][0] - row.clusters[c - 1][1]; if (gp >= Math.max(3, o.gapSp * ln.sp)) wg.push(gp / ln.sp); }
-    wg.sort((a, b) => a - b);
-    ln.wgMed = wg.length ? wg[wg.length >> 1] : 0; ln.wg75 = wg.length ? wg[Math.floor(wg.length * 0.75)] : 0;
-    if (dbg) { dbg.wgMed = +ln.wgMed.toFixed(2); dbg.wg75 = +ln.wg75.toFixed(2); dbg.nwg = wg.length; }
-    if (dbg) o.debug.push(dbg);
     if (o.geomCheck && (row.cov < 0.08 || row.clusters.length < 4)) { if (dbg) dbg.reject = 'geom'; step(); continue; }
     const { img, toPage } = buildCrop(fr.gray, row, ln, o);
     let words = [];
@@ -367,6 +360,7 @@ async function readLyrics(fr, ocr, onProgress, opts) {
   // system's matching verse continues it ("o-" | "cean" -> end, not single)
   const keys = Object.keys(out).map(Number).sort((a, b) => a - b);
   for (let i = 1; i < keys.length; i++) {
+    if (keys[i] !== keys[i - 1] + 1) continue;
     for (const v of out[keys[i]]) {
       const prev = out[keys[i - 1]].find(u => u.band === v.band && u.number === v.number);
       const last = prev && prev.syllables[prev.syllables.length - 1];
