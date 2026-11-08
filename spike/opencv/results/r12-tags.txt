@@ -1,0 +1,46 @@
+note-half        clean        3692 -> 3694 of 4977
+note-half        scan-severe  1838 -> 1839 of 4977
+note-quarter     clean        9067 -> 9080 of 11863
+note-quarter     scan         9163 -> 9180 of 11863
+note-quarter     scan-severe  7981 -> 7990 of 11863
+note-8th         clean        7713 -> 7728 of 9464
+note-8th         scan         7609 -> 7636 of 9464
+note-8th         scan-severe  6771 -> 6766 of 9464
+note-16th        clean        1855 -> 1865 of 2464
+note-16th        scan         1854 -> 1857 of 2464
+note-16th        scan-severe  1701 -> 1697 of 2464
+note-32nd        clean        394 -> 398 of 709
+note-32nd        scan         403 -> 404 of 709
+dot              clean        1336 -> 1363 of 2233
+dot              scan         1316 -> 1333 of 2233
+dot              scan-severe  1159 -> 1163 of 2233
+chord            clean        8548 -> 8553 of 10585
+chord            scan         8710 -> 8708 of 10585
+chord            scan-severe  7796 -> 7799 of 10585
+flag             clean        342 -> 347 of 551
+flag             scan         335 -> 336 of 551
+flag             scan-severe  249 -> 246 of 551
+stem-up          clean        5453 -> 5457 of 6356
+stem-up          scan         5384 -> 5395 of 6356
+stem-up          scan-severe  4664 -> 4667 of 6356
+stem-down        clean        14032 -> 14082 of 16719
+stem-down        scan         14084 -> 14121 of 16719
+stem-down        scan-severe  12476 -> 12477 of 16719
+ledger-above     clean        4274 -> 4287 of 5076
+ledger-above     scan         4360 -> 4366 of 5076
+ledger-above     scan-severe  3973 -> 3971 of 5076
+ledger-below     clean        935 -> 936 of 1128
+ledger-below     scan         968 -> 969 of 1128
+ledger-below     scan-severe  858 -> 859 of 1128
+rest-quarter     clean        176 -> 178 of 224
+rest-8th         scan         116 -> 117 of 148
+acc-sharp        scan         270 -> 274 of 411
+acc-natural      clean        279 -> 278 of 356
+acc-natural      scan         274 -> 273 of 356
+slur             clean        268 -> 281 of 628
+multi-page       clean        17092 -> 17145 of 20298
+multi-page       scan         17317 -> 17357 of 20298
+multi-page       scan-severe  15836 -> 15837 of 20298
+dot false_in clean 790 -> 725
+note-16th false_in clean 519 -> 438
+note-32nd false_in clean 112 -> 97

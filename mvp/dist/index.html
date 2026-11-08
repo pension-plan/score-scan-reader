@@ -3905,7 +3905,24 @@ function resample(g, f) {
 // is the hole a flag (or a beam meeting its stem) closes: flags curl out to
 // the right of the stem.  The stem is a thin ink column (on the lenient
 // binary L) joining both rows.
-function atStemTip(h, heads, L) {
+// A filled "head" that is a piece of a beam (a beam's end segment, or a stack of 16th / 32nd beams
+// between two stems): its ink is a beam's thickness tall, about half a space; a filled head's is a
+// full space (coverage notes family: 0.43-0.65 against 1.0-1.2).
+function beamPiece(h, L, lt) {
+  const { width: w, height: H, data } = L, sp = h.sp, gapMax = Math.max(1, Math.round(lt) + 1);
+  let best = 0;
+  for (const dx of [-0.3, -0.15, 0, 0.15, 0.3]) {
+    const x = Math.round(h.x + dx * sp), y = Math.round(h.y);
+    if (x < 0 || x >= w || y < 0 || y >= H || !data[y * w + x]) continue;
+    // (gaps a staff line's thickness wide are bridged: line removal cuts heads on lines)
+    const ext = (dir) => { let e = y, gap = 0; for (let yy = y + dir; yy >= 0 && yy < H && Math.abs(yy - y) < 2 * sp; yy += dir) { if (data[yy * w + x]) { e = yy; gap = 0; } else if (++gap > gapMax) break; } return e; };
+    best = Math.max(best, (ext(1) - ext(-1) + 1) / sp);
+  }
+  return best > 0 && best < 0.72;
+}
+
+function atStemTip(h, heads, L, lt = 2) {
+  if (h.kind === 'filled') return beamPiece(h, L, lt);
   if (h.kind !== 'hollow') return false;
   const { width: w, height: H, data } = L;
   const sp = h.sp, maxGap = Math.max(1, Math.round(0.12 * sp));
@@ -4180,7 +4197,7 @@ function* frontSteps(gray0, opts = {}) {
   }
   const chords = chordStems(L, hs, { minLen: 1.5, sides: true });
   hs = hs.filter(h => (h.stemDir !== 0 || h.kind === 'hollow') && !(h.chord && h.chord.accidental));
-  hs = hs.filter(h => !atStemTip(h, hs, L));
+  hs = hs.filter(h => !atStemTip(h, hs, L, ltL));
   const barlines = detectBarlines(R, staves, hs, sp.ss);
   return { gray, B, R, L, scale, skew, ss: sp.ss, lt: sp.lt, staves, systems, heads: hs, chords, beams, barlines, warnings, stacked: stacked || [],
     orientation: (quarter % 4) * 90, mode: ctx.mode };
@@ -6105,6 +6122,9 @@ async function readLyrics(fr, ocr, onProgress, opts) {
   if (o.thinAt && swr > o.thinAt) for (const l of all) l.thin = 1;
   for (const ln of all) {
     const step = () => { done++; if (onProgress) onProgress(done, all.length); };
+    // a row that is a title, credit or tempo line (o.skipBoxes: text.js
+    // marks above the music) is not underlay
+    if (o.skipBoxes && o.skipBoxes.some(b => Math.min(b[3], ln.y1) - Math.max(b[1], ln.y0) > 0.5 * Math.min(b[3] - b[1], ln.y1 - ln.y0) && (ln.x0 == null || (b[0] < ln.x1 && b[2] > ln.x0)))) { step(); continue; }
     const pad = Math.round(0.3 * ln.sp);
     const row = ln.strip ? stripRow(ln) : analyseRow(fr.B, ln, pad);
     const ox = ln.strip ? ln.strip.x0 : 0;
@@ -6134,7 +6154,10 @@ async function readLyrics(fr, ocr, onProgress, opts) {
       const wordsL = mapped.map(w => w.text.replace(/[^\p{L}]/gu, '')).filter(t => t.length >= 2);
       const caps = wordsL.filter(t => /^\p{Lu}/u.test(t)).length;
       const txt = mapped.map(w => w.text).join(' ').trim();
-      const big = ln.tall && tallMed && ln.tall > 1.35 * tallMed;
+      // bigger type: a caption, unless the row reads as lower-case words (accents
+      // and umlauts on capitals make a lyric row taller, not a caption)
+      const lowerWords = wordsL.filter(t => /^\p{Ll}/u.test(t)).length;
+      const big = ln.tall && tallMed && ln.tall > 1.35 * tallMed && !(wordsL.length >= 4 && lowerWords >= 0.6 * wordsL.length);
       if ((wordsL.length >= 2 && caps >= 0.8 * wordsL.length && wordsL.length <= 8) || /^[(\[].*[)\]]$/.test(txt) || big) { if (dbg) dbg.reject = 'title'; step(); continue; }
     }
     // unsure short tokens without a vowel ("t", "T", "CL", "gs") are stems,
@@ -6210,6 +6233,197 @@ const OCR_CONFIG = {
 };
 
 module.exports = { OCR_CONFIG, readLyrics, readPartLabels, readStanzas, syllabify, findTextLines, findTextLinesCC, toSyllables, splitSyllable, vowelGroups, detectLang, cropGray, DEFAULTS, _analyseRow: analyseRow };
+
+};
+defs["meter"]=function(require,module,exports){
+'use strict';
+// Time signatures through the piece (L16 / L21).
+//
+// readMeters(fr, asm) runs once per page at the start of buildScore (score.js) and reads every
+// time signature on the page, not only the first system's header:
+//   - the header of every system (cv.js readHeaders reads numbers on the first system only);
+//   - after a barline inside a system (a meter change, after the key change when there is one);
+//   - after the last barline of a system (a courtesy signature announcing the next system's
+//     meter: it is not a bar, and heads found on its digits are dropped with the bar they made).
+// Numbers are matched against the Bravura digit templates (cv.js readTime); C and cut C against
+// the time-C / time-cut templates. Each system gets sy.meters: [{x, beats, type, symbol, header,
+// courtesy}] in x order, where x is the barline (or staff start) from which the meter holds.
+// buildScore (score.js) takes the meter in force at each bar from them when the page shows a
+// change of meter, and writes <time> where it changes.
+const { readTime, makeJsApi } = require('./cv');
+const { labelComponents } = require('./cc');
+
+let api0 = null;
+const matcher = () => (api0 ||= makeJsApi());
+
+// ink of R inside box b (components whose centre is inside), trimmed; null when none
+function crop(R, b, minArea) {
+  const x0 = Math.max(0, Math.floor(b.x0)), y0 = Math.max(0, Math.floor(b.y0));
+  const x1 = Math.min(R.width - 1, Math.ceil(b.x1)), y1 = Math.min(R.height - 1, Math.ceil(b.y1));
+  if (x1 <= x0 || y1 <= y0) return null;
+  const w = x1 - x0 + 1, h = y1 - y0 + 1, img = { width: w, height: h, data: new Uint8Array(w * h) };
+  for (let y = 0; y < h; y++) img.data.set(R.data.subarray((y + y0) * R.width + x0, (y + y0) * R.width + x0 + w), y * w);
+  const { labels, comps } = labelComponents(img);
+  const keep = comps.filter(c => c.area >= minArea && (!b.inner || b.inner(c.x0 + x0, c.y0 + y0, c.x1 + x0, c.y1 + y0)));
+  if (!keep.length) return null;
+  const ids = new Set(keep.map(c => c.id));
+  let gx0 = w, gy0 = h, gx1 = -1, gy1 = -1;
+  for (const c of keep) { gx0 = Math.min(gx0, c.x0); gy0 = Math.min(gy0, c.y0); gx1 = Math.max(gx1, c.x1); gy1 = Math.max(gy1, c.y1); }
+  const gw = gx1 - gx0 + 1, gh = gy1 - gy0 + 1, data = new Uint8Array(gw * gh);
+  for (let y = 0; y < gh; y++) for (let x = 0; x < gw; x++) if (ids.has(labels[(y + gy0) * w + x + gx0])) data[y * gw + x] = 1;
+  return { img: { w: gw, h: gh, data }, x0: gx0 + x0, y0: gy0 + y0, x1: gx1 + x0, y1: gy1 + y0 };
+}
+
+// staff-line removal leaves short vertical gaps: fill them where ink is above and below
+function heal(img, n) {
+  const { w, h, data } = img;
+  for (let x = 0; x < w; x++) {
+    let last = -1;
+    for (let y = 0; y < h; y++) {
+      if (!data[y * w + x]) continue;
+      if (last >= 0 && y - last > 1 && y - last - 1 <= n) for (let k = last + 1; k < y; k++) data[k * w + x] = 1;
+      last = y;
+    }
+  }
+  return img;
+}
+
+const C_OTHERS = ['head-filled', 'head-half', 'rest-quarter', 'rest-8th', 'acc-sharp', 'acc-flat', 'acc-natural', 'clef-C', 'digit-2', 'digit-3', 'digit-4', 'digit-6', 'digit-8', 'digit-9'];
+// a C or cut C starting within [xa, xb]: centred on the middle line, about two spaces high
+// (the cut stroke reaches further up and down)
+function readCommon(R, st, xa, xb, sp) {
+  const xm = (xa + xb) / 2, l0 = st.yAt(0, xm), l2 = st.yAt(2, xm), l4 = st.yAt(4, xm);
+  // the glyph's first piece starts in [xa, xb]; the rest of it (the C's terminals and the
+  // cut stroke, cut apart by staff-line removal) within 1.5 spaces of it
+  const minA = Math.max(3, 0.03 * sp * sp), band = (cy0, cy1) => Math.abs((cy0 + cy1) / 2 - l2) < 1.4 * sp;
+  const first = crop(R, { x0: xa, x1: xb + 2.4 * sp, y0: l0 - 1.2 * sp, y1: l4 + 1.2 * sp,
+    inner: (cx0, cy0, cx1, cy1) => cx0 >= xa - 0.1 * sp && cx0 <= xb && cx1 - cx0 < 2.2 * sp && band(cy0, cy1) }, minA);
+  if (!first) return null;
+  const g = crop(R, { x0: first.x0 - 1, x1: first.x0 + 3 * sp, y0: l0 - 1.2 * sp, y1: l4 + 1.2 * sp,
+    inner: (cx0, cy0, cx1, cy1) => cx0 >= first.x0 - 1 && cx0 <= first.x0 + 1.5 * sp && cx1 - cx0 < 2.2 * sp && band(cy0, cy1) }, minA);
+  if (!g) return null;
+  const w = (g.x1 - g.x0 + 1) / sp, h = (g.y1 - g.y0 + 1) / sp, cy = (g.y0 + g.y1) / 2;
+  if (w < 0.9 || w > 2.1 || h < 1.6 || h > 4.6 || Math.abs(cy - l2) > 0.5 * sp) return null;
+  const sc = matcher().scores(heal(g.img, Math.max(2, Math.round(0.18 * sp))), sp, ['time-C', 'time-cut'].concat(C_OTHERS));
+  const k = sc['time-cut'] > sc['time-C'] ? 'time-cut' : 'time-C';
+  const other = Math.max(...C_OTHERS.map(n => sc[n]));
+  if (sc[k] < 0.5 || sc[k] - other < 0.05) return null;
+  // the cut stroke runs well past the C's top and bottom
+  const cut = k === 'time-cut' && h >= 2.6;
+  return { beats: cut ? 2 : 4, type: cut ? 2 : 4, symbol: cut ? 'cut' : 'common', x0: g.x0, x1: g.x1, score: sc[k] };
+}
+
+// barline x positions of a system (the staves' barlines clustered)
+function systemBars(fr, sy) {
+  const sis = new Set(sy.staves.map(s => s.si));
+  const xs = fr.barlines.filter(b => sis.has(b.staff)).map(b => b.x).sort((a, b) => a - b);
+  const cl = [];
+  for (const x of xs) {
+    const last = cl[cl.length - 1];
+    if (last && x - last[last.length - 1] < 1.2 * fr.ss) last.push(x); else cl.push([x]);
+  }
+  return cl.map(c => c.reduce((a, b) => a + b, 0) / c.length);
+}
+
+// a time signature on staff s starting at about x (after a barline or a key change)
+function meterAt(R, s, x, sp) {
+  const st = s.st, api = matcher();
+  const t = readTime(api, R, st, x - 0.1 * sp, x + 3.4 * sp, sp, 0.55);
+  if (t && t.x0 < x + 1.3 * sp && t.beats >= 1) return { beats: t.beats, type: t.type, symbol: '', x0: t.x0, x1: t.x1, score: t.score };
+  const c = readCommon(R, st, x - 0.1 * sp, x + 1.3 * sp, sp);
+  return c;
+}
+
+const valueOf = (m) => `${m.beats}/${m.type}/${m.symbol || ''}`;
+
+function readMeters(fr, asm, stats = {}) {
+  const R = fr && fr.R;
+  if (!R || !asm) return stats;
+  asm.systems.forEach((sy, si) => {
+    const bars = systemBars(fr, sy);
+    const found = []; // {x, staff, m}
+    for (const s of sy.staves) {
+      const st = s.st, sp = st.space || fr.ss, h = s.hdr;
+      if (!h) continue;
+      const drop = []; // x ranges whose 'heads' are digits
+      try {
+        // the header (the first system's numbers are read by cv.js readHeaders)
+        if (h.time && !h.time.beats && si > 0) {
+          const t = readTime(matcher(), R, st, h.time.x0 - 0.3 * sp, h.time.x1 + 0.3 * sp, sp, 0.45);
+          if (t) { h.time.beats = t.beats; h.time.type = t.type; h.time.cv = true; stats.timeRead = (stats.timeRead || 0) + 1; }
+        } else if (!h.time) {
+          const x0 = h.end - 0.4 * sp;
+          const t = si > 0 ? readTime(matcher(), R, st, x0, x0 + 3.6 * sp, sp, 0.55) : null;
+          const m = t && t.x0 < h.end + 1.5 * sp ? { beats: t.beats, type: t.type, symbol: '', x0: t.x0, x1: t.x1 } : readCommon(R, st, h.end - 0.3 * sp, h.end + 1.5 * sp, sp);
+          if (m) {
+            h.time = { x0: m.x0, x1: m.x1, beats: m.beats, type: m.type, symbol: m.symbol || undefined, cv: true };
+            h.end = Math.max(h.end, m.x1 + 0.2 * sp);
+            drop.push([-Infinity, h.end]);
+            stats.timeFound = (stats.timeFound || 0) + 1;
+          }
+        } else if (h.time.symbol === 'common' || (!h.time.beats && !h.time.symbol)) {
+          // a C read by its back: cut C has the stroke through it
+          const c = readCommon(R, st, h.time.x0 - 0.3 * sp, h.time.x0 + 0.6 * sp, sp);
+          if (c) Object.assign(h.time, { beats: c.beats, type: c.type, symbol: c.symbol });
+        }
+        if (h.time && h.time.beats) found.push({ x: st.left, staff: s, header: true, m: { beats: h.time.beats, type: h.time.type, symbol: h.time.symbol || '' } });
+        // after each barline (after a key change standing there)
+        for (const bx of bars) {
+          if (bx < h.end + sp || bx > st.right - 0.3 * sp) continue;
+          let x = bx + 0.3 * sp;
+          const kc = (s.changes || []).find(ch => ch.fifths != null && ch.box && ch.box.x0 > bx && ch.box.x0 < bx + 2 * sp);
+          if (kc) x = kc.box.x1 + 0.2 * sp;
+          const m = meterAt(R, s, x, sp);
+          if (!m) continue;
+          found.push({ x: bx, staff: s, m });
+          drop.push([m.x0 - 0.3 * sp, m.x1 + 0.3 * sp]);
+        }
+      } catch (e) { stats.errors = (stats.errors || 0) + 1; }
+      if (drop.length) {
+        const n = s.chords.length;
+        s.chords = s.chords.filter(c => !drop.some(([a, b]) => c.x >= a && c.x <= b));
+        stats.headsDropped = (stats.headsDropped || 0) + n - s.chords.length;
+      }
+    }
+    // one meter per barline: the value most staves read there (a lone reading
+    // on a system of three staves or more is not enough)
+    const meters = [];
+    const xs = [...new Set(found.map(f => (f.header ? -1 : f.x)))];
+    for (const x of xs) {
+      const fs = found.filter(f => (f.header ? -1 : f.x) === x);
+      const cnt = {};
+      for (const f of fs) cnt[valueOf(f.m)] = (cnt[valueOf(f.m)] || 0) + 1;
+      const [v, n] = Object.entries(cnt).sort((a, b) => b[1] - a[1])[0];
+      if (sy.staves.length >= 3 && n < 2) continue;
+      const f = fs.find(g => valueOf(g.m) === v);
+      meters.push({ x: f.header ? Math.min(...sy.staves.map(s => s.st.left)) : x, beats: f.m.beats, type: f.m.type, symbol: f.m.symbol || '', header: !!f.header });
+    }
+    meters.sort((a, b) => a.x - b.x);
+    // a signature after the system's last barline with no notes after it announces the next
+    // system's meter
+    const right = Math.max(...sy.staves.map(s => s.st.right));
+    for (const m of meters) {
+      if (m.header) continue;
+      const later = bars.filter(b => b > m.x + 0.5 * fr.ss);
+      const notes = sy.staves.some(s => s.chords.some(c => c.x > m.x + 0.5 * fr.ss));
+      if (!later.length && !notes && right - m.x < 6 * fr.ss) m.courtesy = true;
+    }
+    // bars left empty by the digits dropped (the courtesy signature's 'bar')
+    const before = sy.measures.length;
+    sy.measures = sy.measures.filter(([xa, xb]) => {
+      const sp = fr.ss;
+      if (xb - xa > 6 * sp) return true;
+      if (sy.staves.some(s => s.chords.some(c => c.x > xa && c.x < xb))) return true;
+      return !meters.some(m => !m.header && m.x >= xa - sp && m.x <= xb);
+    });
+    stats.barsDropped = (stats.barsDropped || 0) + before - sy.measures.length;
+    sy.meters = meters;
+    stats.meters = (stats.meters || 0) + meters.filter(m => !m.header).length;
+  });
+  return stats;
+}
+
+module.exports = { readMeters, readCommon, systemBars };
 
 };
 defs["ml"]=function(require,module,exports){
@@ -7165,7 +7379,10 @@ function createConverter(opts = {}) {
     if (!opts.ocr) return;
     progress(`${label}: reading lyrics`, { stage: 'lyrics', page: i, pages: n });
     try {
-      const lyr = await readLyrics(entry.fr, opts.ocr, (d, m) => progress(`${label}: reading lyrics (${d}/${m} lines)`, { stage: 'lyrics', page: i, pages: n }));
+      // titles, credits and tempo lines above the music (text.js) are not lyrics
+      let skipBoxes = null;
+      try { const mk = pageMarks(entry.fr, entry.asm); skipBoxes = mk && mk.text.filter(t => ['title', 'subtitle', 'composer', 'lyricist', 'arranger', 'credit', 'header', 'footer', 'copyright'].includes(t.role) || t.metro).map(t => t.box); } catch (e) { skipBoxes = null; }
+      const lyr = await readLyrics(entry.fr, opts.ocr, (d, m) => progress(`${label}: reading lyrics (${d}/${m} lines)`, { stage: 'lyrics', page: i, pages: n }), skipBoxes && skipBoxes.length ? { skipBoxes } : undefined);
       for (const k in lyr) lyricsBySystem[entry.index + ':' + k] = lyr[k];
     } catch (e) { warnings.push(`Lyrics OCR failed: ${e.message}`); }
     // titles, credits, instrument names, tempo and expression text
@@ -8302,6 +8519,7 @@ defs["score"]=function(require,module,exports){
 // signature inference, per-measure rhythm repair, lyrics alignment, MusicXML.
 const { staffMeasureEvents, pitchOf, keyAlters, DIV } = require('./assemble');
 const { detectRests, mergeRests, restBars } = require('./rests');
+const { readMeters } = require('./meter');
 const { pageMarks } = require('./symbols');
 const { instrumentXML, soundDynamics, tempoFromWords } = require('./playback');
 
@@ -8538,8 +8756,8 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
     const r = sel.map(sy => (sy.staves[k] ? sy.staves[k].st.space / Math.max(...sy.staves.map(s => s.st.space)) : 1)).sort((a, b) => a - b);
     return r.length > 0 && r[r.length >> 1] <= 0.85;
   });
-  // keyboard links between adjacent staves
-  const link = [];
+  // keyboard links between adjacent staves (evid: the evidence per pair, for debugging)
+  const link = [], evid = [];
   for (let k = 0; k + 1 < nSt; k++) {
     const c = pairConnectivity(sel, k);
     const underlay = lyr[k] >= 0.3;
@@ -8577,6 +8795,7 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
       const ev = braceEvidence(sel, k);
       if (ev.lines >= 2 && !ev.braces) { kb = false; notes.push(`Staves ${k + 1}+${k + 2}: joined by a system line but no brace on any system: read as two parts, not a keyboard grand staff.`); }
     }
+    evid.push({ pair: k, bars: c.n, joined: c.frac == null ? null : +c.frac.toFixed(2), lyr: [+lyr[k].toFixed(2), +lyr[k + 1].toFixed(2)], accomp, small: [small[k], small[k + 1]], brace: braceEvidence(sel, k), kb });
     link.push(kb);
   }
   // organ: a pedal staff (bass clef, no text, no name of its own) under a
@@ -8654,7 +8873,7 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
   parts.forEach(p => { if (p.nameRead) read.push(p.name); });
   if (read.length) notes.push(`Part names read from the page: ${read.join(', ')}.`);
   parts.forEach((p, i) => { p.id = 'P' + (i + 1); p.color = COLORS[i % COLORS.length]; });
-  return { parts, nSt, notes, clefs, stats, link };
+  return { parts, nSt, notes, clefs, stats, link, evid };
 }
 
 // Key signature: every staff carries the same key. A staff whose accidentals
@@ -8947,6 +9166,8 @@ function restsFor(q) {
 
 function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   const warnings = [];
+  // time signatures on every system, after barlines and at system ends (meter.js; once per page)
+  for (const p of pages) if (p.asm && !p.asm.metersRead) { try { readMeters(p.fr, p.asm); } catch (e) { /* the piece's one meter */ } p.asm.metersRead = true; }
   const systems = pages.flatMap(p => p.asm.systems.map(s => ({ ...s, fr: p.fr, comps: p.asm.comps })));
   if (!systems.length) return { parts: [], measures: 0, warnings: ['No music systems found.'], xml: emptyXML() };
   // marks first (text.js via symbols.js): braces inform the layout
@@ -9074,11 +9295,38 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   {
     const hs = systems.flatMap(sy => sy.staves.map(s => s.hdr && s.hdr.time)).filter(t => t && t.beats > 0 && t.type > 0);
     if (hs.length >= Math.max(1, 0.3 * systems.filter(sy => sy.index === 0).reduce((a, sy) => a + sy.staves.length, 0))) {
-      const key = mode(hs.map(t => `${t.beats}/${t.type}`)), [b, ty] = key.split('/').map(Number), hq = (b * 4) / ty;
+      const key = mode(hs.map(t => `${t.beats}/${t.type}/${t.symbol || ''}`)), [b, ty] = key.split('/').map(Number), sym = key.split('/')[2], hq = (b * 4) / ty;
       const qNow = (time.beats * 4) / time.type;
-      if (Math.abs(hq - qNow) < 1e-6 || (votes[hq] || 0) >= 0.5 * (votes[qNow] || 0)) { time = { beats: b, type: ty }; timeRead = true; }
+      if (Math.abs(hq - qNow) < 1e-6 || (votes[hq] || 0) >= 0.5 * (votes[qNow] || 0)) { time = { beats: b, type: ty, symbol: sym || '' }; timeRead = true; }
     }
   }
+  // the meter in force at each segment (meter.js: sy.meters, read on every system header, after
+  // barlines and at system ends). Used when the page shows a change of meter; a piece read
+  // with one meter throughout keeps the meter chosen above.
+  const segTime = segs.map(() => time);
+  {
+    const ms = systems.flatMap(sy => (sy.meters || []).filter(m => !m.courtesy));
+    const vals = new Set(ms.map(m => `${m.beats}/${m.type}/${m.symbol || ''}`));
+    if (vals.size >= 2) {
+      let cur = time;
+      segs.forEach((sg, i) => {
+        const sp = (sg.sy.staves[0] && sg.sy.staves[0].st.space) || 16;
+        // a courtesy signature at the end of the system before stands for this system's header
+        // when that was not read
+        const prev = i > 0 && segs[i - 1].sy !== sg.sy ? (segs[i - 1].sy.meters || []).find(m => m.courtesy) : null;
+        if (prev && !(sg.sy.meters || []).some(m => m.header)) cur = { beats: prev.beats, type: prev.type, symbol: prev.symbol || '' };
+        const here = (sg.sy.meters || []).filter(m => !m.courtesy && m.x <= sg.xa + 0.5 * sp);
+        if (here.length && (i === 0 || segs[i - 1].sy !== sg.sy || here[here.length - 1].x > segs[i - 1].xa + 0.5 * sp)) {
+          const m = here[here.length - 1];
+          cur = { beats: m.beats, type: m.type, symbol: m.symbol || '' };
+        }
+        segTime[i] = cur;
+      });
+      const nCh = segTime.filter((t, i) => i > 0 && (t.beats !== segTime[i - 1].beats || t.type !== segTime[i - 1].type || t.symbol !== segTime[i - 1].symbol)).length;
+      if (nCh) warnings.push(`${nCh} change${nCh > 1 ? 's' : ''} of time signature read from the page.`);
+    }
+  }
+  const lenOf = (i) => (segTime[i].beats * 4) / segTime[i].type;
   const mLen = (time.beats * 4) / time.type;
   warnings.push(timeRead ? `Time signature read from the page: ${time.beats}/${time.type}.` : `Time signature inferred from measure contents: ${time.beats}/${time.type}.`);
   // Barline reconciliation. Barline detection both misses barlines and finds
@@ -9091,6 +9339,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   const nStreams = segEv.length ? segEv[0].reduce((a, ps) => a + ps.length, 0) : 0;
   const segStreamSums = segEv.map(e => e.flatMap(ps => ps.map(evs => qsum(evs))));
   const groupDev = (a, b, edge) => {
+    const mLen = lenOf(a);
     // dropping a barline must never make a bar over-full (its notes would be cut)
     const sums = [];
     for (let k = 0; k < nStreams; k++) {
@@ -9128,6 +9377,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     const barsIn = (i, j) => {
       let S = 0;
       for (let t = i0 + i; t < i0 + j; t++) S += segSum[t];
+      const mLen = lenOf(i0 + i);
       const k = Math.round(S / mLen);
       return k >= 2 && Math.abs(S - k * mLen) < 1e-6 ? k : 1;
     };
@@ -9169,7 +9419,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   for (let k = 1; k + 1 < measures.length; k++) {
     const a = measures[k], b = measures[k + 1];
     if (segs[a.segs[0]].sy === segs[b.segs[0]].sy || a.segs.length > 1 || b.segs.length > 1) continue;
-    const sa = segSum[a.segs[0]], sb = segSum[b.segs[0]];
+    const sa = segSum[a.segs[0]], sb = segSum[b.segs[0]], mLen = lenOf(a.segs[0]);
     if (sa < mLen - 1e-6 && sb > 1e-6 && Math.abs(sa + sb - mLen) < 1e-6) { a.segs.push(...b.segs); measures.splice(k + 1, 1); }
   }
   if (opts.debug) segs.forEach((sg, i) => opts.debug.push(`seg ${i} sys ${sg.sy.page}:${sg.sy.index} x ${Math.round(sg.xa)}-${Math.round(sg.xb)} sum ${segSum[i]} streams ${segEv[i].map(ps => ps.map(evs => evs.map(e => (e.rest ? 'r' : '') + e.q).join(',')).join('/')).join(' | ')}`));
@@ -9262,7 +9512,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     if (best.fit < L.minFit || !wordy(v.syllables)) { lyrNotes.add(`A text line under staff ${v.band + 1} does not follow the notes; not used as lyrics.`); continue; }
     const take = opts.copyLyrics || bandVoice[v.band] === 'all' ? cands.filter(c => c.fit >= L.minFit) : [best];
     if (opts.debug) opts.debug.push({ sys: L.sy.page + ':' + L.sy.index, band: v.band, n: v.number, nsyl: v.syllables.length, fits: cands.map(c => [c.p.name, +c.fit.toFixed(2), c.evs.length, +c.soft.toFixed(2)]), take: take.map(c => c.p.name) });
-    for (const c of take) alignSyllables(v, c.evs, sp);
+    for (const c of take) alignSyllables(v, c.evs, sp, L.sy && L.sy.comps);
     v.used = take.map(c => c.p.name).join(', ');
   }
   lyrNotes.forEach(n => warnings.push(n));
@@ -9278,6 +9528,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   // crossing a boundary are split and tied)
   const units = [];
   measures.forEach((m, mi) => {
+    const mLen = lenOf(m.segs[0]), uTime = segTime[m.segs[0]];
     const byPart = perPart.map(pm => pm[mi]);
     const sums = [];
     byPart.forEach(sts => sts.forEach(st => { const q = qsum(st.events); if (q > 1e-6) sums.push(Math.round(q * 4) / 4); }));
@@ -9309,15 +9560,15 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
           }
         }
       }));
-      chunks.forEach(ch => units.push({ m, streams: ch, split: true }));
+      chunks.forEach(ch => units.push({ m, streams: ch, split: true, time: uTime }));
       return;
     }
-    units.push({ m, streams: byPart, split: false });
+    units.push({ m, streams: byPart, split: false, time: uTime });
     // a multi-bar rest (or church rests) in a bar with no notes: one bar each
     const barRests = byPart.flatMap(sts => sts.flatMap(st => st.events));
     if (barRests.length && barRests.every(e => e.bar)) {
       const n = Math.max(...barRests.map(e => restBars(e, mLen)));
-      for (let k = 1; k < n; k++) units.push({ m, streams: byPart.map(sts => sts.map(st => ({ staff: st.staff, events: [] }))), split: false });
+      for (let k = 1; k < n; k++) units.push({ m, streams: byPart.map(sts => sts.map(st => ({ staff: st.staff, events: [] }))), split: false, time: uTime });
     }
   });
   const partMeasures = parts.map(() => []);
@@ -9327,6 +9578,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     parts.forEach((p, pi) => u.streams[pi].forEach((st, k) => streams.push({ pi, k, staff: st.staff, events: st.events.slice() })));
     const sums = streams.map(st => qsum(st.events));
     const nz = sums.filter(x => x > 1e-6).map(x => Math.round(x * DIV) / DIV);
+    const mLen = (u.time.beats * 4) / u.time.type;
     let target = mLen;
     const ms = nz.length ? mode(nz) : 0;
     const agree = nz.filter(x => Math.abs(x - ms) < 1e-6).length;
@@ -9379,7 +9631,8 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   let read = { dirs: parts.map(() => units.map(() => [])), head: {}, nDyn: 0, nWedge: 0, nWords: 0 };
   try { read = readMarks(pages, segs, units, parts, partMeasures); } catch (e) { warnings.push(`Text and dynamics not placed (${e.message}).`); }
   if (read.nDyn || read.nWedge || read.nWords || read.nTie || read.nSlur || read.nGrace || read.nFermata) warnings.push(`Read from the page: ${[read.nDyn && `${read.nDyn} dynamic${read.nDyn > 1 ? 's' : ''}`, read.nWedge && `${read.nWedge} hairpin${read.nWedge > 1 ? 's' : ''}`, read.nWords && `${read.nWords} tempo / expression text${read.nWords > 1 ? 's' : ''}`, read.nTie && `${read.nTie} tie${read.nTie > 1 ? 's' : ''}`, read.nSlur && `${read.nSlur} slur${read.nSlur > 1 ? 's' : ''}`, read.nGrace && `${read.nGrace} grace note${read.nGrace > 1 ? 's' : ''}`, read.nFermata && `${read.nFermata} fermata${read.nFermata > 1 ? 's' : ''}`].filter(Boolean).join(', ')}.`);
-  const xml = toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, measures, credits, unitSys, title: read.head.title, head: read.head, dirs: read.dirs });
+  const unitTime = units.map(u => u.time);
+  const xml = toMusicXML({ parts, partMeasures, fifths, kAlt, time, unitTime, clefs, measures, credits, unitSys, title: read.head.title, head: read.head, dirs: read.dirs });
   const nNotes = partMeasures.map(pm => pm.reduce((a, m) => a + m.reduce((b, s) => b + s.events.filter(e => !e.rest && !e.forward).length, 0), 0));
   const ranges = partMeasures.map(pm => {
     let lo = null, hi = null;
@@ -9496,7 +9749,26 @@ function wordy(syl) {
 // over the following notes of its voice gets an extender (<extend/> start on
 // its note, stop on the last note of the melisma); hyphenated syllables do not
 // (their hyphen spans the melisma).
-function alignSyllables(verse, evs, sp) {
+// An elision slur under a syllable ("a‿in": two syllables sung on one note):
+// a small thin arc in the lower part of the text row, inside the syllable's
+// box. OCR reads such a syllable as one word ("ain"); it is cut at the arc.
+// [left, right] or null
+function elisionOf(s, verse, comps, sp) {
+  if (!comps || s.x0 == null || s.x1 == null || verse.y == null || verse.y1 == null || !s.text || s.text.length < 2) return null;
+  const w = s.x1 - s.x0, rowH = verse.y1 - verse.y;
+  const arc = comps.find(c => {
+    const cw = c.x1 - c.x0 + 1, ch = c.y1 - c.y0 + 1, cx = (c.x0 + c.x1) / 2;
+    // under the baseline, wider than tall but not a flat hyphen
+    return cw >= 0.6 * sp && cw <= 3 * sp && ch <= 0.6 * sp && ch >= 0.2 * sp && cw >= 2.5 * ch && cx > s.x0 + 0.12 * w && cx < s.x1 - 0.12 * w &&
+      c.y0 >= verse.y + 0.75 * rowH && c.y1 <= verse.y1 + 1.0 * sp;
+  });
+  if (!arc) return null;
+  const t = s.text.replace(/[‿_]/g, ''), cx = (arc.x0 + arc.x1) / 2;
+  const k = Math.max(1, Math.min(t.length - 1, Math.round(t.length * (cx - s.x0) / Math.max(1, w))));
+  return [t.slice(0, k), t.slice(k)];
+}
+
+function alignSyllables(verse, evs, sp, comps) {
   const syl = verse.syllables, n = syl.length, m = evs.length;
   if (!n || !m) return;
   const SKIP_EV = 0.15, DROP_SYL = 2.2;
@@ -9528,6 +9800,8 @@ function alignSyllables(verse, evs, sp) {
     ev.lyrics ||= {};
     if (ev.lyrics[num]) continue;
     ev.lyrics[num] = { text: s.text, syllabic: s.syllabic };
+    const el = elisionOf(s, verse, comps, sp);
+    if (el) ev.lyrics[num].elision = el;
     placed.push([a, b]);
   }
   // melismas between placed syllables
@@ -9932,7 +10206,7 @@ function readMarks(pages, segs, units, parts, partMeasures) {
   return { dirs, head, nDyn, nWedge, nWords, nTie, nSlur, nGrace, nFermata };
 }
 
-function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, credits, unitSys, head, dirs }) {
+function toMusicXML({ parts, partMeasures, fifths, kAlt, time, unitTime, clefs, title, credits, unitSys, head, dirs }) {
   // each system's own clef where it was read (a staff can change clef from
   // one system to the next), else the clef most systems show. A clef read on
   // one system only is more often a misread (or a header clef cancelled at
@@ -10071,17 +10345,21 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
     const nStaves = p.src.length;
     const multi = nStaves > 1;
     const curClef = [];
-    let curKey = fifths;
+    let curKey = fifths, curTime = null;
     // clef / key in force at a stream's first note: a change read inside a
     // staff (h.clef / h.fifths from assemble.js) carries on into later bars
     const firstHead = (st) => { for (const e of st.events) if (!e.rest && !e.forward && e.heads && e.heads.length) return e.heads[0]; return null; };
     partMeasures[pi].forEach((streams, mi) => {
       const implicit = streams.every(s => s.implicit);
       L.push(`    <measure number="${implicit ? 0 : mi + (partMeasures[pi][0].every(s => s.implicit) ? 0 : 1)}"${implicit ? ' implicit="yes"' : ''}>`);
+      // the meter of each bar (buildScore: read changes of time signature), written where it changes
+      const tm = (unitTime && unitTime[mi]) || time;
+      const timeXML = `<time${tm.symbol ? ` symbol="${tm.symbol}"` : ''}><beats>${tm.beats}</beats><beat-type>${tm.type}</beat-type></time>`;
       if (mi === 0) {
         const fh0 = streams.map(firstHead).find(Boolean);
         curKey = fh0 && fh0.fifths != null ? fh0.fifths : keyAt(0);
-        L.push(`      <attributes><divisions>${DIV}</divisions><key><fifths>${curKey}</fifths></key><time><beats>${time.beats}</beats><beat-type>${time.type}</beat-type></time>` +
+        curTime = timeXML;
+        L.push(`      <attributes><divisions>${DIV}</divisions><key><fifths>${curKey}</fifths></key>${timeXML}` +
           (multi ? `<staves>${nStaves}</staves>${p.src.map((s, k) => clefXML(clefAt(0, s.staff), k + 1)).join('')}` : clefXML(clefAt(0, p.src[0].staff))) + '</attributes>');
         p.src.forEach((s, k) => { curClef[k] = clefAt(0, s.staff); });
       } else {
@@ -10089,6 +10367,7 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
         const fh = streams.map(firstHead).find(Boolean);
         const key = fh && fh.fifths != null ? fh.fifths : keyAt(mi);
         if (key !== curKey) { ch.push(`<key><fifths>${key}</fifths></key>`); curKey = key; }
+        if (timeXML !== curTime) { ch.push(timeXML); curTime = timeXML; }
         p.src.forEach((s, k) => {
           const h0 = streams[k] ? firstHead(streams[k]) : null;
           const c = (h0 && h0.clef) || clefAt(mi, s.staff);
@@ -10177,7 +10456,9 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
               const nums = new Set([...Object.keys(e.lyrics || {}), ...Object.keys(e.lyrExt || {})]);
               for (const n of [...nums].sort((a, b) => a - b)) {
                 const l = e.lyrics && e.lyrics[n];
-                if (l) lyr += `<lyric number="${n}"><syllabic>${l.syllabic}</syllabic><text>${esc(l.text)}</text>${l.extend ? '<extend type="start"/>' : ''}</lyric>`;
+                // an elision: the two syllables joined by ‿ on one note
+                const body = l && l.elision ? `<syllabic>${l.syllabic}</syllabic><text>${esc(l.elision[0])}</text><elision>‿</elision><syllabic>single</syllabic><text>${esc(l.elision[1])}</text>` : l ? `<syllabic>${l.syllabic}</syllabic><text>${esc(l.text)}</text>` : '';
+                if (l) lyr += `<lyric number="${n}">${body}${l.extend ? '<extend type="start"/>' : ''}</lyric>`;
                 else lyr += `<lyric number="${n}"><extend type="stop"/></lyric>`;
               }
             }

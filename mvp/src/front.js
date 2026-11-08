@@ -31,7 +31,24 @@ function resample(g, f) {
 // is the hole a flag (or a beam meeting its stem) closes: flags curl out to
 // the right of the stem.  The stem is a thin ink column (on the lenient
 // binary L) joining both rows.
-function atStemTip(h, heads, L) {
+// A filled "head" that is a piece of a beam (a beam's end segment, or a stack of 16th / 32nd beams
+// between two stems): its ink is a beam's thickness tall, about half a space; a filled head's is a
+// full space (coverage notes family: 0.43-0.65 against 1.0-1.2).
+function beamPiece(h, L, lt) {
+  const { width: w, height: H, data } = L, sp = h.sp, gapMax = Math.max(1, Math.round(lt) + 1);
+  let best = 0;
+  for (const dx of [-0.3, -0.15, 0, 0.15, 0.3]) {
+    const x = Math.round(h.x + dx * sp), y = Math.round(h.y);
+    if (x < 0 || x >= w || y < 0 || y >= H || !data[y * w + x]) continue;
+    // (gaps a staff line's thickness wide are bridged: line removal cuts heads on lines)
+    const ext = (dir) => { let e = y, gap = 0; for (let yy = y + dir; yy >= 0 && yy < H && Math.abs(yy - y) < 2 * sp; yy += dir) { if (data[yy * w + x]) { e = yy; gap = 0; } else if (++gap > gapMax) break; } return e; };
+    best = Math.max(best, (ext(1) - ext(-1) + 1) / sp);
+  }
+  return best > 0 && best < 0.72;
+}
+
+function atStemTip(h, heads, L, lt = 2) {
+  if (h.kind === 'filled') return beamPiece(h, L, lt);
   if (h.kind !== 'hollow') return false;
   const { width: w, height: H, data } = L;
   const sp = h.sp, maxGap = Math.max(1, Math.round(0.12 * sp));
@@ -306,7 +323,7 @@ function* frontSteps(gray0, opts = {}) {
   }
   const chords = chordStems(L, hs, { minLen: 1.5, sides: true });
   hs = hs.filter(h => (h.stemDir !== 0 || h.kind === 'hollow') && !(h.chord && h.chord.accidental));
-  hs = hs.filter(h => !atStemTip(h, hs, L));
+  hs = hs.filter(h => !atStemTip(h, hs, L, ltL));
   const barlines = detectBarlines(R, staves, hs, sp.ss);
   return { gray, B, R, L, scale, skew, ss: sp.ss, lt: sp.lt, staves, systems, heads: hs, chords, beams, barlines, warnings, stacked: stacked || [],
     orientation: (quarter % 4) * 90, mode: ctx.mode };

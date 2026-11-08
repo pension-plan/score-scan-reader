@@ -2,6 +2,20 @@
 
 Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
 
+## Update: beam pieces taken for heads (L23, part 4)
+
+The false notes in bars with dotted rhythms (`dot` "confused" in the matrix) were not dots: on `nt02-dots` the extra
+notes are filled "heads" found on beams (a beam's end segment at the last stem, or a 16th / 32nd beam stack between
+two stems). Their ink is a beam's thickness tall: 0.43–0.65 of a space at the head's columns against 1.0–1.2 for
+real filled heads on the coverage notes family (gaps of a staff line's thickness bridged: line removal cuts heads on
+lines; without the bridge, heads on lines were lost and hymn pages dropped up to 0.04). `front.js` now drops filled
+heads under 0.72 of a space tall, next to the existing hollow-at-stem-tip filter. `nt02-dots` page 1: 93 → 82 heads.
+
+Coverage (no OCR): false notes in bars with dots 790 → 725, with 16ths 519 → 438, with 32nds 112 → 97 (clean);
+`dot` +27 / +17 / +4, `note-8th` +15 / +27 / −5, `note-16th` +10 / +3 / −4, `stem-down` +50 / +37 / +1, `slur` clean +13.
+Aggregates: coverage 0.7870 → 0.7878 (42 items changed, largest drop −0.007), challenge 0.8288 → 0.8290 (largest drop
+−0.020, `agrace-satb-photocopy-thick` mild), benchmark with OCR 0.9502 → 0.9501 (one item −0.003).
+
 ## Update: hollow heads on ledger lines (L23, part 3)
 
 Half and whole notes on a ledger line came out filled (24 of 73 half-note chords on the clean pages checked; all

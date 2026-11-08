@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 00:21 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 00:26 AEDT.
 
 ## Events
 
@@ -123,6 +123,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 23:49 | Shipped b357ba7 (ties 17 to 33% clean) and a4638e7 (COVERAGE.md: 38 supported / 52 partial / 64 unsupported); release merged. textsym told explicitly to enable graceHeads if regress.mjs passes, before L25 lyrics. |
 | 00:15 | /goal set: continue all outstanding tasks and keep the easygo Estate Status #needs section updated. Added a 'Score Scan Reader' group there (SSR-1 downloads on Pages, SSR-2 repair-mark colour). Started three more Opus xhigh agents: perf (L26 memory), structure (L14, L15 ottava, L16/L21 mid-piece key/time changes, L22 repeats/endings/articulations/beams), voices (L4b, L5b, L6, L7, L9, L18). |
 | 00:21 | Shipped 5aa6a21 and 858beb7 (opencv; release merged): stacked whole-note chords, half/whole notes on ledger lines (filled half-note chords 24 to 2); challenge 0.8282 to 0.8288, benchmark 0.9500 to 0.9502; regressions clean. |
+| 00:26 | 40a5631 (textsym, in 0.24.0): L25 lyric fixes; COVERAGE 41/50/63. Decision: accents via a lazy second OCR pass with extra languages on suspect rows only (no 6.7 MB default, no 1.6x slowdown). graceHeads enable still pending. |
 
 ## Accuracy by round
 
@@ -174,7 +175,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | L22 | Beams, slurs, fermatas, dynamics, hairpins, articulations, repeats and endings never written to MusicXML | Voices (MusicXML) + symbols | Partial (text round) | Coverage: beam 703, slur 100, fermata 130 occurrences, all 0%. Text round (6ed273c): dynamics (27 of 40 benchmark marks, precision 0.84), hairpins (coverage 84-86% clean/scan) and tempo/expression words now written. Beams, slurs, fermatas, articulations, repeats and endings still not written. 2b560bc: slurs now written too. 35b4034: fermatas written (coverage 62/37/27% clean/scan/severe). |
 | L23 | Half and whole notes, dots, 32nd/64th notes partial | Noteheads + symbols | Partial (713fbe7) | Coverage: note-half 76%, note-whole 46%, dot 69% (adds false notes), note-32nd 11%. 2b560bc: grace notes written (coverage 21% clean, 2% severe); grace heads on scans are still taken as normal notes. 713fbe7: 32nd notes 40/42/21 to 394/403/370 of 709 (clean/scan/severe), 64th 0 to 69/66/33 of 123; divisions 1680; coverage 0.7821 to 0.7843. Stacked whole-note chords, half notes read as filled, and dots adding false notes remain. 5aa6a21 + 858beb7: stacked hollow chords split after the header; hollow test ignores ledger rows; whole notes 139/129/91 to 216/192/120 of 537 (clean/scan/severe), half notes 3360 to 3692 clean; coverage 0.7843 to 0.7870. False heads inside beam stacks (seen as dot errors) next. |
 | L24 | Key signatures of 4+ sharps or flats and courtesy accidentals weak | Symbols | Queued for round 4 | Coverage: key-s4 25%, key-s6/s7 0%, acc-courtesy 22%. Current matrix: keys with 4+ accidentals read 13-17 of 15-17 on clean/scan (the 25%/0% was an older matrix); severe scans and courtesy accidentals (16/39) remain. |
-| L25 | Lyrics: non-ASCII and elisions 0%, extenders 58%, multi-verse 73% | Lyrics | Queued for round 4 | Coverage: 4-language item lyrics 0.16. |
+| L25 | Lyrics: non-ASCII and elisions 0%, extenders 58%, multi-verse 73% | Lyrics | Partial (40a5631) | Coverage: 4-language item lyrics 0.16. 40a5631: credits never read as lyrics, accented rows kept, elisions written; lyr02 four-language 0.16 to 0.87; elision 0 to 63/50/63%, multi-verse 85 to 91% clean. Accented letters still near 0% with eng+deu; decision: lazily loaded extra languages for a second pass on suspect rows only. |
 | L26 | Memory grows about 46 MB per page (40-page book peaks at 2.2 GB) | UI + score | Queued for round 4 | Coverage perf: peak MB = 297 + 5.2 × total megapixels (R² 0.97); time per page flat at ~2.3–3 s. |
 | L27 | 0.21.0 shipped with every dynamic, wedge and text mark dropped (a whole-tree push swept in a call to a function not yet exported); graded metrics did not move, so the regression check passed | Integration (push hygiene) + regression check | Resolved (0.21.1) | 437afb3 restored the export (release 0.21.1); regress.mjs now counts written elements (dynamics, wedges, words, metronome, credits, ties, slurs, fermatas, grace, time, key, lyrics) and fails on a drop of more than 10%. Against 0.21.0 it shows dynamics 0 vs 32, ties 22 vs 99, slurs 10 vs 46. |
 
