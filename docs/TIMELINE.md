@@ -69,6 +69,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 17:59 | Rests hotfix shipped as v0.5.1 (17:50 AEDT): rests now detected in every voice including piano; benchmark rests F1 0.445 → 0.581. |
 | 17:59 | Incident 17:50–17:58 AEDT: the live app showed ‘Assembly failed’ (0 parts) because a round 3 work-in-progress change used Node-only debug flags, and CI/Pages builds failed because the app’s new ML model files were git-ignored. Fixed forward: a guard in the bundle, model files committed, push script hardened against files changing mid-push. Live app verified converting Maple Leaf Rag again. |
 | 17:59 | Shared machine was at 99% CPU; the evaluation tool now caps parallel jobs at 16 (was 190) and waits while the host is over 90% busy. All agents told to keep heavy work low. |
+| 17:59 | Round 3 UI owner finished: 41 of 41 UI checks (v0.5.0 page: 35); St. Anselm added as a second sample beside Maple Leaf Rag; English + German lyric OCR shipped; each page notes whether it was rotated, smoothed or split as a 2-up spread; spread pages now colour 98.6% of noteheads by part (was 33%); benchmark 0.934 on the live tree. |
 
 ## Accuracy by round
 
@@ -180,7 +181,7 @@ Every agent started for this build, including stopped runs. Outcomes are on the 
 | Run 7 | Generate | gen:marks | done | 17:34 | 17:46 | 12 | 78 |
 | Run 7 | Generate | gen:structure | done | 17:34 | 17:53 | 19 | 95 |
 | Run 7 | Generate | gen:layouts | done | 17:34 | 17:56 | 22 | 131 |
-| Run 7 | Generate | gen:perf | run | 17:34 |  | 24 | 80 |
+| Run 7 | Generate | gen:perf | run | 17:34 |  | 25 | 80 |
 | Run 8 | Fix | fix:r3:heads | run | 17:36 |  | 23 | 130 |
 | Run 8 | Fix | fix:r3:symbols | run | 17:36 |  | 20 | 118 |
 | Run 8 | Fix | fix:r3:score | run | 17:36 |  | 20 | 116 |
