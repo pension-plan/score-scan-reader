@@ -50,6 +50,21 @@ function makeJsApi() {
     for (let i = 0; i < w * h; i++) d[i] = (bits[i >> 3] >> (i & 7)) & 1 ? 255 : 0;
     tpl[name] = { w, h, d };
   }
+  // filled-in sharps and flats (heavy photocopies close their insides): the sign's holes and the
+  // notches between its strokes closed (a 3 px closing, then every pocket the border cannot reach)
+  for (const name of ['acc-sharp', 'acc-flat']) {
+    const { w, h, d } = tpl[name], r = 3;
+    const ink = (x, y) => x >= 0 && y >= 0 && x < w && y < h && d[y * w + x] > 127;
+    const dil = new Uint8Array(w * h), clo = new Uint8Array(w * h);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { let v = 0; for (let dy = -r; dy <= r && !v; dy++) for (let dx = -r; dx <= r && !v; dx++) v = ink(x + dx, y + dy) ? 1 : 0; dil[y * w + x] = v; }
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { let v = 1; for (let dy = -r; dy <= r && v; dy++) for (let dx = -r; dx <= r && v; dx++) { const xx = x + dx, yy = y + dy; if (xx >= 0 && yy >= 0 && xx < w && yy < h && !dil[yy * w + xx]) v = 0; } clo[y * w + x] = v || (d[y * w + x] > 127 ? 1 : 0); }
+    const out = new Uint8Array(w * h), st = [];
+    for (let x = 0; x < w; x++) { st.push([x, 0], [x, h - 1]); } for (let y = 0; y < h; y++) { st.push([0, y], [w - 1, y]); }
+    while (st.length) { const [x, y] = st.pop(); if (x < 0 || y < 0 || x >= w || y >= h || out[y * w + x] || clo[y * w + x]) continue; out[y * w + x] = 1; st.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]); }
+    const f = new Float32Array(w * h);
+    for (let i = 0; i < w * h; i++) f[i] = out[i] ? 0 : 255;
+    tpl[name + '-filled'] = { w, h, d: f };
+  }
   const cache = new Map();
   const scaled = (name, k) => {
     const key = name + '@' + k.toFixed(3);
@@ -297,7 +312,7 @@ function readKeySig(api, R, st, clef, x0, sp, minScore = 0.42) {
   for (const kind of ['sharp', 'flat']) {
     const ps = KEY_SLOTS[kind][c].split(' ').map(n => diatonic(n) - diatonic(KEY_MID[c]));
     const name = 'acc-' + kind, other = kind === 'sharp' ? 'acc-flat' : 'acc-sharp';
-    let x = x0, n = 0, s0 = 0, sum = 0;
+    let x = x0, n = 0, s0 = 0, sum = 0, filled = false, filled0 = false;
     for (let i = 0; i < 7; i++) {
       // the first sign may touch the clef (its end then lies past the sign)
       let best = null;
@@ -307,20 +322,42 @@ function readKeySig(api, R, st, clef, x0, sp, minScore = 0.42) {
         const img = kind === 'sharp' ? cropImg(R, xc - 0.65 * sp, y - 1.5 * sp, xc + 0.65 * sp, y + 1.5 * sp)
           : cropImg(R, xc - 0.65 * sp, y - 1.9 * sp, xc + 0.65 * sp, y + 0.75 * sp);
         if (!img) continue;
-        const sc = api.scores(img, sp, [name])[name];
-        if (!best || sc > best.s) best = { s: sc, xc, img };
+        // (or the sign filled in solid, on heavy photocopies)
+        // (or the sign filled in solid, on heavy photocopies: only where its middle is solid ink)
+        const s2 = api.scores(img, sp, [name, name + '-filled']);
+        let sc = s2[name];
+        if (s2[name + '-filled'] > sc) {
+          let ink = 0, tot = 0;
+          const cx = img.w / 2, cy = kind === 'sharp' ? img.h / 2 : img.h - 1.1 * sp;
+          for (let yy = Math.round(cy - 0.6 * sp); yy <= Math.round(cy + 0.6 * sp); yy++) for (let xx = Math.round(cx - 0.3 * sp); xx <= Math.round(cx + 0.3 * sp); xx++) {
+            if (yy < 0 || xx < 0 || yy >= img.h || xx >= img.w) continue; tot++; ink += img.data[yy * img.w + xx];
+          }
+          if (tot && ink / tot >= 0.75) { sc = s2[name + '-filled']; filled = true; } else filled = false;
+        } else filled = false;
+        if (!best || sc > best.s) best = { s: sc, xc, img, y, filled };
       }
       if (!best || best.s < minScore) break;
-      const so = api.scores(best.img, sp, KEY_OTHERS);
+      // the sign's ink centred where this slot's sign is (a sharp on its line or space; a flat's ink
+      // sits half a space higher, its stem rising): not a neighbouring slot's sign caught in the window
+      {
+        const im = best.img; let sy = 0, sn = 0;
+        for (let yy = 0; yy < im.h; yy++) for (let xx = 0; xx < im.w; xx++) if (im.data[yy * im.w + xx]) { sy += yy; sn++; }
+        const top = kind === 'sharp' ? best.y - 1.5 * sp : best.y - 1.9 * sp;
+        const want = kind === 'sharp' ? best.y : best.y - 0.5 * sp;
+        if (!sn || Math.abs(top + sy / sn - want) > 0.6 * sp) break;
+      }
+      const so = api.scores(best.img, sp, KEY_OTHERS.concat([other + '-filled']));
+      so[other] = Math.max(so[other], so[other + '-filled']);
       const head = Math.max(so['head-filled'], so['head-half']), digit = Math.max(so['digit-2'], so['digit-3'], so['digit-4']);
       // (a blurred flat can look as much like a natural; past the first sign the slot pattern itself
       // vouches for the kind, so naturals compete for the first slot only)
-      if (best.s - head < 0.05 || best.s < digit || (!i && best.s < so['acc-natural']) || best.s < so[other]) break;
-      if (!i) s0 = best.s;
+      // (past the first slot a filled-in sign may look a little more like a 4 than like itself)
+      if (best.s - head < 0.05 || best.s < digit - (i ? 0.06 : 0) || (!i && best.s < so['acc-natural']) || best.s < so[other]) break;
+      if (!i) { s0 = best.s; filled0 = best.filled; }
       sum += best.s;
       n++; x = best.xc;
     }
-    out[kind] = { n, x1: x + 0.6 * sp, s0, mean: n ? sum / n : 0 };
+    out[kind] = { n, x1: x + 0.6 * sp, s0, mean: n ? sum / n : 0, filled0 };
   }
   return out;
 }
@@ -412,7 +449,8 @@ function readHeaders(fr, asm, opts = {}, stats = {}) {
           const n0 = Math.abs(h.fifths | 0), kind0 = h.fifths < 0 ? 'flat' : h.fifths > 0 ? 'sharp' : null;
           const kind = k && (k.sharp.n > k.flat.n ? 'sharp' : k.flat.n > k.sharp.n ? 'flat' : null);
           // (with no key read, the first sign must match well, or three or more signs fairly well)
-          if (kind && (kind0 === kind || (!kind0 && (k[kind].s0 >= 0.55 || (k[kind].n >= 3 && k[kind].mean >= 0.48)))) && k[kind].n > n0) {
+          // (a filled-in first sign, with no key parsed, needs a second sign in the pattern behind it)
+          if (kind && (kind0 === kind || (!kind0 && !(k[kind].filled0 && k[kind].n < 2) && (k[kind].s0 >= 0.55 || (k[kind].n >= 3 && k[kind].mean >= 0.48)))) && k[kind].n > n0) {
             h.fifths = kind === 'flat' ? -k[kind].n : k[kind].n; h.keyN = k[kind].n; h.cvKey = true;
             const end = k[kind].x1 + 0.2 * sp;
             if (end > h.end && !(h.time && h.time.x0 < end)) {

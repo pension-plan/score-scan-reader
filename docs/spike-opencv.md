@@ -2,6 +2,21 @@
 
 Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
 
+## Update: key signatures filled in solid (heavy photocopies)
+
+Structure's cases: on `andantino-piano-photocopy-thick` severe (and `sab-cross-staff-alto` severe) the two sharps of
+the key are solid blobs, and `readKeySig` read no key on any staff (every F and C a semitone flat). `makeJsApi` now
+also builds filled-in sharp and flat templates (a 3 px closing of the Bravura sign, then every pocket the border cannot
+reach), and a key slot scores against them as well where the middle of the sign is solid ink (75 % or more). Past the
+first slot a sign may score up to 0.06 under the digit templates (a filled sharp looks a little like a 4), and the
+sign's ink must be centred where that slot's sign stands (a sharp on its line or space, a flat half a space higher),
+not a neighbouring slot's sign caught in the window. A filled first sign with no key parsed needs a second sign behind
+it. Andantino's treble staves now read two sharps (item 0.854 → 0.917). `sab-cross-staff-alto` is not fixed: its blobs
+match the filled flat at the B slot about as well, and the second sharp scores 0.39. A/B (no OCR): challenge +0.0001
+(worst `trio-minuet` mild −0.011), coverage +0.0007 (`keys-major-flats` severe +0.137, `voice-piano-night-song`
+severe +0.101), benchmark unchanged. Without the solid-middle check the filled templates added false keys (challenge
+−0.0004, `twinkle-blur` −0.042).
+
 ## Update: missing heads, 3: staves cut short where their lines fade
 
 On `variations-piano-12-pages` severe the first heads of many systems were missing although they are clearly printed:
