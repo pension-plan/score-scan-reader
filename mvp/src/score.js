@@ -3,6 +3,7 @@
 // signature inference, per-measure rhythm repair, lyrics alignment, MusicXML.
 const { staffMeasureEvents, pitchOf, keyAlters, DIV } = require('./assemble');
 const { detectRests, mergeRests, restBars } = require('./rests');
+const { readMeters } = require('./meter');
 const { pageMarks } = require('./symbols');
 const { instrumentXML, soundDynamics, tempoFromWords } = require('./playback');
 
@@ -649,6 +650,8 @@ function restsFor(q) {
 
 function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   const warnings = [];
+  // time signatures on every system, after barlines and at system ends (meter.js; once per page)
+  for (const p of pages) if (p.asm && !p.asm.metersRead) { try { readMeters(p.fr, p.asm); } catch (e) { /* the piece's one meter */ } p.asm.metersRead = true; }
   const systems = pages.flatMap(p => p.asm.systems.map(s => ({ ...s, fr: p.fr, comps: p.asm.comps })));
   if (!systems.length) return { parts: [], measures: 0, warnings: ['No music systems found.'], xml: emptyXML() };
   // marks first (text.js via symbols.js): braces inform the layout
@@ -776,11 +779,38 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   {
     const hs = systems.flatMap(sy => sy.staves.map(s => s.hdr && s.hdr.time)).filter(t => t && t.beats > 0 && t.type > 0);
     if (hs.length >= Math.max(1, 0.3 * systems.filter(sy => sy.index === 0).reduce((a, sy) => a + sy.staves.length, 0))) {
-      const key = mode(hs.map(t => `${t.beats}/${t.type}`)), [b, ty] = key.split('/').map(Number), hq = (b * 4) / ty;
+      const key = mode(hs.map(t => `${t.beats}/${t.type}/${t.symbol || ''}`)), [b, ty] = key.split('/').map(Number), sym = key.split('/')[2], hq = (b * 4) / ty;
       const qNow = (time.beats * 4) / time.type;
-      if (Math.abs(hq - qNow) < 1e-6 || (votes[hq] || 0) >= 0.5 * (votes[qNow] || 0)) { time = { beats: b, type: ty }; timeRead = true; }
+      if (Math.abs(hq - qNow) < 1e-6 || (votes[hq] || 0) >= 0.5 * (votes[qNow] || 0)) { time = { beats: b, type: ty, symbol: sym || '' }; timeRead = true; }
     }
   }
+  // the meter in force at each segment (meter.js: sy.meters, read on every system header, after
+  // barlines and at system ends). Used when the page shows a change of meter; a piece read
+  // with one meter throughout keeps the meter chosen above.
+  const segTime = segs.map(() => time);
+  {
+    const ms = systems.flatMap(sy => (sy.meters || []).filter(m => !m.courtesy));
+    const vals = new Set(ms.map(m => `${m.beats}/${m.type}/${m.symbol || ''}`));
+    if (vals.size >= 2) {
+      let cur = time;
+      segs.forEach((sg, i) => {
+        const sp = (sg.sy.staves[0] && sg.sy.staves[0].st.space) || 16;
+        // a courtesy signature at the end of the system before stands for this system's header
+        // when that was not read
+        const prev = i > 0 && segs[i - 1].sy !== sg.sy ? (segs[i - 1].sy.meters || []).find(m => m.courtesy) : null;
+        if (prev && !(sg.sy.meters || []).some(m => m.header)) cur = { beats: prev.beats, type: prev.type, symbol: prev.symbol || '' };
+        const here = (sg.sy.meters || []).filter(m => !m.courtesy && m.x <= sg.xa + 0.5 * sp);
+        if (here.length && (i === 0 || segs[i - 1].sy !== sg.sy || here[here.length - 1].x > segs[i - 1].xa + 0.5 * sp)) {
+          const m = here[here.length - 1];
+          cur = { beats: m.beats, type: m.type, symbol: m.symbol || '' };
+        }
+        segTime[i] = cur;
+      });
+      const nCh = segTime.filter((t, i) => i > 0 && (t.beats !== segTime[i - 1].beats || t.type !== segTime[i - 1].type || t.symbol !== segTime[i - 1].symbol)).length;
+      if (nCh) warnings.push(`${nCh} change${nCh > 1 ? 's' : ''} of time signature read from the page.`);
+    }
+  }
+  const lenOf = (i) => (segTime[i].beats * 4) / segTime[i].type;
   const mLen = (time.beats * 4) / time.type;
   warnings.push(timeRead ? `Time signature read from the page: ${time.beats}/${time.type}.` : `Time signature inferred from measure contents: ${time.beats}/${time.type}.`);
   // Barline reconciliation. Barline detection both misses barlines and finds
@@ -793,6 +823,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   const nStreams = segEv.length ? segEv[0].reduce((a, ps) => a + ps.length, 0) : 0;
   const segStreamSums = segEv.map(e => e.flatMap(ps => ps.map(evs => qsum(evs))));
   const groupDev = (a, b, edge) => {
+    const mLen = lenOf(a);
     // dropping a barline must never make a bar over-full (its notes would be cut)
     const sums = [];
     for (let k = 0; k < nStreams; k++) {
@@ -830,6 +861,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     const barsIn = (i, j) => {
       let S = 0;
       for (let t = i0 + i; t < i0 + j; t++) S += segSum[t];
+      const mLen = lenOf(i0 + i);
       const k = Math.round(S / mLen);
       return k >= 2 && Math.abs(S - k * mLen) < 1e-6 ? k : 1;
     };
@@ -871,7 +903,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   for (let k = 1; k + 1 < measures.length; k++) {
     const a = measures[k], b = measures[k + 1];
     if (segs[a.segs[0]].sy === segs[b.segs[0]].sy || a.segs.length > 1 || b.segs.length > 1) continue;
-    const sa = segSum[a.segs[0]], sb = segSum[b.segs[0]];
+    const sa = segSum[a.segs[0]], sb = segSum[b.segs[0]], mLen = lenOf(a.segs[0]);
     if (sa < mLen - 1e-6 && sb > 1e-6 && Math.abs(sa + sb - mLen) < 1e-6) { a.segs.push(...b.segs); measures.splice(k + 1, 1); }
   }
   if (opts.debug) segs.forEach((sg, i) => opts.debug.push(`seg ${i} sys ${sg.sy.page}:${sg.sy.index} x ${Math.round(sg.xa)}-${Math.round(sg.xb)} sum ${segSum[i]} streams ${segEv[i].map(ps => ps.map(evs => evs.map(e => (e.rest ? 'r' : '') + e.q).join(',')).join('/')).join(' | ')}`));
@@ -980,6 +1012,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   // crossing a boundary are split and tied)
   const units = [];
   measures.forEach((m, mi) => {
+    const mLen = lenOf(m.segs[0]), uTime = segTime[m.segs[0]];
     const byPart = perPart.map(pm => pm[mi]);
     const sums = [];
     byPart.forEach(sts => sts.forEach(st => { const q = qsum(st.events); if (q > 1e-6) sums.push(Math.round(q * 4) / 4); }));
@@ -1011,15 +1044,15 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
           }
         }
       }));
-      chunks.forEach(ch => units.push({ m, streams: ch, split: true }));
+      chunks.forEach(ch => units.push({ m, streams: ch, split: true, time: uTime }));
       return;
     }
-    units.push({ m, streams: byPart, split: false });
+    units.push({ m, streams: byPart, split: false, time: uTime });
     // a multi-bar rest (or church rests) in a bar with no notes: one bar each
     const barRests = byPart.flatMap(sts => sts.flatMap(st => st.events));
     if (barRests.length && barRests.every(e => e.bar)) {
       const n = Math.max(...barRests.map(e => restBars(e, mLen)));
-      for (let k = 1; k < n; k++) units.push({ m, streams: byPart.map(sts => sts.map(st => ({ staff: st.staff, events: [] }))), split: false });
+      for (let k = 1; k < n; k++) units.push({ m, streams: byPart.map(sts => sts.map(st => ({ staff: st.staff, events: [] }))), split: false, time: uTime });
     }
   });
   const partMeasures = parts.map(() => []);
@@ -1029,6 +1062,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     parts.forEach((p, pi) => u.streams[pi].forEach((st, k) => streams.push({ pi, k, staff: st.staff, events: st.events.slice() })));
     const sums = streams.map(st => qsum(st.events));
     const nz = sums.filter(x => x > 1e-6).map(x => Math.round(x * DIV) / DIV);
+    const mLen = (u.time.beats * 4) / u.time.type;
     let target = mLen;
     const ms = nz.length ? mode(nz) : 0;
     const agree = nz.filter(x => Math.abs(x - ms) < 1e-6).length;
@@ -1081,7 +1115,8 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   let read = { dirs: parts.map(() => units.map(() => [])), head: {}, nDyn: 0, nWedge: 0, nWords: 0 };
   try { read = readMarks(pages, segs, units, parts, partMeasures); } catch (e) { warnings.push(`Text and dynamics not placed (${e.message}).`); }
   if (read.nDyn || read.nWedge || read.nWords || read.nTie || read.nSlur || read.nGrace || read.nFermata) warnings.push(`Read from the page: ${[read.nDyn && `${read.nDyn} dynamic${read.nDyn > 1 ? 's' : ''}`, read.nWedge && `${read.nWedge} hairpin${read.nWedge > 1 ? 's' : ''}`, read.nWords && `${read.nWords} tempo / expression text${read.nWords > 1 ? 's' : ''}`, read.nTie && `${read.nTie} tie${read.nTie > 1 ? 's' : ''}`, read.nSlur && `${read.nSlur} slur${read.nSlur > 1 ? 's' : ''}`, read.nGrace && `${read.nGrace} grace note${read.nGrace > 1 ? 's' : ''}`, read.nFermata && `${read.nFermata} fermata${read.nFermata > 1 ? 's' : ''}`].filter(Boolean).join(', ')}.`);
-  const xml = toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, measures, credits, unitSys, title: read.head.title, head: read.head, dirs: read.dirs });
+  const unitTime = units.map(u => u.time);
+  const xml = toMusicXML({ parts, partMeasures, fifths, kAlt, time, unitTime, clefs, measures, credits, unitSys, title: read.head.title, head: read.head, dirs: read.dirs });
   const nNotes = partMeasures.map(pm => pm.reduce((a, m) => a + m.reduce((b, s) => b + s.events.filter(e => !e.rest && !e.forward).length, 0), 0));
   const ranges = partMeasures.map(pm => {
     let lo = null, hi = null;
@@ -1655,7 +1690,7 @@ function readMarks(pages, segs, units, parts, partMeasures) {
   return { dirs, head, nDyn, nWedge, nWords, nTie, nSlur, nGrace, nFermata };
 }
 
-function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, credits, unitSys, head, dirs }) {
+function toMusicXML({ parts, partMeasures, fifths, kAlt, time, unitTime, clefs, title, credits, unitSys, head, dirs }) {
   // each system's own clef where it was read (a staff can change clef from
   // one system to the next), else the clef most systems show. A clef read on
   // one system only is more often a misread (or a header clef cancelled at
@@ -1794,17 +1829,21 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
     const nStaves = p.src.length;
     const multi = nStaves > 1;
     const curClef = [];
-    let curKey = fifths;
+    let curKey = fifths, curTime = null;
     // clef / key in force at a stream's first note: a change read inside a
     // staff (h.clef / h.fifths from assemble.js) carries on into later bars
     const firstHead = (st) => { for (const e of st.events) if (!e.rest && !e.forward && e.heads && e.heads.length) return e.heads[0]; return null; };
     partMeasures[pi].forEach((streams, mi) => {
       const implicit = streams.every(s => s.implicit);
       L.push(`    <measure number="${implicit ? 0 : mi + (partMeasures[pi][0].every(s => s.implicit) ? 0 : 1)}"${implicit ? ' implicit="yes"' : ''}>`);
+      // the meter of each bar (buildScore: read changes of time signature), written where it changes
+      const tm = (unitTime && unitTime[mi]) || time;
+      const timeXML = `<time${tm.symbol ? ` symbol="${tm.symbol}"` : ''}><beats>${tm.beats}</beats><beat-type>${tm.type}</beat-type></time>`;
       if (mi === 0) {
         const fh0 = streams.map(firstHead).find(Boolean);
         curKey = fh0 && fh0.fifths != null ? fh0.fifths : keyAt(0);
-        L.push(`      <attributes><divisions>${DIV}</divisions><key><fifths>${curKey}</fifths></key><time><beats>${time.beats}</beats><beat-type>${time.type}</beat-type></time>` +
+        curTime = timeXML;
+        L.push(`      <attributes><divisions>${DIV}</divisions><key><fifths>${curKey}</fifths></key>${timeXML}` +
           (multi ? `<staves>${nStaves}</staves>${p.src.map((s, k) => clefXML(clefAt(0, s.staff), k + 1)).join('')}` : clefXML(clefAt(0, p.src[0].staff))) + '</attributes>');
         p.src.forEach((s, k) => { curClef[k] = clefAt(0, s.staff); });
       } else {
@@ -1812,6 +1851,7 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
         const fh = streams.map(firstHead).find(Boolean);
         const key = fh && fh.fifths != null ? fh.fifths : keyAt(mi);
         if (key !== curKey) { ch.push(`<key><fifths>${key}</fifths></key>`); curKey = key; }
+        if (timeXML !== curTime) { ch.push(timeXML); curTime = timeXML; }
         p.src.forEach((s, k) => {
           const h0 = streams[k] ? firstHead(streams[k]) : null;
           const c = (h0 && h0.clef) || clefAt(mi, s.staff);
