@@ -460,12 +460,21 @@ function classifyMarks(fr, asm, left) {
       // bracket is thick. A brace's tip (mid-height) stands out left; a
       // bracket has hooks reaching right at its ends
       let kind = 'line';
+      const img = glyphImage(R, c), lx = (f) => { const y = Math.round(f * (img.height - 1)); for (let x = 0; x < img.width; x++) if (img.data[y * img.width + x]) return x; return img.width; };
+      // left edges of the rows from fraction f0 to f1 of the height, sorted
+      const lxs = (f0, f1) => { const v = []; for (let y = Math.round(f0 * (img.height - 1)); y <= Math.round(f1 * (img.height - 1)); y++) { const x = lx(y / Math.max(1, img.height - 1)); if (x < img.width) v.push(x); } return v.sort((p, q) => p - q); };
+      const med = (v) => (v.length ? v[v.length >> 1] : img.width);
+      // a curly brace's tip (mid-height) stands out left of its two arms,
+      // whatever its stroke weight: thin braces of clean and faded copies are
+      // told from straight system lines this way (L18); the mean of the two
+      // arms cancels a skewed page's slant
+      const tipX = lxs(0.45, 0.55)[0] ?? img.width;
+      const tip = (med(lxs(0.3, 0.4)) + med(lxs(0.6, 0.7))) / 2 - tipX >= Math.max(2, 0.18 * sp);
       if (c.area / h > 0.28 * sp) {
-        const img = glyphImage(R, c), lx = (f) => { const y = Math.round(f * (img.height - 1)); for (let x = 0; x < img.width; x++) if (img.data[y * img.width + x]) return x; return img.width; };
         const wid = (f) => { const y = Math.round(f * (img.height - 1)); let a = -1, b = -1; for (let x = 0; x < img.width; x++) if (img.data[y * img.width + x]) { if (a < 0) a = x; b = x; } return a < 0 ? 0 : b - a + 1; };
         const hook = Math.max(wid(0.01), wid(0.03), wid(0.05)) >= wid(0.5) + 0.6 * sp && Math.max(wid(0.99), wid(0.97), wid(0.95)) >= wid(0.5) + 0.6 * sp;
         kind = hook && !(lx(0.5) + 0.2 * sp < Math.min(lx(0.3), lx(0.7))) ? 'bracket' : 'brace';
-      }
+      } else if (tip && w >= 0.4 * sp) kind = 'brace';
       out.braces.push({ box: [c.x0, c.y0, c.x1, c.y1], kind, span });
       continue;
     }
