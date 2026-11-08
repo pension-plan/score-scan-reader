@@ -2,6 +2,25 @@
 
 Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
 
+## Update: hollow heads on ledger lines of scans (L1)
+
+\`nt06-ledger-lines\` lost 19 of its 37 half and whole notes on the plain scan. A hollow head on a ledger line is
+judged by its ink with the ledger rows left out, relative to the page: hollow when under 0.66 and 0.15 under the
+lightest "filled-looking" head (≥ 0.66). On the scan the hollow heads read 0.61–0.68 and the filled ones 0.79–0.94,
+so the 0.67 hollow ones set the reference and the cut-off fell to 0.52. Now only clearly filled heads (≥ 0.75) set
+the reference, and the cut-off is 0.1 under the lightest of them, at most 0.7. Severe pages whose values run together
+still keep their heads filled. Coverage (OCR, clean / scan / severe): \`note-half\` 1426 / 1311 / 650 → 1432 / 1351 /
+716 of 1510, \`note-whole\` severe 85 → 95 of 199. A/B (no OCR): coverage +0.0010 per item (\`nt06\` scan 0.953 →
+1.000, \`nt03-chords\` severe +0.048), worst −0.005; challenge +0.0003, worst −0.015 (\`pitch-satb-ledger-extremes\`
+severe); benchmark +0.0002.
+
+Tried and not shipped: (1) the same test for heads on staff lines, where a blurred scan leaves the line in R through
+the head (\`organ-three-staves\` scan reads 6 of 20 such half notes as quarters). Coverage −0.0013: filled heads on
+lines read lighter than the page's ledger heads, so grace and cue notes and dotted notes turned hollow. (2) Cutting
+an arpeggio's wavy line off a hollow chord it fuses with, and letting stacks taller than four heads give their top
+head. That fixes chords on \`perf-pages-40\` page 21 but measured 0.0000 overall, with \`voice-piano-night-song\` severe
+−0.017.
+
 ## Update: key signatures read slot by slot (L24 severe scans, L2 old engraving)
 
 The component parse in \`assemble.js\` misses key signature signs that touch something: a flat fused with the treble

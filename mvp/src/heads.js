@@ -368,10 +368,12 @@ function detectHeads(B, R, staves, ss, lt, opts = {}) {
       }
     }
   }
-  // hollow heads on ledger lines: under 0.66, and 0.15 under the lightest filled-looking one (a
-  // degraded page whose values run together keeps them filled)
-  const darkL = heads.filter(h => h.ledgerInk != null && h.ledgerInk >= 0.66).map(h => h.ledgerInk);
-  const lim = Math.min(0.66, darkL.length ? Math.min(...darkL) - 0.15 : 0.66);
+  // hollow heads on ledger lines: under 0.7, and 0.1 under the lightest clearly filled one (0.75 or
+  // more; a scan's hollow ledger heads read 0.61-0.68, its filled ones 0.79-0.94, so a cut-off below
+  // 0.66 took the hollow ones for the page's filled ones). A degraded page whose values run
+  // together keeps them filled
+  const darkL = heads.filter(h => h.ledgerInk != null && h.ledgerInk >= 0.75).map(h => h.ledgerInk);
+  const lim = Math.min(0.7, darkL.length ? Math.min(...darkL) - 0.1 : 0.66);
   for (const h of heads) { if (h.ledgerInk != null && h.ledgerInk < lim) h.kind = 'hollow'; delete h.ledgerInk; }
   // self-calibrated width floor: engravings differ in head proportions
   // (LilyPond ~1.3 spaces, some 1900s hymnals ~1.0), so the floor follows the
