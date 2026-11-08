@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.27.1](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.27.0...score-scan-reader-v0.27.1) (2026-11-08)
+
+
+### Bug Fixes
+
+* **ottava:** octave lines up to ten spaces from the staff ([a7ad2d2](https://github.com/pension-plan/score-scan-reader/commit/a7ad2d255cfe02f0570e29badf8ec5283d8a1112))
+
+
+### Performance Improvements
+
+* **ui:** page image drawn into a canvas, freeing decoded pages (L26) ([8045059](https://github.com/pension-plan/score-scan-reader/commit/804505900e96402b74c906b80804c7d53130326e))
+
 ## [0.27.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.26.0...score-scan-reader-v0.27.0) (2026-11-08)
 
 
