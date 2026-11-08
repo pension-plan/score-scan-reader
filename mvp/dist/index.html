@@ -29,8 +29,14 @@
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   /* overlay marks: drawn on the scan, which stays paper in both themes, so
      they keep paper-contrast values; the legend swatches sit on paper too */
-  --ov-rest:#00796b; --ov-clef:#8e24aa; --ov-key:#c25100; --ov-time:#2e7d32; --ov-mark:#c2185b;
-  --ov-stem:rgba(60,66,78,.55); --ov-lyric:#455a64; --ov-unknown:#e0001b; --ov-label:#15171b; --ov-label-dur:#4f5761; --ov-bar:#2b37b0; --ov-staff:#1e8c5a;
+  /* one distinct colour per symbol type (yellow is reserved for unrecognised ink) */
+  --ov-note:#d32f2f; --ov-stem:#757575; --ov-beam:#6d4c41; --ov-rest:#00897b; --ov-clef:#8e24aa; --ov-key:#ef6c00;
+  --ov-time:#2e7d32; --ov-bar:#283593; --ov-staff:#546e7a; --ov-acc:#c2185b; --ov-dot:#1e88e5; --ov-tup:#827717;
+  --ov-lyric:#00838f; --ov-unknown:rgba(255,222,0,.58); --ov-unknown-edge:#d4b000; --ov-label:#15171b; --ov-label-dur:#4f5761;
+  --ov-mark:var(--ov-acc);
+  /* repair marks (the reader's own): a lime highlighter under a black dashed
+     core, unlike every detection colour and the yellow of unrecognised ink */
+  --rp-halo:rgba(118,255,3,.55); --rp-ink:#0b0c0e; --rp-badge-ink:#b2ff59;
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
@@ -54,8 +60,11 @@ button,input,textarea{font:inherit;color:inherit}
 .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 .muted{color:var(--muted);font-size:13px;margin:0}
 
-.wrap{max-width:1200px;margin:0 auto;padding-block:24px 48px;
+.wrap{margin:0 auto;padding-block:24px 48px;
   padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+
+/* reading text keeps a measure; the results grid (and the sheet view in it) uses the full page width */
+.wrap > :not(.grid){max-width:1200px;margin-left:auto;margin-right:auto}
 
 /* ---- masthead with a five-line staff rule ending in a final barline ---- */
 .masthead{position:relative;padding-bottom:30px;margin-bottom:18px}
@@ -156,9 +165,10 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 .alert{margin-top:10px;padding:10px 12px;border:1px solid var(--warn-mark);background:var(--warn-bg);color:var(--warn-ink);border-radius:2px;font-size:14px}
 
 /* ---- results grid ---- */
-.grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px;margin-top:18px;align-items:start}
-.margin{display:flex;flex-direction:column;gap:18px;min-width:0}
-@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.grid{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;margin-top:18px;align-items:start}
+/* the panels beside the music sit below it, side by side where there is room */
+.margin{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:18px;min-width:0;align-items:start}
+.margin > .code-panel{grid-column:1 / -1}
 .panel{background:var(--panel);border:1px solid var(--rule);border-radius:3px;padding:14px 16px 16px;min-width:0;box-shadow:var(--shadow)}
 .panel-head{display:flex;align-items:center;gap:10px;justify-content:space-between;border-bottom:1px solid var(--rule);
   padding-bottom:8px;margin-bottom:12px;min-height:34px}
@@ -183,8 +193,14 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 .pages.ov-off .ov{visibility:hidden}
 /* overlay layers (toggled in the legend; hide-<layer> on .pages) */
 .ov-rests{stroke:var(--ov-rest)} .ov-clefs{stroke:var(--ov-clef)} .ov-keys{stroke:var(--ov-key)} .ov-times{stroke:var(--ov-time)}
-.ov-marks{stroke:var(--ov-mark)} .ov-lyrics{stroke:var(--ov-lyric)} .ov-unknown{stroke:var(--ov-unknown)} .ov-hatch{stroke:var(--ov-unknown);opacity:.45}
-.ov-stem,.ov-beam{stroke:var(--ov-stem)}
+.ov-marks{stroke:var(--ov-mark)} .ov-lyrics{stroke:var(--ov-lyric)} /* unrecognised ink: a yellow highlighter stroke, multiplied so the ink shows through */
+.ov-unknown{fill:var(--ov-unknown);stroke:none;mix-blend-mode:multiply}
+/* every identified item gets a transparent fill in its type colour, multiplied onto the paper so the ink reads through */
+.ov-head{fill:var(--ov-note)} .ov-beam{stroke:var(--ov-beam);fill:var(--ov-beam)} .ov-stem{stroke:var(--ov-stem)}
+.ov-rests{fill:var(--ov-rest)} .ov-clefs{fill:var(--ov-clef)} .ov-keys{fill:var(--ov-key)} .ov-times{fill:var(--ov-time)}
+.ov-acc{stroke:var(--ov-acc);fill:var(--ov-acc)} .ov-dot{stroke:var(--ov-dot);fill:var(--ov-dot)} .ov-tup{stroke:var(--ov-tup);fill:var(--ov-tup)}
+.ov-head,.ov-beam,.ov-rests,.ov-clefs,.ov-keys,.ov-times,.ov-acc,.ov-dot,.ov-tup{fill-opacity:.26;mix-blend-mode:multiply}
+.ov-clefs path{fill:none} .ov-clefs .bg{stroke:none}
 .ov-labels text{font-family:var(--sans);font-weight:600;fill:var(--ov-label);stroke:var(--paper);stroke-linejoin:round;paint-order:stroke}
 .ov-labels .ld{font-weight:500;font-style:italic;fill:var(--ov-label-dur)}
 .ov-labels .lr{fill:var(--ov-rest)} .ov-labels .lb{fill:var(--ov-bar)}
@@ -202,9 +218,35 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 .layer-n{font:11px var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
 .layer-hint{display:none;font-size:11px;font-style:italic;color:var(--muted)}
 .layers.lbl-small .layer[data-layer="labels"][aria-pressed="true"] .layer-hint{display:inline}
-.ovk-notes{stroke:var(--ov-label)} .ovk-rests{stroke:var(--ov-rest)} .ovk-clefs{stroke:var(--ov-clef)} .ovk-keys{stroke:var(--ov-key)}
-.ovk-times{stroke:var(--ov-time)} .ovk-bars{stroke:var(--ov-bar)} .ovk-bars .ovk-staff{stroke:var(--ov-staff)} .ovk-marks{stroke:var(--ov-mark)}
-.ovk-lyrics{stroke:var(--ov-lyric)} .ovk-labels{color:var(--ov-label)} .ovk-unknown{stroke:var(--ov-unknown)}
+.ovk-notes{stroke:var(--ov-note);fill:var(--ov-note)} .ovk-notes .ovk-stem{stroke:var(--ov-stem);fill:none}
+.ovk-rests{stroke:var(--ov-rest);fill:var(--ov-rest)} .ovk-clefs{stroke:var(--ov-clef);fill:var(--ov-clef)} .ovk-keys{stroke:var(--ov-key);fill:var(--ov-key)}
+.ovk-times{stroke:var(--ov-time);fill:var(--ov-time)} .ovk-bars{stroke:var(--ov-bar)} .ovk-bars .ovk-staff{stroke:var(--ov-staff)}
+.ovk-acc{stroke:var(--ov-acc);fill:var(--ov-acc)} .ovk-dot{stroke:var(--ov-dot);fill:var(--ov-dot)} .ovk-tup{stroke:var(--ov-tup);fill:var(--ov-tup)}
+.ovk-lyrics{stroke:var(--ov-lyric)} .ovk-labels{color:var(--ov-label)}
+.ovk-notes,.ovk-rests,.ovk-clefs,.ovk-keys,.ovk-times,.ovk-acc,.ovk-dot,.ovk-tup{fill-opacity:.3}
+.ovk-unknown{stroke:var(--ov-unknown-edge);fill:var(--ov-unknown)}
+/* repair markup: the layer takes the pointer (and stops touch scrolling) only while drawing */
+.head-tools{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:4px 14px}
+.toggle:disabled{opacity:.45;cursor:not-allowed}
+.pageframe svg.rp{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.pages.drawing .pageframe svg.rp{pointer-events:auto;touch-action:none;cursor:crosshair}
+.pages.drawing .pageframe{outline:2px solid var(--accent)}
+.rp-halo{fill:none;stroke:var(--rp-halo);stroke-linecap:round;stroke-linejoin:round}
+.rp-core{fill:none;stroke:var(--rp-ink);stroke-linecap:round;stroke-linejoin:round}
+.rp-badge circle{fill:var(--rp-ink)} .rp-badge text{fill:var(--rp-badge-ink);font-family:var(--sans);font-weight:700;text-anchor:middle}
+.repairbar{margin:0 0 12px;padding:10px 12px;border:1px dashed var(--rule-strong);border-radius:4px;display:flex;flex-direction:column;gap:8px}
+.repair-help,.repair-msg{margin:0;font-size:12.5px;color:var(--muted)}
+.repair-msg:empty{display:none}
+.repair-row{display:flex;flex-wrap:wrap;gap:6px}
+.btn.small{padding:4px 10px;font-size:12.5px;min-height:30px}
+.rp-tool{display:inline-flex;align-items:center;gap:4px;min-height:30px;padding:2px 10px 2px 6px;border:1px solid var(--rule-strong);border-radius:15px;font-size:12.5px;cursor:pointer}
+.rp-tool:has(input:checked){background:var(--accent-wash);border-color:var(--accent)}
+.repair-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.repair-list:empty{display:none}
+.repair-list li{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;align-items:center;gap:6px;font-size:12.5px}
+.rp-num{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--rp-ink);color:var(--rp-badge-ink);font-weight:700;font-size:11px;box-shadow:0 0 0 3px var(--rp-halo)}
+.repair-list input{min-width:0;width:100%;padding:3px 6px;border:1px solid var(--rule-strong);border-radius:3px;background:var(--panel);font-size:12.5px}
+.repair-out{width:100%;min-height:120px;font:11px var(--mono);background:var(--panel);border:1px solid var(--rule-strong)}
 .zoom{display:inline-flex;align-items:center;gap:6px;margin:0 0 10px}
 .zoom-label{min-width:3.2em;text-align:center;font:12px var(--mono);color:var(--muted)}
 .pageframe.placeholder{aspect-ratio:1 / 1.29;display:grid;place-items:center;line-height:1.5;
@@ -367,10 +409,16 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
     <section class="panel plate" aria-labelledby="detH">
       <div class="panel-head">
         <h2 id="detH">Detection</h2>
-        <button class="toggle" id="overlayToggle" type="button" aria-pressed="true" aria-controls="pages">
-          <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
-          <span>Overlay</span>
-        </button>
+        <div class="head-tools">
+          <button class="toggle" id="repairToggle" type="button" aria-pressed="false" aria-controls="pages repairBar" disabled>
+            <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+            <span>Mark for repair</span>
+          </button>
+          <button class="toggle" id="overlayToggle" type="button" aria-pressed="true" aria-controls="pages">
+            <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+            <span>Overlay</span>
+          </button>
+        </div>
       </div>
       <ul class="legend" id="legend" aria-label="Overlay key"></ul>
       <ul class="layers" id="layers" aria-label="Overlay layers: switch each kind of mark on or off"></ul>
@@ -387,6 +435,25 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
           <p class="pagenav-sum" id="pgSum"></p>
         </div>
         <ol class="pagechips" id="pageChips" aria-label="Pages of the scan"></ol>
+      </div>
+      <div class="repairbar" id="repairBar" hidden>
+        <p class="repair-help" id="repairHelp">Draw on the page to mark what needs repair. Hold Shift for a straight line. Esc stops drawing.</p>
+        <div class="repair-row" role="radiogroup" aria-label="Drawing tool">
+          <label class="rp-tool"><input type="radio" name="rpTool" value="pen" checked><span>Pen</span></label>
+          <label class="rp-tool"><input type="radio" name="rpTool" value="line"><span>Line</span></label>
+          <label class="rp-tool"><input type="radio" name="rpTool" value="box"><span>Box</span></label>
+          <label class="rp-tool"><input type="radio" name="rpTool" value="ellipse"><span>Circle</span></label>
+        </div>
+        <div class="repair-row">
+          <button class="btn small" id="rpUndo" type="button" aria-keyshortcuts="Control+Z Meta+Z">Undo</button>
+          <button class="btn small" id="rpClear" type="button">Clear page</button>
+          <button class="btn small" id="rpCopy" type="button">Copy repair notes</button>
+          <button class="btn small" id="rpJson" type="button">Open repair notes (.json)</button>
+          <button class="btn small" id="rpPng" type="button">Open marked page (.png)</button>
+        </div>
+        <p class="repair-msg" id="rpMsg" role="status" aria-live="polite"></p>
+        <ol class="repair-list" id="rpList" aria-label="Repair marks on this page"></ol>
+        <textarea class="repair-out" id="rpOut" readonly hidden aria-label="Repair notes as JSON"></textarea>
       </div>
       <div id="pages" class="pages"></div>
     </section>
@@ -2808,6 +2875,131 @@ function wrapConverter(conv, getCv, opts = {}) {
 const BANK = {"digit-0":[43,48,"AAD8AwAAAPx/AAAA+P8PAADwH/8BAMB/8D8AAP8B/wMA/g/wPwDwP4D/AcD/AfwfAP8HwP8B/D8A/h/g/wHw/4D/BwD/D/w/APh/4P8BwP+D/w8A/j/8fwDw/+H/A4D/D/8fAPz//H8AwP/n/wMA/j//HwDw//n/AID/z/8HAPx//j8A4P/z/wEA/5//DwD4//x/AMD/5/8HAP4//z8A+P/x/wHA/4f/DwD+P/x/APD/wf8DgP8H/h8A/D/g/wHw/wH/D4D/B/B/APw/gP8H8P8A+D+A/wOA/wP+DwD8H/B/AID/wf8BAPi//wcAgP//DwAA+P8/AAAA/j8AAACAfwAA"],"digit-1":[29,48,"APh/AID/HwD4/wMA/38A4P8PAP7/AcD/PwD8/weA//8A+P8fAP//A/D/fwD+/w/A//8B/P8/gO//B/j8/wCf/x/w8f8DPv5/4MP/Dzz4/4EH/z944P8HD/z/AID/HwDw/wMA/n8AwP8PAPj/AQD/PwDg/wcA/P8AgP8fAPD/AwD+fwDA/w8A+P8BAP8/AOD/BwD8/wCA/x8A8P8DAP9/APD/P8D//x/8//8D//9/"],"digit-2":[40,50,"AAAAAAAA8P8PAAD+/38AgB/A/wHABwD/A+ADAP8P8AMA/h/4BwD+H/wPAPw//D8A/H/+fwD8f/7/APx//v8A/P/+/wD8//7/APz//v8A/P/+/wD+//z/AP7//P8A/v/4fwD/f/B/AP9/4D+A/z+AD4D/HwAAwP8PAADg/wcAAPD/AQAA+H8AAAD8DwAAAP4BAACAfwAAAMAfAAAA8AcAAAD4AQAAAPwAAGAA/x4AYID//wNwwP//H3DA////fOD///9/8P///z/w////P/j///8/+P///x/8////H/zH//8P/gD//wd+APz/Az4A+P8BHADAfwAIAAAAAA=="],"digit-3":[38,48,"AMA/AAAA/v8AAPD//wAA//D/AOAP4P8A/AHwf4B/APg/4H8A/g/8fwD/B/8fwP/B/w/wf/D/A/w//P8A/w//P8D/gf8P8H/g/wH+H/B/gP8H+A/w/wBwAPwfAADA/wMAAPw/AADg/wEAgP8/AADw/z8AAPj/fwAAAP9/AAAA/z8AAAD/HwAAwP8P8AHg/wP/AfD/4f8A/H/8fwD/H/8fwP/v/wfw//v/Afx//v8A/5//H8D/5/8H8P/5/wD+P/w/gP8P/w/w/4H/Af4/4P/A/wfw////APD//w8A8P9/AADg/wMA"],"digit-4":[42,49,"AAAAAAAAAP//AAAA/v8DAAD4/wcAAOD/HwAAgP8/AAAA/n8AAAD4/wEAAPD/AwAAwP8HAAAA/x8cAAD8P3gAAPh/8AEA4P/gBwCA/4MfAAD/B38AAPwP/gEA+B/8BwDgf/gfAMD/8H8AAP/B/wEA/oP/BwD4B/8fAPAf/H8AwD/w/wGAf8D/BwD+AP8fAPwB/H8A+APw/wHgB8D/B8APAP8fgB8A/H8A///////9//////f/////n/////8/AADw/wEAAMD/BwAAAP8fAAAA/H8AAADw/wEAAMD/BwAAAP8fAAAA/n8AAAD8/wMAAP7/fwAA/P//AwDw//8PAMD//x8A"],"digit-5":[37,48,"AAAAAAD+//8f4P///wP8//9/gP///w/w////AP7//x/A////Afj//x8A////AeD//w8APPgHAIAHAAAA8AAAAAAeAAAAwAEAAAA4AAAAAAf+fwDg+P8/APz//w+AP/D/B/gD+P8BHwD8P+ABAP8PGADg/wMAAPh/AAAA/x8AAMD/A/4A+H/wfwD/H/4f4P/j/wP8f/7/gP/P/x/w//n/A/4//3/A/+f/D/j//P+B/4//H/D/8f8B/h/8H+D/g/8B/D/gH+D/A/wH/j8A////A4D//z8A4P//AADA/wMA"],"digit-6":[39,48,"AAD4AwAAwP8fAAD4wz8AAP/APwDAP+A/APgP+D8A/gP+HwD/Af8fwP/A/w/wP+D/B/gf8P8B/g/4/wD/B/h/wP8D/B/g/wD8B/h/APgA/D8AAAD+HwAAAP8PAADA/wf4AOD/g/8B8P/x/wP4//3/B/z///8H/v/H/wf//8D/h/9/wP/H/x/g/+P/D+D/8/8D8P/x/wH4//j/APx//H8A/H/+PwD+P/4fAP8P/w+A/4f/B8D/g/8D4P+B/wH4f8D/APw/wP8A/g/Af4D/B+B/wP8BwD/wfwDAP/wfAMD//wMAgP9/AAAA/wMA"],"digit-7":[39,48,"APADAAAA/g8AXMD/HwBu8P8fgHf8/x/A+///H/D9//8f+P7//z9+/////7//////3//////nn/////MD////+QD+/388AP7/Px4A/P8fBwD854cDAPDxwwEAAPxgAAAAfiAAAIA/AAAA4A8AAAD4BwAAAP4BAACA/wAAAOA/AAAA+B8AAAD+DwAAgP8DAADg/wEAAPj/AAAA/j8AAID/HwAAwP8PAADw/wMAAPz/AQAA/v8AAID/fwAAwP8/AADw/x8AAPj/BwAA/v8DAAD//wEAgP//AADA/38AAOD/PwAA8P8fAAB4gAcA"],"digit-8":[39,50,"AAA/AAAA+P8HAID//w8A8D/wHwD8A8A/AH8AgB/AHwCAH/APAIAf/AMAwA/+AQDAB/8BAOCH/wAA8MN/AAD48X8AAPzw/wAAPvj/AIAf/P8D4A/+/wf4A///H/4A////f4D///8PgP///wOA////B4D///8HgP///wcA////B4D///8H4P///wf8+f//Az/w///BD+D///EDwP///ACA/39+AAD/vx8AAP/fDwAA/+8DAID/8wEAgP/5AQDA//wAAOB/fgAA8B9+AAD4Dz8AAP4DPwAA/wB/AMB/AP8A+A8A/4f/AwD+/38AAPz/DwAA4H8AAA=="],"digit-9":[39,48,"AMA/AAAA/v8BAMD//wcA+D/8BwD+D/wHgP8H/AfA/wH+B/D/AP4H/D8A/wP+H4D/A/8PwP/B/wfg/+H/A+D/8P8B8P/4/wD4f/x/AP4//j8A/z//H4D/H/8PwP+P/w/g/8f/B/j/w/8H/v/B/wf//8D/5/9/4P///z/A/3//H8D/j/8PgP/B/wcAAOD/AwAA8P8BAAD4/wAAAPw/AD8A/h/AfwD/D/A/gP8D/D/A/wH/H/B/gP8P+D/A/wf8D+D/A/4D8P+B/wH4f8B/APgf8B8A/A/4BwD8A/4AAPzDPwAA+P8DAADgPwAA"],"time-C":[41,50,"AAAAAAAAAP4HAAAA/38AAID/gAcAwH8AHADAfwBwAMA/AOABwH8AwAfAfwDAD8B/APA/gP8A8H+A/wHw/4H/AfD/A/8D4P8H/gfA/w/+B4D/H/wPAP8//B8A/n/4PwD8f/B/APD/4P8A4P/g/wGA/8D/AwB8gP8HAAAA/w8AAAD+HwAAAPw/AAAA+H8AAADw/wAAAOD/AQAAnP8DAAA4/wcAAHD+HwAA4Pw/AADA8X8AAIDj/wAAAMP/AwAAB/8HAAAO/g8AAA74PwAAHOB/AAAcwP8BADwA/wcAPAD8HwA8APB/AD4AwP8DPwAA/v8fAAD4/w8AAID/AwAAAAAAAAA="],"time-cut":[41,70,"AAAOAAAAABwAAAAAOAAAAABwAAAAAOAAAAAAwAEAAACAAwAAAAAHAAAAAA4AAAAAHAAAAAB4AAAAAPg/AAAA/v8DAAD/Bx4AAP8HcACA/wfAA4D/D4APgP8fAB8A/zkAfwD/ccD/AP/j4P8D/sPB/wf+h8P/D/wPh/8f/B8O/z/4Hxz+f/A/OPz/8H9w+P/h/+Dw/8H/wcH/g/+DA/+D/wcH/AP/Dw7AAP4fHAAA/D84AAD4f3AAAPD/4AAA4P/BAQDA/4MDAID/BwcAcP4PDgDg/B8cAMD5fzgAgPP/cAAAx//hAACG/8MBAA7+jwMAHPwfBwAY8D8OADjg/xwAMID/OQBwAP5/AHAA+P8AeADg/wH8AID/B34AAP7/fwAA8P8/AACA/w8AAAB8AAAAAHAAAAAA4AAAAADAAQAAAIADAAAAAAcAAAAADgAAAAAcAAAAADgAAAAAcAAAAADgAAAAAAAAAAA="],"clef-G":[66,170,"AAAAAAAAAAAAAAAAAPAAAAAAAAAA4AcAAAAAAADAPwAAAAAAAID/AQAAAAAAAP8PAAAAAAAA/j8AAAAAAAD8/wEAAAAAAPD/BwAAAAAA4P8/AAAAAACA//8AAAAAAAD//wcAAAAAAP7/HwAAAAAA+P//AAAAAADg//8DAAAAAMD//w8AAAAAAP8HfgAAAAAA/AfwAQAAAAD4D4AHAAAAAOAfAB4AAAAAgH8AcAAAAAAA/gDAAwAAAAD8AQAPAAAAAPAHADwAAAAAwA8A8AAAAAAAPwDAAwAAAAB8AAAPAAAAAPgBAD4AAAAA4AcA+AAAAACAHwDgAwAAAAA+AIAPAAAAAPgAAD8AAAAA4AMA/AAAAACADwD4AwAAAAA+AOAHAAAAAPgAwB8AAAAA4AOAfwAAAACABwD+AQAAAAAeAPwHAAAAAHgA+A8AAAAA4AHwPwAAAACAB+D/AAAAAAAewP8BAAAAAHiA/wcAAAAA4AH/DwAAAAAAD/4/AAAAAAA8/P8AAAAAAPD4/wEAAAAAwPP/BwAAAAAA//8PAAAAAAD8/x8AAAAAAPD/fwAAAAAAwP//AAAAAACA//8BAAAAAAD//wcAAAAAAP7/DwAAAAAA/v8fAAAAAAD8/z8AAAAAAPj//wAAAAAA8P//AQAAAADg//8DAAAAAMD//wcAAAAAgP//DwAAAAAA//8fAAAAAAD+/z8AAAAAAPz/fwAAAAAA+P//AQAAAADw//8HAAAAAOD//zwAAAAAgP//8QAAAAAA///BAwAAAAD+/wMPAAAAAPz/BzwAAAAA+P8P8AEAAADg/x+ABwAAAMD/PwAeAAAAgP9/AHgAAAAA/v8A4AEAAAD8/wGABwAAAPD/AwA+AAAA4P8HAPAAAACA/w8AwAMAAAD/HwCA/w8AAPw/AAD//wMA+H8AgP//PwDg/wEA////AYD/AwD///8fAP8HAP7///8A/B8A/P///wfwPwD4////P8B/APD/////gP8B4P////8H/geA/////z/4DwD//////+A/APz/////h/8A+P/z4P8f/gHg/8MD/v/4B4D/Aw/w/+MfAP4HPAD/j38A/A/gAfg//gHwH4AHwP/5B8A/AB4A/+cfAP8AeAD4nz8A/AHgAcB//gHwB4AHAP/xB4AfADwA/McfAH4A8ADgH38A+AHAA4B/+AHgBwAPAP7hBwAfADwA+Ic/AHwA8ADgD/wA4AOAB4A/8AOADwAeAP6AHwB8AHgA+AN+AOAD4AHgB/ADAB+AB8AfgA8A+AEeAD8AfgCAD/AA/gDwAwB4wAP4AYAfAAAAD/ADAPwAAAA84AcA4AcAAPDADwAAfwAAwIMfAAD4BwAAnj8AAIB/AAD4fwAAAPgPAOB/AAAAwP8f8P8AAAAA/P//fwAAAACA////AAAAAADA/+8DAAAAAAAAAA8AAAAAAAAAPAAAAAAAAADwAAAAAAAAAMADAAAAAAAAAB8AAAAAAAAAeAAAAAAAAADgAQAAAAAAAIAHAAAAAAAAAB4AAAAAAAAAeAAAAAAAAADgAQAAAAAAAIAPAAAAAAAAADwAAAAA/gMA8AAAAAD8PwDAAwAAAPj/AQAPAAAA8P8HADwAAADg/z8A8AAAAID//wDAAwAAAP//BwAPAAAA/P8fADwAAADw/38A8AAAAMD//wHAAwAAAP//BwAPAAAA/P8fADwAAADw/38A+AAAAMD//wDgAQAAAP//A4AHAAAA/P8HAB8AAADg/w8APAAAAID/DwD4AAAAAPwPAPABAAAA8A8A4AcAAACAPwDADwAAAAD8AeAfAAAAAOA/8D8AAAAAAP7/PwAAAAAA8P8/AAAAAAAA/B8AAAAAAAAAAAAAAAA="],"clef-F":[67,87,"AAAAAAAAAAAAAID/BwAAAAAAwP//AwAAAADA//9/AAAAAID/4P8PAAAAAP4A8P8BAAAA+AAA/h8AAADgAwDg/wEAAIAHAAD+HwAAAB4AAPD/AcAH+AAAAP8fgH/gAwAA8P8B/AcPAACA/w/wP3wAAAD4/4D/4QMAAMD/B/yPHwAAAP5/4H/8AAAA4P8D/uP/HwAA/z/wj///AQD4/wE+/P8/AMD/DwDg//8BAP5/AAD//x8A4P8HAPj//wAA/z8AwP//DwD4/wEA/v9/AMD/DwDw//8DAP5/AAD//x8A8P8DAPj//wCA/x8AwP//BwD8/wAA/P8/AOD/BwDg//8AAP8/AAD+/wcA+P8BAPD/HwDA/w8AAP9/AAD+f8AH8P8BAPD/A38A/gcAgP8f/AcAAAAA/P/wPwAAAADg/4P/AQAAAID/H/wPAAAAAPz/4H8AAAAA4P8H/gMAAAAA/x/gDwAAAAD4/wA+AAAAAMD/BwAAAAAAAP8/AAAAAAAA+P8AAAAAAADA/wcAAAAAAAD+HwAAAAAAAPj/AAAAAAAAwP8DAAAAAAAA/h8AAAAAAAD4fwAAAAAAAMD/AwAAAAAAAP8PAAAAAAAA+H8AAAAAAADg/wEAAAAAAAD/BwAAAAAAAPw/AAAAAAAA4P8AAAAAAACA/wMAAAAAAAD+DwAAAAAAAPA/AAAAAAAAwP8AAAAAAAAA/wcAAAAAAAD8HwAAAAAAAOA/AAAAAAAAgP8AAAAAAAAA/gMAAAAAAAD4DwAAAAAAAOA/AAAAAAAAgP8AAAAAAAAA/gEAAAAAAAD4BwAAAAAAAOAfAAAAAAAAwD8AAAAAAAAA/wAAAAAAAAD8AwAAAAAAAPgHAAAAAAAA4A8AAAAAAACAPwAAAAAAAAB/AAAAAAAAAP4AAAAAAAAA+AMAAAAAAADwBwAAAAAAAOAPAAAAAAAAAB8AAAAAAAAAGAAAAAAAAAAA"],"clef-C":[67,98,"AAAAAAAAAADwf8AAAP4/AMD/Aw8A/v8PAP4feAD4//8B8P/AA/AH+D+A/wcewAcA/wf8P/AAPwDwf+D/gQf4AwD/B/8PPOB/APA/+H/gAf8HgP/D/wMP/H8A/D/+H3jg/wPA//H/wAP/PwD+n/8HHvj/AfD//D/wwP8PgP/v/4EH/n8A/H//Dzzg/wHg//t/4AH/DwD///8DD/A/APj//x94AP8AwP///8ADwAEA/v//Bx4AAADw//8/8AAAAID///+BBwAAAPz//w88AAAA4P//f+ABAAAA////Aw8AAAD4//8feAAAAMD/9//AAwAAAP6//wcegAEA8P/9P/AAHACA/+//gQfwAAD8P/8PPIAPAOD/+X/gAXwAAP/H/wMP4AMA/D/+H3iAPwDg//D/wAP8AwD/h/8HHuAfAPwf/D/wgP8B8H/g/4EH/D/A/wH/Dzzw////A/h/4IH///8PwP8DD/7//x8A/h94+H/wDwDw/8Dj/wEAAID/B/7/DwAAAPw/8P8/AAAA4P+B//8BAAAA/w/8/wcAAAD4f+D/PwAAAMD/A///AwAAAP4f+P8fAAAA8P/A//8BAACA/wce/w8AAAD8P/Dw/8AfAOD/gQf///8PAP8PPPD///8B+H/gAf///z/A/wMP+H+A/wP+H3jA/wD4P/D/wAP8A4D/g/8HHuAfAPg//D/wAH8AwP/h/4EH8AEA/h//DzyADwDg//l/4AF8AAD/z/8DD+ABAPh//h94AA4AwP/3/8ADMAAA/r//Bx4AAADw//0/8AAAAID/7/+BBwAAAPz//w88AAAA4P//f+ABAAAA////Aw8AAAD4//8feAAAAMD////AAwAAAP7//wceAA4A8P//P/AA/gGA////gQf4HwD8//8PPOD/AeD//3/gAf8PAP/f/wMP/P8A+P/+H3jg/wfA//f/wAP/PwD+n/8HHvj/AfD//D/wwP8HwP/j/4EH/j8A/h//Dzzg/wDwf/h/4AH/A8D/wf8DD/AHAP4P/h94gB8A+D/w/8AD+ADgf4D/Bx6AP8D/Afw/8ADw//8D4P+BBwD//wcA/g8YAMD/BwAAAAAAAAAAAAA="],"rest-quarter":[26,72,"EAAA4AEAgA8AAH4AAPABAMAPAAB+AADwAwDAHwAA/gAA+AcAwD8AAP8AAPwHAOA/AID/AQD+DwD4fwDg/wGA/w8A/38A/P8B8P8D4P8PgP8fAP8/AP7/APz/Afj/B+D/D8D/PwD/fwD8/wHg/weA/w8A/D8A4P8AAP8DAPgPAOA/AAD/AAD4AwDAHwAAfwAA+AEAwA8AAH8A8PwB8P8P4P9/wP//A///D/7/f/j///P//9///3//P4D/fwDg/wCA/wEA/gcA8B8AgH8AAP4BAPAHAIA/AAD8AADgBwAAPwAA+AEAwAcAABwA"],"rest-8th":[24,41,"8AEA+ANg/Afw/g94/w98/x9+/x9///8///8//v8//P8f+D8f8AcfAAAfAIAPAIAPAIAPAMAPAMAHAMAHAOAHAOADAOADAPADAPADAPgBAPgBAPgBAPwAAPwAAPwAAP4AAH4AAH4AAH8AAD8AAD8AAD8AgD8AgB8AAA8A"],"rest-16th":[31,65,"APgAAAD/ATjA/wEO4P+AB/j/4AP8f/gB/j9/AP//P4D//x+A//8PgP//A4D/8QEAP/gAAAB8AAAAHwAAgA8AAMAHAADwAQAA+AAAAHwAAAAeAACADwAAwAcAAOAD8AH4AP4DfID/Az/A/4EP8P/BB/j/8AP8f/wA/v9/AP7/PwD//w8A//8HAP/3AwB++AEAAHwAAAA/AACAHwAAwAcAAPADAAD4AQAAfAAAAD8AAIAfAADADwAA8AMAAPgBAAD8AAAAPwAAgB8AAMAPAADwAwAA+AEAAPwAAAA/AACAHwAAwA8AAPAHAAD4AQAA/AAAAH8AAIAfAACABwAA"],"rest-32nd":[35,89,"AIAPAAAA/gA4APgP4AHg/4AHgP8PPgD8f/gB4P/zDwD//z8A+P//AYD//w8A+P9/AID/8wEA8AMPAAAAfAAAAOADAAAADwAAAHgAAADgAwAAAB8AAAB4AAAAwAMAAAAfAAAA+AAAAMAHAHwAHgD4B/gA4H/AB4D/Bz4A/D/wAOD/wwcA/58/APj//wHA//8PAPz/PwDg//8BAPyfDwCAD3wAAADwAQAAgA8AAAB8AAAA4AMAAIAfAAAAfAAAAOADAAAAHwAAAPwAAADgAwAAAB8A8AH4AOA/4AeA/wM/APwf+ADw/8EHgP8PPwD8f/wB4P//BwD+/z8A8P//AQD//w8A8H9+AAD+8AEAAIAPAAAAfgAAAPADAACADwAAAHwAAADwAwAAgB8AAAD8AAAA4AMAAIAfAAAA/AAAAOAHAAAAHwAAAPwAAADgBwAAAD8AAAD4AQAA4AcAAAA/AAAA+AEAAMAPAAAAPwAAAPgBAADADwAAAH4AAAD4AwAAwA8AAAA8AAAA"],"rest-64th":[41,114,"AAAAAAAAAMAHAAAA4D8AAwDg/wAHAMD/AQ8AwP8HHwCA/w8/AAD/nz8AAP7/fwAA/P//AADw//8BAMD//wEAAP/HAwAA+IEHAAAAgA8AAAAADwAAAAAeAAAAADwAAAAAfAAAAAB4AAAAAPAAAAAA4AEAAADgAwAAAMAHAAAAgAcAAB+ADwCA/wAfAID/AT4AAP8HPAAA/x98AAD+P/wAAPx//AEA+P//AQDw//8DAMD//wcAAP//DwAA/J8PAADgDx8AAAAAPgAAAAB8AAAAAPgAAAAA+AAAAADwAQAAAOADAAAAwAcAAADABwAAAIAPAAAAAB8AAAAAPgAA/AA+AAD8A3wAAPwP+AAA/D/wAQD4f/ADAPD/8QMA4P/zBwDA//8PAID//x8AAP7/HwAA/P8/AADgf34AAAA/fAAAAAD4AAAAAPABAAAA8AMAAADgBwAAAMAHAAAAgA8AAACAHwAAAAA/AAAAAD4AAAAAfAAA8AH8AADwB/gBAPAf8AEA8H/gAwDw/+EHAOD/ww8AwP/HDwCA//8fAAD//z8AAPz/fwAA8P//AADA//8AAAB++AEAAADwAwAAAOAHAAAA4AcAAADADwAAAIAfAAAAAD8AAAAAPwAAAAB+AAAAAPwAAAAA+AEAAAD4AQAAAPADAAAA4AcAAADADwAAAMAPAAAAgB8AAAAAPwAAAAB+AAAAAP4AAAAA/AAAAAD4AQAAAPADAAAA8AcAAADgBwAAAMAPAAAAwB8AAACAHwAAAAA/AAAAADwAAAAA"],"acc-sharp":[25,68,"AAAAAAAOAAAcAAA4AABwABzgADjAAXCAA+AAB8ABDoADHAAHOAAOcAAc4AA4wD9wgH/ggP/Agf+B4/8D//8H/v8P//+f//+f//8P//8P/v8P/H8c+D848B9w4B/gwD3AAXCAA+AABsABDoADHAAHOAAOcAwc4B84wD9wwH/gwP/A4f+B//+D///H///P///H//+D//8D//8H/h8O/A8c+Ac48A9wYBzgADjAAXCAA+AAB8ABDoADHAAHOAAOcAAc4AA4wAFwAADgAADAAQCAAwAAAAAA"],"acc-flat":[23,60,"AAAADgCABwDAAwDgAQDwAAB4AAA8AAAeAAAPAIAHAMADAOABAPAAAHgAADwAAB4AAA8AgAcAwAMA4AEA8AAAeAAAPAAAHgAADwCABwDAAwDggQ/w8B94/D/8/z/+/x//4Z8/4M8P8OcD8PcA+HsA/DwAfh4APw+AnwfgxwPw4wH88AB+eIAfPOAHHvgBD36Ahx/A9wfg/wDgPwDwDwD4AQB8AAAeAAADAAAAAAA="],"acc-natural":[16,66,"BgAPAA8ADwAPAA8ADwAPAA8ADwAPAA8ADwAPAA8AD8AP+I/////////////////////////wH/AP8A/wD/AP8A/wD/AP8A/wD/AP+A/+j/////////////////////////9/8A/wA/AA8ADwAPAA8ADwAPAA8ADwAPAA8ADwAPAA4AAA"],"head-filled":[30,24,"AAB/AAD8fwDA/38A/P8/gP//D/D//wf+///B//9/8P//H/7//8f////x//8//P//j////+P//3/4//8P/v//g///f+D//wfw//8A/P8fAP7/AQD+HwAAfgAA"],"head-half":[29,25,"AMA/AAD/PwD4/w/A//8D/D/4wP8AHvwHgMN/AHD8AwCOHwDA+QEAPB8AwOcBAHweAMDPAwD8OADgHwcA/uEA8D8cgP8DB/w/4PP/A/j/HwD+/wAA/wEAAAAAAA=="],"flag-8th-up":[27,79,"DAAAcAAAgAcAADwAAOABAAAPAAD4AADABwAAPgAA8AEAgB8AAPwAAOAHAAB/AAD4AwDAPwAA/gEA8B8AgP8AAPwPAOB/AAD/BwD4PwDA/wMA/h8AwP8BAPgfAID/AAD4DwCAfwAA+AcAgH8AAPgDAIA/AAD8AQDAHwAA/AAA4A8AAH4AAOADAAA/AADwAQCAHwAA+AAAwAcAAHwAAOADAAAeAADwAAAADwAAeAAAwAMAAB4AAPAAAAAPAAB4AADAAwAAHgAA8AAAgAcAADwAAOABAAAPAAB4AADAAwAAHgAA8AAAwAMAAB4AAPAAAIAHAAA8AADwAQCABwAAPAAA8AEAgA8AADgAAIAA"],"flag-8th-down":[30,80,"AAAAAAAA4AAAAHgAAAAeAACABwAA4AMAAPgAAAA8AAAADwAAwAMAAPABAAB4AAAAHgAAgAcAAOABAAB4AAAAHgAAgAcAAOABAAB4AAAAHgAAgAcAAOABAAB4AAAAHwAAwAcAAPABAAA8AACADwAA4AMAAPgAAAAeAADABwAA8AEAAD4AAIAPAADgAwAAfAAAAB8AAOADAAD4AAAAHwAA4AcAAPwAAAA/AADgBwAA/AEAgD8AAPAPAAD+AQDAPwAA/A8AgP8BAPh/AMD/DwD8/wEA/38AwP8PAPD/AQD8PwAA/w8AwP8BAPA/AAD8DwAA/wEAwH8AAPAPAAD8AwAAfwAAwA8AAPADAAD8AAAAHwAAwAcAAPABAAA8AAAADwAAwAMAAHAAAAAAAAAA"]};
 
 module.exports = { createNodeCv, createBrowserCv, createJsCv, wrapConverter, refineEntry, readTime, readClefAt, readRest, makeApi, moduleReady };
+
+};
+defs["dynglyphs"]=function(require,module,exports){
+'use strict';
+// Dynamics letter templates for src/text.js, generated by tools/dynglyphs.js
+// (do not edit by hand): [text, width, height (staff spaces), grid rows].
+module.exports = [
+  ["f", 2.18, 2.62, [
+    '........##.',
+    '......#####',
+    '......##.##',
+    '.....###...',
+    '...######..',
+    '.....##....',
+    '....###....',
+    '....##.....',
+    '....##.....',
+    '...###.....',
+    '##.##......',
+    '##.##......',
+    '###........',
+  ]],
+  ["p", 1.96, 1.82, [
+    '....#..##.',
+    '...#######',
+    '..#.##..##',
+    '....##..##',
+    '...###.###',
+    '...######.',
+    '...##.....',
+    '..###.....',
+    '#####.....',
+  ]],
+  ["m", 2.04, 1.24, [
+    '..#######.',
+    '.########.',
+    '.###.####.',
+    '..####.##.',
+    '..#.##.###',
+    '.##.#..##.',
+  ]],
+  ["s", 0.87, 1.16, [
+    '..##',
+    '.#.#',
+    '.##.',
+    '..##',
+    '#..#',
+    '###.',
+  ]],
+  ["z", 1.16, 1.24, [
+    '..##..',
+    '.####.',
+    '...#..',
+    '..#..#',
+    '.#####',
+    '..###.',
+  ]],
+  ["ff", 3.27, 2.62, [
+    '........##...###',
+    '.......#.##.##.#',
+    '......##.####.##',
+    '.....###..###...',
+    '...###########..',
+    '....###...###...',
+    '....###...##....',
+    '....###..###....',
+    '....##...###....',
+    '...###...##.....',
+    '.#.##.#..##.....',
+    '##.#..#.##......',
+    '.##...###.......',
+  ]],
+  ["fff", 4.44, 2.62, [
+    '........##...###...##.',
+    '......##.##.##.#.#####',
+    '.....###.#####.####.##',
+    '.....###..###...###...',
+    '...#################..',
+    '....###...###...##....',
+    '....###...##...###....',
+    '....##....##...###....',
+    '...###...###...##.....',
+    '...###...##....##.....',
+    '##.##.#..##.#.##......',
+    '##.#..#..#.##.##......',
+    '###...###...###.......',
+  ]],
+  ["pp", 3.42, 1.82, [
+    '...##..##..#..##.',
+    '...##############',
+    '..#.##..##.###.##',
+    '...###.###.##..##',
+    '...###.######.###',
+    '...######.######.',
+    '..###.....##.....',
+    '..##.....###.....',
+    '#####..#####.....',
+  ]],
+  ["ppp", 4.95, 1.75, [
+    '...###.##..##.###.##..##.',
+    '..#####.######.#######.##',
+    '..#.##..##.###.###.##..##',
+    '....##..##.##..##..##..##',
+    '...###.###.##..##.##..###',
+    '...######.######..######.',
+    '...##.....##......##.#...',
+    '..###.....##.....##......',
+    '.####...####....####.....',
+  ]],
+  ["fp", 3.13, 2.62, [
+    '........###.....',
+    '.......##.#.....',
+    '......##.##.....',
+    '.....###........',
+    '...############.',
+    '.....##.#.###.##',
+    '....###.#.##..##',
+    '....###..###.###',
+    '....##...##..##.',
+    '....##...#####..',
+    '##.##...###.....',
+    '##.##...##......',
+    '####..#...#.....',
+  ]],
+];
 
 };
 defs["front"]=function(require,module,exports){
@@ -7537,8 +7729,28 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     }))));
     return lo ? `${lo.step}${lo.octave}\u2013${hi.step}${hi.octave}` : '-';
   });
+  // where each written measure stands on its page (overlay and repair notes):
+  // {n: measure number as written, page, sys, xa, xb, y0, y1} per segment, in the
+  // page frame of that page entry (a spread's half: page i + 0.5)
+  const first0 = partMeasures[0] && partMeasures[0][0] && partMeasures[0][0].every(s => s.implicit);
+  const measureMap = [];
+  units.forEach((u, mi) => {
+    const n = mi === 0 && first0 ? 0 : mi + (first0 ? 0 : 1);
+    let ex = null;
+    if (u.split) {
+      const xs = u.streams.flat().flatMap(st => st.events).filter(e => e.x != null).map(e => e.x);
+      if (xs.length) ex = [Math.min(...xs), Math.max(...xs)];
+    }
+    for (const si of u.m.segs) {
+      const sg = segs[si], sts = sg.sy.staves;
+      if (!sts.length) continue;
+      const xa = ex ? Math.max(sg.xa, ex[0] - 0.8 * sts[0].st.space) : sg.xa, xb = ex ? Math.min(sg.xb, ex[1] + 0.8 * sts[0].st.space) : sg.xb;
+      measureMap.push({ n, page: sg.sy.page, sys: sg.sy.index, xa: Math.round(xa), xb: Math.round(xb),
+        y0: Math.round(sts[0].st.yAt(0, sg.xa)), y1: Math.round(sts[sts.length - 1].st.yAt(4, sg.xa)) });
+    }
+  });
   // UI compares clefs with 'F'; 'G8' stays a treble clef there
-  return { parts, layout, fifths, time, timeRead, clefs, ranges, measures: units.length, nNotes, credits, warnings: warnings.concat(layout.notes), xml };
+  return { parts, layout, fifths, time, timeRead, clefs, ranges, measures: units.length, nNotes, credits, warnings: warnings.concat(layout.notes), xml, measureMap };
 }
 
 // Horizontal extent of a syllable: lyrics.js may report x0/x1; otherwise it is
@@ -8606,15 +8818,19 @@ defs["symbols"]=function(require,module,exports){
 
 const { detectRests } = require('./rests');
 const { accidentalGlyph } = require('./assemble');
+const { classifyMarks, ROLE_LABEL } = require('./text');
 
 const r1 = (v) => Math.round(v * 10) / 10;
 const box = (b) => [r1(b.x0), r1(b.y0), r1(b.x1), r1(b.y1)];
 // y of staff position k (0 top line .. 4 bottom line, fractions between)
 const lineY = (st, k, x) => st.yAt(0, x) + k * (st.yAt(4, x) - st.yAt(0, x)) / 4;
 
-function pageSymbols(fr, asm) {
+// What the note reader explains (out: the symbol layers) and the leftover
+// components that touch none of it (left).
+function explain(fr, asm) {
   const out = { clefs: [], keys: [], times: [], rests: [], accs: [], dots: [], stems: [], beams: [], tuplets: [], bars: [], unknown: [] };
-  if (!fr || !fr.R || !asm) return out;
+  const left = [];
+  if (!fr || !fr.R || !asm) return { out, left };
   const R = fr.R, comps = asm.comps || [], ss = fr.ss;
   const known = []; // boxes that explain ink
   const add = (b, pad = 0) => known.push([b[0] - pad, b[1] - pad, b[2] + pad, b[3] + pad]);
@@ -8739,12 +8955,426 @@ function pageSymbols(fr, asm) {
         if (c.x0 <= k[2] && c.x1 >= k[0] && c.y0 <= k[3] && c.y1 >= k[1]) { hit = true; break; }
       }
     }
-    if (!hit) out.unknown.push([c.x0, c.y0, c.x1, c.y1]);
+    if (!hit) left.push(c);
+  }
+  return { out, left };
+}
+
+// The page's marks (text.js classifyMarks over the leftover ink), computed
+// once per page and kept on fr (not enumerable: never cloned or compared);
+// readPageText() fills in the text it reads.
+function pageMarks(fr, asm) {
+  if (!fr || !asm) return null;
+  if (fr._marks && fr._marks.asm === asm) return fr._marks.marks;
+  const { out, left } = explain(fr, asm);
+  let marks;
+  try { marks = classifyMarks(fr, asm, left); } catch (e) { marks = { text: [], dyns: [], wedges: [], slurs: [], braces: [], ledgers: [], rest: left }; }
+  Object.defineProperty(marks, 'sym', { value: out, enumerable: false, configurable: true });
+  Object.defineProperty(fr, '_marks', { value: { asm, marks }, enumerable: false, configurable: true, writable: true });
+  return marks;
+}
+
+// Overlay layers. Beyond the note symbols: text [box, role, label],
+// dyns [box, value], wedges [box, type], slurs [box], braces [box, kind],
+// ledgers [box]; unknown is the ink none of these explain.
+function pageSymbols(fr, asm) {
+  const marks = pageMarks(fr, asm);
+  if (!marks) return explain(fr, asm).out;
+  const out = { ...marks.sym };
+  const b4 = (b) => b.map(Math.round);
+  out.text = marks.text.map(t => {
+    const name = ROLE_LABEL[t.role] || 'Text';
+    const label = t.role === 'measure' ? (t.text ? `Bar ${t.text}` : 'Bar number') : t.text ? `${name}: ${t.text}` : name;
+    return [...b4(t.box), t.role, label];
+  });
+  out.dyns = marks.dyns.map(d => [...b4(d.box), d.value]);
+  out.wedges = marks.wedges.map(w => [...b4(w.box), w.type === 'crescendo' ? 'cresc.' : 'dim.']);
+  out.slurs = marks.slurs.map(s => b4(s.box));
+  out.braces = marks.braces.map(s => [...b4(s.box), s.kind]);
+  out.ledgers = marks.ledgers.map(s => b4(s.box));
+  out.unknown = marks.rest.map(c => [c.x0, c.y0, c.x1, c.y1]);
+  return out;
+}
+
+module.exports = { pageSymbols, pageMarks };
+
+};
+defs["text"]=function(require,module,exports){
+'use strict';
+// Text and expression marks: the ink the note reader leaves unexplained
+// (symbols.js leftover components), sorted into what it is.
+//  - text lines (letters grouped into words and lines) with a role from where
+//    they stand: title, subtitle, composer / lyricist / arranger credit,
+//    instrument name (left of the first system) or abbreviation (later
+//    systems), measure number, tempo / expression text, lyrics, header,
+//    footer, copyright. readPageText() reads them with the lyrics OCR (one
+//    line per call, bounded per page); without OCR they keep their role.
+//  - dynamics (ppp .. fff, sf, sfz, fz, fp, rf ...) from the shapes of the
+//    italic-bold dynamics letters (templates scaled by the staff space; OCR
+//    does not read that font), and hairpins (two lines opening or closing).
+//  - braces and system brackets, ledger lines, slurs and ties.
+// Boxes are [x0, y0, x1, y1] in the page's deskewed frame.
+const { _glyphImage: glyphImage } = require('./assemble');
+const { makeGray } = require('./image');
+
+// ---------------------------------------------------------------- dynamics glyphs
+// Letter templates of the dynamics font: rows of a grid over the glyph box
+// ('#' ink, cells about a fifth of a staff space), with the box size in
+// staff spaces: [text, w, h, rows] (dynglyphs.js, made by
+// tools/dynglyphs.js from engraved pages). Drawn from
+// the engraved letters (LilyPond / Emmentaler, the corpus font); bold italic
+// letters of other engravers are close enough for the tolerant match below.
+const DYN_GLYPHS = require('./dynglyphs');
+const DYN_WORDS = new Set(['ppp', 'pp', 'p', 'mp', 'mf', 'f', 'ff', 'fff', 'sf', 'sfz', 'sffz', 'sfp', 'sfpp', 'fz', 'fp', 'rf', 'rfz', 'pppp', 'ffff', 'sfzp', 'fzp', 'n']);
+
+// glyph image (its own ink only) resampled onto a GW x gh grid
+function gridOf(img, gh, GW) {
+  const { width: w, height: h, data } = img;
+  const g = new Float32Array(GW * gh);
+  for (let gy = 0; gy < gh; gy++) for (let gx = 0; gx < GW; gx++) {
+    const xa = Math.floor(gx * w / GW), xb = Math.max(xa + 1, Math.floor((gx + 1) * w / GW));
+    const ya = Math.floor(gy * h / gh), yb = Math.max(ya + 1, Math.floor((gy + 1) * h / gh));
+    let s = 0, n = 0;
+    for (let y = ya; y < yb && y < h; y++) for (let x = xa; x < xb && x < w; x++) { s += data[y * w + x]; n++; }
+    g[gy * GW + gx] = n ? s / n : 0;
+  }
+  return g;
+}
+
+// tolerant overlap (Dice) of a glyph grid with a template: ink within one
+// cell of template ink counts
+function matchGrid(g, t) {
+  const gh = t.gh, GW = t.gw;
+  let inter = 0, sa = 0, sb = 0;
+  for (let y = 0; y < gh; y++) for (let x = 0; x < GW; x++) {
+    const v = g[y * GW + x] >= 0.35 ? 1 : 0, tv = t.cells[y * GW + x];
+    sa += v; sb += tv;
+    if (v && tv) { inter += 1; continue; }
+    if (!v && !tv) continue;
+    // near miss: the other side has ink in a neighbouring cell
+    let near = false;
+    for (let dy = -1; dy <= 1 && !near; dy++) for (let dx = -1; dx <= 1 && !near; dx++) {
+      const xx = x + dx, yy = y + dy;
+      if (xx < 0 || yy < 0 || xx >= GW || yy >= gh) continue;
+      near = v ? t.cells[yy * GW + xx] === 1 : g[yy * GW + xx] >= 0.35;
+    }
+    if (near) inter += 0.5;
+  }
+  return sa + sb ? (2 * inter) / (sa + sb) : 0;
+}
+
+let TPL = null;
+function templates() {
+  if (TPL) return TPL;
+  TPL = DYN_GLYPHS.map(([text, w, h, rows]) => {
+    const gh = rows.length, gw = rows[0].length, cells = new Uint8Array(gw * gh);
+    rows.forEach((r, y) => { for (let x = 0; x < gw; x++) cells[y * gw + x] = r[x] === '#' ? 1 : 0; });
+    return { text, w, h, gh, gw, cells };
+  });
+  return TPL;
+}
+
+// best dynamics letter (or ligature) for one component: {text, score} or null
+function dynGlyph(R, c, sp) {
+  const w = (c.x1 - c.x0 + 1) / sp, h = (c.y1 - c.y0 + 1) / sp;
+  let best = null;
+  let img = null;
+  for (const t of templates()) {
+    if (Math.abs(w - t.w) > 0.3 * t.w + 0.15 || Math.abs(h - t.h) > 0.25 * t.h + 0.15) continue;
+    if (!img) img = glyphImage(R, c);
+    const s = matchGrid(gridOf(img, t.gh, t.gw), t);
+    if (!best || s > best.score) best = { text: t.text, score: s };
+  }
+  return best;
+}
+
+// ---------------------------------------------------------------- shapes
+// columns of a component's own ink: [ink runs per column] (thin-line tests)
+function columnRuns(img) {
+  const { width: w, height: h, data } = img, out = [];
+  for (let x = 0; x < w; x++) {
+    const runs = [];
+    let s = -1;
+    for (let y = 0; y <= h; y++) {
+      const on = y < h && data[y * w + x];
+      if (on && s < 0) s = y;
+      else if (!on && s >= 0) { runs.push([s, y - 1]); s = -1; }
+    }
+    out.push(runs);
   }
   return out;
 }
 
-module.exports = { pageSymbols };
+// hairpin: two thin lines meeting at one end (the point) and apart at the
+// other, the gap growing steadily. 'crescendo' opens to the right.
+function hairpin(R, c, sp) {
+  const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1;
+  if (w < 2.2 * sp || h < 0.35 * sp || h > 2.4 * sp || w < 2 * h) return null;
+  const cols = columnRuns(glyphImage(R, c));
+  const gap = (x) => { const r = cols[x]; if (!r || !r.length) return null; return r.length >= 2 ? r[r.length - 1][0] - r[0][1] : 0; };
+  const thin = (x) => cols[x].every(([a, b]) => b - a + 1 <= 0.45 * sp);
+  const xs = [0.15, 0.3, 0.5, 0.7, 0.85].map(f => Math.round(f * (w - 1)));
+  const gs = xs.map(gap);
+  if (gs.some(g => g == null) || !xs.every(thin)) return null;
+  const inc = gs.every((g, i) => i === 0 || g >= gs[i - 1] - 1), dec = gs.every((g, i) => i === 0 || g <= gs[i - 1] + 1);
+  const span = Math.abs(gs[4] - gs[0]);
+  if (span < 0.25 * sp) return null;
+  if (inc && gs[4] > gs[0] && cols[xs[4]].length >= 2) return 'crescendo';
+  if (dec && gs[0] > gs[4] && cols[xs[0]].length >= 2) return 'diminuendo';
+  return null;
+}
+
+// a slur or tie: one thin curved stroke, wider than tall, bowed
+function slurLike(R, c, sp) {
+  const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1;
+  if (w < 1.0 * sp || h > 0.8 * w || h > 4 * sp) return false;
+  if (c.area / w > 0.5 * sp) return false;
+  const cols = columnRuns(glyphImage(R, c));
+  let single = 0, n = 0;
+  const mid = [];
+  for (let x = 0; x < w; x++) {
+    const r = cols[x];
+    if (!r.length) continue;
+    n++;
+    if (r.length === 1 && r[0][1] - r[0][0] + 1 <= 0.5 * sp) single++;
+    mid.push((r[0][0] + r[r.length - 1][1]) / 2);
+  }
+  if (n < 0.8 * w || single < 0.75 * n) return false;
+  // bowed: the middle stands off the line joining the ends
+  const a = mid[0], b = mid[mid.length - 1], m = mid[mid.length >> 1];
+  return Math.abs(m - (a + b) / 2) >= Math.max(1.5, 0.15 * sp);
+}
+
+// ---------------------------------------------------------------- lines of text
+function groupLines(cs) {
+  cs = cs.slice().sort((a, b) => a.x0 - b.x0);
+  const par = cs.map((_, i) => i);
+  const find = (i) => { while (par[i] !== i) { par[i] = par[par[i]]; i = par[i]; } return i; };
+  for (let i = 0; i < cs.length; i++) {
+    const a = cs[i], ha = a.y1 - a.y0 + 1;
+    for (let j = i + 1; j < cs.length; j++) {
+      const b = cs[j], hb = b.y1 - b.y0 + 1;
+      const big = Math.max(ha, hb);
+      if (b.x0 - a.x1 > 1.3 * big) break;
+      // the same text row: letters overlap in height (x-height letters sit
+      // inside capitals), and sizes are alike
+      const ov = Math.min(a.y1, b.y1) - Math.max(a.y0, b.y0) + 1;
+      if (ov < 0.45 * Math.min(ha, hb) || Math.min(ha, hb) < 0.3 * big) continue;
+      par[find(i)] = find(j);
+    }
+  }
+  const g = new Map();
+  cs.forEach((c, i) => { const r = find(i); if (!g.has(r)) g.set(r, []); g.get(r).push(c); });
+  return [...g.values()].map(mem => {
+    mem.sort((a, b) => a.x0 - b.x0);
+    const hs = mem.map(c => c.y1 - c.y0 + 1).sort((a, b) => a - b);
+    let words = 1;
+    const med = hs[hs.length >> 1];
+    for (let k = 1; k < mem.length; k++) if (mem[k].x0 - Math.max(...mem.slice(0, k).map(c => c.x1)) > 0.45 * med) words++;
+    return { mem, x0: Math.min(...mem.map(c => c.x0)), y0: Math.min(...mem.map(c => c.y0)), x1: Math.max(...mem.map(c => c.x1)), y1: Math.max(...mem.map(c => c.y1)), h: med, words };
+  });
+}
+
+const ROLE_LABEL = {
+  title: 'Title', subtitle: 'Subtitle', composer: 'Composer', lyricist: 'Lyricist', arranger: 'Arranger', credit: 'Credit',
+  instrument: 'Instrument', abbrev: 'Instrument', measure: 'Bar', tempo: 'Tempo', expression: 'Expression', lyrics: 'Lyrics',
+  header: 'Header', footer: 'Footer', page: 'Page', copyright: 'Copyright', text: 'Text',
+};
+
+// Sort leftover components (symbols.js) into marks.
+// left: [{x0,y0,x1,y1,area}], fr / asm as front() and assemblePage() left them.
+function classifyMarks(fr, asm, left) {
+  const out = { text: [], dyns: [], wedges: [], slurs: [], braces: [], ledgers: [], rest: [] };
+  const R = fr.R, ss = fr.ss, W = fr.gray.width, H = fr.gray.height;
+  const systems = (asm && asm.systems) || [];
+  if (!R || !systems.length) { out.rest = left.slice(); return out; }
+  const stv = systems.map(sy => sy.staves.map(s => {
+    const st = s.st, sp = st.space || ss;
+    return { st, si: s.si, sp, left: st.left, right: st.right, top: (x) => st.yAt(0, x), bot: (x) => st.yAt(4, x) };
+  }));
+  const allSt = stv.flat();
+  const L0 = Math.min(...allSt.map(s => s.left)), R0 = Math.max(...allSt.map(s => s.right));
+  const firstTop = Math.min(...stv[0].map(s => s.top(s.left)));
+  const lastSys = stv[stv.length - 1];
+  const lastBot = Math.max(...lastSys.map(s => s.bot(s.left)));
+  // the staff nearest a point (vertical distance to its band) and its system
+  const nearest = (x, y) => {
+    let best = null, bd = Infinity;
+    stv.forEach((sts, k) => sts.forEach((s, j) => {
+      const xx = Math.max(s.left, Math.min(s.right, x)), t = s.top(xx), b = s.bot(xx);
+      const d = y < t ? t - y : y > b ? y - b : 0;
+      // a mark between two staves belongs to the upper one on a tie
+      if (d < bd - 1e-6 || (Math.abs(d - bd) <= 1e-6 && best && y > b)) { bd = d; best = { sys: k, k: j, s, d, above: y < t, inside: d === 0 }; }
+    }));
+    return best;
+  };
+  const inBand = (c) => {
+    const n = nearest((c.x0 + c.x1) / 2, (c.y0 + c.y1) / 2);
+    return n && n.inside;
+  };
+  const heads = fr.heads || [];
+  const rest = [];
+  const letters = [];
+  for (const c of left) {
+    const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1, cx = (c.x0 + c.x1) / 2, cy = (c.y0 + c.y1) / 2;
+    const n = nearest(cx, cy), sp = n ? n.s.sp : ss;
+    // brace / system bracket: tall, narrow, at the staves' left edge
+    if (h >= 3 * sp && w <= 1.6 * sp && n && cx <= n.s.left + 0.6 * sp && cx >= n.s.left - 2.5 * sp) { out.braces.push({ box: [c.x0, c.y0, c.x1, c.y1], kind: w <= 0.45 * sp ? 'line' : 'brace' }); continue; }
+    // ledger line: short, thin, horizontal, off the staff, by a note head
+    if (h <= 0.4 * sp && w >= 0.9 * sp && w <= 3.6 * sp && n && !n.inside &&
+      heads.some(hd => Math.abs(hd.x - cx) <= 1.5 * sp && Math.abs(hd.y - cy) <= 1.3 * sp + (n.above ? Math.max(0, cy - hd.y) : Math.max(0, hd.y - cy)))) {
+      out.ledgers.push({ box: [c.x0, c.y0, c.x1, c.y1] }); continue;
+    }
+    const hp = hairpin(R, c, sp);
+    if (hp) { out.wedges.push({ box: [c.x0, c.y0, c.x1, c.y1], type: hp, sys: n.sys, k: n.k, si: n.s.si }); continue; }
+    if (slurLike(R, c, sp)) { out.slurs.push({ box: [c.x0, c.y0, c.x1, c.y1] }); continue; }
+    // letter-sized ink (text, dynamics)
+    if (h >= 0.35 * sp && h <= 4.5 * sp && w <= 6 * sp && !(h < 0.6 * sp && w > 2.5 * h)) { letters.push(c); continue; }
+    rest.push(c);
+  }
+  // dynamics: a run of letters that all read as dynamics letters and spell a
+  // dynamic, off the staff (or in a margin between staves)
+  const lines = groupLines(letters);
+  const textLines = [];
+  for (const ln of lines) {
+    const n = nearest((ln.x0 + ln.x1) / 2, (ln.y0 + ln.y1) / 2);
+    const sp = n ? n.s.sp : ss;
+    const dyn = n && !n.inside && ln.h <= 3.2 * sp ? readDynamic(R, ln, sp) : null;
+    if (dyn) { out.dyns.push({ box: [ln.x0, ln.y0, ln.x1, ln.y1], value: dyn.text, score: +dyn.score.toFixed(2), sys: n.sys, k: n.k, si: n.s.si, x: (ln.x0 + ln.x1) / 2 }); continue; }
+    // text inside a staff band is rare (text over a staff is more often a
+    // misread chord or a stray): left unknown
+    if (n && n.inside && ln.x0 > n.s.left) { rest.push(...ln.mem); continue; }
+    textLines.push({ ...ln, n });
+  }
+  // roles from where the lines stand
+  const header = textLines.filter(l => l.y1 < firstTop - 0.5 * ss && !(l.x1 < L0 - 0.3 * ss));
+  const maxH = Math.max(0, ...header.map(l => l.h));
+  const pageMid = (L0 + R0) / 2, wMusic = R0 - L0;
+  for (const l of textLines) {
+    const cx = (l.x0 + l.x1) / 2, cy = (l.y0 + l.y1) / 2, n = l.n, sp = n ? n.s.sp : ss;
+    let role = 'text';
+    const sysOf = n ? n.sys : -1;
+    const sts = sysOf >= 0 ? stv[sysOf] : null;
+    const sysTop = sts ? Math.min(...sts.map(s => s.top(s.left))) : 0, sysBot = sts ? Math.max(...sts.map(s => s.bot(s.left))) : 0;
+    const sysLeft = sts ? Math.min(...sts.map(s => s.left)) : L0;
+    if (sts && l.x1 < sysLeft - 0.2 * sp && cy > sysTop - 1.5 * sp && cy < sysBot + 1.5 * sp) role = sysOf === 0 ? 'instrument' : 'abbrev';
+    else if (l.y1 < 0.06 * H && l.h < 1.6 * ss && l.y1 < firstTop - 3 * ss) role = 'header';
+    else if (l.y0 > 0.92 * H && l.y0 > lastBot + 2 * ss) role = 'footer';
+    else if (sts && l.y1 <= sysTop + 0.3 * sp && l.y1 >= sysTop - 3.2 * sp && l.x0 <= sysLeft + 2.5 * sp && l.x0 >= sysLeft - 3.5 * sp && l.h <= 1.3 * sp && l.mem.length <= 3 && l.words === 1 &&
+      (l.y1 >= firstTop - 3.2 * sp || sysOf > 0)) role = 'measure';
+    else if (l.y1 < firstTop - 0.5 * ss) {
+      const centred = Math.abs(cx - pageMid) < 0.12 * wMusic && l.x0 > L0 + 0.1 * wMusic;
+      if (centred && l.h >= 0.85 * maxH) role = 'title';
+      else if (centred) role = 'subtitle';
+      else if (l.x1 > R0 - 0.2 * wMusic && l.x0 > pageMid) role = 'composer';
+      else if (l.y1 >= firstTop - 4.5 * ss && l.x0 <= L0 + 0.35 * wMusic) role = 'tempo';
+      else if (l.x0 <= L0 + 0.25 * wMusic) role = 'lyricist';
+      else role = 'credit';
+    } else if (l.y0 > lastBot + 2.5 * ss) role = l.y0 > 0.9 * H ? 'footer' : 'text';
+    else if (n && !n.above && l.words >= 4 && l.y0 - n.s.bot(cx) < 5 * sp) role = 'lyrics';
+    else if (n && n.above && n.k === 0 && l.y1 > sysTop - 5 * sp && ((sysOf === 0 && l.x0 <= sysLeft + 0.3 * wMusic && l.h >= 1.0 * sp) || l.words >= 2)) role = 'tempo';
+    else role = 'expression';
+    out.text.push({ box: [l.x0, l.y0, l.x1, l.y1], role, text: '', h: l.h, words: l.words, sys: sysOf, k: n ? n.k : -1, si: n ? n.s.si : -1, x: l.x0, comps: l.mem });
+  }
+  // two titles: the larger one wins, the other is a subtitle
+  const titles = out.text.filter(t => t.role === 'title').sort((a, b) => b.h - a.h || a.box[1] - b.box[1]);
+  titles.slice(1).forEach(t => { t.role = 'subtitle'; });
+  // several right-aligned credit lines: the first is the composer; a line
+  // above the title is a dedication / header
+  const comp = out.text.filter(t => t.role === 'composer').sort((a, b) => a.box[1] - b.box[1]);
+  comp.slice(1).forEach(t => { t.role = 'credit'; });
+  out.rest = rest;
+  return out;
+}
+
+// letters of one line read as a dynamic: {text, score} or null
+function readDynamic(R, ln, sp) {
+  if (ln.mem.length > 5 || ln.x1 - ln.x0 > 5.5 * sp) return null;
+  let text = '', sc = 1;
+  for (const c of ln.mem) {
+    const g = dynGlyph(R, c, sp);
+    if (!g || g.score < 0.72) return null;
+    text += g.text;
+    sc = Math.min(sc, g.score);
+  }
+  return DYN_WORDS.has(text) ? { text, score: sc } : null;
+}
+
+// ---------------------------------------------------------------- OCR
+// What a role's text reads as; refines the role from its words.
+const TEMPO_RE = /^(tempo|allegr|andant|adagi|larg|lent|prest|vivac|modera|grave|maestos|allegrett|andantin|marcia|marcato|not fast|slow|fast|lively|moderately|brightly|gently|with|rubato|a tempo|tempo di|in time|langsam|schnell|mässig|massig|ruhig|bewegt|lebhaft|sehr|nicht|rasch|innig|zart|mouvement|lent|vif|modéré|anim|swing|ballad|march|waltz|valse|walzer)/i;
+const EXPR_RE = /^(cresc|decresc|dim|rit|rall|accel|poco|più|piu|meno|molto|sempre|subito|dolce|espr|leggiero|legato|stacc|sost|smorz|morendo|cantabile|sotto|mezza|con|senza|ten|marc|sfz|simile|una corda|tre corde|pizz|arco|div|unis|solo|tutti|loco|fine|d\.?\s?c|d\.?\s?s|da capo|dal segno|coda|to coda|segno)/i;
+function refineRole(t) {
+  const s = t.text.trim();
+  if (!s) return;
+  if (/©|\(c\)|copyright|all rights|public domain|creative commons|cc0|cc-by/i.test(s)) { t.role = 'copyright'; return; }
+  if (t.role === 'header' || t.role === 'footer') { if (/^\d{1,3}$/.test(s)) t.role = 'page'; return; }
+  if (t.role === 'measure') { if (!/^\d{1,4}$/.test(s.replace(/\s/g, ''))) t.role = 'expression'; return; }
+  if (t.role === 'composer' || t.role === 'lyricist' || t.role === 'credit' || t.role === 'subtitle') {
+    if (/\barr(\.|anged)?\b|bearb|arrangement/i.test(s)) t.role = 'arranger';
+    else if (/\b(words|lyrics|text|poem|poet|dichtung|worte|paroles)\b/i.test(s)) t.role = 'lyricist';
+    else if (/\b(music|musik|composed|komp|musique)\b/i.test(s) && t.role !== 'subtitle') t.role = 'composer';
+    else if (t.role !== 'subtitle' && TEMPO_RE.test(s)) t.role = 'tempo';
+    return;
+  }
+  if (t.role === 'expression' || t.role === 'tempo' || t.role === 'text') {
+    if (TEMPO_RE.test(s) && !EXPR_RE.test(s)) t.role = 'tempo';
+    else if (EXPR_RE.test(s)) t.role = 'expression';
+  }
+}
+
+// Read the text lines of a page's marks (pageMarks() result) with the
+// injected OCR (lyrics.js setup: one masked line per call). Lyrics lines are
+// lyrics.js's to read; at most maxLines lines per page.
+async function readPageText(fr, marks, ocr, opts = {}) {
+  if (!ocr || !marks || !fr.gray || !fr.gray.data) return 0;
+  const maxLines = opts.maxLines || 24;
+  const order = { title: 0, composer: 1, instrument: 2, abbrev: 3, subtitle: 4, lyricist: 5, arranger: 5, credit: 6, tempo: 7, expression: 8, measure: 9, copyright: 10, footer: 11, header: 12, page: 13, text: 14 };
+  const todo = marks.text.filter(t => t.role !== 'lyrics').sort((a, b) => (order[a.role] ?? 20) - (order[b.role] ?? 20));
+  // only one abbreviation line per staff is needed (they repeat on every system)
+  const seenAbbr = new Set();
+  let n = 0;
+  for (const t of todo) {
+    if (n >= maxLines) break;
+    if (t.role === 'abbrev') { const key = t.k; if (seenAbbr.has(key)) continue; seenAbbr.add(key); }
+    const img = lineCrop(fr, t.box, t.h);
+    if (!img) continue;
+    let words = [];
+    try { words = await ocr(img); } catch (e) { words = []; }
+    n++;
+    const ok = words.filter(w => w.conf >= 30 && /[\p{L}\p{N}]/u.test(w.text));
+    t.text = ok.map(w => w.text).join(' ').replace(/\s+/g, ' ').trim();
+    t.conf = ok.length ? Math.round(ok.reduce((a, w) => a + w.conf, 0) / ok.length) : 0;
+    refineRole(t);
+  }
+  // the abbreviation read once stands for its staff on every later system
+  for (const t of marks.text) if (t.role === 'abbrev' && !t.text) {
+    const r = marks.text.find(u => u.role === 'abbrev' && u.k === t.k && u.text);
+    if (r) t.text = r.text;
+  }
+  return n;
+}
+
+// gray crop of a text line, upscaled to ~40 px capitals with a white margin
+function lineCrop(fr, b, h) {
+  const g = fr.gray, W = g.width, H = g.height;
+  const pad = Math.round(0.35 * h);
+  const x0 = Math.max(0, Math.floor(b[0]) - pad), y0 = Math.max(0, Math.floor(b[1]) - pad);
+  const x1 = Math.min(W - 1, Math.ceil(b[2]) + pad), y1 = Math.min(H - 1, Math.ceil(b[3]) + pad);
+  const cw = x1 - x0 + 1, ch = y1 - y0 + 1;
+  if (cw < 4 || ch < 4) return null;
+  const scale = Math.min(3, Math.max(0.5, 40 / Math.max(8, h)));
+  const m = Math.round(0.5 * h);
+  const OW = Math.round((cw + 2 * m) * scale), OH = Math.round((ch + 2 * m) * scale);
+  const img = makeGray(OW, OH, 255);
+  for (let y = 0; y < OH; y++) for (let x = 0; x < OW; x++) {
+    const sx = Math.floor(x / scale) - m, sy = Math.floor(y / scale) - m;
+    if (sx >= 0 && sy >= 0 && sx < cw && sy < ch) img.data[y * OW + x] = g.data[(y0 + sy) * W + x0 + sx];
+  }
+  return img;
+}
+
+module.exports = { classifyMarks, readPageText, refineRole, ROLE_LABEL, DYN_WORDS, _dynGlyph: dynGlyph, _gridOf: gridOf, _hairpin: hairpin, _slurLike: slurLike, _groupLines: groupLines };
 
 };
 (typeof self!=="undefined"?self:window).omrRequire=req;
@@ -9116,6 +9746,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
   const store = {
     get(k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } },
     set(k, v) { try { window.localStorage.setItem(k, v); } catch (e) { /* storage blocked */ } },
+    del(k) { try { window.localStorage.removeItem(k); } catch (e) { /* storage blocked */ } },
   };
   const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   const fmtBytes = (n) => n < 1024 ? n + ' B' : n < 1048576 ? (n / 1024).toFixed(n < 10240 ? 1 : 0) + ' KB' : (n / 1048576).toFixed(1) + ' MB';
@@ -9533,7 +10164,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
     return `<svg class="${cls || 'mark'}" viewBox="0 0 14 14" aria-hidden="true">${body} fill="${esc(color)}" stroke="${esc(color)}" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
   }
   const partShape = (i) => SHAPES[i % SHAPES.length];
-  const OV = { staff: 'rgba(30,140,90,.6)', bar: 'rgba(43,55,176,.7)', none: '#8a8f96', found: '#2b37b0' };
+  const OV = { staff: 'rgba(84,110,122,.6)', bar: 'rgba(43,55,176,.7)', none: '#8a8f96', found: '#2b37b0' };
   function markPath(shape, x, y, r) {
     const p = shapePoints(shape, r);
     if (!p) return `M${(x - r).toFixed(1)},${y.toFixed(1)}a${r.toFixed(1)},${r.toFixed(1)} 0 1,0 ${(2 * r).toFixed(1)},0a${r.toFixed(1)},${r.toFixed(1)} 0 1,0 ${(-2 * r).toFixed(1)},0z`;
@@ -9622,11 +10253,16 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
         ph.innerHTML = `<p>${esc(msg)}</p>`;
         host.appendChild(ph);
         renderLayers(null);
+        repair.setOn(false);
+        $('repairToggle').disabled = true;
+        repair.renderList();
         return;
       }
       host.appendChild(this.frame(p));
       renderLayers(p.view);
       fitLabels();
+      repair.attach(host.querySelector('.pageframe'), p);
+      $('repairToggle').disabled = false;
       // how the page was read: turned, smoothed, split as a spread, straightened
       const notes = Sess.pageNotes(p.view);
       if (notes.length) {
@@ -9660,8 +10296,6 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
       const g = (layer, body, attrs) => (body ? `<g class="ov-l ov-${layer}"${attrs || ''}>${body}</g>` : '');
       const rect = (b, pad, extra) => `<rect x="${f1(b[0] - pad)}" y="${f1(b[1] - pad)}" width="${f1(b[2] - b[0] + 2 * pad)}" height="${f1(b[3] - b[1] + 2 * pad)}"${extra || ''}/>`;
       let s = `<svg class="ov" viewBox="0 0 ${v.width} ${v.height}" preserveAspectRatio="none" aria-hidden="true" focusable="false">`;
-      const hatch = `ovh${p.i}`;
-      s += `<defs><pattern id="${hatch}" patternUnits="userSpaceOnUse" width="${f1(ss * 0.6)}" height="${f1(ss * 0.6)}" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="${f1(ss * 0.6)}" class="ov-hatch" stroke-width="${f1(ss * 0.18)}"/></pattern></defs>`;
       // staves and barlines (double / final pairs drawn as two lines)
       let bars = `<g class="ov-staff" fill="none" stroke="${OV.staff}" stroke-width="${f1(sw)}">` + v.staves.map((st) => `<polyline points="${pts(st.top)}"/><polyline points="${pts(st.bot)}"/>`).join('') + '</g>';
       const barList = sy.bars || v.barlines.map(([x, t, b]) => [x, t, b, 'single', x, x]);
@@ -9677,7 +10311,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
       const hw = Math.max(2, ss / 7).toFixed(1);
       if (!hp) {
         // still converting: heads are found but not yet assigned to parts
-        nb += `<path class="ov-found" fill="none" stroke="${OV.found}" stroke-width="${hw}" d="${v.heads.map(([x, y, r]) => markPath('circle', x, y, r)).join('')}"/>`;
+        nb += `<path class="ov-found ov-head" stroke="${OV.found}" stroke-width="${hw}" d="${v.heads.map(([x, y, r]) => markPath('circle', x, y, r)).join('')}"/>`;
       } else {
         const byPart = new Map();
         const none = [];
@@ -9686,8 +10320,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
           if (!idx.length) { none.push(markPath('circle', x, y, r)); return; }
           idx.forEach((pi, j) => { if (!byPart.has(pi)) byPart.set(pi, []); byPart.get(pi).push(markPath(partShape(pi), x, y, r * (1 + 0.38 * j))); });
         });
-        for (const [pi, d] of byPart) nb += `<path fill="none" stroke="${esc(parts[pi] ? parts[pi].color : OV.none)}" stroke-width="${hw}" stroke-linejoin="round" d="${d.join('')}"/>`;
-        if (none.length) nb += `<path fill="none" stroke="${OV.none}" stroke-width="${hw}" stroke-dasharray="3 3" d="${none.join('')}"/>`;
+        for (const [pi, d] of byPart) nb += `<path class="ov-head" stroke="${esc(parts[pi] ? parts[pi].color : OV.none)}" stroke-width="${hw}" stroke-linejoin="round" d="${d.join('')}"/>`;
+        if (none.length) nb += `<path class="ov-head" stroke="${OV.none}" stroke-width="${hw}" stroke-dasharray="3 3" d="${none.join('')}"/>`;
       }
       s += g('notes', nb);
       // rests: rounded boxes
@@ -9698,21 +10332,22 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
         return `M${f1(x0)},${f1(y0 + l)}V${f1(y0)}H${f1(x0 + l)}M${f1(x1 - l)},${f1(y0)}H${f1(x1)}V${f1(y0 + l)}M${f1(x1)},${f1(y1 - l)}V${f1(y1)}H${f1(x1 - l)}M${f1(x0 + l)},${f1(y1)}H${f1(x0)}V${f1(y1 - l)}`;
       };
       const clefs = sy.clefs || [];
-      s += g('clefs', (clefs.some((c) => c[5] !== 2) ? `<path d="${clefs.filter((c) => c[5] !== 2).map((c) => corners(c, ss * 0.2)).join('')}"/>` : '') +
+      s += g('clefs', clefs.filter((c) => c[5] !== 2).map((c) => rect(c, ss * 0.2, ' class="bg"')).join('') + (clefs.some((c) => c[5] !== 2) ? `<path d="${clefs.filter((c) => c[5] !== 2).map((c) => corners(c, ss * 0.2)).join('')}"/>` : '') +
         clefs.filter((c) => c[5] === 2).map((c) => rect(c, 0, ' stroke-dasharray="4 4"')).join(''), ` fill="none" stroke-width="${f1(sw * 1.6)}"`);
       // key signatures: dashed boxes; time signatures: pills
       s += g('keys', (sy.keys || []).map((b) => rect(b, ss * 0.2, ` stroke-dasharray="${f1(sw * 3)} ${f1(sw * 1.5)}"`)).join(''), ` fill="none" stroke-width="${f1(sw * 1.3)}"`);
       s += g('times', (sy.times || []).map((b) => rect(b, ss * 0.25, ` rx="${f1(Math.min(b[2] - b[0], b[3] - b[1]) / 2 + ss * 0.25)}"`)).join(''), ` fill="none" stroke-width="${f1(sw * 1.3)}"`);
       // accidentals (square boxes), augmentation dots (rings), tuplet numbers (dotted boxes)
-      s += g('marks', (sy.accs || []).map((b) => rect(b, ss * 0.1)).join('') +
-        (sy.dots || []).map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${f1(r + ss * 0.15)}"/>`).join('') +
-        (sy.tuplets || []).map((b) => rect(b, ss * 0.15, ` stroke-dasharray="${f1(sw)} ${f1(sw)}"`)).join(''), ` fill="none" stroke-width="${f1(sw)}"`);
+      const sub = (cls, body) => (body ? `<g class="${cls}">${body}</g>` : '');
+      s += g('marks', sub('ov-acc', (sy.accs || []).map((b) => rect(b, ss * 0.1)).join('')) +
+        sub('ov-dot', (sy.dots || []).map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${f1(r + ss * 0.15)}"/>`).join('')) +
+        sub('ov-tup', (sy.tuplets || []).map((b) => rect(b, ss * 0.15, ` stroke-dasharray="${f1(sw)} ${f1(sw)}"`)).join('')), ` fill="none" stroke-width="${f1(sw)}"`);
       // lyric syllables the score used: a bracket under each
       const lyr = this.lyricBoxes(p);
       s += g('lyrics', lyr.map(([x0, y0, x1, y1]) => `<path d="M${f1(x0)},${f1(y1 - ss * 0.3)}V${f1(y1 + ss * 0.15)}H${f1(x1)}V${f1(y1 - ss * 0.3)}"/>`).join(''), ` fill="none" stroke-width="${f1(sw)}"`);
-      // ink nothing explains: hatched, outlined in dashes
+      // ink nothing explains: swiped with a yellow highlighter
       const unk = (sy.unknown || []).filter((b) => !lyr.some((l) => b[0] < l[2] && b[2] > l[0] && b[1] < l[3] && b[3] > l[1]));
-      s += g('unknown', unk.map((b) => rect(b, ss * 0.12)).join(''), ` fill="url(#${hatch})" stroke-width="${f1(sw)}" stroke-dasharray="${f1(sw * 2)} ${f1(sw * 1.2)}"`);
+      s += g('unknown', unk.map((b) => rect(b, ss * 0.18, ` rx="${f1(ss * 0.25)}"`)).join(''));
       s += g('labels', this.labels(p));
       return s + '</svg>';
     },
@@ -9826,16 +10461,16 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
     ['bars', 'Staves, barlines'], ['marks', 'Accidentals, dots, tuplets'], ['lyrics', 'Lyric syllables'], ['labels', 'Pitch and value labels'], ['unknown', 'Not recognised'],
   ];
   const LAYER_ICON = {
-    notes: '<path d="M9 2v8" stroke-width="1.4"/><circle cx="6.5" cy="10" r="2.6" stroke-width="1.6"/>',
+    notes: '<path d="M9 2v8" stroke-width="1.4" class="ovk-stem"/><circle cx="6.5" cy="10" r="2.6" stroke-width="1.6"/>',
     rests: '<rect x="2.5" y="3" width="9" height="8" rx="2.2" stroke-width="1.8"/>',
     clefs: '<path d="M2 5V2h3M9 2h3v3M12 9v3H9M5 12H2V9" stroke-width="1.8"/>',
     keys: '<rect x="2" y="2.5" width="10" height="9" stroke-width="1.6" stroke-dasharray="3 1.6"/>',
     times: '<rect x="3.5" y="1.5" width="7" height="11" rx="3.5" stroke-width="1.6"/>',
     bars: '<path d="M1 4h12M1 10h12" stroke-width="1.4" class="ovk-staff"/><path d="M7 1v12" stroke-width="2.2"/>',
-    marks: '<rect x="1.5" y="3" width="5" height="8" stroke-width="1.4"/><circle cx="10.5" cy="7" r="2" stroke-width="1.4"/>',
+    marks: '<rect x="1" y="3" width="4.5" height="8" stroke-width="1.4" class="ovk-acc"/><circle cx="8.6" cy="7" r="1.8" stroke-width="1.4" class="ovk-dot"/><rect x="11" y="4" width="2.4" height="6" stroke-width="1" class="ovk-tup"/>',
     lyrics: '<path d="M2 8v3h10V8" stroke-width="1.6"/>',
     labels: '<text x="7" y="10.5" font-size="9" text-anchor="middle" stroke="none" fill="currentColor">C5</text>',
-    unknown: '<rect x="2" y="2" width="10" height="10" stroke-width="1.4" stroke-dasharray="2.4 1.4"/><path d="M2 8l6-6M2 12l10-10M6 12l6-6" stroke-width="1.2" opacity=".6"/>',
+    unknown: '<rect x="1.5" y="3.5" width="11" height="7" rx="1.6" stroke-width=".8"/>',
   };
   const layerOff = new Set((() => { try { return JSON.parse(store.get('ssr.layers') || '[]'); } catch (e) { return []; } })());
   function layerCounts(v) {
@@ -10162,6 +10797,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
     drop.nPages = 1;
     drop.set('busy', file.title || file.name, !!file.title);
     showFile(file.name, file.size);
+    repair.open(file.name, file.size);
     legend(null);
     let ocrUsed = false;
     let engine = null;
@@ -10458,6 +11094,287 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
   applyZoom();
   window.addEventListener('resize', fitLabels);
   if (window.visualViewport) window.visualViewport.addEventListener('resize', fitLabels);
+
+  // ------------------------------------------------------ repair marks ---
+  // The reader draws over a page to mark what the reading got wrong. Marks are
+  // kept in the page's full-resolution frame (the overlay's viewBox), per page
+  // and per document (file name and size), and export as JSON for a later
+  // repair pass (docs/SDD.md, repair notes).
+  const RP_TOOL = { pen: 'Pen', line: 'Line', box: 'Box', ellipse: 'Circle' };
+  const repair = {
+    doc: null, file: null, size: 0, marks: {}, hist: [], on: false, tool: 'pen', drawing: null, seq: 0,
+    key() { return 'ssr.repair:' + this.doc; },
+    open(name, size) {
+      this.size = typeof size === 'number' ? size : null; this.doc = `${name}:${this.size == null ? 'sample' : this.size}`; this.file = name; this.hist = []; this.marks = {};
+      try { const j = JSON.parse(store.get(this.key()) || 'null'); if (j && j.marks) this.marks = j.marks; } catch (e) { this.marks = {}; }
+      this.seq = Math.max(0, ...Object.values(this.marks).flat().map((m) => m.id || 0));
+    },
+    save() {
+      if (!this.doc) return;
+      const any = Object.values(this.marks).some((a) => a.length);
+      if (any) store.set(this.key(), JSON.stringify({ v: 1, marks: this.marks })); else store.del(this.key());
+    },
+    page() { return book.pages[book.sel]; },
+    list(i) { return this.marks[i] || []; },
+    change(i, next) {
+      this.hist.push({ i, prev: this.list(i).slice() });
+      if (this.hist.length > 200) this.hist.shift();
+      this.marks[i] = next;
+      this.save();
+      this.paint();
+    },
+    undo() {
+      const p = this.page();
+      let k = this.hist.length - 1;
+      while (k >= 0 && (!p || this.hist[k].i !== p.i)) k--;
+      if (k < 0) { msgRP('Nothing to undo on this page.'); return; }
+      const h = this.hist.splice(k, 1)[0];
+      this.marks[h.i] = h.prev;
+      this.save();
+      this.paint();
+      msgRP('Undone.');
+    },
+    setOn(on) {
+      const p = this.page();
+      on = !!on && !!(p && p.view);
+      this.on = on;
+      $('repairToggle').setAttribute('aria-pressed', String(on));
+      $('repairBar').hidden = !on;
+      $('pages').classList.toggle('drawing', on);
+      if (!on) this.drawing = null;
+    },
+    // the page's layer, drawn on (or redrawn after) show()
+    attach(fig, p) {
+      const v = p.view;
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('class', 'rp');
+      svg.setAttribute('viewBox', `0 0 ${v.width} ${v.height}`);
+      svg.setAttribute('preserveAspectRatio', 'none');
+      svg.setAttribute('aria-hidden', 'true');
+      fig.appendChild(svg);
+      const at = (e) => {
+        const r = svg.getBoundingClientRect();
+        return [Math.round(((e.clientX - r.left) / r.width) * v.width * 10) / 10, Math.round(((e.clientY - r.top) / r.height) * v.height * 10) / 10];
+      };
+      const unit = () => v.width / Math.max(1, svg.getBoundingClientRect().width); // page px per screen px
+      svg.addEventListener('pointerdown', (e) => {
+        if (!this.on || e.button > 0) return;
+        e.preventDefault();
+        try { svg.setPointerCapture(e.pointerId); } catch (err) { /* synthetic pointer */ }
+        const pt = at(e);
+        this.drawing = { tool: this.tool, shift: e.shiftKey, pts: [pt, pt], id: e.pointerId };
+        this.paint();
+      });
+      svg.addEventListener('pointermove', (e) => {
+        const d = this.drawing;
+        if (!d || d.id !== e.pointerId) return;
+        e.preventDefault();
+        const pt = at(e);
+        if (d.tool === 'pen' && !(d.shift || e.shiftKey)) {
+          const q = d.pts[d.pts.length - 1];
+          if (d.pts.length === 2 && d.pts[0] === d.pts[1]) d.pts[1] = pt;
+          else if (Math.hypot(pt[0] - q[0], pt[1] - q[1]) >= 2 * unit()) d.pts.push(pt);
+        } else { d.pts = [d.pts[0], pt]; if (d.tool === 'pen') d.straight = true; }
+        this.paint();
+      });
+      const end = (e, keep) => {
+        const d = this.drawing;
+        if (!d || d.id !== e.pointerId) return;
+        this.drawing = null;
+        const b = bboxOf(d.pts);
+        if (!keep || Math.max(b[2] - b[0], b[3] - b[1]) < 4 * unit()) { this.paint(); return; }
+        const tool = d.tool === 'pen' && (d.straight || d.shift) ? 'line' : d.tool;
+        const m = { id: ++this.seq, tool, pts: tool === 'pen' ? d.pts : [d.pts[0], d.pts[d.pts.length - 1]], note: '', at: new Date().toISOString() };
+        this.change(p.i, this.list(p.i).concat([m]));
+        msgRP(`Mark ${this.list(p.i).length} added (${RP_TOOL[tool].toLowerCase()}). Add a note below if it helps.`);
+      };
+      svg.addEventListener('pointerup', (e) => end(e, true));
+      svg.addEventListener('pointercancel', (e) => end(e, false));
+      this.paint();
+    },
+    paint() {
+      const p = this.page();
+      const svg = $('pages').querySelector('svg.rp');
+      if (svg && p && p.view) {
+        const ss = p.view.ss;
+        let s = this.list(p.i).map((m, k) => markSVG(m, ss, k + 1)).join('');
+        if (this.drawing) s += markSVG({ tool: this.drawing.tool === 'pen' && this.drawing.straight ? 'line' : this.drawing.tool, pts: this.drawing.pts }, ss, 0);
+        svg.innerHTML = s;
+      }
+      this.renderList();
+    },
+    renderList() {
+      const p = this.page();
+      const ms = p ? this.list(p.i) : [];
+      const ol = $('rpList');
+      // keep a note being typed: only rebuild when the marks themselves changed
+      const sig = ms.map((m) => m.id).join(',') + '@' + (p ? p.i : '');
+      if (ol.dataset.sig === sig) return;
+      ol.dataset.sig = sig;
+      ol.innerHTML = ms.map((m, k) => `<li data-id="${m.id}"><span class="rp-num" aria-hidden="true">${k + 1}</span><span>${esc(RP_TOOL[m.tool] || m.tool)}</span>` +
+        `<input type="text" maxlength="160" value="${esc(m.note || '')}" placeholder="Note, e.g. missed chord note" aria-label="Note for mark ${k + 1}">` +
+        `<button class="btn icon small" type="button" data-del="${m.id}" aria-label="Delete mark ${k + 1}">×</button></li>`).join('');
+    },
+  };
+  const msgRP = (t) => { $('rpMsg').textContent = t; };
+  function bboxOf(pts) {
+    const xs = pts.map((q) => q[0]), ys = pts.map((q) => q[1]);
+    return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
+  }
+  // a mark's outline as path data (page frame)
+  function markPathD(m) {
+    const P = m.pts, r1 = (v) => Math.round(v * 10) / 10;
+    if (m.tool === 'box' || m.tool === 'ellipse') {
+      const [x0, y0, x1, y1] = bboxOf(P);
+      if (m.tool === 'box') return `M${r1(x0)},${r1(y0)}H${r1(x1)}V${r1(y1)}H${r1(x0)}Z`;
+      const rx = (x1 - x0) / 2, ry = (y1 - y0) / 2, cx = x0 + rx;
+      return `M${r1(cx - rx)},${r1(y0 + ry)}a${r1(rx)},${r1(ry)} 0 1,0 ${r1(2 * rx)},0a${r1(rx)},${r1(ry)} 0 1,0 ${r1(-2 * rx)},0Z`;
+    }
+    const pts = m.tool === 'line' ? [P[0], P[P.length - 1]] : P;
+    return 'M' + pts.map((q) => `${r1(q[0])},${r1(q[1])}`).join('L');
+  }
+  function markSVG(m, ss, n) {
+    const d = markPathD(m), w = Math.max(3, ss * 0.22);
+    let s = `<g class="rp-mark"><path class="rp-halo" d="${d}" stroke-width="${(w * 4).toFixed(1)}"/><path class="rp-core" d="${d}" stroke-width="${w.toFixed(1)}" stroke-dasharray="${(w * 3).toFixed(1)} ${(w * 2).toFixed(1)}"/>`;
+    if (n) {
+      const [x0, y0] = bboxOf(m.pts), r = ss * 0.75;
+      s += `<g class="rp-badge"><circle cx="${(x0 - r * 0.6).toFixed(1)}" cy="${(y0 - r * 0.6).toFixed(1)}" r="${r.toFixed(1)}"/><text x="${(x0 - r * 0.6).toFixed(1)}" y="${(y0 - r * 0.6 + r * 0.42).toFixed(1)}" font-size="${(r * 1.2).toFixed(1)}">${n}</text></g>`;
+    }
+    return s + '</g>';
+  }
+  // What the reading found inside a mark's box, in the terms the repair pass needs.
+  function repairInside(p, b) {
+    const v = p.view;
+    if (!v) return null;
+    const sy = v.sym || {}, ss = v.ss;
+    const hit = (x0, y0, x1, y1) => x0 <= b[2] && x1 >= b[0] && y0 <= b[3] && y1 >= b[1];
+    const boxHit = (a) => hit(a[0], a[1], a[2], a[3]);
+    const hp = (book.headParts && book.headParts.get(p.i)) || [], hn = (book.headNotes && book.headNotes.get(p.i)) || [], parts = book.parts || [];
+    const heads = [];
+    v.heads.forEach((h, k) => {
+      if (!hit(h[0] - h[2], h[1] - h[2], h[0] + h[2], h[1] + h[2])) return;
+      const n = hn[k];
+      heads.push({ k, x: h[0], y: h[1], stem: h[3] === 1 ? 'up' : h[3] === -1 ? 'down' : h[3] === 2 ? 'both' : 'none',
+        pitch: n ? pitchText(n) : null, value: n ? durText(n[3], n[4], n[5], n[6]) : null, quarters: n ? n[3] : null, parts: (hp[k] || []).map((pi) => (parts[pi] ? parts[pi].name : pi)) });
+    });
+    const pick = (a, f) => (a || []).filter(boxHit).map(f);
+    const bx = (a) => a.slice(0, 4);
+    let measures = null;
+    const mm = lastRes && lastRes.score && lastRes.score.measureMap;
+    if (mm && !v.spread) measures = [...new Set(mm.filter((m) => m.page === p.i && hit(m.xa, m.y0 - 2 * ss, m.xb, m.y1 + 2 * ss)).map((m) => m.n))].sort((x, y) => x - y);
+    return {
+      measures, heads,
+      rests: pick(sy.rests, (r) => ({ box: bx(r), kind: r[4], quarters: r[5], dots: r[6], text: restText(r[4], r[5], r[6], r[7]) })),
+      clefs: pick(sy.clefs, (c) => ({ box: bx(c), clef: c[4], text: clefLabel(c[4]), change: c[5] === 1, assumed: c[5] === 2 })),
+      keys: pick(sy.keys, (c) => ({ box: bx(c), fifths: c[4], text: keyLabel(c[4]), change: !!c[5] })),
+      times: pick(sy.times, (c) => ({ box: bx(c), beats: c[4] || null, beatType: c[5] || null, symbol: c[6] || null })),
+      accidentals: pick(sy.accs, (c) => ({ box: bx(c), kind: c[4] })),
+      dots: (sy.dots || []).filter(([x, y, r]) => hit(x - r, y - r, x + r, y + r)).map(([x, y]) => ({ x, y })),
+      tuplets: pick(sy.tuplets, (c) => ({ box: bx(c), actual: c[4], normal: c[5] })),
+      barlines: (sy.bars || []).filter((r) => hit(r[4], r[1], r[5], r[2])).map((r) => ({ x: r[0], top: r[1], bottom: r[2], type: r[3] })),
+      unrecognised: (sy.unknown || []).filter(boxHit),
+    };
+  }
+  function repairNotes() {
+    const pages = [];
+    book.pages.forEach((p) => {
+      const ms = repair.list(p.i);
+      if (!ms.length) return;
+      const v = p.view;
+      pages.push({
+        page: p.i + 1, width: v ? v.width : null, height: v ? v.height : null, staffSpace: v ? v.ss : null, spread: v ? v.spread || 0 : 0,
+        marks: ms.map((m, k) => { const b = bboxOf(m.pts).map((x) => Math.round(x)); return { n: k + 1, id: m.id, tool: m.tool, note: m.note || '', points: m.pts, bbox: b, drawn: m.at, found: repairInside(p, b) }; }),
+      });
+    });
+    const sc = (lastRes && lastRes.score) || {};
+    return {
+      format: 'score-scan-reader/repair-notes', version: 1, file: repair.file, size: repair.size, exported: new Date().toISOString(),
+      frame: 'page pixels of the straightened page as read (the detection overlay frame); x right, y down',
+      score: { parts: (sc.parts || []).map((p) => p.name), measures: sc.measures || 0, fifths: sc.fifths, time: sc.time || null },
+      pages,
+    };
+  }
+  const notesName = (ext) => `${String(repair.file || 'score').replace(/\.[^.]+$/, '')}-repair${ext}`;
+  // The page may not offer download links (tools/build.js, artifact rules), so
+  // a file opens in a new tab, where the browser saves it; where new tabs are
+  // blocked the copy button still works.
+  function openBlob(blob, what) {
+    const url = URL.createObjectURL(blob);
+    let w = null;
+    try { w = window.open(url, '_blank'); if (w) w.opener = null; } catch (e) { w = null; }
+    setTimeout(() => URL.revokeObjectURL(url), 120000);
+    msgRP(w ? `${what} opened in a new tab: save it from there.` : `${what} could not open here (new tabs are blocked); use Copy repair notes.`);
+  }
+  function countMarks() { return Object.values(repair.marks).reduce((a, m) => a + m.length, 0); }
+  function copyRepair() {
+    const n = countMarks();
+    if (!n) { msgRP('There are no repair marks to copy yet.'); return; }
+    const txt = JSON.stringify(repairNotes(), null, 1);
+    const ok = () => { $('rpOut').hidden = true; msgRP(`Copied ${plural(n, 'repair mark')} as JSON.`); };
+    const fallback = () => { const ta = $('rpOut'); ta.value = txt; ta.hidden = false; ta.focus(); ta.select(); msgRP('This page cannot reach the clipboard. The notes are selected below: press Ctrl+C (Cmd+C on a Mac).'); };
+    try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, fallback); else fallback(); } catch (e) { fallback(); }
+  }
+  function downloadRepairJSON() {
+    if (!countMarks()) { msgRP('There are no repair marks to download yet.'); return; }
+    openBlob(new Blob([JSON.stringify(repairNotes(), null, 1)], { type: 'application/json' }), `Repair notes (${notesName('.json')})`);
+  }
+  function downloadRepairPNG() {
+    const p = repair.page();
+    if (!p || !p.view || !p.url) return;
+    const v = p.view, img = new Image();
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = img.naturalWidth; c.height = img.naturalHeight;
+      const g = c.getContext('2d');
+      g.drawImage(img, 0, 0);
+      const k = c.width / v.width, ss = v.ss, w = Math.max(3, ss * 0.22);
+      g.scale(k, k);
+      const css = getComputedStyle(document.documentElement);
+      const halo = css.getPropertyValue('--rp-halo').trim() || 'rgba(118,255,3,.55)', ink = css.getPropertyValue('--rp-ink').trim() || '#0b0c0e';
+      const badge = css.getPropertyValue('--rp-badge-ink').trim() || '#b2ff59';
+      g.lineCap = 'round'; g.lineJoin = 'round';
+      repair.list(p.i).forEach((m, n) => {
+        const path = new Path2D(markPathD(m));
+        g.setLineDash([]); g.strokeStyle = halo; g.lineWidth = w * 4; g.stroke(path);
+        g.setLineDash([w * 3, w * 2]); g.strokeStyle = ink; g.lineWidth = w; g.stroke(path);
+        const [x0, y0] = bboxOf(m.pts), r = ss * 0.75, cx = x0 - r * 0.6, cy = y0 - r * 0.6;
+        g.setLineDash([]); g.fillStyle = ink; g.beginPath(); g.arc(cx, cy, r, 0, 2 * Math.PI); g.fill();
+        g.fillStyle = badge; g.font = `700 ${r * 1.2}px sans-serif`; g.textAlign = 'center'; g.fillText(String(n + 1), cx, cy + r * 0.42);
+      });
+      c.toBlob((b) => { if (b) openBlob(b, `Page ${p.i + 1} with its marks`); c.width = c.height = 0; }, 'image/png');
+    };
+    img.src = p.url;
+  }
+  $('repairToggle').addEventListener('click', () => repair.setOn(!repair.on));
+  document.querySelectorAll('input[name="rpTool"]').forEach((r) => r.addEventListener('change', () => { if (r.checked) repair.tool = r.value; }));
+  $('rpUndo').addEventListener('click', () => repair.undo());
+  $('rpClear').addEventListener('click', () => {
+    const p = repair.page();
+    if (!p || !repair.list(p.i).length) { msgRP('This page has no marks.'); return; }
+    repair.change(p.i, []);
+    msgRP(`Cleared page ${p.i + 1}. Undo brings the marks back.`);
+  });
+  $('rpCopy').addEventListener('click', copyRepair);
+  $('rpJson').addEventListener('click', downloadRepairJSON);
+  $('rpPng').addEventListener('click', downloadRepairPNG);
+  $('rpList').addEventListener('input', (e) => {
+    const li = e.target.closest('li[data-id]'), p = repair.page();
+    if (!li || !p) return;
+    const m = repair.list(p.i).find((x) => String(x.id) === li.dataset.id);
+    if (m) { m.note = e.target.value; repair.save(); }
+  });
+  $('rpList').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-del]'), p = repair.page();
+    if (!b || !p) return;
+    repair.change(p.i, repair.list(p.i).filter((x) => String(x.id) !== b.dataset.del));
+    msgRP('Mark deleted. Undo brings it back.');
+  });
+  document.addEventListener('keydown', (e) => {
+    if (!repair.on) return;
+    if (e.key === 'Escape') { repair.drawing = null; repair.setOn(false); $('repairToggle').focus(); msgRP(''); return; }
+    const typing = /^(INPUT|TEXTAREA)$/.test(e.target.tagName) && e.target.type !== 'radio';
+    if ((e.ctrlKey || e.metaKey) && !e.shiftKey && (e.key === 'z' || e.key === 'Z') && !typing) { e.preventDefault(); repair.undo(); }
+  });
 
   // Drag and drop anywhere on the page. dragenter/dragleave fire for every
   // child crossed, so count depth and leave the "over" state only at zero.

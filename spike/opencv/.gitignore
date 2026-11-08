@@ -1,0 +1,10 @@
+# regenerated: npm install (opencv-js), node tools/patch-noeval.js, the font download in docs/spike-opencv.md
+node_modules/
+vendor/
+fonts/*.otf
+fonts/*.woff2
+fonts/*.json
+# A/B src snapshots and scratch copies
+src-snap/
+src-ab*/
+proto-test/

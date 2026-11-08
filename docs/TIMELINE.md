@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 19:38 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 19:48 AEDT.
 
 ## Events
 
@@ -87,6 +87,13 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 19:38 | v0.9.0 regression check vs v0.8.0: no regression (benchmark+OCR 0.946 to 0.948, real scans 0.921 to 0.926; challenge 0.808 to 0.809, 0 items down more than 0.05). |
 | 19:38 | Pushed 184d5b5: All examples picker in /app/ (19 shareable benchmark scans, 8 real + 11 synthetic; restricted Bach excluded; assets 39.6 MB of 64). |
 | 19:38 | User asked for hand-drawn repair marks on the page after detection; added to the overlay agent's scope (freehand/line marks in page coordinates, notes, undo, per-document persistence, JSON + PNG export for a later repair pass). |
+| 19:44 | Overlay shipped (42663a6, release 0.10.0): marks for every recognised class, pitch/value labels, zoom control, 'Not recognised' hatching (72 on the rag). Benchmark MusicXML byte-identical; no regression. CI and Pages green. |
+| 19:44 | Overlay agent resumed for the repair-drawing mode. |
+| 19:44 | User asked to pre-identify text (title, composer, instrument names, bar numbers) and dynamics (mf etc.). textsym agent started (Opus xhigh): text-region classification with OCR, dynamics/hairpin shapes, braces/slurs/grace if cheap, and MusicXML credits, part names and dynamics (L9, L22). |
+| 19:46 | Overlay restyle per user: unrecognised ink as yellow highlighter; every identified item filled with a transparent tint of its own type colour (13 distinct type colours; note-head outline keeps the part colour). Verified light/dark. Shipping together with the overlay agent's repair mode (same files); repair marks moving off yellow. |
+| 19:46 | OpenCV investigation done: don't ship OpenCV.js for symbols (10.4 MB, needs an eval-free patch, ~170 MB heap); classical rests/clefs/accidentals already match learned classifiers. Real gap: time-signature digits are never read (0/182). A plain-JS Bravura template matcher reads 99.8% of digits on scans (90.9% severe); first time signature right 333 to 341 of 365 challenge, 246 to 269 of 306 coverage; +0.25 s per item. The OpenCV agent was told to ship it default-on, then build the quality-gated pre-clean stage. |
+| 19:47 | Sheet view now uses the full page width (plate 1888 px at 1920; side panels flow below as columns); verified at 1920/1280/400, no horizontal scroll. Ships with the overlay agent's repair-mode push; build is waiting on textsym's dynglyphs.js. |
+| 19:48 | User flagged bar numbers 5/10/15 as unrecognised; textsym told to recognise them (digit templates or digit-only OCR), label 'Bar N', and cross-check measure counts per system (warning, and fix single missed/extra barlines). Braces also to be recognised and tried as evidence for grand staves (L6, L18). |
 
 ## Accuracy by round
 

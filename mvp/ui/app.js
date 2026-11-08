@@ -27,6 +27,7 @@
   const store = {
     get(k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } },
     set(k, v) { try { window.localStorage.setItem(k, v); } catch (e) { /* storage blocked */ } },
+    del(k) { try { window.localStorage.removeItem(k); } catch (e) { /* storage blocked */ } },
   };
   const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   const fmtBytes = (n) => n < 1024 ? n + ' B' : n < 1048576 ? (n / 1024).toFixed(n < 10240 ? 1 : 0) + ' KB' : (n / 1048576).toFixed(1) + ' MB';
@@ -444,7 +445,7 @@
     return `<svg class="${cls || 'mark'}" viewBox="0 0 14 14" aria-hidden="true">${body} fill="${esc(color)}" stroke="${esc(color)}" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
   }
   const partShape = (i) => SHAPES[i % SHAPES.length];
-  const OV = { staff: 'rgba(30,140,90,.6)', bar: 'rgba(43,55,176,.7)', none: '#8a8f96', found: '#2b37b0' };
+  const OV = { staff: 'rgba(84,110,122,.6)', bar: 'rgba(43,55,176,.7)', none: '#8a8f96', found: '#2b37b0' };
   function markPath(shape, x, y, r) {
     const p = shapePoints(shape, r);
     if (!p) return `M${(x - r).toFixed(1)},${y.toFixed(1)}a${r.toFixed(1)},${r.toFixed(1)} 0 1,0 ${(2 * r).toFixed(1)},0a${r.toFixed(1)},${r.toFixed(1)} 0 1,0 ${(-2 * r).toFixed(1)},0z`;
@@ -533,11 +534,16 @@
         ph.innerHTML = `<p>${esc(msg)}</p>`;
         host.appendChild(ph);
         renderLayers(null);
+        repair.setOn(false);
+        $('repairToggle').disabled = true;
+        repair.renderList();
         return;
       }
       host.appendChild(this.frame(p));
       renderLayers(p.view);
       fitLabels();
+      repair.attach(host.querySelector('.pageframe'), p);
+      $('repairToggle').disabled = false;
       // how the page was read: turned, smoothed, split as a spread, straightened
       const notes = Sess.pageNotes(p.view);
       if (notes.length) {
@@ -571,8 +577,6 @@
       const g = (layer, body, attrs) => (body ? `<g class="ov-l ov-${layer}"${attrs || ''}>${body}</g>` : '');
       const rect = (b, pad, extra) => `<rect x="${f1(b[0] - pad)}" y="${f1(b[1] - pad)}" width="${f1(b[2] - b[0] + 2 * pad)}" height="${f1(b[3] - b[1] + 2 * pad)}"${extra || ''}/>`;
       let s = `<svg class="ov" viewBox="0 0 ${v.width} ${v.height}" preserveAspectRatio="none" aria-hidden="true" focusable="false">`;
-      const hatch = `ovh${p.i}`;
-      s += `<defs><pattern id="${hatch}" patternUnits="userSpaceOnUse" width="${f1(ss * 0.6)}" height="${f1(ss * 0.6)}" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="${f1(ss * 0.6)}" class="ov-hatch" stroke-width="${f1(ss * 0.18)}"/></pattern></defs>`;
       // staves and barlines (double / final pairs drawn as two lines)
       let bars = `<g class="ov-staff" fill="none" stroke="${OV.staff}" stroke-width="${f1(sw)}">` + v.staves.map((st) => `<polyline points="${pts(st.top)}"/><polyline points="${pts(st.bot)}"/>`).join('') + '</g>';
       const barList = sy.bars || v.barlines.map(([x, t, b]) => [x, t, b, 'single', x, x]);
@@ -588,7 +592,7 @@
       const hw = Math.max(2, ss / 7).toFixed(1);
       if (!hp) {
         // still converting: heads are found but not yet assigned to parts
-        nb += `<path class="ov-found" fill="none" stroke="${OV.found}" stroke-width="${hw}" d="${v.heads.map(([x, y, r]) => markPath('circle', x, y, r)).join('')}"/>`;
+        nb += `<path class="ov-found ov-head" stroke="${OV.found}" stroke-width="${hw}" d="${v.heads.map(([x, y, r]) => markPath('circle', x, y, r)).join('')}"/>`;
       } else {
         const byPart = new Map();
         const none = [];
@@ -597,8 +601,8 @@
           if (!idx.length) { none.push(markPath('circle', x, y, r)); return; }
           idx.forEach((pi, j) => { if (!byPart.has(pi)) byPart.set(pi, []); byPart.get(pi).push(markPath(partShape(pi), x, y, r * (1 + 0.38 * j))); });
         });
-        for (const [pi, d] of byPart) nb += `<path fill="none" stroke="${esc(parts[pi] ? parts[pi].color : OV.none)}" stroke-width="${hw}" stroke-linejoin="round" d="${d.join('')}"/>`;
-        if (none.length) nb += `<path fill="none" stroke="${OV.none}" stroke-width="${hw}" stroke-dasharray="3 3" d="${none.join('')}"/>`;
+        for (const [pi, d] of byPart) nb += `<path class="ov-head" stroke="${esc(parts[pi] ? parts[pi].color : OV.none)}" stroke-width="${hw}" stroke-linejoin="round" d="${d.join('')}"/>`;
+        if (none.length) nb += `<path class="ov-head" stroke="${OV.none}" stroke-width="${hw}" stroke-dasharray="3 3" d="${none.join('')}"/>`;
       }
       s += g('notes', nb);
       // rests: rounded boxes
@@ -609,21 +613,22 @@
         return `M${f1(x0)},${f1(y0 + l)}V${f1(y0)}H${f1(x0 + l)}M${f1(x1 - l)},${f1(y0)}H${f1(x1)}V${f1(y0 + l)}M${f1(x1)},${f1(y1 - l)}V${f1(y1)}H${f1(x1 - l)}M${f1(x0 + l)},${f1(y1)}H${f1(x0)}V${f1(y1 - l)}`;
       };
       const clefs = sy.clefs || [];
-      s += g('clefs', (clefs.some((c) => c[5] !== 2) ? `<path d="${clefs.filter((c) => c[5] !== 2).map((c) => corners(c, ss * 0.2)).join('')}"/>` : '') +
+      s += g('clefs', clefs.filter((c) => c[5] !== 2).map((c) => rect(c, ss * 0.2, ' class="bg"')).join('') + (clefs.some((c) => c[5] !== 2) ? `<path d="${clefs.filter((c) => c[5] !== 2).map((c) => corners(c, ss * 0.2)).join('')}"/>` : '') +
         clefs.filter((c) => c[5] === 2).map((c) => rect(c, 0, ' stroke-dasharray="4 4"')).join(''), ` fill="none" stroke-width="${f1(sw * 1.6)}"`);
       // key signatures: dashed boxes; time signatures: pills
       s += g('keys', (sy.keys || []).map((b) => rect(b, ss * 0.2, ` stroke-dasharray="${f1(sw * 3)} ${f1(sw * 1.5)}"`)).join(''), ` fill="none" stroke-width="${f1(sw * 1.3)}"`);
       s += g('times', (sy.times || []).map((b) => rect(b, ss * 0.25, ` rx="${f1(Math.min(b[2] - b[0], b[3] - b[1]) / 2 + ss * 0.25)}"`)).join(''), ` fill="none" stroke-width="${f1(sw * 1.3)}"`);
       // accidentals (square boxes), augmentation dots (rings), tuplet numbers (dotted boxes)
-      s += g('marks', (sy.accs || []).map((b) => rect(b, ss * 0.1)).join('') +
-        (sy.dots || []).map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${f1(r + ss * 0.15)}"/>`).join('') +
-        (sy.tuplets || []).map((b) => rect(b, ss * 0.15, ` stroke-dasharray="${f1(sw)} ${f1(sw)}"`)).join(''), ` fill="none" stroke-width="${f1(sw)}"`);
+      const sub = (cls, body) => (body ? `<g class="${cls}">${body}</g>` : '');
+      s += g('marks', sub('ov-acc', (sy.accs || []).map((b) => rect(b, ss * 0.1)).join('')) +
+        sub('ov-dot', (sy.dots || []).map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${f1(r + ss * 0.15)}"/>`).join('')) +
+        sub('ov-tup', (sy.tuplets || []).map((b) => rect(b, ss * 0.15, ` stroke-dasharray="${f1(sw)} ${f1(sw)}"`)).join('')), ` fill="none" stroke-width="${f1(sw)}"`);
       // lyric syllables the score used: a bracket under each
       const lyr = this.lyricBoxes(p);
       s += g('lyrics', lyr.map(([x0, y0, x1, y1]) => `<path d="M${f1(x0)},${f1(y1 - ss * 0.3)}V${f1(y1 + ss * 0.15)}H${f1(x1)}V${f1(y1 - ss * 0.3)}"/>`).join(''), ` fill="none" stroke-width="${f1(sw)}"`);
-      // ink nothing explains: hatched, outlined in dashes
+      // ink nothing explains: swiped with a yellow highlighter
       const unk = (sy.unknown || []).filter((b) => !lyr.some((l) => b[0] < l[2] && b[2] > l[0] && b[1] < l[3] && b[3] > l[1]));
-      s += g('unknown', unk.map((b) => rect(b, ss * 0.12)).join(''), ` fill="url(#${hatch})" stroke-width="${f1(sw)}" stroke-dasharray="${f1(sw * 2)} ${f1(sw * 1.2)}"`);
+      s += g('unknown', unk.map((b) => rect(b, ss * 0.18, ` rx="${f1(ss * 0.25)}"`)).join(''));
       s += g('labels', this.labels(p));
       return s + '</svg>';
     },
@@ -737,16 +742,16 @@
     ['bars', 'Staves, barlines'], ['marks', 'Accidentals, dots, tuplets'], ['lyrics', 'Lyric syllables'], ['labels', 'Pitch and value labels'], ['unknown', 'Not recognised'],
   ];
   const LAYER_ICON = {
-    notes: '<path d="M9 2v8" stroke-width="1.4"/><circle cx="6.5" cy="10" r="2.6" stroke-width="1.6"/>',
+    notes: '<path d="M9 2v8" stroke-width="1.4" class="ovk-stem"/><circle cx="6.5" cy="10" r="2.6" stroke-width="1.6"/>',
     rests: '<rect x="2.5" y="3" width="9" height="8" rx="2.2" stroke-width="1.8"/>',
     clefs: '<path d="M2 5V2h3M9 2h3v3M12 9v3H9M5 12H2V9" stroke-width="1.8"/>',
     keys: '<rect x="2" y="2.5" width="10" height="9" stroke-width="1.6" stroke-dasharray="3 1.6"/>',
     times: '<rect x="3.5" y="1.5" width="7" height="11" rx="3.5" stroke-width="1.6"/>',
     bars: '<path d="M1 4h12M1 10h12" stroke-width="1.4" class="ovk-staff"/><path d="M7 1v12" stroke-width="2.2"/>',
-    marks: '<rect x="1.5" y="3" width="5" height="8" stroke-width="1.4"/><circle cx="10.5" cy="7" r="2" stroke-width="1.4"/>',
+    marks: '<rect x="1" y="3" width="4.5" height="8" stroke-width="1.4" class="ovk-acc"/><circle cx="8.6" cy="7" r="1.8" stroke-width="1.4" class="ovk-dot"/><rect x="11" y="4" width="2.4" height="6" stroke-width="1" class="ovk-tup"/>',
     lyrics: '<path d="M2 8v3h10V8" stroke-width="1.6"/>',
     labels: '<text x="7" y="10.5" font-size="9" text-anchor="middle" stroke="none" fill="currentColor">C5</text>',
-    unknown: '<rect x="2" y="2" width="10" height="10" stroke-width="1.4" stroke-dasharray="2.4 1.4"/><path d="M2 8l6-6M2 12l10-10M6 12l6-6" stroke-width="1.2" opacity=".6"/>',
+    unknown: '<rect x="1.5" y="3.5" width="11" height="7" rx="1.6" stroke-width=".8"/>',
   };
   const layerOff = new Set((() => { try { return JSON.parse(store.get('ssr.layers') || '[]'); } catch (e) { return []; } })());
   function layerCounts(v) {
@@ -1073,6 +1078,7 @@
     drop.nPages = 1;
     drop.set('busy', file.title || file.name, !!file.title);
     showFile(file.name, file.size);
+    repair.open(file.name, file.size);
     legend(null);
     let ocrUsed = false;
     let engine = null;
@@ -1369,6 +1375,287 @@
   applyZoom();
   window.addEventListener('resize', fitLabels);
   if (window.visualViewport) window.visualViewport.addEventListener('resize', fitLabels);
+
+  // ------------------------------------------------------ repair marks ---
+  // The reader draws over a page to mark what the reading got wrong. Marks are
+  // kept in the page's full-resolution frame (the overlay's viewBox), per page
+  // and per document (file name and size), and export as JSON for a later
+  // repair pass (docs/SDD.md, repair notes).
+  const RP_TOOL = { pen: 'Pen', line: 'Line', box: 'Box', ellipse: 'Circle' };
+  const repair = {
+    doc: null, file: null, size: 0, marks: {}, hist: [], on: false, tool: 'pen', drawing: null, seq: 0,
+    key() { return 'ssr.repair:' + this.doc; },
+    open(name, size) {
+      this.size = typeof size === 'number' ? size : null; this.doc = `${name}:${this.size == null ? 'sample' : this.size}`; this.file = name; this.hist = []; this.marks = {};
+      try { const j = JSON.parse(store.get(this.key()) || 'null'); if (j && j.marks) this.marks = j.marks; } catch (e) { this.marks = {}; }
+      this.seq = Math.max(0, ...Object.values(this.marks).flat().map((m) => m.id || 0));
+    },
+    save() {
+      if (!this.doc) return;
+      const any = Object.values(this.marks).some((a) => a.length);
+      if (any) store.set(this.key(), JSON.stringify({ v: 1, marks: this.marks })); else store.del(this.key());
+    },
+    page() { return book.pages[book.sel]; },
+    list(i) { return this.marks[i] || []; },
+    change(i, next) {
+      this.hist.push({ i, prev: this.list(i).slice() });
+      if (this.hist.length > 200) this.hist.shift();
+      this.marks[i] = next;
+      this.save();
+      this.paint();
+    },
+    undo() {
+      const p = this.page();
+      let k = this.hist.length - 1;
+      while (k >= 0 && (!p || this.hist[k].i !== p.i)) k--;
+      if (k < 0) { msgRP('Nothing to undo on this page.'); return; }
+      const h = this.hist.splice(k, 1)[0];
+      this.marks[h.i] = h.prev;
+      this.save();
+      this.paint();
+      msgRP('Undone.');
+    },
+    setOn(on) {
+      const p = this.page();
+      on = !!on && !!(p && p.view);
+      this.on = on;
+      $('repairToggle').setAttribute('aria-pressed', String(on));
+      $('repairBar').hidden = !on;
+      $('pages').classList.toggle('drawing', on);
+      if (!on) this.drawing = null;
+    },
+    // the page's layer, drawn on (or redrawn after) show()
+    attach(fig, p) {
+      const v = p.view;
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('class', 'rp');
+      svg.setAttribute('viewBox', `0 0 ${v.width} ${v.height}`);
+      svg.setAttribute('preserveAspectRatio', 'none');
+      svg.setAttribute('aria-hidden', 'true');
+      fig.appendChild(svg);
+      const at = (e) => {
+        const r = svg.getBoundingClientRect();
+        return [Math.round(((e.clientX - r.left) / r.width) * v.width * 10) / 10, Math.round(((e.clientY - r.top) / r.height) * v.height * 10) / 10];
+      };
+      const unit = () => v.width / Math.max(1, svg.getBoundingClientRect().width); // page px per screen px
+      svg.addEventListener('pointerdown', (e) => {
+        if (!this.on || e.button > 0) return;
+        e.preventDefault();
+        try { svg.setPointerCapture(e.pointerId); } catch (err) { /* synthetic pointer */ }
+        const pt = at(e);
+        this.drawing = { tool: this.tool, shift: e.shiftKey, pts: [pt, pt], id: e.pointerId };
+        this.paint();
+      });
+      svg.addEventListener('pointermove', (e) => {
+        const d = this.drawing;
+        if (!d || d.id !== e.pointerId) return;
+        e.preventDefault();
+        const pt = at(e);
+        if (d.tool === 'pen' && !(d.shift || e.shiftKey)) {
+          const q = d.pts[d.pts.length - 1];
+          if (d.pts.length === 2 && d.pts[0] === d.pts[1]) d.pts[1] = pt;
+          else if (Math.hypot(pt[0] - q[0], pt[1] - q[1]) >= 2 * unit()) d.pts.push(pt);
+        } else { d.pts = [d.pts[0], pt]; if (d.tool === 'pen') d.straight = true; }
+        this.paint();
+      });
+      const end = (e, keep) => {
+        const d = this.drawing;
+        if (!d || d.id !== e.pointerId) return;
+        this.drawing = null;
+        const b = bboxOf(d.pts);
+        if (!keep || Math.max(b[2] - b[0], b[3] - b[1]) < 4 * unit()) { this.paint(); return; }
+        const tool = d.tool === 'pen' && (d.straight || d.shift) ? 'line' : d.tool;
+        const m = { id: ++this.seq, tool, pts: tool === 'pen' ? d.pts : [d.pts[0], d.pts[d.pts.length - 1]], note: '', at: new Date().toISOString() };
+        this.change(p.i, this.list(p.i).concat([m]));
+        msgRP(`Mark ${this.list(p.i).length} added (${RP_TOOL[tool].toLowerCase()}). Add a note below if it helps.`);
+      };
+      svg.addEventListener('pointerup', (e) => end(e, true));
+      svg.addEventListener('pointercancel', (e) => end(e, false));
+      this.paint();
+    },
+    paint() {
+      const p = this.page();
+      const svg = $('pages').querySelector('svg.rp');
+      if (svg && p && p.view) {
+        const ss = p.view.ss;
+        let s = this.list(p.i).map((m, k) => markSVG(m, ss, k + 1)).join('');
+        if (this.drawing) s += markSVG({ tool: this.drawing.tool === 'pen' && this.drawing.straight ? 'line' : this.drawing.tool, pts: this.drawing.pts }, ss, 0);
+        svg.innerHTML = s;
+      }
+      this.renderList();
+    },
+    renderList() {
+      const p = this.page();
+      const ms = p ? this.list(p.i) : [];
+      const ol = $('rpList');
+      // keep a note being typed: only rebuild when the marks themselves changed
+      const sig = ms.map((m) => m.id).join(',') + '@' + (p ? p.i : '');
+      if (ol.dataset.sig === sig) return;
+      ol.dataset.sig = sig;
+      ol.innerHTML = ms.map((m, k) => `<li data-id="${m.id}"><span class="rp-num" aria-hidden="true">${k + 1}</span><span>${esc(RP_TOOL[m.tool] || m.tool)}</span>` +
+        `<input type="text" maxlength="160" value="${esc(m.note || '')}" placeholder="Note, e.g. missed chord note" aria-label="Note for mark ${k + 1}">` +
+        `<button class="btn icon small" type="button" data-del="${m.id}" aria-label="Delete mark ${k + 1}">×</button></li>`).join('');
+    },
+  };
+  const msgRP = (t) => { $('rpMsg').textContent = t; };
+  function bboxOf(pts) {
+    const xs = pts.map((q) => q[0]), ys = pts.map((q) => q[1]);
+    return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
+  }
+  // a mark's outline as path data (page frame)
+  function markPathD(m) {
+    const P = m.pts, r1 = (v) => Math.round(v * 10) / 10;
+    if (m.tool === 'box' || m.tool === 'ellipse') {
+      const [x0, y0, x1, y1] = bboxOf(P);
+      if (m.tool === 'box') return `M${r1(x0)},${r1(y0)}H${r1(x1)}V${r1(y1)}H${r1(x0)}Z`;
+      const rx = (x1 - x0) / 2, ry = (y1 - y0) / 2, cx = x0 + rx;
+      return `M${r1(cx - rx)},${r1(y0 + ry)}a${r1(rx)},${r1(ry)} 0 1,0 ${r1(2 * rx)},0a${r1(rx)},${r1(ry)} 0 1,0 ${r1(-2 * rx)},0Z`;
+    }
+    const pts = m.tool === 'line' ? [P[0], P[P.length - 1]] : P;
+    return 'M' + pts.map((q) => `${r1(q[0])},${r1(q[1])}`).join('L');
+  }
+  function markSVG(m, ss, n) {
+    const d = markPathD(m), w = Math.max(3, ss * 0.22);
+    let s = `<g class="rp-mark"><path class="rp-halo" d="${d}" stroke-width="${(w * 4).toFixed(1)}"/><path class="rp-core" d="${d}" stroke-width="${w.toFixed(1)}" stroke-dasharray="${(w * 3).toFixed(1)} ${(w * 2).toFixed(1)}"/>`;
+    if (n) {
+      const [x0, y0] = bboxOf(m.pts), r = ss * 0.75;
+      s += `<g class="rp-badge"><circle cx="${(x0 - r * 0.6).toFixed(1)}" cy="${(y0 - r * 0.6).toFixed(1)}" r="${r.toFixed(1)}"/><text x="${(x0 - r * 0.6).toFixed(1)}" y="${(y0 - r * 0.6 + r * 0.42).toFixed(1)}" font-size="${(r * 1.2).toFixed(1)}">${n}</text></g>`;
+    }
+    return s + '</g>';
+  }
+  // What the reading found inside a mark's box, in the terms the repair pass needs.
+  function repairInside(p, b) {
+    const v = p.view;
+    if (!v) return null;
+    const sy = v.sym || {}, ss = v.ss;
+    const hit = (x0, y0, x1, y1) => x0 <= b[2] && x1 >= b[0] && y0 <= b[3] && y1 >= b[1];
+    const boxHit = (a) => hit(a[0], a[1], a[2], a[3]);
+    const hp = (book.headParts && book.headParts.get(p.i)) || [], hn = (book.headNotes && book.headNotes.get(p.i)) || [], parts = book.parts || [];
+    const heads = [];
+    v.heads.forEach((h, k) => {
+      if (!hit(h[0] - h[2], h[1] - h[2], h[0] + h[2], h[1] + h[2])) return;
+      const n = hn[k];
+      heads.push({ k, x: h[0], y: h[1], stem: h[3] === 1 ? 'up' : h[3] === -1 ? 'down' : h[3] === 2 ? 'both' : 'none',
+        pitch: n ? pitchText(n) : null, value: n ? durText(n[3], n[4], n[5], n[6]) : null, quarters: n ? n[3] : null, parts: (hp[k] || []).map((pi) => (parts[pi] ? parts[pi].name : pi)) });
+    });
+    const pick = (a, f) => (a || []).filter(boxHit).map(f);
+    const bx = (a) => a.slice(0, 4);
+    let measures = null;
+    const mm = lastRes && lastRes.score && lastRes.score.measureMap;
+    if (mm && !v.spread) measures = [...new Set(mm.filter((m) => m.page === p.i && hit(m.xa, m.y0 - 2 * ss, m.xb, m.y1 + 2 * ss)).map((m) => m.n))].sort((x, y) => x - y);
+    return {
+      measures, heads,
+      rests: pick(sy.rests, (r) => ({ box: bx(r), kind: r[4], quarters: r[5], dots: r[6], text: restText(r[4], r[5], r[6], r[7]) })),
+      clefs: pick(sy.clefs, (c) => ({ box: bx(c), clef: c[4], text: clefLabel(c[4]), change: c[5] === 1, assumed: c[5] === 2 })),
+      keys: pick(sy.keys, (c) => ({ box: bx(c), fifths: c[4], text: keyLabel(c[4]), change: !!c[5] })),
+      times: pick(sy.times, (c) => ({ box: bx(c), beats: c[4] || null, beatType: c[5] || null, symbol: c[6] || null })),
+      accidentals: pick(sy.accs, (c) => ({ box: bx(c), kind: c[4] })),
+      dots: (sy.dots || []).filter(([x, y, r]) => hit(x - r, y - r, x + r, y + r)).map(([x, y]) => ({ x, y })),
+      tuplets: pick(sy.tuplets, (c) => ({ box: bx(c), actual: c[4], normal: c[5] })),
+      barlines: (sy.bars || []).filter((r) => hit(r[4], r[1], r[5], r[2])).map((r) => ({ x: r[0], top: r[1], bottom: r[2], type: r[3] })),
+      unrecognised: (sy.unknown || []).filter(boxHit),
+    };
+  }
+  function repairNotes() {
+    const pages = [];
+    book.pages.forEach((p) => {
+      const ms = repair.list(p.i);
+      if (!ms.length) return;
+      const v = p.view;
+      pages.push({
+        page: p.i + 1, width: v ? v.width : null, height: v ? v.height : null, staffSpace: v ? v.ss : null, spread: v ? v.spread || 0 : 0,
+        marks: ms.map((m, k) => { const b = bboxOf(m.pts).map((x) => Math.round(x)); return { n: k + 1, id: m.id, tool: m.tool, note: m.note || '', points: m.pts, bbox: b, drawn: m.at, found: repairInside(p, b) }; }),
+      });
+    });
+    const sc = (lastRes && lastRes.score) || {};
+    return {
+      format: 'score-scan-reader/repair-notes', version: 1, file: repair.file, size: repair.size, exported: new Date().toISOString(),
+      frame: 'page pixels of the straightened page as read (the detection overlay frame); x right, y down',
+      score: { parts: (sc.parts || []).map((p) => p.name), measures: sc.measures || 0, fifths: sc.fifths, time: sc.time || null },
+      pages,
+    };
+  }
+  const notesName = (ext) => `${String(repair.file || 'score').replace(/\.[^.]+$/, '')}-repair${ext}`;
+  // The page may not offer download links (tools/build.js, artifact rules), so
+  // a file opens in a new tab, where the browser saves it; where new tabs are
+  // blocked the copy button still works.
+  function openBlob(blob, what) {
+    const url = URL.createObjectURL(blob);
+    let w = null;
+    try { w = window.open(url, '_blank'); if (w) w.opener = null; } catch (e) { w = null; }
+    setTimeout(() => URL.revokeObjectURL(url), 120000);
+    msgRP(w ? `${what} opened in a new tab: save it from there.` : `${what} could not open here (new tabs are blocked); use Copy repair notes.`);
+  }
+  function countMarks() { return Object.values(repair.marks).reduce((a, m) => a + m.length, 0); }
+  function copyRepair() {
+    const n = countMarks();
+    if (!n) { msgRP('There are no repair marks to copy yet.'); return; }
+    const txt = JSON.stringify(repairNotes(), null, 1);
+    const ok = () => { $('rpOut').hidden = true; msgRP(`Copied ${plural(n, 'repair mark')} as JSON.`); };
+    const fallback = () => { const ta = $('rpOut'); ta.value = txt; ta.hidden = false; ta.focus(); ta.select(); msgRP('This page cannot reach the clipboard. The notes are selected below: press Ctrl+C (Cmd+C on a Mac).'); };
+    try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, fallback); else fallback(); } catch (e) { fallback(); }
+  }
+  function downloadRepairJSON() {
+    if (!countMarks()) { msgRP('There are no repair marks to download yet.'); return; }
+    openBlob(new Blob([JSON.stringify(repairNotes(), null, 1)], { type: 'application/json' }), `Repair notes (${notesName('.json')})`);
+  }
+  function downloadRepairPNG() {
+    const p = repair.page();
+    if (!p || !p.view || !p.url) return;
+    const v = p.view, img = new Image();
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = img.naturalWidth; c.height = img.naturalHeight;
+      const g = c.getContext('2d');
+      g.drawImage(img, 0, 0);
+      const k = c.width / v.width, ss = v.ss, w = Math.max(3, ss * 0.22);
+      g.scale(k, k);
+      const css = getComputedStyle(document.documentElement);
+      const halo = css.getPropertyValue('--rp-halo').trim() || 'rgba(118,255,3,.55)', ink = css.getPropertyValue('--rp-ink').trim() || '#0b0c0e';
+      const badge = css.getPropertyValue('--rp-badge-ink').trim() || '#b2ff59';
+      g.lineCap = 'round'; g.lineJoin = 'round';
+      repair.list(p.i).forEach((m, n) => {
+        const path = new Path2D(markPathD(m));
+        g.setLineDash([]); g.strokeStyle = halo; g.lineWidth = w * 4; g.stroke(path);
+        g.setLineDash([w * 3, w * 2]); g.strokeStyle = ink; g.lineWidth = w; g.stroke(path);
+        const [x0, y0] = bboxOf(m.pts), r = ss * 0.75, cx = x0 - r * 0.6, cy = y0 - r * 0.6;
+        g.setLineDash([]); g.fillStyle = ink; g.beginPath(); g.arc(cx, cy, r, 0, 2 * Math.PI); g.fill();
+        g.fillStyle = badge; g.font = `700 ${r * 1.2}px sans-serif`; g.textAlign = 'center'; g.fillText(String(n + 1), cx, cy + r * 0.42);
+      });
+      c.toBlob((b) => { if (b) openBlob(b, `Page ${p.i + 1} with its marks`); c.width = c.height = 0; }, 'image/png');
+    };
+    img.src = p.url;
+  }
+  $('repairToggle').addEventListener('click', () => repair.setOn(!repair.on));
+  document.querySelectorAll('input[name="rpTool"]').forEach((r) => r.addEventListener('change', () => { if (r.checked) repair.tool = r.value; }));
+  $('rpUndo').addEventListener('click', () => repair.undo());
+  $('rpClear').addEventListener('click', () => {
+    const p = repair.page();
+    if (!p || !repair.list(p.i).length) { msgRP('This page has no marks.'); return; }
+    repair.change(p.i, []);
+    msgRP(`Cleared page ${p.i + 1}. Undo brings the marks back.`);
+  });
+  $('rpCopy').addEventListener('click', copyRepair);
+  $('rpJson').addEventListener('click', downloadRepairJSON);
+  $('rpPng').addEventListener('click', downloadRepairPNG);
+  $('rpList').addEventListener('input', (e) => {
+    const li = e.target.closest('li[data-id]'), p = repair.page();
+    if (!li || !p) return;
+    const m = repair.list(p.i).find((x) => String(x.id) === li.dataset.id);
+    if (m) { m.note = e.target.value; repair.save(); }
+  });
+  $('rpList').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-del]'), p = repair.page();
+    if (!b || !p) return;
+    repair.change(p.i, repair.list(p.i).filter((x) => String(x.id) !== b.dataset.del));
+    msgRP('Mark deleted. Undo brings it back.');
+  });
+  document.addEventListener('keydown', (e) => {
+    if (!repair.on) return;
+    if (e.key === 'Escape') { repair.drawing = null; repair.setOn(false); $('repairToggle').focus(); msgRP(''); return; }
+    const typing = /^(INPUT|TEXTAREA)$/.test(e.target.tagName) && e.target.type !== 'radio';
+    if ((e.ctrlKey || e.metaKey) && !e.shiftKey && (e.key === 'z' || e.key === 'Z') && !typing) { e.preventDefault(); repair.undo(); }
+  });
 
   // Drag and drop anywhere on the page. dragenter/dragleave fire for every
   // child crossed, so count depth and leave the "over" state only at zero.

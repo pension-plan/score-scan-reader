@@ -30,6 +30,13 @@ const dynOld = /function makeDynCaller\(dynCall\)\{var args=\[\];.*?return new F
 if (!dynOld.test(s)) throw new Error('not found: makeDynCaller');
 s = s.replace(dynOld, 'function makeDynCaller(dynCall){return function(){var a=[rawFunction];for(var i=0;i<arguments.length;i++)a.push(arguments[i]);return dynCall.apply(null,a)}}');
 
+// the UMD tail hoists its own empty `var Module`, so module arguments could never be passed in;
+// read them from globalThis.__opencvModuleArgs instead (src/cv.js passes instantiateWasm there to
+// initialise synchronously)
+const tail = "  if (typeof Module === 'undefined')\n    var Module = {};\n  return cv(Module);";
+if (!s.includes(tail)) throw new Error('not found: UMD tail');
+s = s.replace(tail, "  return cv((typeof globalThis !== 'undefined' && globalThis.__opencvModuleArgs) || {});");
+
 const left = (s.match(/new Function|new_\(Function/g) || []).length;
 if (left) throw new Error(left + ' dynamic Function uses left');
 fs.writeFileSync(out, s);

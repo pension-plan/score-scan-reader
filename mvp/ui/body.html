@@ -46,10 +46,16 @@
     <section class="panel plate" aria-labelledby="detH">
       <div class="panel-head">
         <h2 id="detH">Detection</h2>
-        <button class="toggle" id="overlayToggle" type="button" aria-pressed="true" aria-controls="pages">
-          <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
-          <span>Overlay</span>
-        </button>
+        <div class="head-tools">
+          <button class="toggle" id="repairToggle" type="button" aria-pressed="false" aria-controls="pages repairBar" disabled>
+            <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+            <span>Mark for repair</span>
+          </button>
+          <button class="toggle" id="overlayToggle" type="button" aria-pressed="true" aria-controls="pages">
+            <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+            <span>Overlay</span>
+          </button>
+        </div>
       </div>
       <ul class="legend" id="legend" aria-label="Overlay key"></ul>
       <ul class="layers" id="layers" aria-label="Overlay layers: switch each kind of mark on or off"></ul>
@@ -66,6 +72,25 @@
           <p class="pagenav-sum" id="pgSum"></p>
         </div>
         <ol class="pagechips" id="pageChips" aria-label="Pages of the scan"></ol>
+      </div>
+      <div class="repairbar" id="repairBar" hidden>
+        <p class="repair-help" id="repairHelp">Draw on the page to mark what needs repair. Hold Shift for a straight line. Esc stops drawing.</p>
+        <div class="repair-row" role="radiogroup" aria-label="Drawing tool">
+          <label class="rp-tool"><input type="radio" name="rpTool" value="pen" checked><span>Pen</span></label>
+          <label class="rp-tool"><input type="radio" name="rpTool" value="line"><span>Line</span></label>
+          <label class="rp-tool"><input type="radio" name="rpTool" value="box"><span>Box</span></label>
+          <label class="rp-tool"><input type="radio" name="rpTool" value="ellipse"><span>Circle</span></label>
+        </div>
+        <div class="repair-row">
+          <button class="btn small" id="rpUndo" type="button" aria-keyshortcuts="Control+Z Meta+Z">Undo</button>
+          <button class="btn small" id="rpClear" type="button">Clear page</button>
+          <button class="btn small" id="rpCopy" type="button">Copy repair notes</button>
+          <button class="btn small" id="rpJson" type="button">Open repair notes (.json)</button>
+          <button class="btn small" id="rpPng" type="button">Open marked page (.png)</button>
+        </div>
+        <p class="repair-msg" id="rpMsg" role="status" aria-live="polite"></p>
+        <ol class="repair-list" id="rpList" aria-label="Repair marks on this page"></ol>
+        <textarea class="repair-out" id="rpOut" readonly hidden aria-label="Repair notes as JSON"></textarea>
       </div>
       <div id="pages" class="pages"></div>
     </section>

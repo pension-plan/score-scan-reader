@@ -26,8 +26,14 @@
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   /* overlay marks: drawn on the scan, which stays paper in both themes, so
      they keep paper-contrast values; the legend swatches sit on paper too */
-  --ov-rest:#00796b; --ov-clef:#8e24aa; --ov-key:#c25100; --ov-time:#2e7d32; --ov-mark:#c2185b;
-  --ov-stem:rgba(60,66,78,.55); --ov-lyric:#455a64; --ov-unknown:#e0001b; --ov-label:#15171b; --ov-label-dur:#4f5761; --ov-bar:#2b37b0; --ov-staff:#1e8c5a;
+  /* one distinct colour per symbol type (yellow is reserved for unrecognised ink) */
+  --ov-note:#d32f2f; --ov-stem:#757575; --ov-beam:#6d4c41; --ov-rest:#00897b; --ov-clef:#8e24aa; --ov-key:#ef6c00;
+  --ov-time:#2e7d32; --ov-bar:#283593; --ov-staff:#546e7a; --ov-acc:#c2185b; --ov-dot:#1e88e5; --ov-tup:#827717;
+  --ov-lyric:#00838f; --ov-unknown:rgba(255,222,0,.58); --ov-unknown-edge:#d4b000; --ov-label:#15171b; --ov-label-dur:#4f5761;
+  --ov-mark:var(--ov-acc);
+  /* repair marks (the reader's own): a lime highlighter under a black dashed
+     core, unlike every detection colour and the yellow of unrecognised ink */
+  --rp-halo:rgba(118,255,3,.55); --rp-ink:#0b0c0e; --rp-badge-ink:#b2ff59;
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
@@ -51,8 +57,11 @@ button,input,textarea{font:inherit;color:inherit}
 .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 .muted{color:var(--muted);font-size:13px;margin:0}
 
-.wrap{max-width:1200px;margin:0 auto;padding-block:24px 48px;
+.wrap{margin:0 auto;padding-block:24px 48px;
   padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+
+/* reading text keeps a measure; the results grid (and the sheet view in it) uses the full page width */
+.wrap > :not(.grid){max-width:1200px;margin-left:auto;margin-right:auto}
 
 /* ---- masthead with a five-line staff rule ending in a final barline ---- */
 .masthead{position:relative;padding-bottom:30px;margin-bottom:18px}
@@ -153,9 +162,10 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 .alert{margin-top:10px;padding:10px 12px;border:1px solid var(--warn-mark);background:var(--warn-bg);color:var(--warn-ink);border-radius:2px;font-size:14px}
 
 /* ---- results grid ---- */
-.grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px;margin-top:18px;align-items:start}
-.margin{display:flex;flex-direction:column;gap:18px;min-width:0}
-@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.grid{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;margin-top:18px;align-items:start}
+/* the panels beside the music sit below it, side by side where there is room */
+.margin{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:18px;min-width:0;align-items:start}
+.margin > .code-panel{grid-column:1 / -1}
 .panel{background:var(--panel);border:1px solid var(--rule);border-radius:3px;padding:14px 16px 16px;min-width:0;box-shadow:var(--shadow)}
 .panel-head{display:flex;align-items:center;gap:10px;justify-content:space-between;border-bottom:1px solid var(--rule);
   padding-bottom:8px;margin-bottom:12px;min-height:34px}
@@ -180,8 +190,14 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 .pages.ov-off .ov{visibility:hidden}
 /* overlay layers (toggled in the legend; hide-<layer> on .pages) */
 .ov-rests{stroke:var(--ov-rest)} .ov-clefs{stroke:var(--ov-clef)} .ov-keys{stroke:var(--ov-key)} .ov-times{stroke:var(--ov-time)}
-.ov-marks{stroke:var(--ov-mark)} .ov-lyrics{stroke:var(--ov-lyric)} .ov-unknown{stroke:var(--ov-unknown)} .ov-hatch{stroke:var(--ov-unknown);opacity:.45}
-.ov-stem,.ov-beam{stroke:var(--ov-stem)}
+.ov-marks{stroke:var(--ov-mark)} .ov-lyrics{stroke:var(--ov-lyric)} /* unrecognised ink: a yellow highlighter stroke, multiplied so the ink shows through */
+.ov-unknown{fill:var(--ov-unknown);stroke:none;mix-blend-mode:multiply}
+/* every identified item gets a transparent fill in its type colour, multiplied onto the paper so the ink reads through */
+.ov-head{fill:var(--ov-note)} .ov-beam{stroke:var(--ov-beam);fill:var(--ov-beam)} .ov-stem{stroke:var(--ov-stem)}
+.ov-rests{fill:var(--ov-rest)} .ov-clefs{fill:var(--ov-clef)} .ov-keys{fill:var(--ov-key)} .ov-times{fill:var(--ov-time)}
+.ov-acc{stroke:var(--ov-acc);fill:var(--ov-acc)} .ov-dot{stroke:var(--ov-dot);fill:var(--ov-dot)} .ov-tup{stroke:var(--ov-tup);fill:var(--ov-tup)}
+.ov-head,.ov-beam,.ov-rests,.ov-clefs,.ov-keys,.ov-times,.ov-acc,.ov-dot,.ov-tup{fill-opacity:.26;mix-blend-mode:multiply}
+.ov-clefs path{fill:none} .ov-clefs .bg{stroke:none}
 .ov-labels text{font-family:var(--sans);font-weight:600;fill:var(--ov-label);stroke:var(--paper);stroke-linejoin:round;paint-order:stroke}
 .ov-labels .ld{font-weight:500;font-style:italic;fill:var(--ov-label-dur)}
 .ov-labels .lr{fill:var(--ov-rest)} .ov-labels .lb{fill:var(--ov-bar)}
@@ -199,9 +215,35 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 .layer-n{font:11px var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
 .layer-hint{display:none;font-size:11px;font-style:italic;color:var(--muted)}
 .layers.lbl-small .layer[data-layer="labels"][aria-pressed="true"] .layer-hint{display:inline}
-.ovk-notes{stroke:var(--ov-label)} .ovk-rests{stroke:var(--ov-rest)} .ovk-clefs{stroke:var(--ov-clef)} .ovk-keys{stroke:var(--ov-key)}
-.ovk-times{stroke:var(--ov-time)} .ovk-bars{stroke:var(--ov-bar)} .ovk-bars .ovk-staff{stroke:var(--ov-staff)} .ovk-marks{stroke:var(--ov-mark)}
-.ovk-lyrics{stroke:var(--ov-lyric)} .ovk-labels{color:var(--ov-label)} .ovk-unknown{stroke:var(--ov-unknown)}
+.ovk-notes{stroke:var(--ov-note);fill:var(--ov-note)} .ovk-notes .ovk-stem{stroke:var(--ov-stem);fill:none}
+.ovk-rests{stroke:var(--ov-rest);fill:var(--ov-rest)} .ovk-clefs{stroke:var(--ov-clef);fill:var(--ov-clef)} .ovk-keys{stroke:var(--ov-key);fill:var(--ov-key)}
+.ovk-times{stroke:var(--ov-time);fill:var(--ov-time)} .ovk-bars{stroke:var(--ov-bar)} .ovk-bars .ovk-staff{stroke:var(--ov-staff)}
+.ovk-acc{stroke:var(--ov-acc);fill:var(--ov-acc)} .ovk-dot{stroke:var(--ov-dot);fill:var(--ov-dot)} .ovk-tup{stroke:var(--ov-tup);fill:var(--ov-tup)}
+.ovk-lyrics{stroke:var(--ov-lyric)} .ovk-labels{color:var(--ov-label)}
+.ovk-notes,.ovk-rests,.ovk-clefs,.ovk-keys,.ovk-times,.ovk-acc,.ovk-dot,.ovk-tup{fill-opacity:.3}
+.ovk-unknown{stroke:var(--ov-unknown-edge);fill:var(--ov-unknown)}
+/* repair markup: the layer takes the pointer (and stops touch scrolling) only while drawing */
+.head-tools{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:4px 14px}
+.toggle:disabled{opacity:.45;cursor:not-allowed}
+.pageframe svg.rp{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.pages.drawing .pageframe svg.rp{pointer-events:auto;touch-action:none;cursor:crosshair}
+.pages.drawing .pageframe{outline:2px solid var(--accent)}
+.rp-halo{fill:none;stroke:var(--rp-halo);stroke-linecap:round;stroke-linejoin:round}
+.rp-core{fill:none;stroke:var(--rp-ink);stroke-linecap:round;stroke-linejoin:round}
+.rp-badge circle{fill:var(--rp-ink)} .rp-badge text{fill:var(--rp-badge-ink);font-family:var(--sans);font-weight:700;text-anchor:middle}
+.repairbar{margin:0 0 12px;padding:10px 12px;border:1px dashed var(--rule-strong);border-radius:4px;display:flex;flex-direction:column;gap:8px}
+.repair-help,.repair-msg{margin:0;font-size:12.5px;color:var(--muted)}
+.repair-msg:empty{display:none}
+.repair-row{display:flex;flex-wrap:wrap;gap:6px}
+.btn.small{padding:4px 10px;font-size:12.5px;min-height:30px}
+.rp-tool{display:inline-flex;align-items:center;gap:4px;min-height:30px;padding:2px 10px 2px 6px;border:1px solid var(--rule-strong);border-radius:15px;font-size:12.5px;cursor:pointer}
+.rp-tool:has(input:checked){background:var(--accent-wash);border-color:var(--accent)}
+.repair-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.repair-list:empty{display:none}
+.repair-list li{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;align-items:center;gap:6px;font-size:12.5px}
+.rp-num{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--rp-ink);color:var(--rp-badge-ink);font-weight:700;font-size:11px;box-shadow:0 0 0 3px var(--rp-halo)}
+.repair-list input{min-width:0;width:100%;padding:3px 6px;border:1px solid var(--rule-strong);border-radius:3px;background:var(--panel);font-size:12.5px}
+.repair-out{width:100%;min-height:120px;font:11px var(--mono);background:var(--panel);border:1px solid var(--rule-strong)}
 .zoom{display:inline-flex;align-items:center;gap:6px;margin:0 0 10px}
 .zoom-label{min-width:3.2em;text-align:center;font:12px var(--mono);color:var(--muted)}
 .pageframe.placeholder{aspect-ratio:1 / 1.29;display:grid;place-items:center;line-height:1.5;

@@ -6,15 +6,19 @@
 
 const { detectRests } = require('./rests');
 const { accidentalGlyph } = require('./assemble');
+const { classifyMarks, ROLE_LABEL } = require('./text');
 
 const r1 = (v) => Math.round(v * 10) / 10;
 const box = (b) => [r1(b.x0), r1(b.y0), r1(b.x1), r1(b.y1)];
 // y of staff position k (0 top line .. 4 bottom line, fractions between)
 const lineY = (st, k, x) => st.yAt(0, x) + k * (st.yAt(4, x) - st.yAt(0, x)) / 4;
 
-function pageSymbols(fr, asm) {
+// What the note reader explains (out: the symbol layers) and the leftover
+// components that touch none of it (left).
+function explain(fr, asm) {
   const out = { clefs: [], keys: [], times: [], rests: [], accs: [], dots: [], stems: [], beams: [], tuplets: [], bars: [], unknown: [] };
-  if (!fr || !fr.R || !asm) return out;
+  const left = [];
+  if (!fr || !fr.R || !asm) return { out, left };
   const R = fr.R, comps = asm.comps || [], ss = fr.ss;
   const known = []; // boxes that explain ink
   const add = (b, pad = 0) => known.push([b[0] - pad, b[1] - pad, b[2] + pad, b[3] + pad]);
@@ -139,9 +143,45 @@ function pageSymbols(fr, asm) {
         if (c.x0 <= k[2] && c.x1 >= k[0] && c.y0 <= k[3] && c.y1 >= k[1]) { hit = true; break; }
       }
     }
-    if (!hit) out.unknown.push([c.x0, c.y0, c.x1, c.y1]);
+    if (!hit) left.push(c);
   }
+  return { out, left };
+}
+
+// The page's marks (text.js classifyMarks over the leftover ink), computed
+// once per page and kept on fr (not enumerable: never cloned or compared);
+// readPageText() fills in the text it reads.
+function pageMarks(fr, asm) {
+  if (!fr || !asm) return null;
+  if (fr._marks && fr._marks.asm === asm) return fr._marks.marks;
+  const { out, left } = explain(fr, asm);
+  let marks;
+  try { marks = classifyMarks(fr, asm, left); } catch (e) { marks = { text: [], dyns: [], wedges: [], slurs: [], braces: [], ledgers: [], rest: left }; }
+  Object.defineProperty(marks, 'sym', { value: out, enumerable: false, configurable: true });
+  Object.defineProperty(fr, '_marks', { value: { asm, marks }, enumerable: false, configurable: true, writable: true });
+  return marks;
+}
+
+// Overlay layers. Beyond the note symbols: text [box, role, label],
+// dyns [box, value], wedges [box, type], slurs [box], braces [box, kind],
+// ledgers [box]; unknown is the ink none of these explain.
+function pageSymbols(fr, asm) {
+  const marks = pageMarks(fr, asm);
+  if (!marks) return explain(fr, asm).out;
+  const out = { ...marks.sym };
+  const b4 = (b) => b.map(Math.round);
+  out.text = marks.text.map(t => {
+    const name = ROLE_LABEL[t.role] || 'Text';
+    const label = t.role === 'measure' ? (t.text ? `Bar ${t.text}` : 'Bar number') : t.text ? `${name}: ${t.text}` : name;
+    return [...b4(t.box), t.role, label];
+  });
+  out.dyns = marks.dyns.map(d => [...b4(d.box), d.value]);
+  out.wedges = marks.wedges.map(w => [...b4(w.box), w.type === 'crescendo' ? 'cresc.' : 'dim.']);
+  out.slurs = marks.slurs.map(s => b4(s.box));
+  out.braces = marks.braces.map(s => [...b4(s.box), s.kind]);
+  out.ledgers = marks.ledgers.map(s => b4(s.box));
+  out.unknown = marks.rest.map(c => [c.x0, c.y0, c.x1, c.y1]);
   return out;
 }
 
-module.exports = { pageSymbols };
+module.exports = { pageSymbols, pageMarks };

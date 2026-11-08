@@ -1,0 +1,2392 @@
+{
+ "n": 14150,
+ "ms_per_patch": {
+  "a-template": 10.261,
+  "b-shape-knn": 0.417,
+  "c-hog-svm": 0.409,
+  "c-hog-knn": 2.474,
+  "ac-hog+tpl-svm": 10.674
+ },
+ "results": {
+  "a-template": {
+   "clean": {
+    "dyn": {
+     "tp": 107,
+     "fp": 39,
+     "fn": 45
+    },
+    "neg": {
+     "tp": 2655,
+     "fp": 88,
+     "fn": 2326
+    },
+    "rest-breve": {
+     "tp": 2,
+     "fp": 2282,
+     "fn": 0
+    },
+    "rest-quarter": {
+     "tp": 136,
+     "fp": 27,
+     "fn": 0
+    },
+    "digit-4": {
+     "tp": 306,
+     "fp": 1,
+     "fn": 0
+    },
+    "clef-G": {
+     "tp": 248,
+     "fp": 0,
+     "fn": 18
+    },
+    "clef-F": {
+     "tp": 140,
+     "fp": 0,
+     "fn": 0
+    },
+    "fermata": {
+     "tp": 111,
+     "fp": 7,
+     "fn": 1
+    },
+    "digit-0": {
+     "tp": 0,
+     "fp": 40,
+     "fn": 0
+    },
+    "dot": {
+     "tp": 0,
+     "fp": 29,
+     "fn": 242
+    },
+    "rest-whole": {
+     "tp": 54,
+     "fp": 36,
+     "fn": 3
+    },
+    "digit-1": {
+     "tp": 0,
+     "fp": 19,
+     "fn": 0
+    },
+    "acc-flat": {
+     "tp": 26,
+     "fp": 72,
+     "fn": 3
+    },
+    "time-C": {
+     "tp": 21,
+     "fp": 51,
+     "fn": 0
+    },
+    "acc-natural": {
+     "tp": 46,
+     "fp": 5,
+     "fn": 5
+    },
+    "digit-8": {
+     "tp": 66,
+     "fp": 3,
+     "fn": 1
+    },
+    "rest-8th": {
+     "tp": 85,
+     "fp": 0,
+     "fn": 7
+    },
+    "digit-2": {
+     "tp": 37,
+     "fp": 0,
+     "fn": 0
+    },
+    "acc-sharp": {
+     "tp": 64,
+     "fp": 0,
+     "fn": 5
+    },
+    "digit-3": {
+     "tp": 56,
+     "fp": 0,
+     "fn": 1
+    },
+    "rest-half": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 32
+    },
+    "digit-6": {
+     "tp": 32,
+     "fp": 3,
+     "fn": 0
+    },
+    "acc-double-flat": {
+     "tp": 5,
+     "fp": 1,
+     "fn": 0
+    },
+    "acc-double-sharp": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 7
+    },
+    "clef-C": {
+     "tp": 38,
+     "fp": 0,
+     "fn": 2
+    },
+    "time-cut": {
+     "tp": 16,
+     "fp": 5,
+     "fn": 0
+    },
+    "rest-16th": {
+     "tp": 57,
+     "fp": 0,
+     "fn": 3
+    },
+    "rest-32nd": {
+     "tp": 22,
+     "fp": 0,
+     "fn": 0
+    },
+    "rest-64th": {
+     "tp": 10,
+     "fp": 0,
+     "fn": 0
+    },
+    "digit-9": {
+     "tp": 7,
+     "fp": 0,
+     "fn": 0
+    },
+    "digit-5": {
+     "tp": 13,
+     "fp": 0,
+     "fn": 0
+    },
+    "digit-7": {
+     "tp": 13,
+     "fp": 0,
+     "fn": 0
+    },
+    "rest-hbar": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 7
+    }
+   },
+   "scan": {
+    "neg": {
+     "tp": 858,
+     "fp": 104,
+     "fn": 432
+    },
+    "dyn": {
+     "tp": 105,
+     "fp": 10,
+     "fn": 48
+    },
+    "rest-breve": {
+     "tp": 2,
+     "fp": 680,
+     "fn": 0
+    },
+    "rest-quarter": {
+     "tp": 136,
+     "fp": 0,
+     "fn": 0
+    },
+    "rest-whole": {
+     "tp": 44,
+     "fp": 30,
+     "fn": 20
+    },
+    "digit-4": {
+     "tp": 306,
+     "fp": 0,
+     "fn": 0
+    },
+    "clef-F": {
+     "tp": 140,
+     "fp": 0,
+     "fn": 0
+    },
+    "clef-G": {
+     "tp": 250,
+     "fp": 0,
+     "fn": 15
+    },
+    "fermata": {
+     "tp": 111,
+     "fp": 0,
+     "fn": 1
+    },
+    "digit-0": {
+     "tp": 0,
+     "fp": 13,
+     "fn": 0
+    },
+    "time-C": {
+     "tp": 21,
+     "fp": 0,
+     "fn": 0
+    },
+    "acc-natural": {
+     "tp": 42,
+     "fp": 0,
+     "fn": 8
+    },
+    "dot": {
+     "tp": 0,
+     "fp": 14,
+     "fn": 257
+    },
+    "rest-8th": {
+     "tp": 84,
+     "fp": 0,
+     "fn": 8
+    },
+    "digit-2": {
+     "tp": 37,
+     "fp": 0,
+     "fn": 0
+    },
+    "acc-sharp": {
+     "tp": 60,
+     "fp": 1,
+     "fn": 9
+    },
+    "digit-3": {
+     "tp": 54,
+     "fp": 0,
+     "fn": 3
+    },
+    "rest-half": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 32
+    },
+    "digit-6": {
+     "tp": 32,
+     "fp": 0,
+     "fn": 0
+    },
+    "digit-8": {
+     "tp": 65,
+     "fp": 0,
+     "fn": 2
+    },
+    "acc-flat": {
+     "tp": 25,
+     "fp": 0,
+     "fn": 4
+    },
+    "acc-double-flat": {
+     "tp": 5,
+     "fp": 1,
+     "fn": 0
+    },
+    "acc-double-sharp": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 7
+    },
+    "clef-C": {
+     "tp": 36,
+     "fp": 0,
+     "fn": 3
+    },
+    "rest-16th": {
+     "tp": 56,
+     "fp": 0,
+     "fn": 4
+    },
+    "rest-32nd": {
+     "tp": 22,
+     "fp": 0,
+     "fn": 0
+    },
+    "rest-64th": {
+     "tp": 10,
+     "fp": 0,
+     "fn": 0
+    },
+    "digit-9": {
+     "tp": 7,
+     "fp": 0,
+     "fn": 0
+    },
+    "digit-5": {
+     "tp": 13,
+     "fp": 0,
+     "fn": 0
+    },
+    "digit-7": {
+     "tp": 13,
+     "fp": 0,
+     "fn": 0
+    },
+    "time-cut": {
+     "tp": 16,
+     "fp": 0,
+     "fn": 0
+    },
+    "digit-1": {
+     "tp": 0,
+     "fp": 7,
+     "fn": 0
+    },
+    "rest-hbar": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 7
+    }
+   },
+   "scan-severe": {
+    "neg": {
+     "tp": 1304,
+     "fp": 271,
+     "fn": 454
+    },
+    "dyn": {
+     "tp": 78,
+     "fp": 25,
+     "fn": 68
+    },
+    "rest-breve": {
+     "tp": 2,
+     "fp": 642,
+     "fn": 0
+    },
+    "rest-quarter": {
+     "tp": 128,
+     "fp": 6,
+     "fn": 1
+    },
+    "rest-whole": {
+     "tp": 40,
+     "fp": 24,
+     "fn": 15
+    },
+    "digit-4": {
+     "tp": 276,
+     "fp": 4,
+     "fn": 10
+    },
+    "clef-G": {
+     "tp": 169,
+     "fp": 0,
+     "fn": 68
+    },
+    "clef-F": {
+     "tp": 100,
+     "fp": 0,
+     "fn": 22
+    },
+    "fermata": {
+     "tp": 83,
+     "fp": 2,
+     "fn": 25
+    },
+    "digit-0": {
+     "tp": 0,
+     "fp": 20,
+     "fn": 0
+    },
+    "time-C": {
+     "tp": 20,
+     "fp": 0,
+     "fn": 1
+    },
+    "acc-natural": {
+     "tp": 39,
+     "fp": 2,
+     "fn": 9
+    },
+    "digit-1": {
+     "tp": 0,
+     "fp": 22,
+     "fn": 0
+    },
+    "dot": {
+     "tp": 0,
+     "fp": 6,
+     "fn": 206
+    },
+    "rest-8th": {
+     "tp": 72,
+     "fp": 0,
+     "fn": 3
+    },
+    "digit-2": {
+     "tp": 19,
+     "fp": 0,
+     "fn": 18
+    },
+    "acc-sharp": {
+     "tp": 39,
+     "fp": 2,
+     "fn": 21
+    },
+    "digit-3": {
+     "tp": 28,
+     "fp": 0,
+     "fn": 17
+    },
+    "rest-half": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 31
+    },
+    "digit-6": {
+     "tp": 22,
+     "fp": 0,
+     "fn": 3
+    },
+    "digit-8": {
+     "tp": 47,
+     "fp": 0,
+     "fn": 12
+    },
+    "acc-flat": {
+     "tp": 23,
+     "fp": 3,
+     "fn": 6
+    },
+    "acc-double-flat": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 1
+    },
+    "acc-double-sharp": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 4
+    },
+    "clef-C": {
+     "tp": 16,
+     "fp": 0,
+     "fn": 24
+    },
+    "rest-16th": {
+     "tp": 32,
+     "fp": 0,
+     "fn": 1
+    },
+    "rest-32nd": {
+     "tp": 17,
+     "fp": 0,
+     "fn": 0
+    },
+    "rest-64th": {
+     "tp": 10,
+     "fp": 0,
+     "fn": 0
+    },
+    "digit-9": {
+     "tp": 6,
+     "fp": 0,
+     "fn": 1
+    },
+    "digit-5": {
+     "tp": 7,
+     "fp": 0,
+     "fn": 6
+    },
+    "digit-7": {
+     "tp": 12,
+     "fp": 0,
+     "fn": 0
+    },
+    "time-cut": {
+     "tp": 13,
+     "fp": 0,
+     "fn": 2
+    }
+   }
+  },
+  "b-shape-knn": {
+   "clean": {
+    "dyn": {
+     "tp": 145,
+     "fp": 27,
+     "fn": 7
+    },
+    "neg": {
+     "tp": 4784,
+     "fp": 67,
+     "fn": 197
+    },
+    "rest-quarter": {
+     "tp": 135,
+     "fp": 15,
+     "fn": 1
+    },
+    "digit-4": {
+     "tp": 306,
+     "fp": 20,
+     "fn": 0
+    },
+    "clef-G": {
+     "tp": 266,
+     "fp": 5,
+     "fn": 0
+    },
+    "clef-F": {
+     "tp": 140,
+     "fp": 3,
+     "fn": 0
+    },
+    "fermata": {
+     "tp": 110,
+     "fp": 11,
+     "fn": 2
+    },
+    "rest-whole": {
+     "tp": 44,
+     "fp": 22,
+     "fn": 13
+    },
+    "rest-half": {
+     "tp": 19,
+     "fp": 13,
+     "fn": 13
+    },
+    "rest-16th": {
+     "tp": 57,
+     "fp": 28,
+     "fn": 3
+    },
+    "time-C": {
+     "tp": 21,
+     "fp": 0,
+     "fn": 0
+    },
+    "dot": {
+     "tp": 211,
+     "fp": 72,
+     "fn": 31
+    },
+    "acc-natural": {
+     "tp": 50,
+     "fp": 3,
+     "fn": 1
+    },
+    "rest-8th": {
+     "tp": 90,
+     "fp": 3,
+     "fn": 2
+    },
+    "digit-2": {
+     "tp": 37,
+     "fp": 9,
+     "fn": 0
+    },
+    "acc-sharp": {
+     "tp": 65,
+     "fp": 10,
+     "fn": 4
+    },
+    "rest-hbar": {
+     "tp": 0,
+     "fp": 1,
+     "fn": 7
+    },
+    "clef-C": {
+     "tp": 38,
+     "fp": 3,
+     "fn": 2
+    },
+    "digit-3": {
+     "tp": 57,
+     "fp": 1,
+     "fn": 0
+    },
+    "digit-6": {
+     "tp": 32,
+     "fp": 0,
+     "fn": 0
+    },
+    "digit-8": {
+     "tp": 67,
+     "fp": 5,
+     "fn": 0
+    },
+    "acc-flat": {
+     "tp": 27,
+     "fp": 1,
+     "fn": 2
+    },
+    "acc-double-flat": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 1
+    },
+    "acc-double-sharp": {
+     "tp": 1,
+     "fp": 0,
+     "fn": 6
+    },
+    "rest-32nd": {
+     "tp": 0,
+     "fp": 2,
+     "fn": 22
+    },
+    "rest-64th": {
+     "tp": 0,
+     "fp": 1,
+     "fn": 10
+    },
+    "rest-breve": {
+     "tp": 0,
+     "fp": 3,
+     "fn": 2
+    },
+    "digit-9": {
+     "tp": 7,
+     "fp": 0,
+     "fn": 0
+    },
+    "digit-5": {
+     "tp": 13,
+     "fp": 0,
+     "fn": 0
+    },
+    "digit-7": {
+     "tp": 13,
+     "fp": 1,
+     "fn": 0
+    },
+    "time-cut": {
+     "tp": 16,
+     "fp": 0,
+     "fn": 0
+    }
+   },
+   "scan": {
+    "neg": {
+     "tp": 1190,
+     "fp": 71,
+     "fn": 100
+    },
+    "dyn": {
+     "tp": 147,
+     "fp": 11,
+     "fn": 6
+    },
+    "rest-quarter": {
+     "tp": 135,
+     "fp": 1,
+     "fn": 1
+    },
+    "rest-whole": {
+     "tp": 52,
+     "fp": 23,
+     "fn": 12
+    },
+    "digit-4": {
+     "tp": 305,
+     "fp": 9,
+     "fn": 1
+    },
+    "clef-F": {
+     "tp": 140,
+     "fp": 1,
+     "fn": 0
+    },
+    "clef-G": {
+     "tp": 265,
+     "fp": 12,
+     "fn": 0
+    },
+    "fermata": {
+     "tp": 111,
+     "fp": 0,
+     "fn": 1
+    },
+    "rest-half": {
+     "tp": 11,
+     "fp": 12,
+     "fn": 21
+    },
+    "dot": {
+     "tp": 219,
+     "fp": 56,
+     "fn": 38
+    },
+    "time-C": {
+     "tp": 21,
+     "fp": 0,
+     "fn": 0
+    },
+    "acc-natural": {
+     "tp": 44,
+     "fp": 1,
+     "fn": 6
+    },
+    "rest-8th": {
+     "tp": 89,
+     "fp": 2,
+     "fn": 3
+    },
+    "digit-2": {
+     "tp": 37,
+     "fp": 1,
+     "fn": 0
+    },
+    "acc-sharp": {
+     "tp": 62,
+     "fp": 7,
+     "fn": 7
+    },
+    "rest-hbar": {
+     "tp": 0,
+     "fp": 2,
+     "fn": 7
+    },
+    "digit-3": {
+     "tp": 55,
+     "fp": 1,
+     "fn": 2
+    },
+    "rest-16th": {
+     "tp": 56,
+     "fp": 31,
+     "fn": 4
+    },
+    "digit-6": {
+     "tp": 32,
+     "fp": 0,
+     "fn": 0
+    },
+    "digit-8": {
+     "tp": 66,
+     "fp": 4,
+     "fn": 1
+    },
+    "acc-flat": {
+     "tp": 26,
+     "fp": 0,
+     "fn": 3
+    },
+    "acc-double-flat": {
+     "tp": 5,
+     "fp": 0,
+     "fn": 0
+    },
+    "acc-double-sharp": {
+     "tp": 4,
+     "fp": 1,
+     "fn": 3
+    },
+    "clef-C": {
+     "tp": 37,
+     "fp": 0,
+     "fn": 2
+    },
+    "rest-32nd": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 22
+    },
+    "rest-64th": {
+     "tp": 0,
+     "fp": 1,
+     "fn": 10
+    },
+    "rest-breve": {
+     "tp": 0,
+     "fp": 3,
+     "fn": 2
+    },
+    "digit-9": {
+     "tp": 7,
+     "fp": 0,
+     "fn": 0
+    },
+    "digit-5": {
+     "tp": 12,
+     "fp": 0,
+     "fn": 1
+    },
+    "digit-7": {
+     "tp": 13,
+     "fp": 3,
+     "fn": 0
+    },
+    "time-cut": {
+     "tp": 16,
+     "fp": 0,
+     "fn": 0
+    }
+   },
+   "scan-severe": {
+    "neg": {
+     "tp": 1538,
+     "fp": 95,
+     "fn": 220
+    },
+    "dyn": {
+     "tp": 134,
+     "fp": 10,
+     "fn": 12
+    },
+    "rest-quarter": {
+     "tp": 122,
+     "fp": 27,
+     "fn": 7
+    },
+    "rest-whole": {
+     "tp": 29,
+     "fp": 38,
+     "fn": 26
+    },
+    "digit-4": {
+     "tp": 280,
+     "fp": 39,
+     "fn": 6
+    },
+    "acc-sharp": {
+     "tp": 44,
+     "fp": 39,
+     "fn": 16
+    },
+    "clef-G": {
+     "tp": 231,
+     "fp": 12,
+     "fn": 6
+    },
+    "clef-F": {
+     "tp": 117,
+     "fp": 10,
+     "fn": 5
+    },
+    "fermata": {
+     "tp": 103,
+     "fp": 7,
+     "fn": 5
+    },
+    "rest-half": {
+     "tp": 15,
+     "fp": 53,
+     "fn": 16
+    },
+    "time-C": {
+     "tp": 20,
+     "fp": 4,
+     "fn": 1
+    },
+    "dot": {
+     "tp": 147,
+     "fp": 85,
+     "fn": 59
+    },
+    "acc-natural": {
+     "tp": 43,
+     "fp": 7,
+     "fn": 5
+    },
+    "digit-3": {
+     "tp": 34,
+     "fp": 8,
+     "fn": 11
+    },
+    "acc-flat": {
+     "tp": 24,
+     "fp": 10,
+     "fn": 5
+    },
+    "rest-8th": {
+     "tp": 74,
+     "fp": 5,
+     "fn": 1
+    },
+    "digit-2": {
+     "tp": 18,
+     "fp": 3,
+     "fn": 19
+    },
+    "rest-hbar": {
+     "tp": 0,
+     "fp": 1,
+     "fn": 0
+    },
+    "clef-C": {
+     "tp": 32,
+     "fp": 3,
+     "fn": 8
+    },
+    "digit-6": {
+     "tp": 22,
+     "fp": 2,
+     "fn": 3
+    },
+    "digit-8": {
+     "tp": 51,
+     "fp": 6,
+     "fn": 8
+    },
+    "acc-double-flat": {
+     "tp": 5,
+     "fp": 0,
+     "fn": 0
+    },
+    "acc-double-sharp": {
+     "tp": 1,
+     "fp": 0,
+     "fn": 3
+    },
+    "rest-16th": {
+     "tp": 31,
+     "fp": 6,
+     "fn": 2
+    },
+    "rest-32nd": {
+     "tp": 0,
+     "fp": 1,
+     "fn": 17
+    },
+    "rest-64th": {
+     "tp": 0,
+     "fp": 1,
+     "fn": 10
+    },
+    "rest-breve": {
+     "tp": 0,
+     "fp": 6,
+     "fn": 2
+    },
+    "digit-9": {
+     "tp": 6,
+     "fp": 1,
+     "fn": 1
+    },
+    "digit-5": {
+     "tp": 6,
+     "fp": 1,
+     "fn": 7
+    },
+    "digit-7": {
+     "tp": 11,
+     "fp": 1,
+     "fn": 1
+    },
+    "time-cut": {
+     "tp": 12,
+     "fp": 4,
+     "fn": 3
+    }
+   }
+  },
+  "c-hog-svm": {
+   "clean": {
+    "dyn": {
+     "tp": 151,
+     "fp": 8,
+     "fn": 1
+    },
+    "neg": {
+     "tp": 4835,
+     "fp": 232,
+     "fn": 146
+    },
+    "rest-quarter": {
+     "tp": 136,
+     "fp": 4,
+     "fn": 0
+    },
+    "digit-4": {
+     "tp": 304,
+     "fp": 13,
+     "fn": 2
+    },
+    "clef-G": {
+     "tp": 265,
+     "fp": 0,
+     "fn": 1
+    },
+    "clef-F": {
+     "tp": 140,
+     "fp": 0,
+     "fn": 0
+    },
+    "dot": {
+     "tp": 211,
+     "fp": 68,
+     "fn": 31
+    },
+    "fermata": {
+     "tp": 104,
+     "fp": 10,
+     "fn": 8
+    },
+    "rest-whole": {
+     "tp": 32,
+     "fp": 13,
+     "fn": 25
+    },
+    "time-C": {
+     "tp": 18,
+     "fp": 0,
+     "fn": 3
+    },
+    "acc-natural": {
+     "tp": 43,
+     "fp": 1,
+     "fn": 8
+    },
+    "digit-8": {
+     "tp": 65,
+     "fp": 2,
+     "fn": 2
+    },
+    "acc-flat": {
+     "tp": 21,
+     "fp": 15,
+     "fn": 8
+    },
+    "time-cut": {
+     "tp": 7,
+     "fp": 2,
+     "fn": 9
+    },
+    "rest-8th": {
+     "tp": 86,
+     "fp": 2,
+     "fn": 6
+    },
+    "digit-2": {
+     "tp": 31,
+     "fp": 0,
+     "fn": 6
+    },
+    "acc-sharp": {
+     "tp": 51,
+     "fp": 8,
+     "fn": 18
+    },
+    "digit-3": {
+     "tp": 47,
+     "fp": 0,
+     "fn": 10
+    },
+    "rest-half": {
+     "tp": 18,
+     "fp": 5,
+     "fn": 14
+    },
+    "digit-6": {
+     "tp": 28,
+     "fp": 1,
+     "fn": 4
+    },
+    "acc-double-flat": {
+     "tp": 1,
+     "fp": 0,
+     "fn": 4
+    },
+    "acc-double-sharp": {
+     "tp": 1,
+     "fp": 0,
+     "fn": 6
+    },
+    "clef-C": {
+     "tp": 37,
+     "fp": 0,
+     "fn": 3
+    },
+    "rest-16th": {
+     "tp": 47,
+     "fp": 1,
+     "fn": 13
+    },
+    "rest-32nd": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 22
+    },
+    "rest-64th": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 10
+    },
+    "rest-breve": {
+     "tp": 0,
+     "fp": 2,
+     "fn": 2
+    },
+    "digit-9": {
+     "tp": 5,
+     "fp": 0,
+     "fn": 2
+    },
+    "digit-5": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 9
+    },
+    "digit-7": {
+     "tp": 6,
+     "fp": 0,
+     "fn": 7
+    },
+    "rest-hbar": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 7
+    }
+   },
+   "scan": {
+    "neg": {
+     "tp": 1216,
+     "fp": 266,
+     "fn": 74
+    },
+    "dyn": {
+     "tp": 144,
+     "fp": 2,
+     "fn": 9
+    },
+    "rest-quarter": {
+     "tp": 136,
+     "fp": 0,
+     "fn": 0
+    },
+    "rest-whole": {
+     "tp": 45,
+     "fp": 7,
+     "fn": 19
+    },
+    "digit-4": {
+     "tp": 301,
+     "fp": 10,
+     "fn": 5
+    },
+    "clef-F": {
+     "tp": 136,
+     "fp": 0,
+     "fn": 4
+    },
+    "clef-G": {
+     "tp": 263,
+     "fp": 0,
+     "fn": 2
+    },
+    "fermata": {
+     "tp": 108,
+     "fp": 1,
+     "fn": 4
+    },
+    "time-C": {
+     "tp": 19,
+     "fp": 0,
+     "fn": 2
+    },
+    "acc-natural": {
+     "tp": 36,
+     "fp": 0,
+     "fn": 14
+    },
+    "dot": {
+     "tp": 217,
+     "fp": 55,
+     "fn": 40
+    },
+    "rest-8th": {
+     "tp": 82,
+     "fp": 0,
+     "fn": 10
+    },
+    "digit-2": {
+     "tp": 35,
+     "fp": 0,
+     "fn": 2
+    },
+    "acc-sharp": {
+     "tp": 55,
+     "fp": 1,
+     "fn": 14
+    },
+    "digit-3": {
+     "tp": 42,
+     "fp": 0,
+     "fn": 15
+    },
+    "rest-half": {
+     "tp": 15,
+     "fp": 6,
+     "fn": 17
+    },
+    "digit-6": {
+     "tp": 29,
+     "fp": 1,
+     "fn": 3
+    },
+    "digit-8": {
+     "tp": 64,
+     "fp": 0,
+     "fn": 3
+    },
+    "acc-flat": {
+     "tp": 20,
+     "fp": 0,
+     "fn": 9
+    },
+    "acc-double-flat": {
+     "tp": 1,
+     "fp": 0,
+     "fn": 4
+    },
+    "acc-double-sharp": {
+     "tp": 1,
+     "fp": 0,
+     "fn": 6
+    },
+    "clef-C": {
+     "tp": 38,
+     "fp": 0,
+     "fn": 1
+    },
+    "rest-16th": {
+     "tp": 32,
+     "fp": 4,
+     "fn": 28
+    },
+    "rest-32nd": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 22
+    },
+    "rest-64th": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 10
+    },
+    "rest-breve": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 2
+    },
+    "digit-9": {
+     "tp": 5,
+     "fp": 0,
+     "fn": 2
+    },
+    "digit-5": {
+     "tp": 1,
+     "fp": 0,
+     "fn": 12
+    },
+    "digit-7": {
+     "tp": 3,
+     "fp": 0,
+     "fn": 10
+    },
+    "time-cut": {
+     "tp": 13,
+     "fp": 0,
+     "fn": 3
+    },
+    "rest-hbar": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 7
+    }
+   },
+   "scan-severe": {
+    "neg": {
+     "tp": 1682,
+     "fp": 562,
+     "fn": 76
+    },
+    "dyn": {
+     "tp": 118,
+     "fp": 3,
+     "fn": 28
+    },
+    "rest-quarter": {
+     "tp": 103,
+     "fp": 0,
+     "fn": 26
+    },
+    "rest-whole": {
+     "tp": 21,
+     "fp": 6,
+     "fn": 34
+    },
+    "digit-4": {
+     "tp": 244,
+     "fp": 8,
+     "fn": 42
+    },
+    "clef-G": {
+     "tp": 223,
+     "fp": 0,
+     "fn": 14
+    },
+    "clef-F": {
+     "tp": 105,
+     "fp": 0,
+     "fn": 17
+    },
+    "acc-flat": {
+     "tp": 16,
+     "fp": 1,
+     "fn": 13
+    },
+    "fermata": {
+     "tp": 95,
+     "fp": 1,
+     "fn": 13
+    },
+    "time-C": {
+     "tp": 9,
+     "fp": 0,
+     "fn": 12
+    },
+    "dot": {
+     "tp": 107,
+     "fp": 61,
+     "fn": 99
+    },
+    "acc-natural": {
+     "tp": 41,
+     "fp": 3,
+     "fn": 7
+    },
+    "rest-8th": {
+     "tp": 40,
+     "fp": 0,
+     "fn": 35
+    },
+    "digit-2": {
+     "tp": 11,
+     "fp": 0,
+     "fn": 26
+    },
+    "acc-sharp": {
+     "tp": 35,
+     "fp": 11,
+     "fn": 25
+    },
+    "digit-3": {
+     "tp": 21,
+     "fp": 0,
+     "fn": 24
+    },
+    "rest-half": {
+     "tp": 10,
+     "fp": 3,
+     "fn": 21
+    },
+    "digit-6": {
+     "tp": 11,
+     "fp": 0,
+     "fn": 14
+    },
+    "digit-8": {
+     "tp": 35,
+     "fp": 0,
+     "fn": 24
+    },
+    "acc-double-flat": {
+     "tp": 1,
+     "fp": 0,
+     "fn": 4
+    },
+    "acc-double-sharp": {
+     "tp": 1,
+     "fp": 0,
+     "fn": 3
+    },
+    "clef-C": {
+     "tp": 28,
+     "fp": 2,
+     "fn": 12
+    },
+    "rest-16th": {
+     "tp": 6,
+     "fp": 1,
+     "fn": 27
+    },
+    "rest-32nd": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 17
+    },
+    "rest-64th": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 10
+    },
+    "rest-breve": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 2
+    },
+    "digit-9": {
+     "tp": 1,
+     "fp": 0,
+     "fn": 6
+    },
+    "digit-5": {
+     "tp": 1,
+     "fp": 0,
+     "fn": 12
+    },
+    "digit-7": {
+     "tp": 1,
+     "fp": 0,
+     "fn": 11
+    },
+    "time-cut": {
+     "tp": 7,
+     "fp": 0,
+     "fn": 8
+    }
+   }
+  },
+  "c-hog-knn": {
+   "clean": {
+    "dyn": {
+     "tp": 147,
+     "fp": 12,
+     "fn": 5
+    },
+    "neg": {
+     "tp": 4839,
+     "fp": 61,
+     "fn": 142
+    },
+    "rest-quarter": {
+     "tp": 133,
+     "fp": 3,
+     "fn": 3
+    },
+    "digit-4": {
+     "tp": 306,
+     "fp": 19,
+     "fn": 0
+    },
+    "clef-G": {
+     "tp": 266,
+     "fp": 0,
+     "fn": 0
+    },
+    "clef-F": {
+     "tp": 140,
+     "fp": 0,
+     "fn": 0
+    },
+    "fermata": {
+     "tp": 110,
+     "fp": 6,
+     "fn": 2
+    },
+    "rest-whole": {
+     "tp": 45,
+     "fp": 18,
+     "fn": 12
+    },
+    "rest-half": {
+     "tp": 23,
+     "fp": 11,
+     "fn": 9
+    },
+    "time-C": {
+     "tp": 21,
+     "fp": 0,
+     "fn": 0
+    },
+    "dot": {
+     "tp": 223,
+     "fp": 48,
+     "fn": 19
+    },
+    "acc-natural": {
+     "tp": 49,
+     "fp": 3,
+     "fn": 2
+    },
+    "acc-flat": {
+     "tp": 22,
+     "fp": 5,
+     "fn": 7
+    },
+    "rest-8th": {
+     "tp": 92,
+     "fp": 2,
+     "fn": 0
+    },
+    "digit-2": {
+     "tp": 37,
+     "fp": 6,
+     "fn": 0
+    },
+    "acc-sharp": {
+     "tp": 66,
+     "fp": 12,
+     "fn": 3
+    },
+    "rest-hbar": {
+     "tp": 0,
+     "fp": 1,
+     "fn": 7
+    },
+    "digit-3": {
+     "tp": 56,
+     "fp": 1,
+     "fn": 1
+    },
+    "digit-6": {
+     "tp": 32,
+     "fp": 0,
+     "fn": 0
+    },
+    "digit-8": {
+     "tp": 65,
+     "fp": 4,
+     "fn": 2
+    },
+    "acc-double-flat": {
+     "tp": 5,
+     "fp": 0,
+     "fn": 0
+    },
+    "time-cut": {
+     "tp": 16,
+     "fp": 7,
+     "fn": 0
+    },
+    "acc-double-sharp": {
+     "tp": 5,
+     "fp": 0,
+     "fn": 2
+    },
+    "clef-C": {
+     "tp": 38,
+     "fp": 1,
+     "fn": 2
+    },
+    "rest-16th": {
+     "tp": 57,
+     "fp": 32,
+     "fn": 3
+    },
+    "rest-32nd": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 22
+    },
+    "rest-64th": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 10
+    },
+    "rest-breve": {
+     "tp": 0,
+     "fp": 3,
+     "fn": 2
+    },
+    "digit-9": {
+     "tp": 7,
+     "fp": 0,
+     "fn": 0
+    },
+    "digit-5": {
+     "tp": 13,
+     "fp": 0,
+     "fn": 0
+    },
+    "digit-7": {
+     "tp": 13,
+     "fp": 0,
+     "fn": 0
+    }
+   },
+   "scan": {
+    "neg": {
+     "tp": 1210,
+     "fp": 80,
+     "fn": 80
+    },
+    "dyn": {
+     "tp": 145,
+     "fp": 3,
+     "fn": 8
+    },
+    "rest-quarter": {
+     "tp": 136,
+     "fp": 0,
+     "fn": 0
+    },
+    "rest-whole": {
+     "tp": 50,
+     "fp": 15,
+     "fn": 14
+    },
+    "digit-4": {
+     "tp": 305,
+     "fp": 8,
+     "fn": 1
+    },
+    "clef-F": {
+     "tp": 140,
+     "fp": 1,
+     "fn": 0
+    },
+    "clef-G": {
+     "tp": 265,
+     "fp": 0,
+     "fn": 0
+    },
+    "fermata": {
+     "tp": 111,
+     "fp": 0,
+     "fn": 1
+    },
+    "time-C": {
+     "tp": 21,
+     "fp": 0,
+     "fn": 0
+    },
+    "acc-natural": {
+     "tp": 44,
+     "fp": 1,
+     "fn": 6
+    },
+    "dot": {
+     "tp": 222,
+     "fp": 42,
+     "fn": 35
+    },
+    "rest-8th": {
+     "tp": 90,
+     "fp": 3,
+     "fn": 2
+    },
+    "digit-2": {
+     "tp": 37,
+     "fp": 0,
+     "fn": 0
+    },
+    "acc-sharp": {
+     "tp": 62,
+     "fp": 10,
+     "fn": 7
+    },
+    "rest-hbar": {
+     "tp": 0,
+     "fp": 2,
+     "fn": 7
+    },
+    "digit-3": {
+     "tp": 54,
+     "fp": 0,
+     "fn": 3
+    },
+    "rest-half": {
+     "tp": 20,
+     "fp": 7,
+     "fn": 12
+    },
+    "digit-6": {
+     "tp": 32,
+     "fp": 0,
+     "fn": 0
+    },
+    "digit-8": {
+     "tp": 67,
+     "fp": 3,
+     "fn": 0
+    },
+    "acc-flat": {
+     "tp": 24,
+     "fp": 0,
+     "fn": 5
+    },
+    "acc-double-flat": {
+     "tp": 5,
+     "fp": 0,
+     "fn": 0
+    },
+    "acc-double-sharp": {
+     "tp": 5,
+     "fp": 0,
+     "fn": 2
+    },
+    "clef-C": {
+     "tp": 38,
+     "fp": 1,
+     "fn": 1
+    },
+    "rest-16th": {
+     "tp": 56,
+     "fp": 35,
+     "fn": 4
+    },
+    "rest-32nd": {
+     "tp": 0,
+     "fp": 2,
+     "fn": 22
+    },
+    "rest-64th": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 10
+    },
+    "rest-breve": {
+     "tp": 0,
+     "fp": 2,
+     "fn": 2
+    },
+    "digit-9": {
+     "tp": 7,
+     "fp": 0,
+     "fn": 0
+    },
+    "digit-5": {
+     "tp": 13,
+     "fp": 0,
+     "fn": 0
+    },
+    "digit-7": {
+     "tp": 13,
+     "fp": 0,
+     "fn": 0
+    },
+    "time-cut": {
+     "tp": 16,
+     "fp": 7,
+     "fn": 0
+    }
+   },
+   "scan-severe": {
+    "neg": {
+     "tp": 1628,
+     "fp": 146,
+     "fn": 130
+    },
+    "dyn": {
+     "tp": 139,
+     "fp": 9,
+     "fn": 7
+    },
+    "rest-quarter": {
+     "tp": 122,
+     "fp": 0,
+     "fn": 7
+    },
+    "rest-whole": {
+     "tp": 41,
+     "fp": 11,
+     "fn": 14
+    },
+    "digit-4": {
+     "tp": 271,
+     "fp": 13,
+     "fn": 15
+    },
+    "clef-G": {
+     "tp": 231,
+     "fp": 6,
+     "fn": 6
+    },
+    "clef-F": {
+     "tp": 117,
+     "fp": 0,
+     "fn": 5
+    },
+    "fermata": {
+     "tp": 103,
+     "fp": 0,
+     "fn": 5
+    },
+    "time-C": {
+     "tp": 19,
+     "fp": 0,
+     "fn": 2
+    },
+    "acc-natural": {
+     "tp": 45,
+     "fp": 7,
+     "fn": 3
+    },
+    "dot": {
+     "tp": 146,
+     "fp": 70,
+     "fn": 60
+    },
+    "rest-8th": {
+     "tp": 71,
+     "fp": 2,
+     "fn": 4
+    },
+    "digit-2": {
+     "tp": 30,
+     "fp": 0,
+     "fn": 7
+    },
+    "digit-3": {
+     "tp": 37,
+     "fp": 3,
+     "fn": 8
+    },
+    "acc-sharp": {
+     "tp": 42,
+     "fp": 24,
+     "fn": 18
+    },
+    "rest-hbar": {
+     "tp": 0,
+     "fp": 1,
+     "fn": 0
+    },
+    "rest-half": {
+     "tp": 19,
+     "fp": 17,
+     "fn": 12
+    },
+    "digit-6": {
+     "tp": 21,
+     "fp": 1,
+     "fn": 4
+    },
+    "digit-8": {
+     "tp": 53,
+     "fp": 7,
+     "fn": 6
+    },
+    "acc-flat": {
+     "tp": 22,
+     "fp": 3,
+     "fn": 7
+    },
+    "acc-double-flat": {
+     "tp": 5,
+     "fp": 1,
+     "fn": 0
+    },
+    "acc-double-sharp": {
+     "tp": 1,
+     "fp": 1,
+     "fn": 3
+    },
+    "clef-C": {
+     "tp": 33,
+     "fp": 4,
+     "fn": 7
+    },
+    "rest-16th": {
+     "tp": 31,
+     "fp": 30,
+     "fn": 2
+    },
+    "rest-32nd": {
+     "tp": 0,
+     "fp": 1,
+     "fn": 17
+    },
+    "rest-64th": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 10
+    },
+    "rest-breve": {
+     "tp": 0,
+     "fp": 6,
+     "fn": 2
+    },
+    "digit-9": {
+     "tp": 6,
+     "fp": 0,
+     "fn": 1
+    },
+    "digit-5": {
+     "tp": 7,
+     "fp": 0,
+     "fn": 6
+    },
+    "digit-7": {
+     "tp": 11,
+     "fp": 0,
+     "fn": 1
+    },
+    "time-cut": {
+     "tp": 13,
+     "fp": 8,
+     "fn": 2
+    }
+   }
+  },
+  "ac-hog+tpl-svm": {
+   "clean": {
+    "dyn": {
+     "tp": 150,
+     "fp": 7,
+     "fn": 2
+    },
+    "neg": {
+     "tp": 4877,
+     "fp": 220,
+     "fn": 104
+    },
+    "rest-quarter": {
+     "tp": 136,
+     "fp": 3,
+     "fn": 0
+    },
+    "digit-4": {
+     "tp": 304,
+     "fp": 3,
+     "fn": 2
+    },
+    "clef-G": {
+     "tp": 261,
+     "fp": 0,
+     "fn": 5
+    },
+    "clef-F": {
+     "tp": 139,
+     "fp": 0,
+     "fn": 1
+    },
+    "fermata": {
+     "tp": 105,
+     "fp": 8,
+     "fn": 7
+    },
+    "dot": {
+     "tp": 211,
+     "fp": 52,
+     "fn": 31
+    },
+    "rest-whole": {
+     "tp": 31,
+     "fp": 7,
+     "fn": 26
+    },
+    "time-C": {
+     "tp": 18,
+     "fp": 0,
+     "fn": 3
+    },
+    "digit-8": {
+     "tp": 67,
+     "fp": 3,
+     "fn": 0
+    },
+    "acc-natural": {
+     "tp": 43,
+     "fp": 1,
+     "fn": 8
+    },
+    "acc-flat": {
+     "tp": 21,
+     "fp": 15,
+     "fn": 8
+    },
+    "time-cut": {
+     "tp": 7,
+     "fp": 2,
+     "fn": 9
+    },
+    "rest-8th": {
+     "tp": 86,
+     "fp": 2,
+     "fn": 6
+    },
+    "digit-2": {
+     "tp": 31,
+     "fp": 0,
+     "fn": 6
+    },
+    "acc-sharp": {
+     "tp": 53,
+     "fp": 11,
+     "fn": 16
+    },
+    "digit-3": {
+     "tp": 44,
+     "fp": 0,
+     "fn": 13
+    },
+    "rest-half": {
+     "tp": 22,
+     "fp": 5,
+     "fn": 10
+    },
+    "digit-6": {
+     "tp": 29,
+     "fp": 1,
+     "fn": 3
+    },
+    "acc-double-flat": {
+     "tp": 1,
+     "fp": 0,
+     "fn": 4
+    },
+    "acc-double-sharp": {
+     "tp": 1,
+     "fp": 0,
+     "fn": 6
+    },
+    "clef-C": {
+     "tp": 38,
+     "fp": 0,
+     "fn": 2
+    },
+    "rest-16th": {
+     "tp": 47,
+     "fp": 1,
+     "fn": 13
+    },
+    "rest-32nd": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 22
+    },
+    "rest-64th": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 10
+    },
+    "rest-breve": {
+     "tp": 0,
+     "fp": 2,
+     "fn": 2
+    },
+    "digit-9": {
+     "tp": 5,
+     "fp": 0,
+     "fn": 2
+    },
+    "digit-5": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 9
+    },
+    "digit-7": {
+     "tp": 7,
+     "fp": 0,
+     "fn": 6
+    },
+    "rest-hbar": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 7
+    }
+   },
+   "scan": {
+    "neg": {
+     "tp": 1247,
+     "fp": 258,
+     "fn": 43
+    },
+    "dyn": {
+     "tp": 145,
+     "fp": 2,
+     "fn": 8
+    },
+    "rest-quarter": {
+     "tp": 136,
+     "fp": 0,
+     "fn": 0
+    },
+    "rest-whole": {
+     "tp": 50,
+     "fp": 6,
+     "fn": 14
+    },
+    "digit-4": {
+     "tp": 301,
+     "fp": 0,
+     "fn": 5
+    },
+    "clef-F": {
+     "tp": 136,
+     "fp": 0,
+     "fn": 4
+    },
+    "clef-G": {
+     "tp": 261,
+     "fp": 0,
+     "fn": 4
+    },
+    "fermata": {
+     "tp": 108,
+     "fp": 1,
+     "fn": 4
+    },
+    "time-C": {
+     "tp": 19,
+     "fp": 0,
+     "fn": 2
+    },
+    "acc-natural": {
+     "tp": 37,
+     "fp": 0,
+     "fn": 13
+    },
+    "dot": {
+     "tp": 215,
+     "fp": 37,
+     "fn": 42
+    },
+    "rest-8th": {
+     "tp": 83,
+     "fp": 0,
+     "fn": 9
+    },
+    "digit-2": {
+     "tp": 35,
+     "fp": 0,
+     "fn": 2
+    },
+    "acc-sharp": {
+     "tp": 54,
+     "fp": 2,
+     "fn": 15
+    },
+    "digit-3": {
+     "tp": 42,
+     "fp": 0,
+     "fn": 15
+    },
+    "rest-half": {
+     "tp": 17,
+     "fp": 4,
+     "fn": 15
+    },
+    "digit-8": {
+     "tp": 64,
+     "fp": 1,
+     "fn": 3
+    },
+    "digit-6": {
+     "tp": 29,
+     "fp": 1,
+     "fn": 3
+    },
+    "acc-flat": {
+     "tp": 19,
+     "fp": 0,
+     "fn": 10
+    },
+    "acc-double-flat": {
+     "tp": 1,
+     "fp": 0,
+     "fn": 4
+    },
+    "acc-double-sharp": {
+     "tp": 1,
+     "fp": 0,
+     "fn": 6
+    },
+    "clef-C": {
+     "tp": 37,
+     "fp": 0,
+     "fn": 2
+    },
+    "rest-16th": {
+     "tp": 35,
+     "fp": 3,
+     "fn": 25
+    },
+    "rest-32nd": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 22
+    },
+    "rest-64th": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 10
+    },
+    "rest-breve": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 2
+    },
+    "digit-9": {
+     "tp": 5,
+     "fp": 0,
+     "fn": 2
+    },
+    "digit-5": {
+     "tp": 1,
+     "fp": 0,
+     "fn": 12
+    },
+    "digit-7": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 9
+    },
+    "time-cut": {
+     "tp": 13,
+     "fp": 0,
+     "fn": 3
+    },
+    "rest-hbar": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 7
+    }
+   },
+   "scan-severe": {
+    "neg": {
+     "tp": 1702,
+     "fp": 535,
+     "fn": 56
+    },
+    "dyn": {
+     "tp": 118,
+     "fp": 2,
+     "fn": 28
+    },
+    "rest-quarter": {
+     "tp": 103,
+     "fp": 0,
+     "fn": 26
+    },
+    "rest-whole": {
+     "tp": 25,
+     "fp": 3,
+     "fn": 30
+    },
+    "digit-4": {
+     "tp": 247,
+     "fp": 3,
+     "fn": 39
+    },
+    "clef-G": {
+     "tp": 222,
+     "fp": 0,
+     "fn": 15
+    },
+    "clef-F": {
+     "tp": 107,
+     "fp": 0,
+     "fn": 15
+    },
+    "fermata": {
+     "tp": 96,
+     "fp": 2,
+     "fn": 12
+    },
+    "time-C": {
+     "tp": 9,
+     "fp": 0,
+     "fn": 12
+    },
+    "acc-natural": {
+     "tp": 40,
+     "fp": 2,
+     "fn": 8
+    },
+    "dot": {
+     "tp": 112,
+     "fp": 44,
+     "fn": 94
+    },
+    "rest-8th": {
+     "tp": 42,
+     "fp": 0,
+     "fn": 33
+    },
+    "digit-2": {
+     "tp": 12,
+     "fp": 0,
+     "fn": 25
+    },
+    "acc-sharp": {
+     "tp": 38,
+     "fp": 13,
+     "fn": 22
+    },
+    "digit-3": {
+     "tp": 20,
+     "fp": 0,
+     "fn": 25
+    },
+    "rest-half": {
+     "tp": 15,
+     "fp": 4,
+     "fn": 16
+    },
+    "digit-6": {
+     "tp": 12,
+     "fp": 0,
+     "fn": 13
+    },
+    "digit-8": {
+     "tp": 38,
+     "fp": 0,
+     "fn": 21
+    },
+    "acc-flat": {
+     "tp": 20,
+     "fp": 0,
+     "fn": 9
+    },
+    "acc-double-flat": {
+     "tp": 1,
+     "fp": 0,
+     "fn": 4
+    },
+    "acc-double-sharp": {
+     "tp": 1,
+     "fp": 0,
+     "fn": 3
+    },
+    "clef-C": {
+     "tp": 28,
+     "fp": 2,
+     "fn": 12
+    },
+    "rest-16th": {
+     "tp": 6,
+     "fp": 1,
+     "fn": 27
+    },
+    "rest-32nd": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 17
+    },
+    "rest-64th": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 10
+    },
+    "rest-breve": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 2
+    },
+    "digit-9": {
+     "tp": 1,
+     "fp": 0,
+     "fn": 6
+    },
+    "digit-5": {
+     "tp": 1,
+     "fp": 0,
+     "fn": 12
+    },
+    "digit-7": {
+     "tp": 1,
+     "fp": 0,
+     "fn": 11
+    },
+    "time-cut": {
+     "tp": 7,
+     "fp": 0,
+     "fn": 8
+    }
+   }
+  }
+ }
+}

@@ -977,6 +977,68 @@ and re-renders the preview within about one second, without re-running recogniti
 - At 400 px width the layout is one column with no horizontal page scroll; the page view scrolls inside its
   own frame. Side gutters use `max(16px, env(safe-area-inset-left))`.
 
+### 8.6 Detection overlay and repair marks
+
+**Overlay layers.** Over each page the overlay draws every symbol the reading recognised, each class with
+its own colour and shape: note heads (by part), stems and beams, rests, clefs, key and time signatures,
+staves and barlines (double bars and repeats), accidentals, augmentation dots, tuplet numbers and the lyric
+syllables the score used. Text labels give each note's pitch and written value (upper voice above the
+staff, lower voice below) and name each rest, clef, key and time signature; they are drawn only while a
+staff space is at least 11 screen pixels (page zoom times pinch zoom). Ink left after staff-line removal
+that touches no recognised symbol is highlighted as "Not recognised". Each layer has a toggle in the legend
+(remembered in `localStorage` as `ssr.layers`); the page zoom (Fit to 6x) is `ssr.zoom`. The data comes
+from `src/symbols.js` `pageSymbols(fr, asm)` via `ui/session.js` `pageView(entry, i, req).sym`, per-head
+`notes` in the result's `pages`, and `score.measureMap`.
+
+**Repair marks.** After detection, "Mark for repair" (a toggle next to Overlay; Escape leaves it) lets the
+reader draw over the page with Pointer Events (mouse, touch, pen): Pen (freehand; Shift held gives a
+straight line), Line, Box and Circle. While drawing is on, the mark layer takes the pointer with
+`touch-action: none`, so a finger draws instead of scrolling; off, the page scrolls normally. Marks are
+stored in the page's full-resolution frame (the overlay's viewBox), so they stay aligned at every zoom and
+on two-up spreads (the sheet's frame). Each mark is numbered on the page and can carry a short note. Undo
+(button, Ctrl/Cmd+Z), delete one mark and clear page are available. Marks persist per document in
+`localStorage` under `ssr.repair:<file name>:<size>` (`:sample` for the bundled samples) and survive
+re-running the conversion. Repair marks are a lime highlighter under a black dashed core (`--rp-*`
+tokens), unlike every detection colour and the yellow of unrecognised ink.
+
+"Copy repair notes" puts the JSON below on the clipboard; "Open repair notes (.json)" and "Open marked page
+(.png)" open a file in a new tab to save from there (the page carries no download links, section 9). The
+JSON is the input for a later repair / re-recognition pass (shape; `[]` and `x0 ...` stand for boxes):
+
+```text
+{
+  "format": "score-scan-reader/repair-notes", "version": 1,
+  "file": "hymn.pdf", "size": 812345, "exported": "2026-11-08T09:00:00.000Z",
+  "frame": "page pixels of the straightened page as read (the detection overlay frame); x right, y down",
+  "score": { "parts": ["Soprano", "Alto"], "measures": 32, "fifths": -1, "time": { "beats": 3, "type": 4 } },
+  "pages": [{
+    "page": 1, "width": 2300, "height": 2977, "staffSpace": 18.4, "spread": 0,
+    "marks": [{
+      "n": 1, "id": 7, "tool": "pen | line | box | ellipse", "note": "missed chord note",
+      "points": [[690.5, 357.2], [701.0, 360.4]], "bbox": [690, 357, 1058, 446], "drawn": "2026-11-08T08:59:10.000Z",
+      "found": {
+        "measures": [1, 2],
+        "heads": [{ "k": 80, "x": 729, "y": 402.5, "stem": "up", "pitch": "C4", "value": "1/8", "quarters": 0.5, "parts": ["Piano"] }],
+        "rests": [{ "box": [x0, y0, x1, y1], "kind": "flag1", "quarters": 0.5, "dots": 0, "text": "rest 1/8" }],
+        "clefs": [{ "box": [], "clef": "G", "text": "G clef", "change": false, "assumed": false }],
+        "keys": [{ "box": [], "fifths": -4, "text": "4♭", "change": false }],
+        "times": [{ "box": [], "beats": null, "beatType": null, "symbol": null }],
+        "accidentals": [{ "box": [], "kind": "natural" }], "dots": [{ "x": 0, "y": 0 }],
+        "tuplets": [{ "box": [], "actual": 3, "normal": 2 }],
+        "barlines": [{ "x": 0, "top": 0, "bottom": 0, "type": "single | double | repeat-start | repeat-end | repeat-both" }],
+        "unrecognised": [[x0, y0, x1, y1]]
+      }
+    }]
+  }]
+}
+```
+
+`points` and every box are in `frame` coordinates of that page; `heads[].k` indexes the page's drawn heads
+(`pageView().heads`, the order of the page entry's `fr.heads`). `measures` are the written measure numbers
+(0 for a pickup) whose segment, from `score.measureMap`, meets the mark's box; it is `null` on a two-up
+spread, whose halves are measured in their own frames. `found` is `null` for a page not read in this
+session.
+
 ## 9. Deployment and artifact constraints
 
 ### 9.1 Packaging

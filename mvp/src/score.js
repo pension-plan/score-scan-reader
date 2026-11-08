@@ -984,8 +984,28 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     }))));
     return lo ? `${lo.step}${lo.octave}\u2013${hi.step}${hi.octave}` : '-';
   });
+  // where each written measure stands on its page (overlay and repair notes):
+  // {n: measure number as written, page, sys, xa, xb, y0, y1} per segment, in the
+  // page frame of that page entry (a spread's half: page i + 0.5)
+  const first0 = partMeasures[0] && partMeasures[0][0] && partMeasures[0][0].every(s => s.implicit);
+  const measureMap = [];
+  units.forEach((u, mi) => {
+    const n = mi === 0 && first0 ? 0 : mi + (first0 ? 0 : 1);
+    let ex = null;
+    if (u.split) {
+      const xs = u.streams.flat().flatMap(st => st.events).filter(e => e.x != null).map(e => e.x);
+      if (xs.length) ex = [Math.min(...xs), Math.max(...xs)];
+    }
+    for (const si of u.m.segs) {
+      const sg = segs[si], sts = sg.sy.staves;
+      if (!sts.length) continue;
+      const xa = ex ? Math.max(sg.xa, ex[0] - 0.8 * sts[0].st.space) : sg.xa, xb = ex ? Math.min(sg.xb, ex[1] + 0.8 * sts[0].st.space) : sg.xb;
+      measureMap.push({ n, page: sg.sy.page, sys: sg.sy.index, xa: Math.round(xa), xb: Math.round(xb),
+        y0: Math.round(sts[0].st.yAt(0, sg.xa)), y1: Math.round(sts[sts.length - 1].st.yAt(4, sg.xa)) });
+    }
+  });
   // UI compares clefs with 'F'; 'G8' stays a treble clef there
-  return { parts, layout, fifths, time, timeRead, clefs, ranges, measures: units.length, nNotes, credits, warnings: warnings.concat(layout.notes), xml };
+  return { parts, layout, fifths, time, timeRead, clefs, ranges, measures: units.length, nNotes, credits, warnings: warnings.concat(layout.notes), xml, measureMap };
 }
 
 // Horizontal extent of a syllable: lyrics.js may report x0/x1; otherwise it is

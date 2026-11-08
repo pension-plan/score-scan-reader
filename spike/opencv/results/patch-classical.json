@@ -1,0 +1,357 @@
+{
+ "clean": {
+  "rests": {
+   "tp": 395,
+   "fp": 29,
+   "fn": 23,
+   "per": {
+    "rest-quarter": {
+     "tp": 128,
+     "fn": 8,
+     "fp": 6
+    },
+    "none": {
+     "tp": 0,
+     "fn": 0,
+     "fp": 0
+    },
+    "rest-whole": {
+     "tp": 54,
+     "fn": 3,
+     "fp": 12
+    },
+    "rest-8th": {
+     "tp": 90,
+     "fn": 2,
+     "fp": 0
+    },
+    "rest-half": {
+     "tp": 31,
+     "fn": 1,
+     "fp": 0
+    },
+    "rest-16th": {
+     "tp": 57,
+     "fn": 3,
+     "fp": 3
+    },
+    "rest-32nd": {
+     "tp": 22,
+     "fn": 0,
+     "fp": 0
+    },
+    "rest-64th": {
+     "tp": 7,
+     "fn": 3,
+     "fp": 0
+    },
+    "rest-breve": {
+     "tp": 2,
+     "fn": 0,
+     "fp": 5
+    },
+    "rest-hbar": {
+     "tp": 4,
+     "fn": 3,
+     "fp": 0
+    },
+    "rest-long": {
+     "tp": 0,
+     "fn": 0,
+     "fp": 3
+    }
+   }
+  },
+  "accidentals": {
+   "tp": 137,
+   "fp": 368,
+   "fn": 15,
+   "per": {
+    "acc-sharp": {
+     "tp": 63,
+     "fn": 4,
+     "fp": 328
+    },
+    "acc-flat": {
+     "tp": 27,
+     "fn": 2,
+     "fp": 39
+    },
+    "acc-natural": {
+     "tp": 47,
+     "fn": 4,
+     "fp": 1
+    },
+    "acc-double-flat": {
+     "tp": 0,
+     "fn": 5,
+     "fp": 0
+    }
+   }
+  },
+  "clefs": {
+   "tp": 435,
+   "fp": 0,
+   "fn": 11,
+   "per": {
+    "clef-G": {
+     "tp": 265,
+     "fn": 1,
+     "fp": 0
+    },
+    "clef-F": {
+     "tp": 139,
+     "fn": 1,
+     "fp": 0
+    },
+    "clef-C": {
+     "tp": 31,
+     "fn": 9,
+     "fp": 0
+    }
+   }
+  },
+  "time": {
+   "n": 308,
+   "found": 169,
+   "read_right": 12,
+   "numbered": 182,
+   "numbered_read": 0
+  }
+ },
+ "scan": {
+  "rests": {
+   "tp": 384,
+   "fp": 18,
+   "fn": 41,
+   "per": {
+    "rest-quarter": {
+     "tp": 124,
+     "fn": 12,
+     "fp": 3
+    },
+    "rest-whole": {
+     "tp": 61,
+     "fn": 3,
+     "fp": 5
+    },
+    "none": {
+     "tp": 0,
+     "fn": 0,
+     "fp": 0
+    },
+    "rest-8th": {
+     "tp": 90,
+     "fn": 2,
+     "fp": 0
+    },
+    "rest-half": {
+     "tp": 31,
+     "fn": 1,
+     "fp": 0
+    },
+    "rest-16th": {
+     "tp": 56,
+     "fn": 4,
+     "fp": 2
+    },
+    "rest-32nd": {
+     "tp": 15,
+     "fn": 7,
+     "fp": 0
+    },
+    "rest-64th": {
+     "tp": 1,
+     "fn": 9,
+     "fp": 0
+    },
+    "rest-breve": {
+     "tp": 2,
+     "fn": 0,
+     "fp": 5
+    },
+    "rest-hbar": {
+     "tp": 4,
+     "fn": 3,
+     "fp": 0
+    },
+    "rest-long": {
+     "tp": 0,
+     "fn": 0,
+     "fp": 3
+    }
+   }
+  },
+  "accidentals": {
+   "tp": 125,
+   "fp": 136,
+   "fn": 15,
+   "per": {
+    "acc-sharp": {
+     "tp": 59,
+     "fn": 4,
+     "fp": 136
+    },
+    "acc-natural": {
+     "tp": 40,
+     "fn": 4,
+     "fp": 0
+    },
+    "acc-flat": {
+     "tp": 26,
+     "fn": 2,
+     "fp": 0
+    },
+    "acc-double-flat": {
+     "tp": 0,
+     "fn": 5,
+     "fp": 0
+    }
+   }
+  },
+  "clefs": {
+   "tp": 434,
+   "fp": 0,
+   "fn": 10,
+   "per": {
+    "clef-G": {
+     "tp": 264,
+     "fn": 1,
+     "fp": 0
+    },
+    "clef-F": {
+     "tp": 140,
+     "fn": 0,
+     "fp": 0
+    },
+    "clef-C": {
+     "tp": 30,
+     "fn": 9,
+     "fp": 0
+    }
+   }
+  },
+  "time": {
+   "n": 308,
+   "found": 160,
+   "read_right": 12,
+   "numbered": 182,
+   "numbered_read": 0
+  }
+ },
+ "scan-severe": {
+  "rests": {
+   "tp": 235,
+   "fp": 58,
+   "fn": 117,
+   "per": {
+    "rest-quarter": {
+     "tp": 76,
+     "fn": 53,
+     "fp": 3
+    },
+    "rest-whole": {
+     "tp": 40,
+     "fn": 15,
+     "fp": 15
+    },
+    "none": {
+     "tp": 0,
+     "fn": 0,
+     "fp": 0
+    },
+    "rest-16th": {
+     "tp": 25,
+     "fn": 8,
+     "fp": 9
+    },
+    "rest-8th": {
+     "tp": 69,
+     "fn": 6,
+     "fp": 20
+    },
+    "rest-half": {
+     "tp": 20,
+     "fn": 11,
+     "fp": 11
+    },
+    "rest-32nd": {
+     "tp": 3,
+     "fn": 14,
+     "fp": 0
+    },
+    "rest-64th": {
+     "tp": 0,
+     "fn": 10,
+     "fp": 0
+    },
+    "rest-breve": {
+     "tp": 2,
+     "fn": 0,
+     "fp": 0
+    }
+   }
+  },
+  "accidentals": {
+   "tp": 106,
+   "fp": 168,
+   "fn": 29,
+   "per": {
+    "acc-sharp": {
+     "tp": 41,
+     "fn": 14,
+     "fp": 163
+    },
+    "acc-natural": {
+     "tp": 42,
+     "fn": 3,
+     "fp": 4
+    },
+    "acc-flat": {
+     "tp": 23,
+     "fn": 4,
+     "fp": 1
+    },
+    "acc-double-flat": {
+     "tp": 0,
+     "fn": 5,
+     "fp": 0
+    },
+    "acc-double-sharp": {
+     "tp": 0,
+     "fn": 3,
+     "fp": 0
+    }
+   }
+  },
+  "clefs": {
+   "tp": 370,
+   "fp": 1,
+   "fn": 29,
+   "per": {
+    "clef-G": {
+     "tp": 228,
+     "fn": 9,
+     "fp": 0
+    },
+    "clef-F": {
+     "tp": 115,
+     "fn": 7,
+     "fp": 1
+    },
+    "clef-C": {
+     "tp": 27,
+     "fn": 13,
+     "fp": 0
+    }
+   }
+  },
+  "time": {
+   "n": 284,
+   "found": 142,
+   "read_right": 12,
+   "numbered": 172,
+   "numbered_read": 0
+  }
+ }
+}

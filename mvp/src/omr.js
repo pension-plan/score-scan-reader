@@ -9,6 +9,8 @@
 const { front } = require('./front');
 const { assemblePage } = require('./assemble');
 const { readLyrics } = require('./lyrics');
+const { readPageText } = require('./text');
+const { pageMarks } = require('./symbols');
 const { buildScore } = require('./score');
 const { makeGray } = require('./image');
 
@@ -97,6 +99,9 @@ function createConverter(opts = {}) {
       const lyr = await readLyrics(entry.fr, opts.ocr, (d, m) => progress(`${label}: reading lyrics (${d}/${m} lines)`, { stage: 'lyrics', page: i, pages: n }));
       for (const k in lyr) lyricsBySystem[entry.index + ':' + k] = lyr[k];
     } catch (e) { warnings.push(`Lyrics OCR failed: ${e.message}`); }
+    // titles, credits, instrument names, tempo and expression text
+    progress(`${label}: reading titles and text`, { stage: 'lyrics', page: i, pages: n });
+    try { await readPageText(entry.fr, pageMarks(entry.fr, entry.asm), opts.ocr); } catch (e) { warnings.push(`Text OCR failed: ${e.message}`); }
   }
 
   return {
