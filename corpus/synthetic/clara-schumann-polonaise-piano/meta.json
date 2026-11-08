@@ -1,0 +1,39 @@
+{
+  "id": "clara-schumann-polonaise-piano",
+  "title": "Polonaise Op. 1 No. 1 (Clara Schumann) - piano, excerpt",
+  "expected_parts": [
+    "Piano"
+  ],
+  "lyrics": [],
+  "shared_staves": [],
+  "layout": "piano solo, grand staff (one part)",
+  "degradation_params": {
+    "dpi": 200,
+    "rotate": 0.9,
+    "paper": 238,
+    "texture": 6,
+    "ink_level": 28,
+    "noise": 6,
+    "saltpepper": 0.001,
+    "blur": 0.7,
+    "jpeg": 55,
+    "format": "jpeg"
+  },
+  "degradations": [
+    "rotation",
+    "paper_texture",
+    "blur",
+    "gaussian_noise",
+    "salt_pepper",
+    "jpeg_q55"
+  ],
+  "engraver": "musicxml2ly+lilypond",
+  "validation": {
+    "midi_attacks_match_truth": true,
+    "attacks": 332,
+    "lyric_text_found_in_engraving": null,
+    "image_only": true
+  },
+  "pages": 1,
+  "measures": 16
+}

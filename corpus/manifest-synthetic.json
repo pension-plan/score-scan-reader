@@ -1,0 +1,904 @@
+[
+  {
+    "id": "sample-embed-old100",
+    "title": "Old Hundredth (All people that on earth do dwell)",
+    "source_url": "self-authored; melody Genevan Psalter 1551 (L. Bourgeois), text W. Kethe 1561",
+    "license": "Public domain (melody, text); harmonization and engraving CC0-1.0",
+    "origin": "synthetic-scan",
+    "dpi": 200,
+    "degradations": [
+      "rotation",
+      "paper_texture",
+      "lighting_gradient",
+      "blur",
+      "gaussian_noise",
+      "jpeg_q70"
+    ],
+    "has_ground_truth": true,
+    "features": [
+      "lyrics",
+      "multi_voice_staff",
+      "satb_closed",
+      "multi_verse",
+      "hymn",
+      "pickup",
+      "fermata"
+    ],
+    "expected_parts": [
+      "Soprano",
+      "Alto",
+      "Tenor",
+      "Bass"
+    ],
+    "shared_staves": [
+      [
+        "Soprano",
+        "Alto"
+      ],
+      [
+        "Tenor",
+        "Bass"
+      ]
+    ],
+    "lyrics_parts": [
+      {
+        "part": "Soprano",
+        "verses": 4
+      }
+    ],
+    "pages": 1,
+    "measures": 11,
+    "engraver": "model->lilypond (custom writer)",
+    "scan": "synthetic/sample-embed-old100/scan.pdf",
+    "truth": "synthetic/sample-embed-old100/truth.musicxml",
+    "clean": "synthetic/sample-embed-old100/clean.pdf",
+    "engraving": "synthetic/sample-embed-old100/engraving.ly",
+    "attribution": "synthetic/sample-embed-old100/ATTRIBUTION.txt",
+    "notes": "Default sample embedded in the app (copied to corpus/sample-embed.pdf)."
+  },
+  {
+    "id": "hymn-joyful-closed-3v",
+    "title": "Joyful, Joyful, We Adore Thee (Hymn to Joy)",
+    "source_url": "self-authored; melody L. van Beethoven 1824 (Hymn to Joy), text H. van Dyke 1907",
+    "license": "Public domain (melody, text); harmonization and engraving CC0-1.0",
+    "origin": "synthetic-scan",
+    "dpi": 300,
+    "degradations": [
+      "rotation",
+      "paper_texture",
+      "lighting_gradient",
+      "blur",
+      "gaussian_noise",
+      "speckles",
+      "jpeg_q60"
+    ],
+    "has_ground_truth": true,
+    "features": [
+      "lyrics",
+      "multi_voice_staff",
+      "satb_closed",
+      "multi_verse",
+      "hymn",
+      "melisma",
+      "slurs"
+    ],
+    "expected_parts": [
+      "Soprano",
+      "Alto",
+      "Tenor",
+      "Bass"
+    ],
+    "shared_staves": [
+      [
+        "Soprano",
+        "Alto"
+      ],
+      [
+        "Tenor",
+        "Bass"
+      ]
+    ],
+    "lyrics_parts": [
+      {
+        "part": "Soprano",
+        "verses": 3
+      }
+    ],
+    "pages": 1,
+    "measures": 16,
+    "engraver": "model->lilypond (custom writer)",
+    "scan": "synthetic/hymn-joyful-closed-3v/scan.pdf",
+    "truth": "synthetic/hymn-joyful-closed-3v/truth.musicxml",
+    "clean": "synthetic/hymn-joyful-closed-3v/clean.pdf",
+    "engraving": "synthetic/hymn-joyful-closed-3v/engraving.ly",
+    "attribution": "synthetic/hymn-joyful-closed-3v/ATTRIBUTION.txt",
+    "notes": ""
+  },
+  {
+    "id": "bach-bwv244-62-closed-en-3v",
+    "title": "O Sacred Head, Now Wounded (BWV 244/62, English, 3 verses)",
+    "source_url": "https://github.com/cuthbertLab/music21/tree/master/music21/corpus/bach/bwv244.62.mxl",
+    "license": "Public domain composition/text; encoding via music21 corpus (Greentree, used by permission)",
+    "origin": "synthetic-scan",
+    "dpi": 300,
+    "degradations": [
+      "rotation",
+      "bleed_through",
+      "paper_texture",
+      "blur",
+      "gaussian_noise",
+      "jpeg_q65"
+    ],
+    "has_ground_truth": true,
+    "features": [
+      "lyrics",
+      "multi_voice_staff",
+      "satb_closed",
+      "multi_verse",
+      "chorale",
+      "independent_rhythms",
+      "fermata",
+      "pickup",
+      "repeat_unrolled",
+      "multi_page"
+    ],
+    "expected_parts": [
+      "Soprano",
+      "Alto",
+      "Tenor",
+      "Bass"
+    ],
+    "shared_staves": [
+      [
+        "Soprano",
+        "Alto"
+      ],
+      [
+        "Tenor",
+        "Bass"
+      ]
+    ],
+    "lyrics_parts": [
+      {
+        "part": "Soprano",
+        "verses": 3
+      }
+    ],
+    "pages": 2,
+    "measures": 20,
+    "engraver": "model->lilypond (custom writer)",
+    "scan": "synthetic/bach-bwv244-62-closed-en-3v/scan.pdf",
+    "truth": "synthetic/bach-bwv244-62-closed-en-3v/truth.musicxml",
+    "clean": "synthetic/bach-bwv244-62-closed-en-3v/clean.pdf",
+    "engraving": "synthetic/bach-bwv244-62-closed-en-3v/engraving.ly",
+    "attribution": "synthetic/bach-bwv244-62-closed-en-3v/ATTRIBUTION.txt",
+    "notes": ""
+  },
+  {
+    "id": "bach-bwv3-6-closed-sb",
+    "title": "Ach Gott, wie manches Herzeleid (BWV 3/6), lyrics under both staves",
+    "source_url": "https://github.com/cuthbertLab/music21/tree/master/music21/corpus/bach/bwv3.6.mxl",
+    "license": "Public domain composition; encoding via music21 corpus (Greentree, used by permission)",
+    "origin": "synthetic-scan",
+    "dpi": 150,
+    "degradations": [
+      "rotation",
+      "paper_texture",
+      "lighting_gradient",
+      "blur",
+      "gaussian_noise",
+      "jpeg_q45"
+    ],
+    "has_ground_truth": true,
+    "features": [
+      "lyrics",
+      "multi_voice_staff",
+      "satb_closed",
+      "chorale",
+      "independent_rhythms",
+      "lyrics_on_lower_staff",
+      "fermata",
+      "pickup",
+      "low_dpi"
+    ],
+    "expected_parts": [
+      "Soprano",
+      "Alto",
+      "Tenor",
+      "Bass"
+    ],
+    "shared_staves": [
+      [
+        "Soprano",
+        "Alto"
+      ],
+      [
+        "Tenor",
+        "Bass"
+      ]
+    ],
+    "lyrics_parts": [
+      {
+        "part": "Soprano",
+        "verses": 1
+      },
+      {
+        "part": "Bass",
+        "verses": 1
+      }
+    ],
+    "pages": 1,
+    "measures": 10,
+    "engraver": "model->lilypond (custom writer)",
+    "scan": "synthetic/bach-bwv3-6-closed-sb/scan.pdf",
+    "truth": "synthetic/bach-bwv3-6-closed-sb/truth.musicxml",
+    "clean": "synthetic/bach-bwv3-6-closed-sb/clean.pdf",
+    "engraving": "synthetic/bach-bwv3-6-closed-sb/engraving.ly",
+    "attribution": "synthetic/bach-bwv3-6-closed-sb/ATTRIBUTION.txt",
+    "notes": ""
+  },
+  {
+    "id": "bach-bwv166-6-closed-repeat",
+    "title": "Wer weiß, wie nahe mir mein Ende (BWV 166/6), repeat with 2 text lines",
+    "source_url": "https://github.com/cuthbertLab/music21/tree/master/music21/corpus/bach/bwv166.6.mxl",
+    "license": "Public domain composition; encoding via music21 corpus (Greentree, used by permission)",
+    "origin": "synthetic-scan",
+    "dpi": 200,
+    "degradations": [
+      "ink_weight",
+      "rotation",
+      "scanner_border",
+      "blur",
+      "salt_pepper",
+      "speckles",
+      "binarized_photocopy"
+    ],
+    "has_ground_truth": true,
+    "features": [
+      "lyrics",
+      "multi_voice_staff",
+      "satb_closed",
+      "chorale",
+      "repeats",
+      "multi_verse",
+      "binarized",
+      "fermata",
+      "pickup"
+    ],
+    "expected_parts": [
+      "Soprano",
+      "Alto",
+      "Tenor",
+      "Bass"
+    ],
+    "shared_staves": [
+      [
+        "Soprano",
+        "Alto"
+      ],
+      [
+        "Tenor",
+        "Bass"
+      ]
+    ],
+    "lyrics_parts": [
+      {
+        "part": "Soprano",
+        "verses": 2
+      }
+    ],
+    "pages": 1,
+    "measures": 11,
+    "engraver": "model->lilypond (custom writer)",
+    "scan": "synthetic/bach-bwv166-6-closed-repeat/scan.pdf",
+    "truth": "synthetic/bach-bwv166-6-closed-repeat/truth.musicxml",
+    "clean": "synthetic/bach-bwv166-6-closed-repeat/clean.pdf",
+    "engraving": "synthetic/bach-bwv166-6-closed-repeat/engraving.ly",
+    "attribution": "synthetic/bach-bwv166-6-closed-repeat/ATTRIBUTION.txt",
+    "notes": ""
+  },
+  {
+    "id": "bach-bwv110-7-ttbb-closed",
+    "title": "Wir Christenleut (BWV 110/7), arranged TTBB closed score",
+    "source_url": "https://github.com/cuthbertLab/music21/tree/master/music21/corpus/bach/bwv110.7.mxl",
+    "license": "Public domain composition; encoding via music21 corpus (Greentree, used by permission)",
+    "origin": "synthetic-scan",
+    "dpi": 200,
+    "degradations": [
+      "page_curl",
+      "rotation",
+      "paper_texture",
+      "lighting_gradient",
+      "gutter_shadow",
+      "blur",
+      "gaussian_noise",
+      "jpeg_q70"
+    ],
+    "has_ground_truth": true,
+    "features": [
+      "lyrics",
+      "multi_voice_staff",
+      "ttbb_closed",
+      "chorale",
+      "treble_8_clef",
+      "page_curl"
+    ],
+    "expected_parts": [
+      "Tenor I",
+      "Tenor II",
+      "Baritone",
+      "Bass"
+    ],
+    "shared_staves": [
+      [
+        "Tenor I",
+        "Tenor II"
+      ],
+      [
+        "Baritone",
+        "Bass"
+      ]
+    ],
+    "lyrics_parts": [
+      {
+        "part": "Tenor I",
+        "verses": 1
+      }
+    ],
+    "pages": 1,
+    "measures": 12,
+    "engraver": "model->lilypond (custom writer)",
+    "scan": "synthetic/bach-bwv110-7-ttbb-closed/scan.pdf",
+    "truth": "synthetic/bach-bwv110-7-ttbb-closed/truth.musicxml",
+    "clean": "synthetic/bach-bwv110-7-ttbb-closed/clean.pdf",
+    "engraving": "synthetic/bach-bwv110-7-ttbb-closed/engraving.ly",
+    "attribution": "synthetic/bach-bwv110-7-ttbb-closed/ATTRIBUTION.txt",
+    "notes": ""
+  },
+  {
+    "id": "aloha-oe-chorus-satb-closed",
+    "title": "Aloha Oe - chorus, SATB closed score (2 verses)",
+    "source_url": "https://github.com/cuthbertLab/music21/tree/master/music21/corpus/liliuokalani/aloha_oe.mxl",
+    "license": "Public domain composition; encoding CC0 (music21 corpus, M. S. Cuthbert)",
+    "origin": "synthetic-scan",
+    "dpi": 200,
+    "degradations": [
+      "paper_texture",
+      "uneven_lighting",
+      "vignette",
+      "perspective_phone_capture",
+      "blur",
+      "gaussian_noise",
+      "jpeg_q60"
+    ],
+    "has_ground_truth": true,
+    "features": [
+      "lyrics",
+      "multi_voice_staff",
+      "satb_closed",
+      "multi_verse",
+      "lyrics_on_lower_staff",
+      "phone_capture",
+      "pickup"
+    ],
+    "expected_parts": [
+      "Soprano",
+      "Alto",
+      "Tenor",
+      "Bass"
+    ],
+    "shared_staves": [
+      [
+        "Soprano",
+        "Alto"
+      ],
+      [
+        "Tenor",
+        "Bass"
+      ]
+    ],
+    "lyrics_parts": [
+      {
+        "part": "Soprano",
+        "verses": 2
+      },
+      {
+        "part": "Tenor",
+        "verses": 2
+      }
+    ],
+    "pages": 1,
+    "measures": 9,
+    "engraver": "model->lilypond (custom writer)",
+    "scan": "synthetic/aloha-oe-chorus-satb-closed/scan.pdf",
+    "truth": "synthetic/aloha-oe-chorus-satb-closed/truth.musicxml",
+    "clean": "synthetic/aloha-oe-chorus-satb-closed/clean.pdf",
+    "engraving": "synthetic/aloha-oe-chorus-satb-closed/engraving.ly",
+    "attribution": "synthetic/aloha-oe-chorus-satb-closed/ATTRIBUTION.txt",
+    "notes": ""
+  },
+  {
+    "id": "beach-prayer-ssaa-piano",
+    "title": "A Prayer of a Tired Child (Beach) - SSAA closed + piano, excerpt",
+    "source_url": "https://github.com/cuthbertLab/music21/tree/master/music21/corpus/beach/prayer_of_a_tired_child.musicxml",
+    "license": "Public domain composition (1915); encoding CC-BY-SA (M. S. Cuthbert 2017) - test use, attribution required",
+    "origin": "synthetic-scan",
+    "dpi": 300,
+    "degradations": [
+      "rotation",
+      "paper_texture",
+      "blur",
+      "gaussian_noise",
+      "jpeg_q80"
+    ],
+    "has_ground_truth": true,
+    "features": [
+      "lyrics",
+      "multi_voice_staff",
+      "ssaa_closed",
+      "divisi",
+      "piano",
+      "voice_piano",
+      "grand_staff_multi_voice",
+      "must_not_split",
+      "slurs",
+      "dynamics",
+      "multi_page"
+    ],
+    "expected_parts": [
+      "Soprano I",
+      "Soprano II",
+      "Alto I",
+      "Alto II",
+      "Piano"
+    ],
+    "shared_staves": [
+      [
+        "Soprano I",
+        "Soprano II"
+      ],
+      [
+        "Alto I",
+        "Alto II"
+      ]
+    ],
+    "lyrics_parts": [
+      {
+        "part": "Soprano I",
+        "verses": 1
+      },
+      {
+        "part": "Alto II",
+        "verses": 1
+      }
+    ],
+    "pages": 2,
+    "measures": 18,
+    "engraver": "model->lilypond (custom writer)",
+    "scan": "synthetic/beach-prayer-ssaa-piano/scan.pdf",
+    "truth": "synthetic/beach-prayer-ssaa-piano/truth.musicxml",
+    "clean": "synthetic/beach-prayer-ssaa-piano/clean.pdf",
+    "engraving": "synthetic/beach-prayer-ssaa-piano/engraving.ly",
+    "attribution": "synthetic/beach-prayer-ssaa-piano/ATTRIBUTION.txt",
+    "notes": ""
+  },
+  {
+    "id": "bach-bwv5-7-open",
+    "title": "Auf meinen lieben Gott (BWV 5/7), open score with text in every part",
+    "source_url": "https://github.com/cuthbertLab/music21/tree/master/music21/corpus/bach/bwv5.7.mxl",
+    "license": "Public domain composition; encoding via music21 corpus (Greentree, used by permission)",
+    "origin": "synthetic-scan",
+    "dpi": 200,
+    "degradations": [
+      "wavy_warp",
+      "rotation",
+      "paper_texture",
+      "blur",
+      "gaussian_noise",
+      "salt_pepper",
+      "jpeg_q65"
+    ],
+    "has_ground_truth": true,
+    "features": [
+      "lyrics",
+      "satb_open",
+      "chorale",
+      "independent_rhythms",
+      "wavy_warp"
+    ],
+    "expected_parts": [
+      "Soprano",
+      "Alto",
+      "Tenor",
+      "Bass"
+    ],
+    "shared_staves": [],
+    "lyrics_parts": [
+      {
+        "part": "Soprano",
+        "verses": 1
+      },
+      {
+        "part": "Alto",
+        "verses": 1
+      },
+      {
+        "part": "Tenor",
+        "verses": 1
+      },
+      {
+        "part": "Bass",
+        "verses": 1
+      }
+    ],
+    "pages": 1,
+    "measures": 15,
+    "engraver": "model->lilypond (custom writer)",
+    "scan": "synthetic/bach-bwv5-7-open/scan.pdf",
+    "truth": "synthetic/bach-bwv5-7-open/truth.musicxml",
+    "clean": "synthetic/bach-bwv5-7-open/clean.pdf",
+    "engraving": "synthetic/bach-bwv5-7-open/engraving.ly",
+    "attribution": "synthetic/bach-bwv5-7-open/ATTRIBUTION.txt",
+    "notes": ""
+  },
+  {
+    "id": "aloha-oe-full-score",
+    "title": "Aloha Oe - solo voice, SATB chorus (open) and piano",
+    "source_url": "https://github.com/cuthbertLab/music21/tree/master/music21/corpus/liliuokalani/aloha_oe.mxl",
+    "license": "Public domain composition; encoding CC0 (music21 corpus, M. S. Cuthbert)",
+    "origin": "synthetic-scan",
+    "dpi": 300,
+    "degradations": [
+      "faded_ink",
+      "paper_texture",
+      "lighting_gradient",
+      "blur",
+      "gaussian_noise",
+      "jpeg_q70"
+    ],
+    "has_ground_truth": true,
+    "features": [
+      "lyrics",
+      "satb_open",
+      "voice_piano",
+      "piano",
+      "multi_verse",
+      "grand_staff_multi_voice",
+      "must_not_split",
+      "faded_ink",
+      "slurs",
+      "dynamics",
+      "multi_page"
+    ],
+    "expected_parts": [
+      "Solo Voice",
+      "Soprano",
+      "Alto",
+      "Tenor",
+      "Bass",
+      "Piano"
+    ],
+    "shared_staves": [],
+    "lyrics_parts": [
+      {
+        "part": "Solo Voice",
+        "verses": 2
+      },
+      {
+        "part": "Soprano",
+        "verses": 2
+      },
+      {
+        "part": "Tenor",
+        "verses": 2
+      }
+    ],
+    "pages": 2,
+    "measures": 23,
+    "engraver": "model->lilypond (custom writer)",
+    "scan": "synthetic/aloha-oe-full-score/scan.pdf",
+    "truth": "synthetic/aloha-oe-full-score/truth.musicxml",
+    "clean": "synthetic/aloha-oe-full-score/clean.pdf",
+    "engraving": "synthetic/aloha-oe-full-score/engraving.ly",
+    "attribution": "synthetic/aloha-oe-full-score/ATTRIBUTION.txt",
+    "notes": ""
+  },
+  {
+    "id": "silent-night-melody-3v",
+    "title": "Silent Night - melody with 3 verses",
+    "source_url": "self-authored; melody F. X. Gruber 1818, text J. Mohr 1816 tr. J. F. Young 1859",
+    "license": "Public domain (melody, text); engraving CC0-1.0",
+    "origin": "synthetic-scan",
+    "dpi": 200,
+    "degradations": [
+      "paper_texture",
+      "uneven_lighting",
+      "vignette",
+      "perspective_phone_capture",
+      "blur",
+      "gaussian_noise",
+      "jpeg_q55"
+    ],
+    "has_ground_truth": true,
+    "features": [
+      "lyrics",
+      "melody",
+      "multi_verse",
+      "melisma",
+      "slurs",
+      "compound_meter",
+      "phone_capture"
+    ],
+    "expected_parts": [
+      "Voice"
+    ],
+    "shared_staves": [],
+    "lyrics_parts": [
+      {
+        "part": "Voice",
+        "verses": 3
+      }
+    ],
+    "pages": 1,
+    "measures": 24,
+    "engraver": "model->lilypond (custom writer)",
+    "scan": "synthetic/silent-night-melody-3v/scan.pdf",
+    "truth": "synthetic/silent-night-melody-3v/truth.musicxml",
+    "clean": "synthetic/silent-night-melody-3v/clean.pdf",
+    "engraving": "synthetic/silent-night-melody-3v/engraving.ly",
+    "attribution": "synthetic/silent-night-melody-3v/ATTRIBUTION.txt",
+    "notes": ""
+  },
+  {
+    "id": "foster-jeanie-melody",
+    "title": "Jeanie with the Light Brown Hair - melody with lyrics (lead sheet)",
+    "source_url": "https://github.com/cuthbertLab/music21/tree/master/music21/corpus/leadSheet/fosterBrownHair.mxl",
+    "license": "Public domain (Stephen Foster 1854); music21 corpus encoding marked Public Domain",
+    "origin": "synthetic-scan",
+    "dpi": 150,
+    "degradations": [
+      "rotation",
+      "paper_texture",
+      "blur",
+      "gaussian_noise",
+      "jpeg_q60"
+    ],
+    "has_ground_truth": true,
+    "features": [
+      "lyrics",
+      "melody",
+      "repeats",
+      "multi_verse",
+      "low_dpi",
+      "pickup"
+    ],
+    "expected_parts": [
+      "Voice"
+    ],
+    "shared_staves": [],
+    "lyrics_parts": [
+      {
+        "part": "Voice",
+        "verses": 2
+      }
+    ],
+    "pages": 1,
+    "measures": 35,
+    "engraver": "model->lilypond (custom writer)",
+    "scan": "synthetic/foster-jeanie-melody/scan.pdf",
+    "truth": "synthetic/foster-jeanie-melody/truth.musicxml",
+    "clean": "synthetic/foster-jeanie-melody/clean.pdf",
+    "engraving": "synthetic/foster-jeanie-melody/engraving.ly",
+    "attribution": "synthetic/foster-jeanie-melody/ATTRIBUTION.txt",
+    "notes": ""
+  },
+  {
+    "id": "joplin-maple-leaf-piano",
+    "title": "Maple Leaf Rag (Joplin) - piano, excerpt",
+    "source_url": "https://github.com/cuthbertLab/music21/tree/master/music21/corpus/joplin/maple_leaf_rag.mxl",
+    "license": "Public domain composition (1899); music21 corpus encoding",
+    "origin": "synthetic-scan",
+    "dpi": 300,
+    "degradations": [
+      "rotation",
+      "paper_texture",
+      "blur",
+      "gaussian_noise",
+      "jpeg_q75"
+    ],
+    "has_ground_truth": true,
+    "features": [
+      "piano",
+      "grand_staff_multi_voice",
+      "repeats",
+      "chords",
+      "must_not_split"
+    ],
+    "expected_parts": [
+      "Piano"
+    ],
+    "shared_staves": [],
+    "lyrics_parts": [],
+    "pages": 1,
+    "measures": 20,
+    "engraver": "musicxml2ly+lilypond",
+    "scan": "synthetic/joplin-maple-leaf-piano/scan.pdf",
+    "truth": "synthetic/joplin-maple-leaf-piano/truth.musicxml",
+    "clean": "synthetic/joplin-maple-leaf-piano/clean.pdf",
+    "engraving": "synthetic/joplin-maple-leaf-piano/engraving.ly",
+    "attribution": "synthetic/joplin-maple-leaf-piano/ATTRIBUTION.txt",
+    "notes": ""
+  },
+  {
+    "id": "clara-schumann-polonaise-piano",
+    "title": "Polonaise Op. 1 No. 1 (Clara Schumann) - piano, excerpt",
+    "source_url": "https://github.com/cuthbertLab/music21/tree/master/music21/corpus/schumann_clara/polonaise_op1n1.mxl",
+    "license": "Public domain composition (1831); music21 corpus encoding",
+    "origin": "synthetic-scan",
+    "dpi": 200,
+    "degradations": [
+      "rotation",
+      "paper_texture",
+      "blur",
+      "gaussian_noise",
+      "salt_pepper",
+      "jpeg_q55"
+    ],
+    "has_ground_truth": true,
+    "features": [
+      "piano",
+      "grand_staff_multi_voice",
+      "tuplets",
+      "clef_change",
+      "chords",
+      "must_not_split"
+    ],
+    "expected_parts": [
+      "Piano"
+    ],
+    "shared_staves": [],
+    "lyrics_parts": [],
+    "pages": 1,
+    "measures": 16,
+    "engraver": "musicxml2ly+lilypond",
+    "scan": "synthetic/clara-schumann-polonaise-piano/scan.pdf",
+    "truth": "synthetic/clara-schumann-polonaise-piano/truth.musicxml",
+    "clean": "synthetic/clara-schumann-polonaise-piano/clean.pdf",
+    "engraving": "synthetic/clara-schumann-polonaise-piano/engraving.ly",
+    "attribution": "synthetic/clara-schumann-polonaise-piano/ATTRIBUTION.txt",
+    "notes": ""
+  },
+  {
+    "id": "bach-bwv67-7-piano-grandstaff",
+    "title": "Du Friedefürst, Herr Jesu Christ (BWV 67/7) set for piano",
+    "source_url": "https://github.com/cuthbertLab/music21/tree/master/music21/corpus/bach/bwv67.7.mxl",
+    "license": "Public domain composition; encoding via music21 corpus (Greentree, used by permission)",
+    "origin": "synthetic-scan",
+    "dpi": 300,
+    "degradations": [
+      "rotation",
+      "bleed_through",
+      "paper_texture",
+      "blur",
+      "gaussian_noise",
+      "jpeg_q75"
+    ],
+    "has_ground_truth": true,
+    "features": [
+      "piano",
+      "grand_staff_multi_voice",
+      "must_not_split",
+      "repeats",
+      "chorale"
+    ],
+    "expected_parts": [
+      "Piano"
+    ],
+    "shared_staves": [],
+    "lyrics_parts": [],
+    "pages": 1,
+    "measures": 11,
+    "engraver": "model->lilypond (custom writer)",
+    "scan": "synthetic/bach-bwv67-7-piano-grandstaff/scan.pdf",
+    "truth": "synthetic/bach-bwv67-7-piano-grandstaff/truth.musicxml",
+    "clean": "synthetic/bach-bwv67-7-piano-grandstaff/clean.pdf",
+    "engraving": "synthetic/bach-bwv67-7-piano-grandstaff/engraving.ly",
+    "attribution": "synthetic/bach-bwv67-7-piano-grandstaff/ATTRIBUTION.txt",
+    "notes": ""
+  },
+  {
+    "id": "schumann-dichterliebe2-voice-piano",
+    "title": "Aus meinen Tränen sprießen (Dichterliebe No. 2) - voice and piano",
+    "source_url": "https://github.com/cuthbertLab/music21/tree/master/music21/corpus/schumann_robert/dichterliebe_no2.xml",
+    "license": "Public domain composition/text (1840/1823); music21 corpus encoding",
+    "origin": "synthetic-scan",
+    "dpi": 300,
+    "degradations": [
+      "page_curl",
+      "paper_texture",
+      "lighting_gradient",
+      "gutter_shadow",
+      "blur",
+      "gaussian_noise",
+      "jpeg_q70"
+    ],
+    "has_ground_truth": true,
+    "features": [
+      "lyrics",
+      "voice_piano",
+      "piano",
+      "grand_staff_multi_voice",
+      "must_not_split",
+      "tuplets",
+      "page_curl",
+      "pickup"
+    ],
+    "expected_parts": [
+      "Voice",
+      "Piano"
+    ],
+    "shared_staves": [],
+    "lyrics_parts": [
+      {
+        "part": "Voice",
+        "verses": 1
+      }
+    ],
+    "pages": 1,
+    "measures": 18,
+    "engraver": "musicxml2ly+lilypond",
+    "scan": "synthetic/schumann-dichterliebe2-voice-piano/scan.pdf",
+    "truth": "synthetic/schumann-dichterliebe2-voice-piano/truth.musicxml",
+    "clean": "synthetic/schumann-dichterliebe2-voice-piano/clean.pdf",
+    "engraving": "synthetic/schumann-dichterliebe2-voice-piano/engraving.ly",
+    "attribution": "synthetic/schumann-dichterliebe2-voice-piano/ATTRIBUTION.txt",
+    "notes": ""
+  },
+  {
+    "id": "schubert-lindenbaum-voice-piano",
+    "title": "Der Lindenbaum (Schubert) - voice and piano, excerpt",
+    "source_url": "https://github.com/cuthbertLab/music21/tree/master/music21/corpus/schubert/Lindenbaum.xml",
+    "license": "Public domain composition/text (1827); music21 corpus encoding",
+    "origin": "synthetic-scan",
+    "dpi": 200,
+    "degradations": [
+      "ink_weight",
+      "rotation",
+      "blur",
+      "speckles",
+      "binarized_photocopy"
+    ],
+    "has_ground_truth": true,
+    "features": [
+      "lyrics",
+      "voice_piano",
+      "piano",
+      "grand_staff_multi_voice",
+      "must_not_split",
+      "tuplets",
+      "binarized",
+      "dynamics",
+      "slurs"
+    ],
+    "expected_parts": [
+      "Voice",
+      "Piano"
+    ],
+    "shared_staves": [],
+    "lyrics_parts": [
+      {
+        "part": "Voice",
+        "verses": 1
+      }
+    ],
+    "pages": 1,
+    "measures": 24,
+    "engraver": "musicxml2ly+lilypond",
+    "scan": "synthetic/schubert-lindenbaum-voice-piano/scan.pdf",
+    "truth": "synthetic/schubert-lindenbaum-voice-piano/truth.musicxml",
+    "clean": "synthetic/schubert-lindenbaum-voice-piano/clean.pdf",
+    "engraving": "synthetic/schubert-lindenbaum-voice-piano/engraving.ly",
+    "attribution": "synthetic/schubert-lindenbaum-voice-piano/ATTRIBUTION.txt",
+    "notes": ""
+  }
+]

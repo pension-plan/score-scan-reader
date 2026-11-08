@@ -1,0 +1,41 @@
+# Hand transcription of Schumann, Album fuer die Jugend Op. 68 No. 1 "Melodie", as printed in the
+# Schuberth & Co. edition revised by Karl Klauser ([1867]), p. 3 (Internet Archive b26976821, leaf n2).
+# One piano part, grand staff (2 staves): MUST NOT be split into separate parts.
+# Both staves use the treble clef; the lower staff of system 1 starts with a bass clef that is
+# immediately cancelled by a treble clef before the first note (encoded as a clef change).
+# Voice R2 (stems down on the upper staff) exists only in m8 and m16.
+# Not encoded: fingerings, slurs, dynamics (p, sf, hairpins), accent/diamond marks, tempo text.
+# Pitches cross-checked against the Mutopia Project edition (Peters source) - no differences found.
+@title Melodie
+@subtitle Album fuer die Jugend, Op. 68 No. 1
+@composer Robert Schumann
+@arranger Karl Klauser (editor)
+@rights Public domain
+@source Erstes Album fuer die Jugend Op. 68, Leipzig: J. Schuberth & Co. [1867], p. 3 (Internet Archive b26976821, leaf n2; Gaylord Music Library, Washington University in St. Louis)
+@key 0 major
+@time 4/4
+@timesymbol common
+@systems 1 5 10 15
+@split Piano=[R R2 / L]
+@printed Piano=[R R2 / L]
+@clef R G
+@clef R2 G
+@clef L F
+
+voice R
+e''4 d'' c'' b' | a'8 c'' b' d'' c''4 g' | g''4 f'' e'' c'' | b'4 <fis' a'>4 g'4 r4 :|
+d''4 c'' b' r4 | f''4 e'' d'' r4 | a''4 g'' f'' e'' | d''8 f'' e'' g'' f''4. d''8 | <c'' e''>4 d'' c'' b' |
+a'8 c'' b' d'' c''4 g' | a''4 g'' <b' f''> <c'' e''> | d''8 f'' b' d'' c''4 r4 | d''4 c'' b' r4 | f''4 e'' d'' r4 |
+a''4 g'' f'' e'' | d''8 f'' e'' g'' f''4. d''8 | <c'' e''>4 d'' c'' b' | a'8 c'' b' d'' c''4 g' | a''4 g'' <b' f''> <c'' e''> | d''8 f'' b' d'' c''4 r4 |.
+
+voice R2
+s1 | s1 | s1 | s1 :|
+s1 | s1 | s1 | s2 a'8 c''! b' d'' | s1 |
+s1 | s1 | s1 | s1 | s1 |
+s1 | s2 a'8 c''! b' d'' | s1 | s1 | s1 | s1 |.
+
+voice L
+\clefG c'8 g' f' g' e' g' c' e' | f'8 d' g' f' e' f' e' d' | e'8 g' d' g' c' g' e' g' | d'8 g' c' d' b d' g4 :|
+f'!8 g' e' g' d' g' fis' g' | d'8 g' c' g' b g' fis' g' | f'8 g' e' g' d' g' c' g' | b8 g' c' cis' d'4 g' | c'8 g' f' g' e' g' c' e' |
+f'8 d' g' f' e' f' e' c' | f'8 c'' e' c'' d' g' c' g' | f'8 a' g' f' e' g' c' e' | f'8 g' e' g' d' g' fis' g' | d'8 g' c' g' b g' fis' g' |
+f'!8 g' e' g' d' g' c' g' | b8 g' c' cis' d'4 g' | c'8 g' f' g' e' g' c' e' | f'8 d' g' f' e' f' e' c' | f'8 c'' e' c'' d' g' c' g' | f'8 a' g' f' e' g' c'4 |.

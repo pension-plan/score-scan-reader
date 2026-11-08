@@ -1,0 +1,21 @@
+haupt1867-aus-meines-herzens-grunde - real scanned page for the OMR test corpus
+===============================================================================
+
+Content      : Aus meines Herzens Grunde - German chorale, closed-score SATB, repeat with 2 text lines
+Work         : Chorale "Aus meines Herzens Grunde" (melody Hamburg 1598); 4-part setting from August Haupt's Choralbuch (Haupt 1810-1891)
+Printed in   : August Haupt, Choralbuch zum haeuslichen Gebrauch: enthaltend 109 der schoensten Choralmelodieen mit beigefuegtem Text, einfach 4-stimmig. Berlin: Schlesinger, 1867, chorale no. 11 (leaf 22)
+Scan source  : https://archive.org/details/bub_gb_T75IAAAAcAAJ/page/n22/mode/1up
+Page image   : https://archive.org/download/bub_gb_T75IAAAAcAAJ/page/n22.jpg  (2500x3206 px, 300 ppi per IA metadata)
+Scanned by   : Bavarian State Library (Bayerische Staatsbibliothek) copy, digitised by Google Books (id T75IAAAAcAAJ); mirrored to the Internet Archive (collection europeanlibraries)
+IA rights    : licenseurl: http://creativecommons.org/publicdomain/mark/1.0/ (Public Domain Mark 1.0)
+Licence      : Public domain (published 1867; arranger d. 1891). Scan marked Public Domain Mark 1.0.
+Rights notes : Google Books scans come with Google's non-binding "usage guidelines" (asks for non-commercial use and keeping attribution); they are not a copyright licence. Flagged for awareness only.
+Scan status  : Scan by the Internet Archive / contributing library. A faithful photographic reproduction of a public-domain 2-D work; no new copyright arises in the US (Bridgeman v. Corel, 1999). The Internet Archive marks such items 'NOT_IN_COPYRIGHT' / Public Domain Mark where stated below.
+
+Files
+  source-page.jpg  the Internet Archive page JPEG, byte-for-byte as downloaded (no edits)
+  scan.pdf         one-page IMAGE-ONLY PDF wrapping source-page.jpg unmodified (img2pdf, DCTDecode,
+                   no fonts, no text layer), page size = pixels / ppi above
+  (no ground truth yet)
+
+Re-fetch: corpus/real/tools/fetch_scans.sh

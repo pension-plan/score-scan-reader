@@ -1,0 +1,41 @@
+# dependencies and environments
+node_modules/
+.venv/
+.venv-*/
+**/.venv*/
+__pycache__/
+*.pyc
+
+# large or generated working data
+mvp/work/*
+!mvp/work/schema/
+spike/*/data/
+spike/*/results/**/*.png
+spike/classical/results/*.jsonl
+spike/ocr/results/
+spike/ocr/models/
+spike/ocr/browser/assets/
+spike/ml/assets/
+spike/ml/dl/
+spike/ml/out/
+spike/ml/ortweb/
+spike/ml/scans/
+corpus/**/_work/
+corpus/**/_logs/
+probe/
+*.onnx
+*.pt
+*.pth
+*.whl
+*.tgz
+*.zip
+
+# corpus items whose source encodings are licensed for testing only (regenerate locally,
+# see corpus/synthetic/_tools/run_all.py); maintained by tools/push.sh
+# -- restricted (auto) --
+corpus/synthetic/bach-bwv110-7-ttbb-closed/
+corpus/synthetic/bach-bwv166-6-closed-repeat/
+corpus/synthetic/bach-bwv244-62-closed-en-3v/
+corpus/synthetic/bach-bwv3-6-closed-sb/
+corpus/synthetic/bach-bwv5-7-open/
+corpus/synthetic/bach-bwv67-7-piano-grandstaff/

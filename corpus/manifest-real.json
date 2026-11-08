@@ -1,0 +1,688 @@
+[
+  {
+    "id": "golden1923-america",
+    "title": "America (\"My Country, 'Tis of Thee\") - closed-score SATB, 4 verses",
+    "source_url": "https://archive.org/details/goldenbookoffavo00beat_0/page/n2/mode/1up",
+    "license": "Public domain in the USA (published 1923; US copyright term expired 1 Jan 2019). Words (Smith, d. 1895) and tune are public domain worldwide.",
+    "origin": "real-scan",
+    "dpi": 500,
+    "degradations": [
+      "library_stamp_over_music",
+      "paper_yellowing",
+      "show_through",
+      "heavy_ink_spread",
+      "slight_skew",
+      "jpeg"
+    ],
+    "has_ground_truth": true,
+    "features": [
+      "lyrics",
+      "multi_voice_staff",
+      "satb_closed",
+      "multi_verse",
+      "hymn",
+      "melisma",
+      "dynamics",
+      "stamp_noise",
+      "text_blocks_on_page"
+    ],
+    "expected_parts": [
+      "Soprano",
+      "Alto",
+      "Tenor",
+      "Bass"
+    ],
+    "shared_staves": [
+      [
+        "Soprano",
+        "Alto"
+      ],
+      [
+        "Tenor",
+        "Bass"
+      ]
+    ],
+    "lyrics_parts": [
+      {
+        "part": "Soprano",
+        "verses": 4
+      }
+    ],
+    "pages": 1,
+    "measures": 14,
+    "engraver": "original 19th/20th-century plate engraving or type, photographed (real scan)",
+    "scan": "real/golden1923-america/scan.pdf",
+    "truth": "real/golden1923-america/truth.musicxml",
+    "clean": null,
+    "engraving": null,
+    "attribution": "real/golden1923-america/ATTRIBUTION.txt",
+    "notes": "Library stamp \"PROPERTY OF CENTRAL STATE NORMAL SCHOOL, LOCK HAVEN, PENN.\" in blue ink crosses system 1 and the prose box. Page also has a prose history box, the text-only hymn \"God Bless Our Native Land\" (2 stanzas) and \"The American's Creed\" box: none of that is music and none of it is in the truth. Truth = the 14-measure hymn only (dynamics/tempo/hairpin omitted).",
+    "work": "America (My Country, 'Tis of Thee); words Samuel Francis Smith (1831); music attributed to Henry Carey (tune \"God Save the King\")",
+    "source_book": "The Golden Book of Favorite Songs, revised ed., ed. John W. Beattie et al., Chicago: Hall & McCreary, 1923",
+    "source_page": "p. 3",
+    "source_item": "https://archive.org/details/goldenbookoffavo00beat_0",
+    "source_leaf": 2,
+    "source_image_url": "https://archive.org/download/goldenbookoffavo00beat_0/page/n2.jpg",
+    "scan_contributor": "Music Library, University of North Carolina at Chapel Hill (Don Yoder Collection of American Hymnody); scanned by the Internet Archive (scribe1.chapelhill), 2014-06-30, Canon EOS 5D Mark II",
+    "scan_rights_metadata": "possible-copyright-status not stated; item in collections uncmus/americana",
+    "rights_notes": "The book's editorial content (compilers incl. J. W. Beattie, d. 1962) is PD in the US by publication date; in life+70 countries the arrangement on this page may not be PD until 2033 - treat as US-PD only. The hymn-style harmonization of \"America\" is the standard traditional one.",
+    "image_px": [
+      2820,
+      4372
+    ],
+    "source_image": "real/golden1923-america/source-page.jpg",
+    "scan_sha256": "d9dcbdb2f3d2e5e8e2bb8302d6f78622dedc30aa3923dc716fd55c75725c41a4",
+    "truth_printed": "real/golden1923-america/truth-printed.musicxml",
+    "truth_source": "real/golden1923-america/truth.src",
+    "truth_stats": {
+      "measures": 14,
+      "pickup": false,
+      "time": "3/4",
+      "fifths": 1,
+      "notes_total": 158,
+      "verses": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "voices": {
+        "S": {
+          "noteheads": 41,
+          "rests": 0,
+          "syllables": {
+            "1": 38,
+            "2": 38,
+            "3": 38,
+            "4": 38
+          }
+        },
+        "A": {
+          "noteheads": 38,
+          "rests": 0,
+          "syllables": {}
+        },
+        "T": {
+          "noteheads": 41,
+          "rests": 0,
+          "syllables": {}
+        },
+        "B": {
+          "noteheads": 38,
+          "rests": 0,
+          "syllables": {}
+        }
+      }
+    },
+    "verify_images": [
+      "real/golden1923-america/verify/truth-compare.png",
+      "real/golden1923-america/verify/truth-printed-compare.png"
+    ]
+  },
+  {
+    "id": "methodist1905-st-anselm",
+    "title": "St. Anselm (hymn 72) - closed-score SATB, 1 interlined verse + 2 block-text stanzas",
+    "source_url": "https://archive.org/details/methodisthymnalo00meth/page/n63/mode/1up",
+    "license": "Public domain (published 1905; composer d. 1896, author d. 1926).",
+    "origin": "real-scan",
+    "dpi": 400,
+    "degradations": [
+      "paper_yellowing",
+      "show_through",
+      "page_curvature",
+      "slight_skew",
+      "jpeg"
+    ],
+    "has_ground_truth": true,
+    "features": [
+      "lyrics",
+      "multi_voice_staff",
+      "satb_closed",
+      "hymn",
+      "pickup",
+      "accidentals",
+      "unison_shared_noteheads",
+      "mid_measure_barlines",
+      "amen",
+      "text_stanzas_below",
+      "cue_text"
+    ],
+    "expected_parts": [
+      "Soprano",
+      "Alto",
+      "Tenor",
+      "Bass"
+    ],
+    "shared_staves": [
+      [
+        "Soprano",
+        "Alto"
+      ],
+      [
+        "Tenor",
+        "Bass"
+      ]
+    ],
+    "lyrics_parts": [
+      {
+        "part": "Soprano",
+        "verses": 1
+      }
+    ],
+    "pages": 1,
+    "measures": 25,
+    "engraver": "original 19th/20th-century plate engraving or type, photographed (real scan)",
+    "scan": "real/methodist1905-st-anselm/scan.pdf",
+    "truth": "real/methodist1905-st-anselm/truth.musicxml",
+    "clean": null,
+    "engraving": null,
+    "attribution": "real/methodist1905-st-anselm/ATTRIBUTION.txt",
+    "notes": "Hymnal style: heavy single barlines mark the end of each text line in the MIDDLE of a 4/4 measure, so the truth follows the printed barlines (25 measures incl. pickup, several partial). Stanzas 2-3 are printed as block text below the music (not in truth). Small cue words \"As some\" over the tenor at the end of system 1 are not lyrics. Tenor B3 tied over the system break (dotted tie). A-men on two final half notes.",
+    "work": "Hymn tune ST. ANSELM (7.6.7.6.D) by Joseph Barnby (1838-1896); words \"The dawn of God's dear Sabbath\" by Ada Cross (Ada Cambridge, 1844-1926)",
+    "source_book": "The Methodist Hymnal: official hymnal of the Methodist Episcopal Church and the Methodist Episcopal Church, South. New York: Eaton & Mains; Cincinnati: Jennings & Graham, 1905",
+    "source_page": "p. 50 (hymn 72)",
+    "source_item": "https://archive.org/details/methodisthymnalo00meth",
+    "source_leaf": 63,
+    "source_image_url": "https://archive.org/download/methodisthymnalo00meth/page/n63.jpg",
+    "scan_contributor": "Princeton Theological Seminary Library copy; scanned by the Internet Archive (scribe1.nyc), 2008-12-22, Canon 5D",
+    "scan_rights_metadata": "possible-copyright-status: NOT_IN_COPYRIGHT",
+    "rights_notes": null,
+    "image_px": [
+      2131,
+      3289
+    ],
+    "source_image": "real/methodist1905-st-anselm/source-page.jpg",
+    "scan_sha256": "e1c6166d1053816ec823c7112c9004fa8d325a4097546a19d4aa252d6318420b",
+    "truth_printed": "real/methodist1905-st-anselm/truth-printed.musicxml",
+    "truth_source": "real/methodist1905-st-anselm/truth.src",
+    "truth_stats": {
+      "measures": 25,
+      "pickup": true,
+      "time": "4/4",
+      "fifths": 4,
+      "notes_total": 220,
+      "verses": [
+        1
+      ],
+      "voices": {
+        "S": {
+          "noteheads": 54,
+          "rests": 0,
+          "syllables": {
+            "1": 54
+          }
+        },
+        "A": {
+          "noteheads": 54,
+          "rests": 0,
+          "syllables": {}
+        },
+        "T": {
+          "noteheads": 58,
+          "rests": 0,
+          "syllables": {}
+        },
+        "B": {
+          "noteheads": 54,
+          "rests": 0,
+          "syllables": {}
+        }
+      }
+    },
+    "verify_images": [
+      "real/methodist1905-st-anselm/verify/truth-printed-compare.png"
+    ]
+  },
+  {
+    "id": "klauser1867-schumann-melodie",
+    "title": "Schumann: Melodie, Op. 68 No. 1 - piano grand staff (must not split)",
+    "source_url": "https://archive.org/details/b26976821/page/n2/mode/1up",
+    "license": "Public domain (composer d. 1856; editor Karl Klauser d. 1905; published 1867). Scan marked Public Domain Mark 1.0.",
+    "origin": "real-scan",
+    "dpi": 300,
+    "degradations": [
+      "grayscale",
+      "heavy_ink",
+      "paper_tone",
+      "book_edge_border",
+      "jpeg"
+    ],
+    "has_ground_truth": true,
+    "features": [
+      "piano",
+      "must_not_split",
+      "grand_staff_multi_voice",
+      "repeats",
+      "clef_change",
+      "chords",
+      "fingerings",
+      "slurs",
+      "dynamics",
+      "title_page_header"
+    ],
+    "expected_parts": [
+      "Piano"
+    ],
+    "shared_staves": [],
+    "lyrics_parts": [],
+    "pages": 1,
+    "measures": 20,
+    "engraver": "original 19th/20th-century plate engraving or type, photographed (real scan)",
+    "scan": "real/klauser1867-schumann-melodie/scan.pdf",
+    "truth": "real/klauser1867-schumann-melodie/truth.musicxml",
+    "clean": null,
+    "engraving": null,
+    "attribution": "real/klauser1867-schumann-melodie/ATTRIBUTION.txt",
+    "notes": "Negative test for part splitting: one Piano part with 2 staves; the upper staff has a second voice only in m8 and m16 (encoded as voice 2, preceded by <forward>). Both staves in treble clef (lower staff of system 1 shows bass clef then an immediate treble clef). Fingerings, slurs, dynamics, accent marks omitted from truth. Pitches cross-checked against the Mutopia Project Peters-based edition: identical.",
+    "work": "Robert Schumann (1810-1856), Album fuer die Jugend Op. 68 No. 1 \"Melodie\" (comp. 1848)",
+    "source_book": "Erstes Album fuer die Jugend Op. 68, 43 kleine Clavierstuecke, progressiv geordnet und mit Fingersatz versehen von K. Klauser. Leipzig: J. Schuberth & Co., [1867] (plate 4359)",
+    "source_page": "p. 3",
+    "source_item": "https://archive.org/details/b26976821",
+    "source_leaf": 2,
+    "source_image_url": "https://archive.org/download/b26976821/page/n2.jpg",
+    "scan_contributor": "Gaylord Music Library, Washington University in St. Louis (uploaded to the Internet Archive)",
+    "scan_rights_metadata": "licenseurl: http://creativecommons.org/publicdomain/mark/1.0/ (Public Domain Mark 1.0)",
+    "rights_notes": null,
+    "image_px": [
+      2256,
+      3257
+    ],
+    "source_image": "real/klauser1867-schumann-melodie/source-page.jpg",
+    "scan_sha256": "fda6bf354e7232520cd7a4d0622c5bb04001e4cb4a11fec4fa87ac2704826535",
+    "truth_printed": "real/klauser1867-schumann-melodie/truth-printed.musicxml",
+    "truth_source": "real/klauser1867-schumann-melodie/truth.src",
+    "truth_stats": {
+      "measures": 20,
+      "pickup": false,
+      "time": "4/4",
+      "fifths": 0,
+      "notes_total": 256,
+      "verses": [],
+      "voices": {
+        "R": {
+          "noteheads": 94,
+          "rests": 7,
+          "syllables": {}
+        },
+        "R2": {
+          "noteheads": 8,
+          "rests": 0,
+          "syllables": {}
+        },
+        "L": {
+          "noteheads": 154,
+          "rests": 0,
+          "syllables": {}
+        }
+      }
+    },
+    "verify_images": [
+      "real/klauser1867-schumann-melodie/verify/truth-compare.png"
+    ]
+  },
+  {
+    "id": "haupt1867-aus-meines-herzens-grunde",
+    "title": "Aus meines Herzens Grunde - German chorale, closed-score SATB, repeat with 2 text lines",
+    "source_url": "https://archive.org/details/bub_gb_T75IAAAAcAAJ/page/n22/mode/1up",
+    "license": "Public domain (published 1867; arranger d. 1891). Scan marked Public Domain Mark 1.0.",
+    "origin": "real-scan",
+    "dpi": 300,
+    "degradations": [
+      "google_bitonal_processing",
+      "thin_broken_staff_lines",
+      "low_contrast_hollow_heads",
+      "jpeg"
+    ],
+    "has_ground_truth": false,
+    "features": [
+      "lyrics",
+      "multi_voice_staff",
+      "satb_closed",
+      "chorale",
+      "pickup",
+      "repeats",
+      "lyrics_under_repeat",
+      "half_note_beat",
+      "fermata",
+      "german_text",
+      "text_stanzas_below"
+    ],
+    "expected_parts": [
+      "Soprano",
+      "Alto",
+      "Tenor",
+      "Bass"
+    ],
+    "shared_staves": [
+      [
+        "Soprano",
+        "Alto"
+      ],
+      [
+        "Tenor",
+        "Bass"
+      ]
+    ],
+    "lyrics_parts": [
+      {
+        "part": "Soprano",
+        "verses": 2
+      }
+    ],
+    "pages": 1,
+    "measures": null,
+    "engraver": "original 19th/20th-century plate engraving or type, photographed (real scan)",
+    "scan": "real/haupt1867-aus-meines-herzens-grunde/scan.pdf",
+    "truth": null,
+    "clean": null,
+    "engraving": null,
+    "attribution": "real/haupt1867-aus-meines-herzens-grunde/ATTRIBUTION.txt",
+    "notes": "No truth yet (hand transcription attempted; low-quality Google bitonal scan makes hollow half notes hard to read reliably). Repeated first section carries two text lines (1st and 2nd time) of stanza 1; stanzas 2-4 are block text below. Mostly half notes in common time, fermatas at line ends.",
+    "work": "Chorale \"Aus meines Herzens Grunde\" (melody Hamburg 1598); 4-part setting from August Haupt's Choralbuch (Haupt 1810-1891)",
+    "source_book": "August Haupt, Choralbuch zum haeuslichen Gebrauch: enthaltend 109 der schoensten Choralmelodieen mit beigefuegtem Text, einfach 4-stimmig. Berlin: Schlesinger, 1867",
+    "source_page": "chorale no. 11 (leaf 22)",
+    "source_item": "https://archive.org/details/bub_gb_T75IAAAAcAAJ",
+    "source_leaf": 22,
+    "source_image_url": "https://archive.org/download/bub_gb_T75IAAAAcAAJ/page/n22.jpg",
+    "scan_contributor": "Bavarian State Library (Bayerische Staatsbibliothek) copy, digitised by Google Books (id T75IAAAAcAAJ); mirrored to the Internet Archive (collection europeanlibraries)",
+    "scan_rights_metadata": "licenseurl: http://creativecommons.org/publicdomain/mark/1.0/ (Public Domain Mark 1.0)",
+    "rights_notes": "Google Books scans come with Google's non-binding \"usage guidelines\" (asks for non-commercial use and keeping attribution); they are not a copyright licence. Flagged for awareness only.",
+    "image_px": [
+      2500,
+      3206
+    ],
+    "source_image": "real/haupt1867-aus-meines-herzens-grunde/source-page.jpg",
+    "scan_sha256": "eace24a229ac434a071c7e8c9762f9e4ae0d9f5cd57409f04b154b864565394b",
+    "truth_printed": null,
+    "truth_source": null,
+    "truth_stats": null,
+    "verify_images": []
+  },
+  {
+    "id": "efss1906-cold-blows-the-wind",
+    "title": "Cold Blows the Wind (No. 6) - folk song, voice + piano, 1 interlined verse",
+    "source_url": "https://archive.org/details/englishfolksongs00goul/page/n23/mode/1up",
+    "license": "Public domain (published c.1906; arrangers d. 1924 - PD in the US and in life+70 countries since 1995).",
+    "origin": "real-scan",
+    "dpi": 300,
+    "degradations": [
+      "paper_tone",
+      "slight_skew",
+      "jpeg"
+    ],
+    "has_ground_truth": false,
+    "features": [
+      "lyrics",
+      "voice_piano",
+      "piano",
+      "must_not_split",
+      "grand_staff_multi_voice",
+      "compound_meter",
+      "pickup",
+      "fermata",
+      "repeats",
+      "slurs",
+      "old_style_bass_clef"
+    ],
+    "expected_parts": [
+      "Voice",
+      "Piano"
+    ],
+    "shared_staves": [],
+    "lyrics_parts": [
+      {
+        "part": "Voice",
+        "verses": 1
+      }
+    ],
+    "pages": 1,
+    "measures": null,
+    "engraver": "original 19th/20th-century plate engraving or type, photographed (real scan)",
+    "scan": "real/efss1906-cold-blows-the-wind/scan.pdf",
+    "truth": null,
+    "clean": null,
+    "engraving": null,
+    "attribution": "real/efss1906-cold-blows-the-wind/ATTRIBUTION.txt",
+    "notes": "No truth. 6/8, D major. Three-staff systems (voice + piano); piano lower staff uses the Curwen-style reversed-C bass clef glyph. Voice staff and piano must not be split; piano right hand carries 2-3 voices.",
+    "work": "English folk song \"Cold blows the wind\", collected and arranged by S. Baring-Gould (1834-1924) and Cecil J. Sharp (1859-1924)",
+    "source_book": "English Folk-Songs for Schools, collected and arranged by S. Baring Gould and Cecil J. Sharp. London: J. Curwen & Sons, [1906]",
+    "source_page": "p. 12 (No. 6)",
+    "source_item": "https://archive.org/details/englishfolksongs00goul",
+    "source_leaf": 23,
+    "source_image_url": "https://archive.org/download/englishfolksongs00goul/page/n23.jpg",
+    "scan_contributor": "Internet Archive (scanning centre nyc, 2007-07-13, Canon 5D), copy contributed by the Internet Archive",
+    "scan_rights_metadata": "possible-copyright-status: NOT_IN_COPYRIGHT (copyright-region US)",
+    "rights_notes": null,
+    "image_px": [
+      1988,
+      3085
+    ],
+    "source_image": "real/efss1906-cold-blows-the-wind/source-page.jpg",
+    "scan_sha256": "6d269451c121ab69e609a13e1c4587b7dd2f6c699ab24422ad484b3b3872dccc",
+    "truth_printed": null,
+    "truth_source": null,
+    "truth_stats": null,
+    "verify_images": []
+  },
+  {
+    "id": "methodist1905-tappan-dennis",
+    "title": "Tappan (hymn 99) + Dennis (hymn 100) - two closed-score SATB hymns on one page",
+    "source_url": "https://archive.org/details/methodisthymnalo00meth/page/n82/mode/1up",
+    "license": "Public domain (published 1905; all creators d. before 1885).",
+    "origin": "real-scan",
+    "dpi": 400,
+    "degradations": [
+      "paper_yellowing",
+      "show_through",
+      "page_curvature",
+      "jpeg"
+    ],
+    "has_ground_truth": false,
+    "features": [
+      "lyrics",
+      "multi_voice_staff",
+      "satb_closed",
+      "hymn",
+      "two_pieces_one_page",
+      "key_change_between_pieces",
+      "time_change_between_pieces",
+      "amen",
+      "text_stanzas_below",
+      "slurs"
+    ],
+    "expected_parts": [
+      "Soprano",
+      "Alto",
+      "Tenor",
+      "Bass"
+    ],
+    "shared_staves": [
+      [
+        "Soprano",
+        "Alto"
+      ],
+      [
+        "Tenor",
+        "Bass"
+      ]
+    ],
+    "lyrics_parts": [
+      {
+        "part": "Soprano",
+        "verses": 1
+      }
+    ],
+    "pages": 1,
+    "measures": null,
+    "engraver": "original 19th/20th-century plate engraving or type, photographed (real scan)",
+    "scan": "real/methodist1905-tappan-dennis/scan.pdf",
+    "truth": null,
+    "clean": null,
+    "engraving": null,
+    "attribution": "real/methodist1905-tappan-dennis/ATTRIBUTION.txt",
+    "notes": "No truth. Tappan: G major, 3/2. Dennis: F major, 3/4. Each has stanza 1 interlined and the rest as block text. Tests segmentation of two independent pieces on one page.",
+    "work": "TAPPAN C.M. by George Kingsley (1811-1884), words Henry Kirke White (1785-1806); DENNIS S.M. arr. from Hans G. Naegeli (1773-1836) [by Lowell Mason], words Philip Doddridge (1702-1751)",
+    "source_book": "The Methodist Hymnal, New York: Eaton & Mains, 1905",
+    "source_page": "p. 60 (hymns 99-100)",
+    "source_item": "https://archive.org/details/methodisthymnalo00meth",
+    "source_leaf": 82,
+    "source_image_url": "https://archive.org/download/methodisthymnalo00meth/page/n82.jpg",
+    "scan_contributor": "Princeton Theological Seminary Library copy; scanned by the Internet Archive (scribe1.nyc), 2008-12-22, Canon 5D",
+    "scan_rights_metadata": "possible-copyright-status: NOT_IN_COPYRIGHT",
+    "rights_notes": null,
+    "image_px": [
+      2131,
+      3289
+    ],
+    "source_image": "real/methodist1905-tappan-dennis/source-page.jpg",
+    "scan_sha256": "9af6a3130301dc7fe099f91c17250788b27ade2bdd829c7f55b8c545d406a144",
+    "truth_printed": null,
+    "truth_source": null,
+    "truth_stats": null,
+    "verify_images": []
+  },
+  {
+    "id": "golden1923-auld-lang-syne",
+    "title": "Auld Lang Syne + Comin' Thro' the Rye - two SATB songs on one page, multi-verse, refrain",
+    "source_url": "https://archive.org/details/goldenbookoffavo00beat_0/page/n36/mode/1up",
+    "license": "Public domain in the USA (published 1923). Words (Burns, d. 1796) and airs are public domain worldwide.",
+    "origin": "real-scan",
+    "dpi": 500,
+    "degradations": [
+      "paper_yellowing",
+      "show_through",
+      "stains",
+      "heavy_ink_spread",
+      "jpeg"
+    ],
+    "has_ground_truth": false,
+    "features": [
+      "lyrics",
+      "multi_voice_staff",
+      "satb_closed",
+      "multi_verse",
+      "refrain",
+      "two_pieces_one_page",
+      "key_change_between_pieces",
+      "pickup",
+      "fermata",
+      "slurs",
+      "melisma"
+    ],
+    "expected_parts": [
+      "Soprano",
+      "Alto",
+      "Tenor",
+      "Bass"
+    ],
+    "shared_staves": [
+      [
+        "Soprano",
+        "Alto"
+      ],
+      [
+        "Tenor",
+        "Bass"
+      ]
+    ],
+    "lyrics_parts": [
+      {
+        "part": "Soprano",
+        "verses": 3
+      }
+    ],
+    "pages": 1,
+    "measures": null,
+    "engraver": "original 19th/20th-century plate engraving or type, photographed (real scan)",
+    "scan": "real/golden1923-auld-lang-syne/scan.pdf",
+    "truth": null,
+    "clean": null,
+    "engraving": null,
+    "attribution": "real/golden1923-auld-lang-syne/ATTRIBUTION.txt",
+    "notes": "No truth. Auld Lang Syne: F major 4/4, 2 verses + refrain (single text line). Comin' Thro' the Rye: Ab major, 3 verses + refrain with brace. Verse count given is the maximum on the page.",
+    "work": "Auld Lang Syne (words Robert Burns, Scottish air); Comin' Thro' the Rye (words Robert Burns, Scottish air)",
+    "source_book": "The Golden Book of Favorite Songs, revised ed., Chicago: Hall & McCreary, 1923",
+    "source_page": "p. 37",
+    "source_item": "https://archive.org/details/goldenbookoffavo00beat_0",
+    "source_leaf": 36,
+    "source_image_url": "https://archive.org/download/goldenbookoffavo00beat_0/page/n36.jpg",
+    "scan_contributor": "Music Library, University of North Carolina at Chapel Hill; scanned by the Internet Archive, 2014",
+    "scan_rights_metadata": "possible-copyright-status not stated",
+    "rights_notes": "As for golden1923-america: arrangements are US-PD by publication date; treat as US-PD only.",
+    "image_px": [
+      2820,
+      4372
+    ],
+    "source_image": "real/golden1923-auld-lang-syne/source-page.jpg",
+    "scan_sha256": "4a188975be88bcf457162ba289feba5492d720e09769c9ccfce08d8b13b3507a",
+    "truth_printed": null,
+    "truth_source": null,
+    "truth_stats": null,
+    "verify_images": []
+  },
+  {
+    "id": "sharp1911-rambling-sailor",
+    "title": "The Rambling Sailor (LXXX) - folk song, voice + piano, 1 interlined verse",
+    "source_url": "https://archive.org/details/folksongsfromsom00shar/page/n17/mode/1up",
+    "license": "Public domain (published 1911; editor d. 1924 - PD in the US and in life+70 countries since 1995).",
+    "origin": "real-scan",
+    "dpi": 350,
+    "degradations": [
+      "paper_tone",
+      "small_staff_size",
+      "jpeg"
+    ],
+    "has_ground_truth": false,
+    "features": [
+      "lyrics",
+      "voice_piano",
+      "piano",
+      "must_not_split",
+      "grand_staff_multi_voice",
+      "repeats",
+      "slurs",
+      "dynamics",
+      "small_print",
+      "multi_page"
+    ],
+    "expected_parts": [
+      "Voice",
+      "Piano"
+    ],
+    "shared_staves": [],
+    "lyrics_parts": [
+      {
+        "part": "Voice",
+        "verses": 1
+      }
+    ],
+    "pages": 1,
+    "measures": null,
+    "engraver": "original 19th/20th-century plate engraving or type, photographed (real scan)",
+    "scan": "real/sharp1911-rambling-sailor/scan.pdf",
+    "truth": null,
+    "clean": null,
+    "engraving": null,
+    "attribution": "real/sharp1911-rambling-sailor/ATTRIBUTION.txt",
+    "notes": "No truth. F major, common time, Vivo. First page of a two-page song (continues on leaf 18, not included). Piano lower staff uses the old-style C-shaped bass clef glyph.",
+    "work": "English folk song \"The Rambling Sailor\", collected and arranged by Cecil J. Sharp (1859-1924)",
+    "source_book": "Folk Songs from Somerset, gathered and edited with pianoforte accompaniment by Cecil J. Sharp, 4th series, 2nd ed. London: Simpkin; Taunton: Barnicott & Pearce, 1911",
+    "source_page": "p. 2 (song LXXX)",
+    "source_item": "https://archive.org/details/folksongsfromsom00shar",
+    "source_leaf": 17,
+    "source_image_url": "https://archive.org/download/folksongsfromsom00shar/page/n17.jpg",
+    "scan_contributor": "University of Toronto, Faculty of Music Library copy; scanned by the Internet Archive (scribe3.toronto), 2022-05-09",
+    "scan_rights_metadata": "possible-copyright-status not stated (University of Toronto collection)",
+    "rights_notes": null,
+    "image_px": [
+      2748,
+      3637
+    ],
+    "source_image": "real/sharp1911-rambling-sailor/source-page.jpg",
+    "scan_sha256": "cd12485eea8d5554d855ef2fe35b2a2a637da387e60198f2e81ec2e4290b1db3",
+    "truth_printed": null,
+    "truth_source": null,
+    "truth_stats": null,
+    "verify_images": []
+  }
+]

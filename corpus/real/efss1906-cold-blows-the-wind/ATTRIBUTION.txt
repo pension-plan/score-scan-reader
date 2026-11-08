@@ -1,0 +1,20 @@
+efss1906-cold-blows-the-wind - real scanned page for the OMR test corpus
+========================================================================
+
+Content      : Cold Blows the Wind (No. 6) - folk song, voice + piano, 1 interlined verse
+Work         : English folk song "Cold blows the wind", collected and arranged by S. Baring-Gould (1834-1924) and Cecil J. Sharp (1859-1924)
+Printed in   : English Folk-Songs for Schools, collected and arranged by S. Baring Gould and Cecil J. Sharp. London: J. Curwen & Sons, [1906], p. 12 (No. 6)
+Scan source  : https://archive.org/details/englishfolksongs00goul/page/n23/mode/1up
+Page image   : https://archive.org/download/englishfolksongs00goul/page/n23.jpg  (1988x3085 px, 300 ppi per IA metadata)
+Scanned by   : Internet Archive (scanning centre nyc, 2007-07-13, Canon 5D), copy contributed by the Internet Archive
+IA rights    : possible-copyright-status: NOT_IN_COPYRIGHT (copyright-region US)
+Licence      : Public domain (published c.1906; arrangers d. 1924 - PD in the US and in life+70 countries since 1995).
+Scan status  : Scan by the Internet Archive / contributing library. A faithful photographic reproduction of a public-domain 2-D work; no new copyright arises in the US (Bridgeman v. Corel, 1999). The Internet Archive marks such items 'NOT_IN_COPYRIGHT' / Public Domain Mark where stated below.
+
+Files
+  source-page.jpg  the Internet Archive page JPEG, byte-for-byte as downloaded (no edits)
+  scan.pdf         one-page IMAGE-ONLY PDF wrapping source-page.jpg unmodified (img2pdf, DCTDecode,
+                   no fonts, no text layer), page size = pixels / ppi above
+  (no ground truth yet)
+
+Re-fetch: corpus/real/tools/fetch_scans.sh

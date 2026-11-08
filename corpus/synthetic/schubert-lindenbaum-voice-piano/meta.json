@@ -1,0 +1,42 @@
+{
+  "id": "schubert-lindenbaum-voice-piano",
+  "title": "Der Lindenbaum (Schubert) - voice and piano, excerpt",
+  "expected_parts": [
+    "Voice",
+    "Piano"
+  ],
+  "lyrics": [
+    {
+      "part": "Voice",
+      "verses": 1
+    }
+  ],
+  "shared_staves": [],
+  "layout": "voice + piano, binarized photocopy look",
+  "degradation_params": {
+    "dpi": 200,
+    "ink_weight": 1,
+    "rotate": -1.0,
+    "binarize": 145,
+    "binarize_noise": 22,
+    "blur": 0.7,
+    "speckle": 150,
+    "format": "png1"
+  },
+  "degradations": [
+    "ink_weight",
+    "rotation",
+    "blur",
+    "speckles",
+    "binarized_photocopy"
+  ],
+  "engraver": "musicxml2ly+lilypond",
+  "validation": {
+    "midi_attacks_match_truth": true,
+    "attacks": 474,
+    "lyric_text_found_in_engraving": 1.0,
+    "image_only": true
+  },
+  "pages": 1,
+  "measures": 24
+}

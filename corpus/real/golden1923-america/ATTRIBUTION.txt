@@ -1,0 +1,30 @@
+golden1923-america - real scanned page for the OMR test corpus
+==============================================================
+
+Content      : America ("My Country, 'Tis of Thee") - closed-score SATB, 4 verses
+Work         : America (My Country, 'Tis of Thee); words Samuel Francis Smith (1831); music attributed to Henry Carey (tune "God Save the King")
+Printed in   : The Golden Book of Favorite Songs, revised ed., ed. John W. Beattie et al., Chicago: Hall & McCreary, 1923, p. 3
+Scan source  : https://archive.org/details/goldenbookoffavo00beat_0/page/n2/mode/1up
+Page image   : https://archive.org/download/goldenbookoffavo00beat_0/page/n2.jpg  (2820x4372 px, 500 ppi per IA metadata)
+Scanned by   : Music Library, University of North Carolina at Chapel Hill (Don Yoder Collection of American Hymnody); scanned by the Internet Archive (scribe1.chapelhill), 2014-06-30, Canon EOS 5D Mark II
+IA rights    : possible-copyright-status not stated; item in collections uncmus/americana
+Licence      : Public domain in the USA (published 1923; US copyright term expired 1 Jan 2019). Words (Smith, d. 1895) and tune are public domain worldwide.
+Rights notes : The book's editorial content (compilers incl. J. W. Beattie, d. 1962) is PD in the US by publication date; in life+70 countries the arrangement on this page may not be PD until 2033 - treat as US-PD only. The hymn-style harmonization of "America" is the standard traditional one.
+Scan status  : Scan by the Internet Archive / contributing library. A faithful photographic reproduction of a public-domain 2-D work; no new copyright arises in the US (Bridgeman v. Corel, 1999). The Internet Archive marks such items 'NOT_IN_COPYRIGHT' / Public Domain Mark where stated below.
+
+Files
+  source-page.jpg  the Internet Archive page JPEG, byte-for-byte as downloaded (no edits)
+  scan.pdf         one-page IMAGE-ONLY PDF wrapping source-page.jpg unmodified (img2pdf, DCTDecode,
+                   no fonts, no text layer), page size = pixels / ppi above
+  truth.musicxml   hand-transcribed ground truth, MusicXML 4.0 partwise, TARGET layout: one part per
+                   voice (shared-staff voices separated into their own parts, lyrics on the voice that
+                   carries them). Validated against the MusicXML 4.0 XSD.
+  truth-printed.musicxml  same notes in the AS-ENGRAVED layout (voices sharing a staff kept on one
+                   staff with stems up/down) - for symbol-level evaluation before part separation.
+  truth.src        transcription source (compiled by tools/mkxml.py); header comments list what is
+                   deliberately not encoded (dynamics, fingering, slurs, block-text stanzas, ...).
+  verify/          musicxml2ly + LilyPond engraving of the truth beside the scan, used to verify the
+                   transcription note by note.
+  Transcription: corpus agent (Claude), 2026-11-08; dedicated to the public domain (CC0 1.0).
+
+Re-fetch: corpus/real/tools/fetch_scans.sh

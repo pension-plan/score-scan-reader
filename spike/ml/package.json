@@ -1,0 +1,12 @@
+{
+  "name": "spike-ml",
+  "private": true,
+  "type": "module",
+  "description": "Feasibility spike: pretrained OMR ONNX models under onnxruntime-node / onnxruntime-web",
+  "dependencies": {
+    "onnxruntime-node": "1.30.0",
+    "onnxruntime-web": "1.30.0",
+    "pngjs": "7.0.0",
+    "playwright-core": "1.48.2"
+  }
+}

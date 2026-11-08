@@ -1,0 +1,20 @@
+{
+  "name": "score-scan-reader",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Scanned sheet-music PDFs to MusicXML 4.0 in the browser: lyrics kept, closed-score SATB split into parts, piano kept whole.",
+  "license": "MIT",
+  "scripts": {
+    "build": "node mvp/tools/build.js",
+    "test": "node mvp/tools/eval.mjs --no-ocr --jobs 4 --out mvp/work/eval-ci.json",
+    "test:ocr": "node mvp/tools/eval.mjs --jobs 4 --out mvp/work/eval-ocr.json",
+    "test:browser": "node mvp/tools/pw/test.js"
+  },
+  "dependencies": {
+    "pngjs": "7.0.0",
+    "tesseract.js": "7.0.0"
+  },
+  "devDependencies": {
+    "playwright": "1.57.0"
+  }
+}

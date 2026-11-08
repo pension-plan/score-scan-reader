@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install system tools (pdftoppm, xmllint)
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils libxml2-utils
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Build the app (checks the artifact contract)
+        run: npm run build
+      - name: Score against the test corpus (no OCR)
+        run: npm test
+      - name: Browser test (Chromium)
+        run: |
+          npx playwright install --with-deps chromium
+          npm run test:browser
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: score-scan-reader-ci
+          path: |
+            mvp/dist/
+            mvp/work/eval-ci.json

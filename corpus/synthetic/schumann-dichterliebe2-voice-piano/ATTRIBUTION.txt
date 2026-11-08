@@ -1,0 +1,4 @@
+Robert Schumann, Dichterliebe Op. 48 No. 2 (1840), text Heinrich Heine - public domain.
+Encoding: music21 corpus schumann_robert/dichterliebe_no2.xml.
+
+Engraving, rasterisation and degradation produced by the corpus generator (corpus/synthetic/_tools); these derived files are dedicated to the public domain (CC0 1.0).

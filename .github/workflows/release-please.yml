@@ -1,0 +1,45 @@
+name: release-please
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-24.04
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - id: release
+        uses: googleapis/release-please-action@v4
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  upload-assets:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Build
+        run: npm install --no-audit --no-fund && npm run build
+      - name: Package downloadable copies
+        run: |
+          TAG=${{ needs.release-please.outputs.tag_name }}
+          mkdir -p out
+          (cd mvp/dist && zip -r ../../out/score-scan-reader-$TAG-web.zip .)
+          zip -r out/score-scan-reader-$TAG-source.zip . -x 'node_modules/*' '.git/*' 'out/*'
+          cp docs/SDD.md out/score-scan-reader-$TAG-design.md
+      - name: Upload release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload ${{ needs.release-please.outputs.tag_name }} out/* --clobber

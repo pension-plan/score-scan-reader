@@ -1,0 +1,4 @@
+Clara Wieck (Schumann), Polonaises Op. 1 No. 1 (1831) - public domain.
+Encoding: music21 corpus schumann_clara/polonaise_op1n1.mxl.
+
+Engraving, rasterisation and degradation produced by the corpus generator (corpus/synthetic/_tools); these derived files are dedicated to the public domain (CC0 1.0).

@@ -1,0 +1,21 @@
+golden1923-auld-lang-syne - real scanned page for the OMR test corpus
+=====================================================================
+
+Content      : Auld Lang Syne + Comin' Thro' the Rye - two SATB songs on one page, multi-verse, refrain
+Work         : Auld Lang Syne (words Robert Burns, Scottish air); Comin' Thro' the Rye (words Robert Burns, Scottish air)
+Printed in   : The Golden Book of Favorite Songs, revised ed., Chicago: Hall & McCreary, 1923, p. 37
+Scan source  : https://archive.org/details/goldenbookoffavo00beat_0/page/n36/mode/1up
+Page image   : https://archive.org/download/goldenbookoffavo00beat_0/page/n36.jpg  (2820x4372 px, 500 ppi per IA metadata)
+Scanned by   : Music Library, University of North Carolina at Chapel Hill; scanned by the Internet Archive, 2014
+IA rights    : possible-copyright-status not stated
+Licence      : Public domain in the USA (published 1923). Words (Burns, d. 1796) and airs are public domain worldwide.
+Rights notes : As for golden1923-america: arrangements are US-PD by publication date; treat as US-PD only.
+Scan status  : Scan by the Internet Archive / contributing library. A faithful photographic reproduction of a public-domain 2-D work; no new copyright arises in the US (Bridgeman v. Corel, 1999). The Internet Archive marks such items 'NOT_IN_COPYRIGHT' / Public Domain Mark where stated below.
+
+Files
+  source-page.jpg  the Internet Archive page JPEG, byte-for-byte as downloaded (no edits)
+  scan.pdf         one-page IMAGE-ONLY PDF wrapping source-page.jpg unmodified (img2pdf, DCTDecode,
+                   no fonts, no text layer), page size = pixels / ppi above
+  (no ground truth yet)
+
+Re-fetch: corpus/real/tools/fetch_scans.sh

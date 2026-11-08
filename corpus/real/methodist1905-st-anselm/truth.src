@@ -1,0 +1,53 @@
+# Hand transcription of hymn 72 "St. Anselm" (Joseph Barnby), The Methodist Hymnal (1905), p. 50.
+# Closed-score SATB: S+A on the treble staff (S stems up, A stems down), T+B on the bass staff.
+# Only stanza 1 is interlined; stanzas 2-3 are printed as block text below the music (NOT in truth).
+# Measures follow the PRINTED barlines: the hymnal's heavy line-end bars ('|!') fall mid-measure,
+# so metric measures 2,4,6,8,10,12,14 are each split into two partial measures (as engraved).
+# Tenor: the end-of-line B3 is tied across the system break into the pickup and into the next
+# downbeat (drawn with ties plus a dotted line in the print); printed cue words "As some" above the
+# tenor at the end of system 1 are not encoded. Unisons (shared noteheads) are given to both voices.
+@title St. Anselm
+@subtitle The dawn of God's dear Sabbath
+@composer Joseph Barnby
+@lyricist Ada Cross
+@rights Public domain
+@source The Methodist Hymnal, New York: Eaton & Mains, 1905, hymn 72, p. 50 (Internet Archive methodisthymnalo00meth, leaf n63)
+@key 4 major
+@time 4/4
+@systems 1 7 13 19
+@split Soprano=[S] Alto=[A] Tenor=[T] Bass=[B]
+@printed Treble=[S A] Bass=[T B]
+@clef S G
+@clef A G
+@clef T F
+@clef B F
+
+voice S
+b'4 | b'4 gis' fis' gis' | fis'2 e'4 |! eis'4 | fis'4 gis' a' cis'' | b'2. |!
+a'4 | gis'4 gis' a' b' | b'2 cis''4 |! b'4 | ais'4 ais' b' cis'' | b'2 |!
+dis''2 | e''4 dis'' cis'' b' | b'2 a'4 |! cis''4 | dis''4 cis'' b' a' | gis'2 |!
+gis'2 | gis'4 gis' a' gis' | cis''2 fis'4 |! a'4 | a'4 gis' fis' gis' | e'1 || e'2 e'2 |.
+
+voice A
+e'4 | e'4 e' dis' e' | dis'2 e'4 |! cis'4 | cis'4 cis' cis' fis' | gis'2. |!
+dis'4 | e'4 e' fis' d'4 | d'2 cis'4 |! eis'4 | fis'4 fis' fis' e' | dis'2 |!
+fis'2 | e'4 e' e' e' | e'2 e'4 |! e'4 | dis'4 dis' dis' cis' | bis2 |!
+bis2 | cis'4 cis' cis' cis' | cis'2 cis'4 |! e'4 | dis'4 dis' cis' dis' | e'1 || cis'2 b2 |.
+
+voice T
+gis4 | gis4 b a b | a2 gis4 |! gis4 | fis4 eis fis a | a4 fis b~ |!
+b4~ | b4 e fis gis | gis2 a4 |! gis4 | fis4 fis gis ais | b2 |!
+b2 | b4 b cis' d' | d'2 cis'4 |! cis'4 | a4 a a fis | fis4 dis |!
+gis4 fis | eis4 eis eis eis | fis2 fis4 |! cis'4 | cis'4 b a a | gis1 || a2 gis2 |.
+
+voice B
+e4 | e4 e b, b, | cis2 cis4 |! b,4 | a,4 cis fis e | dis2. |!
+b,4 | e4 e e e | a,2 a,4 |! cis4 | fis4 fis fis fis | b,2 |!
+a!2 | gis4 gis gis e | a2 a4 |! a4 | fis4 fis fis dis | gis,2 |!
+gis,2 | cis4 cis b, b, | a,2 a,4 |! fis,4 | b,4 b, b, b, | e1 || a,2 e2 |.
+
+lyrics S 1
+The dawn of God's dear Sab -- bath Breaks o'er the earth a -- gain,
+As some sweet sum -- mer morn -- ing Aft -- er a night of pain;
+It comes as cool -- ing show -- ers To some ex -- haust -- ed land,
+As shade of clus -- tered palm trees 'Mid wea -- ry wastes of sand. A -- men.

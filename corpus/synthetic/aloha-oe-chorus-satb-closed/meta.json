@@ -1,0 +1,66 @@
+{
+  "id": "aloha-oe-chorus-satb-closed",
+  "title": "Aloha Oe - chorus, SATB closed score (2 verses)",
+  "expected_parts": [
+    "Soprano",
+    "Alto",
+    "Tenor",
+    "Bass"
+  ],
+  "lyrics": [
+    {
+      "part": "Soprano",
+      "verses": 2
+    },
+    {
+      "part": "Tenor",
+      "verses": 2
+    }
+  ],
+  "shared_staves": [
+    [
+      "Soprano",
+      "Alto"
+    ],
+    [
+      "Tenor",
+      "Bass"
+    ]
+  ],
+  "layout": "closed score; soprano verses 1-2 below treble staff, tenor verses 1-2 below bass staff",
+  "degradation_params": {
+    "dpi": 200,
+    "paper": 232,
+    "texture": 6,
+    "ink_level": 35,
+    "phone": {
+      "margin": 0.05,
+      "bg": 55,
+      "jitter": 0.025
+    },
+    "vignette": 0.28,
+    "blotch": 0.15,
+    "blur": 0.9,
+    "noise": 4,
+    "jpeg": 60,
+    "format": "jpeg"
+  },
+  "degradations": [
+    "paper_texture",
+    "uneven_lighting",
+    "vignette",
+    "perspective_phone_capture",
+    "blur",
+    "gaussian_noise",
+    "jpeg_q60"
+  ],
+  "engraver": "model->lilypond (custom writer)",
+  "validation": {
+    "midi_attacks_match_truth": true,
+    "attacks": 157,
+    "lyric_text_found_in_engraving": 1.0,
+    "image_only": true
+  },
+  "pages": 1,
+  "measures": 9
+}

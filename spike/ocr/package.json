@@ -1,0 +1,14 @@
+{
+  "name": "spike-ocr",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Lyric OCR feasibility spike (tesseract.js vs PaddleOCR ONNX)",
+  "type": "commonjs",
+  "dependencies": {
+    "onnxruntime-node": "1.31.1",
+    "onnxruntime-web": "1.31.1",
+    "pngjs": "7.0.0",
+    "tesseract.js": "7.0.0",
+    "tesseract.js-core": "7.0.0"
+  }
+}

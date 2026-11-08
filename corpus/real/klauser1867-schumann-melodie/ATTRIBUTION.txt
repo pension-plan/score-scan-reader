@@ -1,0 +1,29 @@
+klauser1867-schumann-melodie - real scanned page for the OMR test corpus
+========================================================================
+
+Content      : Schumann: Melodie, Op. 68 No. 1 - piano grand staff (must not split)
+Work         : Robert Schumann (1810-1856), Album fuer die Jugend Op. 68 No. 1 "Melodie" (comp. 1848)
+Printed in   : Erstes Album fuer die Jugend Op. 68, 43 kleine Clavierstuecke, progressiv geordnet und mit Fingersatz versehen von K. Klauser. Leipzig: J. Schuberth & Co., [1867] (plate 4359), p. 3
+Scan source  : https://archive.org/details/b26976821/page/n2/mode/1up
+Page image   : https://archive.org/download/b26976821/page/n2.jpg  (2256x3257 px, 300 ppi per IA metadata)
+Scanned by   : Gaylord Music Library, Washington University in St. Louis (uploaded to the Internet Archive)
+IA rights    : licenseurl: http://creativecommons.org/publicdomain/mark/1.0/ (Public Domain Mark 1.0)
+Licence      : Public domain (composer d. 1856; editor Karl Klauser d. 1905; published 1867). Scan marked Public Domain Mark 1.0.
+Scan status  : Scan by the Internet Archive / contributing library. A faithful photographic reproduction of a public-domain 2-D work; no new copyright arises in the US (Bridgeman v. Corel, 1999). The Internet Archive marks such items 'NOT_IN_COPYRIGHT' / Public Domain Mark where stated below.
+
+Files
+  source-page.jpg  the Internet Archive page JPEG, byte-for-byte as downloaded (no edits)
+  scan.pdf         one-page IMAGE-ONLY PDF wrapping source-page.jpg unmodified (img2pdf, DCTDecode,
+                   no fonts, no text layer), page size = pixels / ppi above
+  truth.musicxml   hand-transcribed ground truth, MusicXML 4.0 partwise, TARGET layout: one part per
+                   voice (shared-staff voices separated into their own parts, lyrics on the voice that
+                   carries them). Validated against the MusicXML 4.0 XSD.
+  truth-printed.musicxml  same notes in the AS-ENGRAVED layout (voices sharing a staff kept on one
+                   staff with stems up/down) - for symbol-level evaluation before part separation.
+  truth.src        transcription source (compiled by tools/mkxml.py); header comments list what is
+                   deliberately not encoded (dynamics, fingering, slurs, block-text stanzas, ...).
+  verify/          musicxml2ly + LilyPond engraving of the truth beside the scan, used to verify the
+                   transcription note by note.
+  Transcription: corpus agent (Claude), 2026-11-08; dedicated to the public domain (CC0 1.0).
+
+Re-fetch: corpus/real/tools/fetch_scans.sh

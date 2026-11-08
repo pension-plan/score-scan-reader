@@ -1,0 +1,70 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Lyric OCR browser check</title></head>
+<body>
+<pre id="out">loading…</pre>
+<!-- self-hosted, relative URLs only (mirrors the artifact constraint: no fetch/worker/wasm from CDNs) -->
+<script src="assets/tesseract/tesseract.min.js"></script>
+<script src="assets/ort/ort.wasm.min.js"></script>
+<script>
+const log = (s) => { document.getElementById('out').textContent += '\n' + s; };
+async function loadImg(src) { const im = new Image(); im.src = src; await im.decode(); return im; }
+async function tessRun(strips, langs, label) {
+  const t0 = performance.now();
+  const w = await Tesseract.createWorker(langs, 1, {
+    workerPath: 'assets/tesseract/worker.min.js', corePath: 'assets/tesseract/', langPath: 'assets/tessdata',
+    workerBlobURL: false, cacheMethod: 'none', gzip: true,
+  });
+  await w.setParameters({ tessedit_pageseg_mode: '7', user_defined_dpi: '300' });
+  const init = performance.now() - t0;
+  const res = []; let tot = 0;
+  for (const s of strips) {
+    const t1 = performance.now();
+    const { data } = await w.recognize('assets/strips/' + s.fn);
+    const ms = performance.now() - t1; tot += ms;
+    res.push({ fn: s.fn, ms: Math.round(ms), ocr: data.text.trim(), gt: s.gt });
+  }
+  await w.terminate();
+  return { label, initMs: Math.round(init), msPerStrip: Math.round(tot / strips.length), res };
+}
+async function paddleRun(strips) {
+  ort.env.wasm.wasmPaths = new URL('assets/ort/', location.href).href;  // must be absolute (dynamic import of .mjs)
+  ort.env.wasm.numThreads = 1;
+  const t0 = performance.now();
+  const dict = await (await fetch('assets/paddle/latin_v5.dict.json')).json();
+  const chars = ['<blank>', ...dict, ' '];
+  const sess = await ort.InferenceSession.create('assets/paddle/latin_v5.onnx', { executionProviders: ['wasm'], graphOptimizationLevel: 'all' });
+  const init = performance.now() - t0;
+  const cv = document.createElement('canvas'); const ctx = cv.getContext('2d', { willReadFrequently: true });
+  const res = []; let tot = 0;
+  for (const s of strips) {
+    const im = await loadImg('assets/strips/' + s.fn);
+    const H = 48, Wr = Math.round(im.width * H / im.height), W = Math.ceil(Wr / 8) * 8;
+    cv.width = W; cv.height = H; ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H); ctx.drawImage(im, 0, 0, Wr, H);
+    const px = ctx.getImageData(0, 0, W, H).data; const x = new Float32Array(3 * H * W);
+    for (let i = 0; i < H * W; i++) { const v = (px[i * 4] / 255 - 0.5) / 0.5; x[i] = v; x[H * W + i] = v; x[2 * H * W + i] = v; }
+    const t1 = performance.now();
+    const o = await sess.run({ x: new ort.Tensor('float32', x, [1, 3, H, W]) });
+    const ms = performance.now() - t1; tot += ms;
+    const out = o[sess.outputNames[0]]; const [, T, C] = out.dims; let prev = -1, txt = '';
+    for (let t = 0; t < T; t++) { let b = 0, bv = -1; for (let c = 0; c < C; c++) { const v = out.data[t * C + c]; if (v > bv) { bv = v; b = c; } } if (b !== prev && b) txt += chars[b]; prev = b; }
+    res.push({ fn: s.fn, ms: Math.round(ms), ocr: txt.trim(), gt: s.gt });
+  }
+  return { label: 'paddle latin_v5 (ort-web wasm, 1 thread)', initMs: Math.round(init), msPerStrip: Math.round(tot / strips.length), res };
+}
+(async () => {
+  try {
+    const q = new URLSearchParams(location.search);
+    let strips = await (await fetch('assets/strips/index.json')).json();
+    if (q.get('n')) strips = strips.filter((_, i) => i % Math.ceil(40 / +q.get('n')) === 0);
+    const tests = (q.get('tests') || 'eng,combined,paddle').split(',');
+    log('strips ' + strips.length + ', crossOriginIsolated=' + self.crossOriginIsolated + ', UA=' + navigator.userAgent);
+    const out = [];
+    for (const [langs, label] of [['eng', 'tess best_int eng'], ['eng+deu+lat', 'tess best_int eng+deu+lat']].filter(([l]) => tests.includes(l === 'eng' ? 'eng' : 'combined'))) {
+      const r = await tessRun(strips, langs, label); out.push(r); log(`${label}: init ${r.initMs} ms, ${r.msPerStrip} ms/strip`);
+    }
+    const p = tests.includes('paddle') ? await paddleRun(strips) : null; if (p) out.push(p); if (p) log(`${p.label}: init ${p.initMs} ms, ${p.msPerStrip} ms/strip`);
+    window.RESULT = out; log('DONE');
+  } catch (e) { log('ERROR ' + (e && e.stack || e)); window.RESULT = { error: String(e) }; }
+})();
+</script>
+</body></html>

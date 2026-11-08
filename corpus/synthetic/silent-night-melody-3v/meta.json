@@ -1,0 +1,50 @@
+{
+  "id": "silent-night-melody-3v",
+  "title": "Silent Night - melody with 3 verses",
+  "expected_parts": [
+    "Voice"
+  ],
+  "lyrics": [
+    {
+      "part": "Voice",
+      "verses": 3
+    }
+  ],
+  "shared_staves": [],
+  "layout": "single staff melody, 3 verses, 6/8",
+  "degradation_params": {
+    "dpi": 200,
+    "paper": 230,
+    "texture": 7,
+    "ink_level": 30,
+    "phone": {
+      "margin": 0.06,
+      "bg": 85,
+      "jitter": 0.03
+    },
+    "blotch": 0.25,
+    "vignette": 0.2,
+    "blur": 1.0,
+    "noise": 5,
+    "jpeg": 55,
+    "format": "jpeg"
+  },
+  "degradations": [
+    "paper_texture",
+    "uneven_lighting",
+    "vignette",
+    "perspective_phone_capture",
+    "blur",
+    "gaussian_noise",
+    "jpeg_q55"
+  ],
+  "engraver": "model->lilypond (custom writer)",
+  "validation": {
+    "midi_attacks_match_truth": true,
+    "attacks": 46,
+    "lyric_text_found_in_engraving": 1.0,
+    "image_only": true
+  },
+  "pages": 1,
+  "measures": 24
+}

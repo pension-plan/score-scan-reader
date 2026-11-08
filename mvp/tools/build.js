@@ -1,0 +1,114 @@
+// Bundles src/*.js (CommonJS) + ui/ into dist/index.html (artifact format) and
+// checks the artifact contract, failing the build on any violation:
+//   - no doctype/html/head/body tags; <title> of 2-4 words in the first 8 KB
+//   - external scripts only from cdnjs/jsdelivr/unpkg, pinned to an exact version;
+//     stylesheets only from Google Fonts
+//   - no alert/confirm/prompt/print calls and no download links in page code
+//   - every relative require() between src modules resolves inside the bundle
+//   - required assets present; each asset <= 15 MB, total <= 64 MB, page <= 16 MB
+// Usage: node tools/build.js [--quiet]
+const fs = require('fs'), path = require('path');
+const ROOT = path.join(__dirname, '..');
+const SRC = path.join(ROOT, 'src');
+const DIST = path.join(ROOT, 'dist');
+const UI = fs.existsSync(path.join(ROOT, 'ui/body.html')) ? path.join(ROOT, 'ui') : path.join(SRC, 'ui');
+const quiet = process.argv.includes('--quiet');
+const MB = 1024 * 1024;
+const REQUIRED_ASSETS = ['tesseract-worker.min.js', 'tesseract-core-simd-lstm.wasm.js', 'eng.traineddata.gz', 'sample-st-anselm.pdf'];
+const SCRIPTS = [
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/7.0.0/tesseract.min.js',
+  'https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.8.9/build/opensheetmusicdisplay.min.js',
+];
+const FONTS = 'https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400..600&display=swap';
+
+const errors = [];
+const fail = (m) => errors.push(m);
+
+// ---- bundle: every src/*.js module (definitions are lazy, so unused ones cost bytes only)
+const mods = fs.readdirSync(SRC).filter((f) => f.endsWith('.js')).map((f) => f.slice(0, -3)).sort();
+if (!mods.includes('omr')) fail('src/omr.js is missing');
+let bundle = '(function(){\nconst defs={},cache={};\nfunction req(n){n=n.replace(/^\\.\\//,"").replace(/\\.js$/,"");if(cache[n])return cache[n].exports;if(!defs[n])return {};const m={exports:{}};cache[n]=m;defs[n](req,m,m.exports);return m.exports;}\n';
+for (const m of mods) {
+  const code = fs.readFileSync(path.join(SRC, m + '.js'), 'utf8');
+  for (const r of code.matchAll(/require\(\s*['"]\.\/([\w.-]+?)(?:\.js)?['"]\s*\)/g)) {
+    if (!mods.includes(r[1])) fail(`src/${m}.js requires ./${r[1]}, which is not in src/`);
+  }
+  bundle += `defs[${JSON.stringify(m)}]=function(require,module,exports){\n${code}\n};\n`;
+}
+bundle += 'window.omrRequire=req;\n})();\n';
+
+const css = fs.readFileSync(path.join(UI, 'style.css'), 'utf8');
+const body = fs.readFileSync(path.join(UI, 'body.html'), 'utf8');
+const app = fs.readFileSync(path.join(UI, 'app.js'), 'utf8');
+if (/<\/script/i.test(bundle + app)) fail('a script terminator (</script) appears inside the bundle or app');
+if (/<\/style/i.test(css)) fail('a </style> appears inside style.css');
+
+const html = `<title>Score Scan Reader</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+${css}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="${FONTS}">
+${body}
+${SCRIPTS.map((s) => `<script src="${s}"></script>`).join('\n')}
+<script>
+${bundle}</script>
+<script>
+${app}</script>
+`;
+
+// ---- artifact contract checks
+const shell = html.replace(/<script>[\s\S]*?<\/script>/g, '<script></script>').replace(/<style>[\s\S]*?<\/style>/g, '<style></style>');
+if (/<!doctype|<html[\s>]|<\/html>|<head[\s>]|<\/head>|<body[\s>]|<\/body>/i.test(shell)) fail('page shell contains doctype/html/head/body tags');
+const title = (html.slice(0, 8192).match(/<title>([^<]*)<\/title>/) || [])[1];
+if (!title) fail('no <title> in the first 8 KB');
+else if (title.trim().split(/\s+/).length < 2 || title.trim().split(/\s+/).length > 4) fail(`title "${title}" is not 2-4 words`);
+for (const m of shell.matchAll(/<script\b[^>]*\bsrc="([^"]+)"/g)) {
+  const u = m[1];
+  if (!/^https:\/\/(cdnjs\.cloudflare\.com\/ajax\/libs\/|cdn\.jsdelivr\.net\/npm\/|unpkg\.com\/)/.test(u)) fail(`script from a host outside the allowlist: ${u}`);
+  if (!/(@|\/)\d+\.\d+\.\d+(\/|$)/.test(u)) fail(`script not pinned to an exact version: ${u}`);
+}
+for (const m of shell.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*>/g)) {
+  if (!/href="https:\/\/fonts\.googleapis\.com\//.test(m[0])) fail(`stylesheet outside Google Fonts: ${m[0]}`);
+}
+const code = bundle + '\n' + app;
+const banned = code.match(/(^|[^.\w$])(alert|confirm|prompt|print)\s*\(|window\.(alert|confirm|prompt|print)\b/m);
+if (banned) fail(`banned dialog/print call in page code: "${banned[0].trim()}"`);
+if (/\sdownload(=|\s|>)/i.test(shell) || /\.download\s*=|setAttribute\(\s*['"]download/.test(code)) fail('download link in page');
+if (/(src|href)="\/(?!\/)/.test(shell) || /fetch\(\s*['"]\//.test(app)) fail('absolute-path asset reference; use relative assets/ paths');
+if (!/:root\s*{/.test(css) || !/prefers-color-scheme:\s*dark/.test(css) || !/:root\[data-theme="dark"\]/.test(css)) fail('theme tokens for light and dark are incomplete');
+if (!/max\(16px,\s*env\(safe-area-inset-left/.test(css)) fail('side gutter does not use max(16px, env(safe-area-inset-left))');
+
+// ---- assets
+const rows = [];
+let total = 0;
+for (const a of REQUIRED_ASSETS) if (!fs.existsSync(path.join(DIST, 'assets', a))) fail(`missing asset dist/assets/${a}`);
+for (const f of fs.existsSync(path.join(DIST, 'assets')) ? fs.readdirSync(path.join(DIST, 'assets')) : []) {
+  const n = fs.statSync(path.join(DIST, 'assets', f)).size;
+  total += n;
+  rows.push([`assets/${f}`, n]);
+  if (n > 15 * MB) fail(`asset ${f} is ${(n / MB).toFixed(1)} MB (limit 15 MB)`);
+}
+const pageBytes = Buffer.byteLength(html);
+if (pageBytes > 16 * MB) fail(`index.html is ${(pageBytes / MB).toFixed(1)} MB (limit 16 MB)`);
+total += pageBytes;
+if (total > 64 * MB) fail(`total ${(total / MB).toFixed(1)} MB exceeds 64 MB`);
+
+if (errors.length) {
+  console.error('BUILD FAILED (dist/index.html left unchanged):\n  - ' + errors.join('\n  - '));
+  process.exit(1);
+}
+// atomic write, so a concurrent browser test never reads a half-written page
+const tmp = path.join(DIST, `.index.html.${process.pid}.tmp`);
+fs.writeFileSync(tmp, html);
+fs.renameSync(tmp, path.join(DIST, 'index.html'));
+if (!quiet) {
+  rows.unshift(['index.html', pageBytes]);
+  console.log(`ui: ${path.relative(ROOT, UI)}/  modules: ${mods.length} (${mods.join(', ')})`);
+  for (const [f, n] of rows) console.log(`  ${f.padEnd(42)} ${(n / 1024).toFixed(0).padStart(7)} KB`);
+  console.log(`  ${'total'.padEnd(42)} ${(total / 1024).toFixed(0).padStart(7)} KB`);
+}
+console.log('dist/index.html', html.length, 'bytes');

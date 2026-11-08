@@ -1,0 +1,55 @@
+# Hand transcription of "America" from The Golden Book of Favorite Songs (Hall & McCreary, 1923), p. 3.
+# Closed-score SATB: S+A on the treble staff, T+B on the bass staff, 4 verses interlined.
+# Omitted from truth: dynamics (mf, ff), tempo text, hairpin/bracket above m12, the prose box,
+# "God Bless Our Native Land" text-only stanzas and "The American's Creed" box.
+@title America
+@subtitle My Country, 'Tis of Thee
+@composer Henry Carey (?)
+@lyricist Samuel Francis Smith
+@rights Public domain (published 1923, USA)
+@source The Golden Book of Favorite Songs, rev. ed., Chicago: Hall & McCreary, 1923, p. 3 (Internet Archive goldenbookoffavo00beat_0, leaf n2)
+@key 1 major
+@time 3/4
+@systems 1 8
+@split Soprano=[S] Alto=[A] Tenor=[T] Bass=[B]
+@printed Treble=[S A] Bass=[T B]
+@clef S G
+@clef A G
+@clef T F
+@clef B F
+
+voice S
+g'4 g' a' | fis'4. g'8 a'4 | b'4 b' c'' | b'4. a'8 g'4 | a'4 g' fis' | g'2. |
+d''4 d'' d'' | d''4. c''8 b'4 | c''4 c'' c'' | c''4. b'8 a'4 | b'4 c''8 b' a' g' | b'4. c''8 d''4 | e''8 c'' b'4 a' | g'2. |.
+
+voice A
+d'4 d' e' | d'4. e'8 fis'4 | g'4 g' g' | g'4. fis'8 e'4 | e'4 d' d' | d'2. |
+b'4 b' b' | b'4. a'8 g'4 | a'4 a' a' | a'4. g'8 fis'4 | g'4 g' g' | g'4. fis'8 g'4 | g'4 g' fis' | g'2. |.
+
+voice T
+b4 b c' | a4. a8 d'4 | d'4 e' e' | d'4. c'8 b4 | c'4 b a | b2. |
+d'4 d' d' | d'4. d'8 d'4 | d'4 d' d' | d'4. d'8 d'4 | d'4 e'8 d' c' b | d'4. d'8 d'4 | c'8 e' d'4 c' | b2. |.
+
+voice B
+g4 g c | d4. d8 d4 | g4 e c | d4. d8 e4 | c4 d d | g2. |
+g4 b d' | g4. g8 g4 | d4 fis a | d4. d8 d4 | g4 g g | g4. a8 b4 | c'4 d' d | g2. |.
+
+lyrics S 1
+My coun -- try, 'tis of thee, Sweet land of lib -- er -- ty, Of thee I sing.
+Land where my fa -- thers died! Land of the Pil -- grim's pride!
+From ev -- _ 'ry _ moun -- tain side, Let _ free -- dom ring!
+
+lyrics S 2
+My na -- tive coun -- try, thee, Land of the no -- ble free, Thy name I love.
+I love thy rocks and rills, Thy woods and tem -- pled hills;
+My heart _ with _ rap -- ture thrills Like _ that a -- bove.
+
+lyrics S 3
+Let mu -- sic swell the breeze, And ring from all the trees Sweet free -- dom's song.
+Let mor -- tal tongues a -- wake; Let all that breathe par -- take;
+Let rocks _ their _ si -- lence break, The _ sound pro -- long.
+
+lyrics S 4
+Our fa -- thers' God, to Thee, Au -- thor of lib -- er -- ty, To Thee we sing.
+Long may our land be bright With free -- dom's ho -- ly light;
+Pro -- tect _ us _ by Thy might, Great _ God, our King!

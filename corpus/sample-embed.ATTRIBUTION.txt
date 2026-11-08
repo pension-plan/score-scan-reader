@@ -1,0 +1,23 @@
+sample-embed.pdf - default sample for the OMR web app
+=====================================================
+
+Content : "Old Hundredth" (All people that on earth do dwell), closed-score SATB hymn,
+          one page, 4 verses printed between the staves (soprano+alto on the treble
+          staff, tenor+bass on the bass staff).
+Melody  : Genevan Psalter (1551), attributed to Louis Bourgeois - public domain.
+Text    : William Kethe (1561) - public domain.
+Harmony : SATB harmonization generated for this project by a small voice-leading
+          solver (corpus/synthetic/_tools/synth/harmonize.py) - dedicated CC0 1.0.
+Engraving/scan: engraved with GNU LilyPond 2.24 (Emmentaler music font, TeX Gyre Schola
+          text font; LilyPond output is not covered by LilyPond's GPL), rasterised at
+          200 dpi grayscale and degraded (rotation -0.35 deg, paper tone/texture, lighting
+          gradient, slight blur, sensor noise, JPEG q70) to look like a scan, then wrapped
+          as an IMAGE-ONLY PDF (no fonts, no text layer; verified with pdffonts/pdftotext).
+          The PDF and the derived files are dedicated to the public domain (CC0 1.0).
+
+Ground truth: sample-embed.truth.musicxml (MusicXML 4.0 partwise, parts Soprano, Alto,
+          Tenor, Bass; lyrics verses 1-4 on Soprano). Identical copy in
+          corpus/synthetic/sample-embed-old100/ (scan.pdf, truth.musicxml).
+
+Licence summary: public domain / CC0 - safe for public redistribution (no attribution
+required; attribution above given as a courtesy). No GPL/AGPL material is embedded.

@@ -1,0 +1,5 @@
+"Stille Nacht": melody Franz Xaver Gruber (1818), text Joseph Mohr (1816);
+English translation John Freeman Young (1859) - all public domain.
+Melody/underlay typed in for this corpus.
+
+Engraving, rasterisation and degradation produced by the corpus generator (corpus/synthetic/_tools); these derived files are dedicated to the public domain (CC0 1.0).

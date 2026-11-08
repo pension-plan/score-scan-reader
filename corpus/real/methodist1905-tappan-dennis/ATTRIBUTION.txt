@@ -1,0 +1,20 @@
+methodist1905-tappan-dennis - real scanned page for the OMR test corpus
+=======================================================================
+
+Content      : Tappan (hymn 99) + Dennis (hymn 100) - two closed-score SATB hymns on one page
+Work         : TAPPAN C.M. by George Kingsley (1811-1884), words Henry Kirke White (1785-1806); DENNIS S.M. arr. from Hans G. Naegeli (1773-1836) [by Lowell Mason], words Philip Doddridge (1702-1751)
+Printed in   : The Methodist Hymnal, New York: Eaton & Mains, 1905, p. 60 (hymns 99-100)
+Scan source  : https://archive.org/details/methodisthymnalo00meth/page/n82/mode/1up
+Page image   : https://archive.org/download/methodisthymnalo00meth/page/n82.jpg  (2131x3289 px, 400 ppi per IA metadata)
+Scanned by   : Princeton Theological Seminary Library copy; scanned by the Internet Archive (scribe1.nyc), 2008-12-22, Canon 5D
+IA rights    : possible-copyright-status: NOT_IN_COPYRIGHT
+Licence      : Public domain (published 1905; all creators d. before 1885).
+Scan status  : Scan by the Internet Archive / contributing library. A faithful photographic reproduction of a public-domain 2-D work; no new copyright arises in the US (Bridgeman v. Corel, 1999). The Internet Archive marks such items 'NOT_IN_COPYRIGHT' / Public Domain Mark where stated below.
+
+Files
+  source-page.jpg  the Internet Archive page JPEG, byte-for-byte as downloaded (no edits)
+  scan.pdf         one-page IMAGE-ONLY PDF wrapping source-page.jpg unmodified (img2pdf, DCTDecode,
+                   no fonts, no text layer), page size = pixels / ppi above
+  (no ground truth yet)
+
+Re-fetch: corpus/real/tools/fetch_scans.sh

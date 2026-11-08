@@ -1,0 +1,5 @@
+Amy Beach, "A Prayer of a Tired Child", Op. 75 No. 4 (G. Schirmer 1915) - public domain.
+Encoding: music21 corpus, "Engraving Copyright 2017 Michael Scott Cuthbert, most uses allowed
+for free (CC-SA-BY)". Derived test files keep that attribution/share-alike notice.
+
+Engraving, rasterisation and degradation produced by the corpus generator (corpus/synthetic/_tools); these derived files are dedicated to the public domain (CC0 1.0).

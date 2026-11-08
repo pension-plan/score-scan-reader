@@ -1,0 +1,453 @@
+{
+ "id": "agrace-satb-spread",
+ "category": "degradation",
+ "piece": "agrace-satb",
+ "variant": "spread",
+ "title": "Amazing Grace (SATB, closed score, 3 verses) - spread",
+ "edge_cases": [
+  "lyrics",
+  "multi_verse",
+  "satb_closed",
+  "multi_voice_staff",
+  "shared_staves",
+  "pickup",
+  "melisma",
+  "slurs",
+  "ties",
+  "compound_lyric_hyphen_over_melisma",
+  "hymn",
+  "key_signature",
+  "time_3_4",
+  "two_up_spread",
+  "double_page",
+  "book_gutter_shadow",
+  "landscape_image",
+  "facing_text_page"
+ ],
+ "expected": {
+  "parts": [
+   "Soprano",
+   "Alto",
+   "Tenor",
+   "Bass"
+  ],
+  "must_not_split": false,
+  "shared_staves": [
+   [
+    "Soprano",
+    "Alto"
+   ],
+   [
+    "Tenor",
+    "Bass"
+   ]
+  ],
+  "notes": "Closed-score SATB: Soprano+Alto share the treble staff, Tenor+Bass share the bass staff. A correct conversion yields FOUR parts (Soprano, Alto, Tenor, Bass), each with its own notes; all three verses belong to the Soprano part (lyric numbers 1-3) and must stay attached to soprano notes, including melisma skips (e.g. \"pre - cious\" spans a slurred melisma). DAMAGE (spread): 2-up double-page spread: a text-only facing page (verso, \"Notes on the Music\", no music) on the left and the music page (recto) on the right, as ONE landscape image. The app must find the music on the right half and ignore the prose page. scan adds curl towards the gutter and 1 deg rotation; severe adds 3.5 deg rotation, perspective, aged paper (RGB). TRUTH LIMITATIONS: The facing page is prose only; its text is not part of the truth (no lyrics, no title)."
+ },
+ "truth_limitations": "The facing page is prose only; its text is not part of the truth (no lyrics, no title).",
+ "degradations": {
+  "scan.pdf": {
+   "seed": 2138160197,
+   "dpi": 200,
+   "pages": 1,
+   "image_px": [
+    [
+     3428,
+     2477
+    ]
+   ],
+   "image_mode": [
+    "L"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 200,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": 246,
+      "texture": 2
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": 22,
+     "stage": "content"
+    },
+    {
+     "op": "curl",
+     "params": {
+      "amp_mm": 5,
+      "width": 0.25,
+      "shade": 0.2
+     },
+     "stage": "page_geometry"
+    },
+    {
+     "op": "two_up_spread",
+     "params": {
+      "gutter_width": 0.05,
+      "gutter_dark": 0.55
+     },
+     "stage": "assembly"
+    },
+    {
+     "op": "bed",
+     "params": {
+      "margin_mm": 5
+     },
+     "stage": "global"
+    },
+    {
+     "op": "rotate",
+     "params": {
+      "deg": 1.0
+     },
+     "stage": "global"
+    },
+    {
+     "op": "gradient",
+     "params": {
+      "strength": 0.1
+     },
+     "stage": "global"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 3
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       32,
+       32,
+       34
+      ],
+      "noise": 4,
+      "texture": 4
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "jpeg",
+      "quality": 72
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": []
+  },
+  "scan-mild.pdf": {
+   "seed": 2138160198,
+   "dpi": 200,
+   "pages": 1,
+   "image_px": [
+    [
+     3370,
+     2401
+    ]
+   ],
+   "image_mode": [
+    "L"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 200,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": 246,
+      "texture": 2
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": 22,
+     "stage": "content"
+    },
+    {
+     "op": "two_up_spread",
+     "params": {
+      "gutter_width": 0.04,
+      "gutter_dark": 0.35
+     },
+     "stage": "assembly"
+    },
+    {
+     "op": "bed",
+     "params": {
+      "margin_mm": 4
+     },
+     "stage": "global"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 2
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       236,
+       236,
+       234
+      ],
+      "noise": 2,
+      "edge_shadow": 0.35
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "jpeg",
+      "quality": 78
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": []
+  },
+  "scan-severe.pdf": {
+   "seed": 2138160199,
+   "dpi": 200,
+   "pages": 1,
+   "image_px": [
+    [
+     700,
+     530
+    ]
+   ],
+   "image_mode": [
+    "RGB"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 200,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": [
+       240,
+       232,
+       210
+      ],
+      "texture": 5,
+      "age_edges": 0.2
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": [
+      45,
+      40,
+      35
+     ],
+     "stage": "content"
+    },
+    {
+     "op": "curl",
+     "params": {
+      "amp_mm": 10,
+      "width": 0.35,
+      "shade": 0.35
+     },
+     "stage": "page_geometry"
+    },
+    {
+     "op": "two_up_spread",
+     "params": {
+      "gutter_width": 0.07,
+      "gutter_dark": 0.75
+     },
+     "stage": "assembly"
+    },
+    {
+     "op": "bed",
+     "params": {
+      "margin_mm": 5
+     },
+     "stage": "global"
+    },
+    {
+     "op": "rotate",
+     "params": {
+      "deg": -3.5
+     },
+     "stage": "global"
+    },
+    {
+     "op": "perspective",
+     "params": {
+      "jitter": 0.03,
+      "keystone": 0.03,
+      "margin": 0.03,
+      "_corners_src": [
+       [
+        -99.8,
+        38.6
+       ],
+       [
+        3890.9,
+        15.5
+       ],
+       [
+        3833.3,
+        2899.8
+       ],
+       [
+        -62.9,
+        2782.3
+       ]
+      ]
+     },
+     "stage": "global"
+    },
+    {
+     "op": "vignette",
+     "params": {
+      "strength": 0.2
+     },
+     "stage": "global"
+    },
+    {
+     "op": "blur",
+     "params": {
+      "sigma": 0.8
+     },
+     "stage": "global"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 4,
+      "chroma": 2
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       32,
+       32,
+       34
+      ],
+      "noise": 4,
+      "texture": 4
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "RGB",
+      "format": "jpeg",
+      "quality": 60,
+      "subsampling": 2
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": []
+  },
+  "clean.pdf": {
+   "seed": null,
+   "dpi": 200,
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 200,
+     "tool": "pdftoppm -gray (LilyPond PDF)"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "png"
+     }
+    }
+   ]
+  }
+ },
+ "dpi": 200,
+ "license": "Public domain melody (NEW BRITAIN, 1829) and text (John Newton, 1779); SATB setting and engraving CC0-1.0",
+ "files": {
+  "scan": "agrace-satb-spread/scan.pdf",
+  "scan_mild": "agrace-satb-spread/scan-mild.pdf",
+  "scan_severe": "agrace-satb-spread/scan-severe.pdf",
+  "clean": "agrace-satb-spread/clean.pdf",
+  "truth": "agrace-satb-spread/truth.musicxml",
+  "engraving": "agrace-satb-spread/engraving.ly"
+ },
+ "measures": 17,
+ "vector_pages": 1,
+ "lyrics": [
+  {
+   "part": "Soprano",
+   "verses": 3
+  }
+ ],
+ "shares_truth_with": [
+  "agrace-satb-clean",
+  "agrace-satb-skew",
+  "agrace-satb-rot90",
+  "agrace-satb-rot180",
+  "agrace-satb-phone",
+  "agrace-satb-book",
+  "agrace-satb-yellowed",
+  "agrace-satb-bleed",
+  "agrace-satb-stain-pencil",
+  "agrace-satb-holes-staple",
+  "agrace-satb-crop",
+  "agrace-satb-halftone",
+  "agrace-satb-jpeg",
+  "agrace-satb-photocopy-thin",
+  "agrace-satb-photocopy-thick",
+  "agrace-satb-lowdpi",
+  "agrace-satb-highdpi",
+  "agrace-satb-blur",
+  "agrace-satb-noise",
+  "agrace-satb-combo"
+ ],
+ "validation": {
+  "truth_xsd_valid": true,
+  "midi_attacks_match_truth": true,
+  "attacks": 119,
+  "midi_lyric_events_match_truth": true,
+  "lyric_syllables": 84,
+  "lyric_text_found_in_engraving_pdf": 1.0,
+  "lilypond_warnings": [],
+  "scan_files_image_only": {
+   "scan.pdf": true,
+   "scan-mild.pdf": true,
+   "scan-severe.pdf": true,
+   "clean.pdf": true
+  }
+ },
+ "origin": "synthetic-scan (challenge: degradation extremes)",
+ "seed": 2138160197
+}

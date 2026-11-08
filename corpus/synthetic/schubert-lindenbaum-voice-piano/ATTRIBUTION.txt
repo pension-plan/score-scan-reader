@@ -1,0 +1,4 @@
+Franz Schubert, "Der Lindenbaum", Winterreise D. 911 No. 5 (1827), text Wilhelm Müller -
+public domain. Encoding: music21 corpus schubert/Lindenbaum.xml.
+
+Engraving, rasterisation and degradation produced by the corpus generator (corpus/synthetic/_tools); these derived files are dedicated to the public domain (CC0 1.0).

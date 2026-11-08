@@ -1,0 +1,12 @@
+const { readGray } = require('../src/image');
+const { runOMR } = require('../src/pipeline');
+const g = readGray(process.argv[2]);
+const t0 = Date.now();
+const r = runOMR(g, {});
+console.log(g.width, g.height, 'ms', Date.now() - t0, 'ss', r.staffSpace, 'lt', r.lineThickness, 'skew', r.skew.angle);
+console.log('staves', r.staves.length, 'systems', JSON.stringify(r.systems));
+console.log('heads', r.heads.length, 'barlines', r.barlines.length);
+const byStaff = {};
+for (const h of r.heads) (byStaff[h.staff] ||= []).push(h);
+for (const k in byStaff) console.log(k, byStaff[k].length, byStaff[k].filter(h=>h.stem===1).length+'up', byStaff[k].filter(h=>h.stem===-1).length+'dn', byStaff[k].filter(h=>h.stem===2).length+'both', 'bars', r.barlines.filter(b=>b.staff==k).length);
+console.log(r.timings);
