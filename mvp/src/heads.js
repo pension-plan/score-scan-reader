@@ -64,11 +64,57 @@ function staffPos(staves, x, y) {
   return best;
 }
 
+// Head-wide column windows of a wide blob (component c of the opened image):
+// the densest window (column ink counts) is a head; a second, nearly as dense
+// window beside it is the other head of a second.  Returns the windows, the
+// mean column height of the best one and of the columns outside it.
+function headWindows(c, labels, w, sp) {
+  const n = c.x1 - c.x0 + 1;
+  const ext = new Float64Array(n), ysum = new Float64Array(n);
+  for (let y = c.y0; y <= c.y1; y++) for (let x = c.x0; x <= c.x1; x++) if (labels[y * w + x] === c.id) { ext[x - c.x0]++; ysum[x - c.x0] += y; }
+  const cyOf = (a, b) => { let s = 0, k = 0; for (let i = a; i < b; i++) { s += ysum[i]; k += ext[i]; } return k ? s / k : 0; };
+  // a sharp / natural fused with its head: a narrow run of columns much taller
+  // than a head next to head-high columns -> leave those columns out
+  let headCols = 0;
+  for (let i = 0; i < n; i++) if (ext[i] >= 0.6 * sp && ext[i] <= 1.3 * sp) headCols++;
+  if (headCols >= 0.8 * sp) {
+    for (let i = 0; i < n;) {
+      if (ext[i] < 1.35 * sp) { i++; continue; }
+      let j = i; while (j < n && ext[j] >= 1.35 * sp) j++;
+      if (j - i <= 0.8 * sp) for (let k = i; k < j; k++) { ext[k] = 0; ysum[k] = 0; }
+      i = j;
+    }
+  }
+  const hw = Math.max(3, Math.round(1.15 * sp));
+  const best = (a, b) => {
+    const ww = Math.min(hw, b - a);
+    let s = 0;
+    for (let i = a; i < a + ww; i++) s += ext[i];
+    let bs = s, ba = a;
+    for (let i = a + 1; i + ww <= b; i++) { s += ext[i + ww - 1] - ext[i - 1]; if (s > bs) { bs = s; ba = i; } }
+    return { a: ba, b: ba + ww, mean: bs / ww };
+  };
+  const m = best(0, n);
+  if (m.mean < 0.6 * sp) return { cols: [], peak: m.mean, rest: 0 };
+  const cols = [[m.a, m.b]];
+  let rs = 0;
+  for (let i = 0; i < n; i++) if (i < m.a || i >= m.b) rs += ext[i];
+  const rest = n > m.b - m.a ? rs / (n - (m.b - m.a)) : 0;
+  for (const [a, b] of [[0, m.a], [m.b, n]]) {
+    if (b - a < 0.9 * sp) continue;
+    // the two heads of a second sit a staff position apart; an accidental
+    // fused with its head sits level with it
+    const t = best(a, b);
+    if (t.mean >= 0.75 * m.mean && t.b - t.a >= 0.9 * sp && Math.abs(cyOf(t.a, t.b) - cyOf(m.a, m.b)) >= 0.25 * sp) cols.push([t.a, t.b]);
+  }
+  return { cols: cols.map(([a, b]) => [c.x0 + a, c.x0 + b]).sort((p, q) => p[0] - q[0]), peak: m.mean, rest };
+}
+
 function detectHeads(B, R, staves, ss, lt) {
   const F = fillHoles(B, R, ss);
   const O1 = openRuns(F, Math.max(3, Math.round(0.55 * ss)), true);
   const O = openRuns(O1, Math.max(3, Math.round(0.42 * ss)), false);
-  const { comps } = labelComponents(O);
+  const { labels, comps } = labelComponents(O);
   const IR = integral(R), IB = integral(B);
   const heads = [], beams = [];
   for (const c of comps) {
@@ -79,13 +125,23 @@ function detectHeads(B, R, staves, ss, lt) {
     if (!sp0 || Math.abs(sp0.p) > 12) continue;
     const sp = sp0.sp;
     const fillRatio = c.area / (bw * bh);
-    if (bw > 2.4 * sp) {
-      if (bh < 1.6 * sp) beams.push({ x0: c.x0, x1: c.x1, y0: c.y0, y1: c.y1, staff: sp0.st.index });
-      continue;
+    // wide blobs: a head fused with its accidental (filled flat / natural bowl)
+    // or a second (two heads side by side): take the head-wide column windows
+    // with the most ink; a flat band with no head-shaped bump is a beam
+    let cols = null;
+    if (bw > 1.75 * sp && bh >= 0.6 * sp && bh <= 5.5 * sp) {
+      const win = headWindows(c, labels, O.width, sp);
+      if (win.cols.length && (bw <= 2.4 * sp || (bw <= 3.6 * sp && win.peak >= 1.25 * win.rest))) cols = win.cols;
     }
-    if (fillRatio < 0.45 || bh > 5.5 * sp) continue;
-    // columns: a second (two heads offset sideways) makes the blob ~2 heads wide
-    const cols = bw > 1.75 * sp ? [[c.x0, c.x0 + bw / 2], [c.x0 + bw / 2, c.x1 + 1]] : [[c.x0, c.x1 + 1]];
+    if (!cols) {
+      if (bw > 2.4 * sp) {
+        if (bh < 1.6 * sp) beams.push({ x0: c.x0, x1: c.x1, y0: c.y0, y1: c.y1, staff: sp0.st.index });
+        continue;
+      }
+      if (fillRatio < 0.45 || bh > 5.5 * sp) continue;
+      // columns: a second (two heads offset sideways) makes the blob ~2 heads wide
+      cols = bw > 1.75 * sp ? [[c.x0, c.x0 + bw / 2], [c.x0 + bw / 2, c.x1 + 1]] : [[c.x0, c.x1 + 1]];
+    }
     for (const [xa, xb] of cols) {
       // vertical extent of ink in this column range
       let ya = -1, yb = -1;

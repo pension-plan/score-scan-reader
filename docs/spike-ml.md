@@ -146,8 +146,8 @@ accuracy):
 | oemer | 0.330 / 0.190 (4 pages only, 8–11 min each) | – | – | – | – | – |
 
 Notes:
-- The piece averages above include the photocopy column; on every other degradation copisteria is at
-  0.99 / 0.99.
+- The piece averages above include the photocopy column. On every other degradation copisteria scores at least
+  0.99 measure-pitch F1 and 0.98 voice-assignment accuracy.
 - Raw results: `spike/ml/out/e2e/results.jsonl`. Outputs: `spike/ml/out/e2e/<system>/<image>/`.
 - oemer needed `opencv-python-headless<5` (it crashes in `find_lines` with OpenCV 5), and ORT pinned to 8 threads.
   Unpinned, one page took 35 min and 4.5 CPU-hours.
@@ -190,7 +190,7 @@ Notes:
   - **Stemless whole notes** in the bass voice (two per page), where the model guesses voice 1. The assembler should
     resolve these from vertical order and rhythm: the lower whole note on a two-voice staff is voice 2.
   - **One tight S/A second**, read as `stem_dir=both`.
-  - In addition, 1–3 noteheads per page are missed, each one note of a two-note chord on a stem.
+  - In addition, 1–3 noteheads per page are missed (for example the soprano B4 in bar 4).
 
 ### satb-line-omr (MIT CRNN+CTC), using its own reference staff finder and decoder (`src/eval_satbline.py`)
 
@@ -329,9 +329,11 @@ then `ort.env.wasm.wasmPaths = 'assets/'` and self-host `ort-wasm-simd.wasm`. Fo
 ## How the detector maps onto the product requirements
 
 - **Closed-score SATB → separate parts.** For each staff, notes with `voice_slot=1` (stems up) become S (treble) or
-  T (bass), and `voice_slot=2` become A or B. `stem_dir=both` on a shared head goes into both voices. A grand staff
-  (brace, `grpSym_brace`) is not split. The bracket/brace class distinguishes choir staves from piano systems, which
-  helps with the "do not split piano" rule.
+  T (bass), and `voice_slot=2` become A or B. `stem_dir=both` on a shared head goes into both voices.
+  The brace/bracket class (`grpSym_*`) is **not** enough to tell a choir system from a piano one: the 1919 hymnal
+  braces its closed-score SATB. Decide "split vs piano" from voice structure instead: two consistent stem-direction
+  voices per staff, mostly homorhythmic, with a lyric band between or under the staves → split. Keyboard texture
+  (chords on one stem, cross-staff beams, no lyrics) → keep as one part.
 - **Rhythm.** Duration comes from the note class (`note_whole … note_16th`) plus the `dots` attribute, rests from
   the `rest_*` classes, and bar boundaries from `barLine_*` and `measure` boxes (one per staff per bar). Clefs,
   `keySig_*` and `meterSig_N_D` (82 meter classes) are all detected.
@@ -340,6 +342,27 @@ then `ort.env.wasm.wasmPaths = 'assets/'` and self-host `ort-wasm-simd.wasm`. Fo
 - **Lyrics.** Not covered. Run OCR on the band between the notehead boxes of adjacent staves, or below the system.
   Attach syllables by x to the voice that carries them: in a hymn the between-staves verses belong to S, and to A,
   T and B too when they are homorhythmic.
+
+## Files (all under `spike/ml/`)
+
+- **Assets**
+  - `assets/`: copista-2m ONNX (int8w recommended; fp16w and fp32 too), `copista2m-classes.json`, LICENSE and NOTICE
+    files, `PROVENANCE.md` (sources, sha256, conversion commands), `SHA256SUMS`.
+  - `assets/copista28m/`: optional 28m int8w, split into ≤14 MB external data.
+- **Source code (`src/`)**
+  - Browser/node pipeline: `copista_core.mjs`, with its Python reference in `omr_copista.py`.
+  - Model conversion: `export_copista.py`, `quantize.py`, `split_external.py`.
+  - Scans and evaluation: `make_scans.py`, `pieces.py`, `eval_xml.py` (MusicXML scorer), `eval_notes.py` and
+    `score_dets.py` (notehead scorer), `run_e2e.py` and `oemer_wrap.py` (reference pipelines), `eval_satbline.py`.
+  - Harnesses: `node_copista.mjs` (node harness), `microbench.mjs`, `web_bench.mjs` (Chromium + CSP harness).
+  - Tables: `summarize.py`.
+- **Data**
+  - `scans/`: 36 test images plus `.boxes.json` notehead ground truth; `scans/gt/` holds MusicXML and JSON ground
+    truth; `scans/ly/` holds the LilyPond sources and PDFs; `scans/real/` holds the 1919 scan.
+- **Results (`out/`)**
+  - `e2e/results.jsonl`, `nodedets/`, `dets_scores.json`, `micro/`, `satbline/results.jsonl`, `web/results.jsonl`.
+  - `tables.md` holds every table, regenerated from the raw files.
+  - Overlays: `real/be_thou_1919_copista2m_overlay.png`, `gt_overlay_check.png`.
 
 ## Reproduce
 

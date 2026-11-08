@@ -377,10 +377,11 @@ function keyAlters(fifths) {
 }
 
 // Find an accidental left of a head; returns 'sharp'|'flat'|'natural'|null
-function headAccidental(R, comps, hd, minX = -Infinity) {
+function headAccidental(R, comps, hd, minX = -Infinity, reach = 1.9) {
   const sp = hd.sp;
-  // candidate glyphs left of the head (pieces cut by staff-line removal grouped)
-  const near = comps.filter(c => c.x1 <= hd.x - 0.5 * sp && c.x1 >= hd.x - 3.2 * sp && c.x0 > minX &&
+  // candidate glyphs left of the head (pieces cut by staff-line removal
+  // grouped); a chord's accidentals stagger further left
+  const near = comps.filter(c => c.x1 <= hd.x - 0.5 * sp && c.x1 >= hd.x - reach * sp && c.x0 > minX &&
     c.y0 < hd.y + 1.6 * sp && c.y1 > hd.y - 2.6 * sp && (c.x1 - c.x0) < 1.6 * sp && (c.y1 - c.y0) < 4 * sp).sort((a, b) => a.x0 - b.x0);
   let best = null, bd = Infinity;
   // single components first; merged groups only add flats cut in two
@@ -447,7 +448,7 @@ function staffMeasureEvents(fr, R, comps, s, xa, xb) {
   const cur = { 1: 0, 2: 0 };
   for (const c of chords) {
     const hs = c.heads.slice().sort((a, b) => a.y - b.y);
-    hs.forEach(h => { if (!h.dur) h.dur = headDuration(R, h, c); h.acc = headAccidental(R, comps, h, s.hdr ? s.hdr.end : -Infinity); });
+    hs.forEach(h => { if (!h.dur) h.dur = headDuration(R, h, c); h.acc = headAccidental(R, comps, h, s.hdr ? s.hdr.end : -Infinity, hs.length > 1 ? 3.2 : 1.9); });
     const ev = (heads) => ({ x: c.x, heads, q: heads[0].dur.q, dots: heads[0].dur.dots });
     v.chordal.push({ ...ev(hs), q: Math.min(...hs.map(h => h.dur.q)) });
     let a1 = [], a2 = [];

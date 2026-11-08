@@ -1,7 +1,7 @@
 'use strict';
 // Page assemblies -> parts (closed-score split / grand staff / single), time
 // signature inference, per-measure rhythm repair, lyrics alignment, MusicXML.
-const { staffMeasureEvents, pitchOf, keyAlters, DIV, median } = require('./assemble');
+const { staffMeasureEvents, pitchOf, keyAlters, DIV } = require('./assemble');
 
 const COLORS = ['#d1495b', '#edae49', '#00798c', '#30638e', '#7b5ea7', '#3a7d44'];
 
@@ -342,8 +342,9 @@ function repairStream(evs, target, anchors, sp) {
 // side by side for a second between the voices are one onset. A lone head goes
 // to its stem's voice and is copied to the other voice as a unison only when
 // that voice is not still holding a note (a missed head there would otherwise
-// leave a hole in its rhythm). With reliable stems, a voice that skips an
-// onset the other voice has gets a rest there instead of at the bar end.
+// leave a hole in its rhythm). With reliable stems, a voice that reaches a
+// shared onset early has its previous note lengthened (a missed dot or flag),
+// or gets a rest there when no note value fits.
 function splitTwoVoices(chordal, sp, trust) {
   const slots = [];
   const only = (dirs, d) => !!dirs && dirs.size === 1 && dirs.has(d);
@@ -558,8 +559,8 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
           }
         }
       }));
-      chunks.forEach((ch, c) => units.push({ m, streams: ch, split: true, first: mi === 0 && c === 0 }));
-    } else units.push({ m, streams: byPart, split: false, first: mi === 0 });
+      chunks.forEach(ch => units.push({ m, streams: ch, split: true }));
+    } else units.push({ m, streams: byPart, split: false });
   });
   const partMeasures = parts.map(() => []);
   units.forEach((u, mi) => {
@@ -628,7 +629,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
       if (!lo || h.pitch.d < lo.d) lo = h.pitch;
       if (!hi || h.pitch.d > hi.d) hi = h.pitch;
     }))));
-    return lo ? `${lo.step}${lo.octave}–${hi.step}${hi.octave}` : '-';
+    return lo ? `${lo.step}${lo.octave}\u2013${hi.step}${hi.octave}` : '-';
   });
   // UI compares clefs with 'F'; 'G8' stays a treble clef there
   return { parts, layout, fifths, time, clefs, ranges, measures: units.length, nNotes, warnings: warnings.concat(layout.notes), xml };
