@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.15.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.14.0...score-scan-reader-v0.15.0) (2026-11-08)
+
+
+### Features
+
+* play the transcribed score with General MIDI instruments ([9d1b30b](https://github.com/pension-plan/score-scan-reader/commit/9d1b30b238a3d8c1259e20bfd1621e8fe39fe51f))
+* **site:** changelog moves to the bottom of /app/, collapsed ([e0c6c6b](https://github.com/pension-plan/score-scan-reader/commit/e0c6c6b0d1f795a61b86c86b30ce92eed7161cf4))
+
 ## [0.14.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.13.0...score-scan-reader-v0.14.0) (2026-11-08)
 
 
