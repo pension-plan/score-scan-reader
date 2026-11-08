@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 16:28 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 16:30 AEDT.
 
 ## Events
 
@@ -45,6 +45,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 16:21 | Round 2 started: 5 owners in parallel working on beamed 8ths/16ths and dense chords, broken bass-staff clefs, tuplets and mid-staff clef changes, missing dots and flags, barline reconciliation, lyric voice assignment, merged OCR words, part-name labels, the 8-page cap and the stanza verses below the music; then integrate and ship. |
 | 16:28 | All times on this page and in the repo timeline are now Sydney daylight time (AEDT, UTC+11). |
 | 16:28 | Challenge set validated: 123 items, 365 image-only scans, all truths verified against LilyPond. Baseline with round 1 code: 0.747 (OCR), 0 crashes, but 35 files produce no notes. Worst: 90° pages, halftone screens, heavy noise, 2-up spreads, tuplets (8 divisions per quarter cannot represent them), double dots, multi-bar rests, double accidentals, 8va, mid-piece key/time changes, C clefs, two voices inside one part, bracketed instrument pairs read as piano. Nine new limits (L10–L18) queued for round 3. Committed to the repo except the 300 MB of scan-damage PDFs, which rebuild in about 40 s. |
+| 16:30 | ML model trial finished: copista-2m (Apache-2.0, 2 MB ONNX) scores notehead F1 0.996 and voice-slot 0.991 on the trial scans and runs in the browser under artifact rules at about 4–5 s per page. All 7 research items are now done; the old main workflow was stopped as planned. Round 3 will add the model as a second detector and ship it only if it scores better. |
 
 ## Accuracy by round
 
@@ -91,10 +92,10 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 |---|---|---|---|---|
 | Run 1 | Vector-PDF design | stopped | 0 of 4 | Stopped at 14:56 AEDT when the input was clarified as scanned images. |
 | Run 2 | Scanned-PDF design | stopped | 0 of 4 | Stopped at 14:58 AEDT to restart with more agents in parallel. |
-| Run 3 | Max-parallel main workflow | running | 6 of 7 | Research only from here. It will be stopped when research returns; the full rebuild was dropped in favour of fix-forward rounds on v1. |
 | Run 4 | Fix-forward round 1 (shipped 0.884) | done | 7 of 7 |  |
 | Run 5 | Challenge test set (edge cases + scan damage) | running | 7 of 7 |  |
 | Run 6 | Fix-forward round 2 | running | 0 of 5 |  |
+| Run 3 | Max-parallel main workflow (research) | stopped | 7 of 10 | Stopped at 16:30 AEDT once all 7 research items returned, as planned; its 3 design-proposal agents had just started and were stopped with it. The full rebuild was replaced by fix-forward rounds on v1. |
 | Side | Agents launched directly from the session | running | 2 of 2 |  |
 
 ## Agents
@@ -111,13 +112,6 @@ Every agent started for this build, including stopped runs. Outcomes are on the 
 | Run 2 | Research | research:voices | stopped | 14:57 | 14:57 | 0 | 6 |
 | Run 2 | Research | research:spike | stopped | 14:57 | 14:57 | 0 | 3 |
 | Run 2 | Research | research:corpus | stopped | 14:57 | 14:57 | 0 | 0 |
-| Run 3 | Research | web:omr | done | 14:58 | 15:11 | 13 | 77 |
-| Run 3 | Research | web:voices | done | 14:58 | 15:15 | 17 | 120 |
-| Run 3 | Research | spike:ml | run | 14:58 |  | 90 | 184 |
-| Run 3 | Research | spike:classical | done | 14:58 | 15:50 | 52 | 120 |
-| Run 3 | Research | spike:ocr | done | 14:58 | 15:58 | 60 | 129 |
-| Run 3 | Research | corpus:synthetic | done | 14:58 | 15:42 | 44 | 82 |
-| Run 3 | Research | corpus:real | done | 14:58 | 15:57 | 59 | 189 |
 | Run 4 | Harness | harness | done | 15:36 | 15:51 | 15 | 22 |
 | Run 4 | Fix | fix:r1:heads | done | 15:51 | 16:16 | 25 | 185 |
 | Run 4 | Fix | fix:r1:symbols | done | 15:51 | 16:16 | 25 | 173 |
@@ -132,10 +126,20 @@ Every agent started for this build, including stopped runs. Outcomes are on the 
 | Run 5 | Generate | gen:layout | done | 15:55 | 16:18 | 23 | 120 |
 | Run 5 | Generate | gen:degradation | done | 15:55 | 16:12 | 17 | 87 |
 | Run 5 | Validate | validate+baseline | done | 16:18 | 16:28 | 10 | 70 |
-| Run 6 | Fix | fix:r2:heads | run | 16:21 |  | 7 | 87 |
-| Run 6 | Fix | fix:r2:symbols | run | 16:21 |  | 7 | 73 |
-| Run 6 | Fix | fix:r2:score | run | 16:21 |  | 7 | 54 |
-| Run 6 | Fix | fix:r2:lyrics | run | 16:21 |  | 7 | 56 |
-| Run 6 | Fix | fix:r2:ui | run | 16:21 |  | 7 | 37 |
+| Run 6 | Fix | fix:r2:heads | run | 16:21 |  | 9 | 100 |
+| Run 6 | Fix | fix:r2:symbols | run | 16:21 |  | 9 | 84 |
+| Run 6 | Fix | fix:r2:score | run | 16:21 |  | 9 | 65 |
+| Run 6 | Fix | fix:r2:lyrics | run | 16:21 |  | 9 | 65 |
+| Run 6 | Fix | fix:r2:ui | run | 16:21 |  | 9 | 38 |
+| Run 3 | Research | web:omr | done | 14:58 | 15:11 | 13 | 77 |
+| Run 3 | Research | web:voices | done | 14:58 | 15:15 | 17 | 120 |
+| Run 3 | Research | spike:ml | done | 14:58 | 16:30 | 92 | 193 |
+| Run 3 | Research | spike:classical | done | 14:58 | 15:50 | 52 | 120 |
+| Run 3 | Research | spike:ocr | done | 14:58 | 15:58 | 60 | 129 |
+| Run 3 | Research | corpus:synthetic | done | 14:58 | 15:42 | 44 | 82 |
+| Run 3 | Research | corpus:real | done | 14:58 | 15:57 | 59 | 189 |
+| Run 3 | Design | design:proposal-1 | stopped | 16:30 | 16:30 | 0 | 2 |
+| Run 3 | Design | design:proposal-2 | stopped | 16:30 | 16:30 | 0 | 1 |
+| Run 3 | Design | design:proposal-3 | stopped | 16:30 | 16:30 | 0 | 1 |
 | Side | Fast track | First version build (mvp/) | done | 15:19 | 15:29 | 10 | 69 |
 | Side | Fast track | Software design document | done | 15:20 | 15:22 | 2 | 16 |

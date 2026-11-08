@@ -544,7 +544,13 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     const { v, cands, sp } = L;
     let best = cands.find(c => c.pi === bandVoice[v.band]) || cands[0];
     // a clearly better local fit wins (a passage where the other voice sings the text)
-    if (best.fit < 0.6) for (const c of cands) if (c.fit >= 0.8 && c.soft >= best.soft + Math.max(1.5, 0.15 * v.syllables.length)) best = c;
+    // (each voice with its own words and rhythm: the line sits under nearly
+    // every onset of one voice and misses several of the other's)
+    const nSyl = v.syllables.length, margin = Math.max(1.5, 0.15 * nSyl);
+    for (const c of cands) {
+      if (c === best || c.soft < best.soft + margin) continue;
+      if ((best.fit < 0.6 && c.fit >= 0.8) || (c.soft >= 0.88 * nSyl && best.soft < 0.8 * nSyl)) best = c;
+    }
     if (best.fit < L.minFit || !wordy(v.syllables)) { lyrNotes.add(`A text line under staff ${v.band + 1} does not follow the notes; not used as lyrics.`); continue; }
     const take = opts.copyLyrics ? cands.filter(c => c.fit >= L.minFit) : [best];
     if (opts.debug) opts.debug.push({ sys: L.sy.page + ':' + L.sy.index, band: v.band, n: v.number, nsyl: v.syllables.length, fits: cands.map(c => [c.p.name, +c.fit.toFixed(2), c.evs.length, +c.soft.toFixed(2)]), take: take.map(c => c.p.name) });
@@ -679,9 +685,13 @@ function sylBox(s, sp) {
 // centred under its note, except one that starts a melisma (a word held over
 // several notes, drawn with an extender line), which is left-aligned with the
 // notehead; so a long syllable may also sit with its left edge at the head.
+// Long tokens (7+ letters) are more often two syllables OCR read as one word
+// ("cherchons") and keep the centred reading only.
 function sylDist(s, x, sp) {
+  const c = Math.abs(x - s.x);
+  if (String(s.text || '').replace(/[^\p{L}]/gu, '').length > 6) return c;
   const x0 = sylBox(s, sp)[0];
-  return Math.min(Math.abs(x - s.x), Math.abs(x - (x0 + 0.55 * sp)) + 0.15 * sp);
+  return Math.min(c, Math.abs(x - (x0 + 0.55 * sp)) + 0.15 * sp);
 }
 
 // share of syllables that sit under an onset of the stream

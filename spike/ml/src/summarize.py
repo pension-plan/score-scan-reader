@@ -104,17 +104,22 @@ for (v, p), rr in sorted(g.items()):
           f"{others:.3f} (staff finder found {sum(r['staves_found'] for r in rr if r['image'].endswith(('rot','scan','photocopy')))} staves) | "
           f"{med([r['ms_per_line'] for r in rr if r['ms_per_line']]):.0f} |")
 
-print("\n## T6 browser (headless Chromium 1248 / chrome-headless-shell arm64), copista-2m, satb_closed_300_scan\n")
+print("\n## T6 browser (headless Chromium 1248 / chrome-headless-shell arm64), copista-2m unless noted, satb_closed_300_scan unless noted\n")
 wr = J("out/web/results.jsonl")
 print("| ort-web | loader | CDN | CSP | wasmPaths | weights | threads / COI | result | page ms (run1 / run2) | dense ms | notes found | load ms | errors |")
 print("|---|---|---|---|---|---|---|---|---|---|---:|---:|---|")
 for r in wr:
+    if "has been closed" in (r.get("error") or ""):
+        continue  # run aborted by restarting the harness
+    mode = r["mode"]
+    if mode == "worker-esm" and (r.get("error") or "").startswith("Error: timeout"):
+        mode = "worker-esm (static import, superseded)"
     runs = r.get("runs") or []
     t = " / ".join(str(x.get("total_ms")) for x in runs) or "–"
     dm = " / ".join(str(round(x.get("dense_ms") or 0)) for x in runs) or "–"
     notes = runs[-1].get("notes") if runs else "–"
     err = (r.get("error") or "").split("\n")[0][:90]
     pe = "; ".join(sorted(set(r.get("pageErrors") or [])))[:80]
-    print(f"| {r['ver']} | {r['mode']} | {r.get('cdn') or 'jsdelivr'} | {r.get('csp')} | {'{wasm}' if r.get('wasmobj') else 'prefix'} | "
-          f"{(r.get('dense') or '').replace('copista','').replace('-dense','').replace('.onnx','')} | {r.get('threads', 1)} / {bool(r.get('coi'))} | "
+    print(f"| {r['ver']} | {mode} | {r.get('cdn') or 'jsdelivr'} | {r.get('csp')} | {'{wasm}' if r.get('wasmobj') else 'prefix'} | "
+          f"{(r.get('dense') or '').replace('copista','').replace('-dense','').replace('.onnx','')}{(' @ ' + r['img'][:-4]) if r.get('img') else ''} | {r.get('threads', 1)} / {bool(r.get('coi'))} | "
           f"{'OK' if r.get('ok') else 'FAIL'} | {t} | {dm} | {notes} | {r.get('load_ms', '–')} | {err or pe} |")

@@ -18,6 +18,8 @@ out = {}
 for run, imgs in sorted(runs.items()):
     rows = []
     for stem, r in sorted(imgs.items()):
+        if not os.path.exists(os.path.join(ROOT, "scans", stem + ".boxes.json")):
+            continue  # e.g. the real 1919 scan: no ground truth
         b, gt = gt_info(stem)
         m = match_points(copista_noteheads(r["dets"]), gt)
         m.update(image=stem, piece=stem.rsplit("_", 2)[0], variant=stem.rsplit("_", 1)[1],

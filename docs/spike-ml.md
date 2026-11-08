@@ -24,7 +24,7 @@ Code, data and raw logs are in `spike/ml/`, and every table can be regenerated (
      dynamic int8 (`int8d`): it is 2× faster in native ORT but **3× slower in wasm** (12.2 s vs 4.1 s).
 2. **Runtime: onnxruntime-web 1.30.0** (MIT). Load `ort.wasm.bundle.min.mjs` from jsdelivr or cdnjs with a
    **dynamic `import()` inside a blob: module worker**, and set `ort.env.wasm.wasmPaths = { wasm: <absolute URL of
-   self-hosted ort-wasm-simd-threaded.wasm> }` (14,239,897 bytes, which fits under 15 MB). This passes an
+   self-hosted ort-wasm-simd-threaded.wasm> }` (14,239,897 bytes, which fits under 15 MB) and `numThreads = 1`. This passes an
    artifact-like strict CSP (no `'self'` in script-src). Fallback: **onnxruntime-web 1.18.0 UMD**
    (`ort.wasm.min.js` via `<script src>` or `importScripts` in a blob worker, `wasmPaths = 'assets/'`, self-host
    `ort-wasm-simd.wasm`, 10.6 MB). Its warm speed is the same within noise (4.2–4.4 s vs 4.1–4.3 s), it uses the
@@ -296,6 +296,8 @@ Weights variants, multi-threading and external data on the working paths (strict
   `ort-wasm-simd-threaded.mjs` *from the CDN* to start its thread workers, and connect-src blocks that ("no available
   backend"). This happened even with COOP/COEP headers sent; in this harness `crossOriginIsolated` stayed false, so
   the multi-thread upside was not measured. The artifact host cannot be assumed to send those headers anyway.
+  With 1.18.0 and `numThreads=4` the page **hangs** with no error: its thread workers `importScripts` a `blob:` URL,
+  script-src blocks that, and the workers die silently.
 - copista-28m int8w split into two external-data files loads via `externalData: [{path, data: url}]` and runs
   in 46.6 s for the page (127 of 128 noteheads).
 - Other pages with 1.30.0 int8w: `satb_open_300_clean` 4.3 s, 128 note boxes for 128 noteheads;
