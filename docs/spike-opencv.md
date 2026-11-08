@@ -2,6 +2,20 @@
 
 Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
 
+## Not shipped: head template scan on degraded staves (time-boxed, one round)
+
+For heads the blob finder misses on degraded pages (faded heads broken into speckle, hollow heads whose thin outline
+breaks), `spike/opencv/tools/headscan.js` matches the filled and half head templates at every staff position, every
+half space along a staff, on the lenient staff-removed binary closed by 3×3 (speckle joined). A position counts with
+head-sized ink (a third of a head's box), no head near, score ≥ 0.5 and 0.05 above accidental, rest, digit and dot
+templates; front.js ran it on staves whose head density is under half the page's best staff, before the stem test.
+On `twinkle-piano2p-photocopy-thin` severe the dissolved heads score no better than their surroundings (best 0.53–0.59,
+the faded quarter heads among them scored lower than accidental and text fragments), the same failure as the parked
+stem-anchored search. A/B (challenge, no OCR): −0.0038 per item; wp.py missing notes 2,506 → 2,519, extras 1,508 →
+2,166 (`pitch-ledger-ottava` mild −0.27, `rh05` severe −0.08); about 15 % slower. Stopped as agreed. What would be
+needed: a measure of head evidence that survives fragmentation (gray-level, not binary, with the staff-line rows
+modelled out), and a per-bar rhythm budget to accept only as many recovered heads as the bar is short.
+
 ## Update: beamed cue heads (with voices' cue writer)
 
 `nt08-cue-notes` clean found 8 of its 24 cue heads. Beamed cue stems reach their beam after 1.6–1.7 spaces, under
