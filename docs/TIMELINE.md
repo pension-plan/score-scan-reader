@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 16:30 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 16:38 AEDT.
 
 ## Events
 
@@ -46,6 +46,8 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 16:28 | All times on this page and in the repo timeline are now Sydney daylight time (AEDT, UTC+11). |
 | 16:28 | Challenge set validated: 123 items, 365 image-only scans, all truths verified against LilyPond. Baseline with round 1 code: 0.747 (OCR), 0 crashes, but 35 files produce no notes. Worst: 90° pages, halftone screens, heavy noise, 2-up spreads, tuplets (8 divisions per quarter cannot represent them), double dots, multi-bar rests, double accidentals, 8va, mid-piece key/time changes, C clefs, two voices inside one part, bracketed instrument pairs read as piano. Nine new limits (L10–L18) queued for round 3. Committed to the repo except the 300 MB of scan-damage PDFs, which rebuild in about 40 s. |
 | 16:30 | ML model trial finished: copista-2m (Apache-2.0, 2 MB ONNX) scores notehead F1 0.996 and voice-slot 0.991 on the trial scans and runs in the browser under artifact rules at about 4–5 s per page. All 7 research items are now done; the old main workflow was stopped as planned. Round 3 will add the model as a second detector and ship it only if it scores better. |
+| 16:38 | Release 0.2.0 published on GitHub (round 1 code) with downloads: web app zip, source zip, design document. Release PRs will be merged after each round ships. |
+| 16:38 | copista-2m ML demo page started, for GitHub Pages at /ml-demo/. |
 
 ## Accuracy by round
 
@@ -96,7 +98,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | Run 5 | Challenge test set (edge cases + scan damage) | running | 7 of 7 |  |
 | Run 6 | Fix-forward round 2 | running | 0 of 5 |  |
 | Run 3 | Max-parallel main workflow (research) | stopped | 7 of 10 | Stopped at 16:30 AEDT once all 7 research items returned, as planned; its 3 design-proposal agents had just started and were stopped with it. The full rebuild was replaced by fix-forward rounds on v1. |
-| Side | Agents launched directly from the session | running | 2 of 2 |  |
+| Side | Agents launched directly from the session | running | 2 of 3 |  |
 
 ## Agents
 
@@ -126,11 +128,11 @@ Every agent started for this build, including stopped runs. Outcomes are on the 
 | Run 5 | Generate | gen:layout | done | 15:55 | 16:18 | 23 | 120 |
 | Run 5 | Generate | gen:degradation | done | 15:55 | 16:12 | 17 | 87 |
 | Run 5 | Validate | validate+baseline | done | 16:18 | 16:28 | 10 | 70 |
-| Run 6 | Fix | fix:r2:heads | run | 16:21 |  | 9 | 100 |
-| Run 6 | Fix | fix:r2:symbols | run | 16:21 |  | 9 | 84 |
-| Run 6 | Fix | fix:r2:score | run | 16:21 |  | 9 | 65 |
-| Run 6 | Fix | fix:r2:lyrics | run | 16:21 |  | 9 | 65 |
-| Run 6 | Fix | fix:r2:ui | run | 16:21 |  | 9 | 38 |
+| Run 6 | Fix | fix:r2:heads | run | 16:21 |  | 17 | 150 |
+| Run 6 | Fix | fix:r2:symbols | run | 16:21 |  | 17 | 124 |
+| Run 6 | Fix | fix:r2:score | run | 16:21 |  | 12 | 90 |
+| Run 6 | Fix | fix:r2:lyrics | run | 16:21 |  | 17 | 98 |
+| Run 6 | Fix | fix:r2:ui | run | 16:21 |  | 15 | 74 |
 | Run 3 | Research | web:omr | done | 14:58 | 15:11 | 13 | 77 |
 | Run 3 | Research | web:voices | done | 14:58 | 15:15 | 17 | 120 |
 | Run 3 | Research | spike:ml | done | 14:58 | 16:30 | 92 | 193 |
@@ -141,5 +143,6 @@ Every agent started for this build, including stopped runs. Outcomes are on the 
 | Run 3 | Design | design:proposal-1 | stopped | 16:30 | 16:30 | 0 | 2 |
 | Run 3 | Design | design:proposal-2 | stopped | 16:30 | 16:30 | 0 | 1 |
 | Run 3 | Design | design:proposal-3 | stopped | 16:30 | 16:30 | 0 | 1 |
+| Side | ML demo | copista-2m demo page for GitHub Pages | run | 16:38 |  | 0 | 5 |
 | Side | Fast track | First version build (mvp/) | done | 15:19 | 15:29 | 10 | 69 |
 | Side | Fast track | Software design document | done | 15:20 | 15:22 | 2 | 16 |
