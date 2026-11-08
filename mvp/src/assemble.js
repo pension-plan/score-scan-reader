@@ -678,7 +678,7 @@ function clefChangeAt(R, near, c0, st, sp, heads) {
 
 // a key signature right after a barline: cancelling naturals and / or the
 // new signs in key-signature order, spread out left to right
-function keyChangeAt(R, comps, st, xStart, xLimit, clef, sp, heads) {
+function keyChangeAt(R, comps, st, xStart, xLimit, clef, sp, heads, lone = false) {
   const lineY = (k) => st.yAt(k, xStart + 2 * sp);
   const cand = comps.filter(c => c.x0 > xStart && c.x0 < xLimit && c.area >= 0.04 * sp * sp &&
     (c.y0 + c.y1) / 2 > lineY(0) - 1.6 * sp && (c.y0 + c.y1) / 2 < lineY(4) + 1.6 * sp).sort((a, b) => a.x0 - b.x0);
@@ -709,8 +709,25 @@ function keyChangeAt(R, comps, st, xStart, xLimit, clef, sp, heads) {
   }
   if (near > 1) return null;
   // box: the signs ('heads' found on them are not notes)
-  if (n >= 2 || (nat >= 1 && n >= 1) || (nat >= 2 && n === 0)) return { fifths: kind === 'flat' ? -n : n, end, box: boxOf(signs) };
+  // a lone sign is a key of one sharp or flat after a double barline (where keys change) when no
+  // note stands right after it (a note's own accidental is followed by its head)
+  if (n >= 2 || (nat >= 1 && n >= 1) || (nat >= 2 && n === 0) || (lone && n === 1 && nat === 0 && near === 0)) return { fifths: kind === 'flat' ? -n : n, end, box: boxOf(signs) };
   return null;
+}
+
+// two strokes through the staff within a space of x (a double or final barline)
+function doubleBar(R, st, x, sp) {
+  let runs = 0, on = false;
+  for (let xx = Math.round(x - 1.0 * sp); xx <= Math.round(x + 1.0 * sp); xx++) {
+    if (xx < 0 || xx >= R.width) continue;
+    const y0 = Math.round(st.yAt(0, xx)), y1 = Math.round(st.yAt(4, xx));
+    let n = 0;
+    for (let y = y0; y <= y1; y++) n += R.data[y * R.width + xx] ? 1 : 0;
+    const v = n >= 0.8 * (y1 - y0 + 1);
+    if (v && !on) runs++;
+    on = v;
+  }
+  return runs >= 2;
 }
 
 function staffChanges(R, comps, s, sp, barX) {
@@ -732,7 +749,10 @@ function staffChanges(R, comps, s, sp, barX) {
   const clefAt = (x) => { let c = s.hdr.clef; for (const ch of changes) if (ch.clef && ch.x <= x) c = ch.clef; return c; };
   for (const bx of barX) {
     if (bx < xa || bx > xb - 1.5 * sp) continue;
-    const k = keyChangeAt(R, comps, st, bx + 0.2 * sp, Math.min(xb, bx + 16 * sp), clefAt(bx), sp, heads);
+    // (a lone sign only from no key: from a key of signs it needs cancelling naturals, and a lone
+    // sign read there is a damaged signature)
+    const prev = changes.filter(ch => ch.fifths != null && ch.x < bx).reduce((a, ch) => ch.fifths, s.hdr.fifths);
+    const k = keyChangeAt(R, comps, st, bx + 0.2 * sp, Math.min(xb, bx + 16 * sp), clefAt(bx), sp, heads, prev === 0 && doubleBar(R, st, bx, sp));
     if (k) changes.push({ x: k.end, fifths: k.fifths, box: k.box });
   }
   changes.sort((a, b) => a.x - b.x);

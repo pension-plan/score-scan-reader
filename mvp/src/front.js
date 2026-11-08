@@ -234,6 +234,17 @@ function invertedShare(R, staves) {
   return n ? inv / n : 0;
 }
 
+// Ink above the first staff and below the last (the page's binary): a title block above the music
+// and nothing like it below says the page is upright, whatever the staff ends look like (a staff
+// that ends in a seven-sharp courtesy key is denser at its end than its clef is at its start)
+function titleAbove(B, staves) {
+  const { width: w, height: h, data } = B;
+  const sp = staves[0].space, top = Math.min(...staves.map(st => st.yAt(0, (st.left + st.right) / 2))), bot = Math.max(...staves.map(st => st.yAt(4, (st.left + st.right) / 2)));
+  const ink = (ya, yb) => { let n = 0; for (let y = Math.max(0, Math.round(ya)); y < Math.min(h, Math.round(yb)); y++) for (let x = 0; x < w; x++) n += data[y * w + x]; return n; };
+  const a = ink(0, top - 4 * sp), b = ink(bot + 4 * sp, h);
+  return a > 2 * b + 0.002 * w * h;
+}
+
 // Staged front end.  Yields the stage about to run ('cleanup', 'staves',
 // 'notes') so a caller can report progress and let the page repaint between
 // stages; returns the result.  front() below runs it in one go, reporting
@@ -283,7 +294,7 @@ function* frontSteps(gray0, opts = {}) {
     return { gray, B, R: B, scale, skew, ss: sp.ss, lt: sp.lt, staves: [], systems: [], heads: [], beams: [], barlines: [], warnings, mode: ctx.mode, precleaned };
   }
   let R = removeStaffLines(B, staves, sp.lt).binary;
-  if (opts.orient !== false && invertedShare(R, staves) >= 0.6) {
+  if (opts.orient !== false && invertedShare(R, staves) >= 0.6 && !titleAbove(B, staves)) {
     const c = prepare(turn(gray0, quarter + 2), MODES.find(m => m.name === ctx.mode));
     if (c.staves.length >= staves.length) {
       const R2 = removeStaffLines(c.B, c.staves, c.sp.lt).binary;

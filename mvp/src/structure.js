@@ -15,6 +15,7 @@
 // buildScore writes them as <barline> (bar-style, <repeat>, <ending>), which playback.js follows.
 
 const { holes } = require('./ottava');
+const { matcher, crop, heal } = require('./meter');
 
 const lineY = (st, k, x) => st.yAt(0, x) + k * (st.yAt(4, x) - st.yAt(0, x)) / 4;
 
@@ -93,6 +94,36 @@ function readBars(fr, asm, sy) {
   return out;
 }
 
+// the numbers printed under a volta bracket's start ("1.", "2.", "1.-3.", "1, 2."): digits read
+// against the digit templates scaled to their own height (half the template's two spaces); a dash
+// between two digits is a range. null when nothing reads
+const DIGITS = ['digit-0', 'digit-1', 'digit-2', 'digit-3', 'digit-4', 'digit-5', 'digit-6', 'digit-7', 'digit-8', 'digit-9'];
+function voltaNumbers(fr, comps, line, sp) {
+  const R = fr.R, api = matcher();
+  const near = comps.filter(o => o.x0 >= line.x0 + 0.2 * sp && o.x0 <= line.x0 + 5 * sp && o.y0 >= line.y0 + 0.15 * sp && o.y1 <= line.y0 + 2.6 * sp && o !== line)
+    .sort((a, b) => a.x0 - b.x0);
+  const digits = [], marks = [];
+  for (const o of near) {
+    const w = o.x1 - o.x0 + 1, h = o.y1 - o.y0 + 1;
+    if (h >= 0.6 * sp && h <= 1.9 * sp && w <= 1.4 * sp) {
+      const g = crop(R, { x0: o.x0, y0: o.y0, x1: o.x1, y1: o.y1, inner: (a, b, c2, d) => a >= o.x0 && c2 <= o.x1 && b >= o.y0 && d <= o.y1 }, 2);
+      if (!g) continue;
+      const sc = api.scores(heal(g.img, 1), h / 2, DIGITS);
+      const d = DIGITS.reduce((p, n) => (sc[n] > sc[p] ? n : p), DIGITS[1]);
+      if (sc[d] >= 0.45 && d !== 'digit-0') digits.push({ x: o.x0, v: DIGITS.indexOf(d) });
+    } else if (w >= 0.3 * sp && w <= 1.2 * sp && h <= 0.3 * sp) marks.push({ x: o.x0, dash: true });
+    if (digits.length && o.x0 - digits[digits.length - 1].x > 3 * sp) break;
+  }
+  if (!digits.length || digits.length > 4) return null;
+  const nums = [digits[0].v];
+  for (let i = 1; i < digits.length; i++) {
+    const range = marks.some(m => m.x > digits[i - 1].x && m.x < digits[i].x);
+    if (range && digits[i].v > nums[nums.length - 1]) for (let k = nums[nums.length - 1] + 1; k <= digits[i].v; k++) nums.push(k);
+    else if (digits[i].v > nums[nums.length - 1]) nums.push(digits[i].v);
+  }
+  return nums;
+}
+
 // volta brackets over the top staff
 function readVoltas(fr, asm, sy) {
   const s = sy.staves[0];
@@ -132,7 +163,7 @@ function readVoltas(fr, asm, sy) {
     const hl = hook(c.x0 + 1), hr = hook(c.x1 - 1);
     if (h > 3 * sp) continue;
     // not a hairpin or text: nothing tall below the line inside the bracket but the hooks
-    out.push({ x0: c.x0, x1: c.x1, y: c.y0, open: !hr, cont: !hl });
+    out.push({ x0: c.x0, x1: c.x1, y: c.y0, open: !hr, cont: !hl, nums: hl ? voltaNumbers(fr, comps, c, sp) : null });
   }
   // a bracket carried over from the system before has no hook at its start: keep it only when it
   // starts at the staff start

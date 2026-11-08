@@ -145,6 +145,9 @@ function meterAt(R, s, x, sp) {
 }
 
 const valueOf = (m) => `${m.beats}/${m.type}/${m.symbol || ''}`;
+// meters that occur in practice: a worn 3 or 5 read as 11, or a stem read as a 1, gives none of these
+const PLAUSIBLE_BEATS = new Set([2, 3, 4, 5, 6, 7, 8, 9, 12]), PLAUSIBLE_TYPES = new Set([2, 4, 8, 16]);
+const plausible = (m) => !!m && PLAUSIBLE_BEATS.has(m.beats) && PLAUSIBLE_TYPES.has(m.type);
 
 function readMeters(fr, asm, stats = {}) {
   const R = fr && fr.R;
@@ -221,7 +224,8 @@ function readMeters(fr, asm, stats = {}) {
     if (hdr.length) groups.unshift(hdr);
     for (const fs of groups) {
       const cnt = {};
-      for (const f of fs) cnt[valueOf(f.m)] = (cnt[valueOf(f.m)] || 0) + 1;
+      for (const f of fs) if (plausible(f.m)) cnt[valueOf(f.m)] = (cnt[valueOf(f.m)] || 0) + 1;
+      if (!Object.keys(cnt).length) continue;
       const [v, n] = Object.entries(cnt).sort((a, b) => b[1] - a[1])[0];
       if (sy.staves.length >= 3 && n < 2) continue;
       const f = fs.find(g => valueOf(g.m) === v);
@@ -268,4 +272,4 @@ function readMeters(fr, asm, stats = {}) {
   return stats;
 }
 
-module.exports = { readMeters, readCommon, systemBars };
+module.exports = { readMeters, readCommon, systemBars, plausibleMeter: plausible, matcher, crop, heal };

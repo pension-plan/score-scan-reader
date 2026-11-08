@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 01:08 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 01:12 AEDT.
 
 ## Events
 
@@ -129,6 +129,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 01:07 | Release 0.26.0 merged: structure round complete (COVERAGE supported 41 to 75, unsupported 63 to 32; benchmark 0.950 to 0.951, challenge 0.829 to 0.831, 6 up, none down), plus perf memory fix (8b5d595) and lazy accented-lyrics OCR (42f3d40). Isolated regress of the combined release running. structure next: key changes, volta numbers, worn meters, marcato/accent, 15ma/22ma. |
 | 01:07 | textsym: graceHeads on (926ec3a) and lazy accented-lyrics OCR (42f3d40) confirmed. structure: its files are clean; the WIP tie drop and satb-open-divisi severe 0.453 to 0.386 trace to voices' uncommitted score.js/text.js; voices told to test in isolation. textsym next: chord symbols, pedal, fingering, rehearsal marks, expression/tempo recall. |
 | 01:08 | perf: L26 resolved (8b5d595, in 0.26.0): 40-page node 2124 to 724 MB, browser worker 695 to 257 MB, byte-identical outputs. Next: browser renderer growth and the 3.2 to 4.9 s/page slowdown (L29). |
+| 01:12 | Isolated regression of release 0.26.0 vs 0.25.0 (committed head): benchmark+OCR 0.951 to 0.951 (real scans 0.929), challenge 0.831 to 0.831, written elements steady (ties 3973, time 781); no regression. Reports in docs/regressions/v0.26.0-*.md. |
 
 ## Accuracy by round
 
