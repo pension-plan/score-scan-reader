@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.13.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.12.0...score-scan-reader-v0.13.0) (2026-11-08)
+
+
+### Features
+
+* **cv:** OpenCV pre-clean for degraded scans ([045d08f](https://github.com/pension-plan/score-scan-reader/commit/045d08f1f9145b3e83906d09b8720e966f60ad80))
+
 ## [0.12.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.11.0...score-scan-reader-v0.12.0) (2026-11-08)
 
 
