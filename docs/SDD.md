@@ -1525,9 +1525,38 @@ Same 81 items (243 PDFs) before (13:18, before 3d15815) and after (03ada96); tot
 | `ottava-8vb` | 0% (0/22) | 100% (22/22) | 0% (0/22) | 100% (22/22) | 0% (0/22) | 100% (22/22) | unsupported -> supported |
 | `ottava-15ma` | 0% (0/12) | 58% (7/12) | 0% (0/12) | 58% (7/12) | 0% (0/12) | 58% (7/12) | unsupported -> partial |
 
+**Second round** (f2e4a8b, 8060286, a7ad2d2, d176663 / f7861d5):
+
+- **Key changes.** A single sharp or flat after a double barline is a key of one sign when the key
+  before it was none (C major / A minor) and no note head follows it (`assemble.js` `keyChangeAt`
+  `lone`, `doubleBar`); a lone sign after a key of several signs is a damaged signature (that change needs
+  cancelling naturals) and is not taken. A page is not turned upside down when a title block stands above
+  the music and nothing like it below (`front.js` `titleAbove`): staves ending in a seven-sharp courtesy
+  key looked denser at their ends than at their clefs, and the whole page was read upside down.
+- **Volta numbers** are read under the bracket's start (digit templates scaled to the number's own
+  height; a dash between two digits is a range: "1.-3." -> 1, 2, 3) and written as `<ending number>`;
+  numbering by order is the fallback.
+- **Implausible meters** (beats outside 2-9 and 12, beat types outside 2, 4, 8, 16) are not taken, on the
+  headers too: a worn 3 read as 11 no longer gives 11/2 or 11/8.
+- **Articulations**: an accent standing beyond a staccato dot is not a fermata's arc; pieces of a mark
+  are joined when together they make a wedge (a marcato's thin stroke cut off reads as a staccatissimo
+  alone); marks are written on every note of the chord (MusicXML writers differ on which note carries
+  them).
+- **Octave lines**: the number word may run 8 spaces left of the dashes ("15ma"); a line run on to the next
+  system with only its number and hook is found by the hook after the number; lines are looked for up to
+  ten spaces from the staff (an 8va over ledger-line passages).
+
+Measured on the full suite (81 items plus the perf family, 243 + 63 PDFs), adc6658 -> f7861d5, clean /
+scan: key-change 81% / 77% -> 87% / 82%; staccato 38% / 38% -> 85% / 85%; accent 57% / 59% -> 79% / 83%;
+marcato 30% / 34% -> 71% / 83%; tenuto 48% / 50% -> 73% / 76%; ottava-8va 39% / 47% -> 60% / 71%;
+ottava-15ma 35% / 32% -> 84% / 81%; fine 20% / 10% -> 90% / 70%; dc 80% / 50% -> 100% / 90%; totals
+64 / 59 / 31 -> 75 / 54 / 25 (supported / partial / unsupported). Gate (isolated `eval.mjs --src`
+of each commit against the one before, private output paths): benchmark 0.951 throughout, challenge
+0.8314 -> 0.8314, no item down by more than 0.02.
+
 **Limits.** Meter: a signature on degraded digits that neither reader reads keeps the meter before it;
-additive and changing meters inside one bar are not modelled. Volta numbers are inferred by order, not
-read (a "1.-3." bracket is numbered 1). Segno / coda are read over the top staff only; "D.S." text that
+additive and changing meters inside one bar are not modelled. Volta numbers on badly worn scans fall
+back to order. Segno / coda are read over the top staff only; "D.S." text that
 OCR truncates still carries its `<sound>` only when the words start "D.S." / "D.C.". Articulations next
 to the stem (as some engravers place a marcato) are not read; fermatas are read separately (`text.js`).
 Beams are written at one level (no secondary-beam numbers). Octave lines need their dashes: a line

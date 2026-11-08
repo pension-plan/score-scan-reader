@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 01:42 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 01:48 AEDT.
 
 ## Events
 
@@ -136,6 +136,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 01:38 | textsym 411aade (+1b60f3b restoring structure hunks): chord symbols, pedal, fingering, rehearsal marks written; expression/tempo words snapped to terms; German rows no longer trigger the second OCR pass. COVERAGE 83/45/26. Next: pedal brackets, rehearsal letters/circles, shape-based chords, lyric merges, unread bar numbers. |
 | 01:38 | Isolated regression of release 0.27.0 vs 0.26.0: benchmark+OCR 0.951 to 0.951, challenge 0.831 to 0.832, ties 3973 to 3985; no regression. |
 | 01:42 | perf: 2851d4d (30% faster, identical output) and 8045059 (browser page images via canvas; 40-page growth +871 to +453 MB). Release merged. ita.special-words browser error sent to textsym. perf next: OCR call cost. |
+| 01:48 | structure's pathless push d176663 swept others' WIP; reverted by f7861d5 (net diff verified clean); push.sh now refuses pathless pushes (a0b334a, L31). Release 0.27.2 merged. |
 
 ## Accuracy by round
 
@@ -193,6 +194,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | L28 | Regression checks scored the shared working tree, so one agent saw another agent unfinished edits (a challenge tie drop 4043 to 3583 that was not on main) | Integration (regression tooling) | Resolved (a262809) | regress.mjs --head <ref> scores a committed ref like the base; warns when mvp/src is dirty. Committed main d0f1105 vs v0.24.0: no regression, ties 4043 to 3966, grace 145 to 307, time 712 to 780. |
 | L29 | Time per page rose ~3.2 to 4.9 s (coverage perf) as recognition stages were added | Performance | Partial (2851d4d) | perf agent profiling per stage (OCR second-pass trigger rate, meter/artic/structure modules, tie arcs, grace heads, header templates). 2851d4d: template scoring from ink pixels only and component labelling without per-pixel arrays (bit-identical); piano page 5.9 to 3.8 s, 5-page doc 4.1 to 2.7 s/page; challenge wall 140 to 100 s. Remaining: OCR calls 10-26/page (text marks + lyrics). |
 | L30 | Concurrent regression runs wrote to the same output paths, so one run could report another run element counts (structure saw lyric 2050 to 1346, tie 119 to 26 that were not real) | Integration (regression tooling) | Resolved (c7607e2) | Outputs and --head checkouts tagged with the process id; base checkout extracted atomically; paths printed to stderr. |
+| L31 | A pathless push.sh run committed every agent uncommitted work (d176663) | Integration (push tooling) | Resolved (a0b334a) | Reverted by f7861d5 (net change verified); push.sh now refuses to run without paths unless PUSH_ALL=1. |
 
 ## Runs
 
