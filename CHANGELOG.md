@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.43.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.42.2...score-scan-reader-v0.43.0) (2026-11-08)
+
+
+### Features
+
+* **lyrics:** OCR misreads corrected against word-frequency lists (L36) ([1fc03e2](https://github.com/pension-plan/score-scan-reader/commit/1fc03e2029e5b4d18081551bd3b7929e0a3b11be))
+
+
+### Bug Fixes
+
+* **corpus:** rh05-graces printed a second clef with the key over the time digits; regenerated ([107049a](https://github.com/pension-plan/score-scan-reader/commit/107049ae36ab2f07dc81273c9c47117c078494c5))
+
+
+### Performance Improvements
+
+* **ml:** ML assist reads each page alongside the page step; Node detector in a worker thread; download stated as ~6 MB ([6c466f1](https://github.com/pension-plan/score-scan-reader/commit/6c466f10c68e25888098697ce610440babe4f798))
+
 ## [0.42.2](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.42.1...score-scan-reader-v0.42.2) (2026-11-08)
 
 
