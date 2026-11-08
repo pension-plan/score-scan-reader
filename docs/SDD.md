@@ -1,6 +1,8 @@
 # Software Design Document: Scanned Sheet Music to MusicXML (browser OMR)
 
-Version 0.9, 2026-11-08. Status: draft written before the design phase has finished. Where a later document
+Version 0.9, 2026-11-08, updated for release v0.40 (8 November 2026): §1.2 scope and §2.2 measured accuracy
+describe the shipped app; the user-facing description is `docs/USER-GUIDE.md`. Original status: draft written
+before the design phase has finished. Where a later document
 (`docs/DESIGN.md`, `docs/spike-*.md`, `docs/proposal-*.md`) has not been written yet, the open choice is marked
 **To be decided by the design phase** and the candidates are listed. Nothing here reports a measured result
 that the research documents do not already contain. When this SDD and `docs/DESIGN.md` disagree on a module
@@ -34,9 +36,16 @@ In scope:
   keeping keyboard grand staves as one part with two staves.
 - A node harness that runs the same core against a ground-truth corpus and reports accuracy.
 
-Out of scope for v1: handwritten music, tablature, early (mensural or chant) notation, chord symbols and
-figured bass, dynamics and articulations beyond fermatas, editing the recognised score inside the app, and
-any server-side processing.
+Out of scope for v1: handwritten music, tablature, early (mensural or chant) notation, figured bass,
+editing the recognised score inside the app, and any server-side processing.
+
+Shipped beyond the original scope (v0.40): chord symbols, dynamics and hairpins, articulations, ottava lines,
+repeats, voltas and D.C./D.S./segno/coda, meter and key changes, grace and cue notes, tuplets, multi-bar
+rests, fingering, pedal marks, rehearsal marks and bar numbers, percussion staves (unpitched, with a drum
+kit), lyrics in six OCR languages (eng+deu, then fra, spa, ita and ces in a lazy second pass), stanzas below the music set as verses, labelling
+of unrecognised marks with corrections applied to the MusicXML, marking a page for repair, General MIDI
+playback with a parts mixer and MIDI export, an optional ML assist (copista-2m), and reading long PDFs page
+by page. `docs/USER-GUIDE.md` describes them for users; `docs/COVERAGE.md` measures each symbol and layout.
 
 ### 1.3 Definitions
 
@@ -102,6 +111,20 @@ any server-side processing.
 | XSD validity of output | 100 % of outputs | §10 |
 | Crashes over the corpus | 0 | [WF] |
 | Degraded synthetic and real scans | Reported separately; thresholds **to be decided by the design phase** once the spikes report numbers | — |
+
+**Measured (release v0.40, commit 9ba5604, 2026-11-08; lyrics read with the app's OCR set-up, eng+deu
+plus the second pass).** Aggregate = 0.3 pitch + 0.2 duration + 0.2 parts + 0.2 lyrics + 0.1 valid XML.
+
+| Set | Items | Aggregate | Pitch | Duration | Rests | Lyrics | Parts | Valid XML | Crashes |
+|---|---|---|---|---|---|---|---|---|---|
+| Benchmark (synthetic + real) | 20 | 0.959 | 0.957 | 0.932 | 0.852 | 0.934 | 0.995 | 1.000 | 0 |
+| Benchmark, real scans | 8 | 0.937 | | | | | | | |
+| Challenge, with OCR | 365 | 0.949 | 0.939 | 0.905 | 0.811 | 0.951 | 0.980 | 1.000 | 0 |
+| Challenge, without OCR (the CI gate) | 365 | 0.846 | 0.935 | 0.904 | 0.813 | 0.463 | 0.959 | 1.000 | 0 |
+| Coverage suite | 312 | 0.930 | 0.910 | 0.838 | 0.750 | 0.977 | 0.970 | 1.000 | 0 |
+
+Per symbol and layout: `docs/COVERAGE.md`. Time per page: about 2–5 s in Node (§ performance), peak memory
+roughly flat in page count.
 
 For context, the best open system reports OMR-NED of 11.1–11.2 % on quartet scans and 17.0–17.8 % on Lieder
 scans for its 2M-parameter model (copisteria, *self-reported*), and Audiveris 5.11 reports 66.9 % and 51.8 %

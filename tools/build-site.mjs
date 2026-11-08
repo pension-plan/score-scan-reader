@@ -3,7 +3,8 @@
 //   site/index.html        landing page
 //   site/app/              the converter (mvp/dist, wrapped as a full HTML document)
 //   site/status/           build log, plan, research and accuracy tracker
-//   site/docs/<name>.html  every docs/*.md rendered (design document, research, trials)
+//   site/docs/<name>.html  every docs/*.md rendered (user guide, design document, research, trials);
+//                          docs/user-guide/ (the guide's screenshots) copied next to them
 // Usage: node tools/build-site.mjs   (run `npm run build` first so mvp/dist is current)
 import fs from 'node:fs';
 import path from 'node:path';
@@ -86,23 +87,29 @@ fs.mkdirSync(path.join(OUT, 'docs'), { recursive: true });
 const renderer = new marked.Renderer();
 const baseCode = renderer.code.bind(renderer);
 renderer.code = (tok) => (tok.lang === 'mermaid' ? `<pre class="mermaid">${tok.text}</pre>` : baseCode(tok));
+// images the docs show (the user guide's screenshots)
+if (fs.existsSync(path.join(docsDir, 'user-guide'))) copyDir(path.join(docsDir, 'user-guide'), path.join(OUT, 'docs', 'user-guide'));
 for (const f of docs) {
   let md = fs.readFileSync(path.join(docsDir, f), 'utf8');
   for (const [from, to] of REWRITE) md = md.split(from).join('../' + to.replace(/^\.\.\//, ''));
-  const html = marked.parse(md, { renderer, gfm: true });
+  // links between docs (COVERAGE.md) go to their rendered pages
+  const html = marked.parse(md, { renderer, gfm: true }).replace(/href="([\w.-]+)\.md(#[^"]*)?"/g, (m, n, h) => (docs.includes(n + '.md') ? `href="${n}.html${h || ''}"` : m));
   const title = (md.match(/^#\s+(.+)$/m) || [])[1] || f.replace(/\.md$/, '');
   fs.writeFileSync(path.join(OUT, 'docs', f.replace(/\.md$/, '.html')),
     head(title, DOC_CSS) + `<main><nav class="crumbs"><a href="../">Score Scan Reader</a> / docs / ${f} · <a href="${REPO}/blob/main/docs/${f}">source</a></nav>\n${html}</main>\n<script src="${MERMAID}"></script>\n<script>window.mermaid && mermaid.initialize({ startOnLoad: true, theme: matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default' });</script>\n</body>\n</html>\n`);
 }
 
 // landing page
-const label = { 'SDD.md': 'Software design document', 'research-omr.md': 'Research: current OMR methods', 'research-voices.md': 'Research: voice and part separation', 'spike-classical.md': 'Trial: plain-JS image pipeline', 'spike-ocr.md': 'Trial: lyric OCR', 'spike-ml.md': 'Trial: pretrained ML models', 'TIMELINE.md': 'Build timeline (AEDT)', 'COVERAGE.md': 'Symbol and layout coverage, speed and memory' };
+const label = { 'USER-GUIDE.md': 'User guide: how to use the converter, what it reads, its limits', 'SDD.md': 'Software design document', 'research-omr.md': 'Research: current OMR methods', 'research-voices.md': 'Research: voice and part separation', 'spike-classical.md': 'Trial: plain-JS image pipeline', 'spike-ocr.md': 'Trial: lyric OCR', 'spike-ml.md': 'Trial: pretrained ML models', 'TIMELINE.md': 'Build timeline (AEDT)', 'COVERAGE.md': 'Symbol and layout coverage, speed and memory' };
+// the user guide first
+docs.sort((a, b) => (b === 'USER-GUIDE.md') - (a === 'USER-GUIDE.md'));
 const docLinks = docs.map((f) => `<li><a href="docs/${f.replace(/\.md$/, '.html')}">${label[f] || f.replace(/\.md$/, '')}</a></li>`).join('\n');
 fs.writeFileSync(path.join(OUT, 'index.html'), head('Score Scan Reader', DOC_CSS) + `<main>
 <h1>Score Scan Reader</h1>
 <p>Converts scanned sheet music (image-only PDFs, PNG or JPG) into MusicXML 4.0 in your browser. Lyrics are kept, closed-score SATB is split into separate parts, and piano grand staves stay together. Your file never leaves the browser.</p>
 <ul>
 <li><a href="app/"><strong>Open the converter</strong></a></li>
+<li><a href="docs/USER-GUIDE.html"><strong>User guide</strong></a>: how to use it, what it reads, privacy and known limits</li>
 <li><a href="status/">Build log, plan, research findings and accuracy tracker</a></li>
 <li><a href="ml-demo/">copista-2m in the browser: the ML symbol detector on a sample scan or your own page</a></li>
 <li><a href="${REPO}">Source code</a> · <a href="${REPO}/releases">Releases and downloads</a> · <a href="${REPO}/actions">CI</a></li>

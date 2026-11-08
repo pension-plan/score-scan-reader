@@ -4,14 +4,21 @@
 
 The site links to the converter, the build log and accuracy tracker, the design document, the research, and the ML detector demo.
 
-Converts **scanned sheet music** (image-only PDFs, PNG or JPG) into **MusicXML 4.0**, entirely in the browser.
+Converts **scanned sheet music** (image-only PDFs, PNG or JPG, up to 40 pages) into **MusicXML 4.0**, entirely in the browser: nothing is uploaded.
 
-- Lyrics are read with OCR and kept as MusicXML lyrics (syllables, verses).
-- When one staff carries two voices, as in closed-score SATB hymns, the voices are split into separate parts (Soprano, Alto, Tenor, Bass).
-- Piano grand staves are kept as one part.
+**New here? Read the [user guide](docs/USER-GUIDE.md)** (also at https://pension-plan.github.io/score-scan-reader/docs/USER-GUIDE.html).
+
+- **Reads** staves (also faint, broken or one-line percussion staves), clefs (G, F, C, treble 8vb, percussion), key and time signatures and their changes, notes from whole to 64th with dots, beams, chords, tuplets, grace and cue notes, rests and multi-bar rests, accidentals, ties and slurs, repeats, voltas, D.C./D.S./segno/coda, dynamics and hairpins, articulations, fermatas, ottava lines, tempo and metronome marks, titles and credits, chord symbols, fingering, pedal marks, rehearsal marks and bar numbers.
+- **Lyrics** are read with OCR (English and German, with a second pass in French, Spanish, Italian and Czech where accents show) and kept as MusicXML lyrics: verses, syllables, melismas, elisions; stanzas printed below the music can be set as verses.
+- **Parts**: two voices on one staff (closed-score SATB, SSAA, TTBB, divisi) are split into separate parts; piano and organ staves stay one part; printed part names are kept. Drum parts are written as unpitched notes with a General MIDI drum kit.
+- **Shows its reading** over the scan (all marks, or only what it could not recognise), lets you **label unrecognised marks** (accidentals, rests, dots and dynamics you identify are written into the MusicXML) and **mark the page for repair** (exported as JSON or a marked PNG).
+- **Plays the score** (General MIDI instruments, tempo, click, count-in, loops, parts mixer, repeats and dynamics) and saves it as a **MIDI file**.
+- Long scans are read page by page with a progress strip; on a slow connection the notes are shown before the lyrics are in. An optional ML assist (the copista-2m detector) rechecks note values.
 
 - **Home (start here):** https://pension-plan.github.io/score-scan-reader/
 - **Live app:** https://pension-plan.github.io/score-scan-reader/app/
+- **User guide:** https://pension-plan.github.io/score-scan-reader/docs/USER-GUIDE.html (source: [docs/USER-GUIDE.md](docs/USER-GUIDE.md))
+- **What it reads, symbol by symbol:** [docs/COVERAGE.md](docs/COVERAGE.md)
 - **Build log, plan, research and accuracy tracker:** https://pension-plan.github.io/score-scan-reader/status/
 - **Build timeline (AEDT):** [docs/TIMELINE.md](docs/TIMELINE.md), also at https://pension-plan.github.io/score-scan-reader/docs/TIMELINE.html
 - **Software design document:** https://pension-plan.github.io/score-scan-reader/docs/SDD.html (source: [docs/SDD.md](docs/SDD.md))
