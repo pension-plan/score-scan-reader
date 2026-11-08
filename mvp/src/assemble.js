@@ -2,6 +2,8 @@
 // Notation assembly: per system and staff -> clef, key, measures, durations,
 // voices; then the part layout (closed-score split vs grand staff) for the page.
 const { detectRests } = require('./rests');
+// double sharps / double flats the accidental reader does not know (src/cv.js templates)
+const { fallbackAccidental } = require('./cv');
 const { labelComponents } = require('./cc');
 
 // divisions per quarter: 840 = 8 * 3 * 5 * 7 keeps 32nds and 3-, 5-, 6- and
@@ -1302,7 +1304,7 @@ function keyAlters(fifths) {
 
 // Find an accidental left of a head; returns 'sharp'|'flat'|'natural'|null
 function headAccidental(R, comps, hd, minX = -Infinity, reach = 1.9) {
-  const g = accidentalGlyph(R, comps, hd, minX, reach);
+  const g = accidentalGlyph(R, comps, hd, minX, reach) || fallbackAccidental(R, comps, hd, minX, reach);
   return g ? g.kind : null;
 }
 

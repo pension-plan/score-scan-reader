@@ -33,7 +33,7 @@
   --ov-note:#d32f2f; --ov-stem:#757575; --ov-beam:#6d4c41; --ov-rest:#00897b; --ov-clef:#8e24aa; --ov-key:#ef6c00;
   --ov-time:#2e7d32; --ov-bar:#283593; --ov-staff:#546e7a; --ov-acc:#c2185b; --ov-dot:#1e88e5; --ov-tup:#827717;
   --ov-lyric:#00838f; --ov-unknown:rgba(255,222,0,.58); --ov-unknown-edge:#d4b000; --ov-label:#15171b; --ov-label-dur:#4f5761;
-  --ov-mark:var(--ov-acc); --ov-text:#5e35b1; --ov-barno:#263238; --ov-dyn:#0277bd; --ov-slur:#f06292; --ov-brace:#8d6e63;
+  --ov-mark:var(--ov-acc); --ov-text:#5e35b1; --ov-barno:#263238; --ov-dyn:#0277bd; --ov-slur:#f06292; --ov-brace:#8d6e63; --ov-grace:#e040fb;
   /* repair marks (the reader's own): a lime highlighter under a black dashed
      core, unlike every detection colour and the yellow of unrecognised ink */
   --rp-halo:rgba(118,255,3,.55); --rp-ink:#0b0c0e; --rp-badge-ink:#b2ff59;
@@ -225,13 +225,13 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 .ov-labels .lr{fill:var(--ov-rest)} .ov-labels .lb{fill:var(--ov-bar)}
 /* text, bar numbers, dynamics, slurs and braces read off the page: tinted boxes like every symbol, text labelled above */
 .ov-text{stroke:var(--ov-text);fill:var(--ov-text)} .ov-barno{stroke:var(--ov-barno);fill:var(--ov-barno)} .ov-dyns{stroke:var(--ov-dyn);fill:var(--ov-dyn)}
-.ov-slurs{stroke:var(--ov-slur);fill:var(--ov-slur)} .ov-braces{stroke:var(--ov-brace);fill:var(--ov-brace)} .ov-ledger{stroke:var(--ov-staff);fill:var(--ov-staff)}
-.ov-text rect,.ov-barno rect,.ov-dyns rect,.ov-slurs rect,.ov-braces rect,.ov-ledger rect{fill-opacity:.26;mix-blend-mode:multiply}
+.ov-slurs{stroke:var(--ov-slur);fill:var(--ov-slur)} .ov-braces{stroke:var(--ov-brace);fill:var(--ov-brace)} .ov-grace{stroke:var(--ov-grace);fill:var(--ov-grace)} .ov-ledger{stroke:var(--ov-staff);fill:var(--ov-staff)}
+.ov-text rect,.ov-barno rect,.ov-dyns rect,.ov-slurs rect,.ov-braces rect,.ov-grace rect,.ov-ledger rect{fill-opacity:.26;mix-blend-mode:multiply}
 .ov-text text,.ov-barno text,.ov-dyns text{font-family:var(--sans);font-weight:600;stroke:var(--paper);stroke-width:3px;stroke-linejoin:round;paint-order:stroke}
 .ov-dyns text{font-style:italic}
 .pages.hide-notes .ov-notes,.pages.hide-rests .ov-rests,.pages.hide-clefs .ov-clefs,.pages.hide-keys .ov-keys,.pages.hide-times .ov-times,
 .pages.hide-bars .ov-bars,.pages.hide-marks .ov-marks,.pages.hide-lyrics .ov-lyrics,.pages.hide-labels .ov-labels,.pages.hide-unknown .ov-unknown,
-.pages.hide-text .ov-text,.pages.hide-barno .ov-barno,.pages.hide-dyns .ov-dyns,.pages.hide-slurs .ov-slurs,.pages.hide-braces .ov-braces,
+.pages.hide-text .ov-text,.pages.hide-barno .ov-barno,.pages.hide-dyns .ov-dyns,.pages.hide-slurs .ov-slurs,.pages.hide-braces .ov-braces,.pages.hide-grace .ov-grace,
 .pages.lbl-small .ov-labels{display:none}
 .pages{overflow-x:auto}
 .pages>.pageframe{flex:none;width:calc(100% * var(--zoom, 1))}
@@ -252,7 +252,7 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 .ovk-notes,.ovk-rests,.ovk-clefs,.ovk-keys,.ovk-times,.ovk-acc,.ovk-dot,.ovk-tup{fill-opacity:.3}
 .ovk-unknown{stroke:var(--ov-unknown-edge);fill:var(--ov-unknown)}
 .ovk-text{color:var(--ov-text)} .ovk-barno{color:var(--ov-barno);stroke:var(--ov-barno);fill:var(--ov-barno)} .ovk-barno rect{fill-opacity:.26} .ovk-dyns{color:var(--ov-dyn);stroke:var(--ov-dyn)}
-.ovk-slurs{stroke:var(--ov-slur)} .ovk-braces{stroke:var(--ov-brace)}
+.ovk-slurs{stroke:var(--ov-slur)} .ovk-braces{stroke:var(--ov-brace)} .ovk-grace{stroke:var(--ov-grace)}
 /* repair markup: the layer takes the pointer (and stops touch scrolling) only while drawing */
 .head-tools{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:4px 14px}
 .toggle:disabled{opacity:.45;cursor:not-allowed}
@@ -708,6 +708,8 @@ defs["assemble"]=function(require,module,exports){
 // Notation assembly: per system and staff -> clef, key, measures, durations,
 // voices; then the part layout (closed-score split vs grand staff) for the page.
 const { detectRests } = require('./rests');
+// double sharps / double flats the accidental reader does not know (src/cv.js templates)
+const { fallbackAccidental } = require('./cv');
 const { labelComponents } = require('./cc');
 
 // divisions per quarter: 840 = 8 * 3 * 5 * 7 keeps 32nds and 3-, 5-, 6- and
@@ -2008,7 +2010,7 @@ function keyAlters(fifths) {
 
 // Find an accidental left of a head; returns 'sharp'|'flat'|'natural'|null
 function headAccidental(R, comps, hd, minX = -Infinity, reach = 1.9) {
-  const g = accidentalGlyph(R, comps, hd, minX, reach);
+  const g = accidentalGlyph(R, comps, hd, minX, reach) || fallbackAccidental(R, comps, hd, minX, reach);
   return g ? g.kind : null;
 }
 
@@ -3066,6 +3068,36 @@ function readClefAt(api, R, st, sp) {
   return { clef: k === 'clef-G' ? 'G' : 'F', score: sc[k], x1: gl.x1 };
 }
 
+// ---------------------------------------------------------------- small accidentals
+// assemble.js accidentalGlyph asks this when its own reader found no accidental left of a head:
+// a double sharp (a small x, about a space square, centred on the head's height) or a double flat
+// (two flats side by side), matched against the Bravura templates. Returns a glyph box with kind
+// 'double-sharp' / 'flat-flat', or null.
+const DS_OTHERS = ['head-filled', 'dot', 'acc-sharp', 'acc-natural', 'acc-flat', 'rest-8th'];
+function fallbackAccidental(R, comps, hd, minX = -Infinity, reach = 1.9) {
+  const sp = hd.sp, api = matcher();
+  const near = comps.filter(c => c.x1 <= hd.x - 0.45 * sp && c.x1 >= hd.x - (reach + 0.4) * sp && c.x0 > minX);
+  let best = null, bs = 0;
+  // staff-line removal cuts a double sharp on a line into pieces: each piece is also tried with the
+  // pieces within a quarter space of it
+  const small = near.filter(o => o.x1 - o.x0 < 1.4 * sp && o.y1 - o.y0 < 1.4 * sp);
+  const groups = small.map(c => { const g = small.filter(o => o.x0 <= c.x1 + 0.25 * sp && o.x1 >= c.x0 - 0.25 * sp && o.y0 <= c.y1 + 0.25 * sp && o.y1 >= c.y0 - 0.25 * sp);
+    return g.length > 1 ? { x0: Math.min(...g.map(o => o.x0)), y0: Math.min(...g.map(o => o.y0)), x1: Math.max(...g.map(o => o.x1)), y1: Math.max(...g.map(o => o.y1)) } : null; }).filter(Boolean);
+  for (const c of near.concat(groups)) {
+    const w = (c.x1 - c.x0 + 1) / sp, h = (c.y1 - c.y0 + 1) / sp, cy = (c.y0 + c.y1) / 2;
+    let kind = null, names = null;
+    if (w >= 0.55 && w <= 1.35 && h >= 0.55 && h <= 1.35 && Math.abs(cy - hd.y) < 0.45 * sp) { kind = 'double-sharp'; names = ['acc-double-sharp']; }
+    else if (w >= 1.0 && w <= 2.4 && h >= 1.5 && h <= 3.4 && Math.abs(c.y1 - 0.55 * sp - hd.y) < 0.6 * sp) { kind = 'flat-flat'; names = ['acc-double-flat']; }
+    if (!kind) continue;
+    const g = glyphIn(R, { x0: c.x0, y0: c.y0, x1: c.x1, y1: c.y1, inner: (x0, y0, x1, y1) => x0 >= c.x0 && x1 <= c.x1 && y0 >= c.y0 && y1 <= c.y1 }, 1);
+    if (!g) continue;
+    const sc = api.scores(g.img, sp, names.concat(DS_OTHERS));
+    const o = api.best(sc, DS_OTHERS);
+    if (sc[names[0]] >= 0.55 && sc[names[0]] - sc[o] >= 0.08 && sc[names[0]] > bs) { bs = sc[names[0]]; best = { x0: c.x0, y0: c.y0, x1: c.x1, y1: c.y1, kind }; }
+  }
+  return best;
+}
+
 // ---------------------------------------------------------------- header reading
 function readHeaders(fr, asm, opts = {}, stats = {}) {
   const R = fr && fr.R;
@@ -3464,9 +3496,9 @@ function dewarpReading(fr, asm, reread, stats = {}) {
   return alt;
 }
 
-const BANK = {"digit-0":[43,48,"AAD8AwAAAPx/AAAA+P8PAADwH/8BAMB/8D8AAP8B/wMA/g/wPwDwP4D/AcD/AfwfAP8HwP8B/D8A/h/g/wHw/4D/BwD/D/w/APh/4P8BwP+D/w8A/j/8fwDw/+H/A4D/D/8fAPz//H8AwP/n/wMA/j//HwDw//n/AID/z/8HAPx//j8A4P/z/wEA/5//DwD4//x/AMD/5/8HAP4//z8A+P/x/wHA/4f/DwD+P/x/APD/wf8DgP8H/h8A/D/g/wHw/wH/D4D/B/B/APw/gP8H8P8A+D+A/wOA/wP+DwD8H/B/AID/wf8BAPi//wcAgP//DwAA+P8/AAAA/j8AAACAfwAA"],"digit-1":[29,48,"APh/AID/HwD4/wMA/38A4P8PAP7/AcD/PwD8/weA//8A+P8fAP//A/D/fwD+/w/A//8B/P8/gO//B/j8/wCf/x/w8f8DPv5/4MP/Dzz4/4EH/z944P8HD/z/AID/HwDw/wMA/n8AwP8PAPj/AQD/PwDg/wcA/P8AgP8fAPD/AwD+fwDA/w8A+P8BAP8/AOD/BwD8/wCA/x8A8P8DAP9/APD/P8D//x/8//8D//9/"],"digit-2":[40,50,"AAAAAAAA8P8PAAD+/38AgB/A/wHABwD/A+ADAP8P8AMA/h/4BwD+H/wPAPw//D8A/H/+fwD8f/7/APx//v8A/P/+/wD8//7/APz//v8A/P/+/wD+//z/AP7//P8A/v/4fwD/f/B/AP9/4D+A/z+AD4D/HwAAwP8PAADg/wcAAPD/AQAA+H8AAAD8DwAAAP4BAACAfwAAAMAfAAAA8AcAAAD4AQAAAPwAAGAA/x4AYID//wNwwP//H3DA////fOD///9/8P///z/w////P/j///8/+P///x/8////H/zH//8P/gD//wd+APz/Az4A+P8BHADAfwAIAAAAAA=="],"digit-3":[38,48,"AMA/AAAA/v8AAPD//wAA//D/AOAP4P8A/AHwf4B/APg/4H8A/g/8fwD/B/8fwP/B/w/wf/D/A/w//P8A/w//P8D/gf8P8H/g/wH+H/B/gP8H+A/w/wBwAPwfAADA/wMAAPw/AADg/wEAgP8/AADw/z8AAPj/fwAAAP9/AAAA/z8AAAD/HwAAwP8P8AHg/wP/AfD/4f8A/H/8fwD/H/8fwP/v/wfw//v/Afx//v8A/5//H8D/5/8H8P/5/wD+P/w/gP8P/w/w/4H/Af4/4P/A/wfw////APD//w8A8P9/AADg/wMA"],"digit-4":[42,49,"AAAAAAAAAP//AAAA/v8DAAD4/wcAAOD/HwAAgP8/AAAA/n8AAAD4/wEAAPD/AwAAwP8HAAAA/x8cAAD8P3gAAPh/8AEA4P/gBwCA/4MfAAD/B38AAPwP/gEA+B/8BwDgf/gfAMD/8H8AAP/B/wEA/oP/BwD4B/8fAPAf/H8AwD/w/wGAf8D/BwD+AP8fAPwB/H8A+APw/wHgB8D/B8APAP8fgB8A/H8A///////9//////f/////n/////8/AADw/wEAAMD/BwAAAP8fAAAA/H8AAADw/wEAAMD/BwAAAP8fAAAA/n8AAAD8/wMAAP7/fwAA/P//AwDw//8PAMD//x8A"],"digit-5":[37,48,"AAAAAAD+//8f4P///wP8//9/gP///w/w////AP7//x/A////Afj//x8A////AeD//w8APPgHAIAHAAAA8AAAAAAeAAAAwAEAAAA4AAAAAAf+fwDg+P8/APz//w+AP/D/B/gD+P8BHwD8P+ABAP8PGADg/wMAAPh/AAAA/x8AAMD/A/4A+H/wfwD/H/4f4P/j/wP8f/7/gP/P/x/w//n/A/4//3/A/+f/D/j//P+B/4//H/D/8f8B/h/8H+D/g/8B/D/gH+D/A/wH/j8A////A4D//z8A4P//AADA/wMA"],"digit-6":[39,48,"AAD4AwAAwP8fAAD4wz8AAP/APwDAP+A/APgP+D8A/gP+HwD/Af8fwP/A/w/wP+D/B/gf8P8B/g/4/wD/B/h/wP8D/B/g/wD8B/h/APgA/D8AAAD+HwAAAP8PAADA/wf4AOD/g/8B8P/x/wP4//3/B/z///8H/v/H/wf//8D/h/9/wP/H/x/g/+P/D+D/8/8D8P/x/wH4//j/APx//H8A/H/+PwD+P/4fAP8P/w+A/4f/B8D/g/8D4P+B/wH4f8D/APw/wP8A/g/Af4D/B+B/wP8BwD/wfwDAP/wfAMD//wMAgP9/AAAA/wMA"],"digit-7":[39,48,"APADAAAA/g8AXMD/HwBu8P8fgHf8/x/A+///H/D9//8f+P7//z9+/////7//////3//////nn/////MD////+QD+/388AP7/Px4A/P8fBwD854cDAPDxwwEAAPxgAAAAfiAAAIA/AAAA4A8AAAD4BwAAAP4BAACA/wAAAOA/AAAA+B8AAAD+DwAAgP8DAADg/wEAAPj/AAAA/j8AAID/HwAAwP8PAADw/wMAAPz/AQAA/v8AAID/fwAAwP8/AADw/x8AAPj/BwAA/v8DAAD//wEAgP//AADA/38AAOD/PwAA8P8fAAB4gAcA"],"digit-8":[39,50,"AAA/AAAA+P8HAID//w8A8D/wHwD8A8A/AH8AgB/AHwCAH/APAIAf/AMAwA/+AQDAB/8BAOCH/wAA8MN/AAD48X8AAPzw/wAAPvj/AIAf/P8D4A/+/wf4A///H/4A////f4D///8PgP///wOA////B4D///8HgP///wcA////B4D///8H4P///wf8+f//Az/w///BD+D///EDwP///ACA/39+AAD/vx8AAP/fDwAA/+8DAID/8wEAgP/5AQDA//wAAOB/fgAA8B9+AAD4Dz8AAP4DPwAA/wB/AMB/AP8A+A8A/4f/AwD+/38AAPz/DwAA4H8AAA=="],"digit-9":[39,48,"AMA/AAAA/v8BAMD//wcA+D/8BwD+D/wHgP8H/AfA/wH+B/D/AP4H/D8A/wP+H4D/A/8PwP/B/wfg/+H/A+D/8P8B8P/4/wD4f/x/AP4//j8A/z//H4D/H/8PwP+P/w/g/8f/B/j/w/8H/v/B/wf//8D/5/9/4P///z/A/3//H8D/j/8PgP/B/wcAAOD/AwAA8P8BAAD4/wAAAPw/AD8A/h/AfwD/D/A/gP8D/D/A/wH/H/B/gP8P+D/A/wf8D+D/A/4D8P+B/wH4f8B/APgf8B8A/A/4BwD8A/4AAPzDPwAA+P8DAADgPwAA"],"time-C":[41,50,"AAAAAAAAAP4HAAAA/38AAID/gAcAwH8AHADAfwBwAMA/AOABwH8AwAfAfwDAD8B/APA/gP8A8H+A/wHw/4H/AfD/A/8D4P8H/gfA/w/+B4D/H/wPAP8//B8A/n/4PwD8f/B/APD/4P8A4P/g/wGA/8D/AwB8gP8HAAAA/w8AAAD+HwAAAPw/AAAA+H8AAADw/wAAAOD/AQAAnP8DAAA4/wcAAHD+HwAA4Pw/AADA8X8AAIDj/wAAAMP/AwAAB/8HAAAO/g8AAA74PwAAHOB/AAAcwP8BADwA/wcAPAD8HwA8APB/AD4AwP8DPwAA/v8fAAD4/w8AAID/AwAAAAAAAAA="],"time-cut":[41,70,"AAAOAAAAABwAAAAAOAAAAABwAAAAAOAAAAAAwAEAAACAAwAAAAAHAAAAAA4AAAAAHAAAAAB4AAAAAPg/AAAA/v8DAAD/Bx4AAP8HcACA/wfAA4D/D4APgP8fAB8A/zkAfwD/ccD/AP/j4P8D/sPB/wf+h8P/D/wPh/8f/B8O/z/4Hxz+f/A/OPz/8H9w+P/h/+Dw/8H/wcH/g/+DA/+D/wcH/AP/Dw7AAP4fHAAA/D84AAD4f3AAAPD/4AAA4P/BAQDA/4MDAID/BwcAcP4PDgDg/B8cAMD5fzgAgPP/cAAAx//hAACG/8MBAA7+jwMAHPwfBwAY8D8OADjg/xwAMID/OQBwAP5/AHAA+P8AeADg/wH8AID/B34AAP7/fwAA8P8/AACA/w8AAAB8AAAAAHAAAAAA4AAAAADAAQAAAIADAAAAAAcAAAAADgAAAAAcAAAAADgAAAAAcAAAAADgAAAAAAAAAAA="],"clef-G":[66,170,"AAAAAAAAAAAAAAAAAPAAAAAAAAAA4AcAAAAAAADAPwAAAAAAAID/AQAAAAAAAP8PAAAAAAAA/j8AAAAAAAD8/wEAAAAAAPD/BwAAAAAA4P8/AAAAAACA//8AAAAAAAD//wcAAAAAAP7/HwAAAAAA+P//AAAAAADg//8DAAAAAMD//w8AAAAAAP8HfgAAAAAA/AfwAQAAAAD4D4AHAAAAAOAfAB4AAAAAgH8AcAAAAAAA/gDAAwAAAAD8AQAPAAAAAPAHADwAAAAAwA8A8AAAAAAAPwDAAwAAAAB8AAAPAAAAAPgBAD4AAAAA4AcA+AAAAACAHwDgAwAAAAA+AIAPAAAAAPgAAD8AAAAA4AMA/AAAAACADwD4AwAAAAA+AOAHAAAAAPgAwB8AAAAA4AOAfwAAAACABwD+AQAAAAAeAPwHAAAAAHgA+A8AAAAA4AHwPwAAAACAB+D/AAAAAAAewP8BAAAAAHiA/wcAAAAA4AH/DwAAAAAAD/4/AAAAAAA8/P8AAAAAAPD4/wEAAAAAwPP/BwAAAAAA//8PAAAAAAD8/x8AAAAAAPD/fwAAAAAAwP//AAAAAACA//8BAAAAAAD//wcAAAAAAP7/DwAAAAAA/v8fAAAAAAD8/z8AAAAAAPj//wAAAAAA8P//AQAAAADg//8DAAAAAMD//wcAAAAAgP//DwAAAAAA//8fAAAAAAD+/z8AAAAAAPz/fwAAAAAA+P//AQAAAADw//8HAAAAAOD//zwAAAAAgP//8QAAAAAA///BAwAAAAD+/wMPAAAAAPz/BzwAAAAA+P8P8AEAAADg/x+ABwAAAMD/PwAeAAAAgP9/AHgAAAAA/v8A4AEAAAD8/wGABwAAAPD/AwA+AAAA4P8HAPAAAACA/w8AwAMAAAD/HwCA/w8AAPw/AAD//wMA+H8AgP//PwDg/wEA////AYD/AwD///8fAP8HAP7///8A/B8A/P///wfwPwD4////P8B/APD/////gP8B4P////8H/geA/////z/4DwD//////+A/APz/////h/8A+P/z4P8f/gHg/8MD/v/4B4D/Aw/w/+MfAP4HPAD/j38A/A/gAfg//gHwH4AHwP/5B8A/AB4A/+cfAP8AeAD4nz8A/AHgAcB//gHwB4AHAP/xB4AfADwA/McfAH4A8ADgH38A+AHAA4B/+AHgBwAPAP7hBwAfADwA+Ic/AHwA8ADgD/wA4AOAB4A/8AOADwAeAP6AHwB8AHgA+AN+AOAD4AHgB/ADAB+AB8AfgA8A+AEeAD8AfgCAD/AA/gDwAwB4wAP4AYAfAAAAD/ADAPwAAAA84AcA4AcAAPDADwAAfwAAwIMfAAD4BwAAnj8AAIB/AAD4fwAAAPgPAOB/AAAAwP8f8P8AAAAA/P//fwAAAACA////AAAAAADA/+8DAAAAAAAAAA8AAAAAAAAAPAAAAAAAAADwAAAAAAAAAMADAAAAAAAAAB8AAAAAAAAAeAAAAAAAAADgAQAAAAAAAIAHAAAAAAAAAB4AAAAAAAAAeAAAAAAAAADgAQAAAAAAAIAPAAAAAAAAADwAAAAA/gMA8AAAAAD8PwDAAwAAAPj/AQAPAAAA8P8HADwAAADg/z8A8AAAAID//wDAAwAAAP//BwAPAAAA/P8fADwAAADw/38A8AAAAMD//wHAAwAAAP//BwAPAAAA/P8fADwAAADw/38A+AAAAMD//wDgAQAAAP//A4AHAAAA/P8HAB8AAADg/w8APAAAAID/DwD4AAAAAPwPAPABAAAA8A8A4AcAAACAPwDADwAAAAD8AeAfAAAAAOA/8D8AAAAAAP7/PwAAAAAA8P8/AAAAAAAA/B8AAAAAAAAAAAAAAAA="],"clef-F":[67,87,"AAAAAAAAAAAAAID/BwAAAAAAwP//AwAAAADA//9/AAAAAID/4P8PAAAAAP4A8P8BAAAA+AAA/h8AAADgAwDg/wEAAIAHAAD+HwAAAB4AAPD/AcAH+AAAAP8fgH/gAwAA8P8B/AcPAACA/w/wP3wAAAD4/4D/4QMAAMD/B/yPHwAAAP5/4H/8AAAA4P8D/uP/HwAA/z/wj///AQD4/wE+/P8/AMD/DwDg//8BAP5/AAD//x8A4P8HAPj//wAA/z8AwP//DwD4/wEA/v9/AMD/DwDw//8DAP5/AAD//x8A8P8DAPj//wCA/x8AwP//BwD8/wAA/P8/AOD/BwDg//8AAP8/AAD+/wcA+P8BAPD/HwDA/w8AAP9/AAD+f8AH8P8BAPD/A38A/gcAgP8f/AcAAAAA/P/wPwAAAADg/4P/AQAAAID/H/wPAAAAAPz/4H8AAAAA4P8H/gMAAAAA/x/gDwAAAAD4/wA+AAAAAMD/BwAAAAAAAP8/AAAAAAAA+P8AAAAAAADA/wcAAAAAAAD+HwAAAAAAAPj/AAAAAAAAwP8DAAAAAAAA/h8AAAAAAAD4fwAAAAAAAMD/AwAAAAAAAP8PAAAAAAAA+H8AAAAAAADg/wEAAAAAAAD/BwAAAAAAAPw/AAAAAAAA4P8AAAAAAACA/wMAAAAAAAD+DwAAAAAAAPA/AAAAAAAAwP8AAAAAAAAA/wcAAAAAAAD8HwAAAAAAAOA/AAAAAAAAgP8AAAAAAAAA/gMAAAAAAAD4DwAAAAAAAOA/AAAAAAAAgP8AAAAAAAAA/gEAAAAAAAD4BwAAAAAAAOAfAAAAAAAAwD8AAAAAAAAA/wAAAAAAAAD8AwAAAAAAAPgHAAAAAAAA4A8AAAAAAACAPwAAAAAAAAB/AAAAAAAAAP4AAAAAAAAA+AMAAAAAAADwBwAAAAAAAOAPAAAAAAAAAB8AAAAAAAAAGAAAAAAAAAAA"],"clef-C":[67,98,"AAAAAAAAAADwf8AAAP4/AMD/Aw8A/v8PAP4feAD4//8B8P/AA/AH+D+A/wcewAcA/wf8P/AAPwDwf+D/gQf4AwD/B/8PPOB/APA/+H/gAf8HgP/D/wMP/H8A/D/+H3jg/wPA//H/wAP/PwD+n/8HHvj/AfD//D/wwP8PgP/v/4EH/n8A/H//Dzzg/wHg//t/4AH/DwD///8DD/A/APj//x94AP8AwP///8ADwAEA/v//Bx4AAADw//8/8AAAAID///+BBwAAAPz//w88AAAA4P//f+ABAAAA////Aw8AAAD4//8feAAAAMD/9//AAwAAAP6//wcegAEA8P/9P/AAHACA/+//gQfwAAD8P/8PPIAPAOD/+X/gAXwAAP/H/wMP4AMA/D/+H3iAPwDg//D/wAP8AwD/h/8HHuAfAPwf/D/wgP8B8H/g/4EH/D/A/wH/Dzzw////A/h/4IH///8PwP8DD/7//x8A/h94+H/wDwDw/8Dj/wEAAID/B/7/DwAAAPw/8P8/AAAA4P+B//8BAAAA/w/8/wcAAAD4f+D/PwAAAMD/A///AwAAAP4f+P8fAAAA8P/A//8BAACA/wce/w8AAAD8P/Dw/8AfAOD/gQf///8PAP8PPPD///8B+H/gAf///z/A/wMP+H+A/wP+H3jA/wD4P/D/wAP8A4D/g/8HHuAfAPg//D/wAH8AwP/h/4EH8AEA/h//DzyADwDg//l/4AF8AAD/z/8DD+ABAPh//h94AA4AwP/3/8ADMAAA/r//Bx4AAADw//0/8AAAAID/7/+BBwAAAPz//w88AAAA4P//f+ABAAAA////Aw8AAAD4//8feAAAAMD////AAwAAAP7//wceAA4A8P//P/AA/gGA////gQf4HwD8//8PPOD/AeD//3/gAf8PAP/f/wMP/P8A+P/+H3jg/wfA//f/wAP/PwD+n/8HHvj/AfD//D/wwP8HwP/j/4EH/j8A/h//Dzzg/wDwf/h/4AH/A8D/wf8DD/AHAP4P/h94gB8A+D/w/8AD+ADgf4D/Bx6AP8D/Afw/8ADw//8D4P+BBwD//wcA/g8YAMD/BwAAAAAAAAAAAAA="],"rest-quarter":[26,72,"EAAA4AEAgA8AAH4AAPABAMAPAAB+AADwAwDAHwAA/gAA+AcAwD8AAP8AAPwHAOA/AID/AQD+DwD4fwDg/wGA/w8A/38A/P8B8P8D4P8PgP8fAP8/AP7/APz/Afj/B+D/D8D/PwD/fwD8/wHg/weA/w8A/D8A4P8AAP8DAPgPAOA/AAD/AAD4AwDAHwAAfwAA+AEAwA8AAH8A8PwB8P8P4P9/wP//A///D/7/f/j///P//9///3//P4D/fwDg/wCA/wEA/gcA8B8AgH8AAP4BAPAHAIA/AAD8AADgBwAAPwAA+AEAwAcAABwA"],"rest-8th":[24,41,"8AEA+ANg/Afw/g94/w98/x9+/x9///8///8//v8//P8f+D8f8AcfAAAfAIAPAIAPAIAPAMAPAMAHAMAHAOAHAOADAOADAPADAPADAPgBAPgBAPgBAPwAAPwAAPwAAP4AAH4AAH4AAH8AAD8AAD8AAD8AgD8AgB8AAA8A"],"rest-16th":[31,65,"APgAAAD/ATjA/wEO4P+AB/j/4AP8f/gB/j9/AP//P4D//x+A//8PgP//A4D/8QEAP/gAAAB8AAAAHwAAgA8AAMAHAADwAQAA+AAAAHwAAAAeAACADwAAwAcAAOAD8AH4AP4DfID/Az/A/4EP8P/BB/j/8AP8f/wA/v9/AP7/PwD//w8A//8HAP/3AwB++AEAAHwAAAA/AACAHwAAwAcAAPADAAD4AQAAfAAAAD8AAIAfAADADwAA8AMAAPgBAAD8AAAAPwAAgB8AAMAPAADwAwAA+AEAAPwAAAA/AACAHwAAwA8AAPAHAAD4AQAA/AAAAH8AAIAfAACABwAA"],"acc-sharp":[25,68,"AAAAAAAOAAAcAAA4AABwABzgADjAAXCAA+AAB8ABDoADHAAHOAAOcAAc4AA4wD9wgH/ggP/Agf+B4/8D//8H/v8P//+f//+f//8P//8P/v8P/H8c+D848B9w4B/gwD3AAXCAA+AABsABDoADHAAHOAAOcAwc4B84wD9wwH/gwP/A4f+B//+D///H///P///H//+D//8D//8H/h8O/A8c+Ac48A9wYBzgADjAAXCAA+AAB8ABDoADHAAHOAAOcAAc4AA4wAFwAADgAADAAQCAAwAAAAAA"],"acc-flat":[23,60,"AAAADgCABwDAAwDgAQDwAAB4AAA8AAAeAAAPAIAHAMADAOABAPAAAHgAADwAAB4AAA8AgAcAwAMA4AEA8AAAeAAAPAAAHgAADwCABwDAAwDggQ/w8B94/D/8/z/+/x//4Z8/4M8P8OcD8PcA+HsA/DwAfh4APw+AnwfgxwPw4wH88AB+eIAfPOAHHvgBD36Ahx/A9wfg/wDgPwDwDwD4AQB8AAAeAAADAAAAAAA="],"acc-natural":[16,66,"BgAPAA8ADwAPAA8ADwAPAA8ADwAPAA8ADwAPAA8AD8AP+I/////////////////////////wH/AP8A/wD/AP8A/wD/AP8A/wD/AP+A/+j/////////////////////////9/8A/wA/AA8ADwAPAA8ADwAPAA8ADwAPAA8ADwAPAA4AAA"],"head-filled":[30,24,"AAB/AAD8fwDA/38A/P8/gP//D/D//wf+///B//9/8P//H/7//8f////x//8//P//j////+P//3/4//8P/v//g///f+D//wfw//8A/P8fAP7/AQD+HwAAfgAA"],"head-half":[29,25,"AMA/AAD/PwD4/w/A//8D/D/4wP8AHvwHgMN/AHD8AwCOHwDA+QEAPB8AwOcBAHweAMDPAwD8OADgHwcA/uEA8D8cgP8DB/w/4PP/A/j/HwD+/wAA/wEAAAAAAA=="]};
+const BANK = {"digit-0":[43,48,"AAD8AwAAAPx/AAAA+P8PAADwH/8BAMB/8D8AAP8B/wMA/g/wPwDwP4D/AcD/AfwfAP8HwP8B/D8A/h/g/wHw/4D/BwD/D/w/APh/4P8BwP+D/w8A/j/8fwDw/+H/A4D/D/8fAPz//H8AwP/n/wMA/j//HwDw//n/AID/z/8HAPx//j8A4P/z/wEA/5//DwD4//x/AMD/5/8HAP4//z8A+P/x/wHA/4f/DwD+P/x/APD/wf8DgP8H/h8A/D/g/wHw/wH/D4D/B/B/APw/gP8H8P8A+D+A/wOA/wP+DwD8H/B/AID/wf8BAPi//wcAgP//DwAA+P8/AAAA/j8AAACAfwAA"],"digit-1":[29,48,"APh/AID/HwD4/wMA/38A4P8PAP7/AcD/PwD8/weA//8A+P8fAP//A/D/fwD+/w/A//8B/P8/gO//B/j8/wCf/x/w8f8DPv5/4MP/Dzz4/4EH/z944P8HD/z/AID/HwDw/wMA/n8AwP8PAPj/AQD/PwDg/wcA/P8AgP8fAPD/AwD+fwDA/w8A+P8BAP8/AOD/BwD8/wCA/x8A8P8DAP9/APD/P8D//x/8//8D//9/"],"digit-2":[40,50,"AAAAAAAA8P8PAAD+/38AgB/A/wHABwD/A+ADAP8P8AMA/h/4BwD+H/wPAPw//D8A/H/+fwD8f/7/APx//v8A/P/+/wD8//7/APz//v8A/P/+/wD+//z/AP7//P8A/v/4fwD/f/B/AP9/4D+A/z+AD4D/HwAAwP8PAADg/wcAAPD/AQAA+H8AAAD8DwAAAP4BAACAfwAAAMAfAAAA8AcAAAD4AQAAAPwAAGAA/x4AYID//wNwwP//H3DA////fOD///9/8P///z/w////P/j///8/+P///x/8////H/zH//8P/gD//wd+APz/Az4A+P8BHADAfwAIAAAAAA=="],"digit-3":[38,48,"AMA/AAAA/v8AAPD//wAA//D/AOAP4P8A/AHwf4B/APg/4H8A/g/8fwD/B/8fwP/B/w/wf/D/A/w//P8A/w//P8D/gf8P8H/g/wH+H/B/gP8H+A/w/wBwAPwfAADA/wMAAPw/AADg/wEAgP8/AADw/z8AAPj/fwAAAP9/AAAA/z8AAAD/HwAAwP8P8AHg/wP/AfD/4f8A/H/8fwD/H/8fwP/v/wfw//v/Afx//v8A/5//H8D/5/8H8P/5/wD+P/w/gP8P/w/w/4H/Af4/4P/A/wfw////APD//w8A8P9/AADg/wMA"],"digit-4":[42,49,"AAAAAAAAAP//AAAA/v8DAAD4/wcAAOD/HwAAgP8/AAAA/n8AAAD4/wEAAPD/AwAAwP8HAAAA/x8cAAD8P3gAAPh/8AEA4P/gBwCA/4MfAAD/B38AAPwP/gEA+B/8BwDgf/gfAMD/8H8AAP/B/wEA/oP/BwD4B/8fAPAf/H8AwD/w/wGAf8D/BwD+AP8fAPwB/H8A+APw/wHgB8D/B8APAP8fgB8A/H8A///////9//////f/////n/////8/AADw/wEAAMD/BwAAAP8fAAAA/H8AAADw/wEAAMD/BwAAAP8fAAAA/n8AAAD8/wMAAP7/fwAA/P//AwDw//8PAMD//x8A"],"digit-5":[37,48,"AAAAAAD+//8f4P///wP8//9/gP///w/w////AP7//x/A////Afj//x8A////AeD//w8APPgHAIAHAAAA8AAAAAAeAAAAwAEAAAA4AAAAAAf+fwDg+P8/APz//w+AP/D/B/gD+P8BHwD8P+ABAP8PGADg/wMAAPh/AAAA/x8AAMD/A/4A+H/wfwD/H/4f4P/j/wP8f/7/gP/P/x/w//n/A/4//3/A/+f/D/j//P+B/4//H/D/8f8B/h/8H+D/g/8B/D/gH+D/A/wH/j8A////A4D//z8A4P//AADA/wMA"],"digit-6":[39,48,"AAD4AwAAwP8fAAD4wz8AAP/APwDAP+A/APgP+D8A/gP+HwD/Af8fwP/A/w/wP+D/B/gf8P8B/g/4/wD/B/h/wP8D/B/g/wD8B/h/APgA/D8AAAD+HwAAAP8PAADA/wf4AOD/g/8B8P/x/wP4//3/B/z///8H/v/H/wf//8D/h/9/wP/H/x/g/+P/D+D/8/8D8P/x/wH4//j/APx//H8A/H/+PwD+P/4fAP8P/w+A/4f/B8D/g/8D4P+B/wH4f8D/APw/wP8A/g/Af4D/B+B/wP8BwD/wfwDAP/wfAMD//wMAgP9/AAAA/wMA"],"digit-7":[39,48,"APADAAAA/g8AXMD/HwBu8P8fgHf8/x/A+///H/D9//8f+P7//z9+/////7//////3//////nn/////MD////+QD+/388AP7/Px4A/P8fBwD854cDAPDxwwEAAPxgAAAAfiAAAIA/AAAA4A8AAAD4BwAAAP4BAACA/wAAAOA/AAAA+B8AAAD+DwAAgP8DAADg/wEAAPj/AAAA/j8AAID/HwAAwP8PAADw/wMAAPz/AQAA/v8AAID/fwAAwP8/AADw/x8AAPj/BwAA/v8DAAD//wEAgP//AADA/38AAOD/PwAA8P8fAAB4gAcA"],"digit-8":[39,50,"AAA/AAAA+P8HAID//w8A8D/wHwD8A8A/AH8AgB/AHwCAH/APAIAf/AMAwA/+AQDAB/8BAOCH/wAA8MN/AAD48X8AAPzw/wAAPvj/AIAf/P8D4A/+/wf4A///H/4A////f4D///8PgP///wOA////B4D///8HgP///wcA////B4D///8H4P///wf8+f//Az/w///BD+D///EDwP///ACA/39+AAD/vx8AAP/fDwAA/+8DAID/8wEAgP/5AQDA//wAAOB/fgAA8B9+AAD4Dz8AAP4DPwAA/wB/AMB/AP8A+A8A/4f/AwD+/38AAPz/DwAA4H8AAA=="],"digit-9":[39,48,"AMA/AAAA/v8BAMD//wcA+D/8BwD+D/wHgP8H/AfA/wH+B/D/AP4H/D8A/wP+H4D/A/8PwP/B/wfg/+H/A+D/8P8B8P/4/wD4f/x/AP4//j8A/z//H4D/H/8PwP+P/w/g/8f/B/j/w/8H/v/B/wf//8D/5/9/4P///z/A/3//H8D/j/8PgP/B/wcAAOD/AwAA8P8BAAD4/wAAAPw/AD8A/h/AfwD/D/A/gP8D/D/A/wH/H/B/gP8P+D/A/wf8D+D/A/4D8P+B/wH4f8B/APgf8B8A/A/4BwD8A/4AAPzDPwAA+P8DAADgPwAA"],"time-C":[41,50,"AAAAAAAAAP4HAAAA/38AAID/gAcAwH8AHADAfwBwAMA/AOABwH8AwAfAfwDAD8B/APA/gP8A8H+A/wHw/4H/AfD/A/8D4P8H/gfA/w/+B4D/H/wPAP8//B8A/n/4PwD8f/B/APD/4P8A4P/g/wGA/8D/AwB8gP8HAAAA/w8AAAD+HwAAAPw/AAAA+H8AAADw/wAAAOD/AQAAnP8DAAA4/wcAAHD+HwAA4Pw/AADA8X8AAIDj/wAAAMP/AwAAB/8HAAAO/g8AAA74PwAAHOB/AAAcwP8BADwA/wcAPAD8HwA8APB/AD4AwP8DPwAA/v8fAAD4/w8AAID/AwAAAAAAAAA="],"time-cut":[41,70,"AAAOAAAAABwAAAAAOAAAAABwAAAAAOAAAAAAwAEAAACAAwAAAAAHAAAAAA4AAAAAHAAAAAB4AAAAAPg/AAAA/v8DAAD/Bx4AAP8HcACA/wfAA4D/D4APgP8fAB8A/zkAfwD/ccD/AP/j4P8D/sPB/wf+h8P/D/wPh/8f/B8O/z/4Hxz+f/A/OPz/8H9w+P/h/+Dw/8H/wcH/g/+DA/+D/wcH/AP/Dw7AAP4fHAAA/D84AAD4f3AAAPD/4AAA4P/BAQDA/4MDAID/BwcAcP4PDgDg/B8cAMD5fzgAgPP/cAAAx//hAACG/8MBAA7+jwMAHPwfBwAY8D8OADjg/xwAMID/OQBwAP5/AHAA+P8AeADg/wH8AID/B34AAP7/fwAA8P8/AACA/w8AAAB8AAAAAHAAAAAA4AAAAADAAQAAAIADAAAAAAcAAAAADgAAAAAcAAAAADgAAAAAcAAAAADgAAAAAAAAAAA="],"clef-G":[66,170,"AAAAAAAAAAAAAAAAAPAAAAAAAAAA4AcAAAAAAADAPwAAAAAAAID/AQAAAAAAAP8PAAAAAAAA/j8AAAAAAAD8/wEAAAAAAPD/BwAAAAAA4P8/AAAAAACA//8AAAAAAAD//wcAAAAAAP7/HwAAAAAA+P//AAAAAADg//8DAAAAAMD//w8AAAAAAP8HfgAAAAAA/AfwAQAAAAD4D4AHAAAAAOAfAB4AAAAAgH8AcAAAAAAA/gDAAwAAAAD8AQAPAAAAAPAHADwAAAAAwA8A8AAAAAAAPwDAAwAAAAB8AAAPAAAAAPgBAD4AAAAA4AcA+AAAAACAHwDgAwAAAAA+AIAPAAAAAPgAAD8AAAAA4AMA/AAAAACADwD4AwAAAAA+AOAHAAAAAPgAwB8AAAAA4AOAfwAAAACABwD+AQAAAAAeAPwHAAAAAHgA+A8AAAAA4AHwPwAAAACAB+D/AAAAAAAewP8BAAAAAHiA/wcAAAAA4AH/DwAAAAAAD/4/AAAAAAA8/P8AAAAAAPD4/wEAAAAAwPP/BwAAAAAA//8PAAAAAAD8/x8AAAAAAPD/fwAAAAAAwP//AAAAAACA//8BAAAAAAD//wcAAAAAAP7/DwAAAAAA/v8fAAAAAAD8/z8AAAAAAPj//wAAAAAA8P//AQAAAADg//8DAAAAAMD//wcAAAAAgP//DwAAAAAA//8fAAAAAAD+/z8AAAAAAPz/fwAAAAAA+P//AQAAAADw//8HAAAAAOD//zwAAAAAgP//8QAAAAAA///BAwAAAAD+/wMPAAAAAPz/BzwAAAAA+P8P8AEAAADg/x+ABwAAAMD/PwAeAAAAgP9/AHgAAAAA/v8A4AEAAAD8/wGABwAAAPD/AwA+AAAA4P8HAPAAAACA/w8AwAMAAAD/HwCA/w8AAPw/AAD//wMA+H8AgP//PwDg/wEA////AYD/AwD///8fAP8HAP7///8A/B8A/P///wfwPwD4////P8B/APD/////gP8B4P////8H/geA/////z/4DwD//////+A/APz/////h/8A+P/z4P8f/gHg/8MD/v/4B4D/Aw/w/+MfAP4HPAD/j38A/A/gAfg//gHwH4AHwP/5B8A/AB4A/+cfAP8AeAD4nz8A/AHgAcB//gHwB4AHAP/xB4AfADwA/McfAH4A8ADgH38A+AHAA4B/+AHgBwAPAP7hBwAfADwA+Ic/AHwA8ADgD/wA4AOAB4A/8AOADwAeAP6AHwB8AHgA+AN+AOAD4AHgB/ADAB+AB8AfgA8A+AEeAD8AfgCAD/AA/gDwAwB4wAP4AYAfAAAAD/ADAPwAAAA84AcA4AcAAPDADwAAfwAAwIMfAAD4BwAAnj8AAIB/AAD4fwAAAPgPAOB/AAAAwP8f8P8AAAAA/P//fwAAAACA////AAAAAADA/+8DAAAAAAAAAA8AAAAAAAAAPAAAAAAAAADwAAAAAAAAAMADAAAAAAAAAB8AAAAAAAAAeAAAAAAAAADgAQAAAAAAAIAHAAAAAAAAAB4AAAAAAAAAeAAAAAAAAADgAQAAAAAAAIAPAAAAAAAAADwAAAAA/gMA8AAAAAD8PwDAAwAAAPj/AQAPAAAA8P8HADwAAADg/z8A8AAAAID//wDAAwAAAP//BwAPAAAA/P8fADwAAADw/38A8AAAAMD//wHAAwAAAP//BwAPAAAA/P8fADwAAADw/38A+AAAAMD//wDgAQAAAP//A4AHAAAA/P8HAB8AAADg/w8APAAAAID/DwD4AAAAAPwPAPABAAAA8A8A4AcAAACAPwDADwAAAAD8AeAfAAAAAOA/8D8AAAAAAP7/PwAAAAAA8P8/AAAAAAAA/B8AAAAAAAAAAAAAAAA="],"clef-F":[67,87,"AAAAAAAAAAAAAID/BwAAAAAAwP//AwAAAADA//9/AAAAAID/4P8PAAAAAP4A8P8BAAAA+AAA/h8AAADgAwDg/wEAAIAHAAD+HwAAAB4AAPD/AcAH+AAAAP8fgH/gAwAA8P8B/AcPAACA/w/wP3wAAAD4/4D/4QMAAMD/B/yPHwAAAP5/4H/8AAAA4P8D/uP/HwAA/z/wj///AQD4/wE+/P8/AMD/DwDg//8BAP5/AAD//x8A4P8HAPj//wAA/z8AwP//DwD4/wEA/v9/AMD/DwDw//8DAP5/AAD//x8A8P8DAPj//wCA/x8AwP//BwD8/wAA/P8/AOD/BwDg//8AAP8/AAD+/wcA+P8BAPD/HwDA/w8AAP9/AAD+f8AH8P8BAPD/A38A/gcAgP8f/AcAAAAA/P/wPwAAAADg/4P/AQAAAID/H/wPAAAAAPz/4H8AAAAA4P8H/gMAAAAA/x/gDwAAAAD4/wA+AAAAAMD/BwAAAAAAAP8/AAAAAAAA+P8AAAAAAADA/wcAAAAAAAD+HwAAAAAAAPj/AAAAAAAAwP8DAAAAAAAA/h8AAAAAAAD4fwAAAAAAAMD/AwAAAAAAAP8PAAAAAAAA+H8AAAAAAADg/wEAAAAAAAD/BwAAAAAAAPw/AAAAAAAA4P8AAAAAAACA/wMAAAAAAAD+DwAAAAAAAPA/AAAAAAAAwP8AAAAAAAAA/wcAAAAAAAD8HwAAAAAAAOA/AAAAAAAAgP8AAAAAAAAA/gMAAAAAAAD4DwAAAAAAAOA/AAAAAAAAgP8AAAAAAAAA/gEAAAAAAAD4BwAAAAAAAOAfAAAAAAAAwD8AAAAAAAAA/wAAAAAAAAD8AwAAAAAAAPgHAAAAAAAA4A8AAAAAAACAPwAAAAAAAAB/AAAAAAAAAP4AAAAAAAAA+AMAAAAAAADwBwAAAAAAAOAPAAAAAAAAAB8AAAAAAAAAGAAAAAAAAAAA"],"clef-C":[67,98,"AAAAAAAAAADwf8AAAP4/AMD/Aw8A/v8PAP4feAD4//8B8P/AA/AH+D+A/wcewAcA/wf8P/AAPwDwf+D/gQf4AwD/B/8PPOB/APA/+H/gAf8HgP/D/wMP/H8A/D/+H3jg/wPA//H/wAP/PwD+n/8HHvj/AfD//D/wwP8PgP/v/4EH/n8A/H//Dzzg/wHg//t/4AH/DwD///8DD/A/APj//x94AP8AwP///8ADwAEA/v//Bx4AAADw//8/8AAAAID///+BBwAAAPz//w88AAAA4P//f+ABAAAA////Aw8AAAD4//8feAAAAMD/9//AAwAAAP6//wcegAEA8P/9P/AAHACA/+//gQfwAAD8P/8PPIAPAOD/+X/gAXwAAP/H/wMP4AMA/D/+H3iAPwDg//D/wAP8AwD/h/8HHuAfAPwf/D/wgP8B8H/g/4EH/D/A/wH/Dzzw////A/h/4IH///8PwP8DD/7//x8A/h94+H/wDwDw/8Dj/wEAAID/B/7/DwAAAPw/8P8/AAAA4P+B//8BAAAA/w/8/wcAAAD4f+D/PwAAAMD/A///AwAAAP4f+P8fAAAA8P/A//8BAACA/wce/w8AAAD8P/Dw/8AfAOD/gQf///8PAP8PPPD///8B+H/gAf///z/A/wMP+H+A/wP+H3jA/wD4P/D/wAP8A4D/g/8HHuAfAPg//D/wAH8AwP/h/4EH8AEA/h//DzyADwDg//l/4AF8AAD/z/8DD+ABAPh//h94AA4AwP/3/8ADMAAA/r//Bx4AAADw//0/8AAAAID/7/+BBwAAAPz//w88AAAA4P//f+ABAAAA////Aw8AAAD4//8feAAAAMD////AAwAAAP7//wceAA4A8P//P/AA/gGA////gQf4HwD8//8PPOD/AeD//3/gAf8PAP/f/wMP/P8A+P/+H3jg/wfA//f/wAP/PwD+n/8HHvj/AfD//D/wwP8HwP/j/4EH/j8A/h//Dzzg/wDwf/h/4AH/A8D/wf8DD/AHAP4P/h94gB8A+D/w/8AD+ADgf4D/Bx6AP8D/Afw/8ADw//8D4P+BBwD//wcA/g8YAMD/BwAAAAAAAAAAAAA="],"rest-quarter":[26,72,"EAAA4AEAgA8AAH4AAPABAMAPAAB+AADwAwDAHwAA/gAA+AcAwD8AAP8AAPwHAOA/AID/AQD+DwD4fwDg/wGA/w8A/38A/P8B8P8D4P8PgP8fAP8/AP7/APz/Afj/B+D/D8D/PwD/fwD8/wHg/weA/w8A/D8A4P8AAP8DAPgPAOA/AAD/AAD4AwDAHwAAfwAA+AEAwA8AAH8A8PwB8P8P4P9/wP//A///D/7/f/j///P//9///3//P4D/fwDg/wCA/wEA/gcA8B8AgH8AAP4BAPAHAIA/AAD8AADgBwAAPwAA+AEAwAcAABwA"],"rest-8th":[24,41,"8AEA+ANg/Afw/g94/w98/x9+/x9///8///8//v8//P8f+D8f8AcfAAAfAIAPAIAPAIAPAMAPAMAHAMAHAOAHAOADAOADAPADAPADAPgBAPgBAPgBAPwAAPwAAPwAAP4AAH4AAH4AAH8AAD8AAD8AAD8AgD8AgB8AAA8A"],"rest-16th":[31,65,"APgAAAD/ATjA/wEO4P+AB/j/4AP8f/gB/j9/AP//P4D//x+A//8PgP//A4D/8QEAP/gAAAB8AAAAHwAAgA8AAMAHAADwAQAA+AAAAHwAAAAeAACADwAAwAcAAOAD8AH4AP4DfID/Az/A/4EP8P/BB/j/8AP8f/wA/v9/AP7/PwD//w8A//8HAP/3AwB++AEAAHwAAAA/AACAHwAAwAcAAPADAAD4AQAAfAAAAD8AAIAfAADADwAA8AMAAPgBAAD8AAAAPwAAgB8AAMAPAADwAwAA+AEAAPwAAAA/AACAHwAAwA8AAPAHAAD4AQAA/AAAAH8AAIAfAACABwAA"],"acc-sharp":[25,68,"AAAAAAAOAAAcAAA4AABwABzgADjAAXCAA+AAB8ABDoADHAAHOAAOcAAc4AA4wD9wgH/ggP/Agf+B4/8D//8H/v8P//+f//+f//8P//8P/v8P/H8c+D848B9w4B/gwD3AAXCAA+AABsABDoADHAAHOAAOcAwc4B84wD9wwH/gwP/A4f+B//+D///H///P///H//+D//8D//8H/h8O/A8c+Ac48A9wYBzgADjAAXCAA+AAB8ABDoADHAAHOAAOcAAc4AA4wAFwAADgAADAAQCAAwAAAAAA"],"acc-flat":[23,60,"AAAADgCABwDAAwDgAQDwAAB4AAA8AAAeAAAPAIAHAMADAOABAPAAAHgAADwAAB4AAA8AgAcAwAMA4AEA8AAAeAAAPAAAHgAADwCABwDAAwDggQ/w8B94/D/8/z/+/x//4Z8/4M8P8OcD8PcA+HsA/DwAfh4APw+AnwfgxwPw4wH88AB+eIAfPOAHHvgBD36Ahx/A9wfg/wDgPwDwDwD4AQB8AAAeAAADAAAAAAA="],"acc-natural":[16,66,"BgAPAA8ADwAPAA8ADwAPAA8ADwAPAA8ADwAPAA8AD8AP+I/////////////////////////wH/AP8A/wD/AP8A/wD/AP8A/wD/AP+A/+j/////////////////////////9/8A/wA/AA8ADwAPAA8ADwAPAA8ADwAPAA8ADwAPAA4AAA"],"head-filled":[30,24,"AAB/AAD8fwDA/38A/P8/gP//D/D//wf+///B//9/8P//H/7//8f////x//8//P//j////+P//3/4//8P/v//g///f+D//wfw//8A/P8fAP7/AQD+HwAAfgAA"],"head-half":[29,25,"AMA/AAD/PwD4/w/A//8D/D/4wP8AHvwHgMN/AHD8AwCOHwDA+QEAPB8AwOcBAHweAMDPAwD8OADgHwcA/uEA8D8cgP8DB/w/4PP/A/j/HwD+/wAA/wEAAAAAAA=="],"acc-double-sharp":[24,24,"fgA//4B//4H//4H//4H//4H//8N//+N//uc/gP8BAH4AADwAADwAAP4AgP8B/uc//8N//8N//4H//4H//4H//4B//4B/fgA/"],"acc-double-flat":[40,60,"AAAAAAAcAHgAAB4AeAAAHgB8AAAeAHgAAB4AeAAAHgB4AAAeAHgAAB4AeAAAHgB4AAAeAHgAAB4AeAAAHgB4AAAeAHgAAB4AeAAAHgB4AAAeAHgAAB4AeAAAHgB4AAAeAHgAAB4AeAAAHgB4AAAeAHgAAB4AeAAAHgB4AAAeAHgAAB4AeAAAHgB4AAAe+HjgAR7+f/wPvv///h/+////P/7///9//sP/h3/+gP8Df36A/wD+PgB/AP4eAH8A/h4AfwD+HgB/AP4eAH8Afh4AfwB+HoB/AH8egH8APx7Af4AfHuB/gB8e4HvADx7we+AHHvh58AMe/Hj4AR4/ePwAvh/4fwD8D/gfAPwH+A8A/AH4BwD8APgDAHwA+AEAPABwAAAMADAAAAAAAAAA"],"dot":[10,10,"APDj33///f+ff/7gAQ=="]};
 
-module.exports = { dewarpPage, dewarpReading, applyOpsJs, readHeaders, precleanPage, pageQuality, precleanPlan, precleanStats, readTime, readClefAt, makeJsApi };
+module.exports = { fallbackAccidental, dewarpPage, dewarpReading, applyOpsJs, readHeaders, precleanPage, pageQuality, precleanPlan, precleanStats, readTime, readClefAt, makeJsApi };
 
 };
 defs["digitglyphs"]=function(require,module,exports){
@@ -9215,7 +9247,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   // and credits, part abbreviations, dynamics, hairpins, tempo and expression text
   let read = { dirs: parts.map(() => units.map(() => [])), head: {}, nDyn: 0, nWedge: 0, nWords: 0 };
   try { read = readMarks(pages, segs, units, parts, partMeasures); } catch (e) { warnings.push(`Text and dynamics not placed (${e.message}).`); }
-  if (read.nDyn || read.nWedge || read.nWords) warnings.push(`Read from the page: ${[read.nDyn && `${read.nDyn} dynamic${read.nDyn > 1 ? 's' : ''}`, read.nWedge && `${read.nWedge} hairpin${read.nWedge > 1 ? 's' : ''}`, read.nWords && `${read.nWords} tempo / expression text${read.nWords > 1 ? 's' : ''}`].filter(Boolean).join(', ')}.`);
+  if (read.nDyn || read.nWedge || read.nWords || read.nTie || read.nSlur || read.nGrace) warnings.push(`Read from the page: ${[read.nDyn && `${read.nDyn} dynamic${read.nDyn > 1 ? 's' : ''}`, read.nWedge && `${read.nWedge} hairpin${read.nWedge > 1 ? 's' : ''}`, read.nWords && `${read.nWords} tempo / expression text${read.nWords > 1 ? 's' : ''}`, read.nTie && `${read.nTie} tie${read.nTie > 1 ? 's' : ''}`, read.nSlur && `${read.nSlur} slur${read.nSlur > 1 ? 's' : ''}`, read.nGrace && `${read.nGrace} grace note${read.nGrace > 1 ? 's' : ''}`].filter(Boolean).join(', ')}.`);
   const xml = toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, measures, credits, unitSys, title: read.head.title, head: read.head, dirs: read.dirs });
   const nNotes = partMeasures.map(pm => pm.reduce((a, m) => a + m.reduce((b, s) => b + s.events.filter(e => !e.rest && !e.forward).length, 0), 0));
   const ranges = partMeasures.map(pm => {
@@ -9583,6 +9615,81 @@ function readMarks(pages, segs, units, parts, partMeasures) {
       }
     }
   }
+  // slurs and ties (text.js curves) whose two ends sit at note heads: a curve
+  // joining two heads of one pitch on one staff is a tie, else a slur. Marked
+  // on the heads (h.tieOn / h.tieOff, h.slurOn / h.slurOff counts) for toMusicXML.
+  let nTie = 0, nSlur = 0;
+  {
+    const written = new Set();
+    for (const pm of partMeasures) for (const m of pm) for (const st of m || []) if (st) for (const e of st.events) for (const h of e.heads || []) written.add(h);
+    const seen = new Set();
+    for (const pg of pages) {
+      const fr = pg.fr, m = fr && fr._marks && fr._marks.marks;
+      if (!m || seen.has(fr)) continue;
+      seen.add(fr);
+      const heads = (fr.heads || []).filter(h => written.has(h));
+      const near = (x, y, side) => {
+        let best = null, bd = Infinity;
+        for (const h of heads) {
+          const sp = h.sp || fr.ss, dx = side < 0 ? x - h.x : h.x - x;
+          if (dx < -0.6 * sp || dx > 1.8 * sp || Math.abs(h.y - y) > 1.6 * sp) continue;
+          const d = Math.abs(dx - 0.5 * sp) + Math.abs(h.y - y);
+          if (d < bd) { bd = d; best = h; }
+        }
+        return best;
+      };
+      for (const c of m.slurs) {
+        if (!c.ends) continue;
+        const a = near(c.ends[0][0], c.ends[0][1], -1), b = near(c.ends[1][0], c.ends[1][1], 1);
+        // half a tie or slur at a system break: one end at a head, the other
+        // at the end of the staff (or its start, after clef and key)
+        if ((!a) !== (!b)) {
+          const h = a || b, st = fr.staves[h.staff];
+          if (!st) continue;
+          const sp = h.sp || fr.ss, x = a ? c.ends[1][0] : c.ends[0][0];
+          const atEdge = a ? x >= st.right - 1.5 * sp : !heads.some(o => o.staff === h.staff && o.x < h.x - 0.5 * sp) && x < h.x - 0.5 * sp;
+          if (!atEdge) continue;
+          const tieish = c.box[2] - c.box[0] <= 4 * sp && Math.abs(c.ends[0][1] - c.ends[1][1]) <= 0.6 * sp;
+          if (tieish) { if (a) a.tieOn = true; else b.tieOff = true; nTie++; }
+          else { if (a) a.slurOn = (a.slurOn || 0) + 1; else b.slurOff = (b.slurOff || 0) + 1; nSlur++; }
+          continue;
+        }
+        if (!a || !b || a === b || b.x <= a.x) continue;
+        if (a.staff === b.staff && a.p === b.p) { a.tieOn = true; b.tieOff = true; nTie++; }
+        else { a.slurOn = (a.slurOn || 0) + 1; b.slurOff = (b.slurOff || 0) + 1; nSlur++; }
+      }
+    }
+  }
+  // grace notes (text.js): each small head goes before the first note after
+  // it on its staff, in each part reading that staff (e.graces)
+  let nGrace = 0;
+  {
+    const seen = new Set();
+    for (const pg of pages) {
+      const fr = pg.fr, m = fr && fr._marks && fr._marks.marks;
+      if (!m || seen.has(fr) || !m.grace) continue;
+      seen.add(fr);
+      for (const g of m.grace) {
+        const sy = pg.asm.systems[g.sys], s = sy && sy.staves[g.k];
+        if (!s) continue;
+        const st = s.st, sp = st.space || fr.ss;
+        for (const { pi } of partsOn(g.k)) {
+          const at = locate(fr, sy.index, g.k, Math.max(...g.heads.map(h => h.x)) + 2.5 * sp, pi);
+          if (!at) continue;
+          // the first written note right of the grace notes on that staff
+          let target = null;
+          for (const sm of partMeasures[pi][at.mi] || []) if (sm && sm.staff === g.k) for (const e of sm.events) {
+            if (e.rest || e.forward || e.x == null || e.x <= g.box[2] - 0.2 * sp || e.x > g.box[2] + 5 * sp) continue;
+            if (!target || e.x < target.x) target = e;
+          }
+          if (!target) continue;
+          const heads = g.heads.slice().sort((a, b) => a.x - b.x);
+          target.graces = (target.graces || []).concat(heads.map(h => ({ p: Math.round((st.yAt(2, h.x) - h.y) / (sp / 2)), slash: g.slash && heads.length === 1, n: heads.length })));
+          nGrace += heads.length;
+        }
+      }
+    }
+  }
   // a keyboard part's name is printed between its staves: the abbreviation
   // stands on the staff nearest to it, which may be the lower one
   for (const p of parts) if (!p.abbrev && p.src.length > 1) {
@@ -9593,7 +9700,7 @@ function readMarks(pages, segs, units, parts, partMeasures) {
     }
   }
   for (const pm of dirs) for (const l of pm) l.sort((a, b) => a.t - b.t);
-  return { dirs, head, nDyn, nWedge, nWords };
+  return { dirs, head, nDyn, nWedge, nWords, nTie, nSlur, nGrace };
 }
 
 function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, credits, unitSys, head, dirs }) {
@@ -9808,6 +9915,11 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
           }
           const hc = e.heads[0].clef || clef;
           if (curClef[si] !== undefined && hc !== curClef[si]) { L.push(`      <attributes>${clefXML(hc, multi ? si + 1 : 0)}</attributes>`); curClef[si] = hc; }
+          // grace notes read before this note (no duration; a slash for an acciaccatura)
+          for (const gn of e.graces || []) {
+            const pt = pitchOf(hc, gn.p, altsFor(e.heads[0].fifths != null ? e.heads[0].fifths : keyAt(mi)), {});
+            L.push(`      <note><grace${gn.slash ? ' slash="yes"' : ''}/><pitch><step>${pt.step}</step>${pt.alter ? `<alter>${pt.alter}</alter>` : ''}<octave>${pt.octave}</octave></pitch><voice>${voice}</voice><type>${gn.n > 1 ? '16th' : 'eighth'}</type><stem>up</stem>${staffTag}</note>`);
+          }
           e.heads.forEach((h, hi) => {
             const pos = h.p;
             const hClef = h.clef || clef, hAlt = altsFor(h.fifths != null ? h.fifths : keyAt(mi));
@@ -9820,8 +9932,12 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
             h.shown ||= { q: e.q, type: tt ? tt.type : null, dots: tt ? tt.dots : 0, tuplet: tmod ? tu.actual : 0 };
             if (!noted.has(h)) { noted.add(h); noteAt.push([h, L.length]); }
             const acc = h.acc && !e.tieStop ? `<accidental>${h.acc}</accidental>` : '';
-            const tie = (e.tieStop ? '<tie type="stop"/>' : '') + (e.tieStart ? '<tie type="start"/>' : '');
-            const tied = e.tieStop || e.tieStart ? `<notations>${e.tieStop ? '<tied type="stop"/>' : ''}${e.tieStart ? '<tied type="start"/>' : ''}</notations>` : '';
+            // ties: a note cut at a barline (e.tieStart / e.tieStop) or a tie read on the page (h.tieOn / h.tieOff);
+            // slurs read on the page (h.slurOn / h.slurOff)
+            const tStop = e.tieStop || h.tieOff, tStart = e.tieStart || h.tieOn;
+            const tie = (tStop ? '<tie type="stop"/>' : '') + (tStart ? '<tie type="start"/>' : '');
+            const slurs = hi === 0 ? (e.heads.some(x => x.slurOff) ? '<slur type="stop" number="1"/>' : '') + (e.heads.some(x => x.slurOn) ? '<slur type="start" number="1"/>' : '') : '';
+            const tied = tStop || tStart || slurs ? `<notations>${tStop ? '<tied type="stop"/>' : ''}${tStart ? '<tied type="start"/>' : ''}${slurs}</notations>` : '';
             // a head with both stems: up in the upper voice, down in the lower
             const sd = h.stemDir === 2 ? (e.low ? -1 : 1) : h.stemDir;
             const stem = sd === 1 ? '<stem>up</stem>' : sd === -1 ? '<stem>down</stem>' : '';
@@ -10681,7 +10797,7 @@ defs["symbols"]=function(require,module,exports){
 
 const { detectRests } = require('./rests');
 const { accidentalGlyph } = require('./assemble');
-const { classifyMarks, ROLE_LABEL } = require('./text');
+const { classifyMarks, ROLE_LABEL, _slurLike: slurLike } = require('./text');
 
 const r1 = (v) => Math.round(v * 10) / 10;
 const box = (b) => [r1(b.x0), r1(b.y0), r1(b.x1), r1(b.y1)];
@@ -10811,6 +10927,9 @@ function explain(fr, asm) {
     if (c.area < minA || Math.max(w, h) < 0.35 * ss) continue;
     // a thin horizontal sliver along a staff line is what line removal left
     if (h <= 0.25 * ss && w < 1.5 * ss) continue;
+    // a slur or tie reaches into the boxes of the heads it joins: a thin bowed
+    // curve is left over even where its box touches them
+    if (w >= 1.2 * ss && h <= 0.8 * w && c.area / w <= 0.5 * ss && slurLike(fr.R, c, ss)) { left.push(c); continue; }
     let hit = false;
     for (let gx = Math.floor(c.x0 / G); gx <= Math.floor(c.x1 / G) && !hit; gx++) for (let gy = Math.floor(c.y0 / G); gy <= Math.floor(c.y1 / G) && !hit; gy++) {
       for (const i of grid.get(gx * 65536 + gy) || []) {
@@ -10831,7 +10950,7 @@ function pageMarks(fr, asm) {
   if (fr._marks && fr._marks.asm === asm) return fr._marks.marks;
   const { out, left } = explain(fr, asm);
   let marks;
-  try { marks = classifyMarks(fr, asm, left); } catch (e) { marks = { text: [], dyns: [], wedges: [], slurs: [], fermatas: [], braces: [], ledgers: [], rest: left }; }
+  try { marks = classifyMarks(fr, asm, left); } catch (e) { marks = { text: [], dyns: [], wedges: [], slurs: [], fermatas: [], braces: [], ledgers: [], grace: [], rest: left }; }
   Object.defineProperty(marks, 'sym', { value: out, enumerable: false, configurable: true });
   Object.defineProperty(fr, '_marks', { value: { asm, marks }, enumerable: false, configurable: true, writable: true });
   return marks;
@@ -10856,6 +10975,7 @@ function pageSymbols(fr, asm) {
   out.fermatas = marks.fermatas.map(s => b4(s.box));
   out.braces = marks.braces.map(s => [...b4(s.box), s.kind]);
   out.ledgers = marks.ledgers.map(s => b4(s.box));
+  out.grace = (marks.grace || []).map(g => [...b4(g.box), g.heads.length, g.slash ? 1 : 0]);
   out.unknown = marks.rest.map(c => [c.x0, c.y0, c.x1, c.y1]);
   return out;
 }
@@ -11046,7 +11166,57 @@ function slurLike(R, c, sp) {
   if (n < 0.8 * w || single < 0.75 * n) return false;
   // bowed: the middle stands off the line joining the ends
   const a = mid[0], b = mid[mid.length - 1], m = mid[mid.length >> 1];
-  return Math.abs(m - (a + b) / 2) >= Math.max(1.5, 0.15 * sp);
+  if (Math.abs(m - (a + b) / 2) < Math.max(1.5, 0.15 * sp)) return false;
+  // its two ends (page frame) and which way it bows
+  let xa = 0, xb = w - 1;
+  while (xa < w && !cols[xa].length) xa++;
+  while (xb > 0 && !cols[xb].length) xb--;
+  const ym = (x) => (cols[x][0][0] + cols[x][cols[x].length - 1][1]) / 2;
+  return { ends: [[c.x0 + xa, c.y0 + ym(xa)], [c.x0 + xb, c.y0 + ym(xb)]], up: m < (a + b) / 2 };
+}
+
+// ---------------------------------------------------------------- grace notes
+// Small note heads inside a component (a grace note, or a beamed group of
+// them, with stems, flags and the slash): ink that is both wide and tall
+// enough to be a head and not a stem, flag or thin beam, in blobs of the size
+// of a small head. [{x, y}] (page frame), and whether a slash crosses a stem.
+function graceHeads(R, c, sp) {
+  const img = glyphImage(R, c), w = img.width, h = img.height, d = img.data;
+  const hr = new Uint16Array(w * h), vr = new Uint16Array(w * h);
+  for (let y = 0; y < h; y++) for (let x = 0; x < w;) { if (!d[y * w + x]) { x++; continue; } let e = x; while (e < w && d[y * w + e]) e++; for (let k = x; k < e; k++) hr[y * w + k] = e - x; x = e; }
+  for (let x = 0; x < w; x++) for (let y = 0; y < h;) { if (!d[y * w + x]) { y++; continue; } let e = y; while (e < h && d[e * w + x]) e++; for (let k = y; k < e; k++) vr[k * w + x] = e - y; y = e; }
+  const core = new Uint8Array(w * h);
+  for (let i = 0; i < w * h; i++) core[i] = d[i] && hr[i] >= 0.42 * sp && vr[i] >= 0.42 * sp ? 1 : 0;
+  // blobs of core pixels
+  const seen = new Uint8Array(w * h), heads = [];
+  for (let i = 0; i < w * h; i++) {
+    if (!core[i] || seen[i]) continue;
+    const st = [i]; seen[i] = 1;
+    let x0 = w, x1 = 0, y0 = h, y1 = 0, n = 0, sx = 0, sy = 0;
+    while (st.length) {
+      const j = st.pop(), x = j % w, y = (j - x) / w;
+      n++; sx += x; sy += y; if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+      for (const k of [j - 1, j + 1, j - w, j + w]) if (k >= 0 && k < w * h && !seen[k] && core[k] && Math.abs((k % w) - x) <= 1) { seen[k] = 1; st.push(k); }
+    }
+    const bw = (x1 - x0 + 1) / sp, bh = (y1 - y0 + 1) / sp;
+    if (bw >= 0.45 && bw <= 1.0 && bh >= 0.4 && bh <= 0.85) heads.push({ x: c.x0 + sx / n, y: c.y0 + sy / n });
+  }
+  // a slash: ink running left of the leftmost head's stem side, above the head
+  let slash = false;
+  if (heads.length === 1) {
+    // the stem: the column with the longest vertical run
+    let sx = 0, best = 0;
+    for (let x = 0; x < w; x++) for (let y = 0; y < h; y++) if (vr[y * w + x] > best) { best = vr[y * w + x]; sx = x; }
+    const hy = heads[0].y - c.y0, up = hy > h / 2;
+    let ink = 0;
+    // left of the stem, clear of the head (above it for a stem up, below for a stem down)
+    for (let y = 0; y < h; y++) {
+      if (up ? y > hy - 0.7 * sp : y < hy + 0.7 * sp) continue;
+      for (let x = 0; x < sx - 1; x++) ink += d[y * w + x];
+    }
+    slash = best >= 1.5 * sp && ink >= 0.08 * sp * sp;
+  }
+  return { heads, slash };
 }
 
 // ---------------------------------------------------------------- lines of text
@@ -11088,7 +11258,7 @@ const ROLE_LABEL = {
 // Sort leftover components (symbols.js) into marks.
 // left: [{x0,y0,x1,y1,area}], fr / asm as front() and assemblePage() left them.
 function classifyMarks(fr, asm, left) {
-  const out = { text: [], dyns: [], wedges: [], slurs: [], fermatas: [], braces: [], ledgers: [], rest: [] };
+  const out = { text: [], dyns: [], wedges: [], slurs: [], fermatas: [], braces: [], ledgers: [], grace: [], rest: [] };
   const R = fr.R, ss = fr.ss, W = fr.gray.width, H = fr.gray.height;
   const systems = (asm && asm.systems) || [];
   if (!R || !systems.length) { out.rest = left.slice(); return out; }
@@ -11148,6 +11318,15 @@ function classifyMarks(fr, asm, left) {
       out.braces.push({ box: [c.x0, c.y0, c.x1, c.y1], kind, span });
       continue;
     }
+    if (slurLike(R, c, sp)) {
+      // a short arc with a dot inside its bow: a fermata
+      const dot = w <= 3 * sp && left.find(d => d !== c && d.x1 - d.x0 <= 0.7 * sp && d.y1 - d.y0 <= 0.7 * sp && (d.x0 + d.x1) / 2 > c.x0 + 0.3 * w && (d.x0 + d.x1) / 2 < c.x1 - 0.3 * w &&
+        Math.abs((d.y0 + d.y1) / 2 - cy) <= 1.2 * sp);
+      if (dot) { out.fermatas.push({ box: [Math.min(c.x0, dot.x0), Math.min(c.y0, dot.y0), Math.max(c.x1, dot.x1), Math.max(c.y1, dot.y1)] }); fermataDots.add(dot); continue; }
+      const sl = slurLike(R, c, sp);
+      out.slurs.push({ box: [c.x0, c.y0, c.x1, c.y1], ends: sl.ends, up: sl.up });
+      continue;
+    }
     // ledger line: short, thin, horizontal, off the staff, by a note head
     if (h <= 0.4 * sp && w >= 0.9 * sp && w <= 3.6 * sp && n && !n.inside &&
       heads.some(hd => Math.abs(hd.x - cx) <= 1.5 * sp && Math.abs(hd.y - cy) <= 1.3 * sp + (n.above ? Math.max(0, cy - hd.y) : Math.max(0, hd.y - cy)))) {
@@ -11156,14 +11335,6 @@ function classifyMarks(fr, asm, left) {
     const hp = hairpin(R, c, sp);
     // dynamics and hairpins stand below their staff unless clearly nearer the one below
     if (hp) { const m = nearest(cx, cy, 1.6); out.wedges.push({ box: [c.x0, c.y0, c.x1, c.y1], type: hp, sys: m.sys, k: m.k, si: m.s.si }); continue; }
-    if (slurLike(R, c, sp)) {
-      // a short arc with a dot inside its bow: a fermata
-      const dot = w <= 3 * sp && left.find(d => d !== c && d.x1 - d.x0 <= 0.7 * sp && d.y1 - d.y0 <= 0.7 * sp && (d.x0 + d.x1) / 2 > c.x0 + 0.3 * w && (d.x0 + d.x1) / 2 < c.x1 - 0.3 * w &&
-        Math.abs((d.y0 + d.y1) / 2 - cy) <= 1.2 * sp);
-      if (dot) { out.fermatas.push({ box: [Math.min(c.x0, dot.x0), Math.min(c.y0, dot.y0), Math.max(c.x1, dot.x1), Math.max(c.y1, dot.y1)] }); fermataDots.add(dot); continue; }
-      out.slurs.push({ box: [c.x0, c.y0, c.x1, c.y1] });
-      continue;
-    }
     // letter-sized ink (text, dynamics)
     if (h >= 0.35 * sp && h <= 4.5 * sp && w <= 6 * sp && !(h < 0.6 * sp && w > 2.5 * h)) { letters.push(c); continue; }
     rest.push(c);
@@ -11251,7 +11422,20 @@ function classifyMarks(fr, asm, left) {
   // above the title is a dedication / header
   const comp = out.text.filter(t => t.role === 'composer').sort((a, b) => a.box[1] - b.box[1]);
   comp.slice(1).forEach(t => { t.role = 'credit'; });
-  out.rest = rest.filter(c => !fermataDots.has(c));
+  // grace notes: unexplained ink by a staff that holds small heads and a stem
+  out.grace = [];
+  const restLeft = [];
+  for (const c of rest) {
+    if (fermataDots.has(c)) continue;
+    const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1, n = nearest((c.x0 + c.x1) / 2, (c.y0 + c.y1) / 2);
+    const sp = n ? n.s.sp : ss;
+    if (n && n.d <= 3 * sp && h >= 1.6 * sp && h <= 4.5 * sp && w <= 7 * sp && w >= 0.5 * sp) {
+      const g = graceHeads(R, c, sp);
+      if (g.heads.length && g.heads.length <= 8) { out.grace.push({ box: [c.x0, c.y0, c.x1, c.y1], heads: g.heads, slash: g.slash, sys: n.sys, k: n.k, si: n.s.si }); continue; }
+    }
+    restLeft.push(c);
+  }
+  out.rest = restLeft;
   return out;
 }
 
@@ -13107,6 +13291,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
       s += g('dyns', (sy.dyns || []).concat(sy.wedges || []).map((d) => named(d, d[4])).join(''), ` stroke-width="${f1(sw)}"`);
       s += g('slurs', [].concat(sy.slurs || [], sy.fermatas || []).map((b) => rect(b, ss * 0.08)).join(''), ` stroke-width="${f1(sw)}"`);
       s += g('braces', (sy.braces || []).map((b) => rect(b, ss * 0.08)).join(''), ` stroke-width="${f1(sw)}"`);
+      s += g('grace', (sy.grace || []).map((b) => rect(b, ss * 0.08, ` rx="${f1(ss * 0.2)}"`)).join(''), ` stroke-width="${f1(sw)}"`);
       // ledger lines belong with the staff lines
       if (sy.ledgers && sy.ledgers.length) s += g('bars', `<g class="ov-ledger">${sy.ledgers.map((b) => rect(b, ss * 0.05)).join('')}</g>`, ` stroke-width="${f1(sw)}"`);
       // (unrecognised ink is drawn as focusable highlights over the page: unkLayerHTML)
@@ -13221,7 +13406,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
   const LAYERS = [
     ['notes', 'Notes, stems, beams'], ['rests', 'Rests'], ['clefs', 'Clefs'], ['keys', 'Key signatures'], ['times', 'Time signatures'],
     ['bars', 'Staves, barlines'], ['marks', 'Accidentals, dots, tuplets'], ['lyrics', 'Lyric syllables'], ['labels', 'Pitch and value labels'],
-    ['text', 'Titles, names, text'], ['barno', 'Bar numbers'], ['dyns', 'Dynamics, hairpins'], ['slurs', 'Slurs, ties, fermatas'], ['braces', 'Braces, brackets'], ['unknown', 'Not recognised'],
+    ['text', 'Titles, names, text'], ['barno', 'Bar numbers'], ['dyns', 'Dynamics, hairpins'], ['slurs', 'Slurs, ties, fermatas'], ['braces', 'Braces, brackets'], ['grace', 'Grace notes'], ['unknown', 'Not recognised'],
   ];
   const LAYER_ICON = {
     notes: '<path d="M9 2v8" stroke-width="1.4" class="ovk-stem"/><circle cx="6.5" cy="10" r="2.6" stroke-width="1.6"/>',
@@ -13238,6 +13423,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
     barno: '<rect x="3" y="2.5" width="8" height="9" stroke-width="1.4"/><text x="7" y="10.3" font-size="8" text-anchor="middle" stroke="none" fill="currentColor">5</text>',
     slurs: '<path d="M2 9c2-4 8-4 10 0" stroke-width="1.6"/>',
     braces: '<path d="M9 1.5c-3 0-1 5.5-4 5.5c3 0 1 5.5 4 5.5" stroke-width="1.5"/>',
+    grace: '<path d="M8 2v7" stroke-width="1.2"/><path d="M5.5 6.5l5-3" stroke-width="1.1"/><ellipse cx="6.5" cy="9.5" rx="2" ry="1.5" stroke-width="1.4"/>',
     unknown: '<rect x="1.5" y="3.5" width="11" height="7" rx="1.6" stroke-width=".8"/>',
   };
   // What the overlay shows: a preset (unrecognised marks only, everything) or
@@ -13262,7 +13448,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
       bars: v ? (sy.bars || v.barlines).length : 0, marks: (sy.accs || []).length + (sy.dots || []).length + (sy.tuplets || []).length,
       lyrics: null, labels: null, unknown: (sy.unknown || []).length,
       text: (sy.text || []).filter((t) => t[4] !== 'lyrics' && t[4] !== 'measure').length, barno: (sy.text || []).filter((t) => t[4] === 'measure').length,
-      dyns: (sy.dyns || []).length + (sy.wedges || []).length, slurs: (sy.slurs || []).length + (sy.fermatas || []).length, braces: (sy.braces || []).length,
+      dyns: (sy.dyns || []).length + (sy.wedges || []).length, slurs: (sy.slurs || []).length + (sy.fermatas || []).length, braces: (sy.braces || []).length, grace: (sy.grace || []).length,
     };
   }
   function renderLayers(v) {

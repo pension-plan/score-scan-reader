@@ -2,6 +2,23 @@
 
 Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
 
+## Update: double sharps and double flats from templates (L24)
+
+`cv.js` `fallbackAccidental`, asked by `assemble.js` `headAccidental` only when the classical accidental reader finds
+nothing left of a head. The classical reader never outputs double accidentals (its candidates are 1.3–3.8 spaces
+tall; a double sharp is a one-space x). Candidates: a component (or pieces within a quarter space of each other:
+staff-line removal cuts an x on a line in two) about a space square, centred on the head's height, scored against
+the Bravura double-sharp template, or a 1–2.4 × 1.5–3.4 space glyph whose bowl sits at the head's height against
+the double-flat template; accepted at a score ≥ 0.55 and 0.08 above heads, dots, rests and single accidentals.
+
+Coverage (no OCR, per tag; `spike/opencv/results/r8-*.txt`): `acc-double-sharp` **0 → 65 / 55 / 11 of 124**
+(clean / scan / severe), `acc-double-flat` **0 → 9 / 11 / 9 of 13**; with the right accidentals the bars add up and
+note values follow (`note-8th` clean +59, `note-16th` +29, `stem-down` +103, `tuplet-6` +22); `acc-flat` clean
+39 → 38. Aggregates: coverage 0.7818 → 0.7821 (35 items up, 2 down by 0.0026), challenge 0.8277 → 0.8278 (8 up,
+none down), benchmark with OCR unchanged (0.9499). Key signatures with 4+ signs read 13–17 of 15–17 on clean and
+scan already (the earlier 25 % / 0 % figures were from an older matrix); their severe-scan losses and courtesy
+accidentals (16 / 39) are left for later.
+
 ## Update: dashed staves re-anchored; local threshold tried (not shipped)
 
 **Re-anchor** (`staves.js` `detectDashedStaves`): with four of five lines allowed, the comb also matched a staff one

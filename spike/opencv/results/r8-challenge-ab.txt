@@ -1,0 +1,19 @@
+n 365 aggregate 0.8277 -> 0.8278 (+0.0001) | pitch 0.9076 -> 0.9078 (+0.0002) | duration 0.8738 -> 0.8738 (+0.0000) | rests 0.7827 -> 0.7827 (+0.0000) | parts 0.9404 -> 0.9404 (+0.0000) | lyrics 0.463 -> 0.463 (+0.0000) | xml_valid 1 -> 1 (+0.0000) | crashes 0 -> 0 (+0.0000) | runtime_ms_mean 2382 -> 2389 (+7)
+  by_variant scan           n=123 agg 0.8471 -> 0.8471 (+0.0000)  dur 0.9115->0.9115 pitch 0.9378->0.938 rests 0.8361->0.8361
+  by_variant scan-mild      n=123 agg 0.8574 -> 0.8575 (+0.0001)  dur 0.9387->0.9387 pitch 0.9511->0.9513 rests 0.8864->0.8864
+  by_variant scan-severe    n=119 agg 0.7771 -> 0.7771 (+0.0000)  dur 0.7678->0.7678 pitch 0.8316->0.8316 rests 0.6203->0.6203
+  by_category degradation    n=251 agg 0.8698 -> 0.8698 (+0.0000)  dur 0.9251->0.9251 pitch 0.9514->0.9514 rests 0.8667->0.8667
+  by_category layout         n=21 agg 0.7584 -> 0.7584 (+0.0000)  dur 0.7154->0.7154 pitch 0.7604->0.7604 rests 0.3668->0.3668
+  by_category lyrics         n=24 agg 0.7227 -> 0.7227 (+0.0000)  dur 0.8443->0.8443 pitch 0.904->0.904 rests 0.7017->0.7017
+  by_category pitch          n=24 agg 0.7017 -> 0.7024 (+0.0007)  dur 0.7474->0.7474 pitch 0.7192->0.7215 rests 0.5697->0.5697
+  by_category rhythm         n=24 agg 0.8141 -> 0.8141 (+0.0000)  dur 0.6965->0.6965 pitch 0.8488->0.8488 rests 0.7403->0.7403
+  by_category voices         n=21 agg 0.6741 -> 0.6741 (+0.0000)  dur 0.7999->0.7999 pitch 0.8192->0.8192 rests 0.5786->0.5786
+items changed: 8/365; first time signature right: off 356/365, on 356/365
+  +0.0004 pitch/pitch-ttbb-enharmonic-keys/scan-severe  agg 0.4492830328682387->0.44968721192718786 dur 0.45021645021645024->0.45021645021645024 time 4/4->4/4 (truth 4/4)
+  +0.0015 pitch/pitch-ttbb-enharmonic-keys/scan-mild  agg 0.7733119917135469->0.7748098158363902 dur 0.9463414634146341->0.9463414634146341 time 4/4->4/4 (truth 4/4)
+  +0.0015 pitch/pitch-ttbb-enharmonic-keys/scan  agg 0.7776259349100464->0.779131221719457 dur 0.9607843137254902->0.9607843137254902 time 4/4->4/4 (truth 4/4)
+  +0.0022 pitch/pitch-keysig-odyssey/scan-mild  agg 0.8837324660819289->0.8858907394632239 dur 0.9246575342465754->0.9246575342465754 time 4/4->4/4 (truth 4/4)
+  +0.0022 pitch/pitch-keysig-odyssey/scan  agg 0.8838199513381996->0.8860097323600974 dur 0.9166666666666666->0.9166666666666666 time 4/4->4/4 (truth 4/4)
+  +0.0028 pitch/pitch-enharmonic-song-2page/scan  agg 0.6668455341871973->0.6696891360829319 dur 0.859504132231405->0.859504132231405 time 4/4->4/4 (truth 4/4)
+  +0.0030 pitch/pitch-enharmonic-song-2page/scan-mild  agg 0.6892371995820271->0.6922675026123302 dur 0.9310344827586207->0.9310344827586207 time 4/4->4/4 (truth 4/4)
+  +0.0033 pitch/pitch-accidental-storm/scan-mild  agg 0.8632246376811593->0.8664855072463767 dur 0.8125->0.8125 time 4/4->4/4 (truth 4/4)
