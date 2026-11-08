@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.34.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.33.1...score-scan-reader-v0.34.0) (2026-11-08)
+
+
+### Features
+
+* **assemble:** parenthesised accidentals marked (h.accParen) ([ed76fe5](https://github.com/pension-plan/score-scan-reader/commit/ed76fe56be8055dfaf80c8219a50ac21a4bb4813))
+* **ui:** stanzas set as verses listed in the Lyrics panel (L5b) ([ac87b5a](https://github.com/pension-plan/score-scan-reader/commit/ac87b5a53c37535cc17146895cf78fbea5297cb7))
+
+
+### Bug Fixes
+
+* **lyrics:** a word space OCR missed splits two words run together ([60f451c](https://github.com/pension-plan/score-scan-reader/commit/60f451cbcd2ec6d99c2111740825d9f7f547ff80))
+* **lyrics:** stanza blocks read per column baseline and chained columns; stanzas.verses for the lyrics list (L5b) ([7cd0530](https://github.com/pension-plan/score-scan-reader/commit/7cd05303a329aa15bcebb50758c27a180676070a))
+* **meter,score:** pickup bars kept short; letters of tempo words are not notes ([256c629](https://github.com/pension-plan/score-scan-reader/commit/256c6291899250729b559704c1f405c7c56b8597))
+
 ## [0.33.1](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.33.0...score-scan-reader-v0.33.1) (2026-11-08)
 
 
