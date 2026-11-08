@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.20.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.19.0...score-scan-reader-v0.20.0) (2026-11-08)
+
+
+### Features
+
+* **cv:** read double sharps and double flats from templates ([d4757fc](https://github.com/pension-plan/score-scan-reader/commit/d4757fcb2b1c5edeba711f0adcc5b7c0b7fa34c8))
+
 ## [0.19.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.18.1...score-scan-reader-v0.19.0) (2026-11-08)
 
 
