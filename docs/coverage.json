@@ -1,9 +1,9 @@
 {
- "generated": "2026-11-08T14:04:46.343Z",
+ "generated": "2026-11-08T14:07:34.333Z",
  "inputs": {
   "eval": "mvp/work/eval-coverage.json",
   "eval_when": "2026-11-08T14:04:19.901Z",
-  "perf": "mvp/work/eval-coverage-baseline-perf.json",
+  "perf": "mvp/work/eval-coverage-perf.json",
   "coverage_dir": "corpus/coverage",
   "src_hash": "868df105a7b3",
   "ocr": true,
@@ -29349,16 +29349,16 @@
   }
  ],
  "perf": {
-  "source": "mvp/work/eval-coverage-baseline-perf.json",
+  "source": "mvp/work/eval-coverage-perf.json",
   "scope": "perf family",
   "config": {
    "dpi": "native",
    "jobs": 8,
    "ocr": true,
    "loadavg": [
-    166.9,
-    174.1,
-    214.4
+    55.9,
+    49.1,
+    43.6
    ],
    "cpus": 192
   },
@@ -29368,55 +29368,55 @@
     "src_dpi": "100",
     "n": 6,
     "mp_per_page": 0.968,
-    "ms_per_page_median": 3227,
-    "ms_per_page_max": 4464,
-    "peak_rss_mb_median": 309.4,
-    "peak_rss_mb_max": 374.5
+    "ms_per_page_median": 4857,
+    "ms_per_page_max": 5783,
+    "peak_rss_mb_median": 312.2,
+    "peak_rss_mb_max": 371.6
    },
    {
     "src_dpi": "150",
     "n": 6,
     "mp_per_page": 2.178,
-    "ms_per_page_median": 3332,
-    "ms_per_page_max": 4900,
-    "peak_rss_mb_median": 318.2,
-    "peak_rss_mb_max": 376.2
+    "ms_per_page_median": 4769,
+    "ms_per_page_max": 6006,
+    "peak_rss_mb_median": 315.9,
+    "peak_rss_mb_max": 389.4
    },
    {
     "src_dpi": "200",
     "n": 6,
     "mp_per_page": 3.869,
-    "ms_per_page_median": 3110,
-    "ms_per_page_max": 4225,
-    "peak_rss_mb_median": 252.2,
-    "peak_rss_mb_max": 337.6
+    "ms_per_page_median": 4599,
+    "ms_per_page_max": 6417,
+    "peak_rss_mb_median": 304,
+    "peak_rss_mb_max": 390
    },
    {
     "src_dpi": "300",
     "n": 33,
     "mp_per_page": 8.703,
-    "ms_per_page_median": 3185,
-    "ms_per_page_max": 5352,
-    "peak_rss_mb_median": 375.3,
-    "peak_rss_mb_max": 2184.3
+    "ms_per_page_median": 4909,
+    "ms_per_page_max": 6487,
+    "peak_rss_mb_median": 366.5,
+    "peak_rss_mb_max": 662.4
    },
    {
     "src_dpi": "400",
     "n": 6,
     "mp_per_page": 15.475,
-    "ms_per_page_median": 5593,
-    "ms_per_page_max": 7527,
-    "peak_rss_mb_median": 446,
-    "peak_rss_mb_max": 557.8
+    "ms_per_page_median": 8066,
+    "ms_per_page_max": 10045,
+    "peak_rss_mb_median": 445.7,
+    "peak_rss_mb_max": 566
    },
    {
     "src_dpi": "600",
     "n": 6,
     "mp_per_page": 34.806,
-    "ms_per_page_median": 4819,
-    "ms_per_page_max": 5363,
-    "peak_rss_mb_median": 418,
-    "peak_rss_mb_max": 445.6
+    "ms_per_page_median": 5784,
+    "ms_per_page_max": 6811,
+    "peak_rss_mb_median": 401.1,
+    "peak_rss_mb_max": 444.9
    }
   ],
   "by_raster_dpi": [
@@ -29424,55 +29424,55 @@
     "raster_dpi": "100",
     "n": 6,
     "mp_per_page": 0.968,
-    "ms_per_page_median": 3227,
-    "ms_per_page_max": 4464,
-    "peak_rss_mb_median": 309.4,
-    "peak_rss_mb_max": 374.5
+    "ms_per_page_median": 4857,
+    "ms_per_page_max": 5783,
+    "peak_rss_mb_median": 312.2,
+    "peak_rss_mb_max": 371.6
    },
    {
     "raster_dpi": "150",
     "n": 6,
     "mp_per_page": 2.178,
-    "ms_per_page_median": 3332,
-    "ms_per_page_max": 4900,
-    "peak_rss_mb_median": 318.2,
-    "peak_rss_mb_max": 376.2
+    "ms_per_page_median": 4769,
+    "ms_per_page_max": 6006,
+    "peak_rss_mb_median": 315.9,
+    "peak_rss_mb_max": 389.4
    },
    {
     "raster_dpi": "200",
     "n": 6,
     "mp_per_page": 3.869,
-    "ms_per_page_median": 3110,
-    "ms_per_page_max": 4225,
-    "peak_rss_mb_median": 252.2,
-    "peak_rss_mb_max": 337.6
+    "ms_per_page_median": 4599,
+    "ms_per_page_max": 6417,
+    "peak_rss_mb_median": 304,
+    "peak_rss_mb_max": 390
    },
    {
     "raster_dpi": "300",
     "n": 33,
     "mp_per_page": 8.703,
-    "ms_per_page_median": 3185,
-    "ms_per_page_max": 5352,
-    "peak_rss_mb_median": 375.3,
-    "peak_rss_mb_max": 2184.3
+    "ms_per_page_median": 4909,
+    "ms_per_page_max": 6487,
+    "peak_rss_mb_median": 366.5,
+    "peak_rss_mb_max": 662.4
    },
    {
     "raster_dpi": "400",
     "n": 6,
     "mp_per_page": 15.475,
-    "ms_per_page_median": 5593,
-    "ms_per_page_max": 7527,
-    "peak_rss_mb_median": 446,
-    "peak_rss_mb_max": 557.8
+    "ms_per_page_median": 8066,
+    "ms_per_page_max": 10045,
+    "peak_rss_mb_median": 445.7,
+    "peak_rss_mb_max": 566
    },
    {
     "raster_dpi": "600",
     "n": 6,
     "mp_per_page": 34.806,
-    "ms_per_page_median": 4819,
-    "ms_per_page_max": 5363,
-    "peak_rss_mb_median": 418,
-    "peak_rss_mb_max": 445.6
+    "ms_per_page_median": 5784,
+    "ms_per_page_max": 6811,
+    "peak_rss_mb_median": 401.1,
+    "peak_rss_mb_max": 444.9
    }
   ],
   "by_paper": [
@@ -29480,55 +29480,55 @@
     "paper": "~A3",
     "n": 1,
     "mp_per_page": 20.49,
-    "ms_per_page_median": 5259,
-    "ms_per_page_max": 5259,
-    "peak_rss_mb_median": 417.9,
-    "peak_rss_mb_max": 417.9
+    "ms_per_page_median": 6487,
+    "ms_per_page_max": 6487,
+    "peak_rss_mb_median": 416,
+    "peak_rss_mb_max": 416
    },
    {
     "paper": "~B4",
     "n": 6,
     "mp_per_page": 10.25,
-    "ms_per_page_median": 5352,
-    "ms_per_page_max": 7527,
-    "peak_rss_mb_median": 419.1,
-    "peak_rss_mb_max": 557.8
+    "ms_per_page_median": 6417,
+    "ms_per_page_max": 10045,
+    "peak_rss_mb_median": 444.9,
+    "peak_rss_mb_max": 566
    },
    {
     "paper": "~Letter",
     "n": 1,
     "mp_per_page": 9.965,
-    "ms_per_page_median": 4833,
-    "ms_per_page_max": 4833,
-    "peak_rss_mb_median": 453.1,
-    "peak_rss_mb_max": 453.1
+    "ms_per_page_median": 6218,
+    "ms_per_page_max": 6218,
+    "peak_rss_mb_median": 466.8,
+    "peak_rss_mb_max": 466.8
    },
    {
     "paper": "A3",
     "n": 5,
     "mp_per_page": 17.403,
-    "ms_per_page_median": 3617,
-    "ms_per_page_max": 4266,
-    "peak_rss_mb_median": 345.9,
-    "peak_rss_mb_max": 411.7
+    "ms_per_page_median": 5034,
+    "ms_per_page_max": 5300,
+    "peak_rss_mb_median": 344.6,
+    "peak_rss_mb_max": 369.3
    },
    {
     "paper": "A4",
     "n": 45,
     "mp_per_page": 8.703,
-    "ms_per_page_median": 2993,
-    "ms_per_page_max": 6659,
-    "peak_rss_mb_median": 345.4,
-    "peak_rss_mb_max": 2184.3
+    "ms_per_page_median": 4547,
+    "ms_per_page_max": 8182,
+    "peak_rss_mb_median": 345.9,
+    "peak_rss_mb_max": 662.4
    },
    {
     "paper": "Letter",
     "n": 5,
     "mp_per_page": 8.415,
-    "ms_per_page_median": 3717,
-    "ms_per_page_max": 4452,
-    "peak_rss_mb_median": 336.6,
-    "peak_rss_mb_max": 369.5
+    "ms_per_page_median": 5445,
+    "ms_per_page_max": 5866,
+    "peak_rss_mb_median": 322.8,
+    "peak_rss_mb_max": 344.8
    }
   ],
   "by_pages": [
@@ -29536,61 +29536,61 @@
     "pages": "1",
     "n": 51,
     "mp_per_page": 8.703,
-    "ms_per_page_median": 3782,
-    "ms_per_page_max": 7527,
-    "peak_rss_mb_median": 336.6,
-    "peak_rss_mb_max": 557.8
+    "ms_per_page_median": 5163,
+    "ms_per_page_max": 10045,
+    "peak_rss_mb_median": 339.4,
+    "peak_rss_mb_max": 566
    },
    {
     "pages": "5",
     "n": 3,
     "mp_per_page": 8.703,
-    "ms_per_page_median": 2740,
-    "ms_per_page_max": 2993,
-    "peak_rss_mb_median": 572.1,
-    "peak_rss_mb_max": 666.1
+    "ms_per_page_median": 4052,
+    "ms_per_page_max": 4170,
+    "peak_rss_mb_median": 518,
+    "peak_rss_mb_max": 523
    },
    {
     "pages": "10",
     "n": 3,
     "mp_per_page": 8.703,
-    "ms_per_page_median": 2614,
-    "ms_per_page_max": 2864,
-    "peak_rss_mb_median": 891.3,
-    "peak_rss_mb_max": 908.4
+    "ms_per_page_median": 4203,
+    "ms_per_page_max": 4246,
+    "peak_rss_mb_median": 552.2,
+    "peak_rss_mb_max": 553
    },
    {
     "pages": "20",
     "n": 3,
     "mp_per_page": 8.703,
-    "ms_per_page_median": 2602,
-    "ms_per_page_max": 2727,
-    "peak_rss_mb_median": 1301.1,
-    "peak_rss_mb_max": 1302.1
+    "ms_per_page_median": 4010,
+    "ms_per_page_max": 4138,
+    "peak_rss_mb_median": 598.8,
+    "peak_rss_mb_max": 603.8
    },
    {
     "pages": "40",
     "n": 3,
     "mp_per_page": 8.703,
-    "ms_per_page_median": 2429,
-    "ms_per_page_max": 2632,
-    "peak_rss_mb_median": 2180.8,
-    "peak_rss_mb_max": 2184.3
+    "ms_per_page_median": 3940,
+    "ms_per_page_max": 4096,
+    "peak_rss_mb_median": 658.9,
+    "peak_rss_mb_max": 662.4
    }
   ],
   "fit_ms_per_page_vs_mp": {
    "n": 63,
-   "slope": 51.49,
-   "intercept": 3056.2,
-   "r2": 0.2
+   "slope": 51.91,
+   "intercept": 4439.2,
+   "r2": 0.158
   },
   "fit_peak_mb_vs_total_mp": {
    "n": 63,
-   "slope": 5.2,
-   "intercept": 296.9,
-   "r2": 0.968
+   "slope": 1.09,
+   "intercept": 349.9,
+   "r2": 0.659
   },
-  "ms_per_megapixel_overall": 301,
+  "ms_per_megapixel_overall": 454,
   "rows": [
    {
     "id": "perf/perf-hymn-a3-300dpi/clean",
@@ -29604,14 +29604,14 @@
     ],
     "pages": 1,
     "mp_per_page": 17.403,
-    "ms_per_page": 3932,
+    "ms_per_page": 5300,
     "page_ms": [
-     3912.6
+     4799.6
     ],
-    "assemble_ms": 18.8,
-    "runtime_ms": 3932,
-    "wall_ms": 4812,
-    "peak_rss_mb": 411.7
+    "assemble_ms": 441.6,
+    "runtime_ms": 5300,
+    "wall_ms": 5725,
+    "peak_rss_mb": 344.6
    },
    {
     "id": "perf/perf-hymn-a3-300dpi/scan",
@@ -29625,14 +29625,14 @@
     ],
     "pages": 1,
     "mp_per_page": 17.403,
-    "ms_per_page": 4266,
+    "ms_per_page": 5293,
     "page_ms": [
-     4244.1
+     4831.5
     ],
-    "assemble_ms": 21.5,
-    "runtime_ms": 4266,
-    "wall_ms": 5041,
-    "peak_rss_mb": 361.9
+    "assemble_ms": 443,
+    "runtime_ms": 5293,
+    "wall_ms": 5696,
+    "peak_rss_mb": 369.3
    },
    {
     "id": "perf/perf-hymn-a3-300dpi/scan-severe",
@@ -29646,14 +29646,14 @@
     ],
     "pages": 1,
     "mp_per_page": 20.49,
-    "ms_per_page": 5259,
+    "ms_per_page": 6487,
     "page_ms": [
-     5239.8
+     5853.7
     ],
-    "assemble_ms": 19.2,
-    "runtime_ms": 5259,
-    "wall_ms": 6191,
-    "peak_rss_mb": 417.9
+    "assemble_ms": 560.1,
+    "runtime_ms": 6487,
+    "wall_ms": 6897,
+    "peak_rss_mb": 416
    },
    {
     "id": "perf/perf-hymn-a4-100dpi/clean",
@@ -29667,14 +29667,14 @@
     ],
     "pages": 1,
     "mp_per_page": 0.968,
-    "ms_per_page": 3227,
+    "ms_per_page": 4282,
     "page_ms": [
-     3206.7
+     3713
     ],
-    "assemble_ms": 20.3,
-    "runtime_ms": 3227,
-    "wall_ms": 3685,
-    "peak_rss_mb": 288.8
+    "assemble_ms": 564.1,
+    "runtime_ms": 4282,
+    "wall_ms": 4680,
+    "peak_rss_mb": 296
    },
    {
     "id": "perf/perf-hymn-a4-100dpi/scan",
@@ -29688,14 +29688,14 @@
     ],
     "pages": 1,
     "mp_per_page": 0.968,
-    "ms_per_page": 3479,
+    "ms_per_page": 4952,
     "page_ms": [
-     3460.8
+     3986.7
     ],
-    "assemble_ms": 17.6,
-    "runtime_ms": 3479,
-    "wall_ms": 3926,
-    "peak_rss_mb": 312.5
+    "assemble_ms": 963.2,
+    "runtime_ms": 4952,
+    "wall_ms": 5349,
+    "peak_rss_mb": 327.6
    },
    {
     "id": "perf/perf-hymn-a4-100dpi/scan-severe",
@@ -29709,14 +29709,14 @@
     ],
     "pages": 1,
     "mp_per_page": 1.138,
-    "ms_per_page": 4464,
+    "ms_per_page": 5783,
     "page_ms": [
-     4439
+     4582.8
     ],
-    "assemble_ms": 23.9,
-    "runtime_ms": 4464,
-    "wall_ms": 4905,
-    "peak_rss_mb": 374.5
+    "assemble_ms": 1198,
+    "runtime_ms": 5783,
+    "wall_ms": 6179,
+    "peak_rss_mb": 371.6
    },
    {
     "id": "perf/perf-hymn-a4-150dpi/clean",
@@ -29730,14 +29730,14 @@
     ],
     "pages": 1,
     "mp_per_page": 2.178,
-    "ms_per_page": 3332,
+    "ms_per_page": 4370,
     "page_ms": [
-     3312.7
+     3870.9
     ],
-    "assemble_ms": 18.6,
-    "runtime_ms": 3332,
-    "wall_ms": 3828,
-    "peak_rss_mb": 322.4
+    "assemble_ms": 495.6,
+    "runtime_ms": 4370,
+    "wall_ms": 4782,
+    "peak_rss_mb": 300.4
    },
    {
     "id": "perf/perf-hymn-a4-150dpi/scan",
@@ -29751,14 +29751,14 @@
     ],
     "pages": 1,
     "mp_per_page": 2.178,
-    "ms_per_page": 3818,
+    "ms_per_page": 4577,
     "page_ms": [
-     3796.2
+     4001.1
     ],
-    "assemble_ms": 22.3,
-    "runtime_ms": 3818,
-    "wall_ms": 4305,
-    "peak_rss_mb": 277.5
+    "assemble_ms": 567.1,
+    "runtime_ms": 4577,
+    "wall_ms": 4999,
+    "peak_rss_mb": 315.9
    },
    {
     "id": "perf/perf-hymn-a4-150dpi/scan-severe",
@@ -29772,14 +29772,14 @@
     ],
     "pages": 1,
     "mp_per_page": 2.563,
-    "ms_per_page": 4900,
+    "ms_per_page": 6006,
     "page_ms": [
-     4862.8
+     5117.7
     ],
-    "assemble_ms": 37.7,
-    "runtime_ms": 4900,
-    "wall_ms": 5383,
-    "peak_rss_mb": 376.2
+    "assemble_ms": 878.8,
+    "runtime_ms": 6006,
+    "wall_ms": 6388,
+    "peak_rss_mb": 389.4
    },
    {
     "id": "perf/perf-hymn-a4-200dpi/clean",
@@ -29793,14 +29793,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 3906,
+    "ms_per_page": 4599,
     "page_ms": [
-     3886.6
+     4185
     ],
-    "assemble_ms": 18.5,
-    "runtime_ms": 3906,
-    "wall_ms": 4334,
-    "peak_rss_mb": 298
+    "assemble_ms": 408.4,
+    "runtime_ms": 4599,
+    "wall_ms": 4985,
+    "peak_rss_mb": 304
    },
    {
     "id": "perf/perf-hymn-a4-200dpi/scan",
@@ -29814,14 +29814,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 4225,
+    "ms_per_page": 4789,
     "page_ms": [
-     4191
+     4345.4
     ],
-    "assemble_ms": 33.4,
-    "runtime_ms": 4225,
-    "wall_ms": 4637,
-    "peak_rss_mb": 337.6
+    "assemble_ms": 438.9,
+    "runtime_ms": 4789,
+    "wall_ms": 5172,
+    "peak_rss_mb": 325.9
    },
    {
     "id": "perf/perf-hymn-a4-200dpi/scan-severe",
@@ -29835,14 +29835,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.55,
-    "ms_per_page": 3110,
+    "ms_per_page": 6417,
     "page_ms": [
-     3089.7
+     5789.1
     ],
-    "assemble_ms": 19.5,
-    "runtime_ms": 3110,
-    "wall_ms": 3539,
-    "peak_rss_mb": 249.4
+    "assemble_ms": 622.3,
+    "runtime_ms": 6417,
+    "wall_ms": 6794,
+    "peak_rss_mb": 390
    },
    {
     "id": "perf/perf-hymn-a4-300dpi/clean",
@@ -29856,14 +29856,14 @@
     ],
     "pages": 1,
     "mp_per_page": 8.703,
-    "ms_per_page": 4147,
+    "ms_per_page": 4861,
     "page_ms": [
-     4125.7
+     4242.5
     ],
-    "assemble_ms": 21,
-    "runtime_ms": 4147,
-    "wall_ms": 4778,
-    "peak_rss_mb": 332.9
+    "assemble_ms": 608.8,
+    "runtime_ms": 4861,
+    "wall_ms": 5236,
+    "peak_rss_mb": 324.1
    },
    {
     "id": "perf/perf-hymn-a4-300dpi/scan",
@@ -29877,14 +29877,14 @@
     ],
     "pages": 1,
     "mp_per_page": 8.703,
-    "ms_per_page": 4166,
+    "ms_per_page": 5326,
     "page_ms": [
-     4139
+     4667
     ],
-    "assemble_ms": 26.4,
-    "runtime_ms": 4166,
-    "wall_ms": 4741,
-    "peak_rss_mb": 336.1
+    "assemble_ms": 649.2,
+    "runtime_ms": 5326,
+    "wall_ms": 5706,
+    "peak_rss_mb": 345.9
    },
    {
     "id": "perf/perf-hymn-a4-300dpi/scan-severe",
@@ -29898,14 +29898,14 @@
     ],
     "pages": 1,
     "mp_per_page": 10.25,
-    "ms_per_page": 5352,
+    "ms_per_page": 6057,
     "page_ms": [
-     5330.9
+     5089.8
     ],
-    "assemble_ms": 20.6,
-    "runtime_ms": 5352,
-    "wall_ms": 6040,
-    "peak_rss_mb": 419.1
+    "assemble_ms": 955.4,
+    "runtime_ms": 6057,
+    "wall_ms": 6446,
+    "peak_rss_mb": 445.5
    },
    {
     "id": "perf/perf-hymn-a4-400dpi/clean",
@@ -29919,14 +29919,14 @@
     ],
     "pages": 1,
     "mp_per_page": 15.475,
-    "ms_per_page": 5593,
+    "ms_per_page": 8066,
     "page_ms": [
-     5568.5
+     6255.2
     ],
-    "assemble_ms": 23.7,
-    "runtime_ms": 5593,
-    "wall_ms": 6476,
-    "peak_rss_mb": 446
+    "assemble_ms": 1761.8,
+    "runtime_ms": 8066,
+    "wall_ms": 8441,
+    "peak_rss_mb": 445.7
    },
    {
     "id": "perf/perf-hymn-a4-400dpi/scan",
@@ -29940,14 +29940,14 @@
     ],
     "pages": 1,
     "mp_per_page": 15.475,
-    "ms_per_page": 6659,
+    "ms_per_page": 8182,
     "page_ms": [
-     6639.3
+     6674.8
     ],
-    "assemble_ms": 19,
-    "runtime_ms": 6659,
-    "wall_ms": 7408,
-    "peak_rss_mb": 454.5
+    "assemble_ms": 1490.6,
+    "runtime_ms": 8182,
+    "wall_ms": 8552,
+    "peak_rss_mb": 462.8
    },
    {
     "id": "perf/perf-hymn-a4-400dpi/scan-severe",
@@ -29961,14 +29961,14 @@
     ],
     "pages": 1,
     "mp_per_page": 18.219,
-    "ms_per_page": 7527,
+    "ms_per_page": 10045,
     "page_ms": [
-     7504.1
+     7162.3
     ],
-    "assemble_ms": 20.9,
-    "runtime_ms": 7527,
-    "wall_ms": 8477,
-    "peak_rss_mb": 557.8
+    "assemble_ms": 2863.7,
+    "runtime_ms": 10045,
+    "wall_ms": 10437,
+    "peak_rss_mb": 566
    },
    {
     "id": "perf/perf-hymn-a4-600dpi/clean",
@@ -29982,14 +29982,14 @@
     ],
     "pages": 1,
     "mp_per_page": 34.806,
-    "ms_per_page": 4819,
+    "ms_per_page": 5607,
     "page_ms": [
-     4798
+     5060.3
     ],
-    "assemble_ms": 20.4,
-    "runtime_ms": 4819,
-    "wall_ms": 6160,
-    "peak_rss_mb": 319.2
+    "assemble_ms": 432.5,
+    "runtime_ms": 5607,
+    "wall_ms": 6001,
+    "peak_rss_mb": 362.4
    },
    {
     "id": "perf/perf-hymn-a4-600dpi/scan",
@@ -30003,14 +30003,14 @@
     ],
     "pages": 1,
     "mp_per_page": 34.806,
-    "ms_per_page": 4958,
+    "ms_per_page": 5810,
     "page_ms": [
-     4937.9
+     5361.7
     ],
-    "assemble_ms": 19.6,
-    "runtime_ms": 4958,
-    "wall_ms": 6034,
-    "peak_rss_mb": 424.7
+    "assemble_ms": 411.7,
+    "runtime_ms": 5810,
+    "wall_ms": 6209,
+    "peak_rss_mb": 391.5
    },
    {
     "id": "perf/perf-hymn-a4-600dpi/scan-severe",
@@ -30024,14 +30024,14 @@
     ],
     "pages": 1,
     "mp_per_page": 40.993,
-    "ms_per_page": 5363,
+    "ms_per_page": 6811,
     "page_ms": [
-     5343.7
+     5934.7
     ],
-    "assemble_ms": 18,
-    "runtime_ms": 5363,
-    "wall_ms": 6837,
-    "peak_rss_mb": 445.6
+    "assemble_ms": 833.6,
+    "runtime_ms": 6811,
+    "wall_ms": 7196,
+    "peak_rss_mb": 444.9
    },
    {
     "id": "perf/perf-hymn-letter-300dpi/clean",
@@ -30045,14 +30045,14 @@
     ],
     "pages": 1,
     "mp_per_page": 8.415,
-    "ms_per_page": 4452,
+    "ms_per_page": 4932,
     "page_ms": [
-     4431.2
+     4290.1
     ],
-    "assemble_ms": 20.4,
-    "runtime_ms": 4452,
-    "wall_ms": 5110,
-    "peak_rss_mb": 324.7
+    "assemble_ms": 613,
+    "runtime_ms": 4932,
+    "wall_ms": 5305,
+    "peak_rss_mb": 309.6
    },
    {
     "id": "perf/perf-hymn-letter-300dpi/scan",
@@ -30066,14 +30066,14 @@
     ],
     "pages": 1,
     "mp_per_page": 8.415,
-    "ms_per_page": 4238,
+    "ms_per_page": 5445,
     "page_ms": [
-     4217.7
+     4832.2
     ],
-    "assemble_ms": 20,
-    "runtime_ms": 4238,
-    "wall_ms": 4825,
-    "peak_rss_mb": 336.6
+    "assemble_ms": 584.8,
+    "runtime_ms": 5445,
+    "wall_ms": 5835,
+    "peak_rss_mb": 314.4
    },
    {
     "id": "perf/perf-hymn-letter-300dpi/scan-severe",
@@ -30087,14 +30087,14 @@
     ],
     "pages": 1,
     "mp_per_page": 9.965,
-    "ms_per_page": 4833,
+    "ms_per_page": 6218,
     "page_ms": [
-     4799.9
+     5295.2
     ],
-    "assemble_ms": 32.8,
-    "runtime_ms": 4833,
-    "wall_ms": 5575,
-    "peak_rss_mb": 453.1
+    "assemble_ms": 889.6,
+    "runtime_ms": 6218,
+    "wall_ms": 6608,
+    "peak_rss_mb": 466.8
    },
    {
     "id": "perf/perf-pages-01/clean",
@@ -30108,14 +30108,14 @@
     ],
     "pages": 1,
     "mp_per_page": 8.703,
-    "ms_per_page": 2362,
+    "ms_per_page": 3674,
     "page_ms": [
-     2344.9
+     2698.1
     ],
-    "assemble_ms": 17.7,
-    "runtime_ms": 2362,
-    "wall_ms": 2974,
-    "peak_rss_mb": 318
+    "assemble_ms": 943.4,
+    "runtime_ms": 3674,
+    "wall_ms": 4061,
+    "peak_rss_mb": 314.8
    },
    {
     "id": "perf/perf-pages-01/scan",
@@ -30129,14 +30129,14 @@
     ],
     "pages": 1,
     "mp_per_page": 8.703,
-    "ms_per_page": 2690,
+    "ms_per_page": 3812,
     "page_ms": [
-     2671.1
+     2784.3
     ],
-    "assemble_ms": 19.2,
-    "runtime_ms": 2690,
-    "wall_ms": 3266,
-    "peak_rss_mb": 335.3
+    "assemble_ms": 1017.8,
+    "runtime_ms": 3812,
+    "wall_ms": 4198,
+    "peak_rss_mb": 345.7
    },
    {
     "id": "perf/perf-pages-01/scan-severe",
@@ -30150,14 +30150,14 @@
     ],
     "pages": 1,
     "mp_per_page": 8.703,
-    "ms_per_page": 2544,
+    "ms_per_page": 3460,
     "page_ms": [
-     2526.3
+     2486.8
     ],
-    "assemble_ms": 17.4,
-    "runtime_ms": 2544,
-    "wall_ms": 3147,
-    "peak_rss_mb": 345.4
+    "assemble_ms": 942.8,
+    "runtime_ms": 3460,
+    "wall_ms": 3827,
+    "peak_rss_mb": 339.4
    },
    {
     "id": "perf/perf-pages-05/clean",
@@ -30171,18 +30171,18 @@
     ],
     "pages": 5,
     "mp_per_page": 8.703,
-    "ms_per_page": 2718,
+    "ms_per_page": 3876,
     "page_ms": [
-     2821.8,
-     2330,
-     3081.6,
-     2741,
-     2538.5
+     2557,
+     2858.9,
+     3502.3,
+     2532,
+     2722.8
     ],
-    "assemble_ms": 78.5,
-    "runtime_ms": 13592,
-    "wall_ms": 15090,
-    "peak_rss_mb": 522.2
+    "assemble_ms": 5198.7,
+    "runtime_ms": 19382,
+    "wall_ms": 19776,
+    "peak_rss_mb": 414.6
    },
    {
     "id": "perf/perf-pages-05/scan",
@@ -30196,18 +30196,18 @@
     ],
     "pages": 5,
     "mp_per_page": 8.703,
-    "ms_per_page": 2993,
+    "ms_per_page": 4052,
     "page_ms": [
-     2931.5,
-     2940.4,
-     3404.6,
-     2907.3,
-     2718.1
+     2819.2,
+     2748.4,
+     3340.1,
+     3062,
+     3011.2
     ],
-    "assemble_ms": 62.1,
-    "runtime_ms": 14964,
-    "wall_ms": 16207,
-    "peak_rss_mb": 666.1
+    "assemble_ms": 5247.2,
+    "runtime_ms": 20258,
+    "wall_ms": 20653,
+    "peak_rss_mb": 518
    },
    {
     "id": "perf/perf-pages-05/scan-severe",
@@ -30221,18 +30221,18 @@
     ],
     "pages": 5,
     "mp_per_page": 8.703,
-    "ms_per_page": 2740,
+    "ms_per_page": 4170,
     "page_ms": [
-     2421.3,
-     3277.8,
-     2963.1,
-     2499.7,
-     2477.1
+     2527.4,
+     3387,
+     3324.4,
+     2691.2,
+     2760.8
     ],
-    "assemble_ms": 60.3,
-    "runtime_ms": 13700,
-    "wall_ms": 14886,
-    "peak_rss_mb": 572.1
+    "assemble_ms": 6147.8,
+    "runtime_ms": 20848,
+    "wall_ms": 21266,
+    "peak_rss_mb": 523
    },
    {
     "id": "perf/perf-pages-10/clean",
@@ -30246,23 +30246,23 @@
     ],
     "pages": 10,
     "mp_per_page": 8.703,
-    "ms_per_page": 2614,
+    "ms_per_page": 3981,
     "page_ms": [
-     2871.3,
-     2361,
-     2913.5,
-     2357.2,
-     2458.2,
-     3628.4,
-     2403.9,
-     2760.2,
-     2151.7,
-     2112.9
+     2602.6,
+     2823,
+     3026.4,
+     3153.5,
+     2709.9,
+     3868.3,
+     2459.2,
+     2244.3,
+     2230,
+     2161.5
     ],
-    "assemble_ms": 117.6,
-    "runtime_ms": 26136,
-    "wall_ms": 28729,
-    "peak_rss_mb": 795.6
+    "assemble_ms": 12524.8,
+    "runtime_ms": 39812,
+    "wall_ms": 40224,
+    "peak_rss_mb": 545.7
    },
    {
     "id": "perf/perf-pages-10/scan",
@@ -30276,23 +30276,23 @@
     ],
     "pages": 10,
     "mp_per_page": 8.703,
-    "ms_per_page": 2864,
+    "ms_per_page": 4203,
     "page_ms": [
-     3203.9,
-     2886.4,
-     3163.6,
-     2945.6,
-     2874.7,
-     3530.3,
-     2672.9,
-     2619,
-     2321,
-     2338.1
+     2776.2,
+     2948.9,
+     3392,
+     3109.4,
+     2949.5,
+     3583,
+     2742.7,
+     2647.8,
+     2457.7,
+     2480.4
     ],
-    "assemble_ms": 87.9,
-    "runtime_ms": 28644,
-    "wall_ms": 30660,
-    "peak_rss_mb": 891.3
+    "assemble_ms": 12929,
+    "runtime_ms": 42026,
+    "wall_ms": 42443,
+    "peak_rss_mb": 552.2
    },
    {
     "id": "perf/perf-pages-10/scan-severe",
@@ -30306,23 +30306,23 @@
     ],
     "pages": 10,
     "mp_per_page": 8.703,
-    "ms_per_page": 2607,
+    "ms_per_page": 4246,
     "page_ms": [
-     2529.5,
-     2802.2,
-     2999.6,
-     2398.8,
-     2391.5,
-     3284.7,
-     2695.5,
-     2545.4,
-     1988.4,
-     2313.4
+     2535.3,
+     3372,
+     3163.8,
+     2668.4,
+     2764,
+     3385.9,
+     2908.1,
+     2516.5,
+     2222.5,
+     2498.7
     ],
-    "assemble_ms": 124.2,
-    "runtime_ms": 26074,
-    "wall_ms": 28026,
-    "peak_rss_mb": 908.4
+    "assemble_ms": 14410,
+    "runtime_ms": 42455,
+    "wall_ms": 42883,
+    "peak_rss_mb": 553
    },
    {
     "id": "perf/perf-pages-20/clean",
@@ -30336,33 +30336,33 @@
     ],
     "pages": 20,
     "mp_per_page": 8.703,
-    "ms_per_page": 2358,
+    "ms_per_page": 3669,
     "page_ms": [
-     2741.8,
-     2404.2,
-     3098.5,
-     2436.7,
-     2468,
-     3488.9,
-     2331.7,
-     2372.3,
-     2092.9,
-     2022,
-     2215.4,
-     2059.6,
-     2193.7,
-     2045.3,
-     1950.5,
-     1951,
-     2028.6,
-     2473.5,
-     2600.5,
-     2021.7
+     2617.1,
+     2749.5,
+     3002.7,
+     2720.6,
+     2864.6,
+     3601,
+     2590.7,
+     2406.2,
+     2392.6,
+     2282.9,
+     2229.3,
+     2151.6,
+     2377.9,
+     2148.8,
+     2218.4,
+     2176.7,
+     2080.9,
+     2558.7,
+     2296.3,
+     2132
     ],
-    "assemble_ms": 163.6,
-    "runtime_ms": 47161,
-    "wall_ms": 51931,
-    "peak_rss_mb": 1137.6
+    "assemble_ms": 23755.1,
+    "runtime_ms": 73388,
+    "wall_ms": 73836,
+    "peak_rss_mb": 584.2
    },
    {
     "id": "perf/perf-pages-20/scan",
@@ -30376,33 +30376,33 @@
     ],
     "pages": 20,
     "mp_per_page": 8.703,
-    "ms_per_page": 2727,
+    "ms_per_page": 4010,
     "page_ms": [
-     3115.3,
-     2921.5,
-     3169.4,
-     3307.4,
-     3120.3,
-     3623.3,
-     2750.1,
-     2589.9,
-     2305.5,
-     2329.8,
-     2355.2,
-     2561.8,
-     2773.3,
-     2245.6,
-     2465.8,
-     2306.3,
-     2276.2,
-     2978.2,
-     2568.3,
-     2584.5
+     2888.1,
+     2816.3,
+     3350,
+     3042.5,
+     3040.1,
+     3626,
+     2860.9,
+     2571.7,
+     2498.7,
+     2953.7,
+     2474.5,
+     2414.2,
+     2877.4,
+     2436.5,
+     2486.2,
+     2439.1,
+     2349.2,
+     2882.1,
+     2537.3,
+     2455
     ],
-    "assemble_ms": 189.8,
-    "runtime_ms": 54537,
-    "wall_ms": 58256,
-    "peak_rss_mb": 1302.1
+    "assemble_ms": 25161.9,
+    "runtime_ms": 80191,
+    "wall_ms": 80609,
+    "peak_rss_mb": 603.8
    },
    {
     "id": "perf/perf-pages-20/scan-severe",
@@ -30416,33 +30416,33 @@
     ],
     "pages": 20,
     "mp_per_page": 8.703,
-    "ms_per_page": 2602,
+    "ms_per_page": 4138,
     "page_ms": [
-     2954.1,
-     3258.6,
-     3239,
-     2673.3,
-     2523.2,
-     3342.8,
-     2648.3,
-     2663.6,
-     1972.1,
-     2377.9,
-     2445.6,
-     2288.5,
-     3143.2,
-     2008.7,
-     2070.9,
-     2294,
-     1995.8,
-     3046.1,
-     2475.5,
-     2354.7
+     2544.8,
+     3471.7,
+     3212.7,
+     2623.9,
+     2732.7,
+     3362.8,
+     2844.4,
+     2600,
+     2249.3,
+     2514.1,
+     2407.6,
+     2130.7,
+     3049,
+     2138.9,
+     2159.5,
+     2129.4,
+     2078.5,
+     5258.9,
+     2618.7,
+     2509.4
     ],
-    "assemble_ms": 273,
-    "runtime_ms": 52049,
-    "wall_ms": 55711,
-    "peak_rss_mb": 1301.1
+    "assemble_ms": 28091.8,
+    "runtime_ms": 82759,
+    "wall_ms": 83173,
+    "peak_rss_mb": 598.8
    },
    {
     "id": "perf/perf-pages-40/clean",
@@ -30456,53 +30456,53 @@
     ],
     "pages": 40,
     "mp_per_page": 8.703,
-    "ms_per_page": 2284,
+    "ms_per_page": 3681,
     "page_ms": [
-     2693.6,
-     2211.4,
-     3135.4,
-     2362.5,
-     2372.7,
-     3446.1,
-     2373.1,
-     2296.8,
-     2146.4,
-     2043.5,
-     2164.6,
-     2136,
-     2306.6,
-     2422,
-     2135.1,
-     2021,
-     2118.3,
-     2532,
-     2156,
-     1972.6,
-     3137.9,
-     1916.9,
-     2071,
-     2065.4,
-     1937.1,
-     1979.7,
-     2207.1,
-     2513.2,
-     2836.7,
-     2258.4,
-     2591.5,
-     2327.6,
-     2140.4,
-     2079.3,
-     1980.7,
-     2263.5,
-     1884.5,
-     1915.5,
-     1903.4,
-     1994.2
+     2823.3,
+     2847.8,
+     3187.3,
+     3337.9,
+     2868.2,
+     3891,
+     2615.1,
+     2297.4,
+     2313,
+     2243.4,
+     2311.2,
+     2171.1,
+     2429.6,
+     2210.8,
+     2302.5,
+     2209.5,
+     2130.5,
+     2617.3,
+     2751.3,
+     2219.1,
+     3355.6,
+     2226.3,
+     2224.8,
+     2137.9,
+     2207.7,
+     2251.7,
+     2487.1,
+     2664.9,
+     3090.5,
+     2424.5,
+     2280.1,
+     2446.3,
+     2242.9,
+     2139.8,
+     2330.5,
+     2424.7,
+     2219.8,
+     2261.4,
+     2235,
+     2125.4
     ],
-    "assemble_ms": 313.6,
-    "runtime_ms": 91364,
-    "wall_ms": 100380,
-    "peak_rss_mb": 1830.6
+    "assemble_ms": 47652.6,
+    "runtime_ms": 147235,
+    "wall_ms": 147662,
+    "peak_rss_mb": 658.9
    },
    {
     "id": "perf/perf-pages-40/scan",
@@ -30516,53 +30516,53 @@
     ],
     "pages": 40,
     "mp_per_page": 8.703,
-    "ms_per_page": 2632,
+    "ms_per_page": 3940,
     "page_ms": [
-     2786.1,
-     2958.8,
-     3138.1,
-     2817.6,
-     2663.9,
-     3567.2,
-     2661.2,
-     2623.5,
-     2311.4,
-     2366.6,
-     2549,
-     2465.3,
-     2941.5,
-     2443.8,
-     2333.8,
-     2274.7,
-     2392.6,
-     2819.1,
-     2420.1,
-     2263.7,
-     3441.8,
-     2364.2,
-     2364.9,
-     2342.4,
-     2240.2,
-     3003.3,
-     2644.5,
-     3723.1,
-     3604.1,
-     2611.4,
-     2625.6,
-     2538.5,
-     2300.1,
-     2267.1,
-     2272,
-     2761.5,
-     2314.6,
-     2259.3,
-     2244,
-     2275.3
+     2840.8,
+     2925.7,
+     3329.2,
+     3082.5,
+     3748.2,
+     3611.9,
+     2782.7,
+     2500.5,
+     2424.4,
+     2449.4,
+     2429.9,
+     2383.1,
+     2879.1,
+     2462.6,
+     2474.8,
+     2420.4,
+     2379.3,
+     2912.2,
+     2574.7,
+     2427.7,
+     3437.6,
+     2449.1,
+     2470.8,
+     2381.4,
+     2478.3,
+     2467.7,
+     2766.2,
+     2893.6,
+     3300.5,
+     2646.3,
+     2490.8,
+     2833.8,
+     2482.4,
+     2367.5,
+     2474.4,
+     2829.2,
+     2416.7,
+     2490.3,
+     2399.9,
+     2296.3
     ],
-    "assemble_ms": 287,
-    "runtime_ms": 105283,
-    "wall_ms": 112120,
-    "peak_rss_mb": 2184.3
+    "assemble_ms": 50141.2,
+    "runtime_ms": 157582,
+    "wall_ms": 158007,
+    "peak_rss_mb": 662.4
    },
    {
     "id": "perf/perf-pages-40/scan-severe",
@@ -30576,53 +30576,53 @@
     ],
     "pages": 40,
     "mp_per_page": 8.703,
-    "ms_per_page": 2429,
+    "ms_per_page": 4096,
     "page_ms": [
-     2483.6,
-     3313.3,
-     2926.4,
-     2572.6,
-     2461.3,
-     3346.1,
-     2849.3,
-     2792.6,
-     2265,
-     2449.6,
-     2437.3,
-     2114.8,
-     2937.5,
-     1852.3,
-     1868,
-     1899.6,
-     1965,
-     2877.4,
-     2466.4,
-     2292.7,
-     2851.3,
-     1901.9,
-     2003.9,
-     2326.6,
-     2848.2,
-     2491.6,
-     2308.9,
-     2595.6,
-     2926.9,
-     2572,
-     2145.5,
-     2171.2,
-     2355.1,
-     2270.5,
-     1917.8,
-     2918,
-     1892.1,
-     2256.7,
-     1925.3,
-     1940.1
+     2609.6,
+     3599.4,
+     3663.5,
+     2860.9,
+     2803.1,
+     3417.5,
+     2891.8,
+     2647.6,
+     2299.8,
+     2588.9,
+     2495.2,
+     2169.7,
+     3103.2,
+     2111.3,
+     2180.7,
+     2130.8,
+     2064.1,
+     5334.5,
+     2628.3,
+     2448.2,
+     2978.7,
+     2189.5,
+     2274.8,
+     2233.9,
+     2600,
+     2595.1,
+     2423.6,
+     2720.6,
+     3164.4,
+     2874.8,
+     2272.6,
+     2560.8,
+     2914.5,
+     2436.4,
+     2222.9,
+     3096.1,
+     2172.4,
+     2526.8,
+     2211.2,
+     2068
     ],
-    "assemble_ms": 380.3,
-    "runtime_ms": 97171,
-    "wall_ms": 103698,
-    "peak_rss_mb": 2180.8
+    "assemble_ms": 57232.4,
+    "runtime_ms": 163828,
+    "wall_ms": 164268,
+    "peak_rss_mb": 652.2
    },
    {
     "id": "perf/perf-piano-a3-300dpi/clean",
@@ -30636,14 +30636,14 @@
     ],
     "pages": 1,
     "mp_per_page": 17.403,
-    "ms_per_page": 3185,
+    "ms_per_page": 4909,
     "page_ms": [
-     3155.8
+     3478.8
     ],
-    "assemble_ms": 28.6,
-    "runtime_ms": 3185,
-    "wall_ms": 4062,
-    "peak_rss_mb": 345.9
+    "assemble_ms": 1373.7,
+    "runtime_ms": 4909,
+    "wall_ms": 5295,
+    "peak_rss_mb": 331.2
    },
    {
     "id": "perf/perf-piano-a3-300dpi/scan",
@@ -30657,14 +30657,14 @@
     ],
     "pages": 1,
     "mp_per_page": 17.403,
-    "ms_per_page": 3617,
+    "ms_per_page": 4933,
     "page_ms": [
-     3584.9
+     3539.2
     ],
-    "assemble_ms": 31.9,
-    "runtime_ms": 3617,
-    "wall_ms": 4419,
-    "peak_rss_mb": 343.5
+    "assemble_ms": 1375.4,
+    "runtime_ms": 4933,
+    "wall_ms": 5307,
+    "peak_rss_mb": 346.2
    },
    {
     "id": "perf/perf-piano-a3-300dpi/scan-severe",
@@ -30678,14 +30678,14 @@
     ],
     "pages": 1,
     "mp_per_page": 17.403,
-    "ms_per_page": 3454,
+    "ms_per_page": 5034,
     "page_ms": [
-     3419.9
+     3699.2
     ],
-    "assemble_ms": 34.4,
-    "runtime_ms": 3454,
-    "wall_ms": 4192,
-    "peak_rss_mb": 334.9
+    "assemble_ms": 1315.9,
+    "runtime_ms": 5034,
+    "wall_ms": 5405,
+    "peak_rss_mb": 333.6
    },
    {
     "id": "perf/perf-piano-a4-100dpi/clean",
@@ -30699,14 +30699,14 @@
     ],
     "pages": 1,
     "mp_per_page": 0.968,
-    "ms_per_page": 2863,
+    "ms_per_page": 4218,
     "page_ms": [
-     2831.7
+     2683.7
     ],
-    "assemble_ms": 30.7,
-    "runtime_ms": 2863,
-    "wall_ms": 3315,
-    "peak_rss_mb": 286.2
+    "assemble_ms": 1532.9,
+    "runtime_ms": 4218,
+    "wall_ms": 4616,
+    "peak_rss_mb": 291.1
    },
    {
     "id": "perf/perf-piano-a4-100dpi/scan",
@@ -30720,14 +30720,14 @@
     ],
     "pages": 1,
     "mp_per_page": 0.968,
-    "ms_per_page": 2721,
+    "ms_per_page": 4857,
     "page_ms": [
-     2692.5
+     3203.8
     ],
-    "assemble_ms": 27.8,
-    "runtime_ms": 2721,
-    "wall_ms": 3149,
-    "peak_rss_mb": 277
+    "assemble_ms": 1651,
+    "runtime_ms": 4857,
+    "wall_ms": 5252,
+    "peak_rss_mb": 305.8
    },
    {
     "id": "perf/perf-piano-a4-100dpi/scan-severe",
@@ -30741,14 +30741,14 @@
     ],
     "pages": 1,
     "mp_per_page": 0.968,
-    "ms_per_page": 2808,
+    "ms_per_page": 4537,
     "page_ms": [
-     2768.5
+     2946.4
     ],
-    "assemble_ms": 39.1,
-    "runtime_ms": 2808,
-    "wall_ms": 3272,
-    "peak_rss_mb": 309.4
+    "assemble_ms": 1588.8,
+    "runtime_ms": 4537,
+    "wall_ms": 4917,
+    "peak_rss_mb": 312.2
    },
    {
     "id": "perf/perf-piano-a4-150dpi/clean",
@@ -30762,14 +30762,14 @@
     ],
     "pages": 1,
     "mp_per_page": 2.178,
-    "ms_per_page": 2886,
+    "ms_per_page": 4769,
     "page_ms": [
-     2826.3
+     3195.5
     ],
-    "assemble_ms": 59.9,
-    "runtime_ms": 2886,
-    "wall_ms": 3370,
-    "peak_rss_mb": 299.8
+    "assemble_ms": 1570,
+    "runtime_ms": 4769,
+    "wall_ms": 5150,
+    "peak_rss_mb": 298.5
    },
    {
     "id": "perf/perf-piano-a4-150dpi/scan",
@@ -30783,14 +30783,14 @@
     ],
     "pages": 1,
     "mp_per_page": 2.178,
-    "ms_per_page": 2901,
+    "ms_per_page": 4625,
     "page_ms": [
-     2868.1
+     3012.9
     ],
-    "assemble_ms": 33,
-    "runtime_ms": 2901,
-    "wall_ms": 3393,
-    "peak_rss_mb": 282.9
+    "assemble_ms": 1608.9,
+    "runtime_ms": 4625,
+    "wall_ms": 5009,
+    "peak_rss_mb": 303.2
    },
    {
     "id": "perf/perf-piano-a4-150dpi/scan-severe",
@@ -30804,14 +30804,14 @@
     ],
     "pages": 1,
     "mp_per_page": 2.178,
-    "ms_per_page": 3271,
+    "ms_per_page": 4917,
     "page_ms": [
-     3239.7
+     3411.4
     ],
-    "assemble_ms": 31.8,
-    "runtime_ms": 3271,
-    "wall_ms": 3833,
-    "peak_rss_mb": 318.2
+    "assemble_ms": 1503.5,
+    "runtime_ms": 4917,
+    "wall_ms": 5302,
+    "peak_rss_mb": 324.4
    },
    {
     "id": "perf/perf-piano-a4-200dpi/clean",
@@ -30825,14 +30825,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 2062,
+    "ms_per_page": 2678,
     "page_ms": [
-     2033.4
+     2086.9
     ],
-    "assemble_ms": 28.3,
-    "runtime_ms": 2062,
-    "wall_ms": 2464,
-    "peak_rss_mb": 232.4
+    "assemble_ms": 586.8,
+    "runtime_ms": 2678,
+    "wall_ms": 3063,
+    "peak_rss_mb": 244.7
    },
    {
     "id": "perf/perf-piano-a4-200dpi/scan",
@@ -30846,14 +30846,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 2113,
+    "ms_per_page": 2895,
     "page_ms": [
-     2083.6
+     2254.6
     ],
-    "assemble_ms": 28.9,
-    "runtime_ms": 2113,
-    "wall_ms": 2530,
-    "peak_rss_mb": 252.2
+    "assemble_ms": 636.5,
+    "runtime_ms": 2895,
+    "wall_ms": 3278,
+    "peak_rss_mb": 258.6
    },
    {
     "id": "perf/perf-piano-a4-200dpi/scan-severe",
@@ -30867,14 +30867,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 2165,
+    "ms_per_page": 2871,
     "page_ms": [
-     2133.5
+     2099
     ],
-    "assemble_ms": 31.2,
-    "runtime_ms": 2165,
-    "wall_ms": 2595,
-    "peak_rss_mb": 240.4
+    "assemble_ms": 767.3,
+    "runtime_ms": 2871,
+    "wall_ms": 3244,
+    "peak_rss_mb": 277.9
    },
    {
     "id": "perf/perf-piano-a4-300dpi/clean",
@@ -30888,14 +30888,14 @@
     ],
     "pages": 1,
     "mp_per_page": 8.703,
-    "ms_per_page": 3131,
+    "ms_per_page": 5231,
     "page_ms": [
-     3095.3
+     3183.6
     ],
-    "assemble_ms": 35.7,
-    "runtime_ms": 3131,
-    "wall_ms": 3798,
-    "peak_rss_mb": 325.5
+    "assemble_ms": 2037.7,
+    "runtime_ms": 5231,
+    "wall_ms": 5619,
+    "peak_rss_mb": 321.6
    },
    {
     "id": "perf/perf-piano-a4-300dpi/scan",
@@ -30909,14 +30909,14 @@
     ],
     "pages": 1,
     "mp_per_page": 8.703,
-    "ms_per_page": 3828,
+    "ms_per_page": 5933,
     "page_ms": [
-     3800.2
+     3750.6
     ],
-    "assemble_ms": 27.9,
-    "runtime_ms": 3828,
-    "wall_ms": 4478,
-    "peak_rss_mb": 354.6
+    "assemble_ms": 2171.3,
+    "runtime_ms": 5933,
+    "wall_ms": 6316,
+    "peak_rss_mb": 345.4
    },
    {
     "id": "perf/perf-piano-a4-300dpi/scan-severe",
@@ -30930,14 +30930,14 @@
     ],
     "pages": 1,
     "mp_per_page": 8.703,
-    "ms_per_page": 4508,
+    "ms_per_page": 5771,
     "page_ms": [
-     4470.2
+     3477.3
     ],
-    "assemble_ms": 37.7,
-    "runtime_ms": 4508,
-    "wall_ms": 5139,
-    "peak_rss_mb": 375.3
+    "assemble_ms": 2282.4,
+    "runtime_ms": 5771,
+    "wall_ms": 6164,
+    "peak_rss_mb": 366.5
    },
    {
     "id": "perf/perf-piano-a4-400dpi/clean",
@@ -30951,14 +30951,14 @@
     ],
     "pages": 1,
     "mp_per_page": 15.475,
-    "ms_per_page": 3979,
+    "ms_per_page": 4547,
     "page_ms": [
-     3943.9
+     3350.5
     ],
-    "assemble_ms": 35,
-    "runtime_ms": 3979,
-    "wall_ms": 4856,
-    "peak_rss_mb": 349.9
+    "assemble_ms": 1177.1,
+    "runtime_ms": 4547,
+    "wall_ms": 4930,
+    "peak_rss_mb": 347.4
    },
    {
     "id": "perf/perf-piano-a4-400dpi/scan",
@@ -30972,14 +30972,14 @@
     ],
     "pages": 1,
     "mp_per_page": 15.475,
-    "ms_per_page": 3782,
+    "ms_per_page": 5163,
     "page_ms": [
-     3754.6
+     3619.5
     ],
-    "assemble_ms": 27.2,
-    "runtime_ms": 3782,
-    "wall_ms": 4554,
-    "peak_rss_mb": 348
+    "assemble_ms": 1525.1,
+    "runtime_ms": 5163,
+    "wall_ms": 5556,
+    "peak_rss_mb": 339
    },
    {
     "id": "perf/perf-piano-a4-400dpi/scan-severe",
@@ -30993,14 +30993,14 @@
     ],
     "pages": 1,
     "mp_per_page": 15.475,
-    "ms_per_page": 3562,
+    "ms_per_page": 5136,
     "page_ms": [
-     3529.1
+     3696.3
     ],
-    "assemble_ms": 32.1,
-    "runtime_ms": 3562,
-    "wall_ms": 4294,
-    "peak_rss_mb": 345.6
+    "assemble_ms": 1423.1,
+    "runtime_ms": 5136,
+    "wall_ms": 5514,
+    "peak_rss_mb": 359.6
    },
    {
     "id": "perf/perf-piano-a4-600dpi/clean",
@@ -31014,14 +31014,14 @@
     ],
     "pages": 1,
     "mp_per_page": 34.806,
-    "ms_per_page": 3781,
+    "ms_per_page": 5238,
     "page_ms": [
-     3752.3
+     3948.3
     ],
-    "assemble_ms": 28.4,
-    "runtime_ms": 3781,
-    "wall_ms": 5183,
-    "peak_rss_mb": 377.5
+    "assemble_ms": 1253.7,
+    "runtime_ms": 5238,
+    "wall_ms": 5636,
+    "peak_rss_mb": 412.8
    },
    {
     "id": "perf/perf-piano-a4-600dpi/scan",
@@ -31035,14 +31035,14 @@
     ],
     "pages": 1,
     "mp_per_page": 34.806,
-    "ms_per_page": 4110,
+    "ms_per_page": 5784,
     "page_ms": [
-     4054.8
+     4330.4
     ],
-    "assemble_ms": 54.4,
-    "runtime_ms": 4110,
-    "wall_ms": 5274,
-    "peak_rss_mb": 418
+    "assemble_ms": 1423.2,
+    "runtime_ms": 5784,
+    "wall_ms": 6198,
+    "peak_rss_mb": 398.3
    },
    {
     "id": "perf/perf-piano-a4-600dpi/scan-severe",
@@ -31056,14 +31056,14 @@
     ],
     "pages": 1,
     "mp_per_page": 34.806,
-    "ms_per_page": 4090,
+    "ms_per_page": 5636,
     "page_ms": [
-     4015.2
+     4207.8
     ],
-    "assemble_ms": 74.8,
-    "runtime_ms": 4090,
-    "wall_ms": 5216,
-    "peak_rss_mb": 332.4
+    "assemble_ms": 1390.6,
+    "runtime_ms": 5636,
+    "wall_ms": 6054,
+    "peak_rss_mb": 401.1
    },
    {
     "id": "perf/perf-piano-letter-300dpi/clean",
@@ -31077,14 +31077,14 @@
     ],
     "pages": 1,
     "mp_per_page": 8.415,
-    "ms_per_page": 3195,
+    "ms_per_page": 5377,
     "page_ms": [
-     3169.1
+     3213.7
     ],
-    "assemble_ms": 25.4,
-    "runtime_ms": 3195,
-    "wall_ms": 3856,
-    "peak_rss_mb": 318.3
+    "assemble_ms": 2156,
+    "runtime_ms": 5377,
+    "wall_ms": 5771,
+    "peak_rss_mb": 332.5
    },
    {
     "id": "perf/perf-piano-letter-300dpi/scan",
@@ -31098,14 +31098,14 @@
     ],
     "pages": 1,
     "mp_per_page": 8.415,
-    "ms_per_page": 3555,
+    "ms_per_page": 5744,
     "page_ms": [
-     3471.2
+     3510.1
     ],
-    "assemble_ms": 83.6,
-    "runtime_ms": 3555,
-    "wall_ms": 4235,
-    "peak_rss_mb": 363.4
+    "assemble_ms": 2224.7,
+    "runtime_ms": 5744,
+    "wall_ms": 6120,
+    "peak_rss_mb": 322.8
    },
    {
     "id": "perf/perf-piano-letter-300dpi/scan-severe",
@@ -31119,14 +31119,14 @@
     ],
     "pages": 1,
     "mp_per_page": 8.415,
-    "ms_per_page": 3717,
+    "ms_per_page": 5866,
     "page_ms": [
-     3686.1
+     3564.9
     ],
-    "assemble_ms": 30.4,
-    "runtime_ms": 3717,
-    "wall_ms": 4351,
-    "peak_rss_mb": 369.5
+    "assemble_ms": 2290.4,
+    "runtime_ms": 5866,
+    "wall_ms": 6258,
+    "peak_rss_mb": 344.8
    }
   ]
  }

@@ -1,6 +1,6 @@
 # Coverage matrix: symbols, layouts, performance
 
-Generated 2026-11-08 14:04 UTC by `tools/coverage.mjs` from `mvp/work/eval-coverage.json` (eval 2026-11-08 14:04, app source hash `868df105a7b3`, OCR on, raster 200 dpi).
+Generated 2026-11-08 14:07 UTC by `tools/coverage.mjs` from `mvp/work/eval-coverage.json` (eval 2026-11-08 14:04, app source hash `868df105a7b3`, OCR on, raster 200 dpi).
 Corpus: `corpus/coverage` — 102 items, 306 scored PDFs (clean, scan, scan-severe). Every item is a short LilyPond engraving with exact MusicXML truth and a `meta.json` listing its symbols, layout and per-symbol counts.
 
 Regenerate:
@@ -276,41 +276,41 @@ Layout score = mean of part-count match (exact), part-name score and the share o
 
 ## Performance
 
-Source: `mvp/work/eval-coverage-baseline-perf.json` (perf family; 63 PDFs; raster native, OCR on, 8 parallel jobs on 192 CPUs, load average 166.9 at the start). Times are the converter in a Node child process, per page, run as the browser worker runs it (`createConverter()`: each page read from disk when its turn comes, `addPage`, then `releasePage` frees its image buffers and keeps the staff-removed binary bit-packed, then `finish`); peak memory is the child's peak RSS (`maxRSS`), including Node itself (~50 MB) and the OCR engine when OCR is on. Pages are rasterised at the resolution of the scan image, so pixel count follows the source dpi.
+Source: `mvp/work/eval-coverage-perf.json` (perf family; 63 PDFs; raster native, OCR on, 8 parallel jobs on 192 CPUs, load average 55.9 at the start). Times are the converter in a Node child process, per page, run as the browser worker runs it (`createConverter()`: each page read from disk when its turn comes, `addPage`, then `releasePage` frees its image buffers and keeps the staff-removed binary bit-packed, then `finish`); peak memory is the child's peak RSS (`maxRSS`), including Node itself (~50 MB) and the OCR engine when OCR is on. Pages are rasterised at the resolution of the scan image, so pixel count follows the source dpi.
 
 **By source scan dpi**
 
 | Scan dpi | PDFs | MP/page | ms/page (median) | ms/page (max) | peak MB (median) | peak MB (max) |
 |---|---:|---:|---:|---:|---:|---:|
-| 100 | 6 | 0.968 | 3227 | 4464 | 309.4 | 374.5 |
-| 150 | 6 | 2.178 | 3332 | 4900 | 318.2 | 376.2 |
-| 200 | 6 | 3.869 | 3110 | 4225 | 252.2 | 337.6 |
-| 300 | 33 | 8.703 | 3185 | 5352 | 375.3 | 2184.3 |
-| 400 | 6 | 15.475 | 5593 | 7527 | 446 | 557.8 |
-| 600 | 6 | 34.806 | 4819 | 5363 | 418 | 445.6 |
+| 100 | 6 | 0.968 | 4857 | 5783 | 312.2 | 371.6 |
+| 150 | 6 | 2.178 | 4769 | 6006 | 315.9 | 389.4 |
+| 200 | 6 | 3.869 | 4599 | 6417 | 304 | 390 |
+| 300 | 33 | 8.703 | 4909 | 6487 | 366.5 | 662.4 |
+| 400 | 6 | 15.475 | 8066 | 10045 | 445.7 | 566 |
+| 600 | 6 | 34.806 | 5784 | 6811 | 401.1 | 444.9 |
 
 **By page size**
 
 | Page size | PDFs | MP/page | ms/page (median) | ms/page (max) | peak MB (median) | peak MB (max) |
 |---|---:|---:|---:|---:|---:|---:|
-| ~A3 | 1 | 20.49 | 5259 | 5259 | 417.9 | 417.9 |
-| ~B4 | 6 | 10.25 | 5352 | 7527 | 419.1 | 557.8 |
-| ~Letter | 1 | 9.965 | 4833 | 4833 | 453.1 | 453.1 |
-| A3 | 5 | 17.403 | 3617 | 4266 | 345.9 | 411.7 |
-| A4 | 45 | 8.703 | 2993 | 6659 | 345.4 | 2184.3 |
-| Letter | 5 | 8.415 | 3717 | 4452 | 336.6 | 369.5 |
+| ~A3 | 1 | 20.49 | 6487 | 6487 | 416 | 416 |
+| ~B4 | 6 | 10.25 | 6417 | 10045 | 444.9 | 566 |
+| ~Letter | 1 | 9.965 | 6218 | 6218 | 466.8 | 466.8 |
+| A3 | 5 | 17.403 | 5034 | 5300 | 344.6 | 369.3 |
+| A4 | 45 | 8.703 | 4547 | 8182 | 345.9 | 662.4 |
+| Letter | 5 | 8.415 | 5445 | 5866 | 322.8 | 344.8 |
 
 **By page count**
 
 | Pages | PDFs | MP/page | ms/page (median) | ms/page (max) | peak MB (median) | peak MB (max) |
 |---|---:|---:|---:|---:|---:|---:|
-| 1 | 51 | 8.703 | 3782 | 7527 | 336.6 | 557.8 |
-| 5 | 3 | 8.703 | 2740 | 2993 | 572.1 | 666.1 |
-| 10 | 3 | 8.703 | 2614 | 2864 | 891.3 | 908.4 |
-| 20 | 3 | 8.703 | 2602 | 2727 | 1301.1 | 1302.1 |
-| 40 | 3 | 8.703 | 2429 | 2632 | 2180.8 | 2184.3 |
+| 1 | 51 | 8.703 | 5163 | 10045 | 339.4 | 566 |
+| 5 | 3 | 8.703 | 4052 | 4170 | 518 | 523 |
+| 10 | 3 | 8.703 | 4203 | 4246 | 552.2 | 553 |
+| 20 | 3 | 8.703 | 4010 | 4138 | 598.8 | 603.8 |
+| 40 | 3 | 8.703 | 3940 | 4096 | 658.9 | 662.4 |
 
-**Linear fits.** ms per page = 3056.2 + **51.49 ms per megapixel** × MP per page (n=63, R²=0.2). Peak MB = 296.9 + 5.2 MB per megapixel × total MP (n=63, R²=0.968). Overall: 301 ms of conversion per megapixel.
+**Linear fits.** ms per page = 4439.2 + **51.91 ms per megapixel** × MP per page (n=63, R²=0.158). Peak MB = 349.9 + 1.09 MB per megapixel × total MP (n=63, R²=0.659). Overall: 454 ms of conversion per megapixel.
 
 ## Items
 
