@@ -175,7 +175,7 @@ srv.listen(0, async () => {
     if (chips.length < 5) return { ok: false, n: chips.length };
     chips[4].click();
     await new Promise((r) => setTimeout(r, 50));
-    const a = { label: document.getElementById('pgLabel').textContent, current: chips[4].getAttribute('aria-current'), img: !!document.querySelector('#pages img'), svg: !!document.querySelector('#pages svg.ov path') };
+    const a = { label: document.getElementById('pgLabel').textContent, current: chips[4].getAttribute('aria-current'), img: !!document.querySelector('#pages .pgimg'), svg: !!document.querySelector('#pages svg.ov path') };
     document.getElementById('pgPrev').click();
     await new Promise((r) => setTimeout(r, 50));
     const b = { label: document.getElementById('pgLabel').textContent, current: chips[3].getAttribute('aria-current') };

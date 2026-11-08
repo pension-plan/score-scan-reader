@@ -40,7 +40,7 @@ const srv = http.createServer((req, res) => {
           marks: q('.ov-marks > *'), unknown: q('.unk-layer .unk'), labels: q('.ov-labels text'), stems: q('.ov-stem'),
           labelsShown: !document.getElementById('pages').classList.contains('lbl-small'),
           layers: [...document.querySelectorAll('#layers .layer')].map(b => b.textContent.trim()),
-          hscroll: document.documentElement.scrollWidth > window.innerWidth, dbg: (() => { const im = document.querySelector('#pages .pageframe img'); return im ? [im.clientWidth, im.width, im.naturalWidth, document.querySelector('#pages svg.ov').viewBox.baseVal.width] : null; })(),
+          hscroll: document.documentElement.scrollWidth > window.innerWidth, dbg: (() => { const im = document.querySelector('#pages .pageframe .pgimg'); return im ? [im.clientWidth, im.width, im.naturalWidth, document.querySelector('#pages svg.ov').viewBox.baseVal.width] : null; })(),
           sample: [...document.querySelectorAll('#pages .ov-labels text')].slice(0, 12).map(t => t.textContent),
         };
       });

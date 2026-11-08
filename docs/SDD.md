@@ -140,6 +140,21 @@ from 334/899/2124 MB to about 384/628/724 MB, and the browser OMR worker's heap 
 retained data: glibc keeps freed 8 MB page buffers in its heap (with `MALLOC_MMAP_THRESHOLD_=1048576` the
 40-page peak is 559 MB, about 3% slower).
 
+The page shows each scan page in a `<canvas>` (class `pgimg`), drawn from the page's JPEG blob through
+`createImageBitmap` (closed after drawing), not as an `<img>`: Chromium keeps every decoded `<img>` in its
+discardable image cache (`cc/image_memory`, about 11 MB per 1400 px page), so a 40-page document held about
+450 MB of decoded pages that only memory pressure released. Only the page on screen is decoded now, and its
+canvas is cleared when another page is shown (40-page browser peak, all processes: +871 MB to +453 MB over
+the idle page; 10 to 40 pages adds about 95 MB). Code that needs the page image reads `.pageframe .pgimg`,
+whose `naturalWidth`/`naturalHeight` give the image's pixel size.
+
+**Time per page (L26 follow-up).** The time-signature reader that runs after every barline (`meter.js`,
+`cv.js` template matching) and component labelling of the whole background (`heads.js fillHoles`) had raised
+the time per page to 4-6 s. Template scores are now summed from the ink pixels only (each shift's sum adds
+the same terms in the same order, so scores are bit-identical), digit readers score the non-digit shapes
+only for a glyph that reads as a digit, and `cc.js labelComponents` uses scalar neighbours instead of a
+per-pixel array: 300 dpi piano page 5.9 to 3.8 s, 5-page item 4.1 to 2.7 s per page, same MusicXML.
+
 **Size budget.** Each supporting file ≤ 15 MB, the total ≤ 64 MB [WF]. Planned: phase 1 about 13–20 MB, phase
 2 with ONNX about 30–40 MB [OMR §9.3]. The build fails if a limit is exceeded (§9).
 
@@ -934,6 +949,26 @@ because its heads are closer to the text [VOI §7.1].
 
 The 31 % rhythm-divergence figure in Bach chorales (§6.1) is why copying is by slot rather than by note index.
 
+As built (`score.js`), copying is opt-in (`opts.copyLyrics`). By default each underlay line goes to one voice of
+its staff, chosen once per text band from the summed onset fit: a line between the staves stays with the upper
+voice unless another fits clearly better, and a line under the lowest split staff goes to its lower voice. Where
+the two voices of the lowest split staff share every onset (an exact tie of the fit) the line goes to both (L7,
+measured and kept): the corpus truths split evenly on such text (tenor in aloha-oe-chorus and the 4-page anthem,
+bass in bwv3-6 and satb-closed-ties-solo-amen), so one voice is wrong half the time (expected lyric F1 about 0.5)
+while both scores about 0.67 on every item. Setting it once under the lower voice moved the OCR challenge run
+by +0.03 on the amen item and -0.05 to -0.06 on the anthem, and the benchmark the same way (bwv3-6 up, aloha
+down).
+
+A melisma inferred from notes left without a syllable (no extender line seen in print) is dropped when letters
+are printed in the verse's own text row under one of those notes (outside the syllable's own box and the next
+one's): the gap is a syllable OCR missed, not a melisma (L4b). Measured on the benchmark with OCR: extenders 166
+before, 164 after, against 126 in truth. The rest of the excess is not this rule's: golden1923-america's truth
+carries no extenders at all (21 of ours), and text set under both voices of a staff (L7) doubles its extenders
+(bwv3-6: 25 against 11). Two stricter rules were measured and rejected: dropping the melisma whenever another verse
+has a syllable on those notes (166 to 119, but it removed true melismas of verses with different syllable counts:
+aloha-oe-full-score 18 to 9 against 20, foster 10 to 4 against 8), and treating a syllable that reaches over the
+next note as two merged syllables (166 to 95; melisma syllables are left-aligned and often do reach over).
+
 ## 8. UI design
 
 ### 8.1 Layout
@@ -1167,12 +1202,35 @@ and leaves no more voice-measures needing rhythm repair. It raises agreement to 
 wind-melody: pitch +0.038, duration -0.042 on 31 variants; clara-schumann pitch -0.014), so it is off by
 default.
 
-**Braces and the part layout.** `score.js` `braceEvidence()` counts, per staff pair, the systems whose
-left edge shows a brace and those showing only a system line. A rule "a pair read as a keyboard grand
-staff with system lines on two systems or more and no brace on any is two instruments" (`opts.braceCheck`,
-off by default) fixes the two-instrument items of the challenge set (pitch-clef-carousel 0.57 to 0.85,
-pitch-ledger-ottava 0.59 to 0.78) but splits degraded pianos whose brace was not found (andantino
-copies 0.99 to 0.50), so it is not used yet; it needs a surer brace detector first.
+**Braces and the part layout (L18).** `text.js` classifies the tall narrow ink at the staves' left edge as a
+system line, a curly brace or a bracket. A brace is recognised by its tip whatever its stroke weight: the
+leftmost ink of the rows at mid-height (45-55 %) stands at least max(2 px, 0.18 staff space) left of the
+median left edge of its two arms (30-40 % and 60-70 %); the mean of the arms cancels a skewed page's slant.
+Before this, thin braces of clean renders and faded copies read as system lines, which is why the old
+`opts.braceCheck` rule split degraded pianos. `score.js` `braceEvidence()` counts per staff pair the systems
+with a brace over exactly the pair (`pair`), with a mark over more staves than the pair (`wide`: the bracket
+or system line of an ensemble), with only a system line (`lines`), and with any mark read (`read`).
+`chooseLayout()` keeps a pair read as a keyboard (joined barlines, chords without text) unless no brace
+over the pair is seen on any system and one of these holds: a wide mark joins it; a C clef is on either
+staff (always); three or more systems (and at least 75 % of those read) show a system line and neither
+staff has chords; both staves carry the same clef and neither has chords. A run of three or more staves
+joined by barlines with no brace over any pair of them is an ensemble group and none of its pairs is a
+keyboard. A printed keyboard name across the pair overrides all of this. On 740 cached challenge and
+coverage scans a brace over the pair is now found for 249 of 259 true grand staves (the rest are
+photocopy-severe pianos, which keep their link by texture), and the rules remove 86 of 98 false keyboard
+pairs (quartets, orchestral sections, flute + tuba, viola + cello) without losing any true one. Every
+pair's evidence is returned as `layout.evid` for debugging. A bottom treble/bass pair of a taller score
+with full chords (three heads on a stem) and no text is an accompaniment even when its joined barlines were
+not seen (voice + piano on a faded copy).
+
+**Instrument names without labels (L9).** When no voice name is read, no underlay is found and some
+staff has an instrument name or a C clef, the unnamed staves are instruments: four single staves in G, G,
+C3, F clefs are named Violin I, Violin II, Viola, Violoncello; an alto-clef staff is a Viola; two
+neighbouring staves in one clef where one is named (or both carry the same name without a number) are
+that instrument's two desks ("Violin I" over "Violin II"). Two small staves (treble over bass) above a
+keyboard are a piano trio's Violin and Violoncello. Desk and divisi numbers read as digits are written in
+the roman style of printed scores ("Violin 1" becomes "Violin I"). The names also choose the playback
+instrument (`playback.js gmFor`).
 
 **Slurs, ties and grace notes in MusicXML.** A thin bowed curve is classified even where its box
 touches the heads it joins. Its two ends are matched to note heads (left end within about 1.8 staff

@@ -134,6 +134,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 01:32 | Shipped 04e1879 (opencv): rests via templates; 32nd rests on scans 40 to 80 of 102, 64th 4 to 11 of 30; challenge 0.831 to 0.832; regress clean. opencv next: courtesy accidentals and keys (L24, L2), hollow heads on scans (L1). |
 | 01:33 | Release 0.27.0 merged (rests 04e1879, faster template scoring 2851d4d, accents/marcato/15ma 8060286, structure f2e4a8b key changes/volta numbers/implausible meters, textsym 411aade pedal/fingering/rehearsal/chord symbols). 411aade reverted f2e4a8b's score.js hunks; restored by 1b60f3b; textsym told to diff against origin/main before pushing shared files. Isolated regress of 0.27.0 running. |
 | 01:38 | textsym 411aade (+1b60f3b restoring structure hunks): chord symbols, pedal, fingering, rehearsal marks written; expression/tempo words snapped to terms; German rows no longer trigger the second OCR pass. COVERAGE 83/45/26. Next: pedal brackets, rehearsal letters/circles, shape-based chords, lyric merges, unread bar numbers. |
+| 01:38 | Isolated regression of release 0.27.0 vs 0.26.0: benchmark+OCR 0.951 to 0.951, challenge 0.831 to 0.832, ties 3973 to 3985; no regression. |
 
 ## Accuracy by round
 

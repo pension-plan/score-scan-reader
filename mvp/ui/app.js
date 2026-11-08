@@ -525,6 +525,8 @@
       $('pgNext').disabled = i >= this.n - 1;
       this.paintChips();
       const host = $('pages');
+      // the canvas of the page shown before is freed now, unless this page is shown again
+      if (this.cv && !(p.view && p.url && this.cv.i === i && this.cv.url === p.url)) { this.cv.el.width = this.cv.el.height = 0; this.cv = null; }
       host.textContent = '';
       if (!p.view || !p.url) {
         const ph = document.createElement('div');
@@ -563,11 +565,22 @@
       const v = p.view;
       const fig = document.createElement('div');
       fig.className = 'pageframe';
-      const img = document.createElement('img');
-      img.src = p.url;
-      img.width = v.width; img.height = v.height;
-      img.decoding = 'async';
-      img.alt = `Page ${p.i + 1} of the scan, straightened: ${plural(v.nStaves, 'staff', 'staves')}, ${plural(v.heads.length, 'note head')} found.`;
+      // the page image is drawn into a canvas, not shown as an <img>: the browser keeps every
+      // decoded <img> in its image cache (11 MB per page at 1400 px, so a long document grew by
+      // that per page); a canvas holds only the page on screen and is freed when the page changes
+      let img = this.cv && this.cv.i === p.i && this.cv.url === p.url ? this.cv.el : null;
+      if (!img) {
+        img = document.createElement('canvas');
+        const [nw, nh] = p.px || [v.width, v.height];
+        img.className = 'pgimg';
+        img.width = nw; img.height = nh;
+        img.style.aspectRatio = `${v.width} / ${v.height}`;
+        Object.defineProperties(img, { naturalWidth: { value: nw }, naturalHeight: { value: nh } });
+        img.setAttribute('role', 'img');
+        drawPageImage(img, p.url);
+        this.cv = { i: p.i, url: p.url, el: img };
+      }
+      img.setAttribute('aria-label', `Page ${p.i + 1} of the scan, straightened: ${plural(v.nStaves, 'staff', 'staves')}, ${plural(v.heads.length, 'note head')} found.`);
       fig.appendChild(img);
       fig.insertAdjacentHTML('beforeend', this.overlay(p));
       fig.insertAdjacentHTML('beforeend', unkLayerHTML(p));
@@ -841,7 +854,7 @@
     const p = book.pages[book.sel];
     let small = true;
     if (fr && p && p.view) {
-      const img = fr.querySelector('img');
+      const img = fr.querySelector('.pgimg');
       const vv = window.visualViewport;
       const k = (img.clientWidth / p.view.width) * (vv && vv.scale ? vv.scale : 1);
       small = p.view.ss * k < 11;
@@ -857,6 +870,17 @@
     $('zoomOut').disabled = zoom <= ZOOMS[0];
     $('zoomIn').disabled = zoom >= ZOOMS[ZOOMS.length - 1];
     fitLabels();
+  }
+  // decode a page image (blob or data URL) into its canvas; the decoded bitmap is closed at once
+  function drawPageImage(cv, url) {
+    const draw = (src, done) => { if (cv.width) cv.getContext('2d').drawImage(src, 0, 0, cv.width, cv.height); done(); };
+    if (typeof createImageBitmap === 'function') {
+      fetch(url).then((r) => r.blob()).then((b) => createImageBitmap(b)).then((bm) => draw(bm, () => bm.close())).catch(() => {});
+    } else {
+      const im = new Image();
+      im.onload = () => draw(im, () => im.removeAttribute('src'));
+      im.src = url;
+    }
   }
   function thumbURL(t) {
     const c = grayToCanvas(t);
@@ -1261,7 +1285,7 @@
           const url = await thumbURL(r.thumb);
           mark('show');
           if (/^blob:/.test(url)) book.urls.push(url);
-          book.setState(i, 'done', { view: r.view, url, ms: r.ms });
+          book.setState(i, 'done', { view: r.view, url, ms: r.ms, px: [r.thumb.width, r.thumb.height] });
         } else book.setState(i, 'empty');
         read++;
         pageDur.push(performance.now() - tp);
@@ -1584,7 +1608,7 @@
   const unkMsg = (t) => { $('unkMsg').textContent = t; };
   // the zoom at which a staff space is at least 16 screen pixels
   function zoomFor(p) {
-    const img = $('pages').querySelector('.pageframe img');
+    const img = $('pages').querySelector('.pageframe .pgimg');
     if (!img || !p.view) return zoom;
     const fit = img.clientWidth / zoom / p.view.width;
     const need = 16 / (p.view.ss * fit);
@@ -1688,7 +1712,7 @@
     $('idEffect').textContent = t ? t() : '';
   }
   function drawCrop(p, b) {
-    const cv = $('idCrop'), img = $('pages').querySelector('.pageframe img');
+    const cv = $('idCrop'), img = $('pages').querySelector('.pageframe .pgimg');
     const g = cv.getContext('2d');
     if (!img || !img.naturalWidth) { cv.hidden = true; return; }
     cv.hidden = false;

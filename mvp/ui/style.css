@@ -204,7 +204,7 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 .legend .aux{color:var(--muted)}
 .pages{display:flex;flex-direction:column;gap:22px;padding:6px}
 .pageframe{position:relative;background:var(--paper);outline:1px solid var(--rule-strong);outline-offset:5px;line-height:0}
-.pageframe img{display:block;width:100%;height:auto}
+.pageframe .pgimg{display:block;width:100%;height:auto}
 .pageframe .ov{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .pages.ov-off .ov{visibility:hidden}
 /* overlay layers (toggled in the legend; hide-<layer> on .pages) */

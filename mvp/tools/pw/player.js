@@ -104,7 +104,7 @@ const srv = http.createServer((req, res) => {
           const ks = pg.view.heads.map((h, k) => k).filter((k) => notes[k] && notes[k][7] >= 0);
           const k = ks[Math.floor(ks.length * 0.6)];
           const h = pg.view.heads[k];
-          const img = document.querySelector('#pages .pageframe img');
+          const img = document.querySelector('#pages .pageframe .pgimg');
           img.scrollIntoView({ block: 'center' });
           const r = img.getBoundingClientRect();
           const n = s.all.find((x) => x.lines.includes(notes[k][7]));

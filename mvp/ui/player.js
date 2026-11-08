@@ -558,7 +558,7 @@
     const fig = e.target.closest && e.target.closest('.pageframe');
     if (!b || !fig) return null;
     const page = b.pages[b.sel];
-    const img = fig.querySelector('img');
+    const img = fig.querySelector('.pgimg');
     if (!page || !page.view || !img) return null;
     const r = img.getBoundingClientRect();
     const v = page.view;
