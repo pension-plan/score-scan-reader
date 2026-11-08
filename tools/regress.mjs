@@ -32,14 +32,21 @@ const jobs = opt('--jobs', '8');
 const work = path.join(ROOT, 'mvp/work/regress', base);
 const baseSrc = path.join(work, 'src');
 
+// Runs are concurrent (several agents share this tree): every run writes to its own paths,
+// tagged with the process id, and the shared base checkout is extracted atomically.
+const RUN = String(process.pid);
 if (!fs.existsSync(path.join(baseSrc, 'omr.js'))) {
-  fs.mkdirSync(work, { recursive: true });
+  const tmp = path.join(ROOT, 'mvp/work/regress', `.${path.basename(work)}.${RUN}`);
+  fs.mkdirSync(tmp, { recursive: true });
   const tar = execFileSync('git', ['archive', base, 'mvp/src'], { cwd: ROOT, maxBuffer: 1 << 28 });
-  spawnSync('tar', ['-x', '-C', work, '--strip-components=1'], { input: tar });
+  spawnSync('tar', ['-x', '-C', tmp, '--strip-components=1'], { input: tar });
+  fs.mkdirSync(work, { recursive: true });
+  try { fs.renameSync(path.join(tmp, 'src'), baseSrc); } catch (e) { /* another run got there first */ }
+  fs.rmSync(tmp, { recursive: true, force: true });
 }
 
 const run = (label, src) => {
-  const out = path.join(ROOT, `mvp/work/regress-${label}-${set}${ocr ? '-ocr' : ''}.json`);
+  const out = path.join(ROOT, `mvp/work/regress-${label}-${set}${ocr ? '-ocr' : ''}-${RUN}.json`);
   const a = ['mvp/tools/eval.mjs', '--out', out, '--jobs', jobs, '--quiet'];
   if (src) a.push('--src', src);
   if (set !== 'default') a.push('--set', set);
@@ -52,7 +59,7 @@ const run = (label, src) => {
 const headRef = opt('--head', null);
 let headSrc = null;
 if (headRef) {
-  const hw = path.join(ROOT, 'mvp/work/regress', 'head-' + headRef.replace(/[^\w.-]/g, '_'));
+  const hw = path.join(ROOT, 'mvp/work/regress', 'head-' + headRef.replace(/[^\w.-]/g, '_') + '-' + RUN);
   headSrc = path.join(hw, 'src');
   fs.rmSync(hw, { recursive: true, force: true });
   fs.mkdirSync(hw, { recursive: true });
@@ -62,6 +69,8 @@ if (headRef) {
   console.error('warning: mvp/src has uncommitted changes (possibly other agents\' work); they are scored as head. Use --head <ref> to score a commit.');
 }
 const A = run(base, baseSrc), B = run('head', headSrc);
+if (headSrc) fs.rmSync(path.dirname(headSrc), { recursive: true, force: true });
+console.error(`outputs: mvp/work/regress-{${base},head}-${set}${ocr ? '-ocr' : ''}-${RUN}.{json,out}`);
 const head = headRef ? git('rev-parse', '--short', headRef) : git('rev-parse', '--short', 'HEAD') + (git('status', '--porcelain', '--', 'mvp/src') ? '+wip' : '');
 const sA = A.summary, sB = B.summary;
 const f = (v) => (typeof v === 'number' ? v.toFixed(3) : '–');
@@ -89,7 +98,7 @@ if (worse.length) {
 // metric, as when a broken import dropped every dynamic in 0.21.0. Count each element across
 // all produced MusicXML files and treat a drop of more than 10% (from at least 10) as a regression.
 const MARKS = ['dynamics', 'wedge', 'words', 'metronome', 'credit', 'tie', 'slur', 'fermata', 'grace', 'time', 'key', 'lyric'];
-const outDir = (label) => path.join(ROOT, `mvp/work/regress-${label}-${set}${ocr ? '-ocr' : ''}.out`);
+const outDir = (label) => path.join(ROOT, `mvp/work/regress-${label}-${set}${ocr ? '-ocr' : ''}-${RUN}.out`);
 const countMarks = (dir) => {
   const n = Object.fromEntries(MARKS.map((m) => [m, 0]));
   if (!fs.existsSync(dir)) return null;
