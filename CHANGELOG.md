@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.23.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.22.0...score-scan-reader-v0.23.0) (2026-11-08)
+
+
+### Features
+
+* ties found between same-pitch neighbour heads with an arc of ink ([b357ba7](https://github.com/pension-plan/score-scan-reader/commit/b357ba7aeff97bab43cac3764ad175a3ce097c5e))
+
 ## [0.22.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.21.1...score-scan-reader-v0.22.0) (2026-11-08)
 
 
