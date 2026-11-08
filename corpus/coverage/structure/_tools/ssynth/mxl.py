@@ -376,7 +376,9 @@ def _note(w, ev, pit, chord, d, voice, staff, role, acc, first):
         for _ in range(ev.slur_start):
             nots.append('<slur type="start" number="1"/>')
         if ev.tuplet and ev.tuplet_start:
-            nots.append('<tuplet type="start"/>')
+            # LilyPond default tupletBracketVisibility = if-no-beam: beamed tuplets show the number only
+            br = 'no' if ev.beams else 'yes'
+            nots.append(f'<tuplet type="start" bracket="{br}" show-number="actual"/>')
         if ev.tuplet and ev.tuplet_stop:
             nots.append('<tuplet type="stop"/>')
         if ev.fermata:

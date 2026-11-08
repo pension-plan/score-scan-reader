@@ -246,7 +246,9 @@ function detectRests({ R, comps, s, xa, xb, debug }) {
     if (bars || q === 2) {
       const pad = (kind === 'breve' || kind === 'long' ? 1.2 : 0.9) * sp;
       if (heads.some(hd => hd.x > c.x0 - 2 * sp && hd.x < c.x1 + 2 * sp && kind !== 'multi')) continue;
+      // (a barline beside it is fine: a thin stroke at least a staff tall)
       if (near.some(o => o !== c && o.area >= 0.1 * sp * sp && (o.x1 - o.x0 > 0.75 * sp || o.y1 - o.y0 > 0.75 * sp) &&
+        !(o.x1 - o.x0 + 1 <= 0.4 * sp && o.y1 - o.y0 + 1 >= 3.5 * sp) &&
         o.x1 > c.x0 - pad && o.x0 < c.x1 + pad && o.y1 > c.y0 - sp && o.y0 < c.y1 + sp)) continue;
     }
     // a glyph directly left of a notehead at its height is an accidental

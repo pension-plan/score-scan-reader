@@ -76,6 +76,15 @@
              (lambda (g)
                (if (procedure? orig) (orig g))
                (if (grob::is-live? g) (cv-log g nm sid))))
+           (if (memq nm '(LyricHyphen LyricExtender))
+               (let ((ost (ly:grob-property-data grob 'stencil)))
+                 (if (procedure? ost)
+                     (ly:grob-set-property! grob 'stencil
+                       (lambda (g)
+                         (let ((st (ost g)))
+                           (cv-out (string-append (symbol->string nm) "Ink") sid (cv-when g) (cv-uid g) (cv-orig g)
+                                   (if (and (ly:stencil? st) (not (ly:stencil-empty? st))) 1 0))
+                           st))))))
            (set! (cv-hooked grob) 'done)))))
 #(define (cv-engraver ctx)
    (let ((sid (let ((i (ly:context-id ctx))) (if (and (string? i) (> (string-length i) 0)) i

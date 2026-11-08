@@ -336,6 +336,8 @@
       "lyric_syllables": 0,
       "hyphens": 0,
       "extenders": 0,
+      "hyphens_visible": 0,
+      "extenders_visible": 0,
       "chord_names": 0,
       "system_delimiters": {}
     },

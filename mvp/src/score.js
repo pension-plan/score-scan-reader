@@ -214,6 +214,14 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
   // printed part names (first system with the full staff count), per staff
   const labels = readLabels(systems, nSt);
   const ownNames = (k, kinds) => labels[k].filter(l => !l.span).flatMap(l => l.names.filter(n => kinds.includes(n.kind)));
+  // staff size against the largest staff of its system (median over the
+  // systems): small staves printed over a full-size score are the solo or
+  // cue staves of a piano score (an instrument each), never one half of a
+  // grand staff, whose two staves have one size (L18)
+  const small = Array.from({ length: nSt }, (_, k) => {
+    const r = sel.map(sy => (sy.staves[k] ? sy.staves[k].st.space / Math.max(...sy.staves.map(s => s.st.space)) : 1)).sort((a, b) => a - b);
+    return !process.env.NOSMALL && r.length > 0 && r[r.length >> 1] <= 0.85;
+  });
   // keyboard links between adjacent staves
   const link = [];
   for (let k = 0; k + 1 < nSt; k++) {
@@ -231,6 +239,7 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
       const chordal = (stats[k].f3 + stats[k + 1].f3) / 2 >= 0.2 || (stats[k].f2 + stats[k + 1].f2) / 2 <= 0.3;
       kb = nSt === 2 && !underlay && (chordal || (ocr && !anyLyrics));
     }
+    if (small[k] || small[k + 1]) kb = false;
     // printed names overrule: one keyboard name across the pair joins it; a
     // staff with its own voice or instrument name is not half of a grand staff
     if (labels[k].some(l => l.span && l.span.includes(k + 1) && l.names.some(n => n.kind === 'keyboard'))) kb = true;
@@ -253,9 +262,12 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
   }
   // vocal staves: split when two voices share the staff for the whole piece
   const vocal = groups.filter(g => !g.keyboard).map(g => g.staves[0]);
-  const vs = vocal.map(k => ({ staff: k, clef: clefs[k], split: stats[k].f2 > 0.35 && stats[k].f3 < 0.2 }));
+  // a piece on one staff splits only where stems up and down are seen
+  // together (research-voices.md section 11): two heads on one stem there
+  // are chords, double stops or blurred heads, not two singers
+  const vs = vocal.map(k => ({ staff: k, clef: clefs[k], small: small[k], split: !small[k] && stats[k].f2 > 0.35 && stats[k].f3 < 0.2 && (nSt > 1 || stats[k].mix >= 0.25 || !!process.env.OLDSOLO) }));
   // a two-staff closed score decides once for both staves
-  if (vs.length === 2 && nSt === 2) {
+  if (vs.length === 2 && nSt === 2 && !small[0] && !small[1]) {
     const both = (stats[0].f2 + stats[1].f2) / 2 > 0.3 && (stats[0].f3 + stats[1].f3) / 2 < 0.2;
     vs.forEach(v => { v.split = both; });
   }
@@ -271,7 +283,14 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
     else if (names.length === 1) { v.names = ls[0].off < 0 ? [names[0], null] : [null, names[0]]; }
     else if (names.length >= 2) v.names = [names[0]];
   }
-  const vnames = vocalNames(vs);
+  // inferred names: voices from the vocal staves' pattern, small staves
+  // (instruments, their names not read) numbered
+  {
+    const vv = vs.filter(v => !v.small), vn = vocalNames(vv), sm = vs.filter(v => v.small);
+    let q = 0;
+    vv.forEach(v => { const n = v.split ? 2 : 1; v.inf = vn.slice(q, q + n); q += n; });
+    sm.forEach((v, i) => { v.inf = [sm.length > 1 ? `Instrument ${i + 1}` : 'Instrument']; });
+  }
   const read = [];
   const parts = [];
   let vi = 0;
@@ -289,11 +308,14 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
       continue;
     }
     const v = vs.find(x => x.staff === g.staves[0]);
-    const nm = (k) => { const n = v.names && v.names[k]; const inf = vnames[vi++]; return n ? { name: n.name, nameRead: true } : { name: inf, nameRead: false }; };
+    const nm = (k) => { const n = v.names && v.names[k]; const inf = v.inf[k] || `Voice ${++vi}`; return n ? { name: n.name, nameRead: true } : { name: inf, nameRead: false }; };
     if (v.split) {
       parts.push({ ...nm(0), kind: 'vocal', src: [{ staff: v.staff, voice: 1 }], layout: `Staff ${v.staff + 1}, stems up (split from a shared staff)` });
       parts.push({ ...nm(1), kind: 'vocal', src: [{ staff: v.staff, voice: 2 }], layout: `Staff ${v.staff + 1}, stems down (split from a shared staff)` });
       notes.push(`Staff ${v.staff + 1}: two voices on one staff, split by stem direction into ${parts[parts.length - 2].name} and ${parts[parts.length - 1].name}.`);
+    } else if (v.small) {
+      parts.push({ ...nm(0), kind: 'instrument', src: [{ staff: v.staff, voice: 'chordal' }], layout: `Staff ${v.staff + 1} (small staff: a separate instrument)` });
+      notes.push(`Staff ${v.staff + 1}: printed smaller than the staves below it, read as a separate instrument part (not part of the piano's grand staff).`);
     } else parts.push({ ...nm(0), kind: 'vocal', src: [{ staff: v.staff, voice: 'chordal' }], layout: `Staff ${v.staff + 1}` });
   }
   parts.forEach(p => { if (p.nameRead) read.push(p.name); });

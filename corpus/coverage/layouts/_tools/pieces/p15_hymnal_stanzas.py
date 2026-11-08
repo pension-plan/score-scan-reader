@@ -26,7 +26,7 @@ def make():
     sc = assemble((4, 4), (1, 'major'), [(p, {'1': v[p.id]}) for p in parts])
     set_verses(sc, 'S', '1', STANZAS, mode='attack')
     add_mark(sc, 0, 'tempo', text='Steadily', unit='half', bpm=56)
-    breaks(sc, systems=(5,))
+    breaks(sc, systems=(3, 6))
     sc.groups = [{'first': 'S', 'last': 'B', 'symbol': 'bracket'}]
     sc.marks_part = 'S'
     hdr = header(sc, 'Light of Ages', 'L.M.', composer='Tune and harmony: coverage suite (2026)',
@@ -50,7 +50,7 @@ ITEM = dict(
                     'measure, fermatas at the line ends, no bar numbers.'),
     truth_limitations=['All four stanzas are encoded on the Soprano (<lyric number="1".."4">); stanza numbers are not '
                        'encoded.'],
-    layout_desc='A4 portrait, staff size 19, 2 systems (pickup + 4, 4 measures), lyrics between the staves',
+    layout_desc='A4 portrait, staff size 19, 3 systems (pickup + 2, 3, 3 measures), four lyric lines between the staves',
     scans=scans(15, 'T1', 'S5'),
     attribution='Light of Ages - tune, harmonisation (corpus voice-leading solver) and the four stanzas composed for '
                 'the OMR coverage suite (2026) - CC0 1.0.\n\n' + CC0_NOTE,

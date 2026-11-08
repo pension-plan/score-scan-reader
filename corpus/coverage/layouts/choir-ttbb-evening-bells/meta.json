@@ -108,7 +108,7 @@
           ]
         }
       ],
-      "bytes": 118334
+      "bytes": 117931
     },
     "scan.pdf": {
       "seed": 7081,
@@ -169,7 +169,7 @@
         "jpeg": 80
       },
       "summary": "300 dpi colour scan on cream paper, 0.4 deg skew, noise, JPEG q80",
-      "bytes": 785429
+      "bytes": 785674
     },
     "scan-severe.pdf": {
       "seed": 7082,
@@ -264,7 +264,7 @@
         "format": "png1"
       },
       "summary": "thick dark binarised photocopy at 200 dpi: ink spread, 2.5 deg skew, staple, two punch holes, salt & pepper",
-      "bytes": 144889
+      "bytes": 144607
     }
   },
   "files": [
@@ -307,6 +307,8 @@
       "lyric_syllables": 28,
       "hyphens": 6,
       "extenders": 0,
+      "hyphens_visible": 6,
+      "extenders_visible": 0,
       "chord_names": 0,
       "system_delimiters": {
         "SystemStartBracket": 2

@@ -120,7 +120,7 @@
           ]
         }
       ],
-      "bytes": 132541
+      "bytes": 132088
     },
     "scan.pdf": {
       "seed": 7101,
@@ -168,7 +168,7 @@
         "jpeg": 75
       },
       "summary": "300 dpi grey flatbed scan, 0.6 deg skew, light paper texture and noise, JPEG q75",
-      "bytes": 650963
+      "bytes": 650991
     },
     "scan-severe.pdf": {
       "seed": 7102,
@@ -278,7 +278,7 @@
         "jpeg": 25
       },
       "summary": "phone photo of the page: perspective/keystone, uneven light, vignette, motion blur, 150 dpi, JPEG q25",
-      "bytes": 110293
+      "bytes": 110104
     }
   },
   "files": [
@@ -320,6 +320,8 @@
       "lyric_syllables": 28,
       "hyphens": 5,
       "extenders": 0,
+      "hyphens_visible": 5,
+      "extenders_visible": 0,
       "chord_names": 0,
       "system_delimiters": {
         "SystemStartBracket": 2,

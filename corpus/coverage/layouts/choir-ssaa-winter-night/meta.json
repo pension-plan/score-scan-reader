@@ -120,7 +120,7 @@
           ]
         }
       ],
-      "bytes": 122112
+      "bytes": 121760
     },
     "scan.pdf": {
       "seed": 7091,
@@ -173,7 +173,7 @@
         "jpeg": 65
       },
       "summary": "250 dpi grey scan, 1.2 deg skew, soft focus, toner specks, JPEG q65",
-      "bytes": 390789
+      "bytes": 391165
     },
     "scan-severe.pdf": {
       "seed": 7092,
@@ -208,22 +208,22 @@
                 "marks": [
                   [
                     442,
-                    550
+                    405
                   ],
                   [
                     688,
-                    404
+                    394
                   ],
                   [
                     506,
-                    550
+                    405
                   ]
                 ],
                 "texts": [
                   [
                     "rit.",
                     373,
-                    371
+                    361
                   ],
                   [
                     "breathe",
@@ -320,7 +320,7 @@
         "jpeg": 30
       },
       "summary": "old yellowed copy: bleed-through, foxing, coffee ring, pencil annotations, 150 dpi colour, 2 deg skew, JPEG q30",
-      "bytes": 105855
+      "bytes": 105705
     }
   },
   "files": [
@@ -363,6 +363,8 @@
       "lyric_syllables": 28,
       "hyphens": 7,
       "extenders": 1,
+      "hyphens_visible": 7,
+      "extenders_visible": 1,
       "chord_names": 0,
       "system_delimiters": {
         "SystemStartBracket": 2

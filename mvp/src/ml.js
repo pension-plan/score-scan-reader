@@ -198,23 +198,34 @@ function beamDepth(h, R, sp) {
   const { width: w, height: H, data } = R;
   const ink = (xx, yy) => xx >= 0 && yy >= 0 && xx < w && yy < H && !!data[yy * w + xx];
   const inward = up ? 1 : -1;
-  // a beam runs sideways from the tip for well over a head's width
-  const yb = Math.round(tip + inward * 0.2 * sp);
-  const run = (step) => { let n = 0, gap = 0, xx = x; while (Math.abs(xx - x) < 3 * sp) { xx += step; if (ink(xx, yb)) { n = Math.abs(xx - x); gap = 0; } else if (++gap > 2) break; } return n; };
-  const side = run(1) >= run(-1) ? 1 : -1;
-  if (Math.max(run(1), run(-1)) < 1.4 * sp) return null;
+  // the beam: the first row near the tip (a slur touching the stem can carry
+  // the tip past it) where ink runs sideways for well over a head's width,
+  // gaps of a screen or a broken print bridged
+  const maxGap = Math.max(2, Math.round(0.15 * sp));
+  const run = (yb, step) => {
+    let n = 0, gap = 0, xx = x;
+    while (Math.abs(xx - x) < 3 * sp) { xx += step; if (ink(xx, yb)) { n = Math.abs(xx - x); gap = 0; } else if (++gap > maxGap) break; }
+    return n;
+  };
+  let row = null, side = 1;
+  for (let k = -Math.round(0.2 * sp); k <= Math.round(1.2 * sp) && row == null; k++) {
+    const yb = Math.round(tip + inward * k), l = run(yb, -1), r = run(yb, 1);
+    if (Math.max(l, r) >= 1.4 * sp) { row = yb; side = r >= l ? 1 : -1; }
+  }
+  if (row == null) return null;
   const depths = [];
   for (const off of [0.45, 0.65, 0.85]) {
     const xx = Math.round(x + side * off * sp);
     let y0 = -1;
-    for (let k = -Math.round(0.3 * sp); k <= Math.round(0.4 * sp) && y0 < 0; k++) if (ink(xx, Math.round(tip + inward * k))) y0 = Math.round(tip + inward * k);
+    for (let k = -Math.round(0.25 * sp); k <= Math.round(0.25 * sp) && y0 < 0; k++) if (ink(xx, row + inward * k)) y0 = row + inward * k;
     if (y0 < 0) continue;
+    while (ink(xx, y0 - inward) && Math.abs(y0 - row) < 0.5 * sp) y0 -= inward;
     let y1 = y0, gap = 0;
     for (let yy = y0 + inward; Math.abs(yy - y0) < 3 * sp; yy += inward) { if (ink(xx, yy)) { y1 = yy; gap = 0; } else if (++gap > 0.35 * sp) break; }
     depths.push((Math.abs(y1 - y0) + 1) / sp);
   }
   if (!depths.length) return null;
-  depths.sort((a, b) => a - b);
+  depths.sort((p, q) => p - q);
   return depths[depths.length >> 1];
 }
 

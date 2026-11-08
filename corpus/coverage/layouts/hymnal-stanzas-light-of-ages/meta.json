@@ -41,7 +41,7 @@
     "pickup": 1,
     "stem-down": 64,
     "stem-up": 64,
-    "system-break": 1,
+    "system-break": 2,
     "tempo-mark": 1,
     "time-4-4": 1,
     "x-group-bracket": 1,
@@ -84,10 +84,10 @@
   "notes": [
     "All four stanzas are encoded on the Soprano (<lyric number=\"1\"..\"4\">); stanza numbers are not encoded."
   ],
-  "layout_description": "A4 portrait, staff size 19, 2 systems (pickup + 4, 4 measures), lyrics between the staves",
+  "layout_description": "A4 portrait, staff size 19, 3 systems (pickup + 2, 3, 3 measures), four lyric lines between the staves",
   "pages": 1,
   "measures": 9,
-  "systems": 2,
+  "systems": 3,
   "noteheads_in_truth": 128,
   "hidden_staff_segments": [],
   "dpi": 300,
@@ -106,7 +106,7 @@
           ]
         }
       ],
-      "bytes": 167579
+      "bytes": 188671
     },
     "scan.pdf": {
       "seed": 7151,
@@ -154,7 +154,7 @@
         "jpeg": 75
       },
       "summary": "300 dpi grey flatbed scan, 0.6 deg skew, light paper texture and noise, JPEG q75",
-      "bytes": 653762
+      "bytes": 689563
     },
     "scan-severe.pdf": {
       "seed": 7152,
@@ -178,43 +178,43 @@
               {
                 "circled": [
                   [
-                    966,
-                    513
+                    185,
+                    1145
                   ],
                   [
-                    474,
-                    509
+                    548,
+                    1143
                   ]
                 ],
                 "marks": [
                   [
-                    159,
-                    494
+                    448,
+                    1378
                   ],
                   [
-                    803,
-                    966
+                    677,
+                    478
                   ],
                   [
-                    949,
-                    347
+                    555,
+                    233
                   ]
                 ],
                 "texts": [
                   [
                     "rit.",
-                    403,
-                    923
+                    886,
+                    500
                   ],
                   [
                     "breathe",
-                    559,
-                    518
+                    240,
+                    1385
                   ],
                   [
                     "p!",
-                    440,
-                    354
+                    719,
+                    484
                   ]
                 ],
                 "lines": 1
@@ -224,7 +224,7 @@
               "bleed_through",
               {
                 "strength": 0.12,
-                "shift_px": 3
+                "shift_px": 0
               }
             ],
             [
@@ -244,8 +244,8 @@
               {
                 "coffee": [
                   [
-                    776,
-                    1016,
+                    473,
+                    1230,
                     124
                   ]
                 ],
@@ -301,7 +301,7 @@
         "jpeg": 30
       },
       "summary": "old yellowed copy: bleed-through, foxing, coffee ring, pencil annotations, 150 dpi colour, 2 deg skew, JPEG q30",
-      "bytes": 122835
+      "bytes": 133945
     }
   },
   "files": [
@@ -340,9 +340,11 @@
       "lyric_syllables": 128,
       "hyphens": 11,
       "extenders": 0,
+      "hyphens_visible": 11,
+      "extenders_visible": 0,
       "chord_names": 0,
       "system_delimiters": {
-        "SystemStartBracket": 2
+        "SystemStartBracket": 3
       }
     },
     "lilypond_warnings": [],

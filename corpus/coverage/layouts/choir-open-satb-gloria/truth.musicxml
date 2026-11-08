@@ -213,6 +213,7 @@
       </note>
     </measure>
     <measure number="5">
+      <print new-system="yes"/>
       <note>
         <pitch><step>C</step><alter>1</alter><octave>5</octave></pitch>
         <duration>2</duration>
@@ -414,6 +415,7 @@
       </note>
     </measure>
     <measure number="5">
+      <print new-system="yes"/>
       <direction placement="below"><direction-type><dynamics><f/></dynamics></direction-type><voice>1</voice></direction>
       <note>
         <pitch><step>E</step><octave>4</octave></pitch>
@@ -596,6 +598,7 @@
       </note>
     </measure>
     <measure number="5">
+      <print new-system="yes"/>
       <direction placement="below"><direction-type><dynamics><f/></dynamics></direction-type><voice>1</voice></direction>
       <note>
         <pitch><step>A</step><octave>3</octave></pitch>
@@ -727,6 +730,7 @@
       </note>
     </measure>
     <measure number="5">
+      <print new-system="yes"/>
       <direction placement="below"><direction-type><dynamics><f/></dynamics></direction-type><voice>1</voice></direction>
       <note>
         <pitch><step>A</step><octave>3</octave></pitch>

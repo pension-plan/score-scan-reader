@@ -30,10 +30,10 @@
     \autoLineBreaksOff \autoPageBreaksOff \tempo "Steadily" 2 = 56 \numericTimeSignature \time 4/4 \key g \major \partial 1*1/4 \voiceOne \stemUp d'4 |
     g'4 a'4 b'4 g'4 |
     c''4 b'4 a'4\fermata d''4 |
-    b'4 g'4 a'4 b'4 |
+    \break b'4 g'4 a'4 b'4 |
     a'4 g'4 fis'4\fermata d'4 |
-    \break g'4 a'4 b'4 c''4 |
-    d''4 c''4 b'4\fermata b'4 |
+    g'4 a'4 b'4 c''4 |
+    \break d''4 c''4 b'4\fermata b'4 |
     c''4 b'4 a'4 g'4
     \set Timing.measurePosition = #(ly:make-moment 1/4) a'4 fis'4 g'4\fermata |
           }
@@ -103,7 +103,8 @@
   >>
   \layout {
     \context { \Score \override CodaMark.break-visibility = ##(#f #t #t) \override SegnoMark.break-visibility = ##(#f #t #t) }
+    \context { \Lyrics \override LyricHyphen.minimum-distance = #1.6 \override LyricExtender.minimum-length = #0.6 }
     \context { \Score \remove "Bar_number_engraver" }
   }
-  \midi { \tempo 4 = 90 \context { \Staff \remove "Staff_performer" } \context { \Voice \consists "Staff_performer" } }
+  \midi { \tempo 4 = 90 \context { \Staff \remove "Staff_performer" } \context { \Voice \consists "Staff_performer" } \context { \ChordNames \remove "Note_performer" } }
 }

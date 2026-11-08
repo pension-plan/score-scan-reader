@@ -17,12 +17,13 @@
   left-margin = 18\mm
   right-margin = 16\mm
   indent = 16\mm
+  short-indent = 7\mm
   system-system-spacing.basic-distance = #20
 }
 \score {
   <<
     \new ChoirStaff <<
-      \new Staff = "s" \with { instrumentName = "Soprano" } { \clef "treble"
+      \new Staff = "s" \with { instrumentName = "Soprano" shortInstrumentName = "S." } { \clef "treble"
           \new Voice = "vSx1" {
     \set melismaBusyProperties = #'()
     \autoBeamOff
@@ -30,7 +31,7 @@
     \stemDown b'4( cis''8[ d''8] e''4) d''4 |
     cis''4( b'4) \stemUp a'2 |
     r4 \stemDown e''4\f fis''4 e''8 d''8 |
-    cis''4 b'8 \stemUp a'8 gis'4 a'4 |
+    \break cis''4 b'8 \stemUp a'8 gis'4 a'4 |
     fis'2\>( gis'2) |
     a'1\fermata\! |
           }
@@ -40,7 +41,7 @@
       "o," "Glo" -- "ri" -- "a" "in" "ex" -- "cel" -- "sis" "De" -- "o." "A" -- _
       "men."
       }
-      \new Staff = "a" \with { instrumentName = "Alto" } { \clef "treble"
+      \new Staff = "a" \with { instrumentName = "Alto" shortInstrumentName = "A." } { \clef "treble"
           \new Voice = "vAx1" {
     \set melismaBusyProperties = #'()
     \autoBeamOff
@@ -57,7 +58,7 @@
       "Glo" -- "ri" -- "a" "in" "ex" -- "cel" -- _ _ _ "sis" "De" -- _
       "o," "ex" -- "cel" -- "sis" "De" -- "o." "A" -- _ "men."
       }
-      \new Staff = "t" \with { instrumentName = "Tenor" } { \clef "treble_8"
+      \new Staff = "t" \with { instrumentName = "Tenor" shortInstrumentName = "T." } { \clef "treble_8"
           \new Voice = "vTx1" {
     \set melismaBusyProperties = #'()
     \autoBeamOff
@@ -74,7 +75,7 @@
       "Glo" -- "ri" -- "a" "in" "ex" -- "cel" -- _ _ _ "sis" "De" -- _
       "o." "A" -- _ "men."
       }
-      \new Staff = "b" \with { instrumentName = "Bass" } { \clef "bass"
+      \new Staff = "b" \with { instrumentName = "Bass" shortInstrumentName = "B." } { \clef "bass"
           \new Voice = "vBx1" {
     \set melismaBusyProperties = #'()
     \autoBeamOff
@@ -95,6 +96,7 @@
   >>
   \layout {
     \context { \Score \override CodaMark.break-visibility = ##(#f #t #t) \override SegnoMark.break-visibility = ##(#f #t #t) }
+    \context { \Lyrics \override LyricHyphen.minimum-distance = #1.6 \override LyricExtender.minimum-length = #0.6 }
   }
-  \midi { \tempo 4 = 90 \context { \Staff \remove "Staff_performer" } \context { \Voice \consists "Staff_performer" } }
+  \midi { \tempo 4 = 90 \context { \Staff \remove "Staff_performer" } \context { \Voice \consists "Staff_performer" } \context { \ChordNames \remove "Note_performer" } }
 }

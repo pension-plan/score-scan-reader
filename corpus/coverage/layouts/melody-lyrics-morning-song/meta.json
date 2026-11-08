@@ -113,7 +113,7 @@
           ]
         }
       ],
-      "bytes": 92448
+      "bytes": 92444
     },
     "scan.pdf": {
       "seed": 7021,
@@ -174,7 +174,7 @@
         "jpeg": 80
       },
       "summary": "300 dpi colour scan on cream paper, 0.4 deg skew, noise, JPEG q80",
-      "bytes": 755004
+      "bytes": 755040
     },
     "scan-severe.pdf": {
       "seed": 7022,
@@ -230,7 +230,7 @@
         "jpeg": 20
       },
       "summary": "low-resolution 120 dpi grey scan, -4 deg skew, heavy blur and noise, JPEG q20",
-      "bytes": 33865
+      "bytes": 33844
     }
   },
   "files": [
@@ -271,6 +271,8 @@
       "lyric_syllables": 32,
       "hyphens": 5,
       "extenders": 7,
+      "hyphens_visible": 5,
+      "extenders_visible": 7,
       "chord_names": 0,
       "system_delimiters": {}
     },

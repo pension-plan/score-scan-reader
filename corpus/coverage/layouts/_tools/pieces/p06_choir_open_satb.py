@@ -2,7 +2,7 @@
 imitative entries, tenor on a treble-8 clef."""
 from csynth.model import set_verses
 
-from .common import CC0_NOTE, add_mark, assemble, header, mk_part, opts, scans
+from .common import CC0_NOTE, add_mark, assemble, breaks, header, mk_part, opts, scans
 
 S = ("e''4\\mf cis''8 d'' e''4 a' | b'4( cis''8 d'' e''4) d'' | cis''4( b') a'2 | r4 e''\\f fis'' e''8 d'' | "
      "cis''4 b'8 a' gis'4 a' | fis'2(\\> gis'2) | a'1\\!\\fermata")
@@ -27,16 +27,18 @@ def make():
         set_verses(sc, pid, '1', [t], mode='attack')
     add_mark(sc, 0, 'tempo', text='Allegro moderato', unit='half', bpm=60)
     sc.measures[0].time_symbol = None
+    breaks(sc, systems=(4,))
     sc.groups = [{'first': 'S', 'last': 'B', 'symbol': 'bracket'}]
     sc.marks_part = 'S'
     hdr = header(sc, 'Gloria', 'for mixed choir (SATB)', lyricist='Text: liturgical (public domain)')
     staves = []
     for pid, clef, nm in (('S', 'treble', 'Soprano'), ('A', 'treble', 'Alto'), ('T', 'treble_8', 'Tenor'),
                           ('B', 'bass', 'Bass')):
-        staves.append({'id': pid.lower(), 'clef': clef, 'name': nm, 'voices': [(pid, '1')],
+        staves.append({'id': pid.lower(), 'clef': clef, 'name': nm, 'short': nm[0] + '.', 'voices': [(pid, '1')],
                        'lyrics': [{'voice': (pid, '1'), 'verses': [1], 'place': 'below', 'stanza': False}]})
     lay = {'groups': [{'type': 'ChoirStaff', 'staves': staves}]}
-    return sc, lay, opts(hdr, 19, extra_paper=['indent = 16\\mm', 'system-system-spacing.basic-distance = #20'])
+    return sc, lay, opts(hdr, 19, extra_paper=['indent = 16\\mm', 'short-indent = 7\\mm',
+                                                'system-system-spacing.basic-distance = #20'])
 
 
 ITEM = dict(
@@ -49,7 +51,7 @@ ITEM = dict(
                     'to that part.'),
     truth_limitations=['The tenor clef is <clef><sign>G</sign><line>2</line><clef-octave-change>-1</clef-octave-change>; '
                        'its pitches are written at sounding pitch as usual for vocal tenor parts.'],
-    layout_desc='A4 portrait, staff size 19, one system of 7 measures on 4 bracketed staves, every staff named',
+    layout_desc='A4 portrait, staff size 19, 2 systems (4 + 3 measures) on 4 bracketed staves, full then short names',
     scans=scans(6, 'T2', 'S1'),
     attribution='Gloria for SATB choir composed for the OMR coverage suite (2026) - CC0 1.0. Text: "Gloria in '
                 'excelsis Deo" (Latin liturgy, public domain).\n\n' + CC0_NOTE,

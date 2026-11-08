@@ -5926,7 +5926,7 @@
         <stem>up</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>A</step><octave>4</octave></pitch>
@@ -5958,7 +5958,7 @@
         <stem>down</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>C</step><alter>1</alter><octave>5</octave></pitch>
@@ -6009,7 +6009,7 @@
         <stem>down</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>D</step><octave>5</octave></pitch>
@@ -6041,7 +6041,7 @@
         <stem>up</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>A</step><octave>4</octave></pitch>
@@ -6092,7 +6092,7 @@
         <stem>down</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>C</step><alter>1</alter><octave>5</octave></pitch>
@@ -6124,7 +6124,7 @@
         <stem>up</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>A</step><octave>4</octave></pitch>
@@ -6175,7 +6175,7 @@
         <stem>up</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>G</step><alter>1</alter><octave>4</octave></pitch>
@@ -6207,7 +6207,7 @@
         <stem>up</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>G</step><alter>1</alter><octave>4</octave></pitch>
@@ -6259,7 +6259,7 @@
         <stem>up</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>A</step><octave>4</octave></pitch>
@@ -6291,7 +6291,7 @@
         <stem>down</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>C</step><alter>1</alter><octave>5</octave></pitch>
@@ -6342,7 +6342,7 @@
         <stem>down</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>D</step><octave>5</octave></pitch>
@@ -6374,7 +6374,7 @@
         <stem>down</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>F</step><alter>1</alter><octave>5</octave></pitch>
@@ -6425,7 +6425,7 @@
         <stem>down</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>E</step><octave>5</octave></pitch>
@@ -6457,7 +6457,7 @@
         <stem>down</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>B</step><octave>4</octave></pitch>
@@ -6544,7 +6544,7 @@
         <stem>down</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>C</step><alter>1</alter><octave>5</octave></pitch>
@@ -6576,7 +6576,7 @@
         <stem>up</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>A</step><octave>4</octave></pitch>
@@ -6627,7 +6627,7 @@
         <stem>up</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>B</step><octave>4</octave></pitch>
@@ -6659,7 +6659,7 @@
         <stem>up</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>F</step><alter>1</alter><octave>4</octave></pitch>
@@ -6710,7 +6710,7 @@
         <stem>down</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>B</step><octave>4</octave></pitch>
@@ -6742,7 +6742,7 @@
         <stem>up</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>E</step><octave>4</octave></pitch>
@@ -6793,7 +6793,7 @@
         <stem>up</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>E</step><octave>4</octave></pitch>
@@ -6825,7 +6825,7 @@
         <stem>up</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>E</step><octave>4</octave></pitch>
@@ -6877,7 +6877,7 @@
         <stem>down</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>D</step><octave>5</octave></pitch>
@@ -6909,7 +6909,7 @@
         <stem>down</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>F</step><alter>1</alter><octave>5</octave></pitch>
@@ -6960,7 +6960,7 @@
         <stem>down</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>C</step><alter>1</alter><octave>5</octave></pitch>
@@ -6992,7 +6992,7 @@
         <stem>up</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>A</step><octave>4</octave></pitch>
@@ -7043,7 +7043,7 @@
         <stem>down</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>B</step><octave>4</octave></pitch>
@@ -7075,7 +7075,7 @@
         <stem>up</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>G</step><alter>1</alter><octave>4</octave></pitch>
@@ -7127,7 +7127,7 @@
         <stem>up</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>E</step><octave>4</octave></pitch>
@@ -7159,7 +7159,7 @@
         <stem>up</stem>
         <staff>1</staff>
         <beam number="1">begin</beam>
-        <notations><tuplet type="start"/></notations>
+        <notations><tuplet type="start" bracket="no" show-number="actual"/></notations>
       </note>
       <note>
         <pitch><step>G</step><alter>1</alter><octave>4</octave></pitch>

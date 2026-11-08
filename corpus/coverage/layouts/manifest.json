@@ -90,7 +90,7 @@
     "staccato": 25,
     "stem-down": 1156,
     "stem-up": 828,
-    "system-break": 28,
+    "system-break": 30,
     "tempo-mark": 20,
     "tenuto": 6,
     "text-expression": 16,
@@ -452,6 +452,8 @@
           "lyric_syllables": 0,
           "hyphens": 0,
           "extenders": 0,
+          "hyphens_visible": 0,
+          "extenders_visible": 0,
           "chord_names": 0,
           "system_delimiters": {}
         },
@@ -586,7 +588,7 @@
               ]
             }
           ],
-          "bytes": 92448
+          "bytes": 92444
         },
         "scan.pdf": {
           "seed": 7021,
@@ -647,7 +649,7 @@
             "jpeg": 80
           },
           "summary": "300 dpi colour scan on cream paper, 0.4 deg skew, noise, JPEG q80",
-          "bytes": 755004
+          "bytes": 755040
         },
         "scan-severe.pdf": {
           "seed": 7022,
@@ -703,7 +705,7 @@
             "jpeg": 20
           },
           "summary": "low-resolution 120 dpi grey scan, -4 deg skew, heavy blur and noise, JPEG q20",
-          "bytes": 33865
+          "bytes": 33844
         }
       },
       "files": [
@@ -744,6 +746,8 @@
           "lyric_syllables": 32,
           "hyphens": 5,
           "extenders": 7,
+          "hyphens_visible": 5,
+          "extenders_visible": 7,
           "chord_names": 0,
           "system_delimiters": {}
         },
@@ -1053,6 +1057,8 @@
           "lyric_syllables": 0,
           "hyphens": 0,
           "extenders": 0,
+          "hyphens_visible": 0,
+          "extenders_visible": 0,
           "chord_names": 0,
           "system_delimiters": {
             "SystemStartBrace": 3
@@ -1203,7 +1209,7 @@
               ]
             }
           ],
-          "bytes": 136551
+          "bytes": 136695
         },
         "scan.pdf": {
           "seed": 7041,
@@ -1256,7 +1262,7 @@
             "jpeg": 65
           },
           "summary": "250 dpi grey scan, 1.2 deg skew, soft focus, toner specks, JPEG q65",
-          "bytes": 450371
+          "bytes": 450452
         },
         "scan-severe.pdf": {
           "seed": 7042,
@@ -1351,7 +1357,7 @@
             "format": "png1"
           },
           "summary": "thick dark binarised photocopy at 200 dpi: ink spread, 2.5 deg skew, staple, two punch holes, salt & pepper",
-          "bytes": 151911
+          "bytes": 151984
         }
       },
       "files": [
@@ -1394,6 +1400,8 @@
           "lyric_syllables": 28,
           "hyphens": 2,
           "extenders": 1,
+          "hyphens_visible": 2,
+          "extenders_visible": 1,
           "chord_names": 0,
           "system_delimiters": {
             "SystemStartBrace": 3
@@ -1537,7 +1545,7 @@
               ]
             }
           ],
-          "bytes": 116944
+          "bytes": 114090
         },
         "scan.pdf": {
           "seed": 7051,
@@ -1585,7 +1593,7 @@
             "jpeg": 75
           },
           "summary": "300 dpi grey flatbed scan, 0.6 deg skew, light paper texture and noise, JPEG q75",
-          "bytes": 565454
+          "bytes": 565607
         },
         "scan-severe.pdf": {
           "seed": 7052,
@@ -1641,7 +1649,7 @@
             "jpeg": 20
           },
           "summary": "low-resolution 120 dpi grey scan, -4 deg skew, heavy blur and noise, JPEG q20",
-          "bytes": 39338
+          "bytes": 39205
         }
       },
       "files": [
@@ -1683,6 +1691,8 @@
           "lyric_syllables": 28,
           "hyphens": 4,
           "extenders": 1,
+          "hyphens_visible": 4,
+          "extenders_visible": 1,
           "chord_names": 0,
           "system_delimiters": {
             "SystemStartBracket": 2
@@ -1733,6 +1743,7 @@
         "slur",
         "stem-down",
         "stem-up",
+        "system-break",
         "tempo-mark",
         "time-4-4",
         "x-group-bracket",
@@ -1764,6 +1775,7 @@
         "slur": 11,
         "stem-down": 37,
         "stem-up": 34,
+        "system-break": 1,
         "tempo-mark": 1,
         "time-4-4": 1,
         "x-group-bracket": 1,
@@ -1809,10 +1821,10 @@
       "notes": [
         "The tenor clef is <clef><sign>G</sign><line>2</line><clef-octave-change>-1</clef-octave-change>; its pitches are written at sounding pitch as usual for vocal tenor parts."
       ],
-      "layout_description": "A4 portrait, staff size 19, one system of 7 measures on 4 bracketed staves, every staff named",
+      "layout_description": "A4 portrait, staff size 19, 2 systems (4 + 3 measures) on 4 bracketed staves, full then short names",
       "pages": 1,
       "measures": 7,
-      "systems": 1,
+      "systems": 2,
       "noteheads_in_truth": 75,
       "hidden_staff_segments": [],
       "dpi": 200,
@@ -1831,7 +1843,7 @@
               ]
             }
           ],
-          "bytes": 122486
+          "bytes": 150762
         },
         "scan.pdf": {
           "seed": 7061,
@@ -1887,7 +1899,7 @@
             "jpeg": 70
           },
           "summary": "200 dpi grey office scan, -0.9 deg skew, slight lighting gradient, noise, JPEG q70",
-          "bytes": 306246
+          "bytes": 355441
         },
         "scan-severe.pdf": {
           "seed": 7062,
@@ -1961,7 +1973,7 @@
             "format": "png1"
           },
           "summary": "thin, faded binarised photocopy at 150 dpi (rendered 300): ink dropout, 3 deg skew, broken lines, salt & pepper, toner specks",
-          "bytes": 24586
+          "bytes": 34526
         }
       },
       "files": [
@@ -2003,9 +2015,11 @@
           "lyric_syllables": 58,
           "hyphens": 32,
           "extenders": 0,
+          "hyphens_visible": 32,
+          "extenders_visible": 0,
           "chord_names": 0,
           "system_delimiters": {
-            "SystemStartBracket": 1
+            "SystemStartBracket": 2
           }
         },
         "lilypond_warnings": [],
@@ -2129,7 +2143,7 @@
               ]
             }
           ],
-          "bytes": 155901
+          "bytes": 155796
         },
         "scan.pdf": {
           "seed": 7071,
@@ -2185,7 +2199,7 @@
             "jpeg": 72
           },
           "summary": "240 dpi grey scan, -0.5 deg skew, faint bleed-through, JPEG q72",
-          "bytes": 404418
+          "bytes": 404972
         },
         "scan-severe.pdf": {
           "seed": 7072,
@@ -2295,7 +2309,7 @@
             "jpeg": 25
           },
           "summary": "phone photo of the page: perspective/keystone, uneven light, vignette, motion blur, 150 dpi, JPEG q25",
-          "bytes": 107749
+          "bytes": 107850
         }
       },
       "files": [
@@ -2337,6 +2351,8 @@
           "lyric_syllables": 84,
           "hyphens": 6,
           "extenders": 0,
+          "hyphens_visible": 6,
+          "extenders_visible": 0,
           "chord_names": 0,
           "system_delimiters": {
             "SystemStartBracket": 2
@@ -2468,7 +2484,7 @@
               ]
             }
           ],
-          "bytes": 118334
+          "bytes": 117931
         },
         "scan.pdf": {
           "seed": 7081,
@@ -2529,7 +2545,7 @@
             "jpeg": 80
           },
           "summary": "300 dpi colour scan on cream paper, 0.4 deg skew, noise, JPEG q80",
-          "bytes": 785429
+          "bytes": 785674
         },
         "scan-severe.pdf": {
           "seed": 7082,
@@ -2624,7 +2640,7 @@
             "format": "png1"
           },
           "summary": "thick dark binarised photocopy at 200 dpi: ink spread, 2.5 deg skew, staple, two punch holes, salt & pepper",
-          "bytes": 144889
+          "bytes": 144607
         }
       },
       "files": [
@@ -2667,6 +2683,8 @@
           "lyric_syllables": 28,
           "hyphens": 6,
           "extenders": 0,
+          "hyphens_visible": 6,
+          "extenders_visible": 0,
           "chord_names": 0,
           "system_delimiters": {
             "SystemStartBracket": 2
@@ -2810,7 +2828,7 @@
               ]
             }
           ],
-          "bytes": 122112
+          "bytes": 121760
         },
         "scan.pdf": {
           "seed": 7091,
@@ -2863,7 +2881,7 @@
             "jpeg": 65
           },
           "summary": "250 dpi grey scan, 1.2 deg skew, soft focus, toner specks, JPEG q65",
-          "bytes": 390789
+          "bytes": 391165
         },
         "scan-severe.pdf": {
           "seed": 7092,
@@ -2898,22 +2916,22 @@
                     "marks": [
                       [
                         442,
-                        550
+                        405
                       ],
                       [
                         688,
-                        404
+                        394
                       ],
                       [
                         506,
-                        550
+                        405
                       ]
                     ],
                     "texts": [
                       [
                         "rit.",
                         373,
-                        371
+                        361
                       ],
                       [
                         "breathe",
@@ -3010,7 +3028,7 @@
             "jpeg": 30
           },
           "summary": "old yellowed copy: bleed-through, foxing, coffee ring, pencil annotations, 150 dpi colour, 2 deg skew, JPEG q30",
-          "bytes": 105855
+          "bytes": 105705
         }
       },
       "files": [
@@ -3053,6 +3071,8 @@
           "lyric_syllables": 28,
           "hyphens": 7,
           "extenders": 1,
+          "hyphens_visible": 7,
+          "extenders_visible": 1,
           "chord_names": 0,
           "system_delimiters": {
             "SystemStartBracket": 2
@@ -3196,7 +3216,7 @@
               ]
             }
           ],
-          "bytes": 132541
+          "bytes": 132088
         },
         "scan.pdf": {
           "seed": 7101,
@@ -3244,7 +3264,7 @@
             "jpeg": 75
           },
           "summary": "300 dpi grey flatbed scan, 0.6 deg skew, light paper texture and noise, JPEG q75",
-          "bytes": 650963
+          "bytes": 650991
         },
         "scan-severe.pdf": {
           "seed": 7102,
@@ -3354,7 +3374,7 @@
             "jpeg": 25
           },
           "summary": "phone photo of the page: perspective/keystone, uneven light, vignette, motion blur, 150 dpi, JPEG q25",
-          "bytes": 110293
+          "bytes": 110104
         }
       },
       "files": [
@@ -3396,6 +3416,8 @@
           "lyric_syllables": 28,
           "hyphens": 5,
           "extenders": 0,
+          "hyphens_visible": 5,
+          "extenders_visible": 0,
           "chord_names": 0,
           "system_delimiters": {
             "SystemStartBracket": 2,
@@ -3709,6 +3731,8 @@
           "lyric_syllables": 0,
           "hyphens": 0,
           "extenders": 0,
+          "hyphens_visible": 0,
+          "extenders_visible": 0,
           "chord_names": 0,
           "system_delimiters": {
             "SystemStartBrace": 2
@@ -4025,6 +4049,8 @@
           "lyric_syllables": 0,
           "hyphens": 0,
           "extenders": 0,
+          "hyphens_visible": 0,
+          "extenders_visible": 0,
           "chord_names": 0,
           "system_delimiters": {
             "SystemStartBracket": 3
@@ -4406,6 +4432,8 @@
           "lyric_syllables": 0,
           "hyphens": 0,
           "extenders": 0,
+          "hyphens_visible": 0,
+          "extenders_visible": 0,
           "chord_names": 0,
           "system_delimiters": {
             "SystemStartBracket": 4,
@@ -4533,7 +4561,7 @@
               ]
             }
           ],
-          "bytes": 143042
+          "bytes": 143841
         },
         "scan.pdf": {
           "seed": 7141,
@@ -4589,7 +4617,7 @@
             "jpeg": 72
           },
           "summary": "240 dpi grey scan, -0.5 deg skew, faint bleed-through, JPEG q72",
-          "bytes": 371438
+          "bytes": 371255
         },
         "scan-severe.pdf": {
           "seed": 7142,
@@ -4663,7 +4691,7 @@
             "format": "png1"
           },
           "summary": "thin, faded binarised photocopy at 150 dpi (rendered 300): ink dropout, 3 deg skew, broken lines, salt & pepper, toner specks",
-          "bytes": 27710
+          "bytes": 27685
         }
       },
       "files": [
@@ -4704,6 +4732,8 @@
           "lyric_syllables": 71,
           "hyphens": 11,
           "extenders": 0,
+          "hyphens_visible": 11,
+          "extenders_visible": 0,
           "chord_names": 31,
           "system_delimiters": {}
         },
@@ -4766,7 +4796,7 @@
         "pickup": 1,
         "stem-down": 64,
         "stem-up": 64,
-        "system-break": 1,
+        "system-break": 2,
         "tempo-mark": 1,
         "time-4-4": 1,
         "x-group-bracket": 1,
@@ -4809,10 +4839,10 @@
       "notes": [
         "All four stanzas are encoded on the Soprano (<lyric number=\"1\"..\"4\">); stanza numbers are not encoded."
       ],
-      "layout_description": "A4 portrait, staff size 19, 2 systems (pickup + 4, 4 measures), lyrics between the staves",
+      "layout_description": "A4 portrait, staff size 19, 3 systems (pickup + 2, 3, 3 measures), four lyric lines between the staves",
       "pages": 1,
       "measures": 9,
-      "systems": 2,
+      "systems": 3,
       "noteheads_in_truth": 128,
       "hidden_staff_segments": [],
       "dpi": 300,
@@ -4831,7 +4861,7 @@
               ]
             }
           ],
-          "bytes": 167579
+          "bytes": 188671
         },
         "scan.pdf": {
           "seed": 7151,
@@ -4879,7 +4909,7 @@
             "jpeg": 75
           },
           "summary": "300 dpi grey flatbed scan, 0.6 deg skew, light paper texture and noise, JPEG q75",
-          "bytes": 653762
+          "bytes": 689563
         },
         "scan-severe.pdf": {
           "seed": 7152,
@@ -4903,43 +4933,43 @@
                   {
                     "circled": [
                       [
-                        966,
-                        513
+                        185,
+                        1145
                       ],
                       [
-                        474,
-                        509
+                        548,
+                        1143
                       ]
                     ],
                     "marks": [
                       [
-                        159,
-                        494
+                        448,
+                        1378
                       ],
                       [
-                        803,
-                        966
+                        677,
+                        478
                       ],
                       [
-                        949,
-                        347
+                        555,
+                        233
                       ]
                     ],
                     "texts": [
                       [
                         "rit.",
-                        403,
-                        923
+                        886,
+                        500
                       ],
                       [
                         "breathe",
-                        559,
-                        518
+                        240,
+                        1385
                       ],
                       [
                         "p!",
-                        440,
-                        354
+                        719,
+                        484
                       ]
                     ],
                     "lines": 1
@@ -4949,7 +4979,7 @@
                   "bleed_through",
                   {
                     "strength": 0.12,
-                    "shift_px": 3
+                    "shift_px": 0
                   }
                 ],
                 [
@@ -4969,8 +4999,8 @@
                   {
                     "coffee": [
                       [
-                        776,
-                        1016,
+                        473,
+                        1230,
                         124
                       ]
                     ],
@@ -5026,7 +5056,7 @@
             "jpeg": 30
           },
           "summary": "old yellowed copy: bleed-through, foxing, coffee ring, pencil annotations, 150 dpi colour, 2 deg skew, JPEG q30",
-          "bytes": 122835
+          "bytes": 133945
         }
       },
       "files": [
@@ -5065,9 +5095,11 @@
           "lyric_syllables": 128,
           "hyphens": 11,
           "extenders": 0,
+          "hyphens_visible": 11,
+          "extenders_visible": 0,
           "chord_names": 0,
           "system_delimiters": {
-            "SystemStartBracket": 2
+            "SystemStartBracket": 3
           }
         },
         "lilypond_warnings": [],
@@ -5441,6 +5473,8 @@
           "lyric_syllables": 0,
           "hyphens": 0,
           "extenders": 0,
+          "hyphens_visible": 0,
+          "extenders_visible": 0,
           "chord_names": 0,
           "system_delimiters": {
             "SystemStartBracket": 2
@@ -5581,7 +5615,7 @@
               ]
             }
           ],
-          "bytes": 182082
+          "bytes": 180902
         },
         "scan.pdf": {
           "seed": 7171,
@@ -5634,7 +5668,7 @@
             "jpeg": 65
           },
           "summary": "250 dpi grey scan, 1.2 deg skew, soft focus, toner specks, JPEG q65",
-          "bytes": 472406
+          "bytes": 472297
         },
         "scan-severe.pdf": {
           "seed": 7172,
@@ -5708,7 +5742,7 @@
             "format": "png1"
           },
           "summary": "thin, faded binarised photocopy at 150 dpi (rendered 300): ink dropout, 3 deg skew, broken lines, salt & pepper, toner specks",
-          "bytes": 37846
+          "bytes": 37836
         }
       },
       "files": [
@@ -5750,6 +5784,8 @@
           "lyric_syllables": 112,
           "hyphens": 16,
           "extenders": 0,
+          "hyphens_visible": 16,
+          "extenders_visible": 0,
           "chord_names": 0,
           "system_delimiters": {
             "SystemStartBracket": 2
@@ -6034,6 +6070,8 @@
           "lyric_syllables": 0,
           "hyphens": 0,
           "extenders": 0,
+          "hyphens_visible": 0,
+          "extenders_visible": 0,
           "chord_names": 0,
           "system_delimiters": {
             "SystemStartBrace": 2
@@ -6340,6 +6378,8 @@
           "lyric_syllables": 0,
           "hyphens": 0,
           "extenders": 0,
+          "hyphens_visible": 0,
+          "extenders_visible": 0,
           "chord_names": 0,
           "system_delimiters": {
             "SystemStartBrace": 2
@@ -6868,6 +6908,8 @@
           "lyric_syllables": 0,
           "hyphens": 0,
           "extenders": 0,
+          "hyphens_visible": 0,
+          "extenders_visible": 0,
           "chord_names": 0,
           "system_delimiters": {}
         },

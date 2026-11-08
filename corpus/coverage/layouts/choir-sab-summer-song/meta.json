@@ -103,7 +103,7 @@
           ]
         }
       ],
-      "bytes": 155901
+      "bytes": 155796
     },
     "scan.pdf": {
       "seed": 7071,
@@ -159,7 +159,7 @@
         "jpeg": 72
       },
       "summary": "240 dpi grey scan, -0.5 deg skew, faint bleed-through, JPEG q72",
-      "bytes": 404418
+      "bytes": 404972
     },
     "scan-severe.pdf": {
       "seed": 7072,
@@ -269,7 +269,7 @@
         "jpeg": 25
       },
       "summary": "phone photo of the page: perspective/keystone, uneven light, vignette, motion blur, 150 dpi, JPEG q25",
-      "bytes": 107749
+      "bytes": 107850
     }
   },
   "files": [
@@ -311,6 +311,8 @@
       "lyric_syllables": 84,
       "hyphens": 6,
       "extenders": 0,
+      "hyphens_visible": 6,
+      "extenders_visible": 0,
       "chord_names": 0,
       "system_delimiters": {
         "SystemStartBracket": 2

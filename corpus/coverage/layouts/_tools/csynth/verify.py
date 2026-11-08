@@ -214,8 +214,17 @@ def compare(score, layout, opts, prep, log_rows):
             g['arpeggio'] += 1
         elif nm == 'Fingering':
             G['fingering'][f[0]] += 1
+        elif nm in ('LyricHyphenInk', 'LyricExtenderInk'):
+            k = ('ink', nm, r[4])
+            seen[k] = max(seen.get(k, 0), int(f[0]))
         elif nm in ('SystemStartBrace', 'SystemStartBracket', 'SystemStartSquare'):
             gdelim[nm] += 1
+    g['hyphens_visible'] = sum(v for k, v in seen.items() if isinstance(k, tuple) and k[0] == 'ink'
+                               and k[1] == 'LyricHyphenInk')
+    g['extenders_visible'] = sum(v for k, v in seen.items() if isinstance(k, tuple) and k[0] == 'ink'
+                                 and k[1] == 'LyricExtenderInk')
+    n['hyphens_visible'] = n['hyphens']
+    n['extenders_visible'] = n['extenders']
     # accidentals: rows carry the moment within their \score; add the segment offset (staff id sets
     # per segment are checked against the expectation with every possible offset)
     exp_acc = E['acc']
@@ -251,6 +260,7 @@ def compare(score, layout, opts, prep, log_rows):
         'stems_down': sum(v for (d, _), v in G['stems'].items() if d == -1), 'accidentals': sum(G['acc'].values()),
         'rests': g['rests'], 'beams': g['beams'], 'flags': g['flags'], 'slurs': g['slurs'], 'ties': g['ties'],
         'scripts': dict(G['scripts']), 'dynamics': dict(G['dyn']), 'lyric_syllables': sum(G['lyric'].values()),
-        'hyphens': g['hyphens'], 'extenders': g['extenders'], 'chord_names': sum(G['chordname'].values()),
+        'hyphens': g['hyphens'], 'extenders': g['extenders'], 'hyphens_visible': g['hyphens_visible'],
+        'extenders_visible': g['extenders_visible'], 'chord_names': sum(G['chordname'].values()),
         'system_delimiters': dict(gdelim)}
     return rep

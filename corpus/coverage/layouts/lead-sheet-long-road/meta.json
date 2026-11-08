@@ -103,7 +103,7 @@
           ]
         }
       ],
-      "bytes": 143042
+      "bytes": 143841
     },
     "scan.pdf": {
       "seed": 7141,
@@ -159,7 +159,7 @@
         "jpeg": 72
       },
       "summary": "240 dpi grey scan, -0.5 deg skew, faint bleed-through, JPEG q72",
-      "bytes": 371438
+      "bytes": 371255
     },
     "scan-severe.pdf": {
       "seed": 7142,
@@ -233,7 +233,7 @@
         "format": "png1"
       },
       "summary": "thin, faded binarised photocopy at 150 dpi (rendered 300): ink dropout, 3 deg skew, broken lines, salt & pepper, toner specks",
-      "bytes": 27710
+      "bytes": 27685
     }
   },
   "files": [
@@ -274,6 +274,8 @@
       "lyric_syllables": 71,
       "hyphens": 11,
       "extenders": 0,
+      "hyphens_visible": 11,
+      "extenders_visible": 0,
       "chord_names": 31,
       "system_delimiters": {}
     },

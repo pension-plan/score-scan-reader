@@ -116,10 +116,11 @@ def make(paper='A4'):
          'lyrics': [{'voice': ('S', '1'), 'verses': [1, 2, 3, 4], 'stanza': True}]},
         {'id': 'tb', 'clef': 'bass', 'voices': [('T', '1'), ('B', '1')]}]}]}
     mg = lambda v: f'{v * scale:.2f}\\mm'
+    tb = 7 if paper == 'Letter' else 12          # US letter is 17.6 mm shorter than A4
     opts = {'header': {'title': 'O God, Our Help in Ages Past', 'subtitle': 'BENCHMARK  C.M.',
                        'poet': 'Isaac Watts, 1719', 'composer': 'Tune and harmony: coverage corpus (CC0)'},
             'staff_size': round(staff, 3), 'paper': pname,
-            'paper_extra': [f'top-margin = {mg(12)}', f'bottom-margin = {mg(12)}', f'left-margin = {mg(15)}',
+            'paper_extra': [f'top-margin = {mg(tb)}', f'bottom-margin = {mg(tb)}', f'left-margin = {mg(15)}',
                             f'right-margin = {mg(15)}', 'indent = 0', 'ragged-last-bottom = ##f',
                             'system-system-spacing.basic-distance = #12'],
             'layout_extra': ['\\context { \\Score \\remove "Bar_number_engraver" }']}

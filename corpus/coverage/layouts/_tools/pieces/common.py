@@ -98,7 +98,9 @@ def opts(hdr, staff_size=20, paper='a4', extra_paper=(), extra_layout=(), **kw):
          'forced_breaks': True,
          'paper_extra': ['ragged-bottom = ##t', 'ragged-last-bottom = ##t', 'top-margin = 14\\mm',
                          'bottom-margin = 14\\mm', 'left-margin = 18\\mm', 'right-margin = 16\\mm'] + list(extra_paper),
-         'layout_extra': list(extra_layout)}
+         # hyphens/extenders must be visible: reserve room for them (LilyPond drops them when syllables are tight)
+         'layout_extra': ['\\context { \\Lyrics \\override LyricHyphen.minimum-distance = #1.6 '
+                          '\\override LyricExtender.minimum-length = #0.6 }'] + list(extra_layout)}
     o.update(kw)
     return o
 

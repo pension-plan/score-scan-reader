@@ -100,6 +100,35 @@ def render_pages(pdf, dpi, workdir, tag):
     return [np.array(Image.open(f), dtype=np.uint8) for f in files]
 
 
+def _mm(opts, key, default):
+    v = default
+    for x in opts.get('paper_extra', []):
+        m = re.match(rf'\s*{key}\s*=\s*([\d.]+)\\mm', x)
+        if m:
+            v = float(m.group(1))
+    return v
+
+
+def margin_check(pages, dpi, opts, tol_mm=1.5, left_tol_mm=4.0):
+    """no ink right of the right margin / left of the left margin (overflowing systems or lyrics)"""
+    rm, lm = _mm(opts, 'right-margin', 16.0), _mm(opts, 'left-margin', 18.0)
+    px = dpi / 25.4
+    res = {'ok': True, 'pages': []}
+    for k, pg in enumerate(pages):
+        ink = pg < 140
+        cols = np.where(ink.any(axis=0))[0]
+        if not len(cols):
+            continue
+        w = pg.shape[1]
+        right_over = (cols.max() - (w - rm * px)) / px
+        left_over = ((lm * px) - cols.min()) / px
+        res['pages'].append({'page': k + 1, 'right_overflow_mm': round(float(right_over), 2),
+                             'left_overflow_mm': round(float(left_over), 2)})
+        if right_over > tol_mm or left_over > left_tol_mm:      # brackets / marks may sit in the left margin
+            res['ok'] = False
+    return res
+
+
 def image_only(pdf, n_expected):
     rc, fonts, _ = run(['pdffonts', pdf])
     font_lines = [l for l in fonts.splitlines()[2:] if l.strip()]
@@ -197,6 +226,10 @@ def build_item(item: dict, keep_work=False):
 
         clean_dpi = 300
         clean_pages = pages_at(clean_dpi)
+        mchk = margin_check(clean_pages, clean_dpi, opts)
+        log['margin_check'] = mchk
+        if not mchk['ok']:
+            raise RuntimeError(f'ink outside the page margins: {mchk}')
         D.save_pdf([Image.fromarray(p) for p in clean_pages], clean_dpi, os.path.join(outdir, 'clean.pdf'), fmt='png')
         degr = {'clean.pdf': {'seed': None, 'dpi': clean_dpi, 'format': 'png (8-bit grey)', 'summary':
                               'undamaged raster of the engraving',

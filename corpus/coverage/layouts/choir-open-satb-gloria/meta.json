@@ -27,6 +27,7 @@
     "slur",
     "stem-down",
     "stem-up",
+    "system-break",
     "tempo-mark",
     "time-4-4",
     "x-group-bracket",
@@ -58,6 +59,7 @@
     "slur": 11,
     "stem-down": 37,
     "stem-up": 34,
+    "system-break": 1,
     "tempo-mark": 1,
     "time-4-4": 1,
     "x-group-bracket": 1,
@@ -103,10 +105,10 @@
   "notes": [
     "The tenor clef is <clef><sign>G</sign><line>2</line><clef-octave-change>-1</clef-octave-change>; its pitches are written at sounding pitch as usual for vocal tenor parts."
   ],
-  "layout_description": "A4 portrait, staff size 19, one system of 7 measures on 4 bracketed staves, every staff named",
+  "layout_description": "A4 portrait, staff size 19, 2 systems (4 + 3 measures) on 4 bracketed staves, full then short names",
   "pages": 1,
   "measures": 7,
-  "systems": 1,
+  "systems": 2,
   "noteheads_in_truth": 75,
   "hidden_staff_segments": [],
   "dpi": 200,
@@ -125,7 +127,7 @@
           ]
         }
       ],
-      "bytes": 122486
+      "bytes": 150762
     },
     "scan.pdf": {
       "seed": 7061,
@@ -181,7 +183,7 @@
         "jpeg": 70
       },
       "summary": "200 dpi grey office scan, -0.9 deg skew, slight lighting gradient, noise, JPEG q70",
-      "bytes": 306246
+      "bytes": 355441
     },
     "scan-severe.pdf": {
       "seed": 7062,
@@ -255,7 +257,7 @@
         "format": "png1"
       },
       "summary": "thin, faded binarised photocopy at 150 dpi (rendered 300): ink dropout, 3 deg skew, broken lines, salt & pepper, toner specks",
-      "bytes": 24586
+      "bytes": 34526
     }
   },
   "files": [
@@ -297,9 +299,11 @@
       "lyric_syllables": 58,
       "hyphens": 32,
       "extenders": 0,
+      "hyphens_visible": 32,
+      "extenders_visible": 0,
       "chord_names": 0,
       "system_delimiters": {
-        "SystemStartBracket": 1
+        "SystemStartBracket": 2
       }
     },
     "lilypond_warnings": [],
