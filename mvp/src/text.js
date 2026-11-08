@@ -180,7 +180,57 @@ function slurLike(R, c, sp) {
   if (n < 0.8 * w || single < 0.75 * n) return false;
   // bowed: the middle stands off the line joining the ends
   const a = mid[0], b = mid[mid.length - 1], m = mid[mid.length >> 1];
-  return Math.abs(m - (a + b) / 2) >= Math.max(1.5, 0.15 * sp);
+  if (Math.abs(m - (a + b) / 2) < Math.max(1.5, 0.15 * sp)) return false;
+  // its two ends (page frame) and which way it bows
+  let xa = 0, xb = w - 1;
+  while (xa < w && !cols[xa].length) xa++;
+  while (xb > 0 && !cols[xb].length) xb--;
+  const ym = (x) => (cols[x][0][0] + cols[x][cols[x].length - 1][1]) / 2;
+  return { ends: [[c.x0 + xa, c.y0 + ym(xa)], [c.x0 + xb, c.y0 + ym(xb)]], up: m < (a + b) / 2 };
+}
+
+// ---------------------------------------------------------------- grace notes
+// Small note heads inside a component (a grace note, or a beamed group of
+// them, with stems, flags and the slash): ink that is both wide and tall
+// enough to be a head and not a stem, flag or thin beam, in blobs of the size
+// of a small head. [{x, y}] (page frame), and whether a slash crosses a stem.
+function graceHeads(R, c, sp) {
+  const img = glyphImage(R, c), w = img.width, h = img.height, d = img.data;
+  const hr = new Uint16Array(w * h), vr = new Uint16Array(w * h);
+  for (let y = 0; y < h; y++) for (let x = 0; x < w;) { if (!d[y * w + x]) { x++; continue; } let e = x; while (e < w && d[y * w + e]) e++; for (let k = x; k < e; k++) hr[y * w + k] = e - x; x = e; }
+  for (let x = 0; x < w; x++) for (let y = 0; y < h;) { if (!d[y * w + x]) { y++; continue; } let e = y; while (e < h && d[e * w + x]) e++; for (let k = y; k < e; k++) vr[k * w + x] = e - y; y = e; }
+  const core = new Uint8Array(w * h);
+  for (let i = 0; i < w * h; i++) core[i] = d[i] && hr[i] >= 0.42 * sp && vr[i] >= 0.42 * sp ? 1 : 0;
+  // blobs of core pixels
+  const seen = new Uint8Array(w * h), heads = [];
+  for (let i = 0; i < w * h; i++) {
+    if (!core[i] || seen[i]) continue;
+    const st = [i]; seen[i] = 1;
+    let x0 = w, x1 = 0, y0 = h, y1 = 0, n = 0, sx = 0, sy = 0;
+    while (st.length) {
+      const j = st.pop(), x = j % w, y = (j - x) / w;
+      n++; sx += x; sy += y; if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+      for (const k of [j - 1, j + 1, j - w, j + w]) if (k >= 0 && k < w * h && !seen[k] && core[k] && Math.abs((k % w) - x) <= 1) { seen[k] = 1; st.push(k); }
+    }
+    const bw = (x1 - x0 + 1) / sp, bh = (y1 - y0 + 1) / sp;
+    if (bw >= 0.45 && bw <= 1.0 && bh >= 0.4 && bh <= 0.85) heads.push({ x: c.x0 + sx / n, y: c.y0 + sy / n });
+  }
+  // a slash: ink running left of the leftmost head's stem side, above the head
+  let slash = false;
+  if (heads.length === 1) {
+    // the stem: the column with the longest vertical run
+    let sx = 0, best = 0;
+    for (let x = 0; x < w; x++) for (let y = 0; y < h; y++) if (vr[y * w + x] > best) { best = vr[y * w + x]; sx = x; }
+    const hy = heads[0].y - c.y0, up = hy > h / 2;
+    let ink = 0;
+    // left of the stem, clear of the head (above it for a stem up, below for a stem down)
+    for (let y = 0; y < h; y++) {
+      if (up ? y > hy - 0.7 * sp : y < hy + 0.7 * sp) continue;
+      for (let x = 0; x < sx - 1; x++) ink += d[y * w + x];
+    }
+    slash = best >= 1.5 * sp && ink >= 0.08 * sp * sp;
+  }
+  return { heads, slash };
 }
 
 // ---------------------------------------------------------------- lines of text
@@ -222,7 +272,7 @@ const ROLE_LABEL = {
 // Sort leftover components (symbols.js) into marks.
 // left: [{x0,y0,x1,y1,area}], fr / asm as front() and assemblePage() left them.
 function classifyMarks(fr, asm, left) {
-  const out = { text: [], dyns: [], wedges: [], slurs: [], fermatas: [], braces: [], ledgers: [], rest: [] };
+  const out = { text: [], dyns: [], wedges: [], slurs: [], fermatas: [], braces: [], ledgers: [], grace: [], rest: [] };
   const R = fr.R, ss = fr.ss, W = fr.gray.width, H = fr.gray.height;
   const systems = (asm && asm.systems) || [];
   if (!R || !systems.length) { out.rest = left.slice(); return out; }
@@ -282,6 +332,15 @@ function classifyMarks(fr, asm, left) {
       out.braces.push({ box: [c.x0, c.y0, c.x1, c.y1], kind, span });
       continue;
     }
+    if (slurLike(R, c, sp)) {
+      // a short arc with a dot inside its bow: a fermata
+      const dot = w <= 3 * sp && left.find(d => d !== c && d.x1 - d.x0 <= 0.7 * sp && d.y1 - d.y0 <= 0.7 * sp && (d.x0 + d.x1) / 2 > c.x0 + 0.3 * w && (d.x0 + d.x1) / 2 < c.x1 - 0.3 * w &&
+        Math.abs((d.y0 + d.y1) / 2 - cy) <= 1.2 * sp);
+      if (dot) { out.fermatas.push({ box: [Math.min(c.x0, dot.x0), Math.min(c.y0, dot.y0), Math.max(c.x1, dot.x1), Math.max(c.y1, dot.y1)] }); fermataDots.add(dot); continue; }
+      const sl = slurLike(R, c, sp);
+      out.slurs.push({ box: [c.x0, c.y0, c.x1, c.y1], ends: sl.ends, up: sl.up });
+      continue;
+    }
     // ledger line: short, thin, horizontal, off the staff, by a note head
     if (h <= 0.4 * sp && w >= 0.9 * sp && w <= 3.6 * sp && n && !n.inside &&
       heads.some(hd => Math.abs(hd.x - cx) <= 1.5 * sp && Math.abs(hd.y - cy) <= 1.3 * sp + (n.above ? Math.max(0, cy - hd.y) : Math.max(0, hd.y - cy)))) {
@@ -290,14 +349,6 @@ function classifyMarks(fr, asm, left) {
     const hp = hairpin(R, c, sp);
     // dynamics and hairpins stand below their staff unless clearly nearer the one below
     if (hp) { const m = nearest(cx, cy, 1.6); out.wedges.push({ box: [c.x0, c.y0, c.x1, c.y1], type: hp, sys: m.sys, k: m.k, si: m.s.si }); continue; }
-    if (slurLike(R, c, sp)) {
-      // a short arc with a dot inside its bow: a fermata
-      const dot = w <= 3 * sp && left.find(d => d !== c && d.x1 - d.x0 <= 0.7 * sp && d.y1 - d.y0 <= 0.7 * sp && (d.x0 + d.x1) / 2 > c.x0 + 0.3 * w && (d.x0 + d.x1) / 2 < c.x1 - 0.3 * w &&
-        Math.abs((d.y0 + d.y1) / 2 - cy) <= 1.2 * sp);
-      if (dot) { out.fermatas.push({ box: [Math.min(c.x0, dot.x0), Math.min(c.y0, dot.y0), Math.max(c.x1, dot.x1), Math.max(c.y1, dot.y1)] }); fermataDots.add(dot); continue; }
-      out.slurs.push({ box: [c.x0, c.y0, c.x1, c.y1] });
-      continue;
-    }
     // letter-sized ink (text, dynamics)
     if (h >= 0.35 * sp && h <= 4.5 * sp && w <= 6 * sp && !(h < 0.6 * sp && w > 2.5 * h)) { letters.push(c); continue; }
     rest.push(c);
@@ -385,7 +436,20 @@ function classifyMarks(fr, asm, left) {
   // above the title is a dedication / header
   const comp = out.text.filter(t => t.role === 'composer').sort((a, b) => a.box[1] - b.box[1]);
   comp.slice(1).forEach(t => { t.role = 'credit'; });
-  out.rest = rest.filter(c => !fermataDots.has(c));
+  // grace notes: unexplained ink by a staff that holds small heads and a stem
+  out.grace = [];
+  const restLeft = [];
+  for (const c of rest) {
+    if (fermataDots.has(c)) continue;
+    const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1, n = nearest((c.x0 + c.x1) / 2, (c.y0 + c.y1) / 2);
+    const sp = n ? n.s.sp : ss;
+    if (n && n.d <= 3 * sp && h >= 1.6 * sp && h <= 4.5 * sp && w <= 7 * sp && w >= 0.5 * sp) {
+      const g = graceHeads(R, c, sp);
+      if (g.heads.length && g.heads.length <= 8) { out.grace.push({ box: [c.x0, c.y0, c.x1, c.y1], heads: g.heads, slash: g.slash, sys: n.sys, k: n.k, si: n.s.si }); continue; }
+    }
+    restLeft.push(c);
+  }
+  out.rest = restLeft;
   return out;
 }
 

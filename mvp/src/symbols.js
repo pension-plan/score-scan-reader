@@ -6,7 +6,7 @@
 
 const { detectRests } = require('./rests');
 const { accidentalGlyph } = require('./assemble');
-const { classifyMarks, ROLE_LABEL } = require('./text');
+const { classifyMarks, ROLE_LABEL, _slurLike: slurLike } = require('./text');
 
 const r1 = (v) => Math.round(v * 10) / 10;
 const box = (b) => [r1(b.x0), r1(b.y0), r1(b.x1), r1(b.y1)];
@@ -136,6 +136,9 @@ function explain(fr, asm) {
     if (c.area < minA || Math.max(w, h) < 0.35 * ss) continue;
     // a thin horizontal sliver along a staff line is what line removal left
     if (h <= 0.25 * ss && w < 1.5 * ss) continue;
+    // a slur or tie reaches into the boxes of the heads it joins: a thin bowed
+    // curve is left over even where its box touches them
+    if (w >= 1.2 * ss && h <= 0.8 * w && c.area / w <= 0.5 * ss && slurLike(fr.R, c, ss)) { left.push(c); continue; }
     let hit = false;
     for (let gx = Math.floor(c.x0 / G); gx <= Math.floor(c.x1 / G) && !hit; gx++) for (let gy = Math.floor(c.y0 / G); gy <= Math.floor(c.y1 / G) && !hit; gy++) {
       for (const i of grid.get(gx * 65536 + gy) || []) {
@@ -156,7 +159,7 @@ function pageMarks(fr, asm) {
   if (fr._marks && fr._marks.asm === asm) return fr._marks.marks;
   const { out, left } = explain(fr, asm);
   let marks;
-  try { marks = classifyMarks(fr, asm, left); } catch (e) { marks = { text: [], dyns: [], wedges: [], slurs: [], fermatas: [], braces: [], ledgers: [], rest: left }; }
+  try { marks = classifyMarks(fr, asm, left); } catch (e) { marks = { text: [], dyns: [], wedges: [], slurs: [], fermatas: [], braces: [], ledgers: [], grace: [], rest: left }; }
   Object.defineProperty(marks, 'sym', { value: out, enumerable: false, configurable: true });
   Object.defineProperty(fr, '_marks', { value: { asm, marks }, enumerable: false, configurable: true, writable: true });
   return marks;
@@ -181,6 +184,7 @@ function pageSymbols(fr, asm) {
   out.fermatas = marks.fermatas.map(s => b4(s.box));
   out.braces = marks.braces.map(s => [...b4(s.box), s.kind]);
   out.ledgers = marks.ledgers.map(s => b4(s.box));
+  out.grace = (marks.grace || []).map(g => [...b4(g.box), g.heads.length, g.slash ? 1 : 0]);
   out.unknown = marks.rest.map(c => [c.x0, c.y0, c.x1, c.y1]);
   return out;
 }

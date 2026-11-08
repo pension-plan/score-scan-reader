@@ -1043,7 +1043,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   // and credits, part abbreviations, dynamics, hairpins, tempo and expression text
   let read = { dirs: parts.map(() => units.map(() => [])), head: {}, nDyn: 0, nWedge: 0, nWords: 0 };
   try { read = readMarks(pages, segs, units, parts, partMeasures); } catch (e) { warnings.push(`Text and dynamics not placed (${e.message}).`); }
-  if (read.nDyn || read.nWedge || read.nWords) warnings.push(`Read from the page: ${[read.nDyn && `${read.nDyn} dynamic${read.nDyn > 1 ? 's' : ''}`, read.nWedge && `${read.nWedge} hairpin${read.nWedge > 1 ? 's' : ''}`, read.nWords && `${read.nWords} tempo / expression text${read.nWords > 1 ? 's' : ''}`].filter(Boolean).join(', ')}.`);
+  if (read.nDyn || read.nWedge || read.nWords || read.nTie || read.nSlur || read.nGrace) warnings.push(`Read from the page: ${[read.nDyn && `${read.nDyn} dynamic${read.nDyn > 1 ? 's' : ''}`, read.nWedge && `${read.nWedge} hairpin${read.nWedge > 1 ? 's' : ''}`, read.nWords && `${read.nWords} tempo / expression text${read.nWords > 1 ? 's' : ''}`, read.nTie && `${read.nTie} tie${read.nTie > 1 ? 's' : ''}`, read.nSlur && `${read.nSlur} slur${read.nSlur > 1 ? 's' : ''}`, read.nGrace && `${read.nGrace} grace note${read.nGrace > 1 ? 's' : ''}`].filter(Boolean).join(', ')}.`);
   const xml = toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, measures, credits, unitSys, title: read.head.title, head: read.head, dirs: read.dirs });
   const nNotes = partMeasures.map(pm => pm.reduce((a, m) => a + m.reduce((b, s) => b + s.events.filter(e => !e.rest && !e.forward).length, 0), 0));
   const ranges = partMeasures.map(pm => {
@@ -1411,6 +1411,81 @@ function readMarks(pages, segs, units, parts, partMeasures) {
       }
     }
   }
+  // slurs and ties (text.js curves) whose two ends sit at note heads: a curve
+  // joining two heads of one pitch on one staff is a tie, else a slur. Marked
+  // on the heads (h.tieOn / h.tieOff, h.slurOn / h.slurOff counts) for toMusicXML.
+  let nTie = 0, nSlur = 0;
+  {
+    const written = new Set();
+    for (const pm of partMeasures) for (const m of pm) for (const st of m || []) if (st) for (const e of st.events) for (const h of e.heads || []) written.add(h);
+    const seen = new Set();
+    for (const pg of pages) {
+      const fr = pg.fr, m = fr && fr._marks && fr._marks.marks;
+      if (!m || seen.has(fr)) continue;
+      seen.add(fr);
+      const heads = (fr.heads || []).filter(h => written.has(h));
+      const near = (x, y, side) => {
+        let best = null, bd = Infinity;
+        for (const h of heads) {
+          const sp = h.sp || fr.ss, dx = side < 0 ? x - h.x : h.x - x;
+          if (dx < -0.6 * sp || dx > 1.8 * sp || Math.abs(h.y - y) > 1.6 * sp) continue;
+          const d = Math.abs(dx - 0.5 * sp) + Math.abs(h.y - y);
+          if (d < bd) { bd = d; best = h; }
+        }
+        return best;
+      };
+      for (const c of m.slurs) {
+        if (!c.ends) continue;
+        const a = near(c.ends[0][0], c.ends[0][1], -1), b = near(c.ends[1][0], c.ends[1][1], 1);
+        // half a tie or slur at a system break: one end at a head, the other
+        // at the end of the staff (or its start, after clef and key)
+        if ((!a) !== (!b)) {
+          const h = a || b, st = fr.staves[h.staff];
+          if (!st) continue;
+          const sp = h.sp || fr.ss, x = a ? c.ends[1][0] : c.ends[0][0];
+          const atEdge = a ? x >= st.right - 1.5 * sp : !heads.some(o => o.staff === h.staff && o.x < h.x - 0.5 * sp) && x < h.x - 0.5 * sp;
+          if (!atEdge) continue;
+          const tieish = c.box[2] - c.box[0] <= 4 * sp && Math.abs(c.ends[0][1] - c.ends[1][1]) <= 0.6 * sp;
+          if (tieish) { if (a) a.tieOn = true; else b.tieOff = true; nTie++; }
+          else { if (a) a.slurOn = (a.slurOn || 0) + 1; else b.slurOff = (b.slurOff || 0) + 1; nSlur++; }
+          continue;
+        }
+        if (!a || !b || a === b || b.x <= a.x) continue;
+        if (a.staff === b.staff && a.p === b.p) { a.tieOn = true; b.tieOff = true; nTie++; }
+        else { a.slurOn = (a.slurOn || 0) + 1; b.slurOff = (b.slurOff || 0) + 1; nSlur++; }
+      }
+    }
+  }
+  // grace notes (text.js): each small head goes before the first note after
+  // it on its staff, in each part reading that staff (e.graces)
+  let nGrace = 0;
+  {
+    const seen = new Set();
+    for (const pg of pages) {
+      const fr = pg.fr, m = fr && fr._marks && fr._marks.marks;
+      if (!m || seen.has(fr) || !m.grace) continue;
+      seen.add(fr);
+      for (const g of m.grace) {
+        const sy = pg.asm.systems[g.sys], s = sy && sy.staves[g.k];
+        if (!s) continue;
+        const st = s.st, sp = st.space || fr.ss;
+        for (const { pi } of partsOn(g.k)) {
+          const at = locate(fr, sy.index, g.k, Math.max(...g.heads.map(h => h.x)) + 2.5 * sp, pi);
+          if (!at) continue;
+          // the first written note right of the grace notes on that staff
+          let target = null;
+          for (const sm of partMeasures[pi][at.mi] || []) if (sm && sm.staff === g.k) for (const e of sm.events) {
+            if (e.rest || e.forward || e.x == null || e.x <= g.box[2] - 0.2 * sp || e.x > g.box[2] + 5 * sp) continue;
+            if (!target || e.x < target.x) target = e;
+          }
+          if (!target) continue;
+          const heads = g.heads.slice().sort((a, b) => a.x - b.x);
+          target.graces = (target.graces || []).concat(heads.map(h => ({ p: Math.round((st.yAt(2, h.x) - h.y) / (sp / 2)), slash: g.slash && heads.length === 1, n: heads.length })));
+          nGrace += heads.length;
+        }
+      }
+    }
+  }
   // a keyboard part's name is printed between its staves: the abbreviation
   // stands on the staff nearest to it, which may be the lower one
   for (const p of parts) if (!p.abbrev && p.src.length > 1) {
@@ -1421,7 +1496,7 @@ function readMarks(pages, segs, units, parts, partMeasures) {
     }
   }
   for (const pm of dirs) for (const l of pm) l.sort((a, b) => a.t - b.t);
-  return { dirs, head, nDyn, nWedge, nWords };
+  return { dirs, head, nDyn, nWedge, nWords, nTie, nSlur, nGrace };
 }
 
 function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, credits, unitSys, head, dirs }) {
@@ -1636,6 +1711,11 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
           }
           const hc = e.heads[0].clef || clef;
           if (curClef[si] !== undefined && hc !== curClef[si]) { L.push(`      <attributes>${clefXML(hc, multi ? si + 1 : 0)}</attributes>`); curClef[si] = hc; }
+          // grace notes read before this note (no duration; a slash for an acciaccatura)
+          for (const gn of e.graces || []) {
+            const pt = pitchOf(hc, gn.p, altsFor(e.heads[0].fifths != null ? e.heads[0].fifths : keyAt(mi)), {});
+            L.push(`      <note><grace${gn.slash ? ' slash="yes"' : ''}/><pitch><step>${pt.step}</step>${pt.alter ? `<alter>${pt.alter}</alter>` : ''}<octave>${pt.octave}</octave></pitch><voice>${voice}</voice><type>${gn.n > 1 ? '16th' : 'eighth'}</type><stem>up</stem>${staffTag}</note>`);
+          }
           e.heads.forEach((h, hi) => {
             const pos = h.p;
             const hClef = h.clef || clef, hAlt = altsFor(h.fifths != null ? h.fifths : keyAt(mi));
@@ -1648,8 +1728,12 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
             h.shown ||= { q: e.q, type: tt ? tt.type : null, dots: tt ? tt.dots : 0, tuplet: tmod ? tu.actual : 0 };
             if (!noted.has(h)) { noted.add(h); noteAt.push([h, L.length]); }
             const acc = h.acc && !e.tieStop ? `<accidental>${h.acc}</accidental>` : '';
-            const tie = (e.tieStop ? '<tie type="stop"/>' : '') + (e.tieStart ? '<tie type="start"/>' : '');
-            const tied = e.tieStop || e.tieStart ? `<notations>${e.tieStop ? '<tied type="stop"/>' : ''}${e.tieStart ? '<tied type="start"/>' : ''}</notations>` : '';
+            // ties: a note cut at a barline (e.tieStart / e.tieStop) or a tie read on the page (h.tieOn / h.tieOff);
+            // slurs read on the page (h.slurOn / h.slurOff)
+            const tStop = e.tieStop || h.tieOff, tStart = e.tieStart || h.tieOn;
+            const tie = (tStop ? '<tie type="stop"/>' : '') + (tStart ? '<tie type="start"/>' : '');
+            const slurs = hi === 0 ? (e.heads.some(x => x.slurOff) ? '<slur type="stop" number="1"/>' : '') + (e.heads.some(x => x.slurOn) ? '<slur type="start" number="1"/>' : '') : '';
+            const tied = tStop || tStart || slurs ? `<notations>${tStop ? '<tied type="stop"/>' : ''}${tStart ? '<tied type="start"/>' : ''}${slurs}</notations>` : '';
             // a head with both stems: up in the upper voice, down in the lower
             const sd = h.stemDir === 2 ? (e.low ? -1 : 1) : h.stemDir;
             const stem = sd === 1 ? '<stem>up</stem>' : sd === -1 ? '<stem>down</stem>' : '';

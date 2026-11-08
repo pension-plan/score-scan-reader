@@ -30,7 +30,7 @@
   --ov-note:#d32f2f; --ov-stem:#757575; --ov-beam:#6d4c41; --ov-rest:#00897b; --ov-clef:#8e24aa; --ov-key:#ef6c00;
   --ov-time:#2e7d32; --ov-bar:#283593; --ov-staff:#546e7a; --ov-acc:#c2185b; --ov-dot:#1e88e5; --ov-tup:#827717;
   --ov-lyric:#00838f; --ov-unknown:rgba(255,222,0,.58); --ov-unknown-edge:#d4b000; --ov-label:#15171b; --ov-label-dur:#4f5761;
-  --ov-mark:var(--ov-acc); --ov-text:#5e35b1; --ov-barno:#263238; --ov-dyn:#0277bd; --ov-slur:#f06292; --ov-brace:#8d6e63;
+  --ov-mark:var(--ov-acc); --ov-text:#5e35b1; --ov-barno:#263238; --ov-dyn:#0277bd; --ov-slur:#f06292; --ov-brace:#8d6e63; --ov-grace:#e040fb;
   /* repair marks (the reader's own): a lime highlighter under a black dashed
      core, unlike every detection colour and the yellow of unrecognised ink */
   --rp-halo:rgba(118,255,3,.55); --rp-ink:#0b0c0e; --rp-badge-ink:#b2ff59;
@@ -222,13 +222,13 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 .ov-labels .lr{fill:var(--ov-rest)} .ov-labels .lb{fill:var(--ov-bar)}
 /* text, bar numbers, dynamics, slurs and braces read off the page: tinted boxes like every symbol, text labelled above */
 .ov-text{stroke:var(--ov-text);fill:var(--ov-text)} .ov-barno{stroke:var(--ov-barno);fill:var(--ov-barno)} .ov-dyns{stroke:var(--ov-dyn);fill:var(--ov-dyn)}
-.ov-slurs{stroke:var(--ov-slur);fill:var(--ov-slur)} .ov-braces{stroke:var(--ov-brace);fill:var(--ov-brace)} .ov-ledger{stroke:var(--ov-staff);fill:var(--ov-staff)}
-.ov-text rect,.ov-barno rect,.ov-dyns rect,.ov-slurs rect,.ov-braces rect,.ov-ledger rect{fill-opacity:.26;mix-blend-mode:multiply}
+.ov-slurs{stroke:var(--ov-slur);fill:var(--ov-slur)} .ov-braces{stroke:var(--ov-brace);fill:var(--ov-brace)} .ov-grace{stroke:var(--ov-grace);fill:var(--ov-grace)} .ov-ledger{stroke:var(--ov-staff);fill:var(--ov-staff)}
+.ov-text rect,.ov-barno rect,.ov-dyns rect,.ov-slurs rect,.ov-braces rect,.ov-grace rect,.ov-ledger rect{fill-opacity:.26;mix-blend-mode:multiply}
 .ov-text text,.ov-barno text,.ov-dyns text{font-family:var(--sans);font-weight:600;stroke:var(--paper);stroke-width:3px;stroke-linejoin:round;paint-order:stroke}
 .ov-dyns text{font-style:italic}
 .pages.hide-notes .ov-notes,.pages.hide-rests .ov-rests,.pages.hide-clefs .ov-clefs,.pages.hide-keys .ov-keys,.pages.hide-times .ov-times,
 .pages.hide-bars .ov-bars,.pages.hide-marks .ov-marks,.pages.hide-lyrics .ov-lyrics,.pages.hide-labels .ov-labels,.pages.hide-unknown .ov-unknown,
-.pages.hide-text .ov-text,.pages.hide-barno .ov-barno,.pages.hide-dyns .ov-dyns,.pages.hide-slurs .ov-slurs,.pages.hide-braces .ov-braces,
+.pages.hide-text .ov-text,.pages.hide-barno .ov-barno,.pages.hide-dyns .ov-dyns,.pages.hide-slurs .ov-slurs,.pages.hide-braces .ov-braces,.pages.hide-grace .ov-grace,
 .pages.lbl-small .ov-labels{display:none}
 .pages{overflow-x:auto}
 .pages>.pageframe{flex:none;width:calc(100% * var(--zoom, 1))}
@@ -249,7 +249,7 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 .ovk-notes,.ovk-rests,.ovk-clefs,.ovk-keys,.ovk-times,.ovk-acc,.ovk-dot,.ovk-tup{fill-opacity:.3}
 .ovk-unknown{stroke:var(--ov-unknown-edge);fill:var(--ov-unknown)}
 .ovk-text{color:var(--ov-text)} .ovk-barno{color:var(--ov-barno);stroke:var(--ov-barno);fill:var(--ov-barno)} .ovk-barno rect{fill-opacity:.26} .ovk-dyns{color:var(--ov-dyn);stroke:var(--ov-dyn)}
-.ovk-slurs{stroke:var(--ov-slur)} .ovk-braces{stroke:var(--ov-brace)}
+.ovk-slurs{stroke:var(--ov-slur)} .ovk-braces{stroke:var(--ov-brace)} .ovk-grace{stroke:var(--ov-grace)}
 /* repair markup: the layer takes the pointer (and stops touch scrolling) only while drawing */
 .head-tools{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:4px 14px}
 .toggle:disabled{opacity:.45;cursor:not-allowed}

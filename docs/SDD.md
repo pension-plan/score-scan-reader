@@ -1157,15 +1157,28 @@ off by default) fixes the two-instrument items of the challenge set (pitch-clef-
 pitch-ledger-ottava 0.59 to 0.78) but splits degraded pianos whose brace was not found (andantino
 copies 0.99 to 0.50), so it is not used yet; it needs a surer brace detector first.
 
+**Slurs, ties and grace notes in MusicXML.** A thin bowed curve is classified even where its box
+touches the heads it joins. Its two ends are matched to note heads (left end within about 1.8 staff
+spaces right of a head, right end left of one, 1.6 spaces vertically): two heads of one pitch on one staff
+make a tie (`<tie>` + `<tied>` on each head), other pairs a slur (`<slur number="1">` start / stop). With
+one end at a head and the other at the end of the staff (or the staff start before the first note) it is
+half of a tie or slur across a system break. Grace notes: unexplained ink by a staff holding blobs of the
+size of a small head (ink at least 0.42 staff space wide and tall, blobs 0.45-1.0 x 0.4-0.85 spaces) and a
+stem; a stroke left of the stem clear of the head is the acciaccatura slash. Each small head becomes a
+`<grace>` note (no duration, eighth, or 16th in a beamed group) before the first note after it on its
+staff, its pitch from its staff position. Coverage recall (clean / scan / severe; all 0 before): slur
+43 / 39 / 33%, tie 17 / 15 / 11%, tie across systems 13 / 15 / 11%, grace 21 / 7 / 2%, grace slash 17 / 0 /
+0%; no item's pitch, duration, rests, lyrics or parts changed on benchmark, challenge or coverage. Grace
+notes on scans are mostly missed: the head detector takes their heads as normal notes (they are then
+explained ink), which this does not undo.
+
 **Overlay colours.** Text `--ov-text` #5e35b1, bar numbers `--ov-barno` #263238, dynamics and hairpins
 `--ov-dyn` #0277bd, slurs / ties / fermatas `--ov-slur` #f06292, braces and brackets `--ov-brace`
-#8d6e63; ledger lines are drawn with the staff (`--ov-staff`). Each is a stroke plus a 0.26 multiplied
+#8d6e63, grace notes `--ov-grace` #e040fb; ledger lines are drawn with the staff (`--ov-staff`). Each is a stroke plus a 0.26 multiplied
 fill, like every other symbol layer.
 
 **Accuracy** (coverage suite, recall on clean / scan / scan-severe; all were 0 before): see the dynamics,
-hairpin, tempo and text rows of `docs/COVERAGE.md`. Not done: grace notes (small heads with slashed stems
-are still read, or missed, as notes), slurs and fermatas are drawn on the overlay but not written to
-MusicXML (attaching them needs the head each curve starts and ends at), measure numbers are labelled but not
+hairpin, tempo and text rows of `docs/COVERAGE.md`. Not done: fermatas are drawn on the overlay but not written to MusicXML, measure numbers are labelled but not
 used to change the bar count by default (see above), rehearsal marks and chord symbols stay text or unknown. Pedal marks and
 fingering are not classified.
 

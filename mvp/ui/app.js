@@ -640,6 +640,7 @@
       s += g('dyns', (sy.dyns || []).concat(sy.wedges || []).map((d) => named(d, d[4])).join(''), ` stroke-width="${f1(sw)}"`);
       s += g('slurs', [].concat(sy.slurs || [], sy.fermatas || []).map((b) => rect(b, ss * 0.08)).join(''), ` stroke-width="${f1(sw)}"`);
       s += g('braces', (sy.braces || []).map((b) => rect(b, ss * 0.08)).join(''), ` stroke-width="${f1(sw)}"`);
+      s += g('grace', (sy.grace || []).map((b) => rect(b, ss * 0.08, ` rx="${f1(ss * 0.2)}"`)).join(''), ` stroke-width="${f1(sw)}"`);
       // ledger lines belong with the staff lines
       if (sy.ledgers && sy.ledgers.length) s += g('bars', `<g class="ov-ledger">${sy.ledgers.map((b) => rect(b, ss * 0.05)).join('')}</g>`, ` stroke-width="${f1(sw)}"`);
       // (unrecognised ink is drawn as focusable highlights over the page: unkLayerHTML)
@@ -754,7 +755,7 @@
   const LAYERS = [
     ['notes', 'Notes, stems, beams'], ['rests', 'Rests'], ['clefs', 'Clefs'], ['keys', 'Key signatures'], ['times', 'Time signatures'],
     ['bars', 'Staves, barlines'], ['marks', 'Accidentals, dots, tuplets'], ['lyrics', 'Lyric syllables'], ['labels', 'Pitch and value labels'],
-    ['text', 'Titles, names, text'], ['barno', 'Bar numbers'], ['dyns', 'Dynamics, hairpins'], ['slurs', 'Slurs, ties, fermatas'], ['braces', 'Braces, brackets'], ['unknown', 'Not recognised'],
+    ['text', 'Titles, names, text'], ['barno', 'Bar numbers'], ['dyns', 'Dynamics, hairpins'], ['slurs', 'Slurs, ties, fermatas'], ['braces', 'Braces, brackets'], ['grace', 'Grace notes'], ['unknown', 'Not recognised'],
   ];
   const LAYER_ICON = {
     notes: '<path d="M9 2v8" stroke-width="1.4" class="ovk-stem"/><circle cx="6.5" cy="10" r="2.6" stroke-width="1.6"/>',
@@ -771,6 +772,7 @@
     barno: '<rect x="3" y="2.5" width="8" height="9" stroke-width="1.4"/><text x="7" y="10.3" font-size="8" text-anchor="middle" stroke="none" fill="currentColor">5</text>',
     slurs: '<path d="M2 9c2-4 8-4 10 0" stroke-width="1.6"/>',
     braces: '<path d="M9 1.5c-3 0-1 5.5-4 5.5c3 0 1 5.5 4 5.5" stroke-width="1.5"/>',
+    grace: '<path d="M8 2v7" stroke-width="1.2"/><path d="M5.5 6.5l5-3" stroke-width="1.1"/><ellipse cx="6.5" cy="9.5" rx="2" ry="1.5" stroke-width="1.4"/>',
     unknown: '<rect x="1.5" y="3.5" width="11" height="7" rx="1.6" stroke-width=".8"/>',
   };
   // What the overlay shows: a preset (unrecognised marks only, everything) or
@@ -795,7 +797,7 @@
       bars: v ? (sy.bars || v.barlines).length : 0, marks: (sy.accs || []).length + (sy.dots || []).length + (sy.tuplets || []).length,
       lyrics: null, labels: null, unknown: (sy.unknown || []).length,
       text: (sy.text || []).filter((t) => t[4] !== 'lyrics' && t[4] !== 'measure').length, barno: (sy.text || []).filter((t) => t[4] === 'measure').length,
-      dyns: (sy.dyns || []).length + (sy.wedges || []).length, slurs: (sy.slurs || []).length + (sy.fermatas || []).length, braces: (sy.braces || []).length,
+      dyns: (sy.dyns || []).length + (sy.wedges || []).length, slurs: (sy.slurs || []).length + (sy.fermatas || []).length, braces: (sy.braces || []).length, grace: (sy.grace || []).length,
     };
   }
   function renderLayers(v) {
