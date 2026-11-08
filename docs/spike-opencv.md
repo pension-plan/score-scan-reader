@@ -2,6 +2,21 @@
 
 Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
 
+## Not shipped: surplus notes on severe scans (time-boxed, one round)
+
+Severe challenge outputs carry 1,074 extra notes (wp.py). Looking at the largest items: `lyr04-veni` severe is a page
+printed upside down under halftone noise (its lyrics read as heads; the title test sees ink above and below, so it is not
+turned), `variations` and `trio` severe are mostly faint barlines merging bars, and on `agrace-satb-blur` severe the
+"stacked chords" are an eighth note's blurred flag, read as one or two wide heads a ledger or two below the staff.
+Two attempts, both neutral or worse:
+- chords on the key or time signature right after the clef (within six spaces of the clef's end), dropped when every
+  head matches a digit or accidental template (filled ones too) better than a notehead: challenge −0.0000, extras
+  unchanged; the header parse already removes nearly all of these, and the rest were not of this kind.
+- heads off the staff (|p| ≥ 6) wider than 1.2 × the page's typical head (the blurred flags measure 1.5–1.7 spaces
+  against 1.15–1.4): extras 1,508 → 1,468 but missing 2,506 → 2,535, challenge −0.0001 (`andantino-blur` severe
+  −0.021: real ledger heads on blurred pages also come out wide).
+Not pursued further; the upside-down noisy page (orientation under halftone noise) is the clearest single case left.
+
 ## Not shipped: head template scan on degraded staves (time-boxed, one round)
 
 For heads the blob finder misses on degraded pages (faded heads broken into speckle, hollow heads whose thin outline
