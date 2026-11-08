@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.2.0...score-scan-reader-v0.3.0) (2026-11-08)
+
+
+### Features
+
+* **demo:** copista-2m ML detector demo on GitHub Pages (/ml-demo/) ([f812157](https://github.com/pension-plan/score-scan-reader/commit/f81215705b45ebf5eddec196e321f79a38214b54))
+* **lyrics:** split multi-note words, port strips line detector, read part labels and stanzas (round 2) ([e1c2221](https://github.com/pension-plan/score-scan-reader/commit/e1c2221d1252d6013fc434d9b4f4b842f82ec299))
+* **parts:** lyric-to-voice assignment, melisma extenders, printed part names, stanza credits (round 2) ([20100ec](https://github.com/pension-plan/score-scan-reader/commit/20100ecc2601edcff2152ce46c833efc3a279a36))
+* **site:** release footer on every Pages page with version, release age (AEDT) and build commit ([663c80b](https://github.com/pension-plan/score-scan-reader/commit/663c80ba9bca6d9ca84651f7d24b630f8f96f06e))
+* **site:** version bar at the top of every Pages page, including commits ahead of the release ([e9c5c3a](https://github.com/pension-plan/score-scan-reader/commit/e9c5c3a496824152553373539c6ba1e83a0d44ca))
+* **ui:** read up to 40 pages page by page in a Web Worker with progress and Stop (round 2) ([56859ef](https://github.com/pension-plan/score-scan-reader/commit/56859ef146641e92e608e058541078b44eb34bd6))
+
 ## [0.2.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.1.0...score-scan-reader-v0.2.0) (2026-11-08)
 
 
