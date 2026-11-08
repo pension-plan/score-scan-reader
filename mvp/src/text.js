@@ -165,6 +165,44 @@ function hairpin(R, c, sp) {
   return null;
 }
 
+// A sustain-pedal bracket line under the music: a long thin horizontal line
+// with a hook up at its start, a notch (a small ^) at each change, and a hook
+// at its end (none where it runs on to the next system). Returns
+// [{type: 'start'|'change'|'stop', x}] (page frame) or null.
+function pedalBracket(R, c, sp) {
+  const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1;
+  if (w < 4 * sp || h > 1.8 * sp || h < 0.3 * sp) return null;
+  const img = glyphImage(R, c), d = img.data;
+  const low = new Int32Array(w).fill(-1), top = new Int32Array(w).fill(-1);
+  for (let x = 0; x < w; x++) for (let y = 0; y < h; y++) if (d[y * w + x]) { if (top[x] < 0) top[x] = y; low[x] = y; }
+  // the line: most columns end on one row
+  const cnt = new Map();
+  for (let x = 0; x < w; x++) if (low[x] >= 0) cnt.set(low[x], (cnt.get(low[x]) || 0) + 1);
+  let base = -1, bc = 0;
+  for (const [y, k] of cnt) if (k > bc) { bc = k; base = y; }
+  let onLine = 0;
+  for (let x = 0; x < w; x++) if (low[x] >= 0 && Math.abs(low[x] - base) <= 1) onLine++;
+  if (onLine < 0.85 * w) return null;
+  // its thickness stays thin away from hooks and notches
+  const rise = (x) => (top[x] < 0 ? 0 : base - top[x]);
+  const thin = Array.from({ length: w }, (_, x) => rise(x) <= 0.25 * sp).filter(Boolean).length;
+  if (thin < 0.7 * w) return null;
+  const out = [];
+  const edge = Math.max(2, Math.round(0.4 * sp));
+  const hookAt = (x0, x1) => { for (let x = x0; x < x1; x++) if (rise(x) >= 0.5 * sp) return true; return false; };
+  out.push({ type: 'start', x: c.x0, hook: hookAt(0, edge) });
+  for (let x = edge; x < w - edge;) {
+    if (rise(x) < 0.3 * sp) { x++; continue; }
+    let e = x; while (e < w - edge && rise(e) >= 0.3 * sp) e++;
+    if (e - x <= 1.6 * sp) out.push({ type: 'change', x: c.x0 + (x + e) / 2 });
+    x = e;
+  }
+  if (hookAt(w - edge, w)) out.push({ type: 'stop', x: c.x1 });
+  // a line without its starting hook that starts at the system's left is a
+  // continuation from the system before: no new press there
+  return out;
+}
+
 // a slur or tie: one thin curved stroke, wider than tall, bowed
 function slurLike(R, c, sp) {
   const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1;
@@ -362,7 +400,7 @@ const ROLE_LABEL = {
 // Sort leftover components (symbols.js) into marks.
 // left: [{x0,y0,x1,y1,area}], fr / asm as front() and assemblePage() left them.
 function classifyMarks(fr, asm, left) {
-  const out = { text: [], dyns: [], wedges: [], slurs: [], fermatas: [], braces: [], ledgers: [], grace: [], pedals: [], fingerings: [], rehearsals: [], rest: [] };
+  const out = { text: [], dyns: [], wedges: [], slurs: [], fermatas: [], braces: [], ledgers: [], grace: [], pedals: [], pedalLines: [], fingerings: [], rehearsals: [], rest: [] };
   const R = fr.R, ss = fr.ss, W = fr.gray.width, H = fr.gray.height;
   const systems = (asm && asm.systems) || [];
   if (!R || !systems.length) { out.rest = left.slice(); return out; }
@@ -422,7 +460,20 @@ function classifyMarks(fr, asm, left) {
     const rowInk = (y) => { let k = 0; for (let x = 0; x < w; x++) k += d[y * w + x]; return k; };
     const colInk = (x) => { let k = 0; for (let y = 0; y < h; y++) k += d[y * w + x]; return k; };
     const edge = (f, len, at) => Math.max(...at.map(f)) >= 0.8 * len;
-    if (!edge(rowInk, w, [0, 1, 2]) || !edge(rowInk, w, [h - 1, h - 2, h - 3]) || !edge(colInk, h, [0, 1, 2]) || !edge(colInk, h, [w - 1, w - 2, w - 3])) continue;
+    const boxed = edge(rowInk, w, [0, 1, 2]) && edge(rowInk, w, [h - 1, h - 2, h - 3]) && edge(colInk, h, [0, 1, 2]) && edge(colInk, h, [w - 1, w - 2, w - 3]);
+    // a circle: round (ink near all four extremes at the middle lines, empty corners)
+    let circled = false;
+    if (!boxed && Math.abs(w - h) <= 0.25 * Math.max(w, h)) {
+      const my = h >> 1, mx = w >> 1;
+      let l = -1, r = -1, t = -1, b = -1;
+      for (let x = 0; x < w; x++) if (d[my * w + x]) { if (l < 0) l = x; r = x; }
+      for (let y = 0; y < h; y++) if (d[y * w + mx]) { if (t < 0) t = y; b = y; }
+      const cw = Math.max(1, Math.round(0.14 * w)), ch = Math.max(1, Math.round(0.14 * h));
+      let corner = 0;
+      for (const [x0, y0] of [[0, 0], [w - cw, 0], [0, h - ch], [w - cw, h - ch]]) for (let y = y0; y < y0 + ch; y++) for (let x = x0; x < x0 + cw; x++) corner += d[y * w + x];
+      circled = l >= 0 && l <= 0.12 * w && r >= 0.88 * w && t >= 0 && t <= 0.12 * h && b >= 0.88 * h && corner <= 0.1 * cw * ch * 4;
+    }
+    if (!boxed && !circled) continue;
     const inner = allComps.filter(q => q !== c && q.x0 > c.x0 && q.x1 < c.x1 && q.y0 > c.y0 && q.y1 < c.y1);
     // the letter may touch the frame (one component): then the interior holds its ink
     let interior = 0;
@@ -430,14 +481,24 @@ function classifyMarks(fr, asm, left) {
     if (!inner.length && interior < 0.08 * (w - 6) * (h - 6)) continue;
     inner.forEach(q => inBox.add(q)); inBox.add(c);
     const num = readDigits(R, inner, sp, null, true);
-    out.rehearsals.push({ box: [c.x0, c.y0, c.x1, c.y1], text: num, inner, sys: n.sys, k: n.k, si: n.s.si, x: c.x0 });
+    out.rehearsals.push({ box: [c.x0, c.y0, c.x1, c.y1], text: num, inner, sys: n.sys, k: n.k, si: n.s.si, x: c.x0, enclosure: boxed ? 'square' : 'circle' });
   }
   // unread letters: the marks run A, B, C ... down the page
-  out.rehearsals.sort((a, b) => a.sys - b.sys || a.x - b.x).forEach((r, i) => { if (!r.text) { r.text = String.fromCharCode(65 + (i % 26)); r.guessed = true; } });
+  // (circled marks are numbers: 1, 2, 3 ...; LilyPond's letters skip I)
+  out.rehearsals.sort((a, b) => a.sys - b.sys || a.x - b.x).forEach((r, i) => { if (!r.text) { r.text = r.enclosure === 'circle' ? String(i + 1) : 'ABCDEFGHJKLMNOPQRSTUVWXYZ'[i % 25]; r.guessed = true; } });
   for (const c of left) {
     if (inBox.has(c)) continue;
     const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1, cx = (c.x0 + c.x1) / 2, cy = (c.y0 + c.y1) / 2;
     const n = nearest(cx, cy), sp = n ? n.s.sp : ss;
+    // a pedal bracket line under the lowest staff
+    if (n && !n.inside && !n.above && n.k === stv[n.sys].length - 1 && w >= 4 * sp) {
+      const pb = pedalBracket(R, c, sp);
+      if (pb) {
+        for (const e of pb) if (e.type !== 'start' || e.hook) out.pedals.push({ box: [Math.round(e.x - 0.3 * sp), c.y0, Math.round(e.x + 0.3 * sp), c.y1], type: e.type, line: true, sys: n.sys, k: n.k, si: n.s.si, x: e.x });
+        out.pedalLines.push({ box: [c.x0, c.y0, c.x1, c.y1] });
+        continue;
+      }
+    }
     // piano pedal marks below the staff: "Ped." (press) and the star (release)
     if (n && !n.inside && !n.above && n.k === stv[n.sys].length - 1 && h >= 1.1 * sp && h <= 2.8 * sp && w <= 4.2 * sp) {
       const pg = dynGlyph(R, c, sp, true);
@@ -460,12 +521,21 @@ function classifyMarks(fr, asm, left) {
       // bracket is thick. A brace's tip (mid-height) stands out left; a
       // bracket has hooks reaching right at its ends
       let kind = 'line';
+      const img = glyphImage(R, c), lx = (f) => { const y = Math.round(f * (img.height - 1)); for (let x = 0; x < img.width; x++) if (img.data[y * img.width + x]) return x; return img.width; };
+      // left edges of the rows from fraction f0 to f1 of the height, sorted
+      const lxs = (f0, f1) => { const v = []; for (let y = Math.round(f0 * (img.height - 1)); y <= Math.round(f1 * (img.height - 1)); y++) { const x = lx(y / Math.max(1, img.height - 1)); if (x < img.width) v.push(x); } return v.sort((p, q) => p - q); };
+      const med = (v) => (v.length ? v[v.length >> 1] : img.width);
+      // a curly brace's tip (mid-height) stands out left of its two arms,
+      // whatever its stroke weight: thin braces of clean and faded copies are
+      // told from straight system lines this way (L18); the mean of the two
+      // arms cancels a skewed page's slant
+      const tipX = lxs(0.45, 0.55)[0] ?? img.width;
+      const tip = (med(lxs(0.3, 0.4)) + med(lxs(0.6, 0.7))) / 2 - tipX >= Math.max(2, 0.18 * sp);
       if (c.area / h > 0.28 * sp) {
-        const img = glyphImage(R, c), lx = (f) => { const y = Math.round(f * (img.height - 1)); for (let x = 0; x < img.width; x++) if (img.data[y * img.width + x]) return x; return img.width; };
         const wid = (f) => { const y = Math.round(f * (img.height - 1)); let a = -1, b = -1; for (let x = 0; x < img.width; x++) if (img.data[y * img.width + x]) { if (a < 0) a = x; b = x; } return a < 0 ? 0 : b - a + 1; };
         const hook = Math.max(wid(0.01), wid(0.03), wid(0.05)) >= wid(0.5) + 0.6 * sp && Math.max(wid(0.99), wid(0.97), wid(0.95)) >= wid(0.5) + 0.6 * sp;
         kind = hook && !(lx(0.5) + 0.2 * sp < Math.min(lx(0.3), lx(0.7))) ? 'bracket' : 'brace';
-      }
+      } else if (tip && w >= 0.4 * sp) kind = 'brace';
       out.braces.push({ box: [c.x0, c.y0, c.x1, c.y1], kind, span });
       continue;
     }

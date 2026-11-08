@@ -21,9 +21,9 @@ nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bo
 </head>
 <body>
 <div class="ssr-verbar" role="note" aria-label="Version" style="font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:6px max(16px,env(safe-area-inset-right,0px)) 6px max(16px,env(safe-area-inset-left,0px));border-bottom:1px solid rgba(127,127,127,.35);display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline;overflow-wrap:anywhere">
-<span>Version <a class="ssr-rel-link" href="https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.3.0" style="color:inherit"><b class="ssr-rel-ver">v0.3.0</b></a><span class="ssr-ahead"></span></span>
-<span class="ssr-rel-age" style="opacity:.8"></span>
-<span style="opacity:.8">build <a href="https://github.com/pension-plan/score-scan-reader/commit/20100ec" style="color:inherit">20100ec</a> <span class="ssr-build-age"></span></span>
+<span><a class="ssr-rel-link" href="https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.14.0" style="color:inherit"><b class="ssr-rel-ver">v0.14.0</b></a><span class="ssr-ahead-short"></span></span>
+<span class="ssr-rel-ago" style="opacity:.8"></span>
+<span style="opacity:.8">build <a href="https://github.com/pension-plan/score-scan-reader/commit/e0c6c6b" style="color:inherit">e0c6c6b</a></span>
 <span class="ssr-newer"></span>
 </div>
 <main>
@@ -37,6 +37,7 @@ nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bo
 </ul>
 <h2>Documents</h2>
 <ul>
+<li><a href="docs/COVERAGE.html">Symbol and layout coverage, speed and memory</a></li>
 <li><a href="docs/SDD.html">Software design document</a></li>
 <li><a href="docs/TIMELINE.html">Build timeline (AEDT)</a></li>
 <li><a href="docs/research-omr.html">Research: current OMR methods</a></li>
@@ -44,15 +45,16 @@ nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bo
 <li><a href="docs/spike-classical.html">Trial: plain-JS image pipeline</a></li>
 <li><a href="docs/spike-ml.html">Trial: pretrained ML models</a></li>
 <li><a href="docs/spike-ocr.html">Trial: lyric OCR</a></li>
+<li><a href="docs/spike-opencv.html">spike-opencv</a></li>
 </ul>
 </main>
 
 <div id="ssr-release" style="font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));border-top:1px solid rgba(127,127,127,.35);opacity:.85;text-align:center;overflow-wrap:anywhere">
-<a class="ssr-rel-link" href="https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.3.0" style="color:inherit"><b class="ssr-rel-ver">v0.3.0</b></a><span class="ssr-ahead"></span> · <span class="ssr-rel-age"></span> · page built from <a href="https://github.com/pension-plan/score-scan-reader/commit/20100ec" style="color:inherit">20100ec</a> <span class="ssr-build-age"></span><span class="ssr-newer"></span>
+<a class="ssr-rel-link" href="https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.14.0" style="color:inherit"><b class="ssr-rel-ver">v0.14.0</b></a><span class="ssr-ahead"></span> · <span class="ssr-rel-age"></span> · page built from <a href="https://github.com/pension-plan/score-scan-reader/commit/e0c6c6b" style="color:inherit">e0c6c6b</a> <span class="ssr-build-age"></span><span class="ssr-newer"></span>
 </div>
 <script>
 (function () {
-  var B = {"version":"0.3.0","tag":"score-scan-reader-v0.3.0","releasedAt":"2026-11-08T06:02:26Z","releaseUrl":"https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.3.0","ahead":0,"commit":"20100ec","builtAt":"2026-11-08T06:04:45.238Z"};
+  var B = {"version":"0.14.0","tag":"score-scan-reader-v0.14.0","releasedAt":"2026-11-08T09:53:36Z","releaseUrl":"https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.14.0","ahead":1,"commit":"e0c6c6b","builtAt":"2026-11-08T10:11:45.267Z"};
   var rel = { ver: B.version, tag: B.tag, at: B.releasedAt, url: B.releaseUrl }, newer = null;
   function ago(iso) {
     var s = Math.max(0, (Date.now() - Date.parse(iso)) / 1000);
@@ -68,6 +70,8 @@ nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bo
     all('ssr-rel-ver', function (e) { e.textContent = 'v' + rel.ver; });
     all('ssr-rel-link', function (e) { e.href = rel.url; });
     all('ssr-ahead', function (e) { e.textContent = B.ahead > 0 ? ' + ' + B.ahead + ' commit' + (B.ahead === 1 ? '' : 's') + ' (unreleased build)' : (B.ahead === 0 ? ' (exact release)' : ''); });
+    all('ssr-ahead-short', function (e) { e.textContent = B.ahead > 0 ? ' +' + B.ahead : ''; e.title = B.ahead > 0 ? B.ahead + ' unreleased commit' + (B.ahead === 1 ? '' : 's') : ''; });
+    all('ssr-rel-ago', function (e) { e.textContent = rel.at ? 'released ' + ago(rel.at) : 'not released yet'; });
     all('ssr-rel-age', function (e) { e.textContent = rel.at ? 'released ' + ago(rel.at) + ' (' + syd(rel.at) + ')' : 'not released yet'; });
     all('ssr-build-age', function (e) { e.textContent = ago(B.builtAt); });
     all('ssr-newer', function (e) { e.textContent = newer ? ' · newer release v' + newer + ' is out' : ''; });

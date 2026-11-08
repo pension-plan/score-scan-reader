@@ -21,9 +21,9 @@ nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bo
 </head>
 <body>
 <div class="ssr-verbar" role="note" aria-label="Version" style="font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:6px max(16px,env(safe-area-inset-right,0px)) 6px max(16px,env(safe-area-inset-left,0px));border-bottom:1px solid rgba(127,127,127,.35);display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline;overflow-wrap:anywhere">
-<span>Version <a class="ssr-rel-link" href="https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.3.0" style="color:inherit"><b class="ssr-rel-ver">v0.3.0</b></a><span class="ssr-ahead"></span></span>
-<span class="ssr-rel-age" style="opacity:.8"></span>
-<span style="opacity:.8">build <a href="https://github.com/pension-plan/score-scan-reader/commit/20100ec" style="color:inherit">20100ec</a> <span class="ssr-build-age"></span></span>
+<span><a class="ssr-rel-link" href="https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.14.0" style="color:inherit"><b class="ssr-rel-ver">v0.14.0</b></a><span class="ssr-ahead-short"></span></span>
+<span class="ssr-rel-ago" style="opacity:.8"></span>
+<span style="opacity:.8">build <a href="https://github.com/pension-plan/score-scan-reader/commit/e0c6c6b" style="color:inherit">e0c6c6b</a></span>
 <span class="ssr-newer"></span>
 </div>
 <main><nav class="crumbs"><a href="../">Score Scan Reader</a> / docs / SDD.md · <a href="https://github.com/pension-plan/score-scan-reader/blob/main/docs/SDD.md">source</a></nav>
@@ -1287,6 +1287,238 @@ pattern and a listed warning.</li>
 <li>At 400 px width the layout is one column with no horizontal page scroll; the page view scrolls inside its
 own frame. Side gutters use <code>max(16px, env(safe-area-inset-left))</code>.</li>
 </ul>
+<h3>8.6 Detection overlay and repair marks</h3>
+<p><strong>Overlay layers.</strong> Over each page the overlay draws every symbol the reading recognised, each class with
+its own colour and shape: note heads (by part), stems and beams, rests, clefs, key and time signatures,
+staves and barlines (double bars and repeats), accidentals, augmentation dots, tuplet numbers and the lyric
+syllables the score used. Text labels give each note&#39;s pitch and written value (upper voice above the
+staff, lower voice below) and name each rest, clef, key and time signature; they are drawn only while a
+staff space is at least 11 screen pixels (page zoom times pinch zoom). Ink left after staff-line removal
+that touches no recognised symbol is highlighted as &quot;Not recognised&quot;. Three views sit above the legend:
+&quot;Unrecognised only&quot; (just the highlights over the plain scan; the default), &quot;Everything&quot;, and &quot;Custom&quot; (a
+toggle per layer). The choice and the custom set are kept in <code>localStorage</code> as <code>ssr.view.v2</code>
+(<code>{mode, off}</code>); a visitor without that key (new, or from before views) starts once on &quot;Unrecognised only&quot;,
+and an older per-layer choice (<code>ssr.layers</code>) becomes the custom set. The page zoom (Fit to 6x) is <code>ssr.zoom</code>. The data comes
+from <code>src/symbols.js</code> <code>pageSymbols(fr, asm)</code> via <code>ui/session.js</code> <code>pageView(entry, i, req).sym</code>, per-head
+<code>notes</code> in the result&#39;s <code>pages</code>, and <code>score.measureMap</code>.</p>
+<p><strong>Repair marks.</strong> After detection, &quot;Mark for repair&quot; (a toggle next to Overlay; Escape leaves it) lets the
+reader draw over the page with Pointer Events (mouse, touch, pen): Pen (freehand; Shift held gives a
+straight line), Line, Box and Circle. While drawing is on, the mark layer takes the pointer with
+<code>touch-action: none</code>, so a finger draws instead of scrolling; off, the page scrolls normally. Marks are
+stored in the page&#39;s full-resolution frame (the overlay&#39;s viewBox), so they stay aligned at every zoom and
+on two-up spreads (the sheet&#39;s frame). Each mark is numbered on the page and can carry a short note. Undo
+(button, Ctrl/Cmd+Z), delete one mark and clear page are available. Marks persist per document in
+<code>localStorage</code> under <code>ssr.repair:&lt;file name&gt;:&lt;size&gt;</code> (<code>:sample</code> for the bundled samples) and survive
+re-running the conversion. Repair marks are a lime highlighter under a black dashed core (<code>--rp-*</code>
+tokens), unlike every detection colour and the yellow of unrecognised ink.</p>
+<p>&quot;Copy repair notes&quot; puts the JSON below on the clipboard; &quot;Open repair notes (.json)&quot; and &quot;Open marked page
+(.png)&quot; open a file in a new tab to save from there (the page carries no download links, section 9). The
+JSON is the input for a later repair / re-recognition pass (shape; <code>[]</code> and <code>x0 ...</code> stand for boxes):</p>
+<pre><code class="language-text">{
+  &quot;format&quot;: &quot;score-scan-reader/repair-notes&quot;, &quot;version&quot;: 1,
+  &quot;file&quot;: &quot;hymn.pdf&quot;, &quot;size&quot;: 812345, &quot;exported&quot;: &quot;2026-11-08T09:00:00.000Z&quot;,
+  &quot;frame&quot;: &quot;page pixels of the straightened page as read (the detection overlay frame); x right, y down&quot;,
+  &quot;score&quot;: { &quot;parts&quot;: [&quot;Soprano&quot;, &quot;Alto&quot;], &quot;measures&quot;: 32, &quot;fifths&quot;: -1, &quot;time&quot;: { &quot;beats&quot;: 3, &quot;type&quot;: 4 } },
+  &quot;pages&quot;: [{
+    &quot;page&quot;: 1, &quot;width&quot;: 2300, &quot;height&quot;: 2977, &quot;staffSpace&quot;: 18.4, &quot;spread&quot;: 0,
+    &quot;marks&quot;: [{
+      &quot;n&quot;: 1, &quot;id&quot;: 7, &quot;tool&quot;: &quot;pen | line | box | ellipse&quot;, &quot;note&quot;: &quot;missed chord note&quot;,
+      &quot;points&quot;: [[690.5, 357.2], [701.0, 360.4]], &quot;bbox&quot;: [690, 357, 1058, 446], &quot;drawn&quot;: &quot;2026-11-08T08:59:10.000Z&quot;,
+      &quot;found&quot;: {
+        &quot;measures&quot;: [1, 2],
+        &quot;heads&quot;: [{ &quot;k&quot;: 80, &quot;x&quot;: 729, &quot;y&quot;: 402.5, &quot;stem&quot;: &quot;up&quot;, &quot;pitch&quot;: &quot;C4&quot;, &quot;value&quot;: &quot;1/8&quot;, &quot;quarters&quot;: 0.5, &quot;parts&quot;: [&quot;Piano&quot;] }],
+        &quot;rests&quot;: [{ &quot;box&quot;: [x0, y0, x1, y1], &quot;kind&quot;: &quot;flag1&quot;, &quot;quarters&quot;: 0.5, &quot;dots&quot;: 0, &quot;text&quot;: &quot;rest 1/8&quot; }],
+        &quot;clefs&quot;: [{ &quot;box&quot;: [], &quot;clef&quot;: &quot;G&quot;, &quot;text&quot;: &quot;G clef&quot;, &quot;change&quot;: false, &quot;assumed&quot;: false }],
+        &quot;keys&quot;: [{ &quot;box&quot;: [], &quot;fifths&quot;: -4, &quot;text&quot;: &quot;4♭&quot;, &quot;change&quot;: false }],
+        &quot;times&quot;: [{ &quot;box&quot;: [], &quot;beats&quot;: null, &quot;beatType&quot;: null, &quot;symbol&quot;: null }],
+        &quot;accidentals&quot;: [{ &quot;box&quot;: [], &quot;kind&quot;: &quot;natural&quot; }], &quot;dots&quot;: [{ &quot;x&quot;: 0, &quot;y&quot;: 0 }],
+        &quot;tuplets&quot;: [{ &quot;box&quot;: [], &quot;actual&quot;: 3, &quot;normal&quot;: 2 }],
+        &quot;barlines&quot;: [{ &quot;x&quot;: 0, &quot;top&quot;: 0, &quot;bottom&quot;: 0, &quot;type&quot;: &quot;single | double | repeat-start | repeat-end | repeat-both&quot; }],
+        &quot;unrecognised&quot;: [[x0, y0, x1, y1]]
+      }
+    }]
+  }]
+}
+</code></pre>
+<p><code>points</code> and every box are in <code>frame</code> coordinates of that page; <code>heads[].k</code> indexes the page&#39;s drawn heads
+(<code>pageView().heads</code>, the order of the page entry&#39;s <code>fr.heads</code>). <code>measures</code> are the written measure numbers
+(0 for a pickup) whose segment, from <code>score.measureMap</code>, meets the mark&#39;s box; it is <code>null</code> on a two-up
+spread, whose halves are measured in their own frames. <code>found</code> is <code>null</code> for a page not read in this
+session.</p>
+<p><strong>Unrecognised marks and the reader&#39;s labels.</strong> Each unrecognised mark is an HTML button over the page
+(positioned in % of the page, so it follows the zoom), centred on the ink, padded 0.6 staff space and at
+least 1.6 staff spaces (and 18 screen pixels) square, with a yellow highlighter fill and a 3-pixel dark
+amber ring. Its accessible name is &quot;Unrecognised mark 2 of 3, bar 15&quot;. &quot;Not recognised: N&quot; with Previous /
+Next (keys P / N when not typing) steps through the marks in reading order across pages, zooming until a
+staff space is at least 16 screen pixels and scrolling the mark to the middle; the selected mark pulses
+(not with reduced motion). Clicking, tapping or pressing Enter on a mark opens &quot;What is this mark?&quot;: a crop
+of the mark, a type (note head filled / half / whole; rest whole to 32nd; accidental sharp, flat, natural,
+double sharp, double flat; augmentation dot; clef G / F / C; time or key signature; dynamic ppp to fff,
+sfz; articulation or ornament; slur; tie; text; bar number; noise; something else), optional details
+(required for &quot;something else&quot;) and a line saying what saving will do. Labels are kept per document in
+<code>localStorage</code> as <code>ssr.ident:&lt;file name&gt;:&lt;size&gt;</code> (<code>{v: 1, items: {&lt;page index&gt;: [{id, page, box, type, sub, detail, at}]}}</code>, <code>box</code> the mark&#39;s ink box in the overlay frame), drawn as a green &quot;identified by you&quot;
+box with its name, editable and removable, and counted (&quot;Identified by you: N&quot;). A label stays with its
+ink box: when a later reading reports the same box it replaces that highlight; otherwise it is drawn where
+it was given.</p>
+<p><strong>User corrections.</strong> <code>src/corrections.js</code> applies labels to the MusicXML after <code>buildScore</code>, as two pure
+functions, so every re-run applies them again and they are unit-tested (<code>mvp/ui/test/corrections.js</code>):
+<code>resolveCorrections(idents, pages, measureMap)</code> ties each label to the notes around it, and
+<code>applyCorrections(xml, corrections)</code> edits the MusicXML text at the lines those notes were written on
+(<code>correctScore(score, idents, pages)</code> runs both). <code>pages[i]</code> is <code>{ss, heads, notes}</code>: the overlay&#39;s heads
+and the result&#39;s per-head notes, whose eighth field is the MusicXML line of the head&#39;s first written note
+(<code>toMusicXML</code> records it as <code>h.xmlLine</code>; a note whose step / octave no longer match is skipped). Applied:</p>
+<table>
+<thead>
+<tr>
+<th>Label</th>
+<th>Change to the MusicXML</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>accidental</td>
+<td>the nearest note to its right on its staff (within 4 staff spaces, 1.3 up / down) gets that <code>&lt;alter&gt;</code> (sharp 1, flat -1, natural 0, double +/-2) and an <code>&lt;accidental&gt;</code></td>
+</tr>
+<tr>
+<td>rest</td>
+<td>a <code>&lt;note&gt;&lt;rest/&gt;</code> of that value in the same voice and staff, after the last note before it in its bar (or before the first after it); the next <code>&lt;backup&gt;</code> grows to match</td>
+</tr>
+<tr>
+<td>dot</td>
+<td>the nearest note to its left (and its chord) gets one more <code>&lt;dot/&gt;</code> and the longer duration; the next <code>&lt;backup&gt;</code> grows to match</td>
+</tr>
+<tr>
+<td>dynamic</td>
+<td>a <code>&lt;direction&gt;</code> with <code>&lt;dynamics&gt;</code> before the nearest note, above or below its staff as drawn</td>
+</tr>
+<tr>
+<td>noise</td>
+<td>nothing: the mark is hidden</td>
+</tr>
+<tr>
+<td>other types</td>
+<td>nothing: kept as a label for repair notes and training examples</td>
+</tr>
+</tbody></table>
+<p>A bar made longer than its time signature is not rebalanced; a warning says so. &quot;N corrections of yours
+applied&quot; shows under the parts summary, and the MusicXML panel, preview and copy carry the corrected
+MusicXML. With no labels the MusicXML is unchanged (benchmark byte-identical).</p>
+<p><strong>Exports.</strong> The repair notes JSON (below) carries, per page, <code>identified</code>: <code>[{id, type, sub, detail, label, bbox, bar, nearestHeads: [{k, x, y, pitch, value}] (three nearest), correction: {kind: accidental | dot | rest | dynamic | hide | label | skip, why, head}, at}]</code>. &quot;Copy labelled examples (JSON)&quot; gives
+training data for a later classifier: <code>{format: &quot;score-scan-reader/labelled-examples&quot;, version: 1, file, exported, examples: [{page, id, type, sub, detail, label, bbox, crop, staffSpace, staffSpacePx, png}]}</code>,
+each <code>png</code> a data URL of the mark with half a staff space around it from the page as shown (at most
+160 px across).</p>
+<h3>8.7 Text, dynamics and other marks</h3>
+<p>Ink the note reader leaves unexplained (<code>src/symbols.js</code> <code>explain()</code>: components touching no recognised
+symbol) is sorted by <code>src/text.js</code> <code>classifyMarks()</code>, once per page (<code>symbols.js</code> <code>pageMarks(fr, asm)</code>,
+cached on <code>fr</code>), into these classes. The overlay shows them as the layers &quot;Titles, names, text&quot;,
+&quot;Dynamics, hairpins&quot; and &quot;Slurs, ties, fermatas, braces, ledger lines&quot;; only what is left stays &quot;Not
+recognised&quot; (Maple Leaf Rag: 70 unrecognised marks before, 6 after, at 200 dpi; 4 in the app).</p>
+<ul>
+<li><strong>Braces and system brackets</strong>: tall, narrow ink at the staves&#39; left edge.</li>
+<li><strong>Ledger lines</strong>: short thin horizontal strokes off the staff beside a note head.</li>
+<li><strong>Hairpins</strong>: two thin lines meeting at one end, the gap growing steadily (crescendo opens right).</li>
+<li><strong>Slurs and ties</strong>: one thin bowed stroke; with a dot inside the bow of a short arc, a <strong>fermata</strong>.</li>
+<li><strong>Dynamics</strong> (ppp to fff, mp, mf, sf, sfz, sffz, sfp, fz, fp, rf, rfz): letters on one row that all match
+the dynamics-font templates (<code>src/dynglyphs.js</code>, made by <code>mvp/tools/dynglyphs.js</code> from engraved pages of the
+coverage corpus; grids of about 0.12 staff space, sized in staff spaces, Dice overlap with a small credit
+for ink one cell off, threshold 0.72) and spell a dynamic. A letter the note reader took (an <code>m</code> read as
+heads or fused with a stem) is recovered by matching neighbouring components, or a letter-sized window
+left of an <code>f</code>/<code>p</code>, against <code>m</code>/<code>s</code>. With OCR on, an expression line that reads as a dynamic becomes one.
+OCR alone is not used: Tesseract does not read the dynamics font.</li>
+<li><strong>Text lines</strong>: the remaining letter-sized ink grouped into lines, with a role from where it stands:
+left of the first system = instrument name, left of later systems = abbreviation; small digits just
+above a system&#39;s first staff = measure number; above the first system: the topmost large centred line =
+title, other centred lines = subtitle, right-aligned = composer, left-aligned near the staff = tempo,
+else lyricist / credit; page top / bottom margins = header / footer; rows of three or more lines (or
+two wide ones) among the music = lyrics (lyrics.js reads those); other lines = expression. A lone glyph
+among the music stays unknown (more often a missed rest or flag than text). With OCR, <code>readPageText()</code>
+reads each line (PSM 7, the lyrics setup, at most 16 lines per page, instrument names reused from
+<code>fr.partLabels</code>, one abbreviation per staff) and refines roles from the words (copyright, page number,
+arranger &quot;arr.&quot;, lyricist &quot;words&quot;, tempo and expression vocabularies).</li>
+</ul>
+<p><strong>MusicXML.</strong> <code>score.js</code> <code>readMarks()</code> writes: <code>&lt;work-title&gt;</code> and <code>&lt;credit&gt;</code> (title, subtitle, composer,
+lyricist, arranger, rights) from page 1, <code>&lt;identification&gt;&lt;creator type=&quot;composer|lyricist|arranger&quot;&gt;</code> and
+<code>&lt;rights&gt;</code>; <code>&lt;part-abbreviation&gt;</code> when the abbreviation read fits the part name (its letters in order:
+&quot;Pno.&quot; for Piano); <code>&lt;direction&gt;</code> with <code>&lt;dynamics&gt;</code> (<code>&lt;other-dynamics&gt;</code> outside the MusicXML set),
+<code>&lt;wedge type=&quot;crescendo|diminuendo&quot;&gt;</code> ... <code>&lt;wedge type=&quot;stop&quot;&gt;</code>, and <code>&lt;words&gt;</code> (tempo bold) for tempo and
+expression text that is a known term or confident words. A direction goes to the staff nearest it (the band
+widened by nearby heads; marks count 1.6x farther above a staff, so a dynamic between staves goes to the
+upper one unless clearly nearer the lower), in each part reading that staff, at the measure and onset of
+the nearest note by x, written before that note in the part&#39;s first voice (<code>&lt;offset&gt;</code> inside it).</p>
+<p><strong>Accuracy</strong> (coverage suite, recall on clean / scan / scan-severe; all were 0 before): see the dynamics,
+hairpin, tempo and text rows of <code>docs/COVERAGE.md</code>. Not done: grace notes (small heads with slashed stems
+are still read, or missed, as notes), slurs and fermatas are drawn on the overlay but not written to
+MusicXML (attaching them needs the head each curve starts and ends at), measure numbers are labelled but not
+used to check the measure count, rehearsal marks and chord symbols stay text or unknown. Pedal marks and
+fingering are not classified.</p>
+<h3>8.8 Playback (General MIDI)</h3>
+<p>The preview panel carries a transport bar and a parts mixer (<code>mvp/ui/player.js</code>, <code>mvp/ui/player.css</code>,
+inlined by <code>tools/build.js</code> before <code>app.js</code>; app.js only calls <code>ScorePlayer.attach({xml, osmd, book, res})</code>
+after each preview render). The timing model is a pure module shared with the Node tests,
+<code>mvp/src/playback.js</code>:</p>
+<ul>
+<li><strong>Events.</strong> The app&#39;s MusicXML (the same string the user exports) is parsed into timed note events per
+part, staff and voice: MIDI pitch, onset and length in quarters along the played timeline and in seconds,
+velocity, and the 0-based MusicXML line of the <code>&lt;note&gt;</code> (the overlay&#39;s head -&gt; note link: each head&#39;s
+<code>xmlLine</code> from <code>resultSummary().pages[].notes</code>). Chords, voices (<code>&lt;backup&gt;</code> / <code>&lt;forward&gt;</code>), dots and
+tuplets (through <code>&lt;duration&gt;</code>), ties (merged, also across voices sharing a pitch), grace notes (1/8 quarter
+or less, on the beat from the principal, or before it when slashed), rests, cue notes (silent) and
+<code>&lt;transpose&gt;</code> are handled.</li>
+<li><strong>Form.</strong> Repeats with voltas (1st/2nd/3rd endings, <code>times</code>), D.C. / D.S. al Fine / al Coda from
+<code>&lt;sound dacapo|dalsegno|fine|tocoda|coda|segno&gt;</code> or from the words (D.C. al Fine, To Coda, Fine). Repeats
+are not taken again after a jump; the last volta is played. All seven corpus structure items with a stated
+played form match it (<code>ui/test/playback.js</code>).</li>
+<li><strong>Tempo.</strong> <code>&lt;sound tempo&gt;</code> beats a metronome mark (beat unit and dots converted to quarters per minute)
+beats tempo words (Allegro 132, Andante 80, Moderato 104, &quot;Not fast&quot; 80 for the rag, Tempo di marcia 112,
+...), else 100 qpm. rit./rall. step down to 82 %, a tempo / Tempo I restore. A fermata holds 1.5x (the
+span plays at 2/3 speed in every part). The player scales all of it by 50-200 %.</li>
+<li><strong>Dynamics.</strong> ppp..fff -&gt; velocity 26..120 (mf 80 by default), <code>&lt;sound dynamics&gt;</code>, sf/sfz/fz/fp as
+accents, wedges and cresc./dim. words ramp to the next dynamic (or +-18), accents +12/+18, staccato
+halves the length; other notes are slightly detached (legato for organ).</li>
+<li><strong>Instruments.</strong> A GM program per part from its name (Piano 0, Organ 19, Violin 40, Viola 41, Cello 42,
+Flute 73, Clarinet 71, Trumpet 56, Tuba 58, Guitar 24, ...; Soprano/Alto/Tenor/Bass/Chorus 52 Choir Aahs,
+a single or solo voice 53 Voice Oohs; drums on channel 10). The score writer now writes it into every
+<code>&lt;score-part&gt;</code> as <code>&lt;score-instrument&gt;</code> + <code>&lt;midi-instrument&gt;</code> (channel, 1-based program, volume 80, pan
+spread across ensembles), on the same line as the part name so head line numbers do not move. It is
+XSD-valid and left the benchmark unchanged: default set with OCR 0.950 -&gt; 0.950, challenge set
+0.823 -&gt; 0.823, 0 of 385 items changed (<code>OMR_NO_MIDI=1</code> leaves the elements out, for that comparison).</li>
+</ul>
+<p><strong>Synth.</strong> Web Audio, nothing fetched from the network at run time. Eight sampled sets
+(<code>dist/assets/gm-{piano,organ,choir,oohs,strings,flute,clarinet,brass}.json</code>, 4.98 MB together: every 3rd
+semitone of the FluidR3_GM renders from gleitz/midi-js-soundfonts, CC BY 3.0, see
+<code>dist/assets/NOTICE.soundfont.txt</code>; rebuilt by <code>tools/soundfont.mjs</code>) load only when a part using them is
+played; the nearest sample is resampled by playbackRate (at most a semitone), sustained families loop the
+middle of the sample, each voice has an attack/release envelope. GM programs map to the nearest set by
+family; a set that fails to load, or a program with no set (synth, percussion, timpani), plays a
+two-oscillator synth with an ADSR. Per part gain -&gt; stereo panner -&gt; master -&gt; compressor. A look-ahead
+scheduler (25 ms timer, 100 ms window on the AudioContext clock) creates voices only just before they sound.
+The AudioContext is created by the first Play click.</p>
+<p><strong>UI.</strong> Play/Pause (aria-pressed; Space when focus is not in a field or on another control), Stop, a
+position scrubber with bar numbers (spaced to fit the width), tempo 50-200 % with the resulting quarter
+note rate, Click (metronome; compound meters beat in dotted quarters), Count-in (one bar), Loop bars A to B
+(first played bar A through the next bar B), and the parts mixer (GM instrument picker, volume, mute, solo).
+Follow-along: the OSMD cursor moves to the latest onset (its stops are listed once, then <code>next()</code> /
+<code>reset()</code>), and the scan overlay rings the note heads that are sounding (an SVG layer of its own in the
+page frame; the plate turns to the page that is playing). Clicking a note head on the scan, or a measure in
+the preview, plays from there. <strong>Export:</strong> &quot;MIDI file (.mid)&quot; writes a type 1 Standard MIDI File (480 PPQ;
+tempo map including the fermata holds, time signatures, one track per part with name, program change,
+volume and pan; mixer mutes and instrument choices applied). <code>tools/build.js</code> still forbids download links
+except in the guarded helper in player.js (between <code>&lt;guarded-download&gt;</code> markers, checked by the build): a
+real <code>&lt;a download&gt;</code> when the page is not framed (GitHub Pages, the primary home), a new tab inside the
+claude.ai artifact frame.</p>
+<p><strong>Tests.</strong> <code>node mvp/ui/test/playback.js</code>: event model cases (chords, voices, ties, grace notes, tempo
+sources, fermata, dynamics and wedges, voltas, D.C. al Fine, D.S. al Coda, GM table, instrument XML), SMF
+round trip through <code>readSMF</code> (tempo map, programs, note on/off pitch, tick and velocity per note, volume,
+pan, mixer overrides), XSD validity, and a sweep over 249 truth files and 385 produced outputs (finite
+ordered timing, note counts with ties merged, played forms). <code>node mvp/tools/pw/player.js &lt;dir&gt;</code>: the rag and
+the St. Anselm hymn (four Choir Aahs parts) at 1280 and 400 px, light and dark: Play -&gt; AudioContext
+running, position, OSMD cursor and scan rings advance, Space pauses, head and measure clicks play from
+there, an OfflineAudioContext render of 4 s is not silent, tempo/mute controls, and the downloaded .mid
+parses with one note-on per event.</p>
+<p><strong>Limits.</strong> No swing, no pedal (sustain marks are not read), no ornaments realised (trills, turns), no
+articulation beyond accent/staccato/tenuto, no per-staff dynamics inside a part (a dynamic applies to the
+whole part), unpitched notes all sound as one drum, the OSMD cursor follows only the measures the preview
+has drawn (48 until &quot;Draw every measure&quot;), and after user corrections that insert lines the head -&gt; note
+link can point one note off.</p>
 <h2>9. Deployment and artifact constraints</h2>
 <h3>9.1 Packaging</h3>
 <p><code>build.mjs</code> produces:</p>
@@ -1678,6 +1910,12 @@ tested on ground-truth symbols generated from the chorales, against the ≥ 99 %
 <td>Default sample</td>
 <td>Attribution file</td>
 </tr>
+<tr>
+<td>FluidR3_GM samples (8 instruments, via gleitz/midi-js-soundfonts)</td>
+<td>CC BY 3.0 (renders: MIT)</td>
+<td>Score playback</td>
+<td>Attribution in <code>dist/assets/NOTICE.soundfont.txt</code></td>
+</tr>
 </tbody></table>
 <h3>11.2 Used offline only (harness, never shipped)</h3>
 <p>pdftoppm and pdfimages (poppler, GPL; run as external processes), LilyPond 2.24 (GPL; its output is not
@@ -1973,11 +2211,11 @@ weights of 40–430 MB, slow autoregressive decoding on single-thread WASM, no S
 <script>window.mermaid && mermaid.initialize({ startOnLoad: true, theme: matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default' });</script>
 
 <div id="ssr-release" style="font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));border-top:1px solid rgba(127,127,127,.35);opacity:.85;text-align:center;overflow-wrap:anywhere">
-<a class="ssr-rel-link" href="https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.3.0" style="color:inherit"><b class="ssr-rel-ver">v0.3.0</b></a><span class="ssr-ahead"></span> · <span class="ssr-rel-age"></span> · page built from <a href="https://github.com/pension-plan/score-scan-reader/commit/20100ec" style="color:inherit">20100ec</a> <span class="ssr-build-age"></span><span class="ssr-newer"></span>
+<a class="ssr-rel-link" href="https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.14.0" style="color:inherit"><b class="ssr-rel-ver">v0.14.0</b></a><span class="ssr-ahead"></span> · <span class="ssr-rel-age"></span> · page built from <a href="https://github.com/pension-plan/score-scan-reader/commit/e0c6c6b" style="color:inherit">e0c6c6b</a> <span class="ssr-build-age"></span><span class="ssr-newer"></span>
 </div>
 <script>
 (function () {
-  var B = {"version":"0.3.0","tag":"score-scan-reader-v0.3.0","releasedAt":"2026-11-08T06:02:26Z","releaseUrl":"https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.3.0","ahead":0,"commit":"20100ec","builtAt":"2026-11-08T06:04:45.238Z"};
+  var B = {"version":"0.14.0","tag":"score-scan-reader-v0.14.0","releasedAt":"2026-11-08T09:53:36Z","releaseUrl":"https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.14.0","ahead":1,"commit":"e0c6c6b","builtAt":"2026-11-08T10:11:45.267Z"};
   var rel = { ver: B.version, tag: B.tag, at: B.releasedAt, url: B.releaseUrl }, newer = null;
   function ago(iso) {
     var s = Math.max(0, (Date.now() - Date.parse(iso)) / 1000);
@@ -1993,6 +2231,8 @@ weights of 40–430 MB, slow autoregressive decoding on single-thread WASM, no S
     all('ssr-rel-ver', function (e) { e.textContent = 'v' + rel.ver; });
     all('ssr-rel-link', function (e) { e.href = rel.url; });
     all('ssr-ahead', function (e) { e.textContent = B.ahead > 0 ? ' + ' + B.ahead + ' commit' + (B.ahead === 1 ? '' : 's') + ' (unreleased build)' : (B.ahead === 0 ? ' (exact release)' : ''); });
+    all('ssr-ahead-short', function (e) { e.textContent = B.ahead > 0 ? ' +' + B.ahead : ''; e.title = B.ahead > 0 ? B.ahead + ' unreleased commit' + (B.ahead === 1 ? '' : 's') : ''; });
+    all('ssr-rel-ago', function (e) { e.textContent = rel.at ? 'released ' + ago(rel.at) : 'not released yet'; });
     all('ssr-rel-age', function (e) { e.textContent = rel.at ? 'released ' + ago(rel.at) + ' (' + syd(rel.at) + ')' : 'not released yet'; });
     all('ssr-build-age', function (e) { e.textContent = ago(B.builtAt); });
     all('ssr-newer', function (e) { e.textContent = newer ? ' · newer release v' + newer + ' is out' : ''; });

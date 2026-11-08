@@ -21,14 +21,14 @@ nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bo
 </head>
 <body>
 <div class="ssr-verbar" role="note" aria-label="Version" style="font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:6px max(16px,env(safe-area-inset-right,0px)) 6px max(16px,env(safe-area-inset-left,0px));border-bottom:1px solid rgba(127,127,127,.35);display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline;overflow-wrap:anywhere">
-<span>Version <a class="ssr-rel-link" href="https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.3.0" style="color:inherit"><b class="ssr-rel-ver">v0.3.0</b></a><span class="ssr-ahead"></span></span>
-<span class="ssr-rel-age" style="opacity:.8"></span>
-<span style="opacity:.8">build <a href="https://github.com/pension-plan/score-scan-reader/commit/20100ec" style="color:inherit">20100ec</a> <span class="ssr-build-age"></span></span>
+<span><a class="ssr-rel-link" href="https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.14.0" style="color:inherit"><b class="ssr-rel-ver">v0.14.0</b></a><span class="ssr-ahead-short"></span></span>
+<span class="ssr-rel-ago" style="opacity:.8"></span>
+<span style="opacity:.8">build <a href="https://github.com/pension-plan/score-scan-reader/commit/e0c6c6b" style="color:inherit">e0c6c6b</a></span>
 <span class="ssr-newer"></span>
 </div>
 <main><nav class="crumbs"><a href="../">Score Scan Reader</a> / docs / TIMELINE.md · <a href="https://github.com/pension-plan/score-scan-reader/blob/main/docs/TIMELINE.md">source</a></nav>
 <h1>Build timeline</h1>
-<p>All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 17:00 AEDT.</p>
+<p>All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 20:58 AEDT.</p>
 <h2>Events</h2>
 <table>
 <thead>
@@ -221,6 +221,206 @@ nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bo
 <td>17:00</td>
 <td>Round 2 voices owner finished: lyric lines assigned to the right voice for the whole piece, melisma extenders written, printed part names read and applied (they also steer splitting), stanza text kept as MusicXML lyrics credits. Live tree: aggregate 0.918, real scans 0.900; challenge set 0.878 → 0.903. L3e, L4a, L4b resolved.</td>
 </tr>
+<tr>
+<td>17:04</td>
+<td>Release 0.3.0 published at 17:02 AEDT (round 2 so far), shipped first and then regression-tested against 0.2.0. Benchmark with OCR 0.897 → 0.918, real scans 0.870 → 0.900, no item worse. Challenge set 0.689 → 0.784 (93 items better), but 4 items dropped by more than 0.05: tracked as L19 for round 3.</td>
+</tr>
+<tr>
+<td>17:04</td>
+<td>Policy from now on: ship first, then test for regressions. CI runs tools/regress.mjs against the last release on every push; /app/ now shows a changelog panel and which engine it runs.</td>
+</tr>
+<tr>
+<td>17:06</td>
+<td>Round 2 noteheads owner finished: challenge set 0.745 → 0.784 from the front end alone (pitch 0.785 → 0.841), challenge files with no staves 19 → 4, benchmark 0.905 → 0.918. Only the symbols owner and the integrator remain in round 2.</td>
+</tr>
+<tr>
+<td>17:12</td>
+<td>Round 2 symbols owner finished: tuplets read and represented exactly (L3c resolved), key signatures right on every real scan but one (L2 resolved), mid-piece clef and key changes detected, slurs no longer mistaken for beams. Live tree 0.919, real scans 0.902. All five owners done; the round 2 integrator is running.</td>
+</tr>
+<tr>
+<td>17:14</td>
+<td>Release 0.4.0 (17:13 AEDT) regression-tested against 0.3.0: no regression on the benchmark (0.918 → 0.919, real scans 0.900 → 0.902) or the challenge set (0.784, no item worse).</td>
+</tr>
+<tr>
+<td>17:33</td>
+<td>User reported rests are not transcribed. Confirmed: 70 of 256 benchmark rests produced, the rest left as invisible gaps. A dedicated rests hotfix agent started (new src/rests.js: all rest values, multi-bar rests, rests on piano staves, visible rests instead of gaps).</td>
+</tr>
+<tr>
+<td>17:36</td>
+<td>Round 2 integrated (0.925 overall, real scans 0.907) and shipped as v0.5.0 at 17:36 AEDT together with Maple Leaf Rag as the default sample. Regression test against 0.4.0 running.</td>
+</tr>
+<tr>
+<td>17:36</td>
+<td>User asked for synthetic tests covering every symbol and layout plus performance: coverage suite workflow started (8 generators by symbol family and layout, per-symbol support matrix, speed and memory by dpi and page count).</td>
+</tr>
+<tr>
+<td>17:36</td>
+<td>Round 3 started: 6 owners including the copista-2m ML integration, working on 24 tracked limits including the L19 regressions and beamed 16ths.</td>
+</tr>
+<tr>
+<td>17:38</td>
+<td>Release 0.5.0 regression-tested against 0.4.0: no regression. Benchmark 0.919 → 0.925 (pitch +0.013, real scans +0.005); challenge 0.784 → 0.789, 16 items better, none worse, schema-valid 99.5% → 100%.</td>
+</tr>
+<tr>
+<td>17:44</td>
+<td>Coverage suite, notes family: 10 items (every note value, dots, chords of 2–6 notes, beams, flags, ledger lines up to 5, grace and cue notes, tremolos), each counted symbol checked against LilyPond&#39;s own layout dump.</td>
+</tr>
+<tr>
+<td>17:45</td>
+<td>Coverage suite: pitch family (12 items: every clef incl. octave clefs, all 15 key signatures, key changes, every accidental incl. double, 8va/8vb/15ma) and time family (10 items: every time signature, changes, pickups, tuplets 2–7 and nested, ties across systems) done; 3 of 8 families finished.</td>
+</tr>
+<tr>
+<td>17:45</td>
+<td>Coverage suite: rests family done (9 items, every rest value, dotted, whole-bar and multi-bar rests, raised and lowered rests on two-voice staves); handed to the rests hotfix agent as extra test data. 4 of 8 families finished.</td>
+</tr>
+<tr>
+<td>17:47</td>
+<td>Coverage suite: marks family done (9 items: articulations, fermatas, ornaments, arpeggios, breath marks, every dynamic and hairpin, pedal marks, fingering, tempo, rehearsal marks, chord symbols). 5 of 8 families finished.</td>
+</tr>
+<tr>
+<td>17:59</td>
+<td>Rests hotfix shipped as v0.5.1 (17:50 AEDT): rests now detected in every voice including piano; benchmark rests F1 0.445 → 0.581.</td>
+</tr>
+<tr>
+<td>17:59</td>
+<td>Incident 17:50–17:58 AEDT: the live app showed ‘Assembly failed’ (0 parts) because a round 3 work-in-progress change used Node-only debug flags, and CI/Pages builds failed because the app’s new ML model files were git-ignored. Fixed forward: a guard in the bundle, model files committed, push script hardened against files changing mid-push. Live app verified converting Maple Leaf Rag again.</td>
+</tr>
+<tr>
+<td>17:59</td>
+<td>Shared machine was at 99% CPU; the evaluation tool now caps parallel jobs at 16 (was 190) and waits while the host is over 90% busy. All agents told to keep heavy work low.</td>
+</tr>
+<tr>
+<td>17:59</td>
+<td>Round 3 UI owner finished: 41 of 41 UI checks (v0.5.0 page: 35); St. Anselm added as a second sample beside Maple Leaf Rag; English + German lyric OCR shipped; each page notes whether it was rotated, smoothed or split as a 2-up spread; spread pages now colour 98.6% of noteheads by part (was 33%); benchmark 0.934 on the live tree.</td>
+</tr>
+<tr>
+<td>18:02</td>
+<td>Release 0.6.0 (18:01 AEDT): rests precision fix (key-signature sharps/naturals were read as quarter rests) plus round 3 UI work. CI and Pages green. Score owner removed all Node-only debug flags; keyboard two-voice split is now the default.</td>
+</tr>
+<tr>
+<td>18:05</td>
+<td>Coverage suite: all 8 families generated (structure 8 items, layouts 20, perf 21 incl. 100–600 dpi, A4/Letter/A3 and 1–40 pages) and the harness built (--set coverage, per-symbol support matrix, per-page time and peak memory). First pass on 76 items: 20 symbol tags supported, 40 partial, 90 unsupported; 16 of 19 layouts supported. Validation and the full baseline are running.</td>
+</tr>
+<tr>
+<td>18:08</td>
+<td>Round 3 voices owner finished: two voices inside piano parts (L17 resolved), small instrument staves above a piano kept as separate parts (L18 partial), key changes carried across systems, single-staff pieces no longer wrongly split. Live tree: benchmark 0.946 (pitch 0.940, duration 0.910, rests 0.800, real scans 0.922); challenge 0.898.</td>
+</tr>
+<tr>
+<td>18:14</td>
+<td>Release 0.7.0 (18:09 AEDT) and regression test: benchmark no regression (0.925 → 0.946, rests 0.436 → 0.800, real scans 0.907 → 0.922); challenge 0.788 → 0.802 with 18 items better and 3 severe scans worse, added to L19.</td>
+</tr>
+<tr>
+<td>18:15</td>
+<td>Round 3 noteheads owner finished: benchmark 0.935 → 0.946, challenge 0.891 → 0.899; Maple Leaf Rag 0.897 → 0.955; thin-photocopy pages that found no staves now read. A duplicate copy of this agent (started by mistake when I messaged it) wrote a regressing change in a scratch folder; it never reached the live code.</td>
+</tr>
+<tr>
+<td>18:16</td>
+<td>Round 3 ML owner finished: copista-2m integrated as a correction pass over the app’s own reading; benchmark 0.942 → 0.957, real scans 0.922 → 0.943, challenge 0.802 → 0.814, Maple Leaf Rag 0.907 → 0.928. Shipped as an option; turning it on by default needs a small UI change, left to the round 3 integrator.</td>
+</tr>
+<tr>
+<td>18:16</td>
+<td>An extra noteheads candidate (snap3) measured: challenge 0.892 → 0.903, fixes several severe yellowed and photocopy scans but regresses a phone-photographed piano scan by 0.26. Not shipped; handed to the round integrator / round 4 (scratchpad/round4-notes.md).</td>
+</tr>
+<tr>
+<td>18:20</td>
+<td>User asked to investigate OpenCV as a fallback for identifying symbols: OpenCV.js trial started (template matching, contour features + kNN/SVM, HOG + SVM), as a fallback only, measured on and off, prototype behind an option if it wins.</td>
+</tr>
+<tr>
+<td>18:24</td>
+<td>Coverage suite complete (18:22 AEDT): 102 items validated, all 139 symbol tags and 19 layouts covered. App baseline: 22 tags supported, 38 partial, 79 unsupported; 18 of 19 layouts supported. Speed ~2.3–3.7 s per page, flat with page count; memory grows ~46 MB per page. Seven new limits (L20–L26) queued for round 4. Report: docs/COVERAGE.md (also on Pages).</td>
+</tr>
+<tr>
+<td>19:28</td>
+<td>Round 3 integrated and shipped: benchmark 0.948, real scans 0.926, challenge 0.910, rests 0.802, all outputs valid, browser check passed; nothing reverted. Limits L10, L12, L13 and L17 resolved this round.</td>
+</tr>
+<tr>
+<td>19:34</td>
+<td>Round 3 pushed (7ae1200) after fixing a false-positive credential refusal (vendored OpenCV build now gitignored). Release 0.9.0 merged; regression check vs v0.8.0 running.</td>
+</tr>
+<tr>
+<td>19:34</td>
+<td>Maple Leaf Rag (default sample) measured: aggregate 0.959, pitch 0.912, duration 0.929, rests 0.792, parts 1.000.</td>
+</tr>
+<tr>
+<td>19:34</td>
+<td>Overlay agent started (Opus xhigh): marks for every recognised symbol class, pitch/duration labels, and highlighting of unrecognised ink.</td>
+</tr>
+<tr>
+<td>19:36</td>
+<td>User asked to use OpenCV to pre-clean scans for the edge cases that break detection. Scope given to the opencv agent: a quality-gated pre-clean stage (mvp/src/cv.js) for halftone, noise, JPEG, phone, photocopy, stain, bleed and curl pages, targeting L11 and L19, measured per class on the challenge set.</td>
+</tr>
+<tr>
+<td>19:38</td>
+<td>v0.9.0 regression check vs v0.8.0: no regression (benchmark+OCR 0.946 to 0.948, real scans 0.921 to 0.926; challenge 0.808 to 0.809, 0 items down more than 0.05).</td>
+</tr>
+<tr>
+<td>19:38</td>
+<td>Pushed 184d5b5: All examples picker in /app/ (19 shareable benchmark scans, 8 real + 11 synthetic; restricted Bach excluded; assets 39.6 MB of 64).</td>
+</tr>
+<tr>
+<td>19:38</td>
+<td>User asked for hand-drawn repair marks on the page after detection; added to the overlay agent&#39;s scope (freehand/line marks in page coordinates, notes, undo, per-document persistence, JSON + PNG export for a later repair pass).</td>
+</tr>
+<tr>
+<td>19:44</td>
+<td>Overlay shipped (42663a6, release 0.10.0): marks for every recognised class, pitch/value labels, zoom control, &#39;Not recognised&#39; hatching (72 on the rag). Benchmark MusicXML byte-identical; no regression. CI and Pages green.</td>
+</tr>
+<tr>
+<td>19:44</td>
+<td>Overlay agent resumed for the repair-drawing mode.</td>
+</tr>
+<tr>
+<td>19:44</td>
+<td>User asked to pre-identify text (title, composer, instrument names, bar numbers) and dynamics (mf etc.). textsym agent started (Opus xhigh): text-region classification with OCR, dynamics/hairpin shapes, braces/slurs/grace if cheap, and MusicXML credits, part names and dynamics (L9, L22).</td>
+</tr>
+<tr>
+<td>19:46</td>
+<td>Overlay restyle per user: unrecognised ink as yellow highlighter; every identified item filled with a transparent tint of its own type colour (13 distinct type colours; note-head outline keeps the part colour). Verified light/dark. Shipping together with the overlay agent&#39;s repair mode (same files); repair marks moving off yellow.</td>
+</tr>
+<tr>
+<td>19:46</td>
+<td>OpenCV investigation done: don&#39;t ship OpenCV.js for symbols (10.4 MB, needs an eval-free patch, ~170 MB heap); classical rests/clefs/accidentals already match learned classifiers. Real gap: time-signature digits are never read (0/182). A plain-JS Bravura template matcher reads 99.8% of digits on scans (90.9% severe); first time signature right 333 to 341 of 365 challenge, 246 to 269 of 306 coverage; +0.25 s per item. The OpenCV agent was told to ship it default-on, then build the quality-gated pre-clean stage.</td>
+</tr>
+<tr>
+<td>19:47</td>
+<td>Sheet view now uses the full page width (plate 1888 px at 1920; side panels flow below as columns); verified at 1920/1280/400, no horizontal scroll. Ships with the overlay agent&#39;s repair-mode push; build is waiting on textsym&#39;s dynglyphs.js.</td>
+</tr>
+<tr>
+<td>19:48</td>
+<td>User flagged bar numbers 5/10/15 as unrecognised; textsym told to recognise them (digit templates or digit-only OCR), label &#39;Bar N&#39;, and cross-check measure counts per system (warning, and fix single missed/extra barlines). Braces also to be recognised and tried as evidence for grand staves (L6, L18).</td>
+</tr>
+<tr>
+<td>19:51</td>
+<td>Shipped b10c817 (release 0.11.0 merged): Mark for repair (pen/line/box/circle, notes, undo, per-document storage, JSON with the detections and bar numbers inside each mark; lime highlighter), plus the yellow-highlighter, per-type tints and full-width view. CI and Pages green; regression check: no regression (0 items down more than 0.05).</td>
+</tr>
+<tr>
+<td>20:18</td>
+<td>Shipped 6ed273c (release 0.12.0 merged): text classes (title, composer, instrument names, bar numbers, tempo, expression, headers), dynamics ppp to fff + sf/sfz/fz/fp, hairpins, slurs/ties/fermatas/braces/ledger lines on the overlay; MusicXML credits, identification, part abbreviations, dynamics, wedges, words. Maple Leaf Rag unrecognised 72 to 4 in the app. Notes unchanged; regressions clean (benchmark 0.948, challenge 0.809).</td>
+</tr>
+<tr>
+<td>20:18</td>
+<td>textsym continues: bar-number measure-count check, braces as grand-staff evidence (L6/L18), grace notes, slurs/ties in MusicXML (L20).</td>
+</tr>
+<tr>
+<td>20:31</td>
+<td>Shipped 045d08f (release 0.13.0 merged): OpenCV pre-clean, quality-gated (clean pages untouched, OpenCV never loaded). Challenge 0.809 to 0.821 (23 items up more than 0.05, none down); thick photocopy 0.681 to 0.816, blur 0.754 to 0.839, combo 0.804 to 0.855, halftone 0.813 to 0.855. Benchmark+OCR 0.948 to 0.950, real scans 0.926 to 0.930. Cost: 10.4 MB asset (3.4 MB gzipped), about 1.1 s on the first degraded page.</td>
+</tr>
+<tr>
+<td>20:31</td>
+<td>Time-signature digit reader was exported but not wired; the opencv agent was sent back to wire it in, on by default.</td>
+</tr>
+<tr>
+<td>20:53</td>
+<td>Shipped 9a124ee + 4aab1af: time-signature digits read by plain-JS templates (on by default; challenge 0.8212 to 0.8227, first time signature right 342 to 352/365); pre-clean ported to plain JS with identical scores, so OpenCV.js (10.4 MB) is no longer shipped (assets back to 39.8 MB). Verified in the app: Maple Leaf Rag shows Time signatures 2, Not recognised 3.</td>
+</tr>
+<tr>
+<td>20:56</td>
+<td>User asked: default to the &#39;not recognised&#39; view, larger and clearer highlights, and a way for users to say what an unrecognised item is. Overlay agent resumed: view presets (Unrecognised only by default), next/previous navigation, bigger highlights with a constant-width ring, click-to-label popover, user corrections applied to the MusicXML (accidentals, rests, dots, dynamics) as a pure post-pass, plus export of labelled crops as training data.</td>
+</tr>
+<tr>
+<td>20:58</td>
+<td>User asked to play the transcribed score with MIDI instruments. Playback agent started (Opus xhigh): MusicXML to timed events (ties, voices, repeats, tempo, dynamics), General MIDI program per part written into the MusicXML, self-hosted sampled GM subset (8 MB budget, lazy) with an oscillator fallback, transport + mixer, follow-along cursor on the preview and the scan, MIDI file export.</td>
+</tr>
 </tbody></table>
 <h2>Accuracy by round</h2>
 <p>Scores are against the benchmark of synthetic and real scans with exact answers (1.00 is perfect).</p>
@@ -277,6 +477,56 @@ nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bo
 <td>1.000</td>
 <td>0.900</td>
 </tr>
+<tr>
+<td>v0.3.0 released (benchmark, OCR)</td>
+<td>0.918</td>
+<td>0.891</td>
+<td>0.851</td>
+<td>0.911</td>
+<td>0.992</td>
+<td>1.000</td>
+<td>0.900</td>
+</tr>
+<tr>
+<td>v0.4.0 released (benchmark, OCR)</td>
+<td>0.919</td>
+<td>0.892</td>
+<td>0.854</td>
+<td>0.911</td>
+<td>0.992</td>
+<td>1.000</td>
+<td>0.902</td>
+</tr>
+<tr>
+<td>Round 2 integrated = v0.5.0</td>
+<td>0.925</td>
+<td>0.906</td>
+<td>0.863</td>
+<td>0.912</td>
+<td>0.993</td>
+<td>1.000</td>
+<td>0.907</td>
+</tr>
+<tr>
+<td>Round 3 (interim, voices owner + rests)</td>
+<td>0.946</td>
+<td>0.940</td>
+<td>0.910</td>
+<td>–</td>
+<td>–</td>
+<td>1.000</td>
+<td>0.922</td>
+</tr>
+<tr>
+<td>Round 3 integrated</td>
+<td>0.948</td>
+<td>0.943</td>
+<td>0.915</td>
+<td>0.916</td>
+<td>0.994</td>
+<td>1.000</td>
+<td>0.926</td>
+</tr>
 </tbody></table>
 <h2>Known limits</h2>
 <table>
@@ -293,169 +543,225 @@ nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bo
 <td>L1</td>
 <td>Hollow noteheads sometimes missed (main source of rhythm errors)</td>
 <td>Noteheads and staves</td>
-<td>Partial (round 1)</td>
-<td>Hollow heads: wider insides filled, broken outlines closed, outline eaten by staff removal restored. Missed half notes 81 → 28, false whole notes 156 → 3. On the faint 1867 Haupt scan heads found 54 → 105. Beamed 8ths/16ths are now the largest miss source (598) — round 2.</td>
+<td>Partial (round 3)</td>
+<td>Benchmark duration 0.863 (r2) to 0.915. Challenge rhythm-category duration 0.562 to 0.689; all challenge items 0.804 to 0.846. The heads accidental-strip fix gave bwv5-7 0.934 to 0.967. With the ML detector on (opt-in, not shipped in the UI), benchmark duration rises to 0.955.</td>
 </tr>
 <tr>
 <td>L2</td>
 <td>Key signatures unreliable on old engraving</td>
 <td>Symbols</td>
-<td>Resolved on synthetic, partial on real (round 1)</td>
-<td>Header read left to right (clef, key, time); accidentals checked against where each sharp or flat should sit for the clef. Correct on every synthetic item; America 1 sharp and St. Anselm 4 sharps correct. Some broken bass staves on St. Anselm still guess the clef.</td>
+<td>Partial (round 3)</td>
+<td>Symbols: challenge scans with the wrong overall key went from 34 to 23. Auld Lang Syne A-flat section 0 to -4, sharp1911 0 to -1. Pitch category, pitch metric: 0.709 to 0.768. Still open: severe scans read key 0, and signs filled into solid rectangles are missed.</td>
 </tr>
 <tr>
 <td>L3a</td>
 <td>Rests not detected</td>
 <td>Symbols</td>
-<td>Partial (round 1)</td>
-<td>Printed rests now detected (whole, half, quarter, eighth) and placed; rests F1 0.14 → 0.41. Over-full voice-measures 259 → 0.</td>
+<td>Partial (round 3)</td>
+<td>Rests F1 on the benchmark 0.436 (r2) to 0.802; on the challenge 0.647 to 0.757. Layout category is still 0.327, voices 0.515.</td>
 </tr>
 <tr>
 <td>L3b</td>
 <td>Ties and slurs not detected; a stray slur can create a false 16th</td>
 <td>Symbols</td>
-<td>In progress (round 1)</td>
-<td></td>
+<td>Open</td>
+<td>No tie or slur detection. The 264 tie starts in the outputs all come from notes split at barlines. The ties edge-case group improved only through other fixes (0.901 to 0.926).</td>
 </tr>
 <tr>
 <td>L3c</td>
 <td>Triplets and other tuplets not detected</td>
 <td>Symbols</td>
-<td>Queued for round 2</td>
-<td></td>
+<td>Resolved (round 3)</td>
+<td>Clara output has 32 time-modification elements (+20 triplet notes in r3). Tuplet edge-case group 0.873 to 0.909. rh01 +0.01 to +0.02, rh08 +0.03 to +0.04.</td>
 </tr>
 <tr>
 <td>L3d</td>
 <td>Mid-piece clef and key changes not detected</td>
 <td>Symbols</td>
-<td>Partial (round 1)</td>
-<td>Treble-8vb clef detected; broken clefs re-joined; two treble clefs in a piano system kept as read. Per-system clef changes are read but not yet applied by score.js (round 2).</td>
+<td>Resolved (round 3)</td>
+<td>pitch-keysig-odyssey scan 0.772 to 0.884; its output writes 8 key elements, matching the 8 in the truth. Clef changes carry across system breaks (rag bars 10-13 left hand in treble).</td>
 </tr>
 <tr>
 <td>L3e</td>
 <td>Part names not read from the labels at the start of each system</td>
 <td>Lyrics (OCR) + voices (apply)</td>
-<td>Resolved (round 2)</td>
-<td>Part-name labels read by OCR and parsed against a multilingual lexicon (Sopran, Canto, Pianoforte, Tenor II…); labels also steer the layout. SAB item 4 → 3 parts.</td>
+<td>Partial (round 3)</td>
+<td>Labels are read on most items (Maple &#39;Piano&#39;, S A T B on hymns; benchmark parts 0.994). Single-letter OCR noise is read as &#39;Alto&#39; on twinkle-phone severe and pitch-ledger-ottava. The integrator fix stops it splitting a piano, but the label reader still returns it. Trio labels are not read.</td>
 </tr>
 <tr>
 <td>L4a</td>
 <td>Lyric alignment drifts when the note count is off</td>
 <td>Voices + lyrics</td>
-<td>Resolved (round 2)</td>
-<td>Each lyric line is assigned to one voice for the whole piece from syllable-to-onset evidence; alignment allows left-aligned melisma syllables and never uses rests. bwv3-6 +0.135, Beach +0.271 lyrics.</td>
+<td>Resolved (round 3)</td>
+<td>Benchmark lyrics 0.916 (lenient 0.935); challenge lyrics 0.899 to 0.927. Alignment holds when the note count is off (e.g. Lindenbaum 477 truth notes against 442 produced, lyrics 0.794).</td>
 </tr>
 <tr>
 <td>L4b</td>
 <td>No melisma or extender handling</td>
 <td>Lyrics + voices</td>
-<td>Resolved (round 2)</td>
-<td>Words over several notes split into syllables (lyrics owner); melismas now carry <extend> start/stop bounded by the printed extender line; 189 extenders in the benchmark output, all schema-valid.</td>
+<td>Partial (round 3)</td>
+<td>Extenders are emitted (233 in 14 benchmark outputs) but over-emitted against the truth&#39;s 126.</td>
 </tr>
 <tr>
 <td>L5a</td>
 <td>At most 8 PDF pages processed</td>
 <td>UI</td>
-<td>Resolved (round 2)</td>
-<td>Up to 40 PDF pages, read one at a time with per-page progress and a Stop button; recognition runs in a Web Worker. 8-page PDF: main thread blocked 23.2 s → 2.2 s, wall time 44.5 s → 27.1 s, memory 310 MB → 50 MB; 40 of 40 pages in 138 s.</td>
+<td>Resolved (round 3)</td>
+<td>Page cap is 40 (r2 multipage test). The UI&#39;s r3 8-page run read all pages and Stop works.</td>
 </tr>
 <tr>
 <td>L5b</td>
 <td>Stanza text printed below the last system dropped for SATB</td>
 <td>Lyrics + voices</td>
-<td>Partial (round 2)</td>
-<td>Stanza text below the music is read and written as MusicXML lyrics credits, matching the truth files (lyr06 verses 4–6). Setting it under the notes is not attempted.</td>
+<td>Partial (round 3)</td>
+<td>Stanzas below the music are kept as credit text, and lyr06 matches the reference. The stanza edge-case group is 0.623 to 0.656. Stanzas are not set as verses even where they would fit.</td>
 </tr>
 <tr>
 <td>L6</td>
 <td>Piano wrongly split: grand staves become S/A/T/B, voice+piano gets 4 parts instead of 2 (breaks the never-split-piano rule)</td>
 <td>Voices (score.js)</td>
-<td>Resolved (round 1)</td>
-<td>All 20 benchmark items now get the right part count (was 13 of 20). Piano grand staves are recognised by barlines running through both staves and are never split; Bach bwv67, Clara Schumann, Lindenbaum, Dichterliebe, Beach and Aloha fixed.</td>
+<td>Partial (round 3)</td>
+<td>Challenge must_not_split items with the wrong part count: 8 in r2, 4 now, out of 169. andantino-yellowed and twinkle-yellowed are fixed by heads. The integrator fix took twinkle-piano2p-phone severe from 0.660 to 0.891 (1 Piano part). Still wrong: song-one-system-poem-block severe, satb-open-divisi severe, anthem-4-pages severe, trio severe.</td>
 </tr>
 <tr>
 <td>L7</td>
 <td>Lyrics attached to every part in closed score (3–4× too many syllables)</td>
 <td>Voices + lyrics</td>
-<td>Resolved (round 1)</td>
-<td>Lyrics between staves go to the upper voice only; lines under the lowest split staff go to both its voices; copying to every voice is opt-in. Lyrics 0.60 → 0.82.</td>
+<td>Partial (round 3)</td>
+<td>Lyrics go to the voice they are printed under, but the &#39;sung by both&#39; copy rule fires on 14 items where the truth gives the text to one voice: aloha-oe-chorus lyric 0.742 (lenient 0.929), bwv3-6 0.722.</td>
 </tr>
 <tr>
 <td>L8</td>
 <td>Lyric text or other glyphs read as noteheads on single-melody pages</td>
 <td>Noteheads and staves</td>
-<td>Resolved (round 1)</td>
-<td>A notehead outside the staff must sit on or next to ledger lines, which removes lyric letters, tuplet numbers and dynamics. Jeanie 0.48 → 0.88, Silent Night 0.56 → 0.96.</td>
+<td>Resolved (round 3)</td>
+<td>foster-jeanie-melody produces 93 notes against 95 in the truth (aggregate 0.961). Rest blobs are no longer merged into chords (heads change 3).</td>
 </tr>
 <tr>
 <td>L9</td>
 <td>Part names generic or wrong (open score shows Staff N; TTBB named SATB, with an octave error)</td>
 <td>Voices + lyrics</td>
-<td>Resolved (round 1)</td>
-<td>Part names from the clef pattern: SATB, TTBB (new treble-8vb clef), SSAA, SAB, solo above SATB, Voice. Reading printed name labels is still tracked under L3e.</td>
+<td>Partial (text round)</td>
+<td>Part-name edge-case group 0.660 to 0.801; ttbb-treble8-a2-unis scan 0.888 to 0.900. Flute/Tuba are named &#39;Voice 1/Alto&#39; or &#39;Piano&#39;. Trio names are not read. Text round (6ed273c): instrument text is read and <part-abbreviation> written (Piano/Pno.); work title, composer, lyricist, arranger and rights written as credits and identification.</td>
 </tr>
 <tr>
 <td>L10</td>
 <td>Pages rotated 90° produce nothing; 180° pages read badly (pitch 0.21)</td>
 <td>Noteheads and staves (page orientation)</td>
-<td>Queued for round 3</td>
-<td>Challenge baseline: rot90 0.15 (all 12 files empty), rot180 0.50.</td>
+<td>Resolved (round 3)</td>
+<td>No rot90 page is in the no-notes list (v0.3.0 had 9). Rotation and landscape edge-case group 0.921 to 0.935.</td>
 </tr>
 <tr>
 <td>L11</td>
 <td>Halftone screens and heavy noise blank the page</td>
 <td>Noteheads and staves (binarisation)</td>
-<td>Queued for round 3</td>
-<td>Challenge: halftone 0.37 (6 of 12 empty), noise 0.50; 35 of 365 files produce no notes.</td>
+<td>Partial (round 3)</td>
+<td>Challenge items with no notes: 4 in r2, 1 now (35 at v0.3.0). Only hymn-descant-cue-notes-amen-small severe remains. Severe photocopies recovered: agrace 0.117 to 0.650, wind-melody 0.167 to 0.784, andantino 0.367 to 0.766. Pre-clean (045d08f): halftone class 0.813 to 0.855 (descreen); hymn-descant-cue-notes-amen-small severe still 0.113 (staff lines broken into dashes).</td>
 </tr>
 <tr>
 <td>L12</td>
 <td>Two-page spreads read as one wide system (8–13 parts)</td>
 <td>Noteheads and staves (page split)</td>
-<td>Queued for round 3</td>
-<td>Challenge: 2-up spread 0.56.</td>
+<td>Resolved (round 3)</td>
+<td>No spread item is in the wrong-part-count list (v0.3.0 had twinkle-spread at 4 and 6 parts). Spread edge-case group 0.879 to 0.890. Spread overlay colouring is 98.7%.</td>
 </tr>
 <tr>
 <td>L13</td>
 <td>Tuplets cannot be represented: 8 divisions per quarter</td>
 <td>Symbols + voices + MusicXML</td>
-<td>Queued for round 3</td>
-<td>Challenge: 0.2% of 461 tuplet notes have the right duration. Needs divisions 24+ and tuplet markup.</td>
+<td>Resolved (round 3)</td>
+<td>divisions=840. Clara writes 32 time-modification elements. Tuplet edge-case group 0.909.</td>
 </tr>
 <tr>
 <td>L14</td>
 <td>Double dots, multi-bar rests and whole-bar rests</td>
 <td>Symbols + voices</td>
-<td>Queued for round 3</td>
-<td>Challenge: double-dotted 0%; rh04 26 bars instead of 40; whole-bar rests 17%.</td>
+<td>Partial (round 3)</td>
+<td>Whole-bar rests are written in 70 challenge outputs and H-bar multi-rests are detected (rests agent). No multiple-rest element is written. Double dots are not modelled. Edge-case group 0.820 to 0.857.</td>
 </tr>
 <tr>
 <td>L15</td>
 <td>Double sharps/flats and 8va/8vb brackets</td>
 <td>Symbols</td>
-<td>Queued for round 3</td>
-<td>Challenge: double accidentals 1 of 9 pitches; 9% under 8va.</td>
+<td>Open</td>
+<td>None of the 365 challenge outputs contains a double-sharp, a double-flat or an octave-shift. pitch-ledger-ottava scores 0.58 to 0.88.</td>
 </tr>
 <tr>
 <td>L16</td>
 <td>Key and time-signature changes mid-piece not written; C clefs (alto/tenor)</td>
 <td>Symbols + voices</td>
-<td>Queued for round 3</td>
-<td>Challenge: later keys 31%, time changes 35%, C clefs 29%. (Overlaps L3d.)</td>
+<td>Partial (round 3)</td>
+<td>Key changes are written (odyssey 8/8). C clefs are read (3 C clefs in every clef-carousel output; scan 0.899 to 0.920). Mid-piece time-signature changes are not written (rh03: 1 time element against 12 in the truth).</td>
 </tr>
 <tr>
 <td>L17</td>
 <td>Two voices inside one part (piano right hand, divisi) merged into chords</td>
 <td>Voices + MusicXML</td>
-<td>Queued for round 3</td>
-<td>Challenge: always merged in 9 pieces.</td>
+<td>Resolved (round 3)</td>
+<td>Score r3: Beach piano 0.881 to 0.955 (pitch 0.86 to 0.96), about 40 twinkle-piano variants +0.015 each. Benchmark beach-prayer 0.878 to 0.967. Multi-voice edge-case group 0.908 to 0.929.</td>
 </tr>
 <tr>
 <td>L18</td>
 <td>A bracketed instrument pair (violin + cello) read as a piano grand staff; organ pedal staff becomes a separate part</td>
 <td>Voices (layout)</td>
-<td>Queued for round 3</td>
-<td>Challenge: trio and clef-carousel read as Piano; organ comes out Piano + Voice.</td>
+<td>Partial (round 3)</td>
+<td>trio-minuet scan 0.480 to 0.819 (small staves become separate instruments). A bracketed pair with joined barlines is still read as a piano: pitch-ledger-ottava mild comes out as Piano, and trio severe as 1 part. Edge-case group 0.790 to 0.828.</td>
+</tr>
+<tr>
+<td>L19</td>
+<td>Regressions found after shipping: after 0.3.0, 4 challenge items (wind-melody thick photocopy severe, German SATB severe, lyr08 Scandinavian, hymn-descant mild); after 0.7.0, 3 severe challenge scans (German SATB −0.119, andantino phone −0.072, andantino skew −0.060)</td>
+<td>Round 3 owners (heads, lyrics, score)</td>
+<td>Partial (round 3)</td>
+<td>Against v0.3.0: wind-melody-photocopy-thick severe 0.251, now 0.369 (fixed); lyr08 scan 0.929, now 0.904 (within 0.05). Still more than 0.05 down: satb-closed-lyrics-both-staves-de severe 0.684 to 0.595, and hymn-descant-cue-notes-amen-small mild 0.705 to 0.633. Pre-clean (045d08f): severe photocopies andantino thick 0.616 to 0.854, wind-melody thick 0.351 to 0.711; German SATB severe (0.545) and phone shots unchanged (flattening phone pages hurt, so skipped; no dewarp yet).</td>
+</tr>
+<tr>
+<td>L20</td>
+<td>Ties never written (only 5 of 79), including ties across systems</td>
+<td>Symbols + voices</td>
+<td>Queued for round 4</td>
+<td>Coverage: tie 0%; tied pitches themselves read 95%.</td>
+</tr>
+<tr>
+<td>L21</td>
+<td>Only 2/4, 3/4 and 4/4 written: C, cut time, 2/2, 3/2, 6/8, 9/8, 12/8, 5/4, 5/8, 7/8 and time changes missing</td>
+<td>Symbols + voices</td>
+<td>Partial (template reader)</td>
+<td>Coverage: 110 occurrences never written; time-3-4 55%, time-4-4 71%. 9a124ee: template digit reader on by default; first time signature right 342 to 352 of 365 challenge items; Maple Leaf Rag 2/4 read on both staves (overlay 0 to 2). Mid-piece changes still not written.</td>
+</tr>
+<tr>
+<td>L22</td>
+<td>Beams, slurs, fermatas, dynamics, hairpins, articulations, repeats and endings never written to MusicXML</td>
+<td>Voices (MusicXML) + symbols</td>
+<td>Partial (text round)</td>
+<td>Coverage: beam 703, slur 100, fermata 130 occurrences, all 0%. Text round (6ed273c): dynamics (27 of 40 benchmark marks, precision 0.84), hairpins (coverage 84-86% clean/scan) and tempo/expression words now written. Beams, slurs, fermatas, articulations, repeats and endings still not written.</td>
+</tr>
+<tr>
+<td>L23</td>
+<td>Half and whole notes, dots, 32nd/64th notes partial</td>
+<td>Noteheads + symbols</td>
+<td>Queued for round 4</td>
+<td>Coverage: note-half 76%, note-whole 46%, dot 69% (adds false notes), note-32nd 11%.</td>
+</tr>
+<tr>
+<td>L24</td>
+<td>Key signatures of 4+ sharps or flats and courtesy accidentals weak</td>
+<td>Symbols</td>
+<td>Queued for round 4</td>
+<td>Coverage: key-s4 25%, key-s6/s7 0%, acc-courtesy 22%.</td>
+</tr>
+<tr>
+<td>L25</td>
+<td>Lyrics: non-ASCII and elisions 0%, extenders 58%, multi-verse 73%</td>
+<td>Lyrics</td>
+<td>Queued for round 4</td>
+<td>Coverage: 4-language item lyrics 0.16.</td>
+</tr>
+<tr>
+<td>L26</td>
+<td>Memory grows about 46 MB per page (40-page book peaks at 2.2 GB)</td>
+<td>UI + score</td>
+<td>Queued for round 4</td>
+<td>Coverage perf: peak MB = 297 + 5.2 × total megapixels (R² 0.97); time per page flat at ~2.3–3 s.</td>
 </tr>
 </tbody></table>
 <h2>Runs</h2>
@@ -493,15 +799,8 @@ nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bo
 <tr>
 <td>Run 5</td>
 <td>Challenge test set (edge cases + scan damage)</td>
-<td>running</td>
+<td>done</td>
 <td>7 of 7</td>
-<td></td>
-</tr>
-<tr>
-<td>Run 6</td>
-<td>Fix-forward round 2</td>
-<td>running</td>
-<td>3 of 5</td>
 <td></td>
 </tr>
 <tr>
@@ -512,10 +811,31 @@ nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bo
 <td>Stopped at 16:30 AEDT once all 7 research items returned, as planned; its 3 design-proposal agents had just started and were stopped with it. The full rebuild was replaced by fix-forward rounds on v1.</td>
 </tr>
 <tr>
+<td>Run 6</td>
+<td>Fix-forward round 2 (shipped 0.925 as v0.5.0)</td>
+<td>done</td>
+<td>6 of 6</td>
+<td></td>
+</tr>
+<tr>
+<td>Run 7</td>
+<td>Coverage suite (102 items, every symbol and layout)</td>
+<td>done</td>
+<td>10 of 10</td>
+<td></td>
+</tr>
+<tr>
+<td>Run 8</td>
+<td>Fix-forward round 3 (shipped 0.948)</td>
+<td>done</td>
+<td>7 of 7</td>
+<td></td>
+</tr>
+<tr>
 <td>Side</td>
 <td>Agents launched directly from the session</td>
 <td>running</td>
-<td>3 of 3</td>
+<td>3 of 7</td>
 <td></td>
 </tr>
 </tbody></table>
@@ -755,56 +1075,6 @@ nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bo
 <td>70</td>
 </tr>
 <tr>
-<td>Run 6</td>
-<td>Fix</td>
-<td>fix:r2:heads</td>
-<td>run</td>
-<td>16:21</td>
-<td></td>
-<td>39</td>
-<td>229</td>
-</tr>
-<tr>
-<td>Run 6</td>
-<td>Fix</td>
-<td>fix:r2:symbols</td>
-<td>run</td>
-<td>16:21</td>
-<td></td>
-<td>39</td>
-<td>177</td>
-</tr>
-<tr>
-<td>Run 6</td>
-<td>Fix</td>
-<td>fix:r2:score</td>
-<td>done</td>
-<td>16:21</td>
-<td>17:00</td>
-<td>39</td>
-<td>170</td>
-</tr>
-<tr>
-<td>Run 6</td>
-<td>Fix</td>
-<td>fix:r2:lyrics</td>
-<td>done</td>
-<td>16:21</td>
-<td>16:41</td>
-<td>20</td>
-<td>109</td>
-</tr>
-<tr>
-<td>Run 6</td>
-<td>Fix</td>
-<td>fix:r2:ui</td>
-<td>done</td>
-<td>16:21</td>
-<td>16:45</td>
-<td>24</td>
-<td>87</td>
-</tr>
-<tr>
 <td>Run 3</td>
 <td>Research</td>
 <td>web:omr</td>
@@ -905,6 +1175,256 @@ nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bo
 <td>1</td>
 </tr>
 <tr>
+<td>Run 6</td>
+<td>Fix</td>
+<td>fix:r2:heads</td>
+<td>done</td>
+<td>16:21</td>
+<td>17:05</td>
+<td>44</td>
+<td>243</td>
+</tr>
+<tr>
+<td>Run 6</td>
+<td>Fix</td>
+<td>fix:r2:symbols</td>
+<td>done</td>
+<td>16:21</td>
+<td>17:12</td>
+<td>51</td>
+<td>234</td>
+</tr>
+<tr>
+<td>Run 6</td>
+<td>Fix</td>
+<td>fix:r2:score</td>
+<td>done</td>
+<td>16:21</td>
+<td>17:00</td>
+<td>39</td>
+<td>170</td>
+</tr>
+<tr>
+<td>Run 6</td>
+<td>Fix</td>
+<td>fix:r2:lyrics</td>
+<td>done</td>
+<td>16:21</td>
+<td>16:41</td>
+<td>20</td>
+<td>109</td>
+</tr>
+<tr>
+<td>Run 6</td>
+<td>Fix</td>
+<td>fix:r2:ui</td>
+<td>done</td>
+<td>16:21</td>
+<td>16:45</td>
+<td>24</td>
+<td>87</td>
+</tr>
+<tr>
+<td>Run 6</td>
+<td>Integrate</td>
+<td>integrate:r2</td>
+<td>done</td>
+<td>17:12</td>
+<td>17:34</td>
+<td>22</td>
+<td>93</td>
+</tr>
+<tr>
+<td>Run 7</td>
+<td>Harness</td>
+<td>harness:coverage</td>
+<td>done</td>
+<td>17:34</td>
+<td>17:50</td>
+<td>16</td>
+<td>98</td>
+</tr>
+<tr>
+<td>Run 7</td>
+<td>Generate</td>
+<td>gen:notes</td>
+<td>done</td>
+<td>17:34</td>
+<td>17:44</td>
+<td>10</td>
+<td>76</td>
+</tr>
+<tr>
+<td>Run 7</td>
+<td>Generate</td>
+<td>gen:rests</td>
+<td>done</td>
+<td>17:34</td>
+<td>17:45</td>
+<td>11</td>
+<td>84</td>
+</tr>
+<tr>
+<td>Run 7</td>
+<td>Generate</td>
+<td>gen:pitch</td>
+<td>done</td>
+<td>17:34</td>
+<td>17:45</td>
+<td>11</td>
+<td>61</td>
+</tr>
+<tr>
+<td>Run 7</td>
+<td>Generate</td>
+<td>gen:time</td>
+<td>done</td>
+<td>17:34</td>
+<td>17:45</td>
+<td>11</td>
+<td>67</td>
+</tr>
+<tr>
+<td>Run 7</td>
+<td>Generate</td>
+<td>gen:marks</td>
+<td>done</td>
+<td>17:34</td>
+<td>17:46</td>
+<td>12</td>
+<td>78</td>
+</tr>
+<tr>
+<td>Run 7</td>
+<td>Generate</td>
+<td>gen:structure</td>
+<td>done</td>
+<td>17:34</td>
+<td>17:53</td>
+<td>19</td>
+<td>95</td>
+</tr>
+<tr>
+<td>Run 7</td>
+<td>Generate</td>
+<td>gen:layouts</td>
+<td>done</td>
+<td>17:34</td>
+<td>17:56</td>
+<td>22</td>
+<td>131</td>
+</tr>
+<tr>
+<td>Run 7</td>
+<td>Generate</td>
+<td>gen:perf</td>
+<td>done</td>
+<td>17:34</td>
+<td>18:05</td>
+<td>31</td>
+<td>92</td>
+</tr>
+<tr>
+<td>Run 7</td>
+<td>Baseline</td>
+<td>validate+baseline</td>
+<td>done</td>
+<td>18:05</td>
+<td>18:24</td>
+<td>19</td>
+<td>113</td>
+</tr>
+<tr>
+<td>Run 8</td>
+<td>Fix</td>
+<td>fix:r3:heads</td>
+<td>done</td>
+<td>17:36</td>
+<td>18:15</td>
+<td>39</td>
+<td>187</td>
+</tr>
+<tr>
+<td>Run 8</td>
+<td>Fix</td>
+<td>fix:r3:symbols</td>
+<td>done</td>
+<td>17:36</td>
+<td>19:08</td>
+<td>92</td>
+<td>273</td>
+</tr>
+<tr>
+<td>Run 8</td>
+<td>Fix</td>
+<td>fix:r3:score</td>
+<td>done</td>
+<td>17:36</td>
+<td>18:07</td>
+<td>31</td>
+<td>134</td>
+</tr>
+<tr>
+<td>Run 8</td>
+<td>Fix</td>
+<td>fix:r3:lyrics</td>
+<td>done</td>
+<td>17:36</td>
+<td>18:22</td>
+<td>46</td>
+<td>156</td>
+</tr>
+<tr>
+<td>Run 8</td>
+<td>Fix</td>
+<td>fix:r3:ui</td>
+<td>done</td>
+<td>17:36</td>
+<td>17:59</td>
+<td>23</td>
+<td>91</td>
+</tr>
+<tr>
+<td>Run 8</td>
+<td>Fix</td>
+<td>fix:r3:ml</td>
+<td>done</td>
+<td>17:36</td>
+<td>18:08</td>
+<td>32</td>
+<td>192</td>
+</tr>
+<tr>
+<td>Run 8</td>
+<td>Integrate</td>
+<td>integrate:r3</td>
+<td>done</td>
+<td>19:08</td>
+<td>19:25</td>
+<td>17</td>
+<td>107</td>
+</tr>
+<tr>
+<td>Side</td>
+<td>Fast track</td>
+<td>a5575cc38e20927a6</td>
+<td>run</td>
+<td>18:07</td>
+<td></td>
+<td>14</td>
+<td>27</td>
+</tr>
+<tr>
+<td>Side</td>
+<td>Fast track</td>
+<td>ae52f1cf560b35868</td>
+<td>run</td>
+<td>18:15</td>
+<td></td>
+<td>4</td>
+<td>29</td>
+</tr>
+<tr>
 <td>Side</td>
 <td>ML demo</td>
 <td>copista-2m demo page for GitHub Pages</td>
@@ -926,6 +1446,26 @@ nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bo
 </tr>
 <tr>
 <td>Side</td>
+<td>Research</td>
+<td>OpenCV.js symbol-fallback investigation</td>
+<td>run</td>
+<td>18:20</td>
+<td></td>
+<td>68</td>
+<td>107</td>
+</tr>
+<tr>
+<td>Side</td>
+<td>Hotfix</td>
+<td>Rests fix (L3a, user-reported)</td>
+<td>run</td>
+<td>17:33</td>
+<td></td>
+<td>35</td>
+<td>179</td>
+</tr>
+<tr>
+<td>Side</td>
 <td>Fast track</td>
 <td>Software design document</td>
 <td>done</td>
@@ -940,11 +1480,11 @@ nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bo
 <script>window.mermaid && mermaid.initialize({ startOnLoad: true, theme: matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default' });</script>
 
 <div id="ssr-release" style="font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));border-top:1px solid rgba(127,127,127,.35);opacity:.85;text-align:center;overflow-wrap:anywhere">
-<a class="ssr-rel-link" href="https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.3.0" style="color:inherit"><b class="ssr-rel-ver">v0.3.0</b></a><span class="ssr-ahead"></span> · <span class="ssr-rel-age"></span> · page built from <a href="https://github.com/pension-plan/score-scan-reader/commit/20100ec" style="color:inherit">20100ec</a> <span class="ssr-build-age"></span><span class="ssr-newer"></span>
+<a class="ssr-rel-link" href="https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.14.0" style="color:inherit"><b class="ssr-rel-ver">v0.14.0</b></a><span class="ssr-ahead"></span> · <span class="ssr-rel-age"></span> · page built from <a href="https://github.com/pension-plan/score-scan-reader/commit/e0c6c6b" style="color:inherit">e0c6c6b</a> <span class="ssr-build-age"></span><span class="ssr-newer"></span>
 </div>
 <script>
 (function () {
-  var B = {"version":"0.3.0","tag":"score-scan-reader-v0.3.0","releasedAt":"2026-11-08T06:02:26Z","releaseUrl":"https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.3.0","ahead":0,"commit":"20100ec","builtAt":"2026-11-08T06:04:45.238Z"};
+  var B = {"version":"0.14.0","tag":"score-scan-reader-v0.14.0","releasedAt":"2026-11-08T09:53:36Z","releaseUrl":"https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.14.0","ahead":1,"commit":"e0c6c6b","builtAt":"2026-11-08T10:11:45.267Z"};
   var rel = { ver: B.version, tag: B.tag, at: B.releasedAt, url: B.releaseUrl }, newer = null;
   function ago(iso) {
     var s = Math.max(0, (Date.now() - Date.parse(iso)) / 1000);
@@ -960,6 +1500,8 @@ nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bo
     all('ssr-rel-ver', function (e) { e.textContent = 'v' + rel.ver; });
     all('ssr-rel-link', function (e) { e.href = rel.url; });
     all('ssr-ahead', function (e) { e.textContent = B.ahead > 0 ? ' + ' + B.ahead + ' commit' + (B.ahead === 1 ? '' : 's') + ' (unreleased build)' : (B.ahead === 0 ? ' (exact release)' : ''); });
+    all('ssr-ahead-short', function (e) { e.textContent = B.ahead > 0 ? ' +' + B.ahead : ''; e.title = B.ahead > 0 ? B.ahead + ' unreleased commit' + (B.ahead === 1 ? '' : 's') : ''; });
+    all('ssr-rel-ago', function (e) { e.textContent = rel.at ? 'released ' + ago(rel.at) : 'not released yet'; });
     all('ssr-rel-age', function (e) { e.textContent = rel.at ? 'released ' + ago(rel.at) + ' (' + syd(rel.at) + ')' : 'not released yet'; });
     all('ssr-build-age', function (e) { e.textContent = ago(B.builtAt); });
     all('ssr-newer', function (e) { e.textContent = newer ? ' · newer release v' + newer + ' is out' : ''; });

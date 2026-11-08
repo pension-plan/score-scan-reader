@@ -1,0 +1,772 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spike: OpenCV.js as a fallback symbol identifier</title>
+<style>
+:root { --bg: #fbfbfa; --fg: #1b1e24; --muted: #5a6170; --rule: #dde1e7; --accent: #2456a6; --code: #f0f2f5; }
+@media (prefers-color-scheme: dark) { :root { --bg: #13161b; --fg: #e5e8ed; --muted: #a2aab7; --rule: #2b313b; --accent: #82a8ea; --code: #1c2028; color-scheme: dark; } }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.65 "Source Serif 4", Georgia, serif; padding: 32px max(16px, env(safe-area-inset-right, 0px)) 64px max(16px, env(safe-area-inset-left, 0px)); }
+main { max-width: 820px; margin: 0 auto; }
+h1, h2, h3, h4 { font-family: system-ui, sans-serif; line-height: 1.25; text-wrap: balance; }
+a { color: var(--accent); }
+code, pre { font-family: ui-monospace, Menlo, monospace; font-size: 0.86em; background: var(--code); border-radius: 4px; }
+code { padding: 1px 4px; } pre { padding: 12px 14px; overflow-x: auto; } pre code { padding: 0; background: none; }
+table { border-collapse: collapse; display: block; overflow-x: auto; font-size: 0.92em; }
+th, td { border: 1px solid var(--rule); padding: 6px 10px; text-align: left; vertical-align: top; }
+nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bottom: 24px; }
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+</head>
+<body>
+<div class="ssr-verbar" role="note" aria-label="Version" style="font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:6px max(16px,env(safe-area-inset-right,0px)) 6px max(16px,env(safe-area-inset-left,0px));border-bottom:1px solid rgba(127,127,127,.35);display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline;overflow-wrap:anywhere">
+<span><a class="ssr-rel-link" href="https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.14.0" style="color:inherit"><b class="ssr-rel-ver">v0.14.0</b></a><span class="ssr-ahead-short"></span></span>
+<span class="ssr-rel-ago" style="opacity:.8"></span>
+<span style="opacity:.8">build <a href="https://github.com/pension-plan/score-scan-reader/commit/e0c6c6b" style="color:inherit">e0c6c6b</a></span>
+<span class="ssr-newer"></span>
+</div>
+<main><nav class="crumbs"><a href="../">Score Scan Reader</a> / docs / spike-opencv.md · <a href="https://github.com/pension-plan/score-scan-reader/blob/main/docs/spike-opencv.md">source</a></nav>
+<h1>Spike: OpenCV.js as a fallback symbol identifier</h1>
+<p>Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (<code>mvp/src/*.js</code>) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in <code>spike/opencv/</code>. The compact results are in <code>spike/opencv/results/</code>, and every number can be regenerated (see &quot;Reproduce&quot;).</p>
+<h2>Update: pre-clean moved to plain JS; OpenCV.js removed from the app</h2>
+<p>The five pre-clean repairs (below) were ported to plain JS (separable Gaussian, running max / min,
+elliptical grey closing, area resize, bilinear resize, divide, all with OpenCV&#39;s border rules) and compared
+with the OpenCV build on the same pages (<code>spike/opencv/probe/js-vs-cv.js</code>, <code>results/preclean-js-vs-opencv-*.txt</code>):</p>
+<table>
+<thead>
+<tr>
+<th>page (plan)</th>
+<th align="right">OpenCV ms</th>
+<th align="right">JS ms</th>
+<th>pixels, mean / max abs difference</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>andantino photocopy-thick scan (thin)</td>
+<td align="right">19</td>
+<td align="right">219</td>
+<td>0 / 0</td>
+</tr>
+<tr>
+<td>agrace photocopy-thin severe (close)</td>
+<td align="right">10</td>
+<td align="right">85</td>
+<td>0 / 0</td>
+</tr>
+<tr>
+<td>andantino blur severe (sharpen)</td>
+<td align="right">194</td>
+<td align="right">313</td>
+<td>0.44 / 2</td>
+</tr>
+<tr>
+<td>andantino halftone scan (descreen)</td>
+<td align="right">56</td>
+<td align="right">153</td>
+<td>0.03 / 1</td>
+</tr>
+<tr>
+<td>andantino combo severe (flatten)</td>
+<td align="right">200</td>
+<td align="right">459</td>
+<td>0.05 / 5</td>
+</tr>
+<tr>
+<td>andantino yellowed severe (flatten)</td>
+<td align="right">133</td>
+<td align="right">381</td>
+<td>0.06 / 3</td>
+</tr>
+</tbody></table>
+<p>End to end the JS port scores the same: challenge 0.8227 (OpenCV) → <strong>0.8228</strong> (JS), 8 of 365 items moved by
+less than 0.015 either way; benchmark with OCR 0.9499 = 0.9499, real scans 0.9295 =. OpenCV is faster per repair
+(by 0.1–0.26 s on a degraded page), but needs a 10.4 MB self-hosted file and ≈1.1 s (browser worker) / 0.17 s (node)
+to load before the first repair, and a patched third-party build. It does not clearly beat plain JS on quality
+or speed for a few degraded pages, so <strong>the app now uses the JS port and no longer ships OpenCV.js</strong> (the
+<code>assets-src/opencv</code> folder, the dist asset and its build.js entry are removed; <code>spike/opencv/tools/patch-noeval.js</code>
+keeps the CSP patch for the record). Clean pages are still returned untouched (same object).</p>
+<h2>Update: plain-JS header reader (shipped, default on)</h2>
+<p><code>mvp/src/cv.js</code> <code>readHeaders(fr, asm)</code> now runs on every page, called from <code>omr.js</code> <code>analyse()</code> right after
+<code>assemblePage</code> (after the orientation clef count, so orientation still judges the plain reading). It is the
+section 4 template reader in plain JS (Bravura templates, normalised correlation), with the OpenCV symbol paths,
+the rest fallback and <code>wrapConverter</code> removed. Changes since the spike:</p>
+<ul>
+<li>matching stays inside the header: a few glyphs per staff, and the template only shifts ±0.35 staff space
+around the glyph&#39;s centre: <strong>≈15–100 ms per page</strong> (was 283 ms with a full search).</li>
+<li>the two numbers are cut at the middle line (they often touch once the line is removed), and the search for a
+missed time signature may start on the tail of the key signature (the first three ink groups are tried).</li>
+<li>when a missed time signature is found the header ends after it, so its digits are no longer taken for notes
+or accidentals, and the overlay&#39;s time-signature layer (<code>symbols.js</code> reads <code>hdr.time</code>) shows it. Maple Leaf Rag
+(benchmark page, 200 dpi): time signatures 1 → 2 (both 2/4 read), the false head on the treble digits dropped,
+no accidental boxed on the digits.</li>
+</ul>
+<p>A/B (same src, pre-clean on in both arms; <code>spike/opencv/results/header-*.txt</code>):</p>
+<table>
+<thead>
+<tr>
+<th>set</th>
+<th>aggregate</th>
+<th>first time signature right</th>
+<th>items changed</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>challenge (no OCR, 365)</td>
+<td>0.8212 → <strong>0.8227</strong> (pitch +0.0031, duration +0.0029)</td>
+<td>342 → <strong>352</strong></td>
+<td>63; one drop −0.023 (<code>andantino-piano-photocopy-thin</code> severe, meter became right)</td>
+</tr>
+<tr>
+<td>benchmark with OCR (20)</td>
+<td>0.9496 → <strong>0.9499</strong>, real scans 0.9295 =</td>
+<td>19 =</td>
+<td>2, both up (<code>joplin-maple-leaf-piano</code> +0.001, <code>schumann-dichterliebe2</code> +0.005)</td>
+</tr>
+</tbody></table>
+<h2>Update: pre-clean for degraded scans (shipped; first with OpenCV, now plain JS, see above)</h2>
+<p>Scope extension: OpenCV now runs as a <strong>pre-clean stage before binarisation</strong>, only on pages a cheap
+quality check calls degraded. This supersedes the &quot;do not add OpenCV.js&quot; verdict below for this use; the
+symbol-reader findings in sections 1–7 still hold.</p>
+<p><strong>How it works</strong> (<code>mvp/src/cv.js</code>, hook <code>mvp/src/front.js</code> <code>frontSteps</code>):</p>
+<ul>
+<li><code>pageQuality(gray)</code> in plain JS (30–70 ms per page) measures: share of mid-grey pixels (<code>mid</code>), mid-grey share of inked
+pixels (<code>midShare</code>), lightest-1 % level (<code>p1</code>), paper darkness and unevenness from 32 px cells (<code>bgLow</code>,
+<code>bgUneven</code>), paper texture (<code>bgStd</code>), isolated specks per Mpx (<code>speck</code>), staff-line thickness / staff space (<code>ltss</code>).</li>
+<li><code>precleanPlan(q)</code> picks repairs; an empty plan returns <strong>the same gray object</strong>, so clean pages are read exactly as
+before and OpenCV is never loaded for them (verified: the clean class and every unaffected item are unchanged).</li>
+<li>Otherwise OpenCV.js (patched 4.10.0, self-hosted <code>dist/assets/opencv-4.10.0-noeval.js</code>) is loaded <strong>synchronously</strong>
+(front() is synchronous): node reads the file; the recognition Web Worker uses a synchronous XHR + <code>blob:</code>
+<code>importScripts</code>, and the embedded wasm is compiled with <code>new WebAssembly.Module</code> through <code>instantiateWasm</code>
+(the patch makes the UMD wrapper read <code>globalThis.__opencvModuleArgs</code>). On a page&#39;s main thread (worker
+unavailable) the pre-clean is skipped. <code>OMR_PRECLEAN=off</code> disables it (node).</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>repair</th>
+<th>when (plan rule)</th>
+<th>OpenCV ops</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>thin</code></td>
+<td>binary page (<code>bgStd</code> &lt; 0.5, <code>mid</code> &lt; 0.03), <code>ltss</code> &gt; 0.16 (thick photocopy)</td>
+<td><code>dilate</code> 3×3 (paper grows) × n, n = round((lt − 0.11·ss)/2) clamped 1–3</td>
+</tr>
+<tr>
+<td><code>close</code></td>
+<td>binary page, 300 &lt; <code>speck</code> &lt; 2000 (thin photocopy broken into dots)</td>
+<td><code>erode</code> 2×2 (ink grows 1 px)</td>
+</tr>
+<tr>
+<td><code>descreen</code></td>
+<td><code>speck</code> &gt; 25000 and <code>bgStd</code> &gt; 4 (halftone screen)</td>
+<td><code>GaussianBlur</code> σ = ss/14</td>
+</tr>
+<tr>
+<td><code>flatten</code></td>
+<td><code>mid</code> &gt; 0.15 and (<code>bgUneven</code> &lt; 0.4, <code>bgLow</code> &gt; 0.12, <code>midShare</code> &gt; 0.8 — yellowed/stained) or <code>bgStd</code> &gt; 6.8 (combined damage)</td>
+<td>4× <code>resize</code>, <code>morphologyEx</code> CLOSE (ellipse 0.8·ss), <code>GaussianBlur</code>, <code>resize</code> back, gain capped at 2.5×, <code>divide</code></td>
+</tr>
+<tr>
+<td><code>sharpen</code></td>
+<td><code>midShare</code> &gt; 0.94 and <code>p1</code> &gt; 100 (heavy blur)</td>
+<td>unsharp mask: <code>GaussianBlur</code> σ = ss/5, <code>addWeighted</code> 3, −2</td>
+</tr>
+</tbody></table>
+<p><strong>Per class, challenge degradation set</strong> (aggregate, <code>eval.mjs --set challenge --no-ocr --jobs 8</code>, same src snapshot,
+<code>OMR_PRECLEAN=off</code> vs on; <code>spike/opencv/results/preclean-perclass.txt</code>):</p>
+<table>
+<thead>
+<tr>
+<th>class</th>
+<th>ops used</th>
+<th>all</th>
+<th>scan</th>
+<th>scan-mild</th>
+<th>scan-severe</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>photocopy-thick</td>
+<td>thin</td>
+<td>0.681 → <strong>0.816</strong></td>
+<td>0.756 → 0.868</td>
+<td>0.831 → 0.888</td>
+<td>0.456 → <strong>0.691</strong></td>
+</tr>
+<tr>
+<td>blur</td>
+<td>sharpen (severe only)</td>
+<td>0.754 → <strong>0.839</strong></td>
+<td>=</td>
+<td>=</td>
+<td>0.542 → <strong>0.796</strong></td>
+</tr>
+<tr>
+<td>combo</td>
+<td>flatten (severe)</td>
+<td>0.804 → <strong>0.855</strong></td>
+<td>=</td>
+<td>=</td>
+<td>0.669 → <strong>0.823</strong></td>
+</tr>
+<tr>
+<td>halftone</td>
+<td>descreen</td>
+<td>0.813 → <strong>0.855</strong></td>
+<td>0.842 → 0.873</td>
+<td>0.786 → 0.854</td>
+<td>0.811 → 0.839</td>
+</tr>
+<tr>
+<td>yellowed</td>
+<td>flatten (severe)</td>
+<td>0.859 → 0.868</td>
+<td>=</td>
+<td>=</td>
+<td>0.809 → 0.838</td>
+</tr>
+<tr>
+<td>photocopy-thin</td>
+<td>close (severe)</td>
+<td>0.806 → 0.815</td>
+<td>=</td>
+<td>=</td>
+<td>0.668 → 0.695</td>
+</tr>
+<tr>
+<td>clean, bleed, book, crop, highdpi, holes-staple, jpeg, lowdpi, noise, phone, rot90/180, scale, skew, spread, stain-pencil</td>
+<td>none</td>
+<td>unchanged</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>Whole challenge set: <strong>0.8091 → 0.8212</strong> (+0.0121; pitch +0.023, duration +0.023, rests +0.013); degradation
+0.8493 → 0.8651, pitch category +0.007, lyrics +0.0045, rhythm +0.0043, layout and voices unchanged; scan-severe
+0.7354 → 0.7623. Largest item drop −0.009 (<code>agrace-satb-photocopy-thick/scan-severe</code>), 46 items up.
+Benchmark <strong>with OCR</strong>: <strong>0.9480 → 0.9496</strong>, real scans 0.9256 → <strong>0.9295</strong>, synthetic 0.9519 → 0.9531, no item down
+(<code>golden1923-america</code> +0.012 flatten, <code>bach-bwv3-6</code> +0.011 flatten, <code>bach-bwv166-6</code> +0.010 thin).</p>
+<p>Named limits: the severe photocopies improve (<code>andantino</code> thick severe 0.616 → 0.854, <code>wind-melody</code> thick severe
+0.351 → 0.711, <code>agrace</code> thin severe 0.595 → 0.657; <code>agrace</code> thick severe stays at 0.25). <strong>Not helped</strong>: L11
+<code>hymn-descant-cue-notes-amen-small</code> severe (0.113; its staff lines are broken into dashes — a 1×ss horizontal
+closing was tried and did not help), L19 <code>satb-closed-lyrics-both-staves-de</code> severe (0.545) and phone shots
+(<code>andantino-piano-phone</code> severe 0.576): flattening phone shots measured worse (class 0.824 → 0.771 even with the
+gain cap), so phone pages are left alone; dewarping was not attempted.</p>
+<p>What was tried and rejected (<code>results/preclean-trials.txt</code>, 12 items per class): 3×3 / 5×5 <strong>median</strong> destroys 1–2 px
+staff lines (halftone 0.813 → 0.643, noise 0.869 → 0.473); <strong>despeckle</strong> (drop tiny components) erases the dotted staff
+lines of thin photocopies (0.806 → 0.690); a second thinning pass ruins mild thick photocopies (mild 0.888 → 0.254),
+hence the thickness-driven pass count; descreen on random noise is slightly worse (0.869 → 0.865); flatten without the
+gain cap turns a photographed page&#39;s dark surround into texture (phone severe 0.708 → 0.448).</p>
+<p><strong>Cost.</strong> Asset: <code>opencv-4.10.0-noeval.js</code> 10,376,412 B (≈3.4 MB gzip), plus licence and notice (dist/assets total
+49.9 MB of 64 MB). Node: quality check 30–70 ms per page; OpenCV load ≈170 ms once; repairs 40–240 ms per degraded page
+(<code>results/preclean-timing.txt</code>). Headless Chromium, CSP blob worker (<code>spike/opencv/probe/browser-preclean.js</code>): the
+first degraded page costs ≈1.1 s extra (sync fetch of 10 MB, wasm compile, then the repair); clean pages cost only the
+quality check; results match node exactly (same plans, staves and heads).</p>
+<h2>Recommendation (TL;DR)</h2>
+<ol>
+<li><strong>Do not add OpenCV.js as a dependency now.</strong> The one approach that wins is <strong>template matching against SMuFL glyphs</strong> (approach a), and a plain-JS implementation of the same matcher produces <strong>byte-identical output</strong> on 671 eval items (challenge + coverage: 0 items changed). It needs no 10.4 MB asset, no CSP patch, and no wasm load. OpenCV.js only makes the matching faster: 38 ms per page against 283 ms in JS. In the browser it costs about 0.85 s to load, so it breaks even after 3–4 pages.</li>
+<li><strong>Adopt template matching (approach a) for time-signature numbers and unread clefs.</strong> The classical header finds numbered time signatures but <strong>never reads their digits</strong> (0 of 182 read on the coverage patches). Bravura digit templates read <strong>99.8 %</strong> of digits on scans and <strong>90.9 %</strong> on severe scans. End to end, with the fallback on, the first time signature is right in <strong>+23 coverage items (246 → 269 of 306)</strong> and <strong>+8 challenge items (333 → 341 of 365)</strong>, with no item moving away from the truth. Aggregate scores change by +0.0003 (coverage), +0.0004 (challenge) and 0 (benchmark). The eval metric does not score time signatures directly; the gain shows up in duration, rests and the coverage time tags (<code>time-6-8</code> 0 → 3 of 31 on scans, <code>time-4-4</code> severe 33 → 41 of 79). Reading unread clefs fixed one piano spread outright (+0.147 aggregate).</li>
+<li><strong>Do not adopt approaches b (contour features + kNN) or c (HOG + linear SVM)</strong> as fallbacks. On isolated glyphs they are no better than the classical readers where those exist (rests, accidentals, clefs). They cannot recognise classes missing from their training items (32nd and 64th rests: 0 % recall under an item-level split). They would also ship training vectors. For digits, HOG-kNN beats templates on severe scans (95.9 % against 90.9 %), but it is trained on this corpus&#39;s engraving font.</li>
+<li><strong>Do not enable the rest fallback.</strong> Template matching as a second opinion on glyphs <code>rests.js</code> leaves unclassified raised rests F1 on the benchmark (+0.030) and challenge (+0.006) but lowered it on coverage (−0.010; false rests on piano scores with pedal marks and fingering). The code is in <code>cv.js</code> behind <code>opts.rests</code>, and the hook is in <code>spike/opencv/hooks/rests-hook.patch</code>, not applied.</li>
+<li>Prototype delivered: <strong><code>mvp/src/cv.js</code></strong>, default <strong>off</strong>, used like <code>ml.js</code> (<code>wrapConverter</code>). It has two interchangeable matchers: <code>createJsCv()</code> (recommended, no asset) and <code>createNodeCv()</code> / <code>createBrowserCv()</code> (OpenCV.js). <code>node mvp/tools/build.js</code> and <code>node mvp/tools/pw/test.js</code> both pass with it in the bundle. The eval harness switch is a ready patch: <code>spike/opencv/hooks/eval-cv.patch</code> adds <code>--cv js|opencv</code> to <code>mvp/tools/eval.mjs</code>. It applies cleanly and was tested on a temporary copy, but is not applied, because that file belongs to the harness owner.</li>
+</ol>
+<h2>1. Runtime feasibility</h2>
+<h3>1.1 Builds, sizes, licence</h3>
+<table>
+<thead>
+<tr>
+<th>package (npm, jsDelivr)</th>
+<th>published</th>
+<th align="right"><code>opencv.js</code></th>
+<th align="right">gzip</th>
+<th>wasm</th>
+<th>licence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>@techstark/opencv-js@4.10.0-release.1</code> (pinned)</td>
+<td>2024-08-25</td>
+<td align="right">10,378,215 B</td>
+<td align="right">3,389,608 B</td>
+<td>inlined as base64 (<code>SINGLE_FILE=1</code>)</td>
+<td>Apache-2.0</td>
+</tr>
+<tr>
+<td><code>@techstark/opencv-js@4.11.0-release.1</code></td>
+<td>2025-06-04</td>
+<td align="right">11,386,540 B</td>
+<td align="right">3,870,043 B</td>
+<td>inlined</td>
+<td>Apache-2.0</td>
+</tr>
+<tr>
+<td><code>@techstark/opencv-js@4.12.0-release.1</code></td>
+<td>2025-11-08</td>
+<td align="right">10,872,779 B</td>
+<td align="right">–</td>
+<td>inlined</td>
+<td>Apache-2.0</td>
+</tr>
+<tr>
+<td><code>@techstark/opencv-js@5.0.0-release.1</code></td>
+<td>2026-06-24</td>
+<td align="right">13,298,869 B</td>
+<td align="right">–</td>
+<td>inlined</td>
+<td>Apache-2.0</td>
+</tr>
+</tbody></table>
+<p>A single file, under the 15 MB asset limit. cdnjs has no OpenCV.js package. The official build at docs.opencv.org is the same emscripten/embind build.</p>
+<p>Modules compiled in (4.10.0 <code>getBuildInformation()</code>): <code>calib3d core dnn features2d flann imgproc js objdetect photo video</code>. <strong>Disabled: <code>ml</code></strong> (so no <code>cv.ml_KNearest</code>, no <code>cv.ml_SVM</code>), <code>imgcodecs</code>, <code>highgui</code>. Also missing from the JS bindings: <strong><code>cv.HuMoments</code></strong> (I computed it from <code>cv.moments</code> nu values) and <strong><code>HOGDescriptor.compute</code></strong> (only <code>detectMultiScale</code> / <code>setSVMDetector</code> are bound; I computed HOG from <code>cv.Sobel</code> + <code>cv.cartToPolar</code>, with JS binning). <code>matchTemplate</code>, <code>moments</code>, <code>findContours</code>, <code>convexHull</code>, <code>connectedComponentsWithStats</code>, <code>resize</code>, <code>threshold</code>, <code>morphologyEx</code> and <code>distanceTransform</code> are present.</p>
+<h3>1.2 The artifact CSP blocks every published build</h3>
+<p>Loaded from the pinned jsDelivr URL under the app&#39;s CSP (<code>script-src</code> has <code>&#39;wasm-unsafe-eval&#39;</code> and <code>blob:</code>, but no <code>&#39;unsafe-eval&#39;</code> and no <code>&#39;self&#39;</code>), <strong>all four builds fail to initialise</strong>: <em>&quot;Evaluating a string as JavaScript violates the following Content Security Policy directive … &#39;unsafe-eval&#39;&quot;</em>. Embind builds every binding invoker with <code>new Function(...)</code> (<code>craftInvokerFunction</code>, <code>createNamedFunction</code>, <code>makeDynCaller</code>, <code>__emval_get_method_caller</code>). 4.11+ removed <code>createNamedFunction</code>&#39;s eval but still crafts invokers with <code>newFunc(Function, …)</code>.</p>
+<p>Fix: <code>spike/opencv/tools/patch-noeval.js</code> rewrites those four generators as equivalent closures. This is the logic emscripten itself emits with <code>-s DYNAMIC_EXECUTION=0</code>. The patch makes exact-string replacements and fails loudly on any other build. The patched 4.10.0 file (10,376,402 B) cannot come from a CDN <code>&lt;script&gt;</code>. It must be <strong>self-hosted and run from a <code>blob:</code> URL</strong> (fetch from <code>&#39;self&#39;</code> via <code>connect-src</code>, then <code>&lt;script src=blob:&gt;</code> or <code>importScripts(blob:)</code> in the recognition worker). Inside a <code>blob:</code> worker, the asset base must be an absolute URL. On GitHub Pages (no CSP) the patched file loads directly.</p>
+<p>Speed is unchanged by the patch (100 calls each, node): <code>moments</code> 5.9 ms vs 5.8 ms stock, <code>findContours</code> 6.0 vs 5.3, <code>matchTemplate</code> + <code>minMaxLoc</code> 14.3 vs 12.2.</p>
+<h3>1.3 Load time and memory</h3>
+<table>
+<thead>
+<tr>
+<th>where</th>
+<th>load</th>
+<th>memory</th>
+<th>probe</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>node 24, stock package <code>require</code></td>
+<td>235–274 ms</td>
+<td>RSS +71–80 MB (+128 MB <code>external</code>)</td>
+<td><code>probe/load.js</code></td>
+</tr>
+<tr>
+<td>node 24, patched file</td>
+<td>140–182 ms</td>
+<td>RSS +79–84 MB</td>
+<td><code>probe/micro.js</code>, <code>probe/timing.js</code></td>
+</tr>
+<tr>
+<td>headless Chromium 1208, page, patched via <code>blob:</code> script</td>
+<td>852–865 ms</td>
+<td>JS heap 168.5 MB</td>
+<td><code>probe/browser.js</code></td>
+</tr>
+<tr>
+<td>headless Chromium, <code>blob:</code> Web Worker, <code>importScripts(blob:)</code></td>
+<td>853–854 ms</td>
+<td>(not observable in a worker)</td>
+<td><code>probe/browser.js</code></td>
+</tr>
+<tr>
+<td>headless Chromium, stock build from jsDelivr</td>
+<td><strong>fails</strong> (CSP eval)</td>
+<td></td>
+<td><code>probe/browser.js</code></td>
+</tr>
+</tbody></table>
+<p>One <code>matchTemplate</code> (TM_CCOEFF_NORMED) of a 40×40 template over a 2000×2800 page takes 211–224 ms in Chromium.</p>
+<h2>2. Ground truth for symbol-level measurement</h2>
+<p>The coverage corpus (<code>corpus/coverage</code>) is LilyPond-engraved, so exact glyph positions are available:</p>
+<ol>
+<li><code>spike/opencv/tools/svgtag.ly</code> is an include-settings file with a Scheme engraver. It sets <code>output-attributes</code> (a callback, read at output time) on every Rest, MultiMeasureRest, Accidental, Clef, TimeSignature, Script, DynamicText, Flag, Dots and NoteHead grob, so LilyPond&#39;s SVG backend wraps each one in <code>&lt;g class=…&gt;</code> with <code>data-*</code> detail (duration log, glyph name, fraction). <code>tools/svgboxes.py</code> turns the SVG paths into pixel boxes at 300 dpi. They align with <code>clean.pdf</code> (checked by ink inside and outside each box).</li>
+<li><code>tools/patches.js</code> runs the pipeline&#39;s own front end (<code>front()</code>, src snapshot) on <code>clean</code>, <code>scan</code> and <code>scan-severe</code>. Each truth box is carried onto the scan by its staff (staff index, fraction along the staff, offset from the middle line in staff spaces), which follows skew, scaling and mild warps. The patch is the union of the staff-removed page&#39;s (<code>fr.R</code>) components whose centres fall inside the box. This is exactly what a fallback sees at run time.</li>
+<li>70 items (rests, pitch, time, marks, notes and layouts families), 15,247 patches. Used after dropping flags, which are attached to stems and so are not glyph patches: 14,150 samples. Of these, 4,000 are other-component negatives, 3,500 noteheads and 529 other scripts. Rests: 1,195 (incl. 14 H-bars, 176 whole/bar rests). Accidentals: 467 (incl. 15 double flats and 18 double sharps). Clefs: 1,289 (incl. 119 C clefs). Time-signature digits: 1,548, plus 110 C / cut glyphs. Also 332 fermatas, 451 dynamics and 705 dots.</li>
+<li>Evaluation uses a 2-fold, <strong>item-level</strong> split, so items never straddle train and test. Training uses all three variants of the train items; testing is per variant.</li>
+</ol>
+<h2>3. Isolated-glyph results (patch level)</h2>
+<h3>3.1 The three approaches, family micro precision / recall (%), test folds</h3>
+<p><code>a-template</code>: best normalised correlation against Bravura 1.392 templates (SIL OFL 1.1) scaled by the measured staff space (×0.85/1/1.15) with small shifts, <code>neg</code> below a threshold tuned on the train fold. <code>b-shape-knn</code>: Hu moments, aspect, size and staff position, fill, solidity, holes, components and 4×4 zoning; standardised 3-NN in JS. <code>c-hog-svm</code> / <code>c-hog-knn</code>: HOG (32×32, 8 px cells, 9 bins, L2-Hys) plus size and position; one-vs-rest linear SVM (Pegasos) or 3-NN in JS. <code>ac</code>: HOG plus the template scores as features.</p>
+<p><strong>scan</strong> (typical 200–300 dpi scan)</p>
+<table>
+<thead>
+<tr>
+<th>approach</th>
+<th>rests</th>
+<th>accidentals</th>
+<th>clefs</th>
+<th>time digits + C</th>
+<th>fermata</th>
+<th>dynamics</th>
+<th>dots</th>
+<th>negatives</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>a-template</td>
+<td>33/83</td>
+<td>99/83</td>
+<td>100/96</td>
+<td>97/99</td>
+<td>100/99</td>
+<td>91/69</td>
+<td>0/0</td>
+<td>89/67</td>
+</tr>
+<tr>
+<td>b-shape-knn</td>
+<td>82/81</td>
+<td>94/88</td>
+<td>97/100</td>
+<td>97/99</td>
+<td>100/99</td>
+<td>93/96</td>
+<td>80/85</td>
+<td>94/92</td>
+</tr>
+<tr>
+<td>c-hog-svm</td>
+<td>95/73</td>
+<td>99/71</td>
+<td>100/98</td>
+<td>98/90</td>
+<td>99/96</td>
+<td>99/94</td>
+<td>80/84</td>
+<td>82/94</td>
+</tr>
+<tr>
+<td>c-hog-knn</td>
+<td>84/83</td>
+<td>93/88</td>
+<td>100/100</td>
+<td>97/99</td>
+<td>100/99</td>
+<td>98/95</td>
+<td>84/86</td>
+<td>94/94</td>
+</tr>
+<tr>
+<td>ac-hog+tpl-svm</td>
+<td>96/76</td>
+<td>98/70</td>
+<td>100/98</td>
+<td>100/90</td>
+<td>99/96</td>
+<td>99/95</td>
+<td>85/84</td>
+<td>83/97</td>
+</tr>
+</tbody></table>
+<p><strong>scan-severe</strong> (photocopies, phone photos, 100–150 dpi)</p>
+<table>
+<thead>
+<tr>
+<th>approach</th>
+<th>rests</th>
+<th>accidentals</th>
+<th>clefs</th>
+<th>time digits + C</th>
+<th>fermata</th>
+<th>dynamics</th>
+<th>dots</th>
+<th>negatives</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>a-template</td>
+<td>31/86</td>
+<td>94/72</td>
+<td>100/71</td>
+<td>91/87</td>
+<td>98/77</td>
+<td>76/53</td>
+<td>0/0</td>
+<td>83/74</td>
+</tr>
+<tr>
+<td>b-shape-knn</td>
+<td>66/77</td>
+<td>68/80</td>
+<td>94/95</td>
+<td>87/88</td>
+<td>94/95</td>
+<td>93/92</td>
+<td>63/71</td>
+<td>94/87</td>
+</tr>
+<tr>
+<td>c-hog-svm</td>
+<td>95/51</td>
+<td>86/64</td>
+<td>99/89</td>
+<td>98/66</td>
+<td>99/88</td>
+<td>98/81</td>
+<td>64/52</td>
+<td>75/96</td>
+</tr>
+<tr>
+<td>c-hog-knn</td>
+<td>81/81</td>
+<td>76/79</td>
+<td>97/95</td>
+<td>94/90</td>
+<td>100/95</td>
+<td>94/95</td>
+<td>68/71</td>
+<td>92/93</td>
+</tr>
+<tr>
+<td>ac-hog+tpl-svm</td>
+<td>96/54</td>
+<td>87/68</td>
+<td>99/89</td>
+<td>99/67</td>
+<td>98/89</td>
+<td>98/81</td>
+<td>72/54</td>
+<td>76/97</td>
+</tr>
+</tbody></table>
+<p>Cost per patch (features + prediction, node, OpenCV.js): template 10.3 ms (31 classes × 3 scales), shape-kNN 0.42 ms, HOG-SVM 0.41 ms, HOG-kNN 2.5 ms.</p>
+<p>Per-class findings (<code>results/patch-classifiers.json</code>):</p>
+<ul>
+<li><strong>Templates are font-independent and precise.</strong> The corpus is engraved in Emmentaler and the templates are Bravura, yet on scans: quarter to 64th rests 100 % precision (recall 91–100 %), sharps / flats / naturals 98–100 / 84–87, G / F / C clefs 100 / 92–100, digits 100 / 95–100, fermata 100 / 99. They fail where shape alone is ambiguous: whole and half rests are the same glyph (rest-whole precision 59 %, half recall 0), and the dot template loses to block-rest and notehead templates (dot recall 0). That is the low &quot;rests&quot; and &quot;dots&quot; precision in the tables.</li>
+<li><strong>Trained models cannot see unseen classes.</strong> All 32nd and 64th rests sit in one fold, so b and c score 0 % on them, while the templates score 100 %.</li>
+<li><strong>Double accidentals:</strong> HOG-kNN double flat 100/100 (n = 5), double sharp 100/71 (n = 7). The classical classifier never outputs them, but the counts are too small to act on.</li>
+</ul>
+<h3>3.2 Time-signature digits, given the time-signature box</h3>
+<table>
+<thead>
+<tr>
+<th>reader</th>
+<th>clean</th>
+<th>scan</th>
+<th>scan-severe</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>templates only (no training)</td>
+<td>100.0 % (532)</td>
+<td><strong>99.8 %</strong> (532)</td>
+<td>90.9 % (484)</td>
+</tr>
+<tr>
+<td>HOG-kNN (other fold)</td>
+<td>99.6 %</td>
+<td>99.4 %</td>
+<td><strong>95.9 %</strong></td>
+</tr>
+<tr>
+<td>combined (template unless kNN confident)</td>
+<td>100.0 %</td>
+<td>99.6 %</td>
+<td>93.4 %</td>
+</tr>
+</tbody></table>
+<h3>3.3 The classical readers on the same truth glyphs (<code>tools/classical.js</code>, <code>results/patch-classical.json</code>)</h3>
+<table>
+<thead>
+<tr>
+<th>family, P / R %</th>
+<th>clean</th>
+<th>scan</th>
+<th>scan-severe</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>rests (<code>detectRests</code> over each staff, after <code>assemblePage</code>)</td>
+<td>93/94</td>
+<td>96/90</td>
+<td>80/67</td>
+</tr>
+<tr>
+<td>accidentals (<code>classifyAccidental</code> on every 1–4-space glyph; precision is low because non-accidentals are tried too, which the pipeline does not do)</td>
+<td>27/90</td>
+<td>48/89</td>
+<td>39/79</td>
+</tr>
+<tr>
+<td>clefs (staff header / clef change)</td>
+<td>100/98</td>
+<td>100/98 (C clef 77 %)</td>
+<td>100/93 (C clef 68 %)</td>
+</tr>
+<tr>
+<td>numbered time signatures: found / numbers read</td>
+<td>169 / 0 of 308</td>
+<td>160 / 0 of 308</td>
+<td>142 / 0 of 284</td>
+</tr>
+</tbody></table>
+<p>So on isolated glyphs the classical rest, accidental and clef readers are already as good as b and c (coverage&#39;s accidental recall of about 50 % end to end comes from association and detection, not classification). The <strong>only family the pipeline cannot read at all is time-signature numbers</strong>. Unread C clefs and the severe-scan rest recall are the next gaps.</p>
+<h2>4. Prototype: <code>mvp/src/cv.js</code></h2>
+<ul>
+<li><strong>When it runs:</strong> after <code>createConverter().addPage</code> (the same pattern as <code>ml.wrapConverter</code>), only where the classical reading is missing:<ol>
+<li>A numbered time signature the header found (<code>hdr.time</code> with no <code>beats</code>) on the <strong>first system of a page</strong>: each row (lines 1–3 and 3–5) is read as one digit, or as two digits split at a gap, whichever matches better. Accepted only if every digit scores ≥ 0.45 and beats every rest, accidental and notehead template; beats 2–16, beat type 1–32.</li>
+<li>No time signature found: two stacked digits right after the clef / key (score ≥ 0.55). The signature is set and &quot;heads&quot; found on it are dropped.</li>
+<li><code>hdr.clefGuessed</code>: the tall glyph at the staff start is matched against G / F / C (≥ 0.45, margin 0.05); a C clef takes its line from its centre. A bass clef over a treble clef in a two-staff system is rejected, as in <code>assemblePage</code>.</li>
+<li><code>opts.rests</code> (off; needs the <code>rests.js</code> hook): quarter to 64th rest templates for glyphs <code>detectRests</code> left unclassified.</li>
+</ol>
+</li>
+<li><strong>Why only the first system:</strong> later systems carry meter changes, which <code>score.js</code> does not model (one meter per piece). An early version read every staff and made pieces starting in 3/4 come out in 6/8 (<code>time/t04-pickup-song</code>).</li>
+<li><strong>Matchers:</strong> <code>createJsCv()</code> (plain JS: area resize, threshold, TM_CCOEFF_NORMED by direct correlation with integral-image window sums). <code>createNodeCv()</code> (<code>OPENCV_JS=path</code>, else <code>mvp/assets-src/opencv/…</code> or <code>spike/opencv/vendor/…</code>). <code>createBrowserCv({ base })</code> (fetch the patched file, then <code>blob:</code>, then <code>importScripts</code> / <code>&lt;script&gt;</code>). Templates: 27 Bravura glyphs at 24 px per staff space, 1 bit per pixel, 12 KB inline. Scores agree to a mean of 0.0001 (max 0.012) and the argmax agrees on 565 of 566 sampled patches (<code>probe/parity.js</code>).</li>
+<li><strong>Browser check</strong> (<code>probe/browser-cv.js</code>, src bundled like <code>build.js</code>, blob worker, artifact CSP): both matchers read 6/8 on <code>time/t02-compound-irregular</code> scan, the same as node. Matching time: 51 ms (OpenCV) vs 272 ms (JS); total with the first-page load: 2.1 s vs 1.6 s.</li>
+<li><strong>Not done:</strong> no UI toggle (that is the UI owner&#39;s file). Today the option is reached by calling <code>wrapConverter</code> in node, the worker or tests. The patched OpenCV file is not copied into <code>dist/assets</code> (10.4 MB for an option that is off, and the recommended matcher does not need it).</li>
+</ul>
+<h2>5. End-to-end A/B (same src snapshot, fallback off vs on)</h2>
+<p>The snapshot of <code>mvp/src</code> (md5 of the concatenated files: <code>7385b7ac…</code>) was copied to <code>spike/opencv/src-ab</code>. The only addition is <code>cv.js</code> plus an env switch in the copy&#39;s <code>omr.js</code>. The eval is <code>mvp/tools/eval.mjs --no-ocr --jobs 16 --src …</code> (OCR off in both arms: the fallback does not touch lyrics). Full output: <code>results/ab-eval.txt</code>.</p>
+<table>
+<thead>
+<tr>
+<th>set (n)</th>
+<th>aggregate</th>
+<th>pitch</th>
+<th>duration</th>
+<th>rests</th>
+<th>first time signature right</th>
+<th>items changed</th>
+<th>runtime per item</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>benchmark (20)</td>
+<td>0.8042 → 0.8042</td>
+<td>=</td>
+<td>=</td>
+<td>=</td>
+<td>19 → 19</td>
+<td>0</td>
+<td>+235 ms</td>
+</tr>
+<tr>
+<td>challenge (365)</td>
+<td>0.8091 → <strong>0.8095</strong></td>
+<td>+0.0009</td>
+<td>+0.0007</td>
+<td>=</td>
+<td><strong>333 → 341</strong></td>
+<td>9</td>
+<td>+256 ms</td>
+</tr>
+<tr>
+<td>coverage (306)</td>
+<td>0.7766 → <strong>0.7769</strong></td>
+<td>+0.0003</td>
+<td>+0.0012</td>
+<td><strong>+0.0103</strong></td>
+<td><strong>246 → 269</strong></td>
+<td>23</td>
+<td>+467 ms</td>
+</tr>
+</tbody></table>
+<ul>
+<li>Every time-signature change moved to the truth: 6/8 ×14, 4/4 ×13, 3/2 ×2, 2/4 ×1, 3/8 ×1. A few items lose a little aggregate even though the meter became right (<code>rests/rst04</code> severe −0.042 at 3/8, <code>notes/nt04-beams</code> clean −0.023 at 2/4); rhythm repair in <code>score.js</code> fits the bars differently under the true meter.</li>
+<li>Largest gains: <code>challenge degradation/twinkle-piano2p-spread/scan-severe</code> +0.147 (clefs read on staves the header had guessed), <code>coverage notes/nt03-chords/clean</code> +0.048, <code>perf/perf-pages-05</code> +0.013 to +0.022.</li>
+<li>Coverage matrix (<code>tools/coverage.mjs</code> on both reports; <code>results/coverage-matrix-{off,on}.json</code>): <code>time-6-8</code> 0 → 2 / 3 / 1 of 31 (clean / scan / severe), <code>time-4-4</code> 43 → 45 clean and 33 → 41 severe, <code>time-3-2</code> 0 → 1, <code>time-2-4</code> 3 → 4 clean, <code>x-time-3-8</code> 0 → 1. Note values gain slightly from the right bar length (<code>note-8th</code> +41 to +45 hits per variant).</li>
+<li>The runtime increase in node is mostly loading OpenCV.js in each eval child process (about 0.18 s). Measured directly over 30 pages: the fallback&#39;s matching takes <strong>38 ms per page with OpenCV and 283 ms with the JS matcher</strong>, against a 1.2 s conversion. The JS matcher&#39;s end-to-end eval output is <strong>identical</strong> to the OpenCV one (challenge 0/365, coverage 0/306 items changed).</li>
+</ul>
+<p>Rest fallback (<code>src-ab2</code>, fallback on, rests hook off vs on):</p>
+<table>
+<thead>
+<tr>
+<th>set</th>
+<th>aggregate</th>
+<th>rests F1</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>benchmark</td>
+<td>0.8042 → 0.8044</td>
+<td>0.8015 → 0.8311</td>
+</tr>
+<tr>
+<td>challenge</td>
+<td>0.8095 → 0.8097</td>
+<td>0.7587 → 0.7645</td>
+</tr>
+<tr>
+<td>coverage</td>
+<td>0.7769 → 0.7764</td>
+<td>0.6249 → 0.6147</td>
+</tr>
+</tbody></table>
+<p>The rest fallback loses on coverage: piano pages (<code>perf-piano-*</code>, <code>marks/mk04</code> pedal and fingering) gain false rests. Not recommended without position and context checks.</p>
+<h2>6. What OpenCV.js would and would not buy</h2>
+<ul>
+<li><strong>Would:</strong> about 7× faster template matching (38 vs 283 ms per page here). That matters only for full-page or multi-scale detection, such as searching whole staves for missed rests or fermatas; per-glyph second opinions do not need it.</li>
+<li><strong>Would not:</strong> any accuracy. The OpenCV build ships no <code>ml</code> module and no HOG <code>compute</code>, and its contour and moment functions are a few lines of JS each. The recommendation in <code>docs/research-omr.md</code> §7.2 (plain typed-array JS) still holds. The new information is that the CDN builds do not run under the artifact CSP at all without the no-eval patch.</li>
+<li><strong>Costs:</strong> 10.4 MB self-hosted asset (3.4 MB gzip), about 0.85 s load and about 170 MB heap in the browser, a patched third-party file to maintain, and <code>Mat.delete()</code> memory management.</li>
+</ul>
+<h2>7. Next steps (owners)</h2>
+<ol>
+<li>Harness owner: apply <code>spike/opencv/hooks/eval-cv.patch</code> (<code>--cv js|opencv</code>), so <code>mvp/src/cv.js</code> can be measured without the spike copy.</li>
+<li>UI / session owner: an opt-in &quot;Read time signatures from templates&quot; setting calling <code>cv.wrapConverter(conv, cv.createJsCv())</code> in the recognition worker. With +0.3 s per page and no regressions in the first-time-signature check, it is a candidate to turn on by default after review.</li>
+<li>Score owner: meter changes (<code>time-change</code>, 110 occurrences) are now the limit. <code>cv.js</code> can read every staff&#39;s numbers once <code>score.js</code> models more than one meter per piece.</li>
+<li>Rests owner: if the rest fallback is wanted, it needs context rules (no fingering or pedal zones, voice position) before <code>spike/opencv/hooks/rests-hook.patch</code> is applied.</li>
+</ol>
+<h2>Files</h2>
+<ul>
+<li><code>mvp/src/cv.js</code>: the prototype (default off; not called by any existing code path).</li>
+<li><code>spike/opencv/tools/</code>: <code>patch-noeval.js</code> (CSP patch), <code>svgtag.ly</code> + <code>svgboxes.py</code> + <code>mkboxes.sh</code> (LilyPond truth boxes), <code>templates.js</code> (Bravura templates via Chromium), <code>patches.js</code> (glyph patches), <code>samples.js</code>, <code>features.js</code>, <code>classifiers.js</code>, <code>exp.js</code>, <code>digits-exp.js</code> (patch experiments), <code>classical.js</code> + <code>classical-report.js</code> (classical baseline), <code>ab.sh</code>, <code>ab-rests.sh</code>, <code>abcmp.js</code> (end-to-end A/B), <code>cvload.js</code>.</li>
+<li><code>spike/opencv/probe/</code>: <code>load.js</code>, <code>hog.js</code>, <code>micro.js</code>, <code>browser.js</code> (CSP / load probes), <code>browser-cv.js</code> (prototype in a CSP blob worker), <code>parity.js</code> (OpenCV vs JS matcher), <code>timing.js</code>, <code>one.js</code>, <code>smoke-mvp.js</code>, debug probes.</li>
+<li><code>spike/opencv/hooks/</code>: <code>eval-cv.patch</code>, <code>rests-hook.patch</code> (not applied).</li>
+<li><code>spike/opencv/results/</code>: <code>ab-eval.txt</code>, <code>patch-classifiers.json</code>, <code>patch-classical.json</code>, <code>coverage-matrix-off.json</code>, <code>coverage-matrix-on.json</code>.</li>
+<li><code>spike/opencv/fonts/LICENSE.txt</code>: Bravura&#39;s OFL 1.1 licence (the font files themselves are ignored).</li>
+</ul>
+<h2>Licences</h2>
+<ul>
+<li>OpenCV.js 4.10.0 (<code>@techstark/opencv-js</code> 4.10.0-release.1): <strong>Apache-2.0</strong>. The no-eval patch is a modification and must be stated in a NOTICE if the file is ever shipped.</li>
+<li>Bravura 1.392 (Steinberg Media Technologies): <strong>SIL OFL 1.1</strong>. <code>cv.js</code> embeds bitmaps rendered from 27 of its glyphs, credited in the file header.</li>
+<li>LilyPond 2.24 (GPL) is used offline only, to make truth boxes; nothing from it ships.</li>
+</ul>
+<h2>Reproduce</h2>
+<pre><code>cd spike/opencv
+npm install                                                    # @techstark/opencv-js 4.10.0-release.1
+node tools/patch-noeval.js node_modules/@techstark/opencv-js/dist/opencv.js vendor/opencv-4.10.0-noeval.js
+for f in redist/woff/Bravura.woff2 LICENSE.txt; do curl -sfL -o fonts/$(basename $f) https://cdn.jsdelivr.net/gh/steinbergmedia/bravura@bravura-1.392/$f; done
+node tools/templates.js 24                                     # data/templates.json
+tools/mkboxes.sh                                               # data/boxes (LilyPond SVG truth)
+ls data/boxes | sed &#39;s/.json$//&#39; | xargs -P 6 -I{} node tools/patches.js {}
+node tools/exp.js --feat &amp;&amp; node tools/digits-exp.js           # section 3
+ls data/patches/*.jsonl | xargs -n1 basename | sed &#39;s/.jsonl$//&#39; | xargs -P 5 -I{} node tools/classical.js {}; node tools/classical-report.js
+cp -r ../../mvp/src src-ab &amp;&amp; cp ../../mvp/src/cv.js src-ab/   # then the OMR_CV_FALLBACK switch in src-ab/omr.js convert()
+tools/ab.sh; node tools/abcmp.js data/eval/ab-coverage-cv0.json data/eval/ab-coverage-cv1.json
+</code></pre>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+<script>window.mermaid && mermaid.initialize({ startOnLoad: true, theme: matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default' });</script>
+
+<div id="ssr-release" style="font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));border-top:1px solid rgba(127,127,127,.35);opacity:.85;text-align:center;overflow-wrap:anywhere">
+<a class="ssr-rel-link" href="https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.14.0" style="color:inherit"><b class="ssr-rel-ver">v0.14.0</b></a><span class="ssr-ahead"></span> · <span class="ssr-rel-age"></span> · page built from <a href="https://github.com/pension-plan/score-scan-reader/commit/e0c6c6b" style="color:inherit">e0c6c6b</a> <span class="ssr-build-age"></span><span class="ssr-newer"></span>
+</div>
+<script>
+(function () {
+  var B = {"version":"0.14.0","tag":"score-scan-reader-v0.14.0","releasedAt":"2026-11-08T09:53:36Z","releaseUrl":"https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.14.0","ahead":1,"commit":"e0c6c6b","builtAt":"2026-11-08T10:11:45.267Z"};
+  var rel = { ver: B.version, tag: B.tag, at: B.releasedAt, url: B.releaseUrl }, newer = null;
+  function ago(iso) {
+    var s = Math.max(0, (Date.now() - Date.parse(iso)) / 1000);
+    if (s < 60) return 'just now';
+    var m = Math.floor(s / 60), h = Math.floor(m / 60), d = Math.floor(h / 24);
+    if (d >= 1) return d + ' d ' + (h % 24) + ' h ago';
+    if (h >= 1) return h + ' h ' + (m % 60) + ' min ago';
+    return m + ' min ago';
+  }
+  function syd(iso) { return new Date(iso).toLocaleString('en-AU', { timeZone: 'Australia/Sydney', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false, timeZoneName: 'short' }); }
+  function all(c, f) { var n = document.getElementsByClassName(c); for (var i = 0; i < n.length; i++) f(n[i]); }
+  function paint() {
+    all('ssr-rel-ver', function (e) { e.textContent = 'v' + rel.ver; });
+    all('ssr-rel-link', function (e) { e.href = rel.url; });
+    all('ssr-ahead', function (e) { e.textContent = B.ahead > 0 ? ' + ' + B.ahead + ' commit' + (B.ahead === 1 ? '' : 's') + ' (unreleased build)' : (B.ahead === 0 ? ' (exact release)' : ''); });
+    all('ssr-ahead-short', function (e) { e.textContent = B.ahead > 0 ? ' +' + B.ahead : ''; e.title = B.ahead > 0 ? B.ahead + ' unreleased commit' + (B.ahead === 1 ? '' : 's') : ''; });
+    all('ssr-rel-ago', function (e) { e.textContent = rel.at ? 'released ' + ago(rel.at) : 'not released yet'; });
+    all('ssr-rel-age', function (e) { e.textContent = rel.at ? 'released ' + ago(rel.at) + ' (' + syd(rel.at) + ')' : 'not released yet'; });
+    all('ssr-build-age', function (e) { e.textContent = ago(B.builtAt); });
+    all('ssr-newer', function (e) { e.textContent = newer ? ' · newer release v' + newer + ' is out' : ''; });
+  }
+  paint();
+  setInterval(paint, 60000);
+  try {
+    fetch('https://api.github.com/repos/pension-plan/score-scan-reader/releases/latest').then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+      if (!j || !j.tag_name) return;
+      if (j.tag_name === B.tag) { rel.at = j.published_at; } else { newer = j.tag_name.replace(/^.*-v/, ''); }
+      paint();
+    }).catch(function () {});
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>

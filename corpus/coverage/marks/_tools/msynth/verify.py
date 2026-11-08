@@ -187,7 +187,8 @@ def expected_grobs(score: Score):
             c['Script'] += len(ev.marks)
             c['DynamicText'] += len(ev.dynamics)
             c['Hairpin'] += sum(1 for w in ev.wedges if w in ('crescendo', 'diminuendo'))
-            c['SustainPedal'] += 1 if ev.pedal else 0
+            # bracket-style pedals print as one PianoPedalBracket line, not SustainPedal texts
+            c['SustainPedal'] += 1 if ev.pedal and getattr(score, 'pedal_style', 'text') == 'text' else 0
             c['Fingering'] += len(ev.fingering)
             c['TextScript'] += len(ev.words)
             c['MetronomeMark'] += 1 if ev.tempo else 0

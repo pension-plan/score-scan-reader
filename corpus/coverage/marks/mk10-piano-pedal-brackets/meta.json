@@ -1,0 +1,273 @@
+{
+  "id": "mk10-piano-pedal-brackets",
+  "family": "marks",
+  "title": "Nocturne in Brackets (pedal lines)",
+  "symbols": [
+    "acc-sharp",
+    "barline-final",
+    "chord",
+    "clef-bass",
+    "clef-treble",
+    "dyn-mf",
+    "dyn-p",
+    "dyn-pp",
+    "key-0",
+    "ledger-above",
+    "ledger-below",
+    "note-half",
+    "note-quarter",
+    "note-whole",
+    "pedal",
+    "rest-half",
+    "stem-down",
+    "stem-up",
+    "system-break",
+    "tempo-mark",
+    "time-4-4",
+    "x-pedal-release"
+  ],
+  "focus_symbols": [
+    "pedal",
+    "tempo-mark",
+    "dyn-p",
+    "dyn-mf",
+    "dyn-pp"
+  ],
+  "layout": "piano",
+  "expected": {
+    "parts": [
+      "Piano"
+    ],
+    "must_not_split": true,
+    "measures": 12,
+    "staves": 2,
+    "notes": "Piano grand staff (one part, two staves), A minor, 4/4, 12 bars on 3 systems. Sustain pedal drawn as bracket lines under the bass staff (no \"Ped.\" text): a line from the first press with a notch at every change (release and press on one note) and a hook at the final release. The line must not be read as notes, ties or hairpins. Every staff is exactly one part with one voice; double stops / piano chords must stay chords and the piano grand staff must stay one part, so no staff may be split into several parts"
+  },
+  "counts": {
+    "acc-sharp": 4,
+    "barline-final": 1,
+    "chord": 16,
+    "clef-bass": 1,
+    "clef-treble": 1,
+    "dyn-mf": 1,
+    "dyn-p": 2,
+    "dyn-pp": 1,
+    "key-0": 1,
+    "ledger-above": 3,
+    "ledger-below": 8,
+    "note-half": 36,
+    "note-quarter": 52,
+    "note-whole": 8,
+    "pedal": 16,
+    "rest-half": 1,
+    "stem-down": 33,
+    "stem-up": 34,
+    "system-break": 2,
+    "tempo-mark": 1,
+    "time-4-4": 1,
+    "x-pedal-release": 16
+  },
+  "degradations": {
+    "scan.pdf": {
+      "seed": 810901,
+      "render_dpi": 300,
+      "dpi": 300,
+      "color": "rgb",
+      "format": "jpeg",
+      "jpeg_quality": 72,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            244,
+            240,
+            230
+          ],
+          "texture": 2
+        },
+        {
+          "op": "rotate",
+          "deg": 0.6,
+          "bg": [
+            236,
+            236,
+            236
+          ]
+        },
+        {
+          "op": "gradient",
+          "strength": 0.05
+        },
+        {
+          "op": "blur",
+          "sigma": 0.5
+        },
+        {
+          "op": "noise",
+          "sigma": 3,
+          "chroma": 1.0
+        }
+      ],
+      "tags": [
+        "coloured_paper_rgb",
+        "paper_texture",
+        "rotation_+0.6deg",
+        "gradient",
+        "blur",
+        "noise",
+        "jpeg_q72"
+      ],
+      "description": "typical scan: 300 dpi rgb, +0.6 deg skew, blur 0.5, noise 3, JPEG q72",
+      "output_pages": 1,
+      "pixel_size": [
+        2519,
+        3534
+      ],
+      "image_mode": "RGB",
+      "bytes": 608537,
+      "image_only_check": {
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "pages": 1,
+        "text_chars": 0
+      },
+      "op_log": []
+    },
+    "scan-severe.pdf": {
+      "seed": 810902,
+      "render_dpi": 200,
+      "dpi": 200,
+      "color": "gray",
+      "format": "jpeg",
+      "jpeg_quality": 25,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            238,
+            236,
+            228
+          ],
+          "texture": 3
+        },
+        {
+          "op": "rotate",
+          "deg": -2.0,
+          "bg": 225
+        },
+        {
+          "op": "blur",
+          "sigma": 0.9
+        },
+        {
+          "op": "noise",
+          "sigma": 8
+        }
+      ],
+      "tags": [
+        "paper_texture",
+        "rotation_-2deg",
+        "blur",
+        "noise",
+        "jpeg_q25"
+      ],
+      "description": "2 deg skew, blur, heavy noise, JPEG q25 at 200 dpi",
+      "output_pages": 1,
+      "pixel_size": [
+        1736,
+        2397
+      ],
+      "image_mode": "L",
+      "bytes": 144275,
+      "image_only_check": {
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "pages": 1,
+        "text_chars": 0
+      },
+      "op_log": []
+    }
+  },
+  "clean": {
+    "dpi": 300,
+    "pages": 1,
+    "ops": [],
+    "format": "png",
+    "note": "undamaged raster render of the engraving",
+    "image_only": true,
+    "fonts": [],
+    "images": 1,
+    "text_chars": 0
+  },
+  "dpi": 300,
+  "pages": 1,
+  "license": "CC0",
+  "license_detail": "CC0-1.0: music composed for this corpus; engraving, truth and scans dedicated to the public domain",
+  "composer": "OMR coverage corpus (CC0)",
+  "notes": [
+    "Truth encoding: Encoding conventions (also listed in every meta.json 'notes'): * articulations: staccato, staccatissimo, accent, tenuto, strong-accent (marcato; type=\"up\" = ^ above, \"down\" = v below), detached-legato (portato), breath-mark \"comma\" on the note the breath mark follows * ornaments: trill-mark, mordent (LilyPond \\mordent, with the vertical stroke), inverted-mordent (\\prall, no stroke), turn, inverted-turn (\\reverseturn) * fermata type=\"upright\" (above) / \"inverted\" (below); placement of articulations / ornaments / fingerings = the side LilyPond engraved (read back from the grobs) * fingering in <technical>, on the note it belongs to; arpeggiate on every note of the chord * dynamics / wedges / pedal / words / tempo / rehearsal as <direction> placed before the note at whose onset they are engraved (wedge stop = the note where the hairpin ends; LilyPond ends a hairpin at the next dynamic or \\!). Pedal marks in LilyPond's default text style (\"Ped.\" / \"*\") are <pedal type=\"start|stop\" line=\"no\" sign=\"yes\"/>; a \"*Ped.\" change is stop + start. * tempo marks: <words font-weight=\"bold\"> + <metronome> (parentheses=\"yes\" when the text and the number are both printed) + <sound tempo> in quarter notes per minute; expression text: <words font-style=\"italic\">; rehearsal marks <rehearsal enclosure=\"square\"> * score-wide marks (tempo, rehearsal) are written once, in the part whose staff carries them in the engraving (the top staff) * chord symbols: <harmony> with root / kind / bass; kind@text = the printed suffix, or use-symbols=\"yes\" for LilyPond's symbol forms (major-seventh triangle, diminished circle, half-diminished slashed circle, augmented +) * <stem> as engraved (read back from LilyPond), accidentals as LilyPond's default style prints them, <beam> on every note of a beamed chord (levels as engraved, manual beaming)",
+    "placement=\"above|below\" of every articulation, ornament and fingering, fermata upright/inverted and marcato (strong-accent) type up/down are the sides LilyPond actually engraved (read back from the final grob directions), not a convention; MusicXML cannot express the exact offset or stacking order of several marks on one note, nor the horizontal position of a fingering inside a chord.",
+    "Hairpin extents: LilyPond ends a hairpin at the note carrying \\! or the next dynamic; the truth puts <wedge type=\"stop\"/> before that note, so a hairpin \"to the barline\" is encoded as ending on the next note.  Hairpins crossing a system break are one wedge in the truth."
+  ],
+  "counting_rules": [
+    "note-<type>, dot, double-dot, ledger-above/below, acc-*, tie, fingering: per notehead (<note>)",
+    "chord, stem-up/down, flag, arpeggio, articulations, ornaments, fermata, slur: per stem/chord event",
+    "beam: per beam group (<beam number=\"1\">begin</beam> on the first note of a chord)",
+    "rest-*: per rest (<rest measure=\"yes\"/> -> rest-whole-bar), rest-dotted: dotted rests",
+    "clef-*, key-*, time-*: per element in the truth (per part; clefs per staff); *-change: elements after the first of that kind in the part/staff",
+    "dyn-*, hairpin-*, pedal, text-expression, tempo-mark, metronome, rehearsal-mark: per <direction> child (per hairpin start; pedal releases \"*\" are counted separately as x-pedal-release); tempo-mark = bold <words> (the engraved tempo text), text-expression = other <words>",
+    "chord-symbol: per <harmony>; system-break / page-break: per <print new-system|new-page> of the first part (once per score)",
+    "ledger-above / ledger-below: noteheads that need at least one ledger line above / below the staff (from the clef in force)",
+    "tie-across-system: tie starting on the last note of a measure that ends a system"
+  ],
+  "files": {
+    "truth": "truth.musicxml",
+    "engraving": "engraving.ly",
+    "clean": "clean.pdf",
+    "scan": "scan.pdf",
+    "scan_severe": "scan-severe.pdf",
+    "attribution": "ATTRIBUTION.txt"
+  },
+  "validation": {
+    "truth_xsd_valid": true,
+    "music21_parses_and_matches": true,
+    "music21_marks_seen": {
+      "Dynamic:mf": 1,
+      "Dynamic:p": 2,
+      "Dynamic:pp": 1,
+      "TextExpression": 1,
+      "spanner:PedalMark": 1,
+      "spanner:StaffGroup": 1
+    },
+    "engraving_event_dump_matches_truth": true,
+    "engraving_events_compared": 134,
+    "printed_grob_census": {
+      "DynamicText": 4,
+      "MetronomeMark": 1,
+      "NoteHead": 96,
+      "Rest": 1,
+      "Accidental": 4
+    },
+    "printed_texts": {
+      "DynamicText": {
+        "p": 2,
+        "mf": 1,
+        "pp": 1
+      },
+      "MetronomeMark": {
+        "Lento": 1
+      }
+    },
+    "accidentals_match": true,
+    "stems_read_from_engraving": 70,
+    "mark_and_fingering_sides_read_from_engraving": 0,
+    "midi_attacks_match_truth": true,
+    "midi_attacks": 96,
+    "truth_counts_match_model": true,
+    "lilypond_warnings": [],
+    "method": "LilyPond 2.24 event/grob dump (_tools/msynth/dump.ly) compared with the model the truth is written from: every note/rest (onset, pitch, type, dots), tie, beam, slur, articulation/ornament/fermata (with forced direction), dynamic, hairpin start/stop, pedal event, fingering (incl. inside chords), text script, arpeggio, breath mark, tempo and rehearsal-mark event and chord-name pitch content; printed grob counts per kind; printed accidentals; stem directions read from the engraving; MIDI attacks; music21 re-parse; xmllint XSD; symbol counts recomputed from truth.musicxml == model."
+  },
+  "generator": "corpus/coverage/marks/_tools/run_all.py (msynth/items.py, build.py)"
+}

@@ -1,0 +1,19 @@
+Score Scan Reader: optional ML symbol detector
+==============================================
+
+copista2m-dense.int8w.onnx, copista2m-rel.int8w.onnx, copista2m-classes.json
+
+  These files are derived from the copista-2m model by KobiMusic (https://kobi.music),
+  https://huggingface.co/kobimusic/copista-2m (revision c37d89e1e52edc95c1a73bda0aea5f2f71a9c763),
+  licensed under the Apache License, Version 2.0 (LICENSE.copista-Apache-2.0.txt).
+  The detector's page pipeline (src/ml-worker.js) follows KobiMusic's copisteria reader,
+  https://github.com/kobimusic/copisteria (Apache-2.0).
+  Modified: exported from PyTorch to ONNX as two graphs (dense trunk, relational verifier),
+  weights re-encoded as per-channel int8 with DequantizeLinear (fp32 compute). See
+  NOTICE.copista-2m and NOTICE.copisteria, which are kept as section 4(d) of the licence asks.
+
+ort-wasm-simd-threaded.wasm
+
+  onnxruntime-web 1.30.0 by Microsoft, MIT licence (LICENSE.onnxruntime-web-MIT.txt), unmodified.
+
+Thanks to KobiMusic for releasing the copista weights under a permissive licence.

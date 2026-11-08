@@ -334,6 +334,65 @@ def mk09():
 MUST_NOT_SPLIT = ('Every staff is exactly one part with one voice; double stops / piano chords must stay chords '
                   'and the piano grand staff must stay one part, so no staff may be split into several parts')
 
+# ---------------------------------------------------------------------------------- mk10
+
+def mk10():
+    rh = r"""
+      \tempo{Lento} e''4\p d'' c'' b' |
+      <a' c'' e''>2 <gis' b' e''>2 |
+      a'4 b' c'' d'' |
+      e''2 <c'' e''>2 |
+      \break f''4\mf e'' d'' c'' |
+      <b' d'' f''>2 <c'' e'' a''>2 |
+      b'4 a' gis' a' |
+      <a' c'' e''>1 |
+      \break c''4\p e'' g'' e'' |
+      <f' a' d''>2 <e' gis' b' e''>2 |
+      c''4 b' a' gis' |
+      <a' c'' e'' a''>1\pp |
+    """
+    lh = r"""
+      a,4\sustainOn e a e |
+      <a, e>2\sustainOff\sustainOn <e, e>2\sustainOff\sustainOn |
+      f,4\sustainOff\sustainOn c f c |
+      c,4\sustainOff\sustainOn g, c g, |
+      d,4\sustainOff\sustainOn a, d a, |
+      <g, d>2\sustainOff\sustainOn <a, e>2\sustainOff\sustainOn |
+      e,4\sustainOff\sustainOn b, e b, |
+      a,1\sustainOff\sustainOn |
+      c4\sustainOff\sustainOn g c' g |
+      <d, a,>2\sustainOff\sustainOn <e, b,>2\sustainOff\sustainOn |
+      f,4\sustainOff\sustainOn c e,\sustainOff\sustainOn b, |
+      <a,, a,>2\sustainOff\sustainOn r2\sustainOff |
+    """
+    return build_score('Nocturne in Brackets (pedal lines)', COMPOSER,
+                       [{'id': 'P1', 'name': 'Piano', 'abbr': 'Pno.',
+                         'staves': [{'clef': 'treble', 'music': rh}, {'clef': 'bass', 'music': lh}]}],
+                       time=(4, 4), key=(0, 'minor'), pedal_style='bracket')
+
+
+# ---------------------------------------------------------------------------------- mk11
+
+def mk11():
+    vn = r"""
+      \mark \tempo{Allegro} g'4 b'8[ d''] g''4 d'' |
+      e''4 c'' a'2 |
+      \mark b'4 d''8[ g''] fis''4 e'' |
+      d''1 |
+      \break \mark e''4 g''8[ e''] c''4 a' |
+      b'4 g' d'2 |
+      \mark c''4 e''8[ c''] a'4 fis' |
+      g'1 |
+      \break \mark d''4 fis''8[ a''] d'''4 a'' |
+      b''4 g'' e''2 |
+      \mark fis''4 d''8[ a'] fis'4 a' |
+      g'1 |
+    """
+    return build_score('Signposts (circled rehearsal numbers)', COMPOSER,
+                       [{'id': 'P1', 'name': 'Violin', 'abbr': 'Vln.', 'staves': [{'clef': 'treble', 'music': vn}]}],
+                       time=(4, 4), key=(1, 'major'), mark_format='circle-numbers')
+
+
 ITEMS = [
     dict(id='mk01-articulations-violin', title='Bowing Study in Articulations', make=mk01, pages=1,
          layout='melody', must_not_split=True,
@@ -519,4 +578,33 @@ ITEMS = [
                  {'op': 'noise', 'sigma': 10, 'chroma': 2}], color='rgb', jpeg=20,
                  description='faded ink with dropouts photographed at an angle: perspective keystone, light '
                              'gradient, heavy noise, JPEG q20')}),
+    dict(id='mk10-piano-pedal-brackets', title='Nocturne in Brackets (pedal lines)', make=mk10, pages=1,
+         layout='piano', must_not_split=True,
+         focus=['pedal', 'tempo-mark', 'dyn-p', 'dyn-mf', 'dyn-pp'],
+         expected_notes='Piano grand staff (one part, two staves), A minor, 4/4, 12 bars on 3 systems. Sustain pedal '
+                        'drawn as bracket lines under the bass staff (no "Ped." text): a line from the first '
+                        'press with a notch at every change (release and press on one note) and a hook at the '
+                        'final release. The line must not be read as notes, ties or hairpins. ' + MUST_NOT_SPLIT,
+         variants={
+             'scan.pdf': typical(810901, 300, 0.6, 72, color='rgb', noise=3, paper=(244, 240, 230)),
+             'scan-severe.pdf': V(810902, 200, [
+                 {'op': 'paper', 'rgb': [238, 236, 228], 'texture': 3},
+                 {'op': 'rotate', 'deg': -2.0, 'bg': 225},
+                 {'op': 'blur', 'sigma': 0.9},
+                 {'op': 'noise', 'sigma': 8}], jpeg=25,
+                 description='2 deg skew, blur, heavy noise, JPEG q25 at 200 dpi')}),
+    dict(id='mk11-violin-circled-rehearsal-numbers', title='Signposts (circled rehearsal numbers)', make=mk11, pages=1,
+         layout='melody', must_not_split=True,
+         focus=['rehearsal-mark', 'tempo-mark'],
+         expected_notes='One violin staff, G major, 12 bars on 3 systems. Circled rehearsal numbers 1-6 at bars 1, 3, '
+                        '5, 7, 9, 11 (two per system, one at the system start and one mid-system). The circled '
+                        'numbers must not be read as notes, bar numbers or fingering. ' + MUST_NOT_SPLIT,
+         variants={
+             'scan.pdf': typical(811001, 300, -0.4, 70, color='rgb', noise=3, paper=(244, 240, 230)),
+             'scan-severe.pdf': V(811002, 200, [
+                 {'op': 'paper', 'rgb': [240, 238, 232], 'texture': 3},
+                 {'op': 'rotate', 'deg': 1.5, 'bg': 225},
+                 {'op': 'blur', 'sigma': 1.0},
+                 {'op': 'noise', 'sigma': 9}], jpeg=25,
+                 description='1.5 deg skew, blur, heavy noise, JPEG q25 at 200 dpi')}),
 ]

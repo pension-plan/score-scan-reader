@@ -1,0 +1,3670 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Coverage matrix: symbols, layouts, performance</title>
+<style>
+:root { --bg: #fbfbfa; --fg: #1b1e24; --muted: #5a6170; --rule: #dde1e7; --accent: #2456a6; --code: #f0f2f5; }
+@media (prefers-color-scheme: dark) { :root { --bg: #13161b; --fg: #e5e8ed; --muted: #a2aab7; --rule: #2b313b; --accent: #82a8ea; --code: #1c2028; color-scheme: dark; } }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.65 "Source Serif 4", Georgia, serif; padding: 32px max(16px, env(safe-area-inset-right, 0px)) 64px max(16px, env(safe-area-inset-left, 0px)); }
+main { max-width: 820px; margin: 0 auto; }
+h1, h2, h3, h4 { font-family: system-ui, sans-serif; line-height: 1.25; text-wrap: balance; }
+a { color: var(--accent); }
+code, pre { font-family: ui-monospace, Menlo, monospace; font-size: 0.86em; background: var(--code); border-radius: 4px; }
+code { padding: 1px 4px; } pre { padding: 12px 14px; overflow-x: auto; } pre code { padding: 0; background: none; }
+table { border-collapse: collapse; display: block; overflow-x: auto; font-size: 0.92em; }
+th, td { border: 1px solid var(--rule); padding: 6px 10px; text-align: left; vertical-align: top; }
+nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bottom: 24px; }
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+</head>
+<body>
+<div class="ssr-verbar" role="note" aria-label="Version" style="font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:6px max(16px,env(safe-area-inset-right,0px)) 6px max(16px,env(safe-area-inset-left,0px));border-bottom:1px solid rgba(127,127,127,.35);display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline;overflow-wrap:anywhere">
+<span><a class="ssr-rel-link" href="https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.14.0" style="color:inherit"><b class="ssr-rel-ver">v0.14.0</b></a><span class="ssr-ahead-short"></span></span>
+<span class="ssr-rel-ago" style="opacity:.8"></span>
+<span style="opacity:.8">build <a href="https://github.com/pension-plan/score-scan-reader/commit/e0c6c6b" style="color:inherit">e0c6c6b</a></span>
+<span class="ssr-newer"></span>
+</div>
+<main><nav class="crumbs"><a href="../">Score Scan Reader</a> / docs / COVERAGE.md · <a href="https://github.com/pension-plan/score-scan-reader/blob/main/docs/COVERAGE.md">source</a></nav>
+<h1>Coverage matrix: symbols, layouts, performance</h1>
+<p>Generated 2026-11-08 09:13 UTC by <code>tools/coverage.mjs</code> from <code>mvp/work/eval-coverage-text.json</code> (eval 2026-11-08 09:11, app source hash <code>984f2a856a04</code>, OCR on, raster 200 dpi).
+Corpus: <code>corpus/coverage</code> — 81 items, 243 scored PDFs (clean, scan, scan-severe). Every item is a short LilyPond engraving with exact MusicXML truth and a <code>meta.json</code> listing its symbols, layout and per-symbol counts.</p>
+<p><strong>Scope of this matrix:</strong> the symbol and layout tables use every coverage family except <code>perf</code> (<code>mvp/work/eval-coverage-text.json</code> = the coverage eval of the text/dynamics round without the 21 perf items, which repeat one hymn page, one piano page and one piano book at several resolutions and would count the same notes up to 8 times). The performance tables come from the native-dpi perf run (<code>mvp/work/eval-coverage-baseline-perf.json</code>). The previous matrix (22 supported, 40 partial, 92 unsupported) was measured on the source at commit e94a0a1; this one is the source of the text/dynamics round (dynamics, hairpins, tempo and expression text now written).</p>
+<p>Regenerate:</p>
+<pre><code>node mvp/tools/eval.mjs --set coverage --out mvp/work/eval-coverage.json
+node mvp/tools/eval.mjs --set coverage --only perf --dpi native --jobs 8 --out mvp/work/eval-coverage-perf.json   # optional, for timing
+node tools/coverage.mjs --eval mvp/work/eval-coverage.json [--perf mvp/work/eval-coverage-perf.json]
+</code></pre>
+<h2>How to read the tables</h2>
+<ul>
+<li><strong>Occurrences</strong>: how often the symbol occurs in the truth files, summed over items (<code>meta.json</code> counts; this tool&#39;s own count from <code>truth.musicxml</code> where meta has none). <strong>Items</strong>: items containing it.</li>
+<li><strong>Accuracy</strong> per input (clean / scan / scan-severe): recall over the truth instances. Note-level tags: truth notes with the tag that are aligned to an app note with the right pitch <em>and</em> the tag&#39;s feature (an element such as <code>&lt;dot/&gt;</code>, <code>&lt;beam&gt;</code>, <code>&lt;slur&gt;</code>, <code>&lt;staccato/&gt;</code>, or, for semantic tags marked <em>sem</em>, its meaning: duration for note values, spelled pitch for accidentals, sounding pitch under an ottava). Clef, key and time tags: exact match of the same clef/key/time change at the aligned measure (±1). Directions and structure: the same element and value at the aligned measure (±1). Notes and rests are aligned with all parts merged, so part splitting does not affect these numbers (it is scored under layouts).</li>
+<li><strong>Emitted</strong>: how many times the app&#39;s MusicXML contains the corresponding element, on the typical scan (0 = never written). Emitted and the accuracy denominators (hit/n) count notes for note-level tags, so a chord, beam group, tuplet, arpeggio or ottava line counts once per note it covers, while <strong>Occurrences</strong> follow the generators&#39; count rules in <code>meta.json</code> (<code>count_rules</code>: chords, beam groups, tuplet brackets and ottava lines once each).</li>
+<li><strong>Read</strong>: share of truth notes carrying the tag that the app read with the right pitch, whether or not it kept the mark.</li>
+<li><strong>Status</strong> (from the <code>scan</code> input, the typical 200–300 dpi scan): supported ≥ 0.8, partial 0.2–0.8, unsupported &lt; 0.2 or the element is never emitted. Semantic tags whose MusicXML element exists but is never written (e.g. <code>&lt;octave-shift&gt;</code>, <code>&lt;multiple-rest&gt;</code>) are capped at partial.</li>
+<li><strong>Confusion</strong> (on <code>clean.pdf</code>): false notes (app notes that match no truth note) per truth note in the measures holding the symbol, minus the same rate in the other measures (all items&#39; rate when the symbol is in every measure). <em>confused</em> = excess &gt; 0.05 and at least 3 surplus false notes; <em>unclear</em> = excess &gt; 0.05 on fewer than 10 truth notes; otherwise <em>not confused</em>: the app may drop the mark, but it does not turn it into extra notes. It matters most for marks the app does not output.</li>
+</ul>
+<p><strong>Totals:</strong> 35 supported, 46 partial, 73 unsupported, 30 not measurable, 0 taxonomy tags without items yet.</p>
+<h2>Symbols: notes</h2>
+<table>
+<thead>
+<tr>
+<th>Tag</th>
+<th align="right">Occurrences</th>
+<th align="right">Items</th>
+<th align="right">Emitted</th>
+<th align="right">Accuracy clean</th>
+<th align="right">Accuracy scan</th>
+<th align="right">Accuracy scan-severe</th>
+<th align="right">Read</th>
+<th>Status</th>
+<th>Confusion</th>
+<th>Check</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>note-breve</code></td>
+<td align="right">4</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0% (0/4)</td>
+<td align="right">0% (0/4)</td>
+<td align="right">0% (0/4)</td>
+<td align="right">75%</td>
+<td><strong>unsupported</strong></td>
+<td>not confused (+0.03)</td>
+<td>duration of the aligned note (sem)</td>
+</tr>
+<tr>
+<td><code>note-whole</code></td>
+<td align="right">163</td>
+<td align="right">37</td>
+<td align="right">132</td>
+<td align="right">54% (102/188)</td>
+<td align="right">46% (86/188)</td>
+<td align="right">26% (49/188)</td>
+<td align="right">61%</td>
+<td>partial</td>
+<td>not confused (-0.03)</td>
+<td>duration of the aligned note (sem)</td>
+</tr>
+<tr>
+<td><code>note-half</code></td>
+<td align="right">1351</td>
+<td align="right">75</td>
+<td align="right">1354</td>
+<td align="right">83% (1228/1471)</td>
+<td align="right">79% (1158/1471)</td>
+<td align="right">36% (525/1471)</td>
+<td align="right">91%</td>
+<td>partial</td>
+<td>not confused (-0.05)</td>
+<td>duration of the aligned note (sem)</td>
+</tr>
+<tr>
+<td><code>note-quarter</code></td>
+<td align="right">4025</td>
+<td align="right">80</td>
+<td align="right">4492</td>
+<td align="right">91% (4023/4426)</td>
+<td align="right">91% (4010/4426)</td>
+<td align="right">68% (3022/4426)</td>
+<td align="right">94%</td>
+<td>supported</td>
+<td>not confused (-0.12)</td>
+<td>duration of the aligned note (sem)</td>
+</tr>
+<tr>
+<td><code>note-8th</code></td>
+<td align="right">1526</td>
+<td align="right">61</td>
+<td align="right">1650</td>
+<td align="right">79% (1269/1608)</td>
+<td align="right">77% (1238/1608)</td>
+<td align="right">64% (1035/1608)</td>
+<td align="right">84%</td>
+<td>partial</td>
+<td>not confused (-0.01)</td>
+<td>duration of the aligned note (sem)</td>
+</tr>
+<tr>
+<td><code>note-16th</code></td>
+<td align="right">651</td>
+<td align="right">22</td>
+<td align="right">744</td>
+<td align="right">79% (516/651)</td>
+<td align="right">80% (521/651)</td>
+<td align="right">69% (452/651)</td>
+<td align="right">89%</td>
+<td>supported</td>
+<td>not confused (+0.00)</td>
+<td>duration of the aligned note (sem)</td>
+</tr>
+<tr>
+<td><code>note-32nd</code></td>
+<td align="right">113</td>
+<td align="right">10</td>
+<td align="right">11</td>
+<td align="right">11% (12/113)</td>
+<td align="right">13% (15/113)</td>
+<td align="right">4% (4/113)</td>
+<td align="right">81%</td>
+<td><strong>unsupported</strong></td>
+<td>not confused (-0.01)</td>
+<td>duration of the aligned note (sem)</td>
+</tr>
+<tr>
+<td><code>note-64th</code></td>
+<td align="right">71</td>
+<td align="right">5</td>
+<td align="right">0</td>
+<td align="right">0% (0/71)</td>
+<td align="right">0% (0/71)</td>
+<td align="right">0% (0/71)</td>
+<td align="right">76%</td>
+<td><strong>unsupported</strong></td>
+<td>not confused (+0.04)</td>
+<td>duration of the aligned note (sem)</td>
+</tr>
+<tr>
+<td><code>dot</code></td>
+<td align="right">295</td>
+<td align="right">49</td>
+<td align="right">323</td>
+<td align="right">68% (203/299)</td>
+<td align="right">70% (208/299)</td>
+<td align="right">52% (154/299)</td>
+<td align="right">88%</td>
+<td>partial</td>
+<td><strong>confused</strong> (+0.08)</td>
+<td><dot/> count + duration</td>
+</tr>
+<tr>
+<td><code>double-dot</code></td>
+<td align="right">15</td>
+<td align="right">4</td>
+<td align="right">6</td>
+<td align="right">27% (4/15)</td>
+<td align="right">27% (4/15)</td>
+<td align="right">7% (1/15)</td>
+<td align="right">87%</td>
+<td>partial</td>
+<td><strong>confused</strong> (+0.17)</td>
+<td><dot/> count + duration</td>
+</tr>
+<tr>
+<td><code>chord</code></td>
+<td align="right">608</td>
+<td align="right">29</td>
+<td align="right">1634</td>
+<td align="right">89% (1480/1666)</td>
+<td align="right">88% (1459/1666)</td>
+<td align="right">68% (1125/1666)</td>
+<td align="right">90%</td>
+<td>supported</td>
+<td>not confused (-0.01)</td>
+<td>element on the aligned note</td>
+</tr>
+<tr>
+<td><code>beam</code></td>
+<td align="right">703</td>
+<td align="right">56</td>
+<td align="right">0</td>
+<td align="right">0% (0/2064)</td>
+<td align="right">0% (0/2064)</td>
+<td align="right">0% (0/2064)</td>
+<td align="right">86%</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-0.00)</td>
+<td>element on the aligned note</td>
+</tr>
+<tr>
+<td><code>flag</code></td>
+<td align="right">308</td>
+<td align="right">31</td>
+<td align="right">1548</td>
+<td align="right">61% (187/308)</td>
+<td align="right">62% (190/308)</td>
+<td align="right">49% (150/308)</td>
+<td align="right">77%</td>
+<td>partial</td>
+<td>not confused (+0.01)</td>
+<td>duration of the flagged note (sem)</td>
+</tr>
+<tr>
+<td><code>stem-up</code></td>
+<td align="right">2653</td>
+<td align="right">67</td>
+<td align="right">2673</td>
+<td align="right">90% (2387/2653)</td>
+<td align="right">88% (2347/2653)</td>
+<td align="right">68% (1811/2653)</td>
+<td align="right">89%</td>
+<td>supported</td>
+<td>not confused (-0.13)</td>
+<td>element on the aligned note</td>
+</tr>
+<tr>
+<td><code>stem-down</code></td>
+<td align="right">4155</td>
+<td align="right">72</td>
+<td align="right">3915</td>
+<td align="right">91% (3783/4155)</td>
+<td align="right">90% (3732/4155)</td>
+<td align="right">73% (3051/4155)</td>
+<td align="right">91%</td>
+<td>supported</td>
+<td>not confused (-0.29)</td>
+<td>element on the aligned note</td>
+</tr>
+<tr>
+<td><code>ledger-above</code></td>
+<td align="right">601</td>
+<td align="right">58</td>
+<td align="right">568</td>
+<td align="right">90% (543/601)</td>
+<td align="right">87% (521/601)</td>
+<td align="right">76% (457/601)</td>
+<td align="right">87%</td>
+<td>supported</td>
+<td>not confused (-0.03)</td>
+<td>pitch (sem)</td>
+</tr>
+<tr>
+<td><code>ledger-below</code></td>
+<td align="right">374</td>
+<td align="right">45</td>
+<td align="right">350</td>
+<td align="right">89% (333/374)</td>
+<td align="right">89% (331/374)</td>
+<td align="right">66% (247/374)</td>
+<td align="right">89%</td>
+<td>supported</td>
+<td>not confused (-0.02)</td>
+<td>pitch (sem)</td>
+</tr>
+<tr>
+<td><code>grace</code></td>
+<td align="right">58</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0% (0/58)</td>
+<td align="right">0% (0/58)</td>
+<td align="right">0% (0/58)</td>
+<td align="right">0%</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-0.08)</td>
+<td><grace/> note, same pitch, aligned measure</td>
+</tr>
+<tr>
+<td><code>grace-slash</code></td>
+<td align="right">16</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0% (0/16)</td>
+<td align="right">0% (0/16)</td>
+<td align="right">0% (0/16)</td>
+<td align="right">0%</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-0.07)</td>
+<td><grace slash="yes"/></td>
+</tr>
+<tr>
+<td><code>cue-note</code></td>
+<td align="right">24</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0% (0/24)</td>
+<td align="right">0% (0/24)</td>
+<td align="right">0% (0/24)</td>
+<td align="right">0%</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>unclear (+0.40)</td>
+<td><cue/> note, same pitch, aligned measure</td>
+</tr>
+<tr>
+<td><code>tremolo</code></td>
+<td align="right">35</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0% (0/35)</td>
+<td align="right">0% (0/35)</td>
+<td align="right">0% (0/35)</td>
+<td align="right">31%</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-0.84)</td>
+<td>element on the aligned note</td>
+</tr>
+</tbody></table>
+<h2>Symbols: rests</h2>
+<table>
+<thead>
+<tr>
+<th>Tag</th>
+<th align="right">Occurrences</th>
+<th align="right">Items</th>
+<th align="right">Emitted</th>
+<th align="right">Accuracy clean</th>
+<th align="right">Accuracy scan</th>
+<th align="right">Accuracy scan-severe</th>
+<th align="right">Read</th>
+<th>Status</th>
+<th>Confusion</th>
+<th>Check</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>rest-breve</code></td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0% (0/2)</td>
+<td align="right">0% (0/2)</td>
+<td align="right">0% (0/2)</td>
+<td align="right">100%</td>
+<td><strong>unsupported</strong> — low n (2)</td>
+<td>–</td>
+<td>aligned rest with the same duration (sem)</td>
+</tr>
+<tr>
+<td><code>rest-whole</code></td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">100% (3/3)</td>
+<td align="right">100% (3/3)</td>
+<td align="right">0% (0/3)</td>
+<td align="right">100%</td>
+<td>supported</td>
+<td>not confused (-0.63)</td>
+<td>aligned rest with the same duration (sem)</td>
+</tr>
+<tr>
+<td><code>rest-half</code></td>
+<td align="right">36</td>
+<td align="right">15</td>
+<td align="right">32</td>
+<td align="right">75% (27/36)</td>
+<td align="right">67% (24/36)</td>
+<td align="right">67% (24/36)</td>
+<td align="right">75%</td>
+<td>partial</td>
+<td>not confused (+0.03)</td>
+<td>aligned rest with the same duration (sem)</td>
+</tr>
+<tr>
+<td><code>rest-quarter</code></td>
+<td align="right">183</td>
+<td align="right">33</td>
+<td align="right">137</td>
+<td align="right">76% (139/183)</td>
+<td align="right">70% (129/183)</td>
+<td align="right">42% (77/183)</td>
+<td align="right">75%</td>
+<td>partial</td>
+<td><strong>confused</strong> (+0.07)</td>
+<td>aligned rest with the same duration (sem)</td>
+</tr>
+<tr>
+<td><code>rest-8th</code></td>
+<td align="right">124</td>
+<td align="right">16</td>
+<td align="right">114</td>
+<td align="right">77% (96/124)</td>
+<td align="right">81% (100/124)</td>
+<td align="right">66% (82/124)</td>
+<td align="right">92%</td>
+<td>supported</td>
+<td>not confused (-0.00)</td>
+<td>aligned rest with the same duration (sem)</td>
+</tr>
+<tr>
+<td><code>rest-16th</code></td>
+<td align="right">60</td>
+<td align="right">7</td>
+<td align="right">59</td>
+<td align="right">65% (39/60)</td>
+<td align="right">67% (40/60)</td>
+<td align="right">38% (23/60)</td>
+<td align="right">92%</td>
+<td>partial</td>
+<td>not confused (+0.02)</td>
+<td>aligned rest with the same duration (sem)</td>
+</tr>
+<tr>
+<td><code>rest-32nd</code></td>
+<td align="right">22</td>
+<td align="right">4</td>
+<td align="right">15</td>
+<td align="right">86% (19/22)</td>
+<td align="right">64% (14/22)</td>
+<td align="right">14% (3/22)</td>
+<td align="right">73%</td>
+<td>partial</td>
+<td><strong>confused</strong> (+0.25)</td>
+<td>aligned rest with the same duration (sem)</td>
+</tr>
+<tr>
+<td><code>rest-64th</code></td>
+<td align="right">10</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">60% (6/10)</td>
+<td align="right">10% (1/10)</td>
+<td align="right">0% (0/10)</td>
+<td align="right">30%</td>
+<td><strong>unsupported</strong></td>
+<td><strong>confused</strong> (+0.47)</td>
+<td>aligned rest with the same duration (sem)</td>
+</tr>
+<tr>
+<td><code>rest-dotted</code></td>
+<td align="right">30</td>
+<td align="right">6</td>
+<td align="right">27</td>
+<td align="right">80% (24/30)</td>
+<td align="right">87% (26/30)</td>
+<td align="right">47% (14/30)</td>
+<td align="right">93%</td>
+<td>supported</td>
+<td><strong>confused</strong> (+0.18)</td>
+<td>aligned rest with the same duration (sem)</td>
+</tr>
+<tr>
+<td><code>rest-whole-bar</code></td>
+<td align="right">202</td>
+<td align="right">14</td>
+<td align="right">190</td>
+<td align="right">79% (159/202)</td>
+<td align="right">62% (126/202)</td>
+<td align="right">39% (78/202)</td>
+<td align="right">81%</td>
+<td>partial</td>
+<td>not confused (-0.03)</td>
+<td>aligned rest with the same duration (sem)</td>
+</tr>
+<tr>
+<td><code>rest-multibar</code></td>
+<td align="right">9</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">67% (6/9)</td>
+<td align="right">44% (4/9)</td>
+<td align="right">0% (0/9)</td>
+<td align="right">–</td>
+<td>partial — <multiple-rest> never emitted</td>
+<td>–</td>
+<td>every bar of the block read as a full-bar rest (sem)</td>
+</tr>
+</tbody></table>
+<h2>Symbols: pitch</h2>
+<table>
+<thead>
+<tr>
+<th>Tag</th>
+<th align="right">Occurrences</th>
+<th align="right">Items</th>
+<th align="right">Emitted</th>
+<th align="right">Accuracy clean</th>
+<th align="right">Accuracy scan</th>
+<th align="right">Accuracy scan-severe</th>
+<th align="right">Read</th>
+<th>Status</th>
+<th>Confusion</th>
+<th>Check</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>clef-treble</code></td>
+<td align="right">105</td>
+<td align="right">71</td>
+<td align="right">106</td>
+<td align="right">98% (103/105)</td>
+<td align="right">99% (104/105)</td>
+<td align="right">88% (92/105)</td>
+<td align="right">–</td>
+<td>supported</td>
+<td>not confused (+0.03)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>clef-bass</code></td>
+<td align="right">63</td>
+<td align="right">45</td>
+<td align="right">62</td>
+<td align="right">95% (60/63)</td>
+<td align="right">97% (61/63)</td>
+<td align="right">76% (48/63)</td>
+<td align="right">–</td>
+<td>supported</td>
+<td>not confused (+0.02)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>clef-alto</code></td>
+<td align="right">14</td>
+<td align="right">13</td>
+<td align="right">13</td>
+<td align="right">93% (13/14)</td>
+<td align="right">93% (13/14)</td>
+<td align="right">93% (13/14)</td>
+<td align="right">–</td>
+<td>supported</td>
+<td>not confused (-0.05)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>clef-tenor</code></td>
+<td align="right">5</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">0% (0/5)</td>
+<td align="right">0% (0/5)</td>
+<td align="right">0% (0/5)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (+0.02)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>clef-soprano</code></td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0% (0/1)</td>
+<td align="right">0% (0/1)</td>
+<td align="right">0% (0/1)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted; low n (1)</td>
+<td>not confused (-0.67)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>clef-treble-8vb</code></td>
+<td align="right">6</td>
+<td align="right">5</td>
+<td align="right">5</td>
+<td align="right">83% (5/6)</td>
+<td align="right">83% (5/6)</td>
+<td align="right">67% (4/6)</td>
+<td align="right">–</td>
+<td>supported</td>
+<td>not confused (-0.01)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>clef-treble-8va</code></td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0% (0/1)</td>
+<td align="right">0% (0/1)</td>
+<td align="right">0% (0/1)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted; low n (1)</td>
+<td>unclear (+0.38)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>clef-bass-8vb</code></td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0% (0/1)</td>
+<td align="right">0% (0/1)</td>
+<td align="right">0% (0/1)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted; low n (1)</td>
+<td><strong>confused</strong> (+0.91)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>clef-change</code></td>
+<td align="right">27</td>
+<td align="right">4</td>
+<td align="right">17</td>
+<td align="right">48% (13/27)</td>
+<td align="right">56% (15/27)</td>
+<td align="right">7% (2/27)</td>
+<td align="right">–</td>
+<td>partial</td>
+<td>not confused (-0.08)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>key-0</code></td>
+<td align="right">40</td>
+<td align="right">37</td>
+<td align="right">50</td>
+<td align="right">97% (36/37)</td>
+<td align="right">97% (36/37)</td>
+<td align="right">92% (34/37)</td>
+<td align="right">–</td>
+<td>supported</td>
+<td>not confused (-0.03)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>key-s1</code></td>
+<td align="right">18</td>
+<td align="right">15</td>
+<td align="right">31</td>
+<td align="right">87% (13/15)</td>
+<td align="right">87% (13/15)</td>
+<td align="right">80% (12/15)</td>
+<td align="right">–</td>
+<td>supported</td>
+<td><strong>confused</strong> (+0.14)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>key-s2</code></td>
+<td align="right">12</td>
+<td align="right">9</td>
+<td align="right">25</td>
+<td align="right">100% (9/9)</td>
+<td align="right">89% (8/9)</td>
+<td align="right">89% (8/9)</td>
+<td align="right">–</td>
+<td>supported</td>
+<td>not confused (-0.07)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>key-s3</code></td>
+<td align="right">6</td>
+<td align="right">5</td>
+<td align="right">8</td>
+<td align="right">83% (5/6)</td>
+<td align="right">83% (5/6)</td>
+<td align="right">83% (5/6)</td>
+<td align="right">–</td>
+<td>supported</td>
+<td>not confused (-0.02)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>key-s4</code></td>
+<td align="right">4</td>
+<td align="right">4</td>
+<td align="right">3</td>
+<td align="right">75% (3/4)</td>
+<td align="right">75% (3/4)</td>
+<td align="right">25% (1/4)</td>
+<td align="right">–</td>
+<td>partial</td>
+<td>not confused (+0.00)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>key-s5</code></td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">2</td>
+<td align="right">67% (2/3)</td>
+<td align="right">67% (2/3)</td>
+<td align="right">33% (1/3)</td>
+<td align="right">–</td>
+<td>partial</td>
+<td>not confused (-0.02)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>key-s6</code></td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">50% (1/2)</td>
+<td align="right">50% (1/2)</td>
+<td align="right">0% (0/2)</td>
+<td align="right">–</td>
+<td>partial — low n (2)</td>
+<td>not confused (-0.25)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>key-s7</code></td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">50% (1/2)</td>
+<td align="right">0% (0/2)</td>
+<td align="right">0% (0/2)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — low n (2)</td>
+<td>not confused (-0.25)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>key-f1</code></td>
+<td align="right">16</td>
+<td align="right">13</td>
+<td align="right">19</td>
+<td align="right">100% (13/13)</td>
+<td align="right">100% (13/13)</td>
+<td align="right">77% (10/13)</td>
+<td align="right">–</td>
+<td>supported</td>
+<td>not confused (-0.04)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>key-f2</code></td>
+<td align="right">7</td>
+<td align="right">7</td>
+<td align="right">10</td>
+<td align="right">100% (7/7)</td>
+<td align="right">100% (7/7)</td>
+<td align="right">86% (6/7)</td>
+<td align="right">–</td>
+<td>supported</td>
+<td>not confused (-0.00)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>key-f3</code></td>
+<td align="right">9</td>
+<td align="right">8</td>
+<td align="right">11</td>
+<td align="right">100% (8/8)</td>
+<td align="right">100% (8/8)</td>
+<td align="right">50% (4/8)</td>
+<td align="right">–</td>
+<td>supported</td>
+<td><strong>confused</strong> (+0.16)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>key-f4</code></td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">2</td>
+<td align="right">100% (3/3)</td>
+<td align="right">67% (2/3)</td>
+<td align="right">33% (1/3)</td>
+<td align="right">–</td>
+<td>partial</td>
+<td>not confused (-0.05)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>key-f5</code></td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">100% (2/2)</td>
+<td align="right">100% (2/2)</td>
+<td align="right">50% (1/2)</td>
+<td align="right">–</td>
+<td>supported — low n (2)</td>
+<td>not confused (-0.02)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>key-f6</code></td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">100% (2/2)</td>
+<td align="right">50% (1/2)</td>
+<td align="right">0% (0/2)</td>
+<td align="right">–</td>
+<td>partial — low n (2)</td>
+<td>not confused (-0.02)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>key-f7</code></td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">100% (2/2)</td>
+<td align="right">100% (2/2)</td>
+<td align="right">0% (0/2)</td>
+<td align="right">–</td>
+<td>supported — low n (2)</td>
+<td>not confused (-0.02)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>key-change</code></td>
+<td align="right">34</td>
+<td align="right">6</td>
+<td align="right">23</td>
+<td align="right">79% (27/34)</td>
+<td align="right">68% (23/34)</td>
+<td align="right">35% (12/34)</td>
+<td align="right">–</td>
+<td>partial</td>
+<td>not confused (+0.01)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>acc-sharp</code></td>
+<td align="right">78</td>
+<td align="right">22</td>
+<td align="right">68</td>
+<td align="right">59% (46/78)</td>
+<td align="right">71% (55/78)</td>
+<td align="right">45% (35/78)</td>
+<td align="right">71%</td>
+<td>partial</td>
+<td>not confused (+0.02)</td>
+<td>spelled pitch (step, alter, octave) (sem)</td>
+</tr>
+<tr>
+<td><code>acc-flat</code></td>
+<td align="right">28</td>
+<td align="right">6</td>
+<td align="right">23</td>
+<td align="right">75% (21/28)</td>
+<td align="right">75% (21/28)</td>
+<td align="right">93% (26/28)</td>
+<td align="right">75%</td>
+<td>partial</td>
+<td>not confused (-0.04)</td>
+<td>spelled pitch (step, alter, octave) (sem)</td>
+</tr>
+<tr>
+<td><code>acc-natural</code></td>
+<td align="right">53</td>
+<td align="right">10</td>
+<td align="right">46</td>
+<td align="right">81% (43/53)</td>
+<td align="right">81% (43/53)</td>
+<td align="right">58% (31/53)</td>
+<td align="right">81%</td>
+<td>supported</td>
+<td>not confused (+0.00)</td>
+<td>spelled pitch (step, alter, octave) (sem)</td>
+</tr>
+<tr>
+<td><code>acc-double-sharp</code></td>
+<td align="right">7</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">0% (0/7)</td>
+<td align="right">0% (0/7)</td>
+<td align="right">0% (0/7)</td>
+<td align="right">29%</td>
+<td><strong>unsupported</strong> — <accidental> never emitted</td>
+<td>not confused (+0.05)</td>
+<td>spelled pitch (step, alter, octave) (sem)</td>
+</tr>
+<tr>
+<td><code>acc-double-flat</code></td>
+<td align="right">5</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0% (0/5)</td>
+<td align="right">0% (0/5)</td>
+<td align="right">0% (0/5)</td>
+<td align="right">0%</td>
+<td><strong>unsupported</strong> — <accidental> never emitted</td>
+<td>not confused (+0.08)</td>
+<td>spelled pitch (step, alter, octave) (sem)</td>
+</tr>
+<tr>
+<td><code>acc-courtesy</code></td>
+<td align="right">9</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">22% (2/9)</td>
+<td align="right">22% (2/9)</td>
+<td align="right">56% (5/9)</td>
+<td align="right">22%</td>
+<td>partial — <accidental> never emitted</td>
+<td>not confused (-0.02)</td>
+<td>spelled pitch (step, alter, octave) (sem)</td>
+</tr>
+<tr>
+<td><code>ottava-8va</code></td>
+<td align="right">4</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0% (0/28)</td>
+<td align="right">0% (0/28)</td>
+<td align="right">0% (0/28)</td>
+<td align="right">0%</td>
+<td><strong>unsupported</strong> — <octave-shift> never emitted</td>
+<td><strong>confused</strong> (+0.43)</td>
+<td>sounding pitch of the notes under the line (sem)</td>
+</tr>
+<tr>
+<td><code>ottava-8vb</code></td>
+<td align="right">4</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0% (0/22)</td>
+<td align="right">0% (0/22)</td>
+<td align="right">0% (0/22)</td>
+<td align="right">0%</td>
+<td><strong>unsupported</strong> — <octave-shift> never emitted</td>
+<td><strong>confused</strong> (+0.40)</td>
+<td>sounding pitch of the notes under the line (sem)</td>
+</tr>
+<tr>
+<td><code>ottava-15ma</code></td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0% (0/12)</td>
+<td align="right">0% (0/12)</td>
+<td align="right">0% (0/12)</td>
+<td align="right">0%</td>
+<td><strong>unsupported</strong> — <octave-shift> never emitted</td>
+<td><strong>confused</strong> (+0.32)</td>
+<td>sounding pitch of the notes under the line (sem)</td>
+</tr>
+<tr>
+<td><code>x-acc-natural-flat</code></td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0% (0/1)</td>
+<td align="right">100% (1/1)</td>
+<td align="right">100% (1/1)</td>
+<td align="right">100%</td>
+<td>partial — <accidental> never emitted; low n (1)</td>
+<td>not confused (+0.03)</td>
+<td>spelled pitch (step, alter, octave) (sem)</td>
+</tr>
+<tr>
+<td><code>x-acc-natural-sharp</code></td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">50% (1/2)</td>
+<td align="right">100% (2/2)</td>
+<td align="right">100% (2/2)</td>
+<td align="right">100%</td>
+<td>partial — <accidental> never emitted; low n (2)</td>
+<td>not confused (+0.12)</td>
+<td>spelled pitch (step, alter, octave) (sem)</td>
+</tr>
+<tr>
+<td><code>x-clef-percussion</code></td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0% (0/2)</td>
+<td align="right">0% (0/2)</td>
+<td align="right">0% (0/2)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted; low n (2)</td>
+<td>not confused (+0.10)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+</tbody></table>
+<h2>Symbols: time</h2>
+<table>
+<thead>
+<tr>
+<th>Tag</th>
+<th align="right">Occurrences</th>
+<th align="right">Items</th>
+<th align="right">Emitted</th>
+<th align="right">Accuracy clean</th>
+<th align="right">Accuracy scan</th>
+<th align="right">Accuracy scan-severe</th>
+<th align="right">Read</th>
+<th>Status</th>
+<th>Confusion</th>
+<th>Check</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>time-2-4</code></td>
+<td align="right">14</td>
+<td align="right">9</td>
+<td align="right">4</td>
+<td align="right">27% (3/11)</td>
+<td align="right">36% (4/11)</td>
+<td align="right">45% (5/11)</td>
+<td align="right">–</td>
+<td>partial</td>
+<td><strong>confused</strong> (+0.18)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>time-3-4</code></td>
+<td align="right">38</td>
+<td align="right">25</td>
+<td align="right">30</td>
+<td align="right">55% (16/29)</td>
+<td align="right">55% (16/29)</td>
+<td align="right">52% (15/29)</td>
+<td align="right">–</td>
+<td>partial</td>
+<td>not confused (+0.01)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>time-4-4</code></td>
+<td align="right">69</td>
+<td align="right">54</td>
+<td align="right">92</td>
+<td align="right">69% (43/62)</td>
+<td align="right">69% (43/62)</td>
+<td align="right">53% (33/62)</td>
+<td align="right">–</td>
+<td>partial</td>
+<td>not confused (+0.01)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>time-2-2</code></td>
+<td align="right">4</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0% (0/4)</td>
+<td align="right">0% (0/4)</td>
+<td align="right">0% (0/4)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-0.04)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>time-3-2</code></td>
+<td align="right">4</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">0% (0/4)</td>
+<td align="right">0% (0/4)</td>
+<td align="right">0% (0/4)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-0.16)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>time-6-8</code></td>
+<td align="right">21</td>
+<td align="right">15</td>
+<td align="right">0</td>
+<td align="right">0% (0/18)</td>
+<td align="right">0% (0/18)</td>
+<td align="right">0% (0/18)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td><strong>confused</strong> (+0.16)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>time-9-8</code></td>
+<td align="right">5</td>
+<td align="right">4</td>
+<td align="right">0</td>
+<td align="right">0% (0/5)</td>
+<td align="right">0% (0/5)</td>
+<td align="right">0% (0/5)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-0.47)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>time-12-8</code></td>
+<td align="right">5</td>
+<td align="right">4</td>
+<td align="right">0</td>
+<td align="right">0% (0/5)</td>
+<td align="right">0% (0/5)</td>
+<td align="right">0% (0/5)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-0.43)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>time-5-4</code></td>
+<td align="right">3</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0% (0/3)</td>
+<td align="right">0% (0/3)</td>
+<td align="right">0% (0/3)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-0.49)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>time-5-8</code></td>
+<td align="right">7</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">0% (0/4)</td>
+<td align="right">0% (0/4)</td>
+<td align="right">0% (0/4)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (+0.01)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>time-7-8</code></td>
+<td align="right">7</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">0% (0/4)</td>
+<td align="right">0% (0/4)</td>
+<td align="right">0% (0/4)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-0.52)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>time-common</code></td>
+<td align="right">11</td>
+<td align="right">6</td>
+<td align="right">0</td>
+<td align="right">0% (0/8)</td>
+<td align="right">0% (0/8)</td>
+<td align="right">0% (0/8)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-0.00)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>time-cut</code></td>
+<td align="right">10</td>
+<td align="right">5</td>
+<td align="right">0</td>
+<td align="right">0% (0/7)</td>
+<td align="right">0% (0/7)</td>
+<td align="right">0% (0/7)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-0.31)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>time-change</code></td>
+<td align="right">110</td>
+<td align="right">20</td>
+<td align="right">0</td>
+<td align="right">0% (0/89)</td>
+<td align="right">0% (0/89)</td>
+<td align="right">0% (0/89)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-0.03)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>pickup</code></td>
+<td align="right">9</td>
+<td align="right">9</td>
+<td align="right">7</td>
+<td align="right">56% (5/9)</td>
+<td align="right">44% (4/9)</td>
+<td align="right">67% (6/9)</td>
+<td align="right">–</td>
+<td>partial</td>
+<td>not confused (+0.12)</td>
+<td>first measure has the pickup length (sem)</td>
+</tr>
+<tr>
+<td><code>tuplet-3</code></td>
+<td align="right">76</td>
+<td align="right">8</td>
+<td align="right">168</td>
+<td align="right">67% (133/200)</td>
+<td align="right">67% (133/200)</td>
+<td align="right">40% (80/200)</td>
+<td align="right">93%</td>
+<td>partial</td>
+<td>not confused (-0.00)</td>
+<td>duration + <time-modification> ratio</td>
+</tr>
+<tr>
+<td><code>tuplet-2</code></td>
+<td align="right">15</td>
+<td align="right">6</td>
+<td align="right">0</td>
+<td align="right">0% (0/27)</td>
+<td align="right">0% (0/27)</td>
+<td align="right">0% (0/27)</td>
+<td align="right">85%</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (+0.01)</td>
+<td>duration + <time-modification> ratio</td>
+</tr>
+<tr>
+<td><code>tuplet-5</code></td>
+<td align="right">10</td>
+<td align="right">4</td>
+<td align="right">29</td>
+<td align="right">45% (20/44)</td>
+<td align="right">45% (20/44)</td>
+<td align="right">34% (15/44)</td>
+<td align="right">95%</td>
+<td>partial</td>
+<td>not confused (-0.13)</td>
+<td>duration + <time-modification> ratio</td>
+</tr>
+<tr>
+<td><code>tuplet-6</code></td>
+<td align="right">6</td>
+<td align="right">2</td>
+<td align="right">24</td>
+<td align="right">67% (24/36)</td>
+<td align="right">67% (24/36)</td>
+<td align="right">44% (16/36)</td>
+<td align="right">89%</td>
+<td>partial</td>
+<td>not confused (-0.07)</td>
+<td>duration + <time-modification> ratio</td>
+</tr>
+<tr>
+<td><code>tuplet-7</code></td>
+<td align="right">5</td>
+<td align="right">2</td>
+<td align="right">21</td>
+<td align="right">40% (14/35)</td>
+<td align="right">40% (14/35)</td>
+<td align="right">40% (14/35)</td>
+<td align="right">100%</td>
+<td>partial</td>
+<td>not confused (-0.07)</td>
+<td>duration + <time-modification> ratio</td>
+</tr>
+<tr>
+<td><code>tuplet-nested</code></td>
+<td align="right">8</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0% (0/26)</td>
+<td align="right">0% (0/26)</td>
+<td align="right">0% (0/26)</td>
+<td align="right">100%</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-1.00)</td>
+<td>duration + <time-modification></td>
+</tr>
+<tr>
+<td><code>tie</code></td>
+<td align="right">79</td>
+<td align="right">14</td>
+<td align="right">4</td>
+<td align="right">0% (0/79)</td>
+<td align="right">0% (0/79)</td>
+<td align="right">0% (0/79)</td>
+<td align="right">95%</td>
+<td><strong>unsupported</strong></td>
+<td><strong>confused</strong> (+0.06)</td>
+<td>element on the aligned note</td>
+</tr>
+<tr>
+<td><code>tie-across-system</code></td>
+<td align="right">46</td>
+<td align="right">11</td>
+<td align="right">0</td>
+<td align="right">0% (0/46)</td>
+<td align="right">0% (0/46)</td>
+<td align="right">0% (0/46)</td>
+<td align="right">93%</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (+0.03)</td>
+<td>element on the aligned note</td>
+</tr>
+<tr>
+<td><code>x-time-3-8</code></td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0% (0/1)</td>
+<td align="right">0% (0/1)</td>
+<td align="right">0% (0/1)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted; low n (1)</td>
+<td>not confused (-0.92)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>x-time-4-2</code></td>
+<td align="right">4</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">0% (0/4)</td>
+<td align="right">0% (0/4)</td>
+<td align="right">0% (0/4)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-0.12)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>x-time-6-4</code></td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0% (0/1)</td>
+<td align="right">0% (0/1)</td>
+<td align="right">0% (0/1)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted; low n (1)</td>
+<td>not confused (-1.17)</td>
+<td>same clef/key/time at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>x-tuplet-4</code></td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0% (0/8)</td>
+<td align="right">0% (0/8)</td>
+<td align="right">0% (0/8)</td>
+<td align="right">100%</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-0.18)</td>
+<td>duration + <time-modification> ratio</td>
+</tr>
+</tbody></table>
+<h2>Symbols: marks</h2>
+<table>
+<thead>
+<tr>
+<th>Tag</th>
+<th align="right">Occurrences</th>
+<th align="right">Items</th>
+<th align="right">Emitted</th>
+<th align="right">Accuracy clean</th>
+<th align="right">Accuracy scan</th>
+<th align="right">Accuracy scan-severe</th>
+<th align="right">Read</th>
+<th>Status</th>
+<th>Confusion</th>
+<th>Check</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>slur</code></td>
+<td align="right">100</td>
+<td align="right">20</td>
+<td align="right">0</td>
+<td align="right">0% (0/100)</td>
+<td align="right">0% (0/100)</td>
+<td align="right">0% (0/100)</td>
+<td align="right">79%</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (+0.05)</td>
+<td>element on the aligned note</td>
+</tr>
+<tr>
+<td><code>staccato</code></td>
+<td align="right">78</td>
+<td align="right">7</td>
+<td align="right">0</td>
+<td align="right">0% (0/78)</td>
+<td align="right">0% (0/78)</td>
+<td align="right">0% (0/78)</td>
+<td align="right">95%</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-0.08)</td>
+<td>element on the aligned note</td>
+</tr>
+<tr>
+<td><code>staccatissimo</code></td>
+<td align="right">9</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0% (0/9)</td>
+<td align="right">0% (0/9)</td>
+<td align="right">0% (0/9)</td>
+<td align="right">89%</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-0.01)</td>
+<td>element on the aligned note</td>
+</tr>
+<tr>
+<td><code>accent</code></td>
+<td align="right">43</td>
+<td align="right">8</td>
+<td align="right">0</td>
+<td align="right">0% (0/43)</td>
+<td align="right">0% (0/43)</td>
+<td align="right">0% (0/43)</td>
+<td align="right">79%</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td><strong>confused</strong> (+0.13)</td>
+<td>element on the aligned note</td>
+</tr>
+<tr>
+<td><code>tenuto</code></td>
+<td align="right">37</td>
+<td align="right">6</td>
+<td align="right">0</td>
+<td align="right">0% (0/37)</td>
+<td align="right">0% (0/37)</td>
+<td align="right">0% (0/37)</td>
+<td align="right">97%</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-0.07)</td>
+<td>element on the aligned note</td>
+</tr>
+<tr>
+<td><code>marcato</code></td>
+<td align="right">23</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">0% (0/23)</td>
+<td align="right">0% (0/23)</td>
+<td align="right">0% (0/23)</td>
+<td align="right">87%</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (+0.04)</td>
+<td>element on the aligned note</td>
+</tr>
+<tr>
+<td><code>fermata</code></td>
+<td align="right">130</td>
+<td align="right">32</td>
+<td align="right">0</td>
+<td align="right">0% (0/130)</td>
+<td align="right">0% (0/130)</td>
+<td align="right">0% (0/130)</td>
+<td align="right">86%</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-0.04)</td>
+<td>element on the aligned note</td>
+</tr>
+<tr>
+<td><code>trill</code></td>
+<td align="right">9</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">0% (0/9)</td>
+<td align="right">0% (0/9)</td>
+<td align="right">0% (0/9)</td>
+<td align="right">100%</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-0.04)</td>
+<td>element on the aligned note</td>
+</tr>
+<tr>
+<td><code>mordent</code></td>
+<td align="right">5</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0% (0/10)</td>
+<td align="right">0% (0/10)</td>
+<td align="right">0% (0/10)</td>
+<td align="right">100%</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (+0.05)</td>
+<td>element on the aligned note</td>
+</tr>
+<tr>
+<td><code>turn</code></td>
+<td align="right">5</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0% (0/7)</td>
+<td align="right">0% (0/7)</td>
+<td align="right">0% (0/7)</td>
+<td align="right">100%</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (+0.06)</td>
+<td>element on the aligned note</td>
+</tr>
+<tr>
+<td><code>arpeggio</code></td>
+<td align="right">24</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">0% (0/68)</td>
+<td align="right">0% (0/68)</td>
+<td align="right">0% (0/68)</td>
+<td align="right">88%</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-0.04)</td>
+<td>element on the aligned note</td>
+</tr>
+<tr>
+<td><code>breath</code></td>
+<td align="right">8</td>
+<td align="right">4</td>
+<td align="right">0</td>
+<td align="right">0% (0/8)</td>
+<td align="right">0% (0/8)</td>
+<td align="right">0% (0/8)</td>
+<td align="right">100%</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-0.02)</td>
+<td>element on the aligned note</td>
+</tr>
+<tr>
+<td><code>dyn-pp</code></td>
+<td align="right">8</td>
+<td align="right">5</td>
+<td align="right">8</td>
+<td align="right">75% (6/8)</td>
+<td align="right">75% (6/8)</td>
+<td align="right">50% (4/8)</td>
+<td align="right">–</td>
+<td>partial</td>
+<td>not confused (-0.03)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>dyn-p</code></td>
+<td align="right">43</td>
+<td align="right">19</td>
+<td align="right">33</td>
+<td align="right">58% (25/43)</td>
+<td align="right">77% (33/43)</td>
+<td align="right">42% (18/43)</td>
+<td align="right">–</td>
+<td>partial</td>
+<td><strong>confused</strong> (+0.13)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>dyn-mp</code></td>
+<td align="right">13</td>
+<td align="right">9</td>
+<td align="right">15</td>
+<td align="right">85% (11/13)</td>
+<td align="right">100% (13/13)</td>
+<td align="right">23% (3/13)</td>
+<td align="right">–</td>
+<td>supported</td>
+<td><strong>confused</strong> (+0.13)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>dyn-mf</code></td>
+<td align="right">54</td>
+<td align="right">25</td>
+<td align="right">29</td>
+<td align="right">87% (47/54)</td>
+<td align="right">43% (23/54)</td>
+<td align="right">28% (15/54)</td>
+<td align="right">–</td>
+<td>partial</td>
+<td>not confused (-0.00)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>dyn-f</code></td>
+<td align="right">56</td>
+<td align="right">18</td>
+<td align="right">43</td>
+<td align="right">77% (43/56)</td>
+<td align="right">77% (43/56)</td>
+<td align="right">61% (34/56)</td>
+<td align="right">–</td>
+<td>partial</td>
+<td>not confused (+0.03)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>dyn-ff</code></td>
+<td align="right">16</td>
+<td align="right">5</td>
+<td align="right">14</td>
+<td align="right">75% (12/16)</td>
+<td align="right">88% (14/16)</td>
+<td align="right">81% (13/16)</td>
+<td align="right">–</td>
+<td>supported</td>
+<td><strong>confused</strong> (+0.10)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>dyn-sfz</code></td>
+<td align="right">6</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">67% (4/6)</td>
+<td align="right">50% (3/6)</td>
+<td align="right">17% (1/6)</td>
+<td align="right">–</td>
+<td>partial</td>
+<td>not confused (-0.04)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>hairpin-cresc</code></td>
+<td align="right">43</td>
+<td align="right">18</td>
+<td align="right">37</td>
+<td align="right">86% (37/43)</td>
+<td align="right">86% (37/43)</td>
+<td align="right">26% (11/43)</td>
+<td align="right">–</td>
+<td>supported</td>
+<td>not confused (-0.02)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>hairpin-dim</code></td>
+<td align="right">31</td>
+<td align="right">15</td>
+<td align="right">28</td>
+<td align="right">84% (26/31)</td>
+<td align="right">84% (26/31)</td>
+<td align="right">19% (6/31)</td>
+<td align="right">–</td>
+<td>supported</td>
+<td>not confused (-0.05)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>pedal</code></td>
+<td align="right">28</td>
+<td align="right">5</td>
+<td align="right">0</td>
+<td align="right">0% (0/28)</td>
+<td align="right">0% (0/28)</td>
+<td align="right">0% (0/28)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td><strong>confused</strong> (+0.08)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>fingering</code></td>
+<td align="right">112</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">0% (0/112)</td>
+<td align="right">0% (0/112)</td>
+<td align="right">0% (0/112)</td>
+<td align="right">89%</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-0.04)</td>
+<td>element on the aligned note</td>
+</tr>
+<tr>
+<td><code>text-expression</code></td>
+<td align="right">45</td>
+<td align="right">11</td>
+<td align="right">7</td>
+<td align="right">14% (5/35)</td>
+<td align="right">20% (7/35)</td>
+<td align="right">17% (6/35)</td>
+<td align="right">–</td>
+<td>partial</td>
+<td>not confused (+0.02)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>tempo-mark</code></td>
+<td align="right">59</td>
+<td align="right">53</td>
+<td align="right">39</td>
+<td align="right">53% (36/68)</td>
+<td align="right">54% (37/68)</td>
+<td align="right">32% (22/68)</td>
+<td align="right">–</td>
+<td>partial</td>
+<td>not confused (+0.04)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>metronome</code></td>
+<td align="right">36</td>
+<td align="right">33</td>
+<td align="right">0</td>
+<td align="right">0% (0/36)</td>
+<td align="right">0% (0/36)</td>
+<td align="right">0% (0/36)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td><strong>confused</strong> (+0.08)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>rehearsal-mark</code></td>
+<td align="right">16</td>
+<td align="right">6</td>
+<td align="right">0</td>
+<td align="right">0% (0/16)</td>
+<td align="right">0% (0/16)</td>
+<td align="right">0% (0/16)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (+0.02)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>chord-symbol</code></td>
+<td align="right">61</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0% (0/61)</td>
+<td align="right">0% (0/61)</td>
+<td align="right">0% (0/61)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-0.05)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>x-artic-detached-legato</code></td>
+<td align="right">4</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0% (0/4)</td>
+<td align="right">0% (0/4)</td>
+<td align="right">0% (0/4)</td>
+<td align="right">100%</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (+0.00)</td>
+<td>element on the aligned note</td>
+</tr>
+<tr>
+<td><code>x-dyn-fff</code></td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">100% (1/1)</td>
+<td align="right">0% (0/1)</td>
+<td align="right">0% (0/1)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — low n (1)</td>
+<td>not confused (-0.02)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>x-dyn-fp</code></td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">100% (1/1)</td>
+<td align="right">100% (1/1)</td>
+<td align="right">0% (0/1)</td>
+<td align="right">–</td>
+<td>supported — low n (1)</td>
+<td>not confused (-0.03)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>x-dyn-fz</code></td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">100% (1/1)</td>
+<td align="right">100% (1/1)</td>
+<td align="right">0% (0/1)</td>
+<td align="right">–</td>
+<td>supported — low n (1)</td>
+<td>not confused (-0.02)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>x-dyn-ppp</code></td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">100% (1/1)</td>
+<td align="right">0% (0/1)</td>
+<td align="right">100% (1/1)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — low n (1)</td>
+<td>not confused (-0.02)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>x-dyn-sf</code></td>
+<td align="right">3</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="right">100% (3/3)</td>
+<td align="right">100% (3/3)</td>
+<td align="right">33% (1/3)</td>
+<td align="right">–</td>
+<td>supported</td>
+<td>not confused (-0.03)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>x-dyn-sfp</code></td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0% (0/1)</td>
+<td align="right">0% (0/1)</td>
+<td align="right">0% (0/1)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted; low n (1)</td>
+<td>not confused (-0.02)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+</tbody></table>
+<h2>Symbols: structure</h2>
+<table>
+<thead>
+<tr>
+<th>Tag</th>
+<th align="right">Occurrences</th>
+<th align="right">Items</th>
+<th align="right">Emitted</th>
+<th align="right">Accuracy clean</th>
+<th align="right">Accuracy scan</th>
+<th align="right">Accuracy scan-severe</th>
+<th align="right">Read</th>
+<th>Status</th>
+<th>Confusion</th>
+<th>Check</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>barline-double</code></td>
+<td align="right">42</td>
+<td align="right">14</td>
+<td align="right">0</td>
+<td align="right">0% (0/42)</td>
+<td align="right">0% (0/42)</td>
+<td align="right">0% (0/42)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (+0.05)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>barline-final</code></td>
+<td align="right">94</td>
+<td align="right">80</td>
+<td align="right">143</td>
+<td align="right">96% (78/81)</td>
+<td align="right">94% (76/81)</td>
+<td align="right">86% (70/81)</td>
+<td align="right">–</td>
+<td>supported</td>
+<td>not confused (-0.02)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>repeat-start</code></td>
+<td align="right">25</td>
+<td align="right">6</td>
+<td align="right">0</td>
+<td align="right">0% (0/25)</td>
+<td align="right">0% (0/25)</td>
+<td align="right">0% (0/25)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-0.01)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>repeat-end</code></td>
+<td align="right">32</td>
+<td align="right">8</td>
+<td align="right">0</td>
+<td align="right">0% (0/32)</td>
+<td align="right">0% (0/32)</td>
+<td align="right">0% (0/32)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-0.01)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>volta-1</code></td>
+<td align="right">8</td>
+<td align="right">5</td>
+<td align="right">0</td>
+<td align="right">0% (0/8)</td>
+<td align="right">0% (0/8)</td>
+<td align="right">0% (0/8)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (+0.02)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>volta-2</code></td>
+<td align="right">8</td>
+<td align="right">5</td>
+<td align="right">0</td>
+<td align="right">0% (0/8)</td>
+<td align="right">0% (0/8)</td>
+<td align="right">0% (0/8)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-0.02)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>segno</code></td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0% (0/2)</td>
+<td align="right">0% (0/2)</td>
+<td align="right">0% (0/2)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted; low n (2)</td>
+<td>not confused (-0.03)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>coda</code></td>
+<td align="right">4</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0% (0/4)</td>
+<td align="right">0% (0/4)</td>
+<td align="right">0% (0/4)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-0.04)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>dc</code></td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">50% (1/2)</td>
+<td align="right">50% (1/2)</td>
+<td align="right">100% (2/2)</td>
+<td align="right">–</td>
+<td>partial — low n (2)</td>
+<td><strong>confused</strong> (+0.20)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>ds</code></td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">100% (2/2)</td>
+<td align="right">100% (2/2)</td>
+<td align="right">100% (2/2)</td>
+<td align="right">–</td>
+<td>supported — low n (2)</td>
+<td>not confused (+0.09)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>fine</code></td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">100% (2/2)</td>
+<td align="right">50% (1/2)</td>
+<td align="right">100% (2/2)</td>
+<td align="right">–</td>
+<td>partial — low n (2)</td>
+<td>not confused (-0.01)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>system-break</code></td>
+<td align="right">226</td>
+<td align="right">80</td>
+<td align="right">0</td>
+<td align="right">0% (0/226)</td>
+<td align="right">0% (0/226)</td>
+<td align="right">0% (0/226)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (-0.03)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>page-break</code></td>
+<td align="right">19</td>
+<td align="right">6</td>
+<td align="right">0</td>
+<td align="right">0% (0/19)</td>
+<td align="right">0% (0/19)</td>
+<td align="right">0% (0/19)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (+0.02)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+<tr>
+<td><code>multi-page</code></td>
+<td align="right">22</td>
+<td align="right">6</td>
+<td align="right">0</td>
+<td align="right">96% (1837/1908)</td>
+<td align="right">94% (1800/1908)</td>
+<td align="right">80% (1518/1908)</td>
+<td align="right">–</td>
+<td>supported</td>
+<td>not confused (+0.02)</td>
+<td>pitch recall of the notes on pages 2+ (sem)</td>
+</tr>
+<tr>
+<td><code>x-volta-3</code></td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0% (0/1)</td>
+<td align="right">0% (0/1)</td>
+<td align="right">0% (0/1)</td>
+<td align="right">–</td>
+<td><strong>unsupported</strong> — element never emitted; low n (1)</td>
+<td>not confused (+0.00)</td>
+<td>same element/value at the aligned measure (+-1)</td>
+</tr>
+</tbody></table>
+<h2>Symbols: lyrics</h2>
+<table>
+<thead>
+<tr>
+<th>Tag</th>
+<th align="right">Occurrences</th>
+<th align="right">Items</th>
+<th align="right">Emitted</th>
+<th align="right">Accuracy clean</th>
+<th align="right">Accuracy scan</th>
+<th align="right">Accuracy scan-severe</th>
+<th align="right">Read</th>
+<th>Status</th>
+<th>Confusion</th>
+<th>Check</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>lyrics</code></td>
+<td align="right">895</td>
+<td align="right">15</td>
+<td align="right">606</td>
+<td align="right">86% (536/624)</td>
+<td align="right">88% (550/624)</td>
+<td align="right">52% (327/624)</td>
+<td align="right">98%</td>
+<td>supported</td>
+<td>not confused (-0.30)</td>
+<td>lyric on the aligned note</td>
+</tr>
+<tr>
+<td><code>lyrics-multi-verse</code></td>
+<td align="right">288</td>
+<td align="right">5</td>
+<td align="right">109</td>
+<td align="right">68% (96/142)</td>
+<td align="right">73% (103/142)</td>
+<td align="right">46% (66/142)</td>
+<td align="right">100%</td>
+<td>partial</td>
+<td>not confused (-0.03)</td>
+<td>lyric on the aligned note</td>
+</tr>
+<tr>
+<td><code>lyrics-melisma</code></td>
+<td align="right">39</td>
+<td align="right">10</td>
+<td align="right">39</td>
+<td align="right">70% (23/33)</td>
+<td align="right">67% (22/33)</td>
+<td align="right">55% (18/33)</td>
+<td align="right">97%</td>
+<td>partial</td>
+<td>not confused (-0.01)</td>
+<td>lyric on the aligned note</td>
+</tr>
+<tr>
+<td><code>lyrics-extender</code></td>
+<td align="right">27</td>
+<td align="right">8</td>
+<td align="right">17</td>
+<td align="right">53% (10/19)</td>
+<td align="right">58% (11/19)</td>
+<td align="right">42% (8/19)</td>
+<td align="right">100%</td>
+<td>partial</td>
+<td>not confused (-0.00)</td>
+<td>lyric on the aligned note</td>
+</tr>
+<tr>
+<td><code>lyrics-hyphen</code></td>
+<td align="right">203</td>
+<td align="right">15</td>
+<td align="right">145</td>
+<td align="right">69% (110/160)</td>
+<td align="right">78% (124/160)</td>
+<td align="right">57% (91/160)</td>
+<td align="right">98%</td>
+<td>partial</td>
+<td>not confused (-0.02)</td>
+<td>lyric on the aligned note</td>
+</tr>
+<tr>
+<td><code>lyrics-elision</code></td>
+<td align="right">11</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0% (0/8)</td>
+<td align="right">0% (0/8)</td>
+<td align="right">0% (0/8)</td>
+<td align="right">100%</td>
+<td><strong>unsupported</strong> — element never emitted</td>
+<td>not confused (+0.00)</td>
+<td>lyric on the aligned note</td>
+</tr>
+<tr>
+<td><code>lyrics-non-ascii</code></td>
+<td align="right">30</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">0% (0/19)</td>
+<td align="right">0% (0/19)</td>
+<td align="right">0% (0/19)</td>
+<td align="right">100%</td>
+<td><strong>unsupported</strong></td>
+<td>not confused (+0.00)</td>
+<td>lyric on the aligned note</td>
+</tr>
+<tr>
+<td><code>stanza-text</code></td>
+<td align="right">7</td>
+<td align="right">2</td>
+<td align="right">–</td>
+<td align="right">84% (76/91)</td>
+<td align="right">79% (92/117)</td>
+<td align="right">81% (82/101)</td>
+<td align="right">–</td>
+<td>partial</td>
+<td>–</td>
+<td>lyric precision (stanza text blocks not underlaid as lyrics) (sem)</td>
+</tr>
+</tbody></table>
+<h2>Generator-specific extra tags (not measured)</h2>
+<p>Tags outside the taxonomy that the generators record in <code>meta.json</code> (detail counts with no MusicXML element of their own, e.g. rest positions or minor-key flags). They are listed for completeness; the symbols they refine are scored above.</p>
+<table>
+<thead>
+<tr>
+<th>Tag</th>
+<th align="right">Occurrences</th>
+<th>Items</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>x-acc-courtesy-paren</code></td>
+<td align="right">6</td>
+<td><code>pitch/pitch-cov-accidentals-chords-piano</code>, <code>pitch/pitch-cov-accidentals-melody</code></td>
+</tr>
+<tr>
+<td><code>x-cross-staff-note</code></td>
+<td align="right">29</td>
+<td><code>layouts/cross-staff-piano-arpeggio-study</code></td>
+</tr>
+<tr>
+<td><code>x-group-bracket</code></td>
+<td align="right">12</td>
+<td><code>layouts/choir-closed-satb-light-of-morning</code>, <code>layouts/choir-open-satb-gloria</code>, <code>layouts/choir-piano-song-of-rejoicing</code>, <code>layouts/choir-sab-summer-song</code>, <code>layouts/choir-ssaa-winter-night</code>, <code>layouts/choir-ttbb-evening-bells</code>, <code>layouts/divisi-choir-bright-new-day</code>, <code>layouts/divisi-strings-lament</code>, <code>layouts/hymnal-stanzas-light-of-ages</code>, <code>layouts/orchestral-festive-march-9-staves</code>, <code>layouts/string-quartet-minuet</code></td>
+</tr>
+<tr>
+<td><code>x-group-square</code></td>
+<td align="right">1</td>
+<td><code>layouts/orchestral-festive-march-9-staves</code></td>
+</tr>
+<tr>
+<td><code>x-inverted-mordent</code></td>
+<td align="right">5</td>
+<td><code>marks/mk02-ornaments-fermatas-flute</code>, <code>marks/mk09-stacked-marks-viola</code></td>
+</tr>
+<tr>
+<td><code>x-inverted-turn</code></td>
+<td align="right">2</td>
+<td><code>marks/mk02-ornaments-fermatas-flute</code></td>
+</tr>
+<tr>
+<td><code>x-key-cancel</code></td>
+<td align="right">5</td>
+<td><code>pitch/pitch-cov-key-changes-organ</code></td>
+</tr>
+<tr>
+<td><code>x-key-minor</code></td>
+<td align="right">16</td>
+<td><code>pitch/pitch-cov-key-changes-organ</code>, <code>pitch/pitch-cov-keys-minor-flats</code>, <code>pitch/pitch-cov-keys-minor-sharps</code></td>
+</tr>
+<tr>
+<td><code>x-measures</code></td>
+<td align="right">237</td>
+<td><code>layouts/choir-closed-satb-light-of-morning</code>, <code>layouts/choir-open-satb-gloria</code>, <code>layouts/choir-piano-song-of-rejoicing</code>, <code>layouts/choir-sab-summer-song</code>, <code>layouts/choir-ssaa-winter-night</code>, <code>layouts/choir-ttbb-evening-bells</code>, <code>layouts/cross-staff-piano-arpeggio-study</code>, <code>layouts/divisi-choir-bright-new-day</code>, <code>layouts/divisi-strings-lament</code>, <code>layouts/hymnal-stanzas-light-of-ages</code>, <code>layouts/lead-sheet-long-road</code>, <code>layouts/melody-cello-elegy-2page</code>, <code>layouts/melody-flute-air</code>, <code>layouts/melody-lyrics-morning-song</code>, <code>layouts/orchestral-festive-march-9-staves</code>, <code>layouts/organ-three-staves-chorale-prelude</code>, <code>layouts/piano-grand-staff-prelude</code>, <code>layouts/string-quartet-minuet</code>, <code>layouts/two-voices-piano-song-without-words</code>, <code>layouts/voice-piano-night-song</code>, <code>lyrics/lyr01-elisions-three-languages</code>, <code>lyrics/lyr02-non-ascii-four-languages</code>, <code>percussion/perc01-parade-flute-snare-drumset</code></td>
+</tr>
+<tr>
+<td><code>x-multi-staff-part</code></td>
+<td align="right">6</td>
+<td><code>layouts/choir-piano-song-of-rejoicing</code>, <code>layouts/cross-staff-piano-arpeggio-study</code>, <code>layouts/organ-three-staves-chorale-prelude</code>, <code>layouts/piano-grand-staff-prelude</code>, <code>layouts/two-voices-piano-song-without-words</code>, <code>layouts/voice-piano-night-song</code></td>
+</tr>
+<tr>
+<td><code>x-notehead-x</code></td>
+<td align="right">58</td>
+<td><code>percussion/perc01-parade-flute-snare-drumset</code></td>
+</tr>
+<tr>
+<td><code>x-noteheads</code></td>
+<td align="right">2249</td>
+<td><code>layouts/choir-closed-satb-light-of-morning</code>, <code>layouts/choir-open-satb-gloria</code>, <code>layouts/choir-piano-song-of-rejoicing</code>, <code>layouts/choir-sab-summer-song</code>, <code>layouts/choir-ssaa-winter-night</code>, <code>layouts/choir-ttbb-evening-bells</code>, <code>layouts/cross-staff-piano-arpeggio-study</code>, <code>layouts/divisi-choir-bright-new-day</code>, <code>layouts/divisi-strings-lament</code>, <code>layouts/hymnal-stanzas-light-of-ages</code>, <code>layouts/lead-sheet-long-road</code>, <code>layouts/melody-cello-elegy-2page</code>, <code>layouts/melody-flute-air</code>, <code>layouts/melody-lyrics-morning-song</code>, <code>layouts/orchestral-festive-march-9-staves</code>, <code>layouts/organ-three-staves-chorale-prelude</code>, <code>layouts/piano-grand-staff-prelude</code>, <code>layouts/string-quartet-minuet</code>, <code>layouts/two-voices-piano-song-without-words</code>, <code>layouts/voice-piano-night-song</code>, <code>lyrics/lyr01-elisions-three-languages</code>, <code>lyrics/lyr02-non-ascii-four-languages</code>, <code>percussion/perc01-parade-flute-snare-drumset</code></td>
+</tr>
+<tr>
+<td><code>x-parts</code></td>
+<td align="right">64</td>
+<td><code>layouts/choir-closed-satb-light-of-morning</code>, <code>layouts/choir-open-satb-gloria</code>, <code>layouts/choir-piano-song-of-rejoicing</code>, <code>layouts/choir-sab-summer-song</code>, <code>layouts/choir-ssaa-winter-night</code>, <code>layouts/choir-ttbb-evening-bells</code>, <code>layouts/cross-staff-piano-arpeggio-study</code>, <code>layouts/divisi-choir-bright-new-day</code>, <code>layouts/divisi-strings-lament</code>, <code>layouts/hymnal-stanzas-light-of-ages</code>, <code>layouts/lead-sheet-long-road</code>, <code>layouts/melody-cello-elegy-2page</code>, <code>layouts/melody-flute-air</code>, <code>layouts/melody-lyrics-morning-song</code>, <code>layouts/orchestral-festive-march-9-staves</code>, <code>layouts/organ-three-staves-chorale-prelude</code>, <code>layouts/piano-grand-staff-prelude</code>, <code>layouts/string-quartet-minuet</code>, <code>layouts/two-voices-piano-song-without-words</code>, <code>layouts/voice-piano-night-song</code>, <code>lyrics/lyr01-elisions-three-languages</code>, <code>lyrics/lyr02-non-ascii-four-languages</code>, <code>percussion/perc01-parade-flute-snare-drumset</code></td>
+</tr>
+<tr>
+<td><code>x-pedal-release</code></td>
+<td align="right">23</td>
+<td><code>marks/mk04-piano-pedal-arpeggio-fingering</code>, <code>marks/mk07-vocalise-voice-piano</code></td>
+</tr>
+<tr>
+<td><code>x-portato</code></td>
+<td align="right">4</td>
+<td><code>marks/mk01-articulations-violin</code></td>
+</tr>
+<tr>
+<td><code>x-rest-fermata</code></td>
+<td align="right">8</td>
+<td><code>rests/rst03-whole-bar-rests-simple</code>, <code>rests/rst04-whole-bar-rests-compound</code>, <code>rests/rst07-piano-rests</code>, <code>rests/rst09-quartet-rests</code></td>
+</tr>
+<tr>
+<td><code>x-rest-in-beam</code></td>
+<td align="right">36</td>
+<td><code>rests/rst08-tuplet-beam-rests</code></td>
+</tr>
+<tr>
+<td><code>x-rest-in-tuplet</code></td>
+<td align="right">28</td>
+<td><code>rests/rst08-tuplet-beam-rests</code></td>
+</tr>
+<tr>
+<td><code>x-rest-lowered</code></td>
+<td align="right">21</td>
+<td><code>rests/rst06-two-voice-rests</code>, <code>rests/rst07-piano-rests</code></td>
+</tr>
+<tr>
+<td><code>x-rest-multibar-hbar</code></td>
+<td align="right">4</td>
+<td><code>rests/rst05-multibar-rests</code></td>
+</tr>
+<tr>
+<td><code>x-rest-multibar-symbols</code></td>
+<td align="right">5</td>
+<td><code>rests/rst05-multibar-rests</code></td>
+</tr>
+<tr>
+<td><code>x-rest-raised</code></td>
+<td align="right">51</td>
+<td><code>rests/rst06-two-voice-rests</code>, <code>rests/rst07-piano-rests</code>, <code>rests/rst08-tuplet-beam-rests</code></td>
+</tr>
+<tr>
+<td><code>x-rest-whole-bar-shared-staff</code></td>
+<td align="right">4</td>
+<td><code>rests/rst06-two-voice-rests</code></td>
+</tr>
+<tr>
+<td><code>x-staff-1-line</code></td>
+<td align="right">1</td>
+<td><code>percussion/perc01-parade-flute-snare-drumset</code></td>
+</tr>
+<tr>
+<td><code>x-staves</code></td>
+<td align="right">71</td>
+<td><code>layouts/choir-closed-satb-light-of-morning</code>, <code>layouts/choir-open-satb-gloria</code>, <code>layouts/choir-piano-song-of-rejoicing</code>, <code>layouts/choir-sab-summer-song</code>, <code>layouts/choir-ssaa-winter-night</code>, <code>layouts/choir-ttbb-evening-bells</code>, <code>layouts/cross-staff-piano-arpeggio-study</code>, <code>layouts/divisi-choir-bright-new-day</code>, <code>layouts/divisi-strings-lament</code>, <code>layouts/hymnal-stanzas-light-of-ages</code>, <code>layouts/lead-sheet-long-road</code>, <code>layouts/melody-cello-elegy-2page</code>, <code>layouts/melody-flute-air</code>, <code>layouts/melody-lyrics-morning-song</code>, <code>layouts/orchestral-festive-march-9-staves</code>, <code>layouts/organ-three-staves-chorale-prelude</code>, <code>layouts/piano-grand-staff-prelude</code>, <code>layouts/string-quartet-minuet</code>, <code>layouts/two-voices-piano-song-without-words</code>, <code>layouts/voice-piano-night-song</code>, <code>lyrics/lyr01-elisions-three-languages</code>, <code>lyrics/lyr02-non-ascii-four-languages</code>, <code>percussion/perc01-parade-flute-snare-drumset</code></td>
+</tr>
+<tr>
+<td><code>x-tie-across-page</code></td>
+<td align="right">3</td>
+<td><code>time/t08-ties-systems-pages</code></td>
+</tr>
+<tr>
+<td><code>x-time-courtesy</code></td>
+<td align="right">24</td>
+<td><code>time/t01-simple-meters</code>, <code>time/t02-compound-irregular</code>, <code>time/t03-common-cut-piano</code>, <code>time/t04-pickup-song</code>, <code>time/t05-triplets-duplets</code>, <code>time/t07-nested-tuplets</code>, <code>time/t08-ties-systems-pages</code>, <code>time/t10-quartet-meters</code></td>
+</tr>
+<tr>
+<td><code>x-to-coda</code></td>
+<td align="right">2</td>
+<td><code>structure/str04-segno-coda-ds</code>, <code>structure/str08-variations-twelve-pages-piano</code></td>
+</tr>
+<tr>
+<td><code>x-two-voice-staff-measure</code></td>
+<td align="right">30</td>
+<td><code>layouts/cross-staff-piano-arpeggio-study</code>, <code>layouts/divisi-choir-bright-new-day</code>, <code>layouts/divisi-strings-lament</code>, <code>layouts/organ-three-staves-chorale-prelude</code>, <code>layouts/two-voices-piano-song-without-words</code></td>
+</tr>
+<tr>
+<td><code>x-unpitched</code></td>
+<td align="right">139</td>
+<td><code>percussion/perc01-parade-flute-snare-drumset</code></td>
+</tr>
+</tbody></table>
+<h2>Layouts</h2>
+<p>Layout score = mean of part-count match (exact), part-name score and the share of recognised notes that landed in the right part (from eval.mjs). Status from the <code>scan</code> input with the same thresholds.</p>
+<table>
+<thead>
+<tr>
+<th>Layout</th>
+<th align="right">Items</th>
+<th align="right">Layout score clean</th>
+<th align="right">Layout score scan</th>
+<th align="right">Layout score scan-severe</th>
+<th align="right">Part count ok</th>
+<th align="right">Names</th>
+<th align="right">Right part</th>
+<th align="right">Split violations</th>
+<th align="right">Aggregate</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>melody</code></td>
+<td align="right">32</td>
+<td align="right">97%</td>
+<td align="right">96%</td>
+<td align="right">86%</td>
+<td align="right">100%</td>
+<td align="right">88%</td>
+<td align="right">100%</td>
+<td align="right">0</td>
+<td align="right">0.861</td>
+<td>supported</td>
+</tr>
+<tr>
+<td><code>melody-lyrics</code></td>
+<td align="right">4</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">0</td>
+<td align="right">0.931</td>
+<td>supported</td>
+</tr>
+<tr>
+<td><code>piano</code></td>
+<td align="right">16</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">88%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">0</td>
+<td align="right">0.930</td>
+<td>supported</td>
+</tr>
+<tr>
+<td><code>voice-piano</code></td>
+<td align="right">3</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">48%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">0</td>
+<td align="right">0.953</td>
+<td>supported</td>
+</tr>
+<tr>
+<td><code>choir-closed-satb</code></td>
+<td align="right">1</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">0</td>
+<td align="right">0.989</td>
+<td>supported</td>
+</tr>
+<tr>
+<td><code>choir-open-satb</code></td>
+<td align="right">1</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">99%</td>
+<td align="right">0</td>
+<td align="right">0.925</td>
+<td>supported</td>
+</tr>
+<tr>
+<td><code>choir-sab</code></td>
+<td align="right">1</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">23%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">0</td>
+<td align="right">0.996</td>
+<td>supported</td>
+</tr>
+<tr>
+<td><code>choir-ttbb</code></td>
+<td align="right">1</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">6%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">0</td>
+<td align="right">1.000</td>
+<td>supported</td>
+</tr>
+<tr>
+<td><code>choir-ssaa</code></td>
+<td align="right">1</td>
+<td align="right">100%</td>
+<td align="right">98%</td>
+<td align="right">99%</td>
+<td align="right">100%</td>
+<td align="right">94%</td>
+<td align="right">100%</td>
+<td align="right">0</td>
+<td align="right">0.985</td>
+<td>supported</td>
+</tr>
+<tr>
+<td><code>choir-piano</code></td>
+<td align="right">1</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">24%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">0</td>
+<td align="right">0.997</td>
+<td>supported</td>
+</tr>
+<tr>
+<td><code>organ</code></td>
+<td align="right">2</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">0</td>
+<td align="right">0.960</td>
+<td>supported</td>
+</tr>
+<tr>
+<td><code>string-quartet</code></td>
+<td align="right">6</td>
+<td align="right">86%</td>
+<td align="right">95%</td>
+<td align="right">57%</td>
+<td align="right">100%</td>
+<td align="right">88%</td>
+<td align="right">98%</td>
+<td align="right">0</td>
+<td align="right">0.951</td>
+<td>supported</td>
+</tr>
+<tr>
+<td><code>orchestral</code></td>
+<td align="right">2</td>
+<td align="right">92%</td>
+<td align="right">93%</td>
+<td align="right">57%</td>
+<td align="right">100%</td>
+<td align="right">82%</td>
+<td align="right">98%</td>
+<td align="right">0</td>
+<td align="right">0.966</td>
+<td>supported</td>
+</tr>
+<tr>
+<td><code>lead-sheet</code></td>
+<td align="right">2</td>
+<td align="right">83%</td>
+<td align="right">83%</td>
+<td align="right">83%</td>
+<td align="right">100%</td>
+<td align="right">50%</td>
+<td align="right">100%</td>
+<td align="right">0</td>
+<td align="right">0.940</td>
+<td>supported</td>
+</tr>
+<tr>
+<td><code>hymnal-stanzas</code></td>
+<td align="right">1</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">0</td>
+<td align="right">0.999</td>
+<td>supported</td>
+</tr>
+<tr>
+<td><code>divisi</code></td>
+<td align="right">2</td>
+<td align="right">100%</td>
+<td align="right">96%</td>
+<td align="right">99%</td>
+<td align="right">100%</td>
+<td align="right">88%</td>
+<td align="right">100%</td>
+<td align="right">0</td>
+<td align="right">0.969</td>
+<td>supported</td>
+</tr>
+<tr>
+<td><code>cross-staff</code></td>
+<td align="right">1</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">100%</td>
+<td align="right">0</td>
+<td align="right">0.874</td>
+<td>supported</td>
+</tr>
+<tr>
+<td><code>two-voices-one-staff-instrument</code></td>
+<td align="right">3</td>
+<td align="right">89%</td>
+<td align="right">89%</td>
+<td align="right">89%</td>
+<td align="right">100%</td>
+<td align="right">67%</td>
+<td align="right">100%</td>
+<td align="right">0</td>
+<td align="right">0.920</td>
+<td>supported</td>
+</tr>
+<tr>
+<td><code>percussion-none</code></td>
+<td align="right">1</td>
+<td align="right">44%</td>
+<td align="right">44%</td>
+<td align="right">44%</td>
+<td align="right">0%</td>
+<td align="right">33%</td>
+<td align="right">100%</td>
+<td align="right">0</td>
+<td align="right">0.628</td>
+<td>partial</td>
+</tr>
+</tbody></table>
+<h2>Performance</h2>
+<p>Source: <code>mvp/work/eval-coverage-baseline-perf.json</code> (perf family; 63 PDFs; raster native, OCR on, 8 parallel jobs on 192 CPUs, load average 166.9 at the start). Times are the converter (<code>convert()</code>) in a Node child process, per page; peak memory is the child&#39;s peak RSS (<code>maxRSS</code>), including Node itself (~50 MB) and the OCR engine when OCR is on. Pages are rasterised at the resolution of the scan image, so pixel count follows the source dpi.</p>
+<p><strong>By source scan dpi</strong></p>
+<table>
+<thead>
+<tr>
+<th>Scan dpi</th>
+<th align="right">PDFs</th>
+<th align="right">MP/page</th>
+<th align="right">ms/page (median)</th>
+<th align="right">ms/page (max)</th>
+<th align="right">peak MB (median)</th>
+<th align="right">peak MB (max)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>100</td>
+<td align="right">6</td>
+<td align="right">0.968</td>
+<td align="right">3227</td>
+<td align="right">4464</td>
+<td align="right">309.4</td>
+<td align="right">374.5</td>
+</tr>
+<tr>
+<td>150</td>
+<td align="right">6</td>
+<td align="right">2.178</td>
+<td align="right">3332</td>
+<td align="right">4900</td>
+<td align="right">318.2</td>
+<td align="right">376.2</td>
+</tr>
+<tr>
+<td>200</td>
+<td align="right">6</td>
+<td align="right">3.869</td>
+<td align="right">3110</td>
+<td align="right">4225</td>
+<td align="right">252.2</td>
+<td align="right">337.6</td>
+</tr>
+<tr>
+<td>300</td>
+<td align="right">33</td>
+<td align="right">8.703</td>
+<td align="right">3185</td>
+<td align="right">5352</td>
+<td align="right">375.3</td>
+<td align="right">2184.3</td>
+</tr>
+<tr>
+<td>400</td>
+<td align="right">6</td>
+<td align="right">15.475</td>
+<td align="right">5593</td>
+<td align="right">7527</td>
+<td align="right">446</td>
+<td align="right">557.8</td>
+</tr>
+<tr>
+<td>600</td>
+<td align="right">6</td>
+<td align="right">34.806</td>
+<td align="right">4819</td>
+<td align="right">5363</td>
+<td align="right">418</td>
+<td align="right">445.6</td>
+</tr>
+</tbody></table>
+<p><strong>By page size</strong></p>
+<table>
+<thead>
+<tr>
+<th>Page size</th>
+<th align="right">PDFs</th>
+<th align="right">MP/page</th>
+<th align="right">ms/page (median)</th>
+<th align="right">ms/page (max)</th>
+<th align="right">peak MB (median)</th>
+<th align="right">peak MB (max)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>~A3</td>
+<td align="right">1</td>
+<td align="right">20.49</td>
+<td align="right">5259</td>
+<td align="right">5259</td>
+<td align="right">417.9</td>
+<td align="right">417.9</td>
+</tr>
+<tr>
+<td>~B4</td>
+<td align="right">6</td>
+<td align="right">10.25</td>
+<td align="right">5352</td>
+<td align="right">7527</td>
+<td align="right">419.1</td>
+<td align="right">557.8</td>
+</tr>
+<tr>
+<td>~Letter</td>
+<td align="right">1</td>
+<td align="right">9.965</td>
+<td align="right">4833</td>
+<td align="right">4833</td>
+<td align="right">453.1</td>
+<td align="right">453.1</td>
+</tr>
+<tr>
+<td>A3</td>
+<td align="right">5</td>
+<td align="right">17.403</td>
+<td align="right">3617</td>
+<td align="right">4266</td>
+<td align="right">345.9</td>
+<td align="right">411.7</td>
+</tr>
+<tr>
+<td>A4</td>
+<td align="right">45</td>
+<td align="right">8.703</td>
+<td align="right">2993</td>
+<td align="right">6659</td>
+<td align="right">345.4</td>
+<td align="right">2184.3</td>
+</tr>
+<tr>
+<td>Letter</td>
+<td align="right">5</td>
+<td align="right">8.415</td>
+<td align="right">3717</td>
+<td align="right">4452</td>
+<td align="right">336.6</td>
+<td align="right">369.5</td>
+</tr>
+</tbody></table>
+<p><strong>By page count</strong></p>
+<table>
+<thead>
+<tr>
+<th>Pages</th>
+<th align="right">PDFs</th>
+<th align="right">MP/page</th>
+<th align="right">ms/page (median)</th>
+<th align="right">ms/page (max)</th>
+<th align="right">peak MB (median)</th>
+<th align="right">peak MB (max)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td align="right">51</td>
+<td align="right">8.703</td>
+<td align="right">3782</td>
+<td align="right">7527</td>
+<td align="right">336.6</td>
+<td align="right">557.8</td>
+</tr>
+<tr>
+<td>5</td>
+<td align="right">3</td>
+<td align="right">8.703</td>
+<td align="right">2740</td>
+<td align="right">2993</td>
+<td align="right">572.1</td>
+<td align="right">666.1</td>
+</tr>
+<tr>
+<td>10</td>
+<td align="right">3</td>
+<td align="right">8.703</td>
+<td align="right">2614</td>
+<td align="right">2864</td>
+<td align="right">891.3</td>
+<td align="right">908.4</td>
+</tr>
+<tr>
+<td>20</td>
+<td align="right">3</td>
+<td align="right">8.703</td>
+<td align="right">2602</td>
+<td align="right">2727</td>
+<td align="right">1301.1</td>
+<td align="right">1302.1</td>
+</tr>
+<tr>
+<td>40</td>
+<td align="right">3</td>
+<td align="right">8.703</td>
+<td align="right">2429</td>
+<td align="right">2632</td>
+<td align="right">2180.8</td>
+<td align="right">2184.3</td>
+</tr>
+</tbody></table>
+<p><strong>Linear fits.</strong> ms per page = 3056.2 + <strong>51.49 ms per megapixel</strong> × MP per page (n=63, R²=0.2). Peak MB = 296.9 + 5.2 MB per megapixel × total MP (n=63, R²=0.968). Overall: 301 ms of conversion per megapixel.</p>
+<h2>Items</h2>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Layout</th>
+<th align="right">Aggregate clean</th>
+<th align="right">Aggregate scan</th>
+<th align="right">Aggregate scan-severe</th>
+<th>Parts (expected → scan)</th>
+<th align="right">ms/page</th>
+<th align="right">peak MB</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>layouts/choir-closed-satb-light-of-morning</code></td>
+<td>choir-closed-satb</td>
+<td align="right">0.982</td>
+<td align="right">0.989</td>
+<td align="right">0.986</td>
+<td>4 → 4</td>
+<td align="right">2417</td>
+<td align="right">243</td>
+</tr>
+<tr>
+<td><code>layouts/choir-open-satb-gloria</code></td>
+<td>choir-open-satb</td>
+<td align="right">0.916</td>
+<td align="right">0.925</td>
+<td align="right">0.879</td>
+<td>4 → 4</td>
+<td align="right">2948</td>
+<td align="right">255</td>
+</tr>
+<tr>
+<td><code>layouts/choir-piano-song-of-rejoicing</code></td>
+<td>choir-piano</td>
+<td align="right">0.999</td>
+<td align="right">0.997</td>
+<td align="right">0.530</td>
+<td>5 → 5</td>
+<td align="right">4153</td>
+<td align="right">321</td>
+</tr>
+<tr>
+<td><code>layouts/choir-sab-summer-song</code></td>
+<td>choir-sab</td>
+<td align="right">0.984</td>
+<td align="right">0.996</td>
+<td align="right">0.328</td>
+<td>3 → 3</td>
+<td align="right">3001</td>
+<td align="right">234</td>
+</tr>
+<tr>
+<td><code>layouts/choir-ssaa-winter-night</code></td>
+<td>choir-ssaa</td>
+<td align="right">0.990</td>
+<td align="right">0.985</td>
+<td align="right">0.982</td>
+<td>4 → 4</td>
+<td align="right">2374</td>
+<td align="right">257</td>
+</tr>
+<tr>
+<td><code>layouts/choir-ttbb-evening-bells</code></td>
+<td>choir-ttbb</td>
+<td align="right">1.000</td>
+<td align="right">1.000</td>
+<td align="right">0.352</td>
+<td>4 → 4</td>
+<td align="right">2794</td>
+<td align="right">223</td>
+</tr>
+<tr>
+<td><code>layouts/cross-staff-piano-arpeggio-study</code></td>
+<td>cross-staff</td>
+<td align="right">0.874</td>
+<td align="right">0.874</td>
+<td align="right">0.799</td>
+<td>1 → 1</td>
+<td align="right">1963</td>
+<td align="right">231</td>
+</tr>
+<tr>
+<td><code>layouts/divisi-choir-bright-new-day</code></td>
+<td>divisi</td>
+<td align="right">0.988</td>
+<td align="right">0.988</td>
+<td align="right">0.942</td>
+<td>4 → 4</td>
+<td align="right">4543</td>
+<td align="right">295</td>
+</tr>
+<tr>
+<td><code>layouts/divisi-strings-lament</code></td>
+<td>divisi</td>
+<td align="right">0.971</td>
+<td align="right">0.950</td>
+<td align="right">0.938</td>
+<td>4 → 4</td>
+<td align="right">2169</td>
+<td align="right">257</td>
+</tr>
+<tr>
+<td><code>layouts/hymnal-stanzas-light-of-ages</code></td>
+<td>hymnal-stanzas</td>
+<td align="right">1.000</td>
+<td align="right">0.999</td>
+<td align="right">0.996</td>
+<td>4 → 4</td>
+<td align="right">3294</td>
+<td align="right">244</td>
+</tr>
+<tr>
+<td><code>layouts/lead-sheet-long-road</code></td>
+<td>lead-sheet</td>
+<td align="right">0.888</td>
+<td align="right">0.920</td>
+<td align="right">0.840</td>
+<td>1 → 1</td>
+<td align="right">2949</td>
+<td align="right">240</td>
+</tr>
+<tr>
+<td><code>layouts/melody-cello-elegy-2page</code></td>
+<td>melody</td>
+<td align="right">0.876</td>
+<td align="right">0.843</td>
+<td align="right">0.713</td>
+<td>1 → 1</td>
+<td align="right">1408</td>
+<td align="right">294</td>
+</tr>
+<tr>
+<td><code>layouts/melody-flute-air</code></td>
+<td>melody</td>
+<td align="right">0.959</td>
+<td align="right">0.968</td>
+<td align="right">0.961</td>
+<td>1 → 1</td>
+<td align="right">1655</td>
+<td align="right">247</td>
+</tr>
+<tr>
+<td><code>layouts/melody-lyrics-morning-song</code></td>
+<td>melody-lyrics</td>
+<td align="right">1.000</td>
+<td align="right">1.000</td>
+<td align="right">0.938</td>
+<td>1 → 1</td>
+<td align="right">2424</td>
+<td align="right">237</td>
+</tr>
+<tr>
+<td><code>layouts/orchestral-festive-march-9-staves</code></td>
+<td>orchestral</td>
+<td align="right">0.972</td>
+<td align="right">0.957</td>
+<td align="right">0.873</td>
+<td>9 → 9</td>
+<td align="right">3811</td>
+<td align="right">496</td>
+</tr>
+<tr>
+<td><code>layouts/organ-three-staves-chorale-prelude</code></td>
+<td>organ</td>
+<td align="right">0.985</td>
+<td align="right">0.946</td>
+<td align="right">0.763</td>
+<td>1 → 1</td>
+<td align="right">2441</td>
+<td align="right">234</td>
+</tr>
+<tr>
+<td><code>layouts/piano-grand-staff-prelude</code></td>
+<td>piano</td>
+<td align="right">0.896</td>
+<td align="right">0.942</td>
+<td align="right">0.928</td>
+<td>1 → 1</td>
+<td align="right">1683</td>
+<td align="right">227</td>
+</tr>
+<tr>
+<td><code>layouts/string-quartet-minuet</code></td>
+<td>string-quartet</td>
+<td align="right">0.777</td>
+<td align="right">0.984</td>
+<td align="right">0.774</td>
+<td>4 → 4</td>
+<td align="right">4095</td>
+<td align="right">298</td>
+</tr>
+<tr>
+<td><code>layouts/two-voices-piano-song-without-words</code></td>
+<td>two-voices-one-staff-instrument</td>
+<td align="right">0.996</td>
+<td align="right">0.996</td>
+<td align="right">0.723</td>
+<td>1 → 1</td>
+<td align="right">1898</td>
+<td align="right">232</td>
+</tr>
+<tr>
+<td><code>layouts/voice-piano-night-song</code></td>
+<td>voice-piano</td>
+<td align="right">0.972</td>
+<td align="right">0.922</td>
+<td align="right">0.459</td>
+<td>2 → 2</td>
+<td align="right">2869</td>
+<td align="right">243</td>
+</tr>
+<tr>
+<td><code>lyrics/lyr01-elisions-three-languages</code></td>
+<td>melody-lyrics</td>
+<td align="right">0.919</td>
+<td align="right">0.976</td>
+<td align="right">0.888</td>
+<td>1 → 1</td>
+<td align="right">3367</td>
+<td align="right">231</td>
+</tr>
+<tr>
+<td><code>lyrics/lyr02-non-ascii-four-languages</code></td>
+<td>melody-lyrics</td>
+<td align="right">0.825</td>
+<td align="right">0.832</td>
+<td align="right">0.815</td>
+<td>1 → 1</td>
+<td align="right">3429</td>
+<td align="right">241</td>
+</tr>
+<tr>
+<td><code>marks/mk01-articulations-violin</code></td>
+<td>melody</td>
+<td align="right">0.974</td>
+<td align="right">0.974</td>
+<td align="right">0.967</td>
+<td>1 → 1</td>
+<td align="right">2048</td>
+<td align="right">230</td>
+</tr>
+<tr>
+<td><code>marks/mk02-ornaments-fermatas-flute</code></td>
+<td>melody</td>
+<td align="right">0.951</td>
+<td align="right">0.958</td>
+<td align="right">0.959</td>
+<td>1 → 1</td>
+<td align="right">1809</td>
+<td align="right">231</td>
+</tr>
+<tr>
+<td><code>marks/mk03-dynamics-hairpins-cello</code></td>
+<td>melody</td>
+<td align="right">0.978</td>
+<td align="right">0.967</td>
+<td align="right">0.799</td>
+<td>1 → 1</td>
+<td align="right">2055</td>
+<td align="right">249</td>
+</tr>
+<tr>
+<td><code>marks/mk04-piano-pedal-arpeggio-fingering</code></td>
+<td>piano</td>
+<td align="right">0.938</td>
+<td align="right">0.921</td>
+<td align="right">0.841</td>
+<td>1 → 1</td>
+<td align="right">2695</td>
+<td align="right">225</td>
+</tr>
+<tr>
+<td><code>marks/mk05-tempo-text-rehearsal-oboe</code></td>
+<td>melody</td>
+<td align="right">0.752</td>
+<td align="right">0.940</td>
+<td align="right">0.723</td>
+<td>1 → 1</td>
+<td align="right">2530</td>
+<td align="right">235</td>
+</tr>
+<tr>
+<td><code>marks/mk06-lead-sheet-chord-symbols</code></td>
+<td>lead-sheet</td>
+<td align="right">0.970</td>
+<td align="right">0.960</td>
+<td align="right">0.850</td>
+<td>1 → 1</td>
+<td align="right">2643</td>
+<td align="right">237</td>
+</tr>
+<tr>
+<td><code>marks/mk07-vocalise-voice-piano</code></td>
+<td>voice-piano</td>
+<td align="right">0.980</td>
+<td align="right">1.000</td>
+<td align="right">0.904</td>
+<td>2 → 2</td>
+<td align="right">2499</td>
+<td align="right">233</td>
+</tr>
+<tr>
+<td><code>marks/mk08-string-quartet-marks</code></td>
+<td>string-quartet</td>
+<td align="right">0.979</td>
+<td align="right">0.973</td>
+<td align="right">0.907</td>
+<td>4 → 4</td>
+<td align="right">2631</td>
+<td align="right">239</td>
+</tr>
+<tr>
+<td><code>marks/mk09-stacked-marks-viola</code></td>
+<td>melody</td>
+<td align="right">0.935</td>
+<td align="right">0.920</td>
+<td align="right">0.888</td>
+<td>1 → 1</td>
+<td align="right">2710</td>
+<td align="right">237</td>
+</tr>
+<tr>
+<td><code>notes/nt01-note-values</code></td>
+<td>melody</td>
+<td align="right">0.822</td>
+<td align="right">0.827</td>
+<td align="right">0.660</td>
+<td>1 → 1</td>
+<td align="right">1907</td>
+<td align="right">248</td>
+</tr>
+<tr>
+<td><code>notes/nt02-dots</code></td>
+<td>melody</td>
+<td align="right">0.845</td>
+<td align="right">0.830</td>
+<td align="right">0.797</td>
+<td>1 → 1</td>
+<td align="right">2360</td>
+<td align="right">240</td>
+</tr>
+<tr>
+<td><code>notes/nt03-chords</code></td>
+<td>piano</td>
+<td align="right">0.864</td>
+<td align="right">0.856</td>
+<td align="right">0.894</td>
+<td>1 → 1</td>
+<td align="right">1785</td>
+<td align="right">237</td>
+</tr>
+<tr>
+<td><code>notes/nt04-beams</code></td>
+<td>melody</td>
+<td align="right">0.923</td>
+<td align="right">0.918</td>
+<td align="right">0.916</td>
+<td>1 → 1</td>
+<td align="right">1873</td>
+<td align="right">255</td>
+</tr>
+<tr>
+<td><code>notes/nt05-flags-stems</code></td>
+<td>melody</td>
+<td align="right">0.834</td>
+<td align="right">0.847</td>
+<td align="right">0.762</td>
+<td>1 → 1</td>
+<td align="right">1779</td>
+<td align="right">251</td>
+</tr>
+<tr>
+<td><code>notes/nt06-ledger-lines</code></td>
+<td>piano</td>
+<td align="right">0.946</td>
+<td align="right">0.946</td>
+<td align="right">0.946</td>
+<td>1 → 1</td>
+<td align="right">2365</td>
+<td align="right">238</td>
+</tr>
+<tr>
+<td><code>notes/nt07-grace-notes</code></td>
+<td>melody</td>
+<td align="right">0.971</td>
+<td align="right">0.755</td>
+<td align="right">0.684</td>
+<td>1 → 1</td>
+<td align="right">1904</td>
+<td align="right">229</td>
+</tr>
+<tr>
+<td><code>notes/nt08-cue-notes</code></td>
+<td>melody</td>
+<td align="right">0.936</td>
+<td align="right">0.946</td>
+<td align="right">0.947</td>
+<td>1 → 1</td>
+<td align="right">1923</td>
+<td align="right">247</td>
+</tr>
+<tr>
+<td><code>notes/nt09-tremolos</code></td>
+<td>piano</td>
+<td align="right">0.709</td>
+<td align="right">0.709</td>
+<td align="right">0.695</td>
+<td>1 → 1</td>
+<td align="right">1945</td>
+<td align="right">242</td>
+</tr>
+<tr>
+<td><code>notes/nt10-piano-etude</code></td>
+<td>piano</td>
+<td align="right">0.951</td>
+<td align="right">0.941</td>
+<td align="right">0.914</td>
+<td>1 → 1</td>
+<td align="right">2026</td>
+<td align="right">235</td>
+</tr>
+<tr>
+<td><code>percussion/perc01-parade-flute-snare-drumset</code></td>
+<td>percussion-none</td>
+<td align="right">0.646</td>
+<td align="right">0.628</td>
+<td align="right">0.634</td>
+<td>3 → 2</td>
+<td align="right">2521</td>
+<td align="right">250</td>
+</tr>
+<tr>
+<td><code>pitch/pitch-cov-accidentals-chords-piano</code></td>
+<td>piano</td>
+<td align="right">0.944</td>
+<td align="right">0.938</td>
+<td align="right">0.856</td>
+<td>1 → 1</td>
+<td align="right">1792</td>
+<td align="right">238</td>
+</tr>
+<tr>
+<td><code>pitch/pitch-cov-accidentals-melody</code></td>
+<td>melody</td>
+<td align="right">0.853</td>
+<td align="right">0.902</td>
+<td align="right">0.836</td>
+<td>1 → 1</td>
+<td align="right">1760</td>
+<td align="right">250</td>
+</tr>
+<tr>
+<td><code>pitch/pitch-cov-clef-changes-piano</code></td>
+<td>piano</td>
+<td align="right">0.945</td>
+<td align="right">1.000</td>
+<td align="right">0.367</td>
+<td>1 → 1</td>
+<td align="right">1599</td>
+<td align="right">215</td>
+</tr>
+<tr>
+<td><code>pitch/pitch-cov-clefs-all</code></td>
+<td>melody</td>
+<td align="right">0.736</td>
+<td align="right">0.730</td>
+<td align="right">0.676</td>
+<td>1 → 1</td>
+<td align="right">1704</td>
+<td align="right">232</td>
+</tr>
+<tr>
+<td><code>pitch/pitch-cov-clefs-quartet</code></td>
+<td>string-quartet</td>
+<td align="right">0.769</td>
+<td align="right">0.955</td>
+<td align="right">0.756</td>
+<td>4 → 4</td>
+<td align="right">1833</td>
+<td align="right">240</td>
+</tr>
+<tr>
+<td><code>pitch/pitch-cov-key-changes-organ</code></td>
+<td>organ</td>
+<td align="right">0.978</td>
+<td align="right">0.974</td>
+<td align="right">0.811</td>
+<td>1 → 1</td>
+<td align="right">1958</td>
+<td align="right">270</td>
+</tr>
+<tr>
+<td><code>pitch/pitch-cov-keys-major-flats</code></td>
+<td>piano</td>
+<td align="right">0.997</td>
+<td align="right">0.997</td>
+<td align="right">0.577</td>
+<td>1 → 1</td>
+<td align="right">1672</td>
+<td align="right">242</td>
+</tr>
+<tr>
+<td><code>pitch/pitch-cov-keys-major-sharps</code></td>
+<td>melody</td>
+<td align="right">0.992</td>
+<td align="right">0.911</td>
+<td align="right">0.872</td>
+<td>1 → 1</td>
+<td align="right">1683</td>
+<td align="right">215</td>
+</tr>
+<tr>
+<td><code>pitch/pitch-cov-keys-minor-flats</code></td>
+<td>melody</td>
+<td align="right">0.967</td>
+<td align="right">0.971</td>
+<td align="right">0.885</td>
+<td>1 → 1</td>
+<td align="right">1929</td>
+<td align="right">234</td>
+</tr>
+<tr>
+<td><code>pitch/pitch-cov-keys-minor-sharps</code></td>
+<td>melody</td>
+<td align="right">0.604</td>
+<td align="right">0.541</td>
+<td align="right">0.557</td>
+<td>1 → 1</td>
+<td align="right">2266</td>
+<td align="right">244</td>
+</tr>
+<tr>
+<td><code>pitch/pitch-cov-ottava-ledger-melody</code></td>
+<td>melody</td>
+<td align="right">0.838</td>
+<td align="right">0.838</td>
+<td align="right">0.787</td>
+<td>1 → 1</td>
+<td align="right">1814</td>
+<td align="right">238</td>
+</tr>
+<tr>
+<td><code>pitch/pitch-cov-ottava-piano</code></td>
+<td>piano</td>
+<td align="right">0.809</td>
+<td align="right">0.795</td>
+<td align="right">0.803</td>
+<td>1 → 1</td>
+<td align="right">2035</td>
+<td align="right">224</td>
+</tr>
+<tr>
+<td><code>rests/rst01-rest-values</code></td>
+<td>melody</td>
+<td align="right">0.823</td>
+<td align="right">0.757</td>
+<td align="right">0.685</td>
+<td>1 → 1</td>
+<td align="right">1670</td>
+<td align="right">230</td>
+</tr>
+<tr>
+<td><code>rests/rst02-dotted-rests</code></td>
+<td>melody</td>
+<td align="right">0.858</td>
+<td align="right">0.887</td>
+<td align="right">0.746</td>
+<td>1 → 1</td>
+<td align="right">1895</td>
+<td align="right">238</td>
+</tr>
+<tr>
+<td><code>rests/rst03-whole-bar-rests-simple</code></td>
+<td>melody</td>
+<td align="right">0.768</td>
+<td align="right">0.777</td>
+<td align="right">0.577</td>
+<td>1 → 1</td>
+<td align="right">1649</td>
+<td align="right">242</td>
+</tr>
+<tr>
+<td><code>rests/rst04-whole-bar-rests-compound</code></td>
+<td>melody</td>
+<td align="right">0.721</td>
+<td align="right">0.728</td>
+<td align="right">0.817</td>
+<td>1 → 1</td>
+<td align="right">1699</td>
+<td align="right">235</td>
+</tr>
+<tr>
+<td><code>rests/rst05-multibar-rests</code></td>
+<td>melody</td>
+<td align="right">0.849</td>
+<td align="right">0.728</td>
+<td align="right">0.620</td>
+<td>1 → 1</td>
+<td align="right">1833</td>
+<td align="right">242</td>
+</tr>
+<tr>
+<td><code>rests/rst06-two-voice-rests</code></td>
+<td>two-voices-one-staff-instrument</td>
+<td align="right">0.856</td>
+<td align="right">0.858</td>
+<td align="right">0.840</td>
+<td>1 → 1</td>
+<td align="right">1785</td>
+<td align="right">235</td>
+</tr>
+<tr>
+<td><code>rests/rst07-piano-rests</code></td>
+<td>piano</td>
+<td align="right">0.927</td>
+<td align="right">0.910</td>
+<td align="right">0.886</td>
+<td>1 → 1</td>
+<td align="right">1803</td>
+<td align="right">240</td>
+</tr>
+<tr>
+<td><code>rests/rst08-tuplet-beam-rests</code></td>
+<td>melody</td>
+<td align="right">0.835</td>
+<td align="right">0.827</td>
+<td align="right">0.367</td>
+<td>1 → 1</td>
+<td align="right">2148</td>
+<td align="right">248</td>
+</tr>
+<tr>
+<td><code>rests/rst09-quartet-rests</code></td>
+<td>string-quartet</td>
+<td align="right">0.990</td>
+<td align="right">0.961</td>
+<td align="right">0.923</td>
+<td>4 → 4</td>
+<td align="right">3125</td>
+<td align="right">325</td>
+</tr>
+<tr>
+<td><code>structure/str01-double-final-barlines</code></td>
+<td>melody</td>
+<td align="right">1.000</td>
+<td align="right">1.000</td>
+<td align="right">0.953</td>
+<td>1 → 1</td>
+<td align="right">1525</td>
+<td align="right">253</td>
+</tr>
+<tr>
+<td><code>structure/str02-repeat-signs-piano</code></td>
+<td>piano</td>
+<td align="right">0.988</td>
+<td align="right">0.990</td>
+<td align="right">0.754</td>
+<td>1 → 1</td>
+<td align="right">1711</td>
+<td align="right">246</td>
+</tr>
+<tr>
+<td><code>structure/str03-voltas-string-quartet</code></td>
+<td>string-quartet</td>
+<td align="right">0.983</td>
+<td align="right">0.980</td>
+<td align="right">0.466</td>
+<td>4 → 4</td>
+<td align="right">3198</td>
+<td align="right">358</td>
+</tr>
+<tr>
+<td><code>structure/str04-segno-coda-ds</code></td>
+<td>melody</td>
+<td align="right">0.882</td>
+<td align="right">0.883</td>
+<td align="right">0.909</td>
+<td>1 → 1</td>
+<td align="right">1931</td>
+<td align="right">214</td>
+</tr>
+<tr>
+<td><code>structure/str05-fine-dc-al-fine-piano</code></td>
+<td>piano</td>
+<td align="right">1.000</td>
+<td align="right">1.000</td>
+<td align="right">0.877</td>
+<td>1 → 1</td>
+<td align="right">1898</td>
+<td align="right">246</td>
+</tr>
+<tr>
+<td><code>structure/str06-breaks-two-pages-song</code></td>
+<td>voice-piano</td>
+<td align="right">0.972</td>
+<td align="right">0.938</td>
+<td align="right">0.201</td>
+<td>2 → 2</td>
+<td align="right">3568</td>
+<td align="right">466</td>
+</tr>
+<tr>
+<td><code>structure/str07-orchestral-five-pages</code></td>
+<td>orchestral</td>
+<td align="right">0.982</td>
+<td align="right">0.975</td>
+<td align="right">0.664</td>
+<td>7 → 7</td>
+<td align="right">2853</td>
+<td align="right">577</td>
+</tr>
+<tr>
+<td><code>structure/str08-variations-twelve-pages-piano</code></td>
+<td>piano</td>
+<td align="right">0.983</td>
+<td align="right">0.973</td>
+<td align="right">0.961</td>
+<td>1 → 1</td>
+<td align="right">1464</td>
+<td align="right">639</td>
+</tr>
+<tr>
+<td><code>time/t01-simple-meters</code></td>
+<td>melody</td>
+<td align="right">0.875</td>
+<td align="right">0.875</td>
+<td align="right">0.851</td>
+<td>1 → 1</td>
+<td align="right">1646</td>
+<td align="right">237</td>
+</tr>
+<tr>
+<td><code>time/t02-compound-irregular</code></td>
+<td>melody</td>
+<td align="right">0.897</td>
+<td align="right">0.894</td>
+<td align="right">0.909</td>
+<td>1 → 1</td>
+<td align="right">1830</td>
+<td align="right">228</td>
+</tr>
+<tr>
+<td><code>time/t03-common-cut-piano</code></td>
+<td>piano</td>
+<td align="right">0.959</td>
+<td align="right">0.974</td>
+<td align="right">0.928</td>
+<td>1 → 1</td>
+<td align="right">1618</td>
+<td align="right">230</td>
+</tr>
+<tr>
+<td><code>time/t04-pickup-song</code></td>
+<td>melody-lyrics</td>
+<td align="right">0.916</td>
+<td align="right">0.917</td>
+<td align="right">0.936</td>
+<td>1 → 1</td>
+<td align="right">2069</td>
+<td align="right">263</td>
+</tr>
+<tr>
+<td><code>time/t05-triplets-duplets</code></td>
+<td>melody</td>
+<td align="right">0.817</td>
+<td align="right">0.839</td>
+<td align="right">0.803</td>
+<td>1 → 1</td>
+<td align="right">1683</td>
+<td align="right">224</td>
+</tr>
+<tr>
+<td><code>time/t06-quint-sext-sept</code></td>
+<td>melody</td>
+<td align="right">0.971</td>
+<td align="right">0.968</td>
+<td align="right">0.914</td>
+<td>1 → 1</td>
+<td align="right">1554</td>
+<td align="right">219</td>
+</tr>
+<tr>
+<td><code>time/t07-nested-tuplets</code></td>
+<td>melody</td>
+<td align="right">0.808</td>
+<td align="right">0.802</td>
+<td align="right">0.831</td>
+<td>1 → 1</td>
+<td align="right">1538</td>
+<td align="right">220</td>
+</tr>
+<tr>
+<td><code>time/t08-ties-systems-pages</code></td>
+<td>piano</td>
+<td align="right">0.978</td>
+<td align="right">0.990</td>
+<td align="right">0.404</td>
+<td>1 → 1</td>
+<td align="right">1480</td>
+<td align="right">269</td>
+</tr>
+<tr>
+<td><code>time/t09-two-voices-guitar</code></td>
+<td>two-voices-one-staff-instrument</td>
+<td align="right">0.906</td>
+<td align="right">0.906</td>
+<td align="right">0.765</td>
+<td>1 → 1</td>
+<td align="right">1703</td>
+<td align="right">227</td>
+</tr>
+<tr>
+<td><code>time/t10-quartet-meters</code></td>
+<td>string-quartet</td>
+<td align="right">0.868</td>
+<td align="right">0.854</td>
+<td align="right">0.620</td>
+<td>4 → 4</td>
+<td align="right">1949</td>
+<td align="right">243</td>
+</tr>
+</tbody></table>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+<script>window.mermaid && mermaid.initialize({ startOnLoad: true, theme: matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default' });</script>
+
+<div id="ssr-release" style="font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));border-top:1px solid rgba(127,127,127,.35);opacity:.85;text-align:center;overflow-wrap:anywhere">
+<a class="ssr-rel-link" href="https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.14.0" style="color:inherit"><b class="ssr-rel-ver">v0.14.0</b></a><span class="ssr-ahead"></span> · <span class="ssr-rel-age"></span> · page built from <a href="https://github.com/pension-plan/score-scan-reader/commit/e0c6c6b" style="color:inherit">e0c6c6b</a> <span class="ssr-build-age"></span><span class="ssr-newer"></span>
+</div>
+<script>
+(function () {
+  var B = {"version":"0.14.0","tag":"score-scan-reader-v0.14.0","releasedAt":"2026-11-08T09:53:36Z","releaseUrl":"https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.14.0","ahead":1,"commit":"e0c6c6b","builtAt":"2026-11-08T10:11:45.267Z"};
+  var rel = { ver: B.version, tag: B.tag, at: B.releasedAt, url: B.releaseUrl }, newer = null;
+  function ago(iso) {
+    var s = Math.max(0, (Date.now() - Date.parse(iso)) / 1000);
+    if (s < 60) return 'just now';
+    var m = Math.floor(s / 60), h = Math.floor(m / 60), d = Math.floor(h / 24);
+    if (d >= 1) return d + ' d ' + (h % 24) + ' h ago';
+    if (h >= 1) return h + ' h ' + (m % 60) + ' min ago';
+    return m + ' min ago';
+  }
+  function syd(iso) { return new Date(iso).toLocaleString('en-AU', { timeZone: 'Australia/Sydney', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false, timeZoneName: 'short' }); }
+  function all(c, f) { var n = document.getElementsByClassName(c); for (var i = 0; i < n.length; i++) f(n[i]); }
+  function paint() {
+    all('ssr-rel-ver', function (e) { e.textContent = 'v' + rel.ver; });
+    all('ssr-rel-link', function (e) { e.href = rel.url; });
+    all('ssr-ahead', function (e) { e.textContent = B.ahead > 0 ? ' + ' + B.ahead + ' commit' + (B.ahead === 1 ? '' : 's') + ' (unreleased build)' : (B.ahead === 0 ? ' (exact release)' : ''); });
+    all('ssr-ahead-short', function (e) { e.textContent = B.ahead > 0 ? ' +' + B.ahead : ''; e.title = B.ahead > 0 ? B.ahead + ' unreleased commit' + (B.ahead === 1 ? '' : 's') : ''; });
+    all('ssr-rel-ago', function (e) { e.textContent = rel.at ? 'released ' + ago(rel.at) : 'not released yet'; });
+    all('ssr-rel-age', function (e) { e.textContent = rel.at ? 'released ' + ago(rel.at) + ' (' + syd(rel.at) + ')' : 'not released yet'; });
+    all('ssr-build-age', function (e) { e.textContent = ago(B.builtAt); });
+    all('ssr-newer', function (e) { e.textContent = newer ? ' · newer release v' + newer + ' is out' : ''; });
+  }
+  paint();
+  setInterval(paint, 60000);
+  try {
+    fetch('https://api.github.com/repos/pension-plan/score-scan-reader/releases/latest').then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+      if (!j || !j.tag_name) return;
+      if (j.tag_name === B.tag) { rel.at = j.published_at; } else { newer = j.tag_name.replace(/^.*-v/, ''); }
+      paint();
+    }).catch(function () {});
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>
