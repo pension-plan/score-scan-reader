@@ -1409,7 +1409,8 @@ still read as sung notes.
 only on pages whose full heads are clearly wider (median at least 1.12 spaces; on narrow-headed old prints a worn
 head reads as small) and only with a stem of their own (front.js). In score.js a run of small notes is cue
 (written `<cue/>`, no `<tie>` element, which the schema does not allow on cues) on a staff where small heads are
-a minority (a staff of small heads only is a small staff or percussion), when the bar has a rest, or when no
+less than three quarters of the heads (a cue passage can be half a part's notes; a staff of small heads only is a
+small staff or percussion), when the bar has a rest, or when no
 full-size note follows a run of three or more; small notes right before a full-size note in a bar without rests
 are grace notes whatever value was read (nt07). Cue notes in a bar with a rest go to a second voice of the part
 (an optional stream, a forward to where they start), so the rest stays in voice 1 (nt08). A bar of a small sung

@@ -865,14 +865,15 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   // streams written per part: one per source staff; a keyboard part also has
   // an optional second voice on each staff (L17), empty unless that staff
   // shows two rhythms at once in a bar. p.src stays the staff list.
-  // layout staves where cue-size heads (heads.js h.small) are a minority of
-  // the heads: cue notes in a part. A staff of small heads only is a small
-  // staff (a descant) or a percussion staff, not cues
+  // layout staves where cue-size heads (heads.js h.small) are less than three
+  // quarters of the heads: cue notes in a part (a cue passage can be half of
+  // a part's notes, nt08). A staff of small heads only is a small staff (a
+  // descant) or a percussion staff, not cues
   const cueStaves = new Set();
   {
     const n = new Map();
     systems.forEach(sy => sy.staves.forEach((st, k) => st.chords.forEach(c => c.heads.forEach(h => { const a = n.get(k) || [0, 0]; a[0]++; if (h.small) a[1]++; n.set(k, a); }))));
-    for (const [k, [all, sm]] of n) if (sm > 0 && sm < 0.4 * all) cueStaves.add(k);
+    for (const [k, [all, sm]] of n) if (sm > 0 && sm < 0.75 * all) cueStaves.add(k);
   }
   parts.forEach(p => {
     const multi = p.src.length > 1;
