@@ -131,7 +131,8 @@ function groupGlyphs(cs, sp) {
     if (g) {
       const gw = g.x1 - g.x0 + 1, gh = g.y1 - g.y0 + 1;
       const ov = Math.min(c.x1, g.x1) - Math.max(c.x0, g.x0);
-      const overlap = ov >= 0.15 * sp || ov >= 0.6 * (c.x1 - c.x0);
+      const vnear = c.y0 <= g.y1 + 0.5 * sp && c.y1 >= g.y0 - 0.5 * sp; // not a sign stacked above / below
+      const overlap = vnear && (ov >= 0.15 * sp || ov >= 0.6 * (c.x1 - c.x0));
       const bowl = gw < 0.45 * sp && gh > 1.4 * sp && c.x0 - g.x1 < 0.5 * sp && (c.x1 - c.x0) < 0.9 * sp &&
         (c.y1 - c.y0) < 1.5 * sp && c.y0 > g.y0 + 0.35 * gh && c.y1 < g.y1 + 0.5 * sp;
       if (overlap || bowl) { g.parts.push(c); Object.assign(g, boxOf(g.parts)); continue; }
@@ -183,6 +184,17 @@ function isTimeSig(R, st, g, sp) {
     return wideRows(img, y2 - 0.7 * sp, y2 + 0.7 * sp, 0.25 * sp) >= 0.9 && wideRows(img, y2 - 0.8 * sp, y2 - 0.6 * sp, 0.8 * sp) > 0;
   }
   return false;
+}
+
+// back of a common-time C (a thick crescent from the second to the fourth
+// line); with a stroke through the whole staff it is cut time
+function commonTime(st, g, sp) {
+  const x = (g.x0 + g.x1) / 2, y1 = st.yAt(1, x), y3 = st.yAt(3, x);
+  const wid = (g.x1 - g.x0 + 1) / sp, hgt = (g.y1 - g.y0 + 1) / sp;
+  const fill = g.parts ? g.parts.reduce((a, c) => a + c.area, 0) / ((g.x1 - g.x0 + 1) * (g.y1 - g.y0 + 1)) : 0;
+  if (wid >= 0.35 && wid <= 1.0 && hgt >= 1.7 && hgt <= 2.7 && fill > 0.45 &&
+      Math.abs(g.y0 - y1) < 0.4 * sp && Math.abs(g.y1 - y3) < 0.4 * sp) return 'common';
+  return null;
 }
 
 // Header of a staff: clef, key signature, time signature, read left to right
@@ -253,7 +265,16 @@ function analyseHeader(R, comps, st, limitX, trace) {
       if (ok.length) { kcs = ok; kind = k; n++; end = g.x1; continue; }
       break;
     }
-    if (isTimeSig(R, st, g, sp)) { time = { x0: g.x0, x1: g.x1 }; end = g.x1; }
+    if (isTimeSig(R, st, g, sp)) { time = { x0: g.x0, x1: g.x1 }; end = g.x1; break; }
+    const cs = commonTime(st, g, sp);
+    if (cs) {
+      // the C's arcs lie on staff lines and were removed with them: what is
+      // left is its back and the two terminals, within ~1.6 spaces
+      let x1 = g.x1;
+      for (const o of glyphs.slice(gi + 1)) if (o.x0 < g.x0 + 1.7 * sp && (o.y1 - o.y0) < 2.6 * sp && o.y0 > lineY(0) - 0.3 * sp && o.y1 < lineY(4) + 0.3 * sp) x1 = Math.max(x1, o.x1);
+      time = { x0: g.x0, x1, beats: cs === 'cut' ? 2 : 4, type: cs === 'cut' ? 2 : 4, symbol: cs };
+      end = x1;
+    }
     break;
   }
   return { clef: clef === 'G' && clefOct === -1 ? 'G8' : clef, clefOct, fifths: kind === 'flat' ? -n : n, end: end + 0.2 * sp, keyN: n, time, mid: lineY(2) };
@@ -287,7 +308,8 @@ function hasDot(R, hd) {
   const { width: w, height: h, data } = R;
   const sp = hd.sp;
   // the dot sits in a space: on a line head -> look half a space above
-  const ys = hd.p % 2 === 0 ? [hd.y - 0.5 * sp] : [hd.y];
+  // (lower voice, stem down: in the space below)
+  const ys = hd.p % 2 !== 0 ? [hd.y] : hd.stemDir === -1 ? [hd.y - 0.5 * sp, hd.y + 0.5 * sp] : [hd.y - 0.5 * sp];
   for (const yc of ys) {
     for (let x = Math.round(hd.x + 0.85 * sp); x < hd.x + 1.9 * sp; x++) {
       let n = 0, tot = 0;
@@ -355,16 +377,23 @@ function keyAlters(fifths) {
 }
 
 // Find an accidental left of a head; returns 'sharp'|'flat'|'natural'|null
-function headAccidental(R, comps, hd) {
+function headAccidental(R, comps, hd, minX = -Infinity) {
   const sp = hd.sp;
-  for (const c of comps) {
-    if (c.x1 > hd.x - 0.55 * sp || c.x1 < hd.x - 2.6 * sp) continue;
-    const cy = (c.y0 + c.y1) / 2;
-    if (Math.abs(cy - hd.y) > 0.8 * sp) continue;
-    const k = classifyAccidental(R, c, sp);
-    if (k) return k;
+  // candidate glyphs left of the head (pieces cut by staff-line removal grouped)
+  const near = comps.filter(c => c.x1 <= hd.x - 0.5 * sp && c.x1 >= hd.x - 3.2 * sp && c.x0 > minX &&
+    c.y0 < hd.y + 1.6 * sp && c.y1 > hd.y - 2.6 * sp && (c.x1 - c.x0) < 1.6 * sp && (c.y1 - c.y0) < 4 * sp).sort((a, b) => a.x0 - b.x0);
+  let best = null, bd = Infinity;
+  for (const g of groupGlyphs(near, sp)) {
+    const k = classifyAccidental(R, g, sp);
+    if (!k) continue;
+    // the sign's own height: a flat's bowl, the middle of a sharp / natural
+    const yc = k === 'flat' ? g.y1 - 0.55 * sp : (g.y0 + g.y1) / 2;
+    const dy = Math.abs(yc - hd.y);
+    if (dy > 0.55 * sp) continue;
+    const d = (hd.x - g.x1) / sp + 2 * dy / sp;
+    if (d < bd) { bd = d; best = k; }
   }
-  return null;
+  return best;
 }
 
 function median(a) { const s = a.slice().sort((x, y) => x - y); return s.length ? s[s.length >> 1] : 0; }
@@ -416,7 +445,7 @@ function staffMeasureEvents(fr, R, comps, s, xa, xb) {
   const cur = { 1: 0, 2: 0 };
   for (const c of chords) {
     const hs = c.heads.slice().sort((a, b) => a.y - b.y);
-    hs.forEach(h => { if (!h.dur) h.dur = headDuration(R, h, c); h.acc = headAccidental(R, comps, h); });
+    hs.forEach(h => { if (!h.dur) h.dur = headDuration(R, h, c); h.acc = headAccidental(R, comps, h, s.hdr ? s.hdr.end : -Infinity); });
     const ev = (heads) => ({ x: c.x, heads, q: heads[0].dur.q, dots: heads[0].dur.dots });
     v.chordal.push({ ...ev(hs), q: Math.min(...hs.map(h => h.dur.q)) });
     let a1 = [], a2 = [];

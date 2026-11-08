@@ -1,4 +1,0 @@
-Theme: "Ah! vous dirai-je, maman", French folk melody first printed 1761 - public domain.
-Variations generated for this corpus from a harmonic plan - CC0 1.0.
-
-Engraving, rasterisation and damage simulation produced by the layout-challenge generator (corpus/challenge/layout/_tools); these derived files are dedicated to the public domain (CC0 1.0).

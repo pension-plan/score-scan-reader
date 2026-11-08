@@ -30,9 +30,13 @@ probe/
 *.tgz
 *.zip
 
+# challenge corpus: committed once validated (generators are still writing it)
+corpus/challenge/
+
 # corpus items whose source encodings are licensed for testing only (regenerate locally,
 # see corpus/synthetic/_tools/run_all.py); maintained by tools/push.sh
 # -- restricted (auto) --
+corpus/challenge/layout/organ-chorale-3-staves-landscape/
 corpus/synthetic/bach-bwv110-7-ttbb-closed/
 corpus/synthetic/bach-bwv166-6-closed-repeat/
 corpus/synthetic/bach-bwv244-62-closed-en-3v/

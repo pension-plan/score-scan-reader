@@ -131,7 +131,12 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
     const c = pairConnectivity(sel, k);
     const underlay = lyr[k] >= 0.3;
     let kb;
-    if (c.n >= 2) kb = c.frac >= 0.5 && !underlay;
+    // accompaniment cue (research-voices.md section 5): the bottom pair of
+    // staves carries chords but no text while a staff above it carries the
+    // underlay -> voice(s) over a piano whose barlines were not seen joined
+    const chordy = Math.max(stats[k].f2 + stats[k].f3, stats[k + 1].f2 + stats[k + 1].f3) >= 0.2;
+    const accomp = ocr && k + 1 === nSt - 1 && lyr.slice(0, k).some(x => x >= 0.3) && lyr[k] < 0.15 && lyr[k + 1] < 0.15 && chordy;
+    if (c.n >= 2) kb = (c.frac >= 0.5 && !underlay) || accomp;
     else {
       // no barline evidence: two chordal staves with no text at all read as piano
       const chordal = (stats[k].f3 + stats[k + 1].f3) / 2 >= 0.2 || (stats[k].f2 + stats[k + 1].f2) / 2 <= 0.3;
@@ -164,7 +169,7 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
     if (g.keyboard) {
       kbi++;
       parts.push({ name: nKb > 1 ? `Piano ${kbi}` : 'Piano', kind: 'keyboard', src: g.staves.map(s => ({ staff: s, voice: 'chordal' })) });
-      notes.push(`Staves ${g.staves.map(s => s + 1).join('+')}: barlines run through the staves and no lyrics between them, so they are kept together as one keyboard part (never split).`);
+      notes.push(`Staves ${g.staves.map(s => s + 1).join('+')}: read as a keyboard grand staff (barlines joined or chords without lyrics under a sung line), kept together as one part and never split.`);
       continue;
     }
     const v = vs.find(x => x.staff === g.staves[0]);
@@ -289,17 +294,20 @@ function repairStream(evs, target, anchors, sp) {
     opts.push([q / 2, 1.5]);
     if (q * 2 <= 4 + EPS) opts.push([q * 2, 1.6]);
     for (const [nq, c] of opts) if (qToType(nq)) cands.push({ i, nq, d: nq - q, c });
+    // an extra note (a false notehead) in an over-full measure
+    if (diff < 0) cands.push({ i, nq: 0, d: -q, c: 1.8, drop: true });
   });
   const apply = (edits) => evs.map((e, i) => {
     const ed = edits.find(x => x.i === i);
     if (!ed) return e;
+    if (ed.drop) return null;
     e.q = ed.nq; e.dots = qToType(ed.nq).dots;
     return e;
-  });
+  }).filter(Boolean);
   const base = anchorMisses(evs, anchors, sp);
   let best = null;
   const consider = (edits, c) => {
-    const trial = evs.map((e, i) => { const ed = edits.find(x => x.i === i); return ed ? { ...e, q: ed.nq } : e; });
+    const trial = evs.map((e, i) => { const ed = edits.find(x => x.i === i); return ed ? (ed.drop ? null : { ...e, q: ed.nq }) : e; }).filter(Boolean);
     const cost = c + 2 * anchorMisses(trial, anchors, sp);
     if (!best || cost < best.cost) best = { edits, cost };
   };
@@ -312,7 +320,21 @@ function repairStream(evs, target, anchors, sp) {
   const gapCost = 2.6 + 2 * base;
   if (best && best.cost < gapCost) return { events: apply(best.edits), ok: true };
   if (diff > EPS) return { events: evs.concat([{ forward: true, q: diff }]), ok: false };
-  return { events: evs, ok: false };
+  // still over-full: keep what fits and cut the note that crosses the barline
+  // so the measure stays importable (notation programs reject over-full bars)
+  const out = [];
+  let t = 0;
+  for (const e of evs) {
+    if (t >= target - EPS) break;
+    if (t + e.q > target + EPS) {
+      const rest = target - t, tt = qToType(rest);
+      if (tt) { e.q = rest; e.dots = tt.dots; out.push(e); }
+      else for (const q of restsFor(rest)) out.push({ forward: true, q });
+      t = target; break;
+    }
+    out.push(e); t += e.q;
+  }
+  return { events: out, ok: false };
 }
 
 // Two voices sharing a staff (closed score): stem up -> upper voice, stem
@@ -446,29 +468,13 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   else { mq = 4; warnings.push('Could not infer a time signature; using 4/4.'); }
   const mLen = (time.beats * 4) / time.type;
   warnings.push(`Time signature inferred from measure contents: ${time.beats}/${time.type}.`);
-  // group barline segments into measures: a spurious barline (or a measure
-  // broken across systems / at a repeat sign) splits one measure into short
-  // segments. Dynamic programming over groups of 1-3 consecutive segments,
-  // cost = distance of the group length from the bar length + a merge charge;
-  // an opening pickup and a short closing bar are free-ish.
-  const nSeg = segs.length;
-  const dev = (S, i, j) => {
-    if (Math.abs(S - mLen) < 1e-6) return 0;
-    if (S < mLen && ((i === 0 && j < nSeg) || (j === nSeg && i > 0))) return 0.3;
-    return Math.min(2.5, 1.5 * Math.abs(S - mLen));
-  };
-  const best = new Array(nSeg + 1).fill(Infinity), from = new Array(nSeg + 1).fill(-1);
-  best[0] = 0;
-  for (let j = 1; j <= nSeg; j++) {
-    let S = 0;
-    for (let i = j - 1; i >= Math.max(0, j - 3); i--) {
-      S += segSum[i];
-      const c = best[i] + dev(S, i, j) + 0.8 * (j - 1 - i);
-      if (c < best[j] - 1e-9) { best[j] = c; from[j] = i; }
-    }
+  // merge consecutive short segments that together make one measure
+  const measures = []; // [{segIdx:[...]}]
+  for (let i = 0; i < segs.length; i++) {
+    if (i > 0 && segSum[i] < mLen - 1e-6 && i + 1 < segs.length && segSum[i] + segSum[i + 1] <= mLen + 1e-6 &&
+        Math.abs(segSum[i] + segSum[i + 1] - mLen) < 1e-6) { measures.push({ segs: [i, i + 1] }); i++; }
+    else measures.push({ segs: [i] });
   }
-  const measures = []; // [{segs:[...]}]
-  for (let j = nSeg; j > 0; j = from[j]) measures.unshift({ segs: Array.from({ length: j - from[j] }, (_, t) => from[j] + t) });
   const perPart = parts.map((p, pi) => measures.map(m => p.src.map((src, k) => ({
     staff: src.staff, events: m.segs.flatMap(si => segEv[si][pi][k]),
   }))));
@@ -532,6 +538,23 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     const edge = mi === 0 || mi === measures.length - 1;
     if (edge && ms > 1e-6 && ms < mLen - 1e-6 && agree >= Math.max(2, 0.5 * nz.length)) target = ms;
     else if (edge && ms > 1e-6 && ms < mLen - 1e-6 && nz.length === 1) target = ms;
+    // rests printed in the voices of a measure (looked up only when needed)
+    const restCache = new Map();
+    const restsOf = (st) => {
+      if (m.segs.length !== 1) return [];
+      if (!restCache.has(st)) {
+        const seg = segs[m.segs[0]], sv = seg.sy.staves[st.staff];
+        restCache.set(st, sv ? findRests(seg, sv, parts[st.pi].src[st.k].voice) : []);
+      }
+      return restCache.get(st);
+    };
+    // a short opening bar whose voices show printed rests that fill it up is
+    // a full bar starting with rests, not a pickup
+    if (mi === 0 && target < mLen - 1e-6) {
+      const short = streams.filter((st, i) => sums[i] > 1e-6 && sums[i] < mLen - 1e-6);
+      const filled = short.filter(st => restsOf(st).length && placeRests(st.events, restsOf(st), mLen - qsum(st.events))).length;
+      if (filled && filled >= 0.5 * short.length) target = mLen;
+    }
     const implicit = mi === 0 && target < mLen - 1e-6;
     const sp = (m.sy.staves[0] && m.sy.staves[0].st.space) || 16;
     const anchors = [];
@@ -545,11 +568,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
       if (sums[i] <= 1e-6) evs = [{ rest: true, q: target, dots: 0, whole: true }];
       else if (Math.abs(sums[i] - target) > 1e-6) {
         let placed = null;
-        if (sums[i] < target && m.segs.length === 1) {
-          const seg = segs[m.segs[0]], sv = seg.sy.staves[st.staff];
-          const src = parts[st.pi].src[st.k];
-          if (sv) placed = placeRests(evs, findRests(seg, sv, src.voice), target - sums[i]);
-        }
+        if (sums[i] < target) placed = placeRests(evs, restsOf(st), target - sums[i]);
         if (placed) { evs = placed; restsFound++; }
         else {
           const r = repairStream(evs, target, anchors.filter(a => a.i !== i), sp);
@@ -562,7 +581,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   });
   if (restsFound) warnings.push(`${restsFound} voice-measures completed with rests read from the page.`);
   if (repaired) warnings.push(`${repaired} voice-measures repaired to fit ${time.beats}/${time.type} (likely misread dots, flags or beams).`);
-  if (mismatch) warnings.push(`${mismatch} voice-measures still do not add up to ${time.beats}/${time.type}; left with gaps or over-full.`);
+  if (mismatch) warnings.push(`${mismatch} voice-measures still did not add up to ${time.beats}/${time.type}; gaps left empty, notes past the barline cut.`);
   const xml = toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, measures });
   const nNotes = partMeasures.map(pm => pm.reduce((a, m) => a + m.reduce((b, s) => b + s.events.filter(e => !e.rest && !e.forward).length, 0), 0));
   const ranges = partMeasures.map(pm => {

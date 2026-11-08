@@ -1,4 +1,0 @@
-Text: Matthias Claudius, "Abendlied" ("Der Mond ist aufgegangen"), 1779 - public domain.
-Melody and SATB harmonisation: original CC0 (harmonisation by the corpus voice-leading solver).
-
-Music (melody, harmonisation, accompaniment), engraving, rasterisation and damage were produced for this corpus by corpus/challenge/lyrics/_tools and are dedicated to the public domain (CC0 1.0).

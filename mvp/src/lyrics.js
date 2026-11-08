@@ -9,6 +9,8 @@ const DEFAULTS = {
   addSp: 0.8,         // blank columns inserted into each word gap (staff spaces)
   rules: true,        // erase vertical rules (barlines, brackets, stems) crossing the text row
   targetH: 56,        // OCR crop height in px (incl. padding)
+  bilinear: false,    // smooth upscaling of the crop
+  norm: true,         // contrast-stretch the crop (paper -> white, ink -> black)
   minWordConf: 20,    // words below this are kept only when they look like clean words
   minLineConf: 50,
   relaxLow: true,     // keep clean-looking low-confidence words on confident rows
@@ -154,15 +156,37 @@ function buildCrop(g, row, ln, o) {
   for (let y = row.ya; y <= row.yb; y++) for (let i = 0; i < n; i += 2) hist[g.data[y * g.width + row.xa + i]]++;
   let tot = 0; for (let i = 0; i < 256; i++) tot += hist[i];
   let acc = 0, bg = 255; for (let i = 255; i >= 0; i--) { acc += hist[i]; if (acc >= 0.3 * tot) { bg = i; break; } }
+  // dark level: ink percentile, for an optional contrast stretch
+  acc = 0; let dk = 0; for (let i = 0; i < 256; i++) { acc += hist[i]; if (acc >= 0.02 * tot) { dk = i; break; } }
+  const stretch = o.norm && bg - dk > 40;
+  const lut = new Uint8ClampedArray(256);
+  for (let i = 0; i < 256; i++) lut[i] = stretch ? Math.round(255 * (i - dk) / (bg - dk)) : i;
   const W = Math.max(1, Math.round(srcW * scale)), Hh = Math.max(1, Math.round(srcH * scale));
-  const img = makeGray(W, Hh, bg);
+  const img = makeGray(W, Hh, stretch ? 255 : bg);
+  const blank = stretch ? 255 : bg;
+  const real = (v) => v >= 0 && v < srcW && vcol[v] >= 0 && !(o.rules && row.rule[vcol[v]]);
   for (let x = 0; x < W; x++) {
-    const vc = vcol[Math.min(srcW - 1, Math.floor(x / scale))];
-    if (vc < 0 || (o.rules && row.rule[vc])) continue;
-    const sx = row.xa + vc;
+    if (!o.bilinear) {
+      const vi = Math.min(srcW - 1, Math.floor(x / scale));
+      if (!real(vi)) continue;
+      const sx = row.xa + vcol[vi];
+      for (let y = 0; y < Hh; y++) {
+        const sy = Math.min(g.height - 1, row.ya + Math.floor(y / scale));
+        img.data[y * W + x] = lut[g.data[sy * g.width + sx]];
+      }
+      continue;
+    }
+    // bilinear: blend neighbouring virtual columns (inserted / erased ones are paper)
+    const fx = Math.max(0, (x + 0.5) / scale - 0.5), v0 = Math.floor(fx), tx = fx - v0;
+    const r0 = real(v0), r1 = real(v0 + 1);
+    if (!r0 && !r1) continue;
+    const sx0 = r0 ? row.xa + vcol[v0] : -1, sx1 = r1 ? row.xa + vcol[v0 + 1] : -1;
     for (let y = 0; y < Hh; y++) {
-      const sy = Math.min(g.height - 1, row.ya + Math.floor(y / scale));
-      img.data[y * W + x] = g.data[sy * g.width + sx];
+      const fy = Math.max(0, (y + 0.5) / scale - 0.5), y0 = Math.floor(fy), ty = fy - y0;
+      const ya = Math.min(g.height - 1, row.ya + y0), yb = Math.min(g.height - 1, row.ya + y0 + 1);
+      const at = (sx, yy) => (sx < 0 ? blank : lut[g.data[yy * g.width + sx]]);
+      const top = at(sx0, ya) * (1 - tx) + at(sx1, ya) * tx, bot = at(sx0, yb) * (1 - tx) + at(sx1, yb) * tx;
+      img.data[y * W + x] = Math.round(top * (1 - ty) + bot * ty);
     }
   }
   const toPage = (xc) => {
@@ -338,6 +362,19 @@ async function readLyrics(fr, ocr, onProgress, opts) {
       rows.forEach((v, i) => { v.number = i + 1; });
     }
     out[k] = out[k].filter(v => !v.stanza);
+  }
+  // a word hyphenated across a system break: the first syllable of the next
+  // system's matching verse continues it ("o-" | "cean" -> end, not single)
+  const keys = Object.keys(out).map(Number).sort((a, b) => a - b);
+  for (let i = 1; i < keys.length; i++) {
+    for (const v of out[keys[i]]) {
+      const prev = out[keys[i - 1]].find(u => u.band === v.band && u.number === v.number);
+      const last = prev && prev.syllables[prev.syllables.length - 1];
+      if (!last || !(last.syllabic === 'begin' || last.syllabic === 'middle') || !v.syllables.length) continue;
+      const f = v.syllables[0];
+      if (f.syllabic === 'single') f.syllabic = 'end';
+      else if (f.syllabic === 'begin') f.syllabic = 'middle';
+    }
   }
   return out;
 }

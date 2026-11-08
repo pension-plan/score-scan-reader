@@ -1,5 +1,0 @@
-Text: "Veni, veni, Emmanuel", Latin hymn (Psalteriolum Cantionum, 1710) - public domain.
-English translation: John Mason Neale, 1851 - public domain.
-Melody: CC0 modal melody written for this corpus.
-
-Music (melody, harmonisation, accompaniment), engraving, rasterisation and damage were produced for this corpus by corpus/challenge/lyrics/_tools and are dedicated to the public domain (CC0 1.0).
