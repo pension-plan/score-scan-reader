@@ -1456,6 +1456,14 @@ and type): written 195 to 439, matched 151 to 298 (recall 0.26 to 0.51); within 
 0.92 to 0.86, recall 0.30 to 0.65); most exact-bar misses are bar-number drift in the 10- to 40-page documents.
 Challenge with OCR: 9 to 12 written, 2 to 4 matched. Aggregates unchanged (wedges are not scored).
 
+**Marks on a staff split into two parts.** A dynamic, hairpin, tempo or other direction on a staff split into two
+parts goes to the upper voice's part, as the transcriptions write one mark printed between the staves of a closed
+score; only when it is printed twice (the same dynamic or hairpin above and below the staff within 1.5 spaces) does
+the one below go to the lower voice's part. Before, every mark was written into both parts. Per-part count of
+dynamics and hairpins against truth (sum of differences): coverage with OCR 401 to 331, challenge 204 to 148;
+metronome marks 102 to 65 and 12 to 7; benchmark 24 to 25. Element totals fall (challenge dynamics 490 to 421,
+benchmark 35 to 28): those were the copies.
+
 **Slurs, ties and grace notes in MusicXML.** A thin bowed curve is classified even where its box
 touches the heads it joins. Its two ends are matched to note heads (left end within about 1.8 staff
 spaces right of a head, right end left of one, 1.6 spaces vertically): two heads of one pitch on one staff
