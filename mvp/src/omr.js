@@ -48,6 +48,9 @@ function analyse(gray, idx, frOpts) {
 // that reads clearly more clefs wins.
 function analyseOriented(gray, idx, frOpts) {
   let best = { ...analyse(gray, idx, frOpts), turns: 0, gray };
+  // a front end that settles the orientation itself (it reports it) is not
+  // second-guessed: that would only repeat its work
+  if (best.fr && best.fr.orientation !== undefined) return best;
   const better = (a, b) => a.read > b.read || (a.read === b.read && a.n > b.n);
   if (!best.n && gray.width > 50 && gray.height > 50) {
     for (const t of [1, 3]) {
@@ -104,7 +107,7 @@ function createConverter(opts = {}) {
       const frOpts = { onProgress: (m, info) => progress(`${label}: ${m}`, Object.assign({ page: i, pages: n }, info || {})) };
       let a;
       try { a = analyseOriented(gray, i, frOpts); } catch (e) { warnings.push(`Page ${i + 1}: image analysis failed (${e.message}).`); return null; }
-      a.fr.warnings.forEach(w => warnings.push(`Page ${i + 1}: ${w}`));
+      (a.fr.warnings || []).forEach(w => warnings.push(`Page ${i + 1}: ${w}`));
       if (!a.n) return null;
       if (a.turns) warnings.push(`Page ${i + 1}: the scan was ${a.turns === 2 ? 'upside down' : 'turned sideways'}; read it turned ${a.turns === 2 ? 'the right way up' : a.turns === 1 ? 'a quarter clockwise' : 'a quarter anticlockwise'}.`);
       progress(`${label}: reading note symbols`, { stage: 'notes', page: i, pages: n });

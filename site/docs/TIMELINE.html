@@ -22,7 +22,7 @@ nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bo
 <body>
 <main><nav class="crumbs"><a href="../">Score Scan Reader</a> / docs / TIMELINE.md · <a href="https://github.com/pension-plan/score-scan-reader/blob/main/docs/TIMELINE.md">source</a></nav>
 <h1>Build timeline</h1>
-<p>All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 16:38 AEDT.</p>
+<p>All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 16:45 AEDT.</p>
 <h2>Events</h2>
 <table>
 <thead>
@@ -199,6 +199,18 @@ nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bo
 <td>16:38</td>
 <td>copista-2m ML demo page started, for GitHub Pages at /ml-demo/.</td>
 </tr>
+<tr>
+<td>16:42</td>
+<td>copista-2m ML demo published on GitHub Pages: <a href="https://pension-plan.github.io/score-scan-reader/ml-demo/">https://pension-plan.github.io/score-scan-reader/ml-demo/</a> — runs the model in your browser on a sample hymn (124 noteheads split exactly S/A and T/B on the sample) or your own scan. Live check passed: 203 symbols in 7.0 s, no errors. On a real 1905 scan the model’s voice slots fail (208 of 213 in one slot), so the app keeps its own voice logic.</td>
+</tr>
+<tr>
+<td>16:42</td>
+<td>Round 2 lyrics owner finished: words spanning several notes split into syllables, the trial’s line detector ported, part-name labels and stanza text now read. Lyrics 0.82 → 0.86 on its own; live tree with other owners’ work so far: aggregate 0.914, real scans 0.893.</td>
+</tr>
+<tr>
+<td>16:45</td>
+<td>Round 2 UI owner finished: L5a resolved. Reads up to 40 pages (was 8), one page at a time with progress, a page strip and a Stop button; recognition moved to a Web Worker (main-thread freeze on an 8-page PDF 23.2 s → 2.2 s, memory 310 MB → 50 MB). 35 of 35 UI checks pass.</td>
+</tr>
 </tbody></table>
 <h2>Accuracy by round</h2>
 <p>Scores are against the benchmark of synthetic and real scans with exact answers (1.00 is perfect).</p>
@@ -244,6 +256,16 @@ nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bo
 <td>–</td>
 <td>–</td>
 <td>–</td>
+</tr>
+<tr>
+<td>Round 2 (interim, lyrics owner)</td>
+<td>0.914</td>
+<td>–</td>
+<td>–</td>
+<td>0.905</td>
+<td>–</td>
+<td>–</td>
+<td>0.893</td>
 </tr>
 </tbody></table>
 <h2>Known limits</h2>
@@ -303,8 +325,8 @@ nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bo
 <td>L3e</td>
 <td>Part names not read from the labels at the start of each system</td>
 <td>Lyrics (OCR) + voices (apply)</td>
-<td>Queued for round 2</td>
-<td></td>
+<td>Partial (round 2)</td>
+<td>Part-name labels at system starts are now read by OCR (fr.partLabels); voices owner must apply them.</td>
 </tr>
 <tr>
 <td>L4a</td>
@@ -317,22 +339,22 @@ nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bo
 <td>L4b</td>
 <td>No melisma or extender handling</td>
 <td>Lyrics + voices</td>
-<td>Partial (round 1)</td>
-<td>Hyphens carried across system breaks; extender underscores handled. Splitting unhyphenated words over several notes still open.</td>
+<td>Partial (round 2)</td>
+<td>Words spanning several notes are now split into one syllable per note (vowel groups, en/de/la rules); extenders and their end positions are reported. Lindenbaum lyrics 0.45 → 0.65.</td>
 </tr>
 <tr>
 <td>L5a</td>
 <td>At most 8 PDF pages processed</td>
 <td>UI</td>
-<td>Queued for round 2</td>
-<td></td>
+<td>Resolved (round 2)</td>
+<td>Up to 40 PDF pages, read one at a time with per-page progress and a Stop button; recognition runs in a Web Worker. 8-page PDF: main thread blocked 23.2 s → 2.2 s, wall time 44.5 s → 27.1 s, memory 310 MB → 50 MB; 40 of 40 pages in 138 s.</td>
 </tr>
 <tr>
 <td>L5b</td>
 <td>Stanza text printed below the last system dropped for SATB</td>
 <td>Lyrics + voices</td>
-<td>Partial (round 1)</td>
-<td>Stanza blocks below the music are now detected and kept out of the underlay (no more poem text as lyrics). Attaching them as extra verses still open.</td>
+<td>Partial (round 2)</td>
+<td>Stanza text blocks below the music are now read (fr.stanzas); attaching them as verses is up to the voices owner.</td>
 </tr>
 <tr>
 <td>L6</td>
@@ -469,7 +491,7 @@ nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bo
 <td>Run 6</td>
 <td>Fix-forward round 2</td>
 <td>running</td>
-<td>0 of 5</td>
+<td>2 of 5</td>
 <td></td>
 </tr>
 <tr>
@@ -483,7 +505,7 @@ nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bo
 <td>Side</td>
 <td>Agents launched directly from the session</td>
 <td>running</td>
-<td>2 of 3</td>
+<td>3 of 3</td>
 <td></td>
 </tr>
 </tbody></table>
@@ -729,8 +751,8 @@ nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bo
 <td>run</td>
 <td>16:21</td>
 <td></td>
-<td>17</td>
-<td>150</td>
+<td>24</td>
+<td>172</td>
 </tr>
 <tr>
 <td>Run 6</td>
@@ -739,8 +761,8 @@ nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bo
 <td>run</td>
 <td>16:21</td>
 <td></td>
-<td>17</td>
-<td>124</td>
+<td>24</td>
+<td>149</td>
 </tr>
 <tr>
 <td>Run 6</td>
@@ -749,28 +771,28 @@ nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bo
 <td>run</td>
 <td>16:21</td>
 <td></td>
-<td>12</td>
-<td>90</td>
+<td>24</td>
+<td>114</td>
 </tr>
 <tr>
 <td>Run 6</td>
 <td>Fix</td>
 <td>fix:r2:lyrics</td>
-<td>run</td>
+<td>done</td>
 <td>16:21</td>
-<td></td>
-<td>17</td>
-<td>98</td>
+<td>16:41</td>
+<td>20</td>
+<td>109</td>
 </tr>
 <tr>
 <td>Run 6</td>
 <td>Fix</td>
 <td>fix:r2:ui</td>
-<td>run</td>
+<td>done</td>
 <td>16:21</td>
-<td></td>
-<td>15</td>
-<td>74</td>
+<td>16:45</td>
+<td>24</td>
+<td>87</td>
 </tr>
 <tr>
 <td>Run 3</td>
@@ -876,11 +898,11 @@ nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bo
 <td>Side</td>
 <td>ML demo</td>
 <td>copista-2m demo page for GitHub Pages</td>
-<td>run</td>
+<td>done</td>
 <td>16:38</td>
-<td></td>
-<td>0</td>
-<td>5</td>
+<td>16:41</td>
+<td>3</td>
+<td>21</td>
 </tr>
 <tr>
 <td>Side</td>
@@ -906,5 +928,38 @@ nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bo
 </main>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
 <script>window.mermaid && mermaid.initialize({ startOnLoad: true, theme: matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default' });</script>
+
+<div id="ssr-release" style="font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));border-top:1px solid rgba(127,127,127,.35);color:inherit;opacity:.85;text-align:center;overflow-wrap:anywhere">
+<a id="ssr-rel-link" href="https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.2.0" style="color:inherit"><b id="ssr-rel-ver">v0.2.0</b></a> · <span id="ssr-rel-age">release date unknown</span> · page built from <a href="https://github.com/pension-plan/score-scan-reader/commit/56859ef" style="color:inherit">56859ef</a> <span id="ssr-build-age"></span>
+</div>
+<script>
+(function () {
+  var BUILT = {"version":"0.2.0","releasedAt":"2026-11-08T05:37:15Z","releaseUrl":"https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.2.0","commit":"56859ef","builtAt":"2026-11-08T05:55:18.037Z"};
+  var rel = { ver: BUILT.version, at: BUILT.releasedAt, url: BUILT.releaseUrl };
+  function ago(iso) {
+    var s = Math.max(0, (Date.now() - Date.parse(iso)) / 1000);
+    if (s < 60) return 'just now';
+    var m = Math.floor(s / 60), h = Math.floor(m / 60), d = Math.floor(h / 24);
+    if (d >= 1) return d + ' d ' + (h % 24) + ' h ago';
+    if (h >= 1) return h + ' h ' + (m % 60) + ' min ago';
+    return m + ' min ago';
+  }
+  function paint() {
+    var v = document.getElementById('ssr-rel-ver'), a = document.getElementById('ssr-rel-age'), l = document.getElementById('ssr-rel-link'), b = document.getElementById('ssr-build-age');
+    if (!v) return;
+    v.textContent = 'v' + rel.ver;
+    l.href = rel.url;
+    a.textContent = rel.at ? 'released ' + ago(rel.at) + ' (' + new Date(rel.at).toLocaleString('en-AU', { timeZone: 'Australia/Sydney', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false, timeZoneName: 'short' }) + ')' : 'not released yet';
+    b.textContent = ago(BUILT.builtAt);
+  }
+  paint();
+  setInterval(paint, 60000);
+  try {
+    fetch('https://api.github.com/repos/pension-plan/score-scan-reader/releases/latest').then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+      if (j && j.tag_name) { rel = { ver: j.tag_name.replace(/^.*-v/, ''), at: j.published_at, url: j.html_url }; paint(); }
+    }).catch(function () {});
+  } catch (e) {}
+})();
+</script>
 </body>
 </html>

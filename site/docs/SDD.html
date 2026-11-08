@@ -1965,5 +1965,38 @@ weights of 40–430 MB, slow autoregressive decoding on single-thread WASM, no S
 </main>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
 <script>window.mermaid && mermaid.initialize({ startOnLoad: true, theme: matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default' });</script>
+
+<div id="ssr-release" style="font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));border-top:1px solid rgba(127,127,127,.35);color:inherit;opacity:.85;text-align:center;overflow-wrap:anywhere">
+<a id="ssr-rel-link" href="https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.2.0" style="color:inherit"><b id="ssr-rel-ver">v0.2.0</b></a> · <span id="ssr-rel-age">release date unknown</span> · page built from <a href="https://github.com/pension-plan/score-scan-reader/commit/56859ef" style="color:inherit">56859ef</a> <span id="ssr-build-age"></span>
+</div>
+<script>
+(function () {
+  var BUILT = {"version":"0.2.0","releasedAt":"2026-11-08T05:37:15Z","releaseUrl":"https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.2.0","commit":"56859ef","builtAt":"2026-11-08T05:55:18.037Z"};
+  var rel = { ver: BUILT.version, at: BUILT.releasedAt, url: BUILT.releaseUrl };
+  function ago(iso) {
+    var s = Math.max(0, (Date.now() - Date.parse(iso)) / 1000);
+    if (s < 60) return 'just now';
+    var m = Math.floor(s / 60), h = Math.floor(m / 60), d = Math.floor(h / 24);
+    if (d >= 1) return d + ' d ' + (h % 24) + ' h ago';
+    if (h >= 1) return h + ' h ' + (m % 60) + ' min ago';
+    return m + ' min ago';
+  }
+  function paint() {
+    var v = document.getElementById('ssr-rel-ver'), a = document.getElementById('ssr-rel-age'), l = document.getElementById('ssr-rel-link'), b = document.getElementById('ssr-build-age');
+    if (!v) return;
+    v.textContent = 'v' + rel.ver;
+    l.href = rel.url;
+    a.textContent = rel.at ? 'released ' + ago(rel.at) + ' (' + new Date(rel.at).toLocaleString('en-AU', { timeZone: 'Australia/Sydney', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false, timeZoneName: 'short' }) + ')' : 'not released yet';
+    b.textContent = ago(BUILT.builtAt);
+  }
+  paint();
+  setInterval(paint, 60000);
+  try {
+    fetch('https://api.github.com/repos/pension-plan/score-scan-reader/releases/latest').then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+      if (j && j.tag_name) { rel = { ver: j.tag_name.replace(/^.*-v/, ''), at: j.published_at, url: j.html_url }; paint(); }
+    }).catch(function () {});
+  } catch (e) {}
+})();
+</script>
 </body>
 </html>

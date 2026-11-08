@@ -458,7 +458,7 @@ function crossBands(R, b, cx, minRun) {
 
 // The glyph alone, cropped to its box: only its own components (g.parts, or g
 // itself), so a neighbour reaching into the box cannot disturb shape tests.
-function glyphImage(R, g) {
+function glyphImage(R, g, heal = 0) {
   const bw = g.x1 - g.x0 + 1, bh = g.y1 - g.y0 + 1;
   const img = { width: bw, height: bh, data: new Uint8Array(bw * bh) };
   for (let y = 0; y < bh; y++) {
@@ -472,17 +472,36 @@ function glyphImage(R, g) {
     if (parts.some(p => p.area === c.area && p.x0 === c.x0 + g.x0 && p.y0 === c.y0 + g.y0 && p.x1 === c.x1 + g.x0 && p.y1 === c.y1 + g.y0)) keep[c.id] = 1;
   }
   for (let i = 0; i < bw * bh; i++) img.data[i] = labels[i] && keep[labels[i]] ? 1 : 0;
+  // heal strokes cut where staff lines were removed: short vertical gaps
+  // with ink on both sides are filled
+  if (heal > 0) for (let x = 0; x < bw; x++) {
+    let last = -1;
+    for (let y = 0; y < bh; y++) {
+      if (!img.data[y * bw + x]) continue;
+      if (last >= 0 && y - last > 1 && y - last - 1 <= heal) for (let k = last + 1; k < y; k++) img.data[k * bw + x] = 1;
+      last = y;
+    }
+  }
   return img;
 }
 
 // g: one component or a merged glyph group {x0,y0,x1,y1[,parts]} on R
 function classifyAccidental(R, g, sp) {
+  // as cut by staff-line removal first; failing that, with the cuts healed
+  return classifyAccidentalImg(R, g, sp, 0) || classifyAccidentalImg(R, g, sp, Math.max(2, Math.round(0.18 * sp)));
+}
+
+function classifyAccidentalImg(R, g, sp, heal) {
   const hgt = g.y1 - g.y0 + 1, wid = g.x1 - g.x0 + 1;
   if (hgt < 1.3 * sp || hgt > 3.8 * sp || wid < 0.3 * sp || wid > 1.5 * sp) return null;
-  const img = glyphImage(R, g);
+  const img = glyphImage(R, g, heal);
   const b = { x0: 0, y0: 0, x1: wid - 1, y1: hgt - 1 };
   const st = strokes(img, b);
-  if (st.length >= 2) {
+  // a flat's bowl side can pass for a second stroke: much shorter than the
+  // stem and ending with it at the bottom
+  const flatLike = st.length === 2 && st[1].top - st[0].top > 0.25 * hgt && Math.abs(st[1].bot - st[0].bot) < 0.3 * sp &&
+    (st[1].bot - st[1].top) < 0.6 * (st[0].bot - st[0].top);
+  if (st.length >= 2 && !flatLike) {
     const a = st[0], c = st[st.length - 1];
     if (c.x0 - a.x1 < Math.max(2, 0.1 * sp)) return null;
     // sharps and naturals have bars joining the two strokes (two, or one
@@ -493,7 +512,7 @@ function classifyAccidental(R, g, sp) {
     if (a.top < c.top - 0.4 * sp && c.bot > a.bot + 0.4 * sp) return 'natural';
     return 'sharp';
   }
-  if (st.length === 1 && st[0].x0 < 0.35 * wid && hgt > 1.5 * sp && hgt < 3.4 * sp && wid < 1.25 * sp) {
+  if ((st.length === 1 || flatLike) && st[0].x0 < 0.35 * wid && hgt > 1.5 * sp && hgt < 3.4 * sp && wid < 1.25 * sp) {
     // flat: stroke on the left, bowl only in the lower part to its right
     // (a stem-down note has its head at the top instead)
     let n = 0, sy = 0, top = hgt;
@@ -851,7 +870,26 @@ function hasDot(R, hd) {
   return false;
 }
 
-function headDuration(R, hd, chord) {
+// Augmentation dot as a component: a small round blob right of the head,
+// in a space (not on a staff line), within a space above / below the head.
+function dotBlob(hd, ctx) {
+  const sp = hd.sp, st = ctx.st;
+  for (const c of ctx.dots) {
+    if (c.x0 < hd.x + 0.55 * sp || c.x0 > hd.x + 2.0 * sp || c.y1 < hd.y - 0.9 * sp || c.y0 > hd.y + 0.9 * sp) continue;
+    const cx = (c.x0 + c.x1) / 2, cy = (c.y0 + c.y1) / 2;
+    if (Math.abs(cy - hd.y) > 0.85 * sp) continue;
+    if (st) {
+      // distance to the nearest staff or ledger line position
+      const y0 = st.yAt(0, cx), y4 = st.yAt(4, cx), gap = (y4 - y0) / 4;
+      const k = Math.round((cy - y0) / gap);
+      if (Math.abs(cy - (y0 + k * gap)) < 0.22 * gap) continue;
+    }
+    return true;
+  }
+  return false;
+}
+
+function headDuration(R, hd, chord, ctx) {
   const sp = hd.sp;
   let q;
   const dir = hd.stemDir;
@@ -866,7 +904,9 @@ function headDuration(R, hd, chord) {
       q = q / Math.pow(2, nb);
     }
   }
-  const dot = hasDot(R, hd);
+  // the pixel test misses dots off the head's estimated height; the blob
+  // test misses dots run into other ink: either will do
+  const dot = hasDot(R, hd) || (!!ctx && dotBlob(hd, ctx));
   return { q: dot ? q * 1.5 : q, dots: dot ? 1 : 0 };
 }
 
@@ -1160,7 +1200,14 @@ function assemblePage(fr, pageIndex = 0) {
       const music = chords.filter(c => c.x > hdr.end);
       const s = { st, si, chords: music, hdr };
       // durations read once here: tuplets rescale whole groups
-      for (const c of music) for (const h of c.heads) if (!h.dur) h.dur = headDuration(R, h, c);
+      const spS = st.space || fr.ss;
+      // dot-sized round blobs near this staff
+      const ya = st.yAt(0, st.left) - 6 * spS, yb = st.yAt(4, st.left) + 6 * spS;
+      const dots = comps.filter(c => c.y1 > ya && c.y0 < yb && c.x0 > hdr.end && (c.x1 - c.x0 + 1) >= 0.2 * spS && (c.x1 - c.x0 + 1) <= 0.8 * spS &&
+        (c.y1 - c.y0 + 1) >= 0.2 * spS && (c.y1 - c.y0 + 1) <= 0.8 * spS && c.area >= 0.08 * spS * spS &&
+        c.area >= 0.45 * (c.x1 - c.x0 + 1) * (c.y1 - c.y0 + 1) && Math.max(c.x1 - c.x0 + 1, c.y1 - c.y0 + 1) <= 1.8 * Math.min(c.x1 - c.x0 + 1, c.y1 - c.y0 + 1));
+      const dctx = { st, dots };
+      for (const c of music) for (const h of c.heads) if (!h.dur) h.dur = headDuration(R, h, c, dctx);
       try {
         const sp = st.space || fr.ss;
         const { items, groups } = beamGroups(R, labels, s, sp);
@@ -3624,6 +3671,9 @@ function analyse(gray, idx, frOpts) {
 // that reads clearly more clefs wins.
 function analyseOriented(gray, idx, frOpts) {
   let best = { ...analyse(gray, idx, frOpts), turns: 0, gray };
+  // a front end that settles the orientation itself (it reports it) is not
+  // second-guessed: that would only repeat its work
+  if (best.fr && best.fr.orientation !== undefined) return best;
   const better = (a, b) => a.read > b.read || (a.read === b.read && a.n > b.n);
   if (!best.n && gray.width > 50 && gray.height > 50) {
     for (const t of [1, 3]) {
@@ -3680,7 +3730,7 @@ function createConverter(opts = {}) {
       const frOpts = { onProgress: (m, info) => progress(`${label}: ${m}`, Object.assign({ page: i, pages: n }, info || {})) };
       let a;
       try { a = analyseOriented(gray, i, frOpts); } catch (e) { warnings.push(`Page ${i + 1}: image analysis failed (${e.message}).`); return null; }
-      a.fr.warnings.forEach(w => warnings.push(`Page ${i + 1}: ${w}`));
+      (a.fr.warnings || []).forEach(w => warnings.push(`Page ${i + 1}: ${w}`));
       if (!a.n) return null;
       if (a.turns) warnings.push(`Page ${i + 1}: the scan was ${a.turns === 2 ? 'upside down' : 'turned sideways'}; read it turned ${a.turns === 2 ? 'the right way up' : a.turns === 1 ? 'a quarter clockwise' : 'a quarter anticlockwise'}.`);
       progress(`${label}: reading note symbols`, { stage: 'notes', page: i, pages: n });
@@ -3945,6 +3995,91 @@ function vocalNames(vs) {
   return out;
 }
 
+// ------------------------------------------------------------ part labels
+// Names printed left of the first system (lyrics.js readPartLabels ->
+// fr.partLabels: [{staves, text, conf, y}]). research-voices.md section 6:
+// normalise, look the words up in a small multilingual lexicon, keep the
+// printed spelling for full names ("Sopran", "Tenor II", "Canto") and expand
+// abbreviations ("S." -> Soprano). Collective names give two voices.
+const LEX = [
+  [/^(s|sop|sopr|soprano|soprani|sopranos|sopran|soprane|treble|trebles|cantus|superius|discantus|descant)$/, 'Soprano', 'vocal'],
+  [/^(a|alt|alto|alti|altos|contralto|altus)$/, 'Alto', 'vocal'],
+  [/^(t|ten|tenor|tenore|tenori|tenors|ténor|ténors)$/, 'Tenor', 'vocal'],
+  [/^(bar|bari|baritone|baritono|bariton|baryton)$/, 'Baritone', 'vocal'],
+  [/^(b|bs|bass|basso|bassi|basse|basses|bassus)$/, 'Bass', 'vocal'],
+  [/^(mezzo|mezzosoprano)$/, 'Mezzo-soprano', 'vocal'],
+  [/^(voice|voce|voix|singstimme|gesang|stimme|canto|chant|melody|melodie|mélodie|cantor)$/, 'Voice', 'vocal'],
+  [/^(piano|pianoforte|pf|pfte|pno|klavier|clavier|accompaniment|acc|accomp|keyboard|organ|orgel|organo|orgue|harmonium|manual|manuals)$/, 'Piano', 'keyboard'],
+  [/^(violin|violino|violine|violon|viola|violoncello|cello|vc|vln|vla|flute|flauto|flöte|oboe|clarinet|clarinetto|bassoon|fagotto|horn|corno|trumpet|tromba|trombone|tuba|harp|guitar|contrabass|kontrabass)$/, null, 'instrument'],
+];
+const COLLECTIVE = [[/^(women|ladies|frauen|femmes|donne|sa)$/, ['Soprano', 'Alto']], [/^(men|männer|maenner|hommes|uomini|tb)$/, ['Tenor', 'Bass']]];
+const MOD = /^(i{1,3}|iv|[1-4]|[1-4](st|nd|rd|th)|primo|secondo|solo|div|divisi|1mo|2do)$/;
+
+function parseLabel(text) {
+  const out = [];
+  const clean = String(text || '').normalize('NFC').replace(/[^\p{L}\p{N}.&/,+\s'’-]/gu, ' ');
+  // a part label is a name or two, not prose (text of a facing page, a
+  // preface): most of its words must be names, numerals or joiners
+  const all = clean.split(/[\s&/,+]+/).map(w => w.toLowerCase().replace(/[.'’]/g, '')).filter(Boolean);
+  const known = all.filter(w => LEX.some(([re]) => re.test(w)) || COLLECTIVE.some(([re]) => re.test(w)) || MOD.test(w) || /^(and|und|et)$/.test(w)).length;
+  if (all.length > 4 || (all.length > 1 && known < 0.6 * all.length)) return out;
+  for (const chunk of clean.split(/\s*(?:[&/,+]|\band\b|\bund\b|\bet\b)\s*/i)) {
+    const words = chunk.split(/\s+/).filter(Boolean);
+    let cur = null;
+    for (const w0 of words) {
+      const w = w0.toLowerCase().replace(/[.'’]/g, '');
+      if (!w) continue;
+      const col = COLLECTIVE.find(([re]) => re.test(w));
+      if (col) { col[1].forEach(n => out.push({ name: n, kind: 'vocal', abbrev: false })); cur = null; continue; }
+      const hit = LEX.find(([re]) => re.test(w));
+      if (hit && !(cur && MOD.test(w) && w === 'solo')) {
+        const abbrev = w.length <= 3 && hit[1] !== null && w !== 'alt' && w !== 'pf';
+        const shown = abbrev ? hit[1] : w0.replace(/[.,]+$/, '');
+        cur = { name: shown.charAt(0).toUpperCase() + shown.slice(1), kind: hit[2], abbrev, canon: hit[1] };
+        out.push(cur);
+        continue;
+      }
+      if (MOD.test(w)) {
+        if (cur) cur.name += ' ' + w0.replace(/[.,]+$/, '').replace(/^i{1,3}$/i, m => m.toUpperCase());
+        else out.push(cur = { name: w0, kind: 'modifier', pending: true });
+        continue;
+      }
+      // a lone unknown word: keep as a name only when the whole label is that word
+      if (words.length === 1 && w.length >= 3) out.push(cur = { name: w0.charAt(0).toUpperCase() + w0.slice(1), kind: 'unknown', abbrev: false });
+    }
+  }
+  // "Solo Voice": a modifier printed before its name
+  for (let i = 0; i + 1 < out.length; i++) if (out[i].pending && out[i + 1].kind !== 'modifier') { out[i + 1].name = out[i].name + ' ' + out[i + 1].name; out.splice(i, 1); }
+  for (const n of out) if (n.pending && /^solo$/i.test(n.name)) { n.name = 'Solo'; n.kind = 'vocal'; n.canon = 'Voice'; }
+  return out.filter(n => n.kind !== 'modifier' && n.kind !== 'unknown');
+}
+
+// Labels of the first system that has the piece's staff count, per staff
+// (system-relative): [{names, off (label centre - staff centre, in spaces), span}]
+function readLabels(systems, nSt) {
+  const per = Array.from({ length: nSt }, () => []);
+  const seen = new Set();
+  for (const sy of systems) {
+    const fr = sy.fr;
+    if (!fr || !fr.partLabels || !fr.partLabels.length || seen.has(fr) || sy.index !== 0) continue;
+    seen.add(fr);
+    if (sy.staves.length !== nSt) continue;
+    const ids = sy.staves.map(s => s.si);
+    for (const l of fr.partLabels) {
+      const rel = (l.staves || [l.staff]).map(s => ids.indexOf(s)).filter(k => k >= 0);
+      if (!rel.length || (l.conf != null && l.conf < 45)) continue;
+      const names = parseLabel(l.text);
+      if (!names.length) continue;
+      const st = sy.staves[rel[0]].st, sp = st.space;
+      const off = rel.length === 1 && l.y != null ? (l.y - st.yAt(2, st.left)) / sp : 0;
+      per[rel[0]].push({ names, off, span: rel.length > 1 ? rel : null, y: l.y || 0 });
+    }
+    break;
+  }
+  per.forEach(a => a.sort((x, y) => x.y - y.y));
+  return per;
+}
+
 // Decide the part layout for the whole piece (never per measure):
 //  - adjacent staves joined by barlines with no underlay between them are a
 //    keyboard grand staff: one part, never split (voices kept inside it);
@@ -3960,6 +4095,9 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
   const anyLyrics = lyr.some(x => x > 0);
   const ocr = opts.ocr !== false;
   const notes = [];
+  // printed part names (first system with the full staff count), per staff
+  const labels = readLabels(systems, nSt);
+  const ownNames = (k, kinds) => labels[k].filter(l => !l.span).flatMap(l => l.names.filter(n => kinds.includes(n.kind)));
   // keyboard links between adjacent staves
   const link = [];
   for (let k = 0; k + 1 < nSt; k++) {
@@ -3977,6 +4115,10 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
       const chordal = (stats[k].f3 + stats[k + 1].f3) / 2 >= 0.2 || (stats[k].f2 + stats[k + 1].f2) / 2 <= 0.3;
       kb = nSt === 2 && !underlay && (chordal || (ocr && !anyLyrics));
     }
+    // printed names overrule: one keyboard name across the pair joins it; a
+    // staff with its own voice or instrument name is not half of a grand staff
+    if (labels[k].some(l => l.span && l.span.includes(k + 1) && l.names.some(n => n.kind === 'keyboard'))) kb = true;
+    else if (ownNames(k, ['vocal', 'instrument']).length || ownNames(k + 1, ['vocal', 'instrument']).length) kb = false;
     link.push(kb);
   }
   // groups: runs of linked staves (max 3: organ) are one keyboard part
@@ -3995,7 +4137,20 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
     const both = (stats[0].f2 + stats[1].f2) / 2 > 0.3 && (stats[0].f3 + stats[1].f3) / 2 < 0.2;
     vs.forEach(v => { v.split = both; });
   }
+  // printed names decide the voice count of a staff: two names (stacked
+  // "Soprano / Alto", "S. A.", "Women") split it, one name centred on the
+  // staff keeps it whole (SAB: "Baritone" alone under "Soprano / Alto"); a
+  // single name off-centre had its partner missed and names one voice only
+  for (const v of vs) {
+    const ls = labels[v.staff].filter(l => !l.span && l.names.some(n => n.kind === 'vocal' || n.kind === 'instrument'));
+    const names = ls.flatMap(l => l.names.filter(n => n.kind === 'vocal' || n.kind === 'instrument'));
+    if (names.length >= 2 && (stats[v.staff].f2 > 0.1 || stats[v.staff].mix > 0)) { v.split = true; v.names = [names[0], names[1]]; }
+    else if (names.length === 1 && Math.abs(ls[0].off) < 0.8) { v.split = false; v.names = [names[0]]; }
+    else if (names.length === 1) { v.names = ls[0].off < 0 ? [names[0], null] : [null, names[0]]; }
+    else if (names.length >= 2) v.names = [names[0]];
+  }
   const vnames = vocalNames(vs);
+  const read = [];
   const parts = [];
   let vi = 0;
   const nKb = groups.filter(g => g.keyboard).length;
@@ -4003,17 +4158,22 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
   for (const g of groups) {
     if (g.keyboard) {
       kbi++;
-      parts.push({ name: nKb > 1 ? `Piano ${kbi}` : 'Piano', kind: 'keyboard', src: g.staves.map(s => ({ staff: s, voice: 'chordal' })) });
+      const kbName = g.staves.flatMap(k => labels[k]).flatMap(l => l.names).find(n => n.kind === 'keyboard');
+      parts.push({ name: kbName ? kbName.name : nKb > 1 ? `Piano ${kbi}` : 'Piano', nameRead: !!kbName, kind: 'keyboard', src: g.staves.map(s => ({ staff: s, voice: 'chordal' })),
+        layout: `Staves ${g.staves[0] + 1}\u2013${g.staves[g.staves.length - 1] + 1}: keyboard grand staff, one part` });
       notes.push(`Staves ${g.staves.map(s => s + 1).join('+')}: read as a keyboard grand staff (barlines joined or chords without lyrics under a sung line), kept together as one part and never split.`);
       continue;
     }
     const v = vs.find(x => x.staff === g.staves[0]);
+    const nm = (k) => { const n = v.names && v.names[k]; const inf = vnames[vi++]; return n ? { name: n.name, nameRead: true } : { name: inf, nameRead: false }; };
     if (v.split) {
-      parts.push({ name: vnames[vi++], kind: 'vocal', src: [{ staff: v.staff, voice: 1 }] });
-      parts.push({ name: vnames[vi++], kind: 'vocal', src: [{ staff: v.staff, voice: 2 }] });
+      parts.push({ ...nm(0), kind: 'vocal', src: [{ staff: v.staff, voice: 1 }], layout: `Staff ${v.staff + 1}, stems up (split from a shared staff)` });
+      parts.push({ ...nm(1), kind: 'vocal', src: [{ staff: v.staff, voice: 2 }], layout: `Staff ${v.staff + 1}, stems down (split from a shared staff)` });
       notes.push(`Staff ${v.staff + 1}: two voices on one staff, split by stem direction into ${parts[parts.length - 2].name} and ${parts[parts.length - 1].name}.`);
-    } else parts.push({ name: vnames[vi++], kind: 'vocal', src: [{ staff: v.staff, voice: 'chordal' }] });
+    } else parts.push({ ...nm(0), kind: 'vocal', src: [{ staff: v.staff, voice: 'chordal' }], layout: `Staff ${v.staff + 1}` });
   }
+  parts.forEach(p => { if (p.nameRead) read.push(p.name); });
+  if (read.length) notes.push(`Part names read from the page: ${read.join(', ')}.`);
   parts.forEach((p, i) => { p.id = 'P' + (i + 1); p.color = COLORS[i % COLORS.length]; });
   return { parts, nSt, notes, clefs, stats, link };
 }
@@ -4113,47 +4273,66 @@ function placeRests(evs, rests, gap) {
   return out;
 }
 
-// Cheapest set of at most two duration edits that makes a voice fill the
-// measure: missed / extra augmentation dot, missed / extra flag or beam
-// (halve / double). Ties go to edits that keep onsets in step with the other
-// voices. Returns {events, ok}.
+// Cheapest set of duration edits that makes a voice fill the measure exactly:
+// a missed / extra augmentation dot, a missed / extra flag or beam (halve /
+// double) or, in an over-full measure, a false notehead dropped. A dynamic
+// programme over the events and the time reached so far; an edit that puts a
+// note's onset out of step with a voice printed at the same x (simultaneous
+// notes are vertically aligned) costs extra. Returns {events, ok}.
+function searchRepair(evs, target, anchors, sp, over) {
+  const U = DIV, T = Math.round(target * U);
+  const near = evs.map(e => (e.rest || e.x == null) ? null : anchors.filter(a => Math.abs(a.x - e.x) <= 0.8 * sp).map(a => Math.round(a.t * U)));
+  const opts = evs.map(e => {
+    const q = e.q, d = e.dots || 0, o = [[q, 0]];
+    if (!e.rest) {
+      if (!d) o.push([q * 1.5, 1.0]);
+      if (d === 1) o.push([q / 1.5, 1.2]);
+      o.push([q / 2, 1.5]);
+      if (q * 2 <= 4 + EPS) o.push([q * 2, 1.6]);
+      // a note that took a syllable is printed for sure: dropping it costs more
+      if (over) o.push([0, e.lyrics ? 3.5 : 1.8]);
+    }
+    return o.filter(([nq]) => nq === 0 || qToType(nq)).map(([nq, c]) => [Math.round(nq * U), nq, c]);
+  });
+  const layers = [new Map([[0, { c: 0, from: 0, q: null }]])];
+  for (let i = 0; i < evs.length; i++) {
+    const cur = layers[i], nxt = new Map();
+    for (const [t, st] of cur) {
+      const nr = near[i];
+      for (const [du, nq, c] of opts[i]) {
+        const t2 = t + du;
+        if (t2 > T) continue;
+        const cost = st.c + c + (du > 0 && nr && nr.length && !nr.includes(t) ? 2 : 0);
+        const p = nxt.get(t2);
+        if (!p || cost < p.c - 1e-9) nxt.set(t2, { c: cost, from: t, q: nq });
+      }
+    }
+    layers.push(nxt);
+  }
+  const end = layers[evs.length].get(T);
+  if (!end) return null;
+  const qs = new Array(evs.length);
+  for (let i = evs.length, t = T; i > 0; i--) { const st = layers[i].get(t); qs[i - 1] = st.q; t = st.from; }
+  return { cost: end.c, qs };
+}
+
 function repairStream(evs, target, anchors, sp) {
   const sum = qsum(evs), diff = target - sum;
-  const cands = [];
-  evs.forEach((e, i) => {
-    if (e.rest) return;
-    const q = e.q, dots = e.dots || 0;
-    const opts = [];
-    if (!dots) opts.push([q * 1.5, 1.0]);
-    if (dots === 1) opts.push([q / 1.5, 1.2]);
-    opts.push([q / 2, 1.5]);
-    if (q * 2 <= 4 + EPS) opts.push([q * 2, 1.6]);
-    for (const [nq, c] of opts) if (qToType(nq)) cands.push({ i, nq, d: nq - q, c });
-    // an extra note (a false notehead) in an over-full measure
-    if (diff < 0) cands.push({ i, nq: 0, d: -q, c: 1.8, drop: true });
-  });
-  const apply = (edits) => evs.map((e, i) => {
-    const ed = edits.find(x => x.i === i);
-    if (!ed) return e;
-    if (ed.drop) return null;
-    e.q = ed.nq; e.dots = qToType(ed.nq).dots;
-    return e;
-  }).filter(Boolean);
   const base = anchorMisses(evs, anchors, sp);
-  let best = null;
-  const consider = (edits, c) => {
-    const trial = evs.map((e, i) => { const ed = edits.find(x => x.i === i); return ed ? (ed.drop ? null : { ...e, q: ed.nq }) : e; }).filter(Boolean);
-    const cost = c + 2 * anchorMisses(trial, anchors, sp);
-    if (!best || cost < best.cost) best = { edits, cost };
-  };
-  for (const a of cands) if (Math.abs(a.d - diff) < EPS) consider([a], a.c);
-  for (let x = 0; x < cands.length; x++) for (let y = x + 1; y < cands.length; y++) {
-    const a = cands[x], b = cands[y];
-    if (a.i !== b.i && Math.abs(a.d + b.d - diff) < EPS) consider([a, b], a.c + b.c);
-  }
-  // leaving a gap costs about as much as two edits
+  const best = searchRepair(evs, target, anchors, sp, diff < -EPS);
+  // leaving a gap costs about as much as two edits; an over-full bar must be
+  // fixed, so a little more is spent there before squeezing it
   const gapCost = 2.6 + 2 * base;
-  if (best && best.cost < gapCost) return { events: apply(best.edits), ok: true };
+  if (best && best.cost < gapCost + (diff < -EPS ? 1.2 : 0)) {
+    const out = [];
+    evs.forEach((e, i) => {
+      const nq = best.qs[i];
+      if (nq === 0) return;
+      if (Math.abs(nq - e.q) > EPS) { e.q = nq; e.dots = qToType(nq).dots; }
+      out.push(e);
+    });
+    return { events: out, ok: true };
+  }
   if (diff > EPS) return { events: evs.concat([{ forward: true, q: diff }]), ok: false };
   // still over-full: shorten the longest values (drop a dot, else halve) until
   // the voice fits, so every note read is kept; pad any small gap left over
@@ -4323,8 +4502,21 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   else if (mq === 1.5) time = { beats: 3, type: 8 };
   else if (mq === 3.5) time = { beats: 7, type: 8 };
   else { mq = 4; warnings.push('Could not infer a time signature; using 4/4.'); }
+  // a time signature read from the staff headers (C, cut C, or digits when
+  // the header reader gives them) is shown as printed when its bar length
+  // agrees with the contents, and wins outright when the contents give it
+  // fair support
+  let timeRead = false;
+  {
+    const hs = systems.flatMap(sy => sy.staves.map(s => s.hdr && s.hdr.time)).filter(t => t && t.beats > 0 && t.type > 0);
+    if (hs.length >= Math.max(1, 0.3 * systems.filter(sy => sy.index === 0).reduce((a, sy) => a + sy.staves.length, 0))) {
+      const key = mode(hs.map(t => `${t.beats}/${t.type}`)), [b, ty] = key.split('/').map(Number), hq = (b * 4) / ty;
+      const qNow = (time.beats * 4) / time.type;
+      if (Math.abs(hq - qNow) < 1e-6 || (votes[hq] || 0) >= 0.5 * (votes[qNow] || 0)) { time = { beats: b, type: ty }; timeRead = true; }
+    }
+  }
   const mLen = (time.beats * 4) / time.type;
-  warnings.push(`Time signature inferred from measure contents: ${time.beats}/${time.type}.`);
+  warnings.push(timeRead ? `Time signature read from the page: ${time.beats}/${time.type}.` : `Time signature inferred from measure contents: ${time.beats}/${time.type}.`);
   // Barline reconciliation. Barline detection both misses barlines and finds
   // false ones (stems, brackets, text). Within each system the raw segments
   // are grouped into measures by a small dynamic programme: a group costs how
@@ -4394,9 +4586,10 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   // into two voices the line goes to ONE voice, chosen once per text band for
   // the whole piece from how well the syllables sit under each voice's onsets
   // (summed over every system and verse). With no clear winner a line between
-  // staves goes to the upper voice (the melody) and a line under the lowest
-  // split staff to its lower voice (the nearer one). A line whose local fit is
-  // clearly better in the other voice (a divisi passage) follows that voice.
+  // staves goes to the upper voice (the melody); a line under the lowest split
+  // staff whose two voices share every onset goes to both (research-voices.md
+  // section 7.2). A line whose local fit is clearly better in the other voice
+  // (each voice with its own words) follows that voice.
   // opts.copyLyrics copies every line to all fitting voices of its staff
   // (research-voices.md section 7.2). Keyboard staves never take underlay.
   const lyrNotes = new Set();
@@ -4442,7 +4635,11 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     let best = prior;
     for (const pi of pis) if (e[pi] > (lowest ? e[best] + 0.6 : 1.25 * e[best] + 2)) best = pi;
     bandVoice[band] = best;
-    if (pis.length > 1) lyrNotes.add(`Lyrics under staff ${+band + 1} attached to ${parts[best].name} (${best === prior ? (lowest ? 'nearest voice' : 'upper voice') : 'its rhythm fits the syllables best'}).`);
+    // under the lowest split staff with nothing to tell the voices apart (the
+    // same onsets throughout): the text serves both voices of that staff
+    const tie = lowest && best === prior && pis.every(pi => Math.abs(e[pi] - e[prior]) < 0.6);
+    if (tie) bandVoice[band] = 'all';
+    if (pis.length > 1) lyrNotes.add(`Lyrics under staff ${+band + 1} attached to ${tie ? pis.map(pi => parts[pi].name).join(' and ') + ' (same rhythm, text sung by both)' : parts[best].name + (best === prior ? ' (upper voice)' : ' (its rhythm fits the syllables best)')}.`);
   }
   for (const L of lines) {
     const { v, cands, sp } = L;
@@ -4456,7 +4653,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
       if ((best.fit < 0.6 && c.fit >= 0.8) || (c.soft >= 0.88 * nSyl && best.soft < 0.8 * nSyl)) best = c;
     }
     if (best.fit < L.minFit || !wordy(v.syllables)) { lyrNotes.add(`A text line under staff ${v.band + 1} does not follow the notes; not used as lyrics.`); continue; }
-    const take = opts.copyLyrics ? cands.filter(c => c.fit >= L.minFit) : [best];
+    const take = opts.copyLyrics || bandVoice[v.band] === 'all' ? cands.filter(c => c.fit >= L.minFit) : [best];
     if (opts.debug) opts.debug.push({ sys: L.sy.page + ':' + L.sy.index, band: v.band, n: v.number, nsyl: v.syllables.length, fits: cands.map(c => [c.p.name, +c.fit.toFixed(2), c.evs.length, +c.soft.toFixed(2)]), take: take.map(c => c.p.name) });
     for (const c of take) alignSyllables(v, c.evs, sp);
     v.used = take.map(c => c.p.name).join(', ');
@@ -4471,10 +4668,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   let mismatch = 0, repaired = 0, restsFound = 0, splitBars = 0;
   // a missed barline leaves two (or more) bars in one segment: when the voices
   // agree on about k bar lengths, cut every voice at the bar boundaries (notes
-  // crossing a boundary are split and tied). A segment clearly longer than a
-  // bar whose length is not a whole number of bars (a misread value inside)
-  // is cut by position instead: at the onsets of a reference voice that fall
-  // on whole bars, every voice cut at the same x.
+  // crossing a boundary are split and tied)
   const units = [];
   measures.forEach((m, mi) => {
     const byPart = perPart.map(pm => pm[mi]);
@@ -4506,33 +4700,6 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
       }));
       chunks.forEach(ch => units.push({ m, streams: ch, split: true }));
       return;
-    }
-    if (S >= 1.75 * mLen - 1e-6 && sums.filter(x => x >= 1.5 * mLen).length >= Math.max(1, 0.5 * sums.length)) {
-      // reference: the voice with the most onsets on whole bars
-      let ref = null;
-      byPart.forEach(sts => sts.forEach(st => {
-        let t = 0;
-        const cuts = [];
-        st.events.forEach((e, i) => {
-          if (i > 0 && t > 1e-6 && e.x != null && st.events[i - 1].x != null && Math.abs(t / mLen - Math.round(t / mLen)) < 1e-6) cuts.push((st.events[i - 1].x + e.x) / 2);
-          t += e.q;
-        });
-        if (cuts.length && (!ref || cuts.length > ref.length)) ref = cuts;
-      }));
-      if (ref) {
-        const xs = ref.sort((a, b) => a - b);
-        const chunks = Array.from({ length: xs.length + 1 }, () => byPart.map(sts => sts.map(st => ({ staff: st.staff, events: [] }))));
-        byPart.forEach((sts, pi) => sts.forEach((st, si) => {
-          let c = 0;
-          for (const e of st.events) {
-            if (e.x != null) while (c < xs.length && e.x > xs[c]) c++;
-            chunks[c][pi][si].events.push(e);
-          }
-        }));
-        splitBars += xs.length;
-        chunks.forEach(ch => units.push({ m, streams: ch, split: true }));
-        return;
-      }
     }
     units.push({ m, streams: byPart, split: false });
   });
@@ -4594,7 +4761,21 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   if (restsFound) warnings.push(`${restsFound} voice-measures completed with rests read from the page.`);
   if (repaired) warnings.push(`${repaired} voice-measures repaired to fit ${time.beats}/${time.type} (likely misread dots, flags or beams).`);
   if (mismatch) warnings.push(`${mismatch} voice-measures still did not add up to ${time.beats}/${time.type}; gaps left empty, notes past the barline cut.`);
-  const xml = toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, measures });
+  // stanzas printed after the music (lyrics.js readStanzas -> fr.stanzas) are
+  // not set under notes: kept as lyric credits, as engraved scores carry them
+  const credits = [];
+  const seenFr = new Set();
+  for (const pg of pages) {
+    if (!pg.fr || seenFr.has(pg.fr)) continue;
+    seenFr.add(pg.fr);
+    for (const st of pg.fr.stanzas || []) {
+      const lines = (st.lines || []).map(l => String(l).trim()).filter(Boolean);
+      if (lines.length) credits.push({ page: Math.floor(pg.index || 0) + 1, label: st.label || (st.number ? st.number + '.' : ''), text: lines.join('\n') });
+    }
+  }
+  if (credits.length) warnings.push(`${credits.length} stanza${credits.length > 1 ? 's' : ''} printed below the music kept as text in the file (not set under notes).`);
+  const unitSys = units.map(u => u.m.sy);
+  const xml = toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, measures, credits, unitSys });
   const nNotes = partMeasures.map(pm => pm.reduce((a, m) => a + m.reduce((b, s) => b + s.events.filter(e => !e.rest && !e.forward).length, 0), 0));
   const ranges = partMeasures.map(pm => {
     let lo = null, hi = null;
@@ -4606,7 +4787,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     return lo ? `${lo.step}${lo.octave}\u2013${hi.step}${hi.octave}` : '-';
   });
   // UI compares clefs with 'F'; 'G8' stays a treble clef there
-  return { parts, layout, fifths, time, clefs, ranges, measures: units.length, nNotes, warnings: warnings.concat(layout.notes), xml };
+  return { parts, layout, fifths, time, timeRead, clefs, ranges, measures: units.length, nNotes, credits, warnings: warnings.concat(layout.notes), xml };
 }
 
 // Horizontal extent of a syllable: lyrics.js may report x0/x1; otherwise it is
@@ -4627,7 +4808,8 @@ function sylDist(s, x, sp) {
   const c = Math.abs(x - s.x);
   if (String(s.text || '').replace(/[^\p{L}]/gu, '').length > 6) return c;
   const x0 = sylBox(s, sp)[0];
-  return Math.min(c, Math.abs(x - (x0 + 0.55 * sp)) + 0.15 * sp);
+  // an extender line printed after it: certainly a melisma start
+  return Math.min(c, Math.abs(x - (x0 + 0.55 * sp)) + (s.extend || s.ext ? 0 : 0.15 * sp));
 }
 
 // share of syllables that sit under an onset of the stream
@@ -4708,9 +4890,12 @@ function alignSyllables(verse, evs, sp) {
     const s = syl[a];
     if (s.syllabic !== 'single' && s.syllabic !== 'end') return;
     const next = k + 1 < placed.length ? placed[k + 1][1] : null;
-    // after the last syllable of the line only with an extender seen in print
-    const last = next != null ? next - 1 : (s.ext ? m - 1 : b);
-    if (last <= b || (last - b > 6 && !s.ext)) return;
+    const ext = s.ext || s.extend;
+    // after the last syllable of the line only with an extender seen in print;
+    // a printed extender also says where the melisma ends
+    let last = next != null ? next - 1 : (ext ? m - 1 : b);
+    if (ext && s.extendTo != null) while (last > b && evs[last].x > s.extendTo + 1.0 * sp) last--;
+    if (last <= b || (last - b > 6 && !ext)) return;
     for (let t = b + 1; t <= last; t++) if (evs[t].lyrics && evs[t].lyrics[num]) return;
     evs[b].lyrics[num].extend = true;
     (evs[last].lyrExt ||= {})[num] = true;
@@ -4730,13 +4915,41 @@ function clefXML(c, n) {
   return `<clef${num}><sign>G</sign><line>2</line></clef>`;
 }
 
-function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title }) {
+function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, credits, unitSys }) {
+  // each system's own clef where it was read (a staff can change clef from
+  // one system to the next), else the clef most systems show
+  const clefAt = (mi, staff) => {
+    const sy = unitSys && unitSys[mi], st = sy && sy.staves[staff];
+    return (st && !st.hdr.clefGuessed && st.hdr.clef) || clefs[staff] || 'G';
+  };
+  // Accidentals on a shared staff bind every voice on it for the rest of the
+  // bar (a split Alto keeps the natural the Soprano printed): per measure and
+  // staff, the accidentals of all parts by onset time.
+  const accLine = new Map();
+  partMeasures.forEach(pm => pm.forEach((streams, mi) => streams.forEach(st => {
+    const key = mi + ':' + st.staff;
+    if (!accLine.has(key)) accLine.set(key, []);
+    const clef = clefAt(mi, st.staff);
+    let t = 0;
+    for (const e of st.events) {
+      if (!e.rest && !e.forward && e.heads) for (const h of e.heads) {
+        if (!h.acc || e.tieStop) continue;
+        const pk = pitchOf(clef, h.p, kAlt, {});
+        accLine.get(key).push({ t, k: pk.step + pk.octave, a: h.acc === 'sharp' ? 1 : h.acc === 'flat' ? -1 : h.acc === 'double-sharp' ? 2 : h.acc === 'flat-flat' ? -2 : 0 });
+      }
+      t += e.q;
+    }
+  })));
+  accLine.forEach(a => a.sort((x, y) => x.t - y.t));
   const L = [];
   L.push('<?xml version="1.0" encoding="UTF-8" standalone="no"?>');
   L.push('<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">');
   L.push('<score-partwise version="4.0">');
   L.push(`  <work><work-title>${esc(title || 'Scanned score')}</work-title></work>`);
   L.push('  <identification><encoding><software>Score Scan Reader (classical OMR, browser)</software></encoding></identification>');
+  for (const c of credits || []) {
+    L.push(`  <credit page="${c.page}"><credit-type>lyrics</credit-type>${c.label ? `<credit-words>${esc(c.label)} </credit-words>` : ''}<credit-words>${esc(c.text)}</credit-words></credit>`);
+  }
   L.push('  <part-list>');
   // vocal parts split from shared staves are bracketed as one choir group
   const vocalIdx = parts.map((p, i) => (p.kind === 'vocal' ? i : -1)).filter(i => i >= 0);
@@ -4752,20 +4965,27 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title }) {
     L.push(`  <part id="${p.id}">`);
     const nStaves = p.src.length;
     const multi = nStaves > 1;
+    const curClef = [];
     partMeasures[pi].forEach((streams, mi) => {
       const implicit = streams.every(s => s.implicit);
       L.push(`    <measure number="${implicit ? 0 : mi + (partMeasures[pi][0].every(s => s.implicit) ? 0 : 1)}"${implicit ? ' implicit="yes"' : ''}>`);
       if (mi === 0) {
         L.push(`      <attributes><divisions>${DIV}</divisions><key><fifths>${fifths}</fifths></key><time><beats>${time.beats}</beats><beat-type>${time.type}</beat-type></time>` +
-          (multi ? `<staves>${nStaves}</staves>${p.src.map((s, k) => clefXML(clefs[s.staff], k + 1)).join('')}` : clefXML(clefs[p.src[0].staff])) + '</attributes>');
+          (multi ? `<staves>${nStaves}</staves>${p.src.map((s, k) => clefXML(clefAt(0, s.staff), k + 1)).join('')}` : clefXML(clefAt(0, p.src[0].staff))) + '</attributes>');
+        p.src.forEach((s, k) => { curClef[k] = clefAt(0, s.staff); });
+      } else {
+        const ch = [];
+        p.src.forEach((s, k) => { const c = clefAt(mi, s.staff); if (c !== curClef[k]) { ch.push(clefXML(c, multi ? k + 1 : 0)); curClef[k] = c; } });
+        if (ch.length) L.push(`      <attributes>${ch.join('')}</attributes>`);
       }
       streams.forEach((s, si) => {
         if (si > 0) {
           const prev = streams[si - 1].events.reduce((a, e) => a + Math.max(1, Math.round(e.q * DIV)), 0);
           if (prev) L.push(`      <backup><duration>${prev}</duration></backup>`);
         }
-        const clef = clefs[s.staff] || 'G';
-        const measAcc = {};
+        const clef = clefAt(mi, s.staff);
+        const line = accLine.get(mi + ':' + s.staff) || [];
+        let et = 0;
         const voice = multi ? 1 + 4 * si : 1;
         const staffTag = multi ? `<staff>${si + 1}</staff>` : '';
         for (const e of s.events) {

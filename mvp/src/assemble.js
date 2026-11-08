@@ -66,7 +66,7 @@ function crossBands(R, b, cx, minRun) {
 
 // The glyph alone, cropped to its box: only its own components (g.parts, or g
 // itself), so a neighbour reaching into the box cannot disturb shape tests.
-function glyphImage(R, g) {
+function glyphImage(R, g, heal = 0) {
   const bw = g.x1 - g.x0 + 1, bh = g.y1 - g.y0 + 1;
   const img = { width: bw, height: bh, data: new Uint8Array(bw * bh) };
   for (let y = 0; y < bh; y++) {
@@ -80,17 +80,36 @@ function glyphImage(R, g) {
     if (parts.some(p => p.area === c.area && p.x0 === c.x0 + g.x0 && p.y0 === c.y0 + g.y0 && p.x1 === c.x1 + g.x0 && p.y1 === c.y1 + g.y0)) keep[c.id] = 1;
   }
   for (let i = 0; i < bw * bh; i++) img.data[i] = labels[i] && keep[labels[i]] ? 1 : 0;
+  // heal strokes cut where staff lines were removed: short vertical gaps
+  // with ink on both sides are filled
+  if (heal > 0) for (let x = 0; x < bw; x++) {
+    let last = -1;
+    for (let y = 0; y < bh; y++) {
+      if (!img.data[y * bw + x]) continue;
+      if (last >= 0 && y - last > 1 && y - last - 1 <= heal) for (let k = last + 1; k < y; k++) img.data[k * bw + x] = 1;
+      last = y;
+    }
+  }
   return img;
 }
 
 // g: one component or a merged glyph group {x0,y0,x1,y1[,parts]} on R
 function classifyAccidental(R, g, sp) {
+  // as cut by staff-line removal first; failing that, with the cuts healed
+  return classifyAccidentalImg(R, g, sp, 0) || classifyAccidentalImg(R, g, sp, Math.max(2, Math.round(0.18 * sp)));
+}
+
+function classifyAccidentalImg(R, g, sp, heal) {
   const hgt = g.y1 - g.y0 + 1, wid = g.x1 - g.x0 + 1;
   if (hgt < 1.3 * sp || hgt > 3.8 * sp || wid < 0.3 * sp || wid > 1.5 * sp) return null;
-  const img = glyphImage(R, g);
+  const img = glyphImage(R, g, heal);
   const b = { x0: 0, y0: 0, x1: wid - 1, y1: hgt - 1 };
   const st = strokes(img, b);
-  if (st.length >= 2) {
+  // a flat's bowl side can pass for a second stroke: much shorter than the
+  // stem and ending with it at the bottom
+  const flatLike = st.length === 2 && st[1].top - st[0].top > 0.25 * hgt && Math.abs(st[1].bot - st[0].bot) < 0.3 * sp &&
+    (st[1].bot - st[1].top) < 0.6 * (st[0].bot - st[0].top);
+  if (st.length >= 2 && !flatLike) {
     const a = st[0], c = st[st.length - 1];
     if (c.x0 - a.x1 < Math.max(2, 0.1 * sp)) return null;
     // sharps and naturals have bars joining the two strokes (two, or one
@@ -101,7 +120,7 @@ function classifyAccidental(R, g, sp) {
     if (a.top < c.top - 0.4 * sp && c.bot > a.bot + 0.4 * sp) return 'natural';
     return 'sharp';
   }
-  if (st.length === 1 && st[0].x0 < 0.35 * wid && hgt > 1.5 * sp && hgt < 3.4 * sp && wid < 1.25 * sp) {
+  if ((st.length === 1 || flatLike) && st[0].x0 < 0.35 * wid && hgt > 1.5 * sp && hgt < 3.4 * sp && wid < 1.25 * sp) {
     // flat: stroke on the left, bowl only in the lower part to its right
     // (a stem-down note has its head at the top instead)
     let n = 0, sy = 0, top = hgt;

@@ -116,3 +116,68 @@ ${docLinks}
 </html>
 `);
 console.log(`site/ built: app, status, ${docs.length} docs`);
+
+// ---- release footer on every page: version, release age and build age --------
+// Ages are computed in the viewer's browser and tick every minute. The latest
+// release is also re-fetched from the GitHub API on load, so the footer stays
+// current between rebuilds; the values baked in here are the fallback.
+{
+  const { execSync } = await import('node:child_process');
+  const sh = (c) => { try { return execSync(c, { cwd: ROOT, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(); } catch { return ''; } };
+  const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
+  let rel = null;
+  try {
+    const r = await fetch('https://api.github.com/repos/pension-plan/score-scan-reader/releases/latest', { signal: AbortSignal.timeout(8000), headers: { 'user-agent': 'score-scan-reader-site' } });
+    if (r.ok) { const j = await r.json(); rel = { tag: j.tag_name, at: j.published_at, url: j.html_url }; }
+  } catch { /* offline build: footer falls back to package.json */ }
+  const info = {
+    version: (rel && rel.tag ? rel.tag.replace(/^.*-v/, '') : pkg.version),
+    releasedAt: rel ? rel.at : null,
+    releaseUrl: rel ? rel.url : `${REPO}/releases`,
+    commit: (process.env.GITHUB_SHA || sh('git rev-parse HEAD')).slice(0, 7),
+    builtAt: new Date().toISOString(),
+  };
+  const footer = `
+<div id="ssr-release" style="font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));border-top:1px solid rgba(127,127,127,.35);color:inherit;opacity:.85;text-align:center;overflow-wrap:anywhere">
+<a id="ssr-rel-link" href="${info.releaseUrl}" style="color:inherit"><b id="ssr-rel-ver">v${info.version}</b></a> · <span id="ssr-rel-age">release date unknown</span> · page built from <a href="${REPO}/commit/${info.commit}" style="color:inherit">${info.commit}</a> <span id="ssr-build-age"></span>
+</div>
+<script>
+(function () {
+  var BUILT = ${JSON.stringify(info)};
+  var rel = { ver: BUILT.version, at: BUILT.releasedAt, url: BUILT.releaseUrl };
+  function ago(iso) {
+    var s = Math.max(0, (Date.now() - Date.parse(iso)) / 1000);
+    if (s < 60) return 'just now';
+    var m = Math.floor(s / 60), h = Math.floor(m / 60), d = Math.floor(h / 24);
+    if (d >= 1) return d + ' d ' + (h % 24) + ' h ago';
+    if (h >= 1) return h + ' h ' + (m % 60) + ' min ago';
+    return m + ' min ago';
+  }
+  function paint() {
+    var v = document.getElementById('ssr-rel-ver'), a = document.getElementById('ssr-rel-age'), l = document.getElementById('ssr-rel-link'), b = document.getElementById('ssr-build-age');
+    if (!v) return;
+    v.textContent = 'v' + rel.ver;
+    l.href = rel.url;
+    a.textContent = rel.at ? 'released ' + ago(rel.at) + ' (' + new Date(rel.at).toLocaleString('en-AU', { timeZone: 'Australia/Sydney', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false, timeZoneName: 'short' }) + ')' : 'not released yet';
+    b.textContent = ago(BUILT.builtAt);
+  }
+  paint();
+  setInterval(paint, 60000);
+  try {
+    fetch('https://api.github.com/repos/pension-plan/score-scan-reader/releases/latest').then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+      if (j && j.tag_name) { rel = { ver: j.tag_name.replace(/^.*-v/, ''), at: j.published_at, url: j.html_url }; paint(); }
+    }).catch(function () {});
+  } catch (e) {}
+})();
+</script>
+`;
+  const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]);
+  let n = 0;
+  for (const f of walk(OUT).filter((f) => f.endsWith('.html'))) {
+    let s = fs.readFileSync(f, 'utf8');
+    if (s.includes('id="ssr-release"')) continue;
+    s = /<\/body>/i.test(s) ? s.replace(/<\/body>(?![\s\S]*<\/body>)/i, footer + '</body>') : s + footer;
+    fs.writeFileSync(f, s); n++;
+  }
+  console.log(`release footer: v${info.version}${info.releasedAt ? ' released ' + info.releasedAt : ''} on ${n} pages`);
+}

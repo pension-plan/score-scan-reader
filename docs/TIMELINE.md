@@ -132,9 +132,9 @@ Every agent started for this build, including stopped runs. Outcomes are on the 
 | Run 5 | Generate | gen:layout | done | 15:55 | 16:18 | 23 | 120 |
 | Run 5 | Generate | gen:degradation | done | 15:55 | 16:12 | 17 | 87 |
 | Run 5 | Validate | validate+baseline | done | 16:18 | 16:28 | 10 | 70 |
-| Run 6 | Fix | fix:r2:heads | run | 16:21 |  | 24 | 172 |
-| Run 6 | Fix | fix:r2:symbols | run | 16:21 |  | 24 | 149 |
-| Run 6 | Fix | fix:r2:score | run | 16:21 |  | 24 | 114 |
+| Run 6 | Fix | fix:r2:heads | run | 16:21 |  | 32 | 205 |
+| Run 6 | Fix | fix:r2:symbols | run | 16:21 |  | 32 | 164 |
+| Run 6 | Fix | fix:r2:score | run | 16:21 |  | 31 | 147 |
 | Run 6 | Fix | fix:r2:lyrics | done | 16:21 | 16:41 | 20 | 109 |
 | Run 6 | Fix | fix:r2:ui | done | 16:21 | 16:45 | 24 | 87 |
 | Run 3 | Research | web:omr | done | 14:58 | 15:11 | 13 | 77 |
