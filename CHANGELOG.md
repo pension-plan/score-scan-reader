@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.18.1](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.18.0...score-scan-reader-v0.18.1) (2026-11-08)
+
+
+### Bug Fixes
+
+* **staves:** re-anchor dashed staves found one line off ([ec2a68e](https://github.com/pension-plan/score-scan-reader/commit/ec2a68e3dde8b115ca684fd26b620410d79fb316))
+
 ## [0.18.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.17.0...score-scan-reader-v0.18.0) (2026-11-08)
 
 
