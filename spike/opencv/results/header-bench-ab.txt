@@ -1,0 +1,6 @@
+n 20 aggregate 0.9496 -> 0.9499 (+0.0003) | pitch 0.944 -> 0.9447 (+0.0007) | duration 0.9177 -> 0.9182 (+0.0005) | rests 0.8015 -> 0.8015 (+0.0000) | parts 0.9939 -> 0.994 (+0.0001) | lyrics 0.9203 -> 0.9203 (+0.0000) | xml_valid 1 -> 1 (+0.0000) | crashes 0 -> 0 (+0.0000) | runtime_ms_mean 3917 -> 3948 (+31)
+items changed: 2/20; first time signature right: off 19/20, on 19/20
+  +0.0013 joplin-maple-leaf-piano  agg 0.9593604627807014->0.9606755009696185 dur 0.9287671232876712->0.9313186813186813 time 2/4->2/4 (truth 2/4)
+  +0.0052 schumann-dichterliebe2-voice-piano  agg 0.887267560594049->0.8924881191107329 dur 0.7196969696969697->0.7279693486590039 time 2/4->2/4 (truth 2/4)
+hd0 0.9496 real 0.9295
+hd1 0.9499 real 0.9295

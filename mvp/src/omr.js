@@ -13,6 +13,7 @@ const { readPageText } = require('./text');
 const { pageMarks } = require('./symbols');
 const { buildScore } = require('./score');
 const { makeGray } = require('./image');
+const { readHeaders } = require('./cv');
 
 // gray page turned clockwise by quarter turns (1, 2 or 3)
 function turnGray(g, turns) {
@@ -41,6 +42,9 @@ function analyse(gray, idx, frOpts) {
   const asm = assemblePage(fr, idx);
   let n = 0, read = 0;
   for (const sy of asm.systems) for (const s of sy.staves) { n++; if (!s.hdr.clefGuessed) read++; }
+  // header glyphs the parse left unread (time-signature numbers, unread clefs): template
+  // matching in src/cv.js; after the count above, so orientation still judges the plain reading
+  readHeaders(fr, asm);
   return { fr, asm, n, read };
 }
 

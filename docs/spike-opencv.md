@@ -2,6 +2,28 @@
 
 Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
 
+## Update: plain-JS header reader (shipped, default on)
+
+`mvp/src/cv.js` `readHeaders(fr, asm)` now runs on every page, called from `omr.js` `analyse()` right after
+`assemblePage` (after the orientation clef count, so orientation still judges the plain reading). It is the
+section 4 template reader in plain JS (Bravura templates, normalised correlation), with the OpenCV symbol paths,
+the rest fallback and `wrapConverter` removed. Changes since the spike:
+- matching stays inside the header: a few glyphs per staff, and the template only shifts ±0.35 staff space
+  around the glyph's centre: **≈15–100 ms per page** (was 283 ms with a full search).
+- the two numbers are cut at the middle line (they often touch once the line is removed), and the search for a
+  missed time signature may start on the tail of the key signature (the first three ink groups are tried).
+- when a missed time signature is found the header ends after it, so its digits are no longer taken for notes
+  or accidentals, and the overlay's time-signature layer (`symbols.js` reads `hdr.time`) shows it. Maple Leaf Rag
+  (benchmark page, 200 dpi): time signatures 1 → 2 (both 2/4 read), the false head on the treble digits dropped,
+  no accidental boxed on the digits.
+
+A/B (same src, pre-clean on in both arms; `spike/opencv/results/header-*.txt`):
+
+| set | aggregate | first time signature right | items changed |
+|---|---|---|---|
+| challenge (no OCR, 365) | 0.8212 → **0.8227** (pitch +0.0031, duration +0.0029) | 342 → **352** | 63; one drop −0.023 (`andantino-piano-photocopy-thin` severe, meter became right) |
+| benchmark with OCR (20) | 0.9496 → **0.9499**, real scans 0.9295 = | 19 = | 2, both up (`joplin-maple-leaf-piano` +0.001, `schumann-dichterliebe2` +0.005) |
+
 ## Update: OpenCV pre-clean for degraded scans (shipped)
 
 Scope extension: OpenCV now runs as a **pre-clean stage before binarisation**, only on pages a cheap
