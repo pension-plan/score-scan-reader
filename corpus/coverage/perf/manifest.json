@@ -15554,11 +15554,13 @@
    "chord",
    "clef-alto",
    "clef-bass",
+   "clef-bass-8vb",
    "clef-change",
    "clef-soprano",
    "clef-tenor",
    "clef-treble",
    "clef-treble-8va",
+   "clef-treble-8vb",
    "coda",
    "dot",
    "ds",
@@ -15676,11 +15678,13 @@
    "chord": 1861,
    "clef-alto": 5,
    "clef-bass": 11,
-   "clef-change": 40,
+   "clef-bass-8vb": 4,
+   "clef-change": 48,
    "clef-soprano": 5,
    "clef-tenor": 5,
    "clef-treble": 11,
    "clef-treble-8va": 5,
+   "clef-treble-8vb": 4,
    "coda": 1,
    "dot": 650,
    "ds": 1,
@@ -15785,7 +15789,7 @@
      2481,
      3508
     ],
-    "bytes": 5608468
+    "bytes": 5613449
    },
    "scan.pdf": {
     "seed": 53001,
@@ -15887,7 +15891,7 @@
      "dpi": 300
     },
     "summary": "typical sheet-fed scan of every page: grey, 0.2-1.0 deg skew that differs per page, light blur + noise, JPEG q80",
-    "bytes": 34131625,
+    "bytes": 34139033,
     "pdf_pages": [
      {
       "page": 1,
@@ -17313,7 +17317,7 @@
      "dpi": 300
     },
     "summary": "worn photocopies scanned in grey: 1.5-3.5 deg skew per page, bleed-through of the next page, strong lighting gradient, blur, noise, toner speckles, JPEG q35",
-    "bytes": 22552867,
+    "bytes": 22555915,
     "pdf_pages": [
      {
       "page": 1,
@@ -19095,9 +19099,9 @@
    "group": "pages",
    "engraving": "var-40",
    "file_bytes": {
-    "clean.pdf": 5608468,
-    "scan.pdf": 34131625,
-    "scan-severe.pdf": 22552867
+    "clean.pdf": 5613449,
+    "scan.pdf": 34139033,
+    "scan-severe.pdf": 22555915
    },
    "measures": 796,
    "systems": 199,
@@ -19312,8 +19316,8 @@
      "ok": true
     },
     "clef-change": {
-     "truth": 40,
-     "engraved": 40,
+     "truth": 48,
+     "engraved": 48,
      "ok": true
     },
     "dyn-pp": {

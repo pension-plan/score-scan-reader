@@ -122,6 +122,19 @@ def items():
     return out
 
 
+PERF_NOTE = {
+    'dpi': 'Same A4 engraving and the same damage recipe/seed at 100, 150, 200, 300, 400 and 600 dpi '
+           '(pixel-based damage parameters are scaled with dpi/300): only the resolution changes.',
+    'Letter': 'US Letter (215.9 x 279.4 mm): same staff size and system breaks as the A4 item; margins / vertical '
+              'spacing adapted to the shorter page.',
+    'A3': 'A3 (297 x 420 mm): the A4 layout enlarged by sqrt(2) (staff size and margins x1.414) - same systems, '
+          'about twice the pixels of A4 at the same dpi.',
+    'pages': 'Pages 1..N of the same 40-variation piano book (page k is identical in every document except the '
+             'title subtitle on page 1 and the final barline); same per-page damage (seed*1000+k) in every '
+             'document, so time / memory can be compared per page.',
+}
+
+
 # --------------------------------------------------------------------------- stage 4
 
 def assemble(args):
@@ -166,8 +179,7 @@ def assemble(args):
             'pdf_pages': [{'page': r['page'] + 1, 'size_px': r['size'], 'mode': r.get('mode'), 'ops': r['ops']}
                           for r in recs],
         }
-    w, h = page_recs[0]['size'] if page_recs[0]['file'] == 'clean.pdf' else \
-        next(r['size'] for r in page_recs if r['file'] == 'clean.pdf')
+    w, h = next(r['size'] for r in page_recs if r['file'] == 'clean.pdf')
     mp = round(w * h / 1e6, 3)
     counts = eng['counts']
     symbols = sorted(counts)
@@ -200,7 +212,8 @@ def assemble(args):
                  'file_bytes': {f: degr[f]['bytes'] for f in files},
                  'measures': eng['measures'], 'systems': eng['systems'], 'notes_in_truth': eng['notes_in_truth'],
                  'rests_in_truth': eng['rests_in_truth'],
-                 'staff_size_pt': eng['staff_size'], 'paper_mm': [eng['paper']['width_mm'], eng['paper']['height_mm']]},
+                 'staff_size_pt': eng['staff_size'], 'paper_mm': [eng['paper']['width_mm'], eng['paper']['height_mm']],
+                 'note': PERF_NOTE[it['axis'] if it['axis'] != 'pageSize' else it['paper']]},
         'notes': notes,
         'truth_limitations': info['truth_limitations'],
         'source': info['source'],

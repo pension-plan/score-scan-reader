@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 17:59 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 18:02 AEDT.
 
 ## Events
 
@@ -70,6 +70,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 17:59 | Incident 17:50–17:58 AEDT: the live app showed ‘Assembly failed’ (0 parts) because a round 3 work-in-progress change used Node-only debug flags, and CI/Pages builds failed because the app’s new ML model files were git-ignored. Fixed forward: a guard in the bundle, model files committed, push script hardened against files changing mid-push. Live app verified converting Maple Leaf Rag again. |
 | 17:59 | Shared machine was at 99% CPU; the evaluation tool now caps parallel jobs at 16 (was 190) and waits while the host is over 90% busy. All agents told to keep heavy work low. |
 | 17:59 | Round 3 UI owner finished: 41 of 41 UI checks (v0.5.0 page: 35); St. Anselm added as a second sample beside Maple Leaf Rag; English + German lyric OCR shipped; each page notes whether it was rotated, smoothed or split as a 2-up spread; spread pages now colour 98.6% of noteheads by part (was 33%); benchmark 0.934 on the live tree. |
+| 18:02 | Release 0.6.0 (18:01 AEDT): rests precision fix (key-signature sharps/naturals were read as quarter rests) plus round 3 UI work. CI and Pages green. Score owner removed all Node-only debug flags; keyboard two-voice split is now the default. |
 
 ## Accuracy by round
 
@@ -91,7 +92,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 |---|---|---|---|---|
 | L1 | Hollow noteheads sometimes missed (main source of rhythm errors) | Noteheads and staves | Partial (round 1) | Hollow heads: wider insides filled, broken outlines closed, outline eaten by staff removal restored. Missed half notes 81 → 28, false whole notes 156 → 3. On the faint 1867 Haupt scan heads found 54 → 105. Beamed 8ths/16ths are now the largest miss source (598) — round 2. Round 2: thin-walled half notes filled on thin-line prints, false hollow heads from flag holes removed; notehead recall 0.867 → 0.888, precision 0.917 → 0.932. |
 | L2 | Key signatures unreliable on old engraving | Symbols | Resolved (round 2) | Every real-scan header now reads right except an old-style bass clef (Sharp 1911) and one Haupt staff: St. Anselm 4 sharps on all staves, Tappan-Dennis +1 and −1, Haupt 1 sharp, America 1 sharp. |
-| L3a | Rests not detected | Symbols | Partial (hotfix shipped in 0.5.1) | New rest detector (src/rests.js) in every voice incl. piano. Rest glyphs written 108 → 269 (truth 256); benchmark rests F1 0.445 → 0.581; challenge 0.527 → 0.707; rest zoo 0 → 0.77. Unknown gaps stay as <forward> because turning them into rests invented rests (measured worse). Hotfix agent still improving recall. |
+| L3a | Rests not detected | Symbols | Partial (0.6.0) | Rest detector in every voice incl. piano; key-signature sharps/naturals no longer read as rests. Rests F1 benchmark 0.445 → 0.726, challenge 0.527 → 0.729 (no-OCR snapshot). |
 | L3b | Ties and slurs not detected; a stray slur can create a false 16th | Symbols | Partial (round 2) | Slurs no longer read as beams (Lindenbaum false 16ths 35 → 23); ties not yet detected. |
 | L3c | Triplets and other tuplets not detected | Symbols | Resolved (round 2) | Tuplet numbers read (3, 5, 6, 7, with or without brackets); divisions raised to 840 per quarter so every tuplet duration is exact. Tuplet étude duration +0.31 to +0.39. MusicXML <type> for tuplet notes still to add. |
 | L3d | Mid-piece clef and key changes not detected | Symbols | Resolved (round 2) | Clef and key changes detected and written into the MusicXML; per-system keys gated. Clara pitch +0.123; keysig-odyssey +0.12. |
@@ -111,7 +112,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | L14 | Double dots, multi-bar rests and whole-bar rests | Symbols + voices | Queued for round 3 | Challenge: double-dotted 0%; rh04 26 bars instead of 40; whole-bar rests 17%. |
 | L15 | Double sharps/flats and 8va/8vb brackets | Symbols | Queued for round 3 | Challenge: double accidentals 1 of 9 pitches; 9% under 8va. |
 | L16 | Key and time-signature changes mid-piece not written; C clefs (alto/tenor) | Symbols + voices | Queued for round 3 | Challenge: later keys 31%, time changes 35%, C clefs 29%. (Overlaps L3d.) |
-| L17 | Two voices inside one part (piano right hand, divisi) merged into chords | Voices + MusicXML | Queued for round 3 | Challenge: always merged in 9 pieces. |
+| L17 | Two voices inside one part (piano right hand, divisi) merged into chords | Voices + MusicXML | In progress (round 3) | Score owner: keyboard parts now split into up/down voices inside the part by default. |
 | L18 | A bracketed instrument pair (violin + cello) read as a piano grand staff; organ pedal staff becomes a separate part | Voices (layout) | Queued for round 3 | Challenge: trio and clef-carousel read as Piano; organ comes out Piano + Voice. |
 | L19 | Regressions found after shipping 0.3.0: 4 challenge items dropped > 0.05 vs 0.2.0 (wind-melody thick-photocopy severe −0.067, satb-closed-lyrics-both-staves-de severe −0.061, lyr08 Scandinavian −0.056, hymn-descant mild −0.050) | Round 3 owners (heads, lyrics, score) | Queued for round 3 | docs/regressions/v0.3.0-vs-v0.2.0.md |
 
@@ -181,14 +182,14 @@ Every agent started for this build, including stopped runs. Outcomes are on the 
 | Run 7 | Generate | gen:marks | done | 17:34 | 17:46 | 12 | 78 |
 | Run 7 | Generate | gen:structure | done | 17:34 | 17:53 | 19 | 95 |
 | Run 7 | Generate | gen:layouts | done | 17:34 | 17:56 | 22 | 131 |
-| Run 7 | Generate | gen:perf | run | 17:34 |  | 25 | 80 |
+| Run 7 | Generate | gen:perf | run | 17:34 |  | 28 | 87 |
 | Run 8 | Fix | fix:r3:heads | run | 17:36 |  | 23 | 130 |
 | Run 8 | Fix | fix:r3:symbols | run | 17:36 |  | 20 | 118 |
-| Run 8 | Fix | fix:r3:score | run | 17:36 |  | 20 | 116 |
-| Run 8 | Fix | fix:r3:lyrics | run | 17:36 |  | 20 | 114 |
+| Run 8 | Fix | fix:r3:score | run | 17:36 |  | 25 | 126 |
+| Run 8 | Fix | fix:r3:lyrics | run | 17:36 |  | 26 | 122 |
 | Run 8 | Fix | fix:r3:ui | run | 17:36 |  | 23 | 91 |
-| Run 8 | Fix | fix:r3:ml | run | 17:36 |  | 22 | 177 |
+| Run 8 | Fix | fix:r3:ml | run | 17:36 |  | 26 | 178 |
 | Side | ML demo | copista-2m demo page for GitHub Pages | done | 16:38 | 16:41 | 3 | 21 |
 | Side | Fast track | First version build (mvp/) | done | 15:19 | 15:29 | 10 | 69 |
-| Side | Hotfix | Rests fix (L3a, user-reported) | run | 17:33 |  | 26 | 178 |
+| Side | Hotfix | Rests fix (L3a, user-reported) | run | 17:33 |  | 27 | 178 |
 | Side | Fast track | Software design document | done | 15:20 | 15:22 | 2 | 16 |

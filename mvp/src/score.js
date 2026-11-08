@@ -220,7 +220,7 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
   // grand staff, whose two staves have one size (L18)
   const small = Array.from({ length: nSt }, (_, k) => {
     const r = sel.map(sy => (sy.staves[k] ? sy.staves[k].st.space / Math.max(...sy.staves.map(s => s.st.space)) : 1)).sort((a, b) => a - b);
-    return !process.env.NOSMALL && r.length > 0 && r[r.length >> 1] <= 0.85;
+    return r.length > 0 && r[r.length >> 1] <= 0.85;
   });
   // keyboard links between adjacent staves
   const link = [];
@@ -265,7 +265,7 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
   // a piece on one staff splits only where stems up and down are seen
   // together (research-voices.md section 11): two heads on one stem there
   // are chords, double stops or blurred heads, not two singers
-  const vs = vocal.map(k => ({ staff: k, clef: clefs[k], small: small[k], split: !small[k] && stats[k].f2 > 0.35 && stats[k].f3 < 0.2 && (nSt > 1 || stats[k].mix >= 0.25 || !!process.env.OLDSOLO) }));
+  const vs = vocal.map(k => ({ staff: k, clef: clefs[k], small: small[k], split: !small[k] && stats[k].f2 > 0.35 && stats[k].f3 < 0.2 && (nSt > 1 || stats[k].mix >= 0.25) }));
   // a two-staff closed score decides once for both staves
   if (vs.length === 2 && nSt === 2 && !small[0] && !small[1]) {
     const both = (stats[0].f2 + stats[1].f2) / 2 > 0.3 && (stats[0].f3 + stats[1].f3) / 2 < 0.2;
@@ -560,9 +560,8 @@ function keyboardVoices(chordal, rests, sp) {
       dn.push({ x: ev.x, heads: d, q, dots: qd(h0).dots, low: true });
     }
   }
-  if (process.env.KBDEBUG && evidence && up.length && dn.length) console.error('KB', evidence, 'v2notes', dn.length, 'both', chordal.filter(e => e.heads.some(h => h.stemDir === 2)).map(e => e.heads.filter(h => h.stemDir === 2).map(h => h.dur.q + '/' + (h.dur.down ? h.dur.down.q : '-')).join(',')).join(' '), 'mixed', chordal.filter(e => e.heads.some(h => h.stemDir === 1) && e.heads.some(h => h.stemDir === -1)).length);
   // one sign and one lone lower note is as likely a stray stem or flag
-  if (!evidence || !up.length || !dn.length || (evidence < 2 && dn.length < 2 && !process.env.KBWEAK)) return null;
+  if (!evidence || !up.length || !dn.length || (evidence < 2 && dn.length < 2)) return null;
   const v1 = mergeRests(up, rests, 1, sp);
   const anchors = [];
   let t = 0;
@@ -648,7 +647,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
       if (!s) return [];
       const c = (cache[src.staff] ||= staffMeasureEvents(m.sy.fr, m.sy.fr.R, m.sy.comps, s, m.xa, m.xb));
       const rs = (restCache[src.staff] ||= m.sy.fr.R ? detectRests({ R: m.sy.fr.R, comps: m.sy.comps || [], s, xa: m.xa, xb: m.xb }) : []);
-      if (p.kind === 'keyboard' && !process.env.NOKB2) {
+      if (p.kind === 'keyboard') {
         if (c.kb === undefined) { c.kb = keyboardVoices(c.chordal, rs, s.st.space); if (c.kb) kbSplit++; }
         if (src.voice === 'kb2') return c.kb ? c.kb[2] : [];
         if (c.kb) return c.kb[1];
@@ -687,7 +686,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   const single = +((Object.entries(votes).filter(([k]) => +k >= 1.5 && PRIOR[+k]).map(([k, v]) => [k, v * PRIOR[+k]]).sort((a, b) => b[1] - a[1])[0] || [0])[0]);
   segSum.forEach((v, i) => {
     if (i + 1 >= segSum.length) return;
-    if (!process.env.OLDPAIRS && single && rnd(v) === single && rnd(segSum[i + 1]) === single) return;
+    if (single && rnd(v) === single && rnd(segSum[i + 1]) === single) return;
     vote(v + segSum[i + 1], 0.6);
   });
   let mq = +(Object.entries(votes).filter(([k]) => +k >= 1.5 && PRIOR[+k]).map(([k, v]) => [k, v * PRIOR[+k]]).sort((a, b) => b[1] - a[1])[0] || [4])[0];
@@ -878,7 +877,10 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     const S = sums.length ? mode(sums) : 0;
     const k = Math.round(S / mLen);
     const agree = sums.filter(x => Math.abs(x - S) <= 0.25 * mLen).length;
-    if (k >= 2 && Math.abs(S - k * mLen) <= 0.25 * mLen && agree >= Math.max(1, 0.5 * sums.length)) {
+    // a missed barline lengthens every voice of the system alike: one voice
+    // that alone runs long has false notes in it (a tie end read as a half
+    // note), not a second bar
+    if (k >= 2 && Math.abs(S - k * mLen) <= 0.25 * mLen && agree >= (sums.length >= 2 ? Math.max(2, Math.ceil((2 / 3) * sums.length)) : 1)) {
       splitBars += k - 1;
       const chunks = Array.from({ length: k }, () => byPart.map(sts => sts.map(st => ({ staff: st.staff, events: [] }))));
       byPart.forEach((sts, pi) => sts.forEach((st, si) => {
@@ -1169,14 +1171,28 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
   }
   const keyAt = (mi) => {
     const sy = unitSys && unitSys[mi], k = sy != null ? sysKeyOf.get(sy) : undefined;
-    if (!process.env.OLDKEYS && sy != null && seqKey.has(sy)) return seqKey.get(sy);
+    if (sy != null && seqKey.has(sy)) return seqKey.get(sy);
     return k != null && keyOk(k) ? k : fifths;
   };
   const altsOf = new Map();
   const altsFor = (f) => { if (!altsOf.has(f)) altsOf.set(f, keyAlters(f)); return altsOf.get(f); };
+  // A clef read on one system only is also kept when it carries on a clef
+  // change read inside that staff on the system before (the new clef is
+  // printed again at the head of the next system)
+  const carried = new Set();
+  {
+    const order = [...allSys];
+    for (let i = 1; i < order.length; i++) order[i].staves.forEach((st, k) => {
+      const prev = order[i - 1].staves[k];
+      if (!prev || st.hdr.clefGuessed || !st.hdr.clef) return;
+      let last = null;
+      for (const ch of prev.chords) for (const h of ch.heads) if (!last || h.x > last.x) last = h;
+      if (last && last.clef && last.clef === st.hdr.clef) carried.add(order[i].staves[k]);
+    });
+  }
   const clefAt = (mi, staff) => {
     const sy = unitSys && unitSys[mi], st = sy && sy.staves[staff];
-    if (st && !st.hdr.clefGuessed && st.hdr.clef && (seenClef[staff + ':' + st.hdr.clef] || 0) >= 2) return st.hdr.clef;
+    if (st && !st.hdr.clefGuessed && st.hdr.clef && ((seenClef[staff + ':' + st.hdr.clef] || 0) >= 2 || carried.has(st))) return st.hdr.clef;
     return clefs[staff] || 'G';
   };
   // Accidentals on a shared staff bind every voice on it for the rest of the

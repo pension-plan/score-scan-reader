@@ -802,20 +802,20 @@
     \pageBreak \mark \markup { \box \bold "40" } \tempo "Var. 40  Comodo" 4 = 96 \key d \major d''4\pp fis''4 a''2 |
     \clef "soprano" b'4 d''4 fis''2 |
     \clef "treble^8" e'''4 g'''4 b'''2 |
-    \clef "treble" a'4 cis''4 e''2 |
-    \break d''4 fis''4 a''2 |
+    \clef "treble_8" a4 cis'4 e'2 |
+    \break \clef "treble" d''4 fis''4 a''2 |
     \clef "soprano" g'4 b'4 d''2 |
     \clef "treble^8" a''4 cis'''4 e'''2 |
-    \clef "treble" d''4 fis''4 a''2 |
-    \break b'4 d''4 fis''2 |
+    \clef "treble_8" d'4 fis'4 a'2 |
+    \break \clef "treble" b'4 d''4 fis''2 |
     \clef "soprano" g'4 b'4 d''2 |
     \clef "treble^8" d'''4 fis'''4 a'''2 |
-    \clef "treble" a'4 cis''4 e''2 |
-    \break d''4 fis''4 a''2 |
+    \clef "treble_8" a4 cis'4 e'2 |
+    \break \clef "treble" d''4 fis''4 a''2 |
     \clef "soprano" e'4 gis'4 b'2 |
     \clef "treble^8" a''4 cis'''4 e'''2 |
-    \clef "treble" d''4 fis''4 a''2 |
-    \break d''4 fis''4 a''2 |
+    \clef "treble_8" d'4 fis'4 a'2 |
+    \break \clef "treble" d''4 fis''4 a''2 |
     \clef "soprano" fis'4 a'4 cis''2 |
     \clef "treble^8" a''4 cis'''4 e'''2 |
     \clef "treble" d''4 fis''4 a''2 \bar "|." |
@@ -2401,20 +2401,20 @@
     \key d \major d8 fis8 a8 fis8 <d fis a>2 |
     \clef "tenor" b8 d'8 fis'8 d'8 <b d' fis'>2 |
     \clef "alto" e'8 g'8 b'8 g'8 <e' g' b'>2 |
-    \clef "bass" a,8 cis8 e8 cis8 <a, cis e>2 |
-    d8 fis8 a8 fis8 <d fis a>2 |
+    \clef "bass_8" a,,8 cis,8 e,8 cis,8 <a,, cis, e,>2 |
+    \clef "bass" d8 fis8 a8 fis8 <d fis a>2 |
     \clef "tenor" g8 b8 d'8 b8 <g b d'>2 |
     \clef "alto" a8 cis'8 e'8 cis'8 <a cis' e'>2 |
-    \clef "bass" d8 fis8 a8 fis8 <d fis a>2 |
-    b,8 d8 fis8 d8 <b, d fis>2 |
+    \clef "bass_8" d,8 fis,8 a,8 fis,8 <d, fis, a,>2 |
+    \clef "bass" b,8 d8 fis8 d8 <b, d fis>2 |
     \clef "tenor" g8 b8 d'8 b8 <g b d'>2 |
     \clef "alto" d'8 fis'8 a'8 fis'8 <d' fis' a'>2 |
-    \clef "bass" a,8 cis8 e8 cis8 <a, cis e>2 |
-    d8 fis8 a8 fis8 <d fis a>2 |
+    \clef "bass_8" a,,8 cis,8 e,8 cis,8 <a,, cis, e,>2 |
+    \clef "bass" d8 fis8 a8 fis8 <d fis a>2 |
     \clef "tenor" e8 gis8 b8 gis8 <e gis b>2 |
     \clef "alto" a8 cis'8 e'8 cis'8 <a cis' e'>2 |
+    \clef "bass_8" d,8 fis,8 a,8 fis,8 <d, fis, a,>2 |
     \clef "bass" d8 fis8 a8 fis8 <d fis a>2 |
-    d8 fis8 a8 fis8 <d fis a>2 |
     \clef "tenor" fis8 a8 cis'8 a8 <fis a cis'>2 |
     \clef "alto" a8 cis'8 e'8 cis'8 <a cis' e'>2 |
     \clef "bass" d8 fis8 a8 fis8 <d fis a>2 |
