@@ -1,0 +1,3223 @@
+{
+  "family": "notes",
+  "n_items": 10,
+  "generator": "corpus/coverage/notes/_tools/run_all.py",
+  "license": "CC0",
+  "count_rules": {
+    "_scope": "Counts are read from truth.musicxml. \"Main notes\" = <note> elements with <pitch> that are neither <grace/> nor <cue/>; note-family tags count main notes only, grace and cue notes are counted by grace / grace-slash / cue-note. Cross-checked against the LilyPond engraving (grob dump).",
+    "note-<value>": "main noteheads (<note> elements, chord tones included) with that <type>; two-note-tremolo notes count with their printed type",
+    "dot": "main noteheads with exactly one <dot/> (every head of a dotted chord carries its own dot)",
+    "double-dot": "main noteheads with exactly two <dot/>",
+    "chord": "main chord events: a note without <chord/> followed by >= 1 <chord/> notes (sizes in counts_detail)",
+    "beam": "beam groups among main notes (= <beam number=\"1\">begin</beam>); grace beam groups in counts_detail",
+    "flag": "main stems (chord = one stem) of value eighth or shorter without <beam> and not in a two-note tremolo",
+    "stem-up / stem-down": "main stems (chord = one stem) with <stem>up</stem> / <stem>down</stem>; whole notes and breves have no stem",
+    "ledger-above / ledger-below": "main noteheads that need >= 1 ledger line above / below the 5-line staff (staff position from pitch and the clef in force); per-depth numbers in counts_detail (ledger-above-1 .. -5 = heads needing exactly n lines)",
+    "grace": "grace noteheads",
+    "grace-slash": "grace noteheads with <grace slash=\"yes\"/>",
+    "cue-note": "cue noteheads (<cue/>)",
+    "tremolo": "tremolo marks: single-note tremolos (per stem) + two-note tremolos (per pair, type=\"start\")",
+    "rest-<value>": "rests (not measure rests) with that <type>",
+    "rest-dotted": "dotted rests",
+    "rest-whole-bar": "<rest measure=\"yes\"/> (each bar of a multi-bar rest counts)",
+    "rest-multibar": "<multiple-rest> blocks",
+    "acc-*": "printed <accidental> elements on any note (main, grace or cue)",
+    "acc-courtesy": "<accidental cautionary=\"yes\"> or parentheses=\"yes\"",
+    "clef-*": "<clef> elements (one per staff at the start)",
+    "clef-change": "<clef> elements after the first attributes of the part",
+    "key-*": "<key> elements",
+    "time-*": "<time> elements (C / cut symbol counted as time-common / time-cut only)",
+    "slur": "<slur type=\"start\"> (includes the slur LilyPond draws for \\acciaccatura/\\appoggiatura)",
+    "tie": "<tie type=\"start\">",
+    "barline-final": "light-heavy barlines without repeat",
+    "system-break": "<print new-system=\"yes\">",
+    "page-break": "<print new-page=\"yes\">",
+    "multi-page": "1 when the engraving has more than one page",
+    "text-expression": "<words> directions that are not tempo marks (bold measure-start words)"
+  },
+  "symbol_totals": {
+    "acc-flat": 5,
+    "acc-natural": 2,
+    "acc-sharp": 7,
+    "barline-final": 10,
+    "beam": 99,
+    "chord": 102,
+    "clef-bass": 4,
+    "clef-treble": 10,
+    "cue-note": 24,
+    "dot": 48,
+    "double-dot": 10,
+    "flag": 126,
+    "grace": 58,
+    "grace-slash": 16,
+    "key-0": 10,
+    "ledger-above": 146,
+    "ledger-below": 83,
+    "note-16th": 197,
+    "note-32nd": 90,
+    "note-64th": 60,
+    "note-8th": 216,
+    "note-breve": 3,
+    "note-half": 182,
+    "note-quarter": 202,
+    "note-whole": 47,
+    "rest-16th": 2,
+    "rest-8th": 5,
+    "rest-half": 1,
+    "rest-quarter": 2,
+    "rest-whole-bar": 4,
+    "slur": 17,
+    "stem-down": 501,
+    "stem-up": 252,
+    "system-break": 33,
+    "text-expression": 3,
+    "time-2-4": 1,
+    "time-3-2": 1,
+    "time-3-4": 3,
+    "time-4-4": 11,
+    "time-6-8": 2,
+    "time-change": 10,
+    "tremolo": 35,
+    "x-time-4-2": 2
+  },
+  "symbol_items": {
+    "acc-flat": [
+      "nt03-chords",
+      "nt07-grace-notes"
+    ],
+    "acc-natural": [
+      "nt03-chords",
+      "nt07-grace-notes"
+    ],
+    "acc-sharp": [
+      "nt03-chords",
+      "nt07-grace-notes"
+    ],
+    "barline-final": [
+      "nt01-note-values",
+      "nt02-dots",
+      "nt03-chords",
+      "nt04-beams",
+      "nt05-flags-stems",
+      "nt06-ledger-lines",
+      "nt07-grace-notes",
+      "nt08-cue-notes",
+      "nt09-tremolos",
+      "nt10-piano-etude"
+    ],
+    "beam": [
+      "nt01-note-values",
+      "nt02-dots",
+      "nt03-chords",
+      "nt04-beams",
+      "nt06-ledger-lines",
+      "nt09-tremolos",
+      "nt10-piano-etude"
+    ],
+    "chord": [
+      "nt02-dots",
+      "nt03-chords",
+      "nt04-beams",
+      "nt06-ledger-lines",
+      "nt09-tremolos",
+      "nt10-piano-etude"
+    ],
+    "clef-bass": [
+      "nt03-chords",
+      "nt06-ledger-lines",
+      "nt09-tremolos",
+      "nt10-piano-etude"
+    ],
+    "clef-treble": [
+      "nt01-note-values",
+      "nt02-dots",
+      "nt03-chords",
+      "nt04-beams",
+      "nt05-flags-stems",
+      "nt06-ledger-lines",
+      "nt07-grace-notes",
+      "nt08-cue-notes",
+      "nt09-tremolos",
+      "nt10-piano-etude"
+    ],
+    "cue-note": [
+      "nt08-cue-notes"
+    ],
+    "dot": [
+      "nt02-dots",
+      "nt03-chords",
+      "nt04-beams",
+      "nt05-flags-stems",
+      "nt07-grace-notes",
+      "nt10-piano-etude"
+    ],
+    "double-dot": [
+      "nt02-dots",
+      "nt10-piano-etude"
+    ],
+    "flag": [
+      "nt01-note-values",
+      "nt02-dots",
+      "nt05-flags-stems",
+      "nt10-piano-etude"
+    ],
+    "grace": [
+      "nt07-grace-notes",
+      "nt10-piano-etude"
+    ],
+    "grace-slash": [
+      "nt07-grace-notes",
+      "nt10-piano-etude"
+    ],
+    "key-0": [
+      "nt01-note-values",
+      "nt02-dots",
+      "nt03-chords",
+      "nt04-beams",
+      "nt05-flags-stems",
+      "nt06-ledger-lines",
+      "nt07-grace-notes",
+      "nt08-cue-notes",
+      "nt09-tremolos",
+      "nt10-piano-etude"
+    ],
+    "ledger-above": [
+      "nt01-note-values",
+      "nt02-dots",
+      "nt03-chords",
+      "nt04-beams",
+      "nt05-flags-stems",
+      "nt06-ledger-lines",
+      "nt07-grace-notes",
+      "nt09-tremolos",
+      "nt10-piano-etude"
+    ],
+    "ledger-below": [
+      "nt01-note-values",
+      "nt03-chords",
+      "nt05-flags-stems",
+      "nt06-ledger-lines",
+      "nt09-tremolos",
+      "nt10-piano-etude"
+    ],
+    "note-16th": [
+      "nt01-note-values",
+      "nt02-dots",
+      "nt03-chords",
+      "nt04-beams",
+      "nt05-flags-stems",
+      "nt06-ledger-lines",
+      "nt10-piano-etude"
+    ],
+    "note-32nd": [
+      "nt01-note-values",
+      "nt02-dots",
+      "nt04-beams",
+      "nt05-flags-stems",
+      "nt10-piano-etude"
+    ],
+    "note-64th": [
+      "nt01-note-values",
+      "nt02-dots",
+      "nt05-flags-stems"
+    ],
+    "note-8th": [
+      "nt01-note-values",
+      "nt02-dots",
+      "nt03-chords",
+      "nt04-beams",
+      "nt05-flags-stems",
+      "nt06-ledger-lines",
+      "nt09-tremolos",
+      "nt10-piano-etude"
+    ],
+    "note-breve": [
+      "nt01-note-values"
+    ],
+    "note-half": [
+      "nt01-note-values",
+      "nt02-dots",
+      "nt03-chords",
+      "nt04-beams",
+      "nt05-flags-stems",
+      "nt06-ledger-lines",
+      "nt07-grace-notes",
+      "nt08-cue-notes",
+      "nt09-tremolos",
+      "nt10-piano-etude"
+    ],
+    "note-quarter": [
+      "nt01-note-values",
+      "nt02-dots",
+      "nt03-chords",
+      "nt04-beams",
+      "nt05-flags-stems",
+      "nt06-ledger-lines",
+      "nt07-grace-notes",
+      "nt08-cue-notes",
+      "nt09-tremolos",
+      "nt10-piano-etude"
+    ],
+    "note-whole": [
+      "nt01-note-values",
+      "nt02-dots",
+      "nt03-chords",
+      "nt04-beams",
+      "nt06-ledger-lines",
+      "nt07-grace-notes",
+      "nt08-cue-notes",
+      "nt09-tremolos",
+      "nt10-piano-etude"
+    ],
+    "rest-16th": [
+      "nt04-beams"
+    ],
+    "rest-8th": [
+      "nt04-beams",
+      "nt10-piano-etude"
+    ],
+    "rest-half": [
+      "nt08-cue-notes"
+    ],
+    "rest-quarter": [
+      "nt08-cue-notes",
+      "nt10-piano-etude"
+    ],
+    "rest-whole-bar": [
+      "nt08-cue-notes"
+    ],
+    "slur": [
+      "nt07-grace-notes",
+      "nt10-piano-etude"
+    ],
+    "stem-down": [
+      "nt01-note-values",
+      "nt02-dots",
+      "nt03-chords",
+      "nt04-beams",
+      "nt05-flags-stems",
+      "nt06-ledger-lines",
+      "nt07-grace-notes",
+      "nt08-cue-notes",
+      "nt09-tremolos",
+      "nt10-piano-etude"
+    ],
+    "stem-up": [
+      "nt01-note-values",
+      "nt02-dots",
+      "nt03-chords",
+      "nt04-beams",
+      "nt05-flags-stems",
+      "nt06-ledger-lines",
+      "nt07-grace-notes",
+      "nt09-tremolos",
+      "nt10-piano-etude"
+    ],
+    "system-break": [
+      "nt01-note-values",
+      "nt02-dots",
+      "nt03-chords",
+      "nt04-beams",
+      "nt05-flags-stems",
+      "nt06-ledger-lines",
+      "nt07-grace-notes",
+      "nt08-cue-notes",
+      "nt09-tremolos",
+      "nt10-piano-etude"
+    ],
+    "text-expression": [
+      "nt08-cue-notes"
+    ],
+    "time-2-4": [
+      "nt04-beams"
+    ],
+    "time-3-2": [
+      "nt02-dots"
+    ],
+    "time-3-4": [
+      "nt04-beams",
+      "nt05-flags-stems"
+    ],
+    "time-4-4": [
+      "nt01-note-values",
+      "nt02-dots",
+      "nt03-chords",
+      "nt04-beams",
+      "nt06-ledger-lines",
+      "nt07-grace-notes",
+      "nt08-cue-notes",
+      "nt09-tremolos",
+      "nt10-piano-etude"
+    ],
+    "time-6-8": [
+      "nt02-dots",
+      "nt04-beams"
+    ],
+    "time-change": [
+      "nt01-note-values",
+      "nt02-dots",
+      "nt04-beams"
+    ],
+    "tremolo": [
+      "nt09-tremolos"
+    ],
+    "x-time-4-2": [
+      "nt01-note-values"
+    ]
+  },
+  "layouts": {
+    "nt01-note-values": "melody",
+    "nt02-dots": "melody",
+    "nt03-chords": "piano",
+    "nt04-beams": "melody",
+    "nt05-flags-stems": "melody",
+    "nt06-ledger-lines": "piano",
+    "nt07-grace-notes": "melody",
+    "nt08-cue-notes": "melody",
+    "nt09-tremolos": "piano",
+    "nt10-piano-etude": "piano"
+  },
+  "items": [
+    {
+      "id": "nt01-note-values",
+      "family": "notes",
+      "title": "Note Values (violin)",
+      "description": "Every note value from breve to 64th on one treble staff: 4/2 bars of breves, wholes and halves, then 4/4 bars of quarters, eighths, 16ths, 32nds and 64ths, each value both beamed and flagged and with stems up and down.",
+      "symbols": [
+        "barline-final",
+        "beam",
+        "clef-treble",
+        "flag",
+        "key-0",
+        "ledger-above",
+        "ledger-below",
+        "note-16th",
+        "note-32nd",
+        "note-64th",
+        "note-8th",
+        "note-breve",
+        "note-half",
+        "note-quarter",
+        "note-whole",
+        "stem-down",
+        "stem-up",
+        "system-break",
+        "time-4-4",
+        "time-change"
+      ],
+      "focus_symbols": [
+        "note-breve",
+        "note-whole",
+        "note-half",
+        "note-quarter",
+        "note-8th",
+        "note-16th",
+        "note-32nd",
+        "note-64th",
+        "beam",
+        "flag",
+        "stem-up",
+        "stem-down"
+      ],
+      "layout": "melody",
+      "expected": {
+        "parts": [
+          "Violin"
+        ],
+        "must_not_split": false,
+        "staves_per_part": {
+          "Violin": 1
+        },
+        "measures": 15,
+        "first_measure_number": 1,
+        "notes": "One part (Violin), 15 bars: 4/2 (bars 1-4), 4/4 (5-13), 4/2 (14-15). Breves in bars 1, 4, 15. Each 4/4 bar mixes beamed groups and unbeamed (flagged) notes of the same value; the 64th bars hold groups of 16 and 8 beamed 64ths plus four flagged 64ths."
+      },
+      "counts": {
+        "barline-final": 1,
+        "beam": 14,
+        "clef-treble": 1,
+        "flag": 36,
+        "key-0": 1,
+        "ledger-above": 25,
+        "ledger-below": 1,
+        "note-16th": 26,
+        "note-32nd": 32,
+        "note-64th": 40,
+        "note-8th": 18,
+        "note-breve": 3,
+        "note-half": 7,
+        "note-quarter": 8,
+        "note-whole": 4,
+        "stem-down": 87,
+        "stem-up": 44,
+        "system-break": 5,
+        "time-4-4": 1,
+        "time-change": 2,
+        "x-time-4-2": 2
+      },
+      "counts_detail": {
+        "beam-level-1-begin": 14,
+        "beam-level-1-continue": 52,
+        "beam-level-1-end": 14,
+        "beam-level-2-begin": 10,
+        "beam-level-2-continue": 52,
+        "beam-level-2-end": 10,
+        "beam-level-3-begin": 6,
+        "beam-level-3-continue": 44,
+        "beam-level-3-end": 6,
+        "beam-level-4-begin": 3,
+        "beam-level-4-continue": 26,
+        "beam-level-4-end": 3,
+        "flag-16th": 10,
+        "flag-32nd": 8,
+        "flag-64th": 8,
+        "flag-eighth": 10,
+        "ledger-above-1": 16,
+        "ledger-above-2": 9,
+        "ledger-below-1": 1
+      },
+      "notes": [
+        "Every stemmed note carries <stem>: the engraving is forced to exactly that direction (standard middle-line rule, the extreme note of a chord / beam group / two-note tremolo decides, middle line goes down; graces up; explicit \\stemUp/\\stemDown passages kept). Whole notes and breves carry no <stem>.",
+        "<beam> elements reproduce the engraved beams level by level (manual beaming): level 1 joins the whole group, a secondary level joins neighbours that both carry it; a rest inside a beam carries no <beam> element but a 16th rest between 16ths keeps the secondary beam continuous (as LilyPond draws it), so the note after it continues the level; beamlets are forward/backward hooks."
+      ],
+      "degradations": {
+        "scan.pdf": {
+          "seed": 960101,
+          "level": "typical",
+          "recipe": "typical-office-scan",
+          "render_dpi": 300,
+          "dpi": 300,
+          "color": "gray",
+          "format": "jpeg",
+          "jpeg_quality": 60,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                245,
+                244,
+                240
+              ],
+              "texture": 2
+            },
+            {
+              "op": "rotate",
+              "deg": 0.7,
+              "bg": [
+                232,
+                232,
+                232
+              ]
+            },
+            {
+              "op": "gradient",
+              "strength": 0.06
+            },
+            {
+              "op": "blur",
+              "sigma": 0.5
+            },
+            {
+              "op": "noise",
+              "sigma": 3.0
+            }
+          ],
+          "tags": [
+            "paper_texture",
+            "rotation_+0.7deg",
+            "gradient",
+            "blur",
+            "noise",
+            "jpeg_q60"
+          ],
+          "output_pages": 1,
+          "pixel_size": [
+            2525,
+            3540
+          ],
+          "image_mode": "L",
+          "bytes": 417508,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        },
+        "scan-severe.pdf": {
+          "seed": 960102,
+          "level": "severe",
+          "recipe": "photocopy-thick",
+          "render_dpi": 200,
+          "dpi": 200,
+          "color": "gray",
+          "format": "png1",
+          "jpeg_quality": null,
+          "jpeg_passes": null,
+          "ops": [
+            {
+              "op": "ink_weight",
+              "px": 1
+            },
+            {
+              "op": "paper",
+              "rgb": [
+                250,
+                250,
+                250
+              ]
+            },
+            {
+              "op": "rotate",
+              "deg": 2.4,
+              "bg": 255
+            },
+            {
+              "op": "speckle",
+              "per_mpx": 70
+            },
+            {
+              "op": "binarize",
+              "threshold": 178,
+              "pre_blur": 1.0,
+              "noise": 22
+            },
+            {
+              "op": "saltpepper",
+              "amount": 0.002
+            }
+          ],
+          "tags": [
+            "ink_weight",
+            "rotation_+2.4deg",
+            "speckle",
+            "binarized_photocopy_thick",
+            "saltpepper"
+          ],
+          "output_pages": 1,
+          "pixel_size": [
+            1752,
+            2407
+          ],
+          "image_mode": "1",
+          "bytes": 59280,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        }
+      },
+      "dpi": 300,
+      "pages": 1,
+      "license": "CC0",
+      "license_detail": "CC0-1.0: composition, engraving, truth and scans created for this corpus",
+      "composer": "OMR coverage corpus (CC0)",
+      "files": {
+        "truth": "truth.musicxml",
+        "engraving": "engraving.ly",
+        "clean": "clean.pdf",
+        "scan": "scan.pdf",
+        "scan_severe": "scan-severe.pdf",
+        "attribution": "ATTRIBUTION.txt"
+      },
+      "clean": {
+        "dpi": 300,
+        "pages": 1,
+        "ops": [],
+        "note": "undamaged raster render (PNG)",
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "text_chars": 0
+      },
+      "validation": {
+        "truth_xsd_valid": true,
+        "music21_reparse_matches_model": true,
+        "engraving_event_dump_matches_truth": true,
+        "engraving_events_compared": 166,
+        "stem_grobs_compared": 131,
+        "notehead_grobs_compared": 138,
+        "printed_accidentals_compared": 0,
+        "time_signatures_compared": 3,
+        "midi_attacks_match_truth": true,
+        "midi_attacks": 138,
+        "midi_grace_notes_excluded": 0,
+        "counts_truth_equal_engraving": true,
+        "engraved_counts": {
+          "note-breve": 3,
+          "note-whole": 4,
+          "note-half": 7,
+          "stem-down": 87,
+          "note-quarter": 8,
+          "stem-up": 44,
+          "note-8th": 18,
+          "flag": 36,
+          "note-16th": 26,
+          "ledger-above": 25,
+          "note-32nd": 32,
+          "ledger-below": 1,
+          "note-64th": 40,
+          "beam": 14
+        },
+        "lilypond_warnings": [],
+        "method": "LilyPond 2.24 run with an instrumented dump (nsynth/dump.ly): every note/rest event (onset, pitch, notated type, dots, tuplet scale, grace offset), tie, beam start/stop, slur, tremolo, time signature, bar number/measure position; every Stem of the final layout (direction, duration log, beamed, beams/beamlets left and right, stem-tremolo strokes, heads) and every NoteHead (staff position -> ledger lines, head type, font size for grace/cue); every printed accidental. All compared with the model the truth is written from; plus LilyPond MIDI attacks, a music21 re-parse of truth.musicxml and xmllint against MusicXML 4.0 XSD. The symbol counts in this file are read back from truth.musicxml (nsynth/counts.py) and must equal the counts measured on the engraving."
+      },
+      "generator": "corpus/coverage/notes/_tools/run_all.py (nsynth/items.py, build.py, scan.py)",
+      "path": "notes/nt01-note-values"
+    },
+    {
+      "id": "nt02-dots",
+      "family": "notes",
+      "title": "Dotted Rhythms (oboe)",
+      "description": "Single and double dots on whole, half, quarter, eighth, 16th and 32nd notes; dotted values beamed with their complements (hooks), dotted two-note chords.",
+      "symbols": [
+        "barline-final",
+        "beam",
+        "chord",
+        "clef-treble",
+        "dot",
+        "double-dot",
+        "flag",
+        "key-0",
+        "ledger-above",
+        "note-16th",
+        "note-32nd",
+        "note-64th",
+        "note-8th",
+        "note-half",
+        "note-quarter",
+        "note-whole",
+        "stem-down",
+        "stem-up",
+        "system-break",
+        "time-3-2",
+        "time-4-4",
+        "time-6-8",
+        "time-change"
+      ],
+      "focus_symbols": [
+        "dot",
+        "double-dot",
+        "note-whole",
+        "note-half",
+        "note-quarter",
+        "note-8th",
+        "note-16th",
+        "note-32nd",
+        "note-64th",
+        "beam",
+        "chord"
+      ],
+      "layout": "melody",
+      "expected": {
+        "parts": [
+          "Oboe"
+        ],
+        "must_not_split": false,
+        "staves_per_part": {
+          "Oboe": 1
+        },
+        "measures": 16,
+        "first_measure_number": 1,
+        "notes": "One part (Oboe), 16 bars in 3/2, 4/4, 6/8, 4/4. Dotted whole (bar 1), double-dotted half (3), double-dotted quarters (6, 14), double-dotted eighths + 32nd (8), dotted 16th + 32nd (8, 9), dotted 32nd + 64th (9), double-dotted 16th + 64th (14), dotted chords (10, 11). Every dot belongs to the note it follows; no rests."
+      },
+      "counts": {
+        "barline-final": 1,
+        "beam": 13,
+        "chord": 5,
+        "clef-treble": 1,
+        "dot": 27,
+        "double-dot": 9,
+        "flag": 9,
+        "key-0": 1,
+        "ledger-above": 9,
+        "note-16th": 17,
+        "note-32nd": 8,
+        "note-64th": 4,
+        "note-8th": 16,
+        "note-half": 11,
+        "note-quarter": 14,
+        "note-whole": 2,
+        "stem-down": 49,
+        "stem-up": 16,
+        "system-break": 5,
+        "time-3-2": 1,
+        "time-4-4": 2,
+        "time-6-8": 1,
+        "time-change": 3
+      },
+      "counts_detail": {
+        "beam-level-1-begin": 13,
+        "beam-level-1-continue": 9,
+        "beam-level-1-end": 13,
+        "beam-level-2-backward-hook": 7,
+        "beam-level-2-begin": 5,
+        "beam-level-2-continue": 8,
+        "beam-level-2-end": 5,
+        "beam-level-2-forward-hook": 1,
+        "beam-level-3-backward-hook": 8,
+        "beam-level-3-begin": 1,
+        "beam-level-3-continue": 2,
+        "beam-level-3-end": 1,
+        "beam-level-4-backward-hook": 4,
+        "chord-2-notes": 5,
+        "flag-16th": 3,
+        "flag-eighth": 6,
+        "ledger-above-1": 8,
+        "ledger-above-2": 1
+      },
+      "notes": [
+        "Every stemmed note carries <stem>: the engraving is forced to exactly that direction (standard middle-line rule, the extreme note of a chord / beam group / two-note tremolo decides, middle line goes down; graces up; explicit \\stemUp/\\stemDown passages kept). Whole notes and breves carry no <stem>.",
+        "<beam> elements reproduce the engraved beams level by level (manual beaming): level 1 joins the whole group, a secondary level joins neighbours that both carry it; a rest inside a beam carries no <beam> element but a 16th rest between 16ths keeps the secondary beam continuous (as LilyPond draws it), so the note after it continues the level; beamlets are forward/backward hooks.",
+        "dot / double-dot count noteheads (each head of a dotted chord has a dot)."
+      ],
+      "degradations": {
+        "scan.pdf": {
+          "seed": 960201,
+          "level": "typical",
+          "recipe": "typical-office-scan",
+          "render_dpi": 300,
+          "dpi": 300,
+          "color": "gray",
+          "format": "jpeg",
+          "jpeg_quality": 55,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                245,
+                244,
+                240
+              ],
+              "texture": 2
+            },
+            {
+              "op": "rotate",
+              "deg": -1.1,
+              "bg": [
+                232,
+                232,
+                232
+              ]
+            },
+            {
+              "op": "gradient",
+              "strength": 0.06
+            },
+            {
+              "op": "blur",
+              "sigma": 0.5
+            },
+            {
+              "op": "noise",
+              "sigma": 3.0
+            }
+          ],
+          "tags": [
+            "paper_texture",
+            "rotation_-1.1deg",
+            "gradient",
+            "blur",
+            "noise",
+            "jpeg_q55"
+          ],
+          "output_pages": 1,
+          "pixel_size": [
+            2549,
+            3556
+          ],
+          "image_mode": "L",
+          "bytes": 333057,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        },
+        "scan-severe.pdf": {
+          "seed": 960202,
+          "level": "severe",
+          "recipe": "low-dpi-jpeg",
+          "render_dpi": 300,
+          "dpi": 100,
+          "color": "gray",
+          "format": "jpeg",
+          "jpeg_quality": 18,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                240,
+                238,
+                230
+              ],
+              "texture": 4
+            },
+            {
+              "op": "rotate",
+              "deg": -3.1,
+              "bg": 225
+            },
+            {
+              "op": "blur",
+              "sigma": 1.0
+            },
+            {
+              "op": "noise",
+              "sigma": 7
+            },
+            {
+              "op": "downsample",
+              "dpi": 100
+            }
+          ],
+          "tags": [
+            "paper_texture",
+            "rotation_-3.1deg",
+            "blur",
+            "noise",
+            "downsampled_100dpi",
+            "jpeg_q18"
+          ],
+          "output_pages": 1,
+          "pixel_size": [
+            889,
+            1212
+          ],
+          "image_mode": "L",
+          "bytes": 30593,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        }
+      },
+      "dpi": 300,
+      "pages": 1,
+      "license": "CC0",
+      "license_detail": "CC0-1.0: composition, engraving, truth and scans created for this corpus",
+      "composer": "OMR coverage corpus (CC0)",
+      "files": {
+        "truth": "truth.musicxml",
+        "engraving": "engraving.ly",
+        "clean": "clean.pdf",
+        "scan": "scan.pdf",
+        "scan_severe": "scan-severe.pdf",
+        "attribution": "ATTRIBUTION.txt"
+      },
+      "clean": {
+        "dpi": 300,
+        "pages": 1,
+        "ops": [],
+        "note": "undamaged raster render (PNG)",
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "text_chars": 0
+      },
+      "validation": {
+        "truth_xsd_valid": true,
+        "music21_reparse_matches_model": true,
+        "engraving_event_dump_matches_truth": true,
+        "engraving_events_compared": 98,
+        "stem_grobs_compared": 65,
+        "notehead_grobs_compared": 72,
+        "printed_accidentals_compared": 0,
+        "time_signatures_compared": 4,
+        "midi_attacks_match_truth": true,
+        "midi_attacks": 72,
+        "midi_grace_notes_excluded": 0,
+        "counts_truth_equal_engraving": true,
+        "engraved_counts": {
+          "note-whole": 2,
+          "note-half": 11,
+          "stem-down": 49,
+          "stem-up": 16,
+          "note-8th": 16,
+          "flag": 9,
+          "note-quarter": 14,
+          "note-16th": 17,
+          "ledger-above": 9,
+          "note-32nd": 8,
+          "note-64th": 4,
+          "chord": 5,
+          "beam": 13
+        },
+        "lilypond_warnings": [],
+        "method": "LilyPond 2.24 run with an instrumented dump (nsynth/dump.ly): every note/rest event (onset, pitch, notated type, dots, tuplet scale, grace offset), tie, beam start/stop, slur, tremolo, time signature, bar number/measure position; every Stem of the final layout (direction, duration log, beamed, beams/beamlets left and right, stem-tremolo strokes, heads) and every NoteHead (staff position -> ledger lines, head type, font size for grace/cue); every printed accidental. All compared with the model the truth is written from; plus LilyPond MIDI attacks, a music21 re-parse of truth.musicxml and xmllint against MusicXML 4.0 XSD. The symbol counts in this file are read back from truth.musicxml (nsynth/counts.py) and must equal the counts measured on the engraving."
+      },
+      "generator": "corpus/coverage/notes/_tools/run_all.py (nsynth/items.py, build.py, scan.py)",
+      "path": "notes/nt02-dots"
+    },
+    {
+      "id": "nt03-chords",
+      "family": "notes",
+      "title": "Chord Study (piano)",
+      "description": "Chords of 2, 3, 4, 5 and 6 notes in both hands: close and open positions, seconds (displaced noteheads), accidentals inside chords, beamed eighth- and 16th-note chords, dotted and whole-note chords, chords with ledger lines.",
+      "symbols": [
+        "acc-flat",
+        "acc-natural",
+        "acc-sharp",
+        "barline-final",
+        "beam",
+        "chord",
+        "clef-bass",
+        "clef-treble",
+        "dot",
+        "key-0",
+        "ledger-above",
+        "ledger-below",
+        "note-16th",
+        "note-8th",
+        "note-half",
+        "note-quarter",
+        "note-whole",
+        "stem-down",
+        "stem-up",
+        "system-break",
+        "time-4-4"
+      ],
+      "focus_symbols": [
+        "chord",
+        "note-whole",
+        "note-half",
+        "note-quarter",
+        "note-8th",
+        "note-16th",
+        "beam",
+        "stem-up",
+        "stem-down",
+        "acc-sharp",
+        "acc-flat",
+        "acc-natural"
+      ],
+      "layout": "piano",
+      "expected": {
+        "parts": [
+          "Piano"
+        ],
+        "must_not_split": true,
+        "staves_per_part": {
+          "Piano": 2
+        },
+        "measures": 10,
+        "first_measure_number": 1,
+        "notes": "ONE part (Piano) on a grand staff (2 staves), 10 bars of 4/4; every simultaneity is a chord on one stem (must stay a chord, not separate voices or parts). Chord sizes per counts_detail; 6-note chords in bars 2 and 9 (RH) and bar 9 (LH)."
+      },
+      "counts": {
+        "acc-flat": 4,
+        "acc-natural": 1,
+        "acc-sharp": 4,
+        "barline-final": 1,
+        "beam": 5,
+        "chord": 58,
+        "clef-bass": 1,
+        "clef-treble": 1,
+        "dot": 9,
+        "key-0": 1,
+        "ledger-above": 18,
+        "ledger-below": 16,
+        "note-16th": 25,
+        "note-8th": 29,
+        "note-half": 76,
+        "note-quarter": 55,
+        "note-whole": 15,
+        "stem-down": 26,
+        "stem-up": 28,
+        "system-break": 3,
+        "time-4-4": 1
+      },
+      "counts_detail": {
+        "beam-level-1-begin": 5,
+        "beam-level-1-continue": 8,
+        "beam-level-1-end": 5,
+        "beam-level-2-begin": 2,
+        "beam-level-2-continue": 4,
+        "beam-level-2-end": 2,
+        "chord-2-notes": 7,
+        "chord-3-notes": 27,
+        "chord-4-notes": 18,
+        "chord-5-notes": 3,
+        "chord-6-notes": 3,
+        "ledger-above-1": 9,
+        "ledger-above-2": 6,
+        "ledger-above-3": 2,
+        "ledger-above-4": 1,
+        "ledger-below-1": 11,
+        "ledger-below-2": 5
+      },
+      "notes": [
+        "Every stemmed note carries <stem>: the engraving is forced to exactly that direction (standard middle-line rule, the extreme note of a chord / beam group / two-note tremolo decides, middle line goes down; graces up; explicit \\stemUp/\\stemDown passages kept). Whole notes and breves carry no <stem>.",
+        "<beam> elements reproduce the engraved beams level by level (manual beaming): level 1 joins the whole group, a secondary level joins neighbours that both carry it; a rest inside a beam carries no <beam> element but a 16th rest between 16ths keeps the secondary beam continuous (as LilyPond draws it), so the note after it continues the level; beamlets are forward/backward hooks.",
+        "chord counts chord events (one stem); chord tones are counted as noteheads in note-<value>."
+      ],
+      "degradations": {
+        "scan.pdf": {
+          "seed": 960301,
+          "level": "typical",
+          "recipe": "typical-office-scan",
+          "render_dpi": 300,
+          "dpi": 300,
+          "color": "gray",
+          "format": "jpeg",
+          "jpeg_quality": 65,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                245,
+                244,
+                240
+              ],
+              "texture": 2
+            },
+            {
+              "op": "rotate",
+              "deg": 0.4,
+              "bg": [
+                232,
+                232,
+                232
+              ]
+            },
+            {
+              "op": "gradient",
+              "strength": 0.06
+            },
+            {
+              "op": "blur",
+              "sigma": 0.5
+            },
+            {
+              "op": "noise",
+              "sigma": 3.0
+            }
+          ],
+          "tags": [
+            "paper_texture",
+            "rotation_+0.4deg",
+            "gradient",
+            "blur",
+            "noise",
+            "jpeg_q65"
+          ],
+          "output_pages": 1,
+          "pixel_size": [
+            2507,
+            3526
+          ],
+          "image_mode": "L",
+          "bytes": 490363,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        },
+        "scan-severe.pdf": {
+          "seed": 960302,
+          "level": "severe",
+          "recipe": "phone-capture",
+          "render_dpi": 200,
+          "dpi": 200,
+          "color": "rgb",
+          "format": "jpeg",
+          "jpeg_quality": 20,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                244,
+                241,
+                232
+              ],
+              "texture": 3
+            },
+            {
+              "op": "perspective",
+              "margin": 0.05,
+              "jitter": 0.03,
+              "keystone": 0.06,
+              "bg": [
+                60,
+                52,
+                45
+              ]
+            },
+            {
+              "op": "shadow",
+              "strength": 0.4,
+              "pos": 0.2,
+              "soft": 0.07
+            },
+            {
+              "op": "vignette",
+              "strength": 0.3
+            },
+            {
+              "op": "motion_blur",
+              "length": 5,
+              "angle": 15
+            },
+            {
+              "op": "noise",
+              "sigma": 7,
+              "chroma": 2
+            }
+          ],
+          "tags": [
+            "coloured_paper_rgb",
+            "paper_texture",
+            "perspective_phone_capture",
+            "shadow",
+            "vignette",
+            "motion_blur",
+            "noise",
+            "jpeg_q20"
+          ],
+          "output_pages": 1,
+          "pixel_size": [
+            1818,
+            2503
+          ],
+          "image_mode": "RGB",
+          "bytes": 140667,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        }
+      },
+      "dpi": 300,
+      "pages": 1,
+      "license": "CC0",
+      "license_detail": "CC0-1.0: composition, engraving, truth and scans created for this corpus",
+      "composer": "OMR coverage corpus (CC0)",
+      "files": {
+        "truth": "truth.musicxml",
+        "engraving": "engraving.ly",
+        "clean": "clean.pdf",
+        "scan": "scan.pdf",
+        "scan_severe": "scan-severe.pdf",
+        "attribution": "ATTRIBUTION.txt"
+      },
+      "clean": {
+        "dpi": 300,
+        "pages": 1,
+        "ops": [],
+        "note": "undamaged raster render (PNG)",
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "text_chars": 0
+      },
+      "validation": {
+        "truth_xsd_valid": true,
+        "music21_reparse_matches_model": true,
+        "engraving_event_dump_matches_truth": true,
+        "engraving_events_compared": 210,
+        "stem_grobs_compared": 54,
+        "notehead_grobs_compared": 200,
+        "printed_accidentals_compared": 9,
+        "time_signatures_compared": 2,
+        "midi_attacks_match_truth": true,
+        "midi_attacks": 200,
+        "midi_grace_notes_excluded": 0,
+        "counts_truth_equal_engraving": true,
+        "engraved_counts": {
+          "note-quarter": 55,
+          "chord": 58,
+          "stem-up": 28,
+          "ledger-below": 16,
+          "note-half": 76,
+          "stem-down": 26,
+          "note-8th": 29,
+          "ledger-above": 18,
+          "note-16th": 25,
+          "note-whole": 15,
+          "beam": 5
+        },
+        "lilypond_warnings": [],
+        "method": "LilyPond 2.24 run with an instrumented dump (nsynth/dump.ly): every note/rest event (onset, pitch, notated type, dots, tuplet scale, grace offset), tie, beam start/stop, slur, tremolo, time signature, bar number/measure position; every Stem of the final layout (direction, duration log, beamed, beams/beamlets left and right, stem-tremolo strokes, heads) and every NoteHead (staff position -> ledger lines, head type, font size for grace/cue); every printed accidental. All compared with the model the truth is written from; plus LilyPond MIDI attacks, a music21 re-parse of truth.musicxml and xmllint against MusicXML 4.0 XSD. The symbol counts in this file are read back from truth.musicxml (nsynth/counts.py) and must equal the counts measured on the engraving."
+      },
+      "generator": "corpus/coverage/notes/_tools/run_all.py (nsynth/items.py, build.py, scan.py)",
+      "path": "notes/nt03-chords"
+    },
+    {
+      "id": "nt04-beams",
+      "family": "notes",
+      "title": "Beam Groups (flute)",
+      "description": "Beams of 2, 3, 4, 6 and 8 eighths, 4/6/8 16ths, 32nds; beamed groups in 2/4, 3/4, 6/8 and 4/4; mixed values with forward/backward beamlets; secondary beams broken inside a group; beams across eighth and 16th rests; beamed chords.",
+      "symbols": [
+        "barline-final",
+        "beam",
+        "chord",
+        "clef-treble",
+        "dot",
+        "key-0",
+        "ledger-above",
+        "note-16th",
+        "note-32nd",
+        "note-8th",
+        "note-half",
+        "note-quarter",
+        "note-whole",
+        "rest-16th",
+        "rest-8th",
+        "stem-down",
+        "stem-up",
+        "system-break",
+        "time-2-4",
+        "time-3-4",
+        "time-4-4",
+        "time-6-8",
+        "time-change"
+      ],
+      "focus_symbols": [
+        "beam",
+        "note-8th",
+        "note-16th",
+        "note-32nd",
+        "stem-up",
+        "stem-down"
+      ],
+      "layout": "melody",
+      "expected": {
+        "parts": [
+          "Flute"
+        ],
+        "must_not_split": false,
+        "staves_per_part": {
+          "Flute": 1
+        },
+        "measures": 16,
+        "first_measure_number": 1,
+        "notes": "One part (Flute), 16 bars, meters 2/4, 3/4, 6/8, 4/4, 3/4, 4/4. Beam groups exactly as in the truth <beam> elements: e.g. bar 9 = two groups of eight 16ths whose secondary beam breaks after the 4th note; rests inside beams in bars 7, 11, 14."
+      },
+      "counts": {
+        "barline-final": 1,
+        "beam": 35,
+        "chord": 5,
+        "clef-treble": 1,
+        "dot": 4,
+        "key-0": 1,
+        "ledger-above": 11,
+        "note-16th": 58,
+        "note-32nd": 26,
+        "note-8th": 56,
+        "note-half": 2,
+        "note-quarter": 1,
+        "note-whole": 1,
+        "rest-16th": 2,
+        "rest-8th": 4,
+        "stem-down": 119,
+        "stem-up": 19,
+        "system-break": 5,
+        "time-2-4": 1,
+        "time-3-4": 2,
+        "time-4-4": 2,
+        "time-6-8": 1,
+        "time-change": 5
+      },
+      "counts_detail": {
+        "beam-level-1-begin": 35,
+        "beam-level-1-continue": 66,
+        "beam-level-1-end": 35,
+        "beam-level-2-backward-hook": 2,
+        "beam-level-2-begin": 20,
+        "beam-level-2-continue": 40,
+        "beam-level-2-end": 20,
+        "beam-level-2-forward-hook": 2,
+        "beam-level-3-backward-hook": 1,
+        "beam-level-3-begin": 4,
+        "beam-level-3-continue": 16,
+        "beam-level-3-end": 4,
+        "beam-level-3-forward-hook": 1,
+        "chord-2-notes": 5,
+        "ledger-above-1": 10,
+        "ledger-above-2": 1
+      },
+      "notes": [
+        "Every stemmed note carries <stem>: the engraving is forced to exactly that direction (standard middle-line rule, the extreme note of a chord / beam group / two-note tremolo decides, middle line goes down; graces up; explicit \\stemUp/\\stemDown passages kept). Whole notes and breves carry no <stem>.",
+        "<beam> elements reproduce the engraved beams level by level (manual beaming): level 1 joins the whole group, a secondary level joins neighbours that both carry it; a rest inside a beam carries no <beam> element but a 16th rest between 16ths keeps the secondary beam continuous (as LilyPond draws it), so the note after it continues the level; beamlets are forward/backward hooks."
+      ],
+      "degradations": {
+        "scan.pdf": {
+          "seed": 960401,
+          "level": "typical",
+          "recipe": "typical-office-scan",
+          "render_dpi": 200,
+          "dpi": 200,
+          "color": "gray",
+          "format": "jpeg",
+          "jpeg_quality": 70,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                245,
+                244,
+                240
+              ],
+              "texture": 2
+            },
+            {
+              "op": "rotate",
+              "deg": 1.3,
+              "bg": [
+                232,
+                232,
+                232
+              ]
+            },
+            {
+              "op": "gradient",
+              "strength": 0.06
+            },
+            {
+              "op": "blur",
+              "sigma": 0.5
+            },
+            {
+              "op": "noise",
+              "sigma": 3.0
+            }
+          ],
+          "tags": [
+            "paper_texture",
+            "rotation_+1.3deg",
+            "gradient",
+            "blur",
+            "noise",
+            "jpeg_q70"
+          ],
+          "output_pages": 1,
+          "pixel_size": [
+            1708,
+            2377
+          ],
+          "image_mode": "L",
+          "bytes": 312526,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        },
+        "scan-severe.pdf": {
+          "seed": 960402,
+          "level": "severe",
+          "recipe": "faded-foxed",
+          "render_dpi": 300,
+          "dpi": 300,
+          "color": "rgb",
+          "format": "jpeg",
+          "jpeg_quality": 25,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "ink_dropout",
+              "amount": 0.35
+            },
+            {
+              "op": "paper",
+              "rgb": [
+                232,
+                218,
+                180
+              ],
+              "texture": 7,
+              "bleed": {
+                "strength": 0.2
+              },
+              "ink_var": 35
+            },
+            {
+              "op": "foxing",
+              "n": 140,
+              "strength": 0.6
+            },
+            {
+              "op": "rotate",
+              "deg": 1.8,
+              "bg": [
+                200,
+                200,
+                200
+              ]
+            },
+            {
+              "op": "blur",
+              "sigma": 0.9
+            },
+            {
+              "op": "noise",
+              "sigma": 6,
+              "chroma": 2
+            }
+          ],
+          "tags": [
+            "ink_dropout",
+            "coloured_paper_rgb",
+            "paper_texture",
+            "bleed_through",
+            "foxing",
+            "rotation_+1.8deg",
+            "blur",
+            "noise",
+            "jpeg_q25"
+          ],
+          "output_pages": 1,
+          "pixel_size": [
+            2591,
+            3586
+          ],
+          "image_mode": "RGB",
+          "bytes": 293168,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        }
+      },
+      "dpi": 200,
+      "pages": 1,
+      "license": "CC0",
+      "license_detail": "CC0-1.0: composition, engraving, truth and scans created for this corpus",
+      "composer": "OMR coverage corpus (CC0)",
+      "files": {
+        "truth": "truth.musicxml",
+        "engraving": "engraving.ly",
+        "clean": "clean.pdf",
+        "scan": "scan.pdf",
+        "scan_severe": "scan-severe.pdf",
+        "attribution": "ATTRIBUTION.txt"
+      },
+      "clean": {
+        "dpi": 300,
+        "pages": 1,
+        "ops": [],
+        "note": "undamaged raster render (PNG)",
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "text_chars": 0
+      },
+      "validation": {
+        "truth_xsd_valid": true,
+        "music21_reparse_matches_model": true,
+        "engraving_event_dump_matches_truth": true,
+        "engraving_events_compared": 220,
+        "stem_grobs_compared": 138,
+        "notehead_grobs_compared": 144,
+        "printed_accidentals_compared": 0,
+        "time_signatures_compared": 6,
+        "midi_attacks_match_truth": true,
+        "midi_attacks": 144,
+        "midi_grace_notes_excluded": 0,
+        "counts_truth_equal_engraving": true,
+        "engraved_counts": {
+          "note-8th": 56,
+          "stem-down": 119,
+          "note-16th": 58,
+          "stem-up": 19,
+          "ledger-above": 11,
+          "note-32nd": 26,
+          "note-quarter": 1,
+          "chord": 5,
+          "note-half": 2,
+          "note-whole": 1,
+          "beam": 35
+        },
+        "lilypond_warnings": [],
+        "method": "LilyPond 2.24 run with an instrumented dump (nsynth/dump.ly): every note/rest event (onset, pitch, notated type, dots, tuplet scale, grace offset), tie, beam start/stop, slur, tremolo, time signature, bar number/measure position; every Stem of the final layout (direction, duration log, beamed, beams/beamlets left and right, stem-tremolo strokes, heads) and every NoteHead (staff position -> ledger lines, head type, font size for grace/cue); every printed accidental. All compared with the model the truth is written from; plus LilyPond MIDI attacks, a music21 re-parse of truth.musicxml and xmllint against MusicXML 4.0 XSD. The symbol counts in this file are read back from truth.musicxml (nsynth/counts.py) and must equal the counts measured on the engraving."
+      },
+      "generator": "corpus/coverage/notes/_tools/run_all.py (nsynth/items.py, build.py, scan.py)",
+      "path": "notes/nt04-beams"
+    },
+    {
+      "id": "nt05-flags-stems",
+      "family": "notes",
+      "title": "Flags and Stems (violin)",
+      "description": "Unbeamed eighths, 16ths, 32nds and 64ths with flags on up-stems and down-stems; passages with stems forced against the middle-line rule (\\stemUp on high notes, \\stemDown on low notes, both directions on the middle line).",
+      "symbols": [
+        "barline-final",
+        "clef-treble",
+        "dot",
+        "flag",
+        "key-0",
+        "ledger-above",
+        "ledger-below",
+        "note-16th",
+        "note-32nd",
+        "note-64th",
+        "note-8th",
+        "note-half",
+        "note-quarter",
+        "stem-down",
+        "stem-up",
+        "system-break",
+        "time-3-4"
+      ],
+      "focus_symbols": [
+        "flag",
+        "stem-up",
+        "stem-down",
+        "note-8th",
+        "note-16th",
+        "note-32nd",
+        "note-64th"
+      ],
+      "layout": "melody",
+      "expected": {
+        "parts": [
+          "Violin"
+        ],
+        "must_not_split": false,
+        "staves_per_part": {
+          "Violin": 1
+        },
+        "measures": 14,
+        "first_measure_number": 1,
+        "notes": "One part (Violin), 14 bars of 3/4, no beams at all: every short note has its own flag. Stem directions as in <stem> (bars 8-12 are forced)."
+      },
+      "counts": {
+        "barline-final": 1,
+        "clef-treble": 1,
+        "dot": 1,
+        "flag": 78,
+        "key-0": 1,
+        "ledger-above": 12,
+        "ledger-below": 6,
+        "note-16th": 20,
+        "note-32nd": 8,
+        "note-64th": 16,
+        "note-8th": 34,
+        "note-half": 2,
+        "note-quarter": 13,
+        "stem-down": 48,
+        "stem-up": 45,
+        "system-break": 3,
+        "time-3-4": 1
+      },
+      "counts_detail": {
+        "flag-16th": 20,
+        "flag-32nd": 8,
+        "flag-64th": 16,
+        "flag-eighth": 34,
+        "ledger-above-1": 9,
+        "ledger-above-2": 3,
+        "ledger-below-1": 6
+      },
+      "notes": [
+        "Every stemmed note carries <stem>: the engraving is forced to exactly that direction (standard middle-line rule, the extreme note of a chord / beam group / two-note tremolo decides, middle line goes down; graces up; explicit \\stemUp/\\stemDown passages kept). Whole notes and breves carry no <stem>."
+      ],
+      "degradations": {
+        "scan.pdf": {
+          "seed": 960501,
+          "level": "typical",
+          "recipe": "typical-office-scan",
+          "render_dpi": 300,
+          "dpi": 300,
+          "color": "gray",
+          "format": "jpeg",
+          "jpeg_quality": 60,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                245,
+                244,
+                240
+              ],
+              "texture": 2
+            },
+            {
+              "op": "rotate",
+              "deg": -0.5,
+              "bg": [
+                232,
+                232,
+                232
+              ]
+            },
+            {
+              "op": "gradient",
+              "strength": 0.06
+            },
+            {
+              "op": "blur",
+              "sigma": 0.5
+            },
+            {
+              "op": "noise",
+              "sigma": 3.0
+            }
+          ],
+          "tags": [
+            "paper_texture",
+            "rotation_-0.5deg",
+            "gradient",
+            "blur",
+            "noise",
+            "jpeg_q60"
+          ],
+          "output_pages": 1,
+          "pixel_size": [
+            2513,
+            3530
+          ],
+          "image_mode": "L",
+          "bytes": 348350,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        },
+        "scan-severe.pdf": {
+          "seed": 960502,
+          "level": "severe",
+          "recipe": "photocopy-thin",
+          "render_dpi": 200,
+          "dpi": 200,
+          "color": "gray",
+          "format": "png1",
+          "jpeg_quality": null,
+          "jpeg_passes": null,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                252,
+                252,
+                252
+              ]
+            },
+            {
+              "op": "rotate",
+              "deg": -1.6,
+              "bg": 255
+            },
+            {
+              "op": "speckle",
+              "per_mpx": 90
+            },
+            {
+              "op": "binarize",
+              "threshold": 72,
+              "pre_blur": 0.8,
+              "noise": 18
+            }
+          ],
+          "tags": [
+            "rotation_-1.6deg",
+            "speckle",
+            "binarized_photocopy_thin"
+          ],
+          "output_pages": 1,
+          "pixel_size": [
+            1720,
+            2385
+          ],
+          "image_mode": "1",
+          "bytes": 27533,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        }
+      },
+      "dpi": 300,
+      "pages": 1,
+      "license": "CC0",
+      "license_detail": "CC0-1.0: composition, engraving, truth and scans created for this corpus",
+      "composer": "OMR coverage corpus (CC0)",
+      "files": {
+        "truth": "truth.musicxml",
+        "engraving": "engraving.ly",
+        "clean": "clean.pdf",
+        "scan": "scan.pdf",
+        "scan_severe": "scan-severe.pdf",
+        "attribution": "ATTRIBUTION.txt"
+      },
+      "clean": {
+        "dpi": 300,
+        "pages": 1,
+        "ops": [],
+        "note": "undamaged raster render (PNG)",
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "text_chars": 0
+      },
+      "validation": {
+        "truth_xsd_valid": true,
+        "music21_reparse_matches_model": true,
+        "engraving_event_dump_matches_truth": true,
+        "engraving_events_compared": 93,
+        "stem_grobs_compared": 93,
+        "notehead_grobs_compared": 93,
+        "printed_accidentals_compared": 0,
+        "time_signatures_compared": 1,
+        "midi_attacks_match_truth": true,
+        "midi_attacks": 93,
+        "midi_grace_notes_excluded": 0,
+        "counts_truth_equal_engraving": true,
+        "engraved_counts": {
+          "ledger-below": 6,
+          "note-8th": 34,
+          "stem-up": 45,
+          "flag": 78,
+          "stem-down": 48,
+          "ledger-above": 12,
+          "note-16th": 20,
+          "note-quarter": 13,
+          "note-32nd": 8,
+          "note-64th": 16,
+          "note-half": 2
+        },
+        "lilypond_warnings": [],
+        "method": "LilyPond 2.24 run with an instrumented dump (nsynth/dump.ly): every note/rest event (onset, pitch, notated type, dots, tuplet scale, grace offset), tie, beam start/stop, slur, tremolo, time signature, bar number/measure position; every Stem of the final layout (direction, duration log, beamed, beams/beamlets left and right, stem-tremolo strokes, heads) and every NoteHead (staff position -> ledger lines, head type, font size for grace/cue); every printed accidental. All compared with the model the truth is written from; plus LilyPond MIDI attacks, a music21 re-parse of truth.musicxml and xmllint against MusicXML 4.0 XSD. The symbol counts in this file are read back from truth.musicxml (nsynth/counts.py) and must equal the counts measured on the engraving."
+      },
+      "generator": "corpus/coverage/notes/_tools/run_all.py (nsynth/items.py, build.py, scan.py)",
+      "path": "notes/nt05-flags-stems"
+    },
+    {
+      "id": "nt06-ledger-lines",
+      "family": "notes",
+      "title": "Ledger Lines (piano)",
+      "description": "Notes and chords needing 1 to 5 ledger lines above and below the treble and the bass staff: single notes, beamed scales, chords and whole notes, C1 to C7.",
+      "symbols": [
+        "barline-final",
+        "beam",
+        "chord",
+        "clef-bass",
+        "clef-treble",
+        "key-0",
+        "ledger-above",
+        "ledger-below",
+        "note-16th",
+        "note-8th",
+        "note-half",
+        "note-quarter",
+        "note-whole",
+        "stem-down",
+        "stem-up",
+        "system-break",
+        "time-4-4"
+      ],
+      "focus_symbols": [
+        "ledger-above",
+        "ledger-below",
+        "chord",
+        "note-whole",
+        "note-half",
+        "note-quarter",
+        "note-8th",
+        "note-16th"
+      ],
+      "layout": "piano",
+      "expected": {
+        "parts": [
+          "Piano"
+        ],
+        "must_not_split": true,
+        "staves_per_part": {
+          "Piano": 2
+        },
+        "measures": 10,
+        "first_measure_number": 1,
+        "notes": "ONE part (Piano), grand staff, 10 bars of 4/4, no clef changes or ottavas: the extreme pitches (C7, B6 in the right hand; C1, D1 in the left hand; B2 in the right hand, D5/E5 in the left hand) must be read from 5 ledger lines."
+      },
+      "counts": {
+        "barline-final": 1,
+        "beam": 10,
+        "chord": 9,
+        "clef-bass": 1,
+        "clef-treble": 1,
+        "key-0": 1,
+        "ledger-above": 44,
+        "ledger-below": 37,
+        "note-16th": 16,
+        "note-8th": 24,
+        "note-half": 32,
+        "note-quarter": 16,
+        "note-whole": 5,
+        "stem-down": 37,
+        "stem-up": 35,
+        "system-break": 3,
+        "time-4-4": 1
+      },
+      "counts_detail": {
+        "beam-level-1-begin": 10,
+        "beam-level-1-continue": 20,
+        "beam-level-1-end": 10,
+        "beam-level-2-begin": 4,
+        "beam-level-2-continue": 8,
+        "beam-level-2-end": 4,
+        "chord-2-notes": 2,
+        "chord-3-notes": 6,
+        "chord-4-notes": 1,
+        "ledger-above-1": 6,
+        "ledger-above-2": 10,
+        "ledger-above-3": 10,
+        "ledger-above-4": 10,
+        "ledger-above-5": 8,
+        "ledger-below-1": 6,
+        "ledger-below-2": 9,
+        "ledger-below-3": 8,
+        "ledger-below-4": 7,
+        "ledger-below-5": 7
+      },
+      "notes": [
+        "Every stemmed note carries <stem>: the engraving is forced to exactly that direction (standard middle-line rule, the extreme note of a chord / beam group / two-note tremolo decides, middle line goes down; graces up; explicit \\stemUp/\\stemDown passages kept). Whole notes and breves carry no <stem>.",
+        "<beam> elements reproduce the engraved beams level by level (manual beaming): level 1 joins the whole group, a secondary level joins neighbours that both carry it; a rest inside a beam carries no <beam> element but a 16th rest between 16ths keeps the secondary beam continuous (as LilyPond draws it), so the note after it continues the level; beamlets are forward/backward hooks.",
+        "Ledger-line counts are noteheads (main notes) needing >= 1 ledger line; counts_detail gives the number needing exactly 1..5 lines (staff position from the pitch and clef, cross-checked against LilyPond's NoteHead staff positions)."
+      ],
+      "degradations": {
+        "scan.pdf": {
+          "seed": 960601,
+          "level": "typical",
+          "recipe": "typical-office-scan",
+          "render_dpi": 300,
+          "dpi": 300,
+          "color": "gray",
+          "format": "jpeg",
+          "jpeg_quality": 55,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                245,
+                244,
+                240
+              ],
+              "texture": 2
+            },
+            {
+              "op": "rotate",
+              "deg": 0.9,
+              "bg": [
+                232,
+                232,
+                232
+              ]
+            },
+            {
+              "op": "gradient",
+              "strength": 0.06
+            },
+            {
+              "op": "blur",
+              "sigma": 0.5
+            },
+            {
+              "op": "noise",
+              "sigma": 3.0
+            }
+          ],
+          "tags": [
+            "paper_texture",
+            "rotation_+0.9deg",
+            "gradient",
+            "blur",
+            "noise",
+            "jpeg_q55"
+          ],
+          "output_pages": 1,
+          "pixel_size": [
+            2537,
+            3548
+          ],
+          "image_mode": "L",
+          "bytes": 393481,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        },
+        "scan-severe.pdf": {
+          "seed": 960602,
+          "level": "severe",
+          "recipe": "halftone-skew",
+          "render_dpi": 300,
+          "dpi": 300,
+          "color": "gray",
+          "format": "jpeg",
+          "jpeg_quality": 30,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                242,
+                240,
+                234
+              ],
+              "texture": 3
+            },
+            {
+              "op": "halftone",
+              "lpi": 85,
+              "angle": 45,
+              "supersample": 2
+            },
+            {
+              "op": "rotate",
+              "deg": 4.0,
+              "bg": 40
+            },
+            {
+              "op": "blur",
+              "sigma": 0.8
+            },
+            {
+              "op": "noise",
+              "sigma": 6
+            }
+          ],
+          "tags": [
+            "paper_texture",
+            "halftone",
+            "rotation_+4deg",
+            "blur",
+            "noise",
+            "jpeg_q30"
+          ],
+          "output_pages": 1,
+          "pixel_size": [
+            2721,
+            3674
+          ],
+          "image_mode": "L",
+          "bytes": 566090,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        }
+      },
+      "dpi": 300,
+      "pages": 1,
+      "license": "CC0",
+      "license_detail": "CC0-1.0: composition, engraving, truth and scans created for this corpus",
+      "composer": "OMR coverage corpus (CC0)",
+      "files": {
+        "truth": "truth.musicxml",
+        "engraving": "engraving.ly",
+        "clean": "clean.pdf",
+        "scan": "scan.pdf",
+        "scan_severe": "scan-severe.pdf",
+        "attribution": "ATTRIBUTION.txt"
+      },
+      "clean": {
+        "dpi": 300,
+        "pages": 1,
+        "ops": [],
+        "note": "undamaged raster render (PNG)",
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "text_chars": 0
+      },
+      "validation": {
+        "truth_xsd_valid": true,
+        "music21_reparse_matches_model": true,
+        "engraving_event_dump_matches_truth": true,
+        "engraving_events_compared": 113,
+        "stem_grobs_compared": 72,
+        "notehead_grobs_compared": 93,
+        "printed_accidentals_compared": 0,
+        "time_signatures_compared": 2,
+        "midi_attacks_match_truth": true,
+        "midi_attacks": 93,
+        "midi_grace_notes_excluded": 0,
+        "counts_truth_equal_engraving": true,
+        "engraved_counts": {
+          "ledger-above": 44,
+          "note-quarter": 16,
+          "stem-down": 37,
+          "note-half": 32,
+          "note-8th": 24,
+          "chord": 9,
+          "ledger-below": 37,
+          "stem-up": 35,
+          "note-16th": 16,
+          "note-whole": 5,
+          "beam": 10
+        },
+        "lilypond_warnings": [],
+        "method": "LilyPond 2.24 run with an instrumented dump (nsynth/dump.ly): every note/rest event (onset, pitch, notated type, dots, tuplet scale, grace offset), tie, beam start/stop, slur, tremolo, time signature, bar number/measure position; every Stem of the final layout (direction, duration log, beamed, beams/beamlets left and right, stem-tremolo strokes, heads) and every NoteHead (staff position -> ledger lines, head type, font size for grace/cue); every printed accidental. All compared with the model the truth is written from; plus LilyPond MIDI attacks, a music21 re-parse of truth.musicxml and xmllint against MusicXML 4.0 XSD. The symbol counts in this file are read back from truth.musicxml (nsynth/counts.py) and must equal the counts measured on the engraving."
+      },
+      "generator": "corpus/coverage/notes/_tools/run_all.py (nsynth/items.py, build.py, scan.py)",
+      "path": "notes/nt06-ledger-lines"
+    },
+    {
+      "id": "nt07-grace-notes",
+      "family": "notes",
+      "title": "Grace Notes (flute)",
+      "description": "Acciaccaturas (slashed, slurred), appoggiaturas (eighth, quarter and 16th, slurred), plain and slashed graces without slur, beamed grace groups of 2-6 16ths and of 32nds, a grace chord, graces with accidentals, graces at the start of bars and of the piece.",
+      "symbols": [
+        "acc-flat",
+        "acc-natural",
+        "acc-sharp",
+        "barline-final",
+        "clef-treble",
+        "dot",
+        "grace",
+        "grace-slash",
+        "key-0",
+        "ledger-above",
+        "note-half",
+        "note-quarter",
+        "note-whole",
+        "slur",
+        "stem-down",
+        "stem-up",
+        "system-break",
+        "time-4-4"
+      ],
+      "focus_symbols": [
+        "grace",
+        "grace-slash",
+        "slur",
+        "note-quarter",
+        "note-half"
+      ],
+      "layout": "melody",
+      "expected": {
+        "parts": [
+          "Flute"
+        ],
+        "must_not_split": false,
+        "staves_per_part": {
+          "Flute": 1
+        },
+        "measures": 10,
+        "first_measure_number": 1,
+        "notes": "One part (Flute), 10 bars of 4/4. Grace notes take no time: every bar holds exactly 4 beats of main notes. Slashed: acciaccaturas and \\slashedGrace singles."
+      },
+      "counts": {
+        "acc-flat": 1,
+        "acc-natural": 1,
+        "acc-sharp": 3,
+        "barline-final": 1,
+        "clef-treble": 1,
+        "dot": 1,
+        "grace": 54,
+        "grace-slash": 14,
+        "key-0": 1,
+        "ledger-above": 3,
+        "note-half": 6,
+        "note-quarter": 23,
+        "note-whole": 1,
+        "slur": 16,
+        "stem-down": 25,
+        "stem-up": 4,
+        "system-break": 3,
+        "time-4-4": 1
+      },
+      "counts_detail": {
+        "grace-beam-groups": 10,
+        "ledger-above-1": 3
+      },
+      "notes": [
+        "Every stemmed note carries <stem>: the engraving is forced to exactly that direction (standard middle-line rule, the extreme note of a chord / beam group / two-note tremolo decides, middle line goes down; graces up; explicit \\stemUp/\\stemDown passages kept). Whole notes and breves carry no <stem>.",
+        "Grace notes are <grace/> notes without <duration>; slash=\"yes\" for acciaccaturas and \\slashedGrace notes only (both single notes). The slur LilyPond draws for \\acciaccatura / \\appoggiatura is slur number 2. Grace notes are excluded from all note-value, stem, beam, flag and ledger counts."
+      ],
+      "degradations": {
+        "scan.pdf": {
+          "seed": 960701,
+          "level": "typical",
+          "recipe": "typical-office-scan",
+          "render_dpi": 250,
+          "dpi": 250,
+          "color": "gray",
+          "format": "jpeg",
+          "jpeg_quality": 60,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                245,
+                244,
+                240
+              ],
+              "texture": 2
+            },
+            {
+              "op": "rotate",
+              "deg": 1.0,
+              "bg": [
+                232,
+                232,
+                232
+              ]
+            },
+            {
+              "op": "gradient",
+              "strength": 0.06
+            },
+            {
+              "op": "blur",
+              "sigma": 0.5
+            },
+            {
+              "op": "noise",
+              "sigma": 3.0
+            }
+          ],
+          "tags": [
+            "paper_texture",
+            "rotation_+1deg",
+            "gradient",
+            "blur",
+            "noise",
+            "jpeg_q60"
+          ],
+          "output_pages": 1,
+          "pixel_size": [
+            2119,
+            2960
+          ],
+          "image_mode": "L",
+          "bytes": 260482,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        },
+        "scan-severe.pdf": {
+          "seed": 960702,
+          "level": "severe",
+          "recipe": "book-curl",
+          "render_dpi": 200,
+          "dpi": 200,
+          "color": "rgb",
+          "format": "jpeg",
+          "jpeg_quality": 25,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                240,
+                236,
+                224
+              ],
+              "texture": 4
+            },
+            {
+              "op": "curl",
+              "side": "right",
+              "amp": 40,
+              "width": 0.35
+            },
+            {
+              "op": "gutter",
+              "side": "right",
+              "width": 0.1,
+              "dark": 0.6
+            },
+            {
+              "op": "rotate",
+              "deg": 2.0,
+              "bg": [
+                210,
+                210,
+                210
+              ]
+            },
+            {
+              "op": "gradient",
+              "strength": 0.25
+            },
+            {
+              "op": "blur",
+              "sigma": 0.8
+            },
+            {
+              "op": "noise",
+              "sigma": 6,
+              "chroma": 2
+            }
+          ],
+          "tags": [
+            "coloured_paper_rgb",
+            "paper_texture",
+            "curl",
+            "gutter",
+            "rotation_+2deg",
+            "gradient",
+            "blur",
+            "noise",
+            "jpeg_q25"
+          ],
+          "output_pages": 1,
+          "pixel_size": [
+            1736,
+            2397
+          ],
+          "image_mode": "RGB",
+          "bytes": 129672,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        }
+      },
+      "dpi": 250,
+      "pages": 1,
+      "license": "CC0",
+      "license_detail": "CC0-1.0: composition, engraving, truth and scans created for this corpus",
+      "composer": "OMR coverage corpus (CC0)",
+      "files": {
+        "truth": "truth.musicxml",
+        "engraving": "engraving.ly",
+        "clean": "clean.pdf",
+        "scan": "scan.pdf",
+        "scan_severe": "scan-severe.pdf",
+        "attribution": "ATTRIBUTION.txt"
+      },
+      "clean": {
+        "dpi": 300,
+        "pages": 1,
+        "ops": [],
+        "note": "undamaged raster render (PNG)",
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "text_chars": 0
+      },
+      "validation": {
+        "truth_xsd_valid": true,
+        "music21_reparse_matches_model": true,
+        "engraving_event_dump_matches_truth": true,
+        "engraving_events_compared": 136,
+        "stem_grobs_compared": 82,
+        "notehead_grobs_compared": 84,
+        "printed_accidentals_compared": 5,
+        "time_signatures_compared": 1,
+        "midi_attacks_match_truth": true,
+        "midi_attacks": 30,
+        "midi_grace_notes_excluded": 54,
+        "counts_truth_equal_engraving": true,
+        "engraved_counts": {
+          "grace": 54,
+          "note-quarter": 23,
+          "stem-down": 25,
+          "ledger-above": 3,
+          "note-half": 6,
+          "stem-up": 4,
+          "note-whole": 1
+        },
+        "lilypond_warnings": [],
+        "method": "LilyPond 2.24 run with an instrumented dump (nsynth/dump.ly): every note/rest event (onset, pitch, notated type, dots, tuplet scale, grace offset), tie, beam start/stop, slur, tremolo, time signature, bar number/measure position; every Stem of the final layout (direction, duration log, beamed, beams/beamlets left and right, stem-tremolo strokes, heads) and every NoteHead (staff position -> ledger lines, head type, font size for grace/cue); every printed accidental. All compared with the model the truth is written from; plus LilyPond MIDI attacks, a music21 re-parse of truth.musicxml and xmllint against MusicXML 4.0 XSD. The symbol counts in this file are read back from truth.musicxml (nsynth/counts.py) and must equal the counts measured on the engraving."
+      },
+      "generator": "corpus/coverage/notes/_tools/run_all.py (nsynth/items.py, build.py, scan.py)",
+      "path": "notes/nt07-grace-notes"
+    },
+    {
+      "id": "nt08-cue-notes",
+      "family": "notes",
+      "title": "Cue Notes (flute part)",
+      "description": "A flute part with small cue notes (oboe / violin cues) above whole-bar and half-bar rests: beamed cue eighths and 16ths, dotted cue note, cue chord, cue instrument names.",
+      "symbols": [
+        "barline-final",
+        "clef-treble",
+        "cue-note",
+        "key-0",
+        "note-half",
+        "note-quarter",
+        "note-whole",
+        "rest-half",
+        "rest-quarter",
+        "rest-whole-bar",
+        "stem-down",
+        "system-break",
+        "text-expression",
+        "time-4-4"
+      ],
+      "focus_symbols": [
+        "cue-note",
+        "rest-whole-bar",
+        "text-expression"
+      ],
+      "layout": "melody",
+      "expected": {
+        "parts": [
+          "Flute"
+        ],
+        "must_not_split": true,
+        "staves_per_part": {
+          "Flute": 1
+        },
+        "measures": 10,
+        "first_measure_number": 1,
+        "notes": "ONE part (Flute), 10 bars of 4/4, one staff. The small notes are cues (another instrument): a correct conversion marks them <cue/> or leaves them out; they must not become sounding flute notes and must not create a second part. The real flute music is voice 1 (rests under the cues in bars 3-5, 7-9)."
+      },
+      "counts": {
+        "barline-final": 1,
+        "clef-treble": 1,
+        "cue-note": 24,
+        "key-0": 1,
+        "note-half": 4,
+        "note-quarter": 9,
+        "note-whole": 1,
+        "rest-half": 1,
+        "rest-quarter": 1,
+        "rest-whole-bar": 4,
+        "stem-down": 13,
+        "system-break": 2,
+        "text-expression": 3,
+        "time-4-4": 1
+      },
+      "counts_detail": {
+        "cue-16th": 4,
+        "cue-eighth": 9,
+        "cue-half": 4,
+        "cue-quarter": 7
+      },
+      "notes": [
+        "Every stemmed note carries <stem>: the engraving is forced to exactly that direction (standard middle-line rule, the extreme note of a chord / beam group / two-note tremolo decides, middle line goes down; graces up; explicit \\stemUp/\\stemDown passages kept). Whole notes and breves carry no <stem>.",
+        "<beam> elements reproduce the engraved beams level by level (manual beaming): level 1 joins the whole group, a secondary level joins neighbours that both carry it; a rest inside a beam carries no <beam> element but a 16th rest between 16ths keeps the secondary beam continuous (as LilyPond draws it), so the note after it continues the level; beamlets are forward/backward hooks.",
+        "Cue notes are <cue/> notes with <type size=\"cue\"> in their own voice (voice 2, stems up) above the rests of the real part (voice 1); they are engraved in a LilyPond CueVoice (font size -4) and do not sound (absent from the MIDI check). The cue instrument names are <words> directions."
+      ],
+      "degradations": {
+        "scan.pdf": {
+          "seed": 960801,
+          "level": "typical",
+          "recipe": "typical-office-scan",
+          "render_dpi": 300,
+          "dpi": 300,
+          "color": "gray",
+          "format": "jpeg",
+          "jpeg_quality": 65,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                245,
+                244,
+                240
+              ],
+              "texture": 2
+            },
+            {
+              "op": "rotate",
+              "deg": -0.8,
+              "bg": [
+                232,
+                232,
+                232
+              ]
+            },
+            {
+              "op": "gradient",
+              "strength": 0.06
+            },
+            {
+              "op": "blur",
+              "sigma": 0.5
+            },
+            {
+              "op": "noise",
+              "sigma": 3.0
+            }
+          ],
+          "tags": [
+            "paper_texture",
+            "rotation_-0.8deg",
+            "gradient",
+            "blur",
+            "noise",
+            "jpeg_q65"
+          ],
+          "output_pages": 1,
+          "pixel_size": [
+            2531,
+            3544
+          ],
+          "image_mode": "L",
+          "bytes": 340607,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        },
+        "scan-severe.pdf": {
+          "seed": 960802,
+          "level": "severe",
+          "recipe": "coffee-stained",
+          "render_dpi": 300,
+          "dpi": 300,
+          "color": "rgb",
+          "format": "jpeg",
+          "jpeg_quality": 22,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "ink_dropout",
+              "amount": 0.2
+            },
+            {
+              "op": "paper",
+              "rgb": [
+                230,
+                214,
+                175
+              ],
+              "texture": 8,
+              "bleed": {
+                "strength": 0.15
+              }
+            },
+            {
+              "op": "coffee",
+              "n": 2,
+              "radius_mm": 40,
+              "strength": 0.6
+            },
+            {
+              "op": "foxing",
+              "n": 150,
+              "strength": 0.6
+            },
+            {
+              "op": "rotate",
+              "deg": -2.2,
+              "bg": [
+                190,
+                190,
+                190
+              ]
+            },
+            {
+              "op": "blur",
+              "sigma": 1.0
+            },
+            {
+              "op": "noise",
+              "sigma": 5,
+              "chroma": 2
+            }
+          ],
+          "tags": [
+            "ink_dropout",
+            "coloured_paper_rgb",
+            "paper_texture",
+            "bleed_through",
+            "coffee",
+            "foxing",
+            "rotation_-2.2deg",
+            "blur",
+            "noise",
+            "jpeg_q22"
+          ],
+          "output_pages": 1,
+          "pixel_size": [
+            2615,
+            3602
+          ],
+          "image_mode": "RGB",
+          "bytes": 167432,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        }
+      },
+      "dpi": 300,
+      "pages": 1,
+      "license": "CC0",
+      "license_detail": "CC0-1.0: composition, engraving, truth and scans created for this corpus",
+      "composer": "OMR coverage corpus (CC0)",
+      "files": {
+        "truth": "truth.musicxml",
+        "engraving": "engraving.ly",
+        "clean": "clean.pdf",
+        "scan": "scan.pdf",
+        "scan_severe": "scan-severe.pdf",
+        "attribution": "ATTRIBUTION.txt"
+      },
+      "clean": {
+        "dpi": 300,
+        "pages": 1,
+        "ops": [],
+        "note": "undamaged raster render (PNG)",
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "text_chars": 0
+      },
+      "validation": {
+        "truth_xsd_valid": true,
+        "music21_reparse_matches_model": true,
+        "engraving_event_dump_matches_truth": true,
+        "engraving_events_compared": 54,
+        "stem_grobs_compared": 36,
+        "notehead_grobs_compared": 38,
+        "printed_accidentals_compared": 0,
+        "time_signatures_compared": 1,
+        "midi_attacks_match_truth": true,
+        "midi_attacks": 14,
+        "midi_grace_notes_excluded": 0,
+        "counts_truth_equal_engraving": true,
+        "engraved_counts": {
+          "note-quarter": 9,
+          "stem-down": 13,
+          "note-half": 4,
+          "note-whole": 1,
+          "cue-note": 24
+        },
+        "lilypond_warnings": [],
+        "method": "LilyPond 2.24 run with an instrumented dump (nsynth/dump.ly): every note/rest event (onset, pitch, notated type, dots, tuplet scale, grace offset), tie, beam start/stop, slur, tremolo, time signature, bar number/measure position; every Stem of the final layout (direction, duration log, beamed, beams/beamlets left and right, stem-tremolo strokes, heads) and every NoteHead (staff position -> ledger lines, head type, font size for grace/cue); every printed accidental. All compared with the model the truth is written from; plus LilyPond MIDI attacks, a music21 re-parse of truth.musicxml and xmllint against MusicXML 4.0 XSD. The symbol counts in this file are read back from truth.musicxml (nsynth/counts.py) and must equal the counts measured on the engraving."
+      },
+      "generator": "corpus/coverage/notes/_tools/run_all.py (nsynth/items.py, build.py, scan.py)",
+      "path": "notes/nt08-cue-notes"
+    },
+    {
+      "id": "nt09-tremolos",
+      "family": "notes",
+      "title": "Tremolos (piano)",
+      "description": "Single-note tremolos with 1, 2 and 3 strokes on quarters, halves, wholes, beamed eighths and chords; two-note (alternating) tremolos between notes, octaves and chords filling half and whole bars.",
+      "symbols": [
+        "barline-final",
+        "beam",
+        "chord",
+        "clef-bass",
+        "clef-treble",
+        "key-0",
+        "ledger-above",
+        "ledger-below",
+        "note-8th",
+        "note-half",
+        "note-quarter",
+        "note-whole",
+        "stem-down",
+        "stem-up",
+        "system-break",
+        "time-4-4",
+        "tremolo"
+      ],
+      "focus_symbols": [
+        "tremolo",
+        "note-whole",
+        "note-half",
+        "note-quarter",
+        "note-8th",
+        "chord"
+      ],
+      "layout": "piano",
+      "expected": {
+        "parts": [
+          "Piano"
+        ],
+        "must_not_split": true,
+        "staves_per_part": {
+          "Piano": 2
+        },
+        "measures": 9,
+        "first_measure_number": 1,
+        "notes": "ONE part (Piano), grand staff, 9 bars of 4/4. Tremolo strokes are not beams of separate notes: c''4:16 is ONE quarter note with 2 strokes; a two-note tremolo is two notes of the printed value (e.g. two half notes) occupying together one half note."
+      },
+      "counts": {
+        "barline-final": 1,
+        "beam": 2,
+        "chord": 8,
+        "clef-bass": 1,
+        "clef-treble": 1,
+        "key-0": 1,
+        "ledger-above": 1,
+        "ledger-below": 9,
+        "note-8th": 4,
+        "note-half": 32,
+        "note-quarter": 12,
+        "note-whole": 12,
+        "stem-down": 18,
+        "stem-up": 20,
+        "system-break": 2,
+        "time-4-4": 1,
+        "tremolo": 35
+      },
+      "counts_detail": {
+        "beam-level-1-begin": 2,
+        "beam-level-1-end": 2,
+        "chord-2-notes": 4,
+        "chord-3-notes": 3,
+        "chord-4-notes": 1,
+        "ledger-above-2": 1,
+        "ledger-below-1": 1,
+        "ledger-below-2": 7,
+        "ledger-below-3": 1,
+        "tremolo-single-1": 3,
+        "tremolo-single-2": 15,
+        "tremolo-single-3": 7,
+        "tremolo-two-note-2": 6,
+        "tremolo-two-note-3": 4
+      },
+      "notes": [
+        "Every stemmed note carries <stem>: the engraving is forced to exactly that direction (standard middle-line rule, the extreme note of a chord / beam group / two-note tremolo decides, middle line goes down; graces up; explicit \\stemUp/\\stemDown passages kept). Whole notes and breves carry no <stem>.",
+        "<beam> elements reproduce the engraved beams level by level (manual beaming): level 1 joins the whole group, a secondary level joins neighbours that both carry it; a rest inside a beam carries no <beam> element but a 16th rest between 16ths keeps the secondary beam continuous (as LilyPond draws it), so the note after it continues the level; beamlets are forward/backward hooks.",
+        "Single-note tremolos: <ornaments><tremolo type=\"single\">n</tremolo> with n = strokes drawn on the stem (beamed eighths: subdivision beams minus the beam). Two-note tremolos: both notes carry the printed value of the whole tremolo (e.g. two half notes filling a half-note beat) with <time-modification>2:1</time-modification> and <tremolo type=\"start|stop\">n</tremolo> (n = beams between them); the repeated sounding notes are NOT unfolded in the truth (standard MusicXML), so the truth duration of each note is half its printed value."
+      ],
+      "degradations": {
+        "scan.pdf": {
+          "seed": 960901,
+          "level": "typical",
+          "recipe": "typical-office-scan",
+          "render_dpi": 200,
+          "dpi": 200,
+          "color": "gray",
+          "format": "jpeg",
+          "jpeg_quality": 60,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                245,
+                244,
+                240
+              ],
+              "texture": 2
+            },
+            {
+              "op": "rotate",
+              "deg": 0.6,
+              "bg": [
+                232,
+                232,
+                232
+              ]
+            },
+            {
+              "op": "gradient",
+              "strength": 0.06
+            },
+            {
+              "op": "blur",
+              "sigma": 0.5
+            },
+            {
+              "op": "noise",
+              "sigma": 3.0
+            }
+          ],
+          "tags": [
+            "paper_texture",
+            "rotation_+0.6deg",
+            "gradient",
+            "blur",
+            "noise",
+            "jpeg_q60"
+          ],
+          "output_pages": 1,
+          "pixel_size": [
+            1680,
+            2357
+          ],
+          "image_mode": "L",
+          "bytes": 197452,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        },
+        "scan-severe.pdf": {
+          "seed": 960902,
+          "level": "severe",
+          "recipe": "heavy-skew-noise",
+          "render_dpi": 150,
+          "dpi": 150,
+          "color": "gray",
+          "format": "jpeg",
+          "jpeg_quality": 15,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                238,
+                238,
+                236
+              ],
+              "texture": 3
+            },
+            {
+              "op": "rotate",
+              "deg": 6.0,
+              "bg": 50
+            },
+            {
+              "op": "blur",
+              "sigma": 1.2
+            },
+            {
+              "op": "noise",
+              "sigma": 12
+            },
+            {
+              "op": "saltpepper",
+              "amount": 0.004
+            }
+          ],
+          "tags": [
+            "paper_texture",
+            "rotation_+6deg",
+            "blur",
+            "noise",
+            "saltpepper",
+            "jpeg_q15"
+          ],
+          "output_pages": 1,
+          "pixel_size": [
+            1419,
+            1876
+          ],
+          "image_mode": "L",
+          "bytes": 93928,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        }
+      },
+      "dpi": 200,
+      "pages": 1,
+      "license": "CC0",
+      "license_detail": "CC0-1.0: composition, engraving, truth and scans created for this corpus",
+      "composer": "OMR coverage corpus (CC0)",
+      "files": {
+        "truth": "truth.musicxml",
+        "engraving": "engraving.ly",
+        "clean": "clean.pdf",
+        "scan": "scan.pdf",
+        "scan_severe": "scan-severe.pdf",
+        "attribution": "ATTRIBUTION.txt"
+      },
+      "clean": {
+        "dpi": 300,
+        "pages": 1,
+        "ops": [],
+        "note": "undamaged raster render (PNG)",
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "text_chars": 0
+      },
+      "validation": {
+        "truth_xsd_valid": true,
+        "music21_reparse_matches_model": true,
+        "engraving_event_dump_matches_truth": true,
+        "engraving_events_compared": 89,
+        "stem_grobs_compared": 38,
+        "notehead_grobs_compared": 60,
+        "printed_accidentals_compared": 0,
+        "time_signatures_compared": 2,
+        "midi_attacks_match_truth": true,
+        "midi_attacks": 60,
+        "midi_grace_notes_excluded": 0,
+        "counts_truth_equal_engraving": true,
+        "engraved_counts": {
+          "note-quarter": 12,
+          "stem-down": 18,
+          "tremolo": 35,
+          "note-half": 32,
+          "note-whole": 12,
+          "note-8th": 4,
+          "chord": 8,
+          "ledger-above": 1,
+          "stem-up": 20,
+          "ledger-below": 9,
+          "beam": 2
+        },
+        "lilypond_warnings": [],
+        "method": "LilyPond 2.24 run with an instrumented dump (nsynth/dump.ly): every note/rest event (onset, pitch, notated type, dots, tuplet scale, grace offset), tie, beam start/stop, slur, tremolo, time signature, bar number/measure position; every Stem of the final layout (direction, duration log, beamed, beams/beamlets left and right, stem-tremolo strokes, heads) and every NoteHead (staff position -> ledger lines, head type, font size for grace/cue); every printed accidental. All compared with the model the truth is written from; plus LilyPond MIDI attacks, a music21 re-parse of truth.musicxml and xmllint against MusicXML 4.0 XSD. The symbol counts in this file are read back from truth.musicxml (nsynth/counts.py) and must equal the counts measured on the engraving."
+      },
+      "generator": "corpus/coverage/notes/_tools/run_all.py (nsynth/items.py, build.py, scan.py)",
+      "path": "notes/nt09-tremolos"
+    },
+    {
+      "id": "nt10-piano-etude",
+      "family": "notes",
+      "title": "Etude in C (piano)",
+      "description": "A piano etude combining all note symbols in context: beamed 8ths/16ths/32nds, dotted and double-dotted values, chords of 2-5 notes, grace notes, ledger lines, flags, both stem directions, a beam across a rest.",
+      "symbols": [
+        "barline-final",
+        "beam",
+        "chord",
+        "clef-bass",
+        "clef-treble",
+        "dot",
+        "double-dot",
+        "flag",
+        "grace",
+        "grace-slash",
+        "key-0",
+        "ledger-above",
+        "ledger-below",
+        "note-16th",
+        "note-32nd",
+        "note-8th",
+        "note-half",
+        "note-quarter",
+        "note-whole",
+        "rest-8th",
+        "rest-quarter",
+        "slur",
+        "stem-down",
+        "stem-up",
+        "system-break",
+        "time-4-4"
+      ],
+      "focus_symbols": [
+        "note-half",
+        "note-quarter",
+        "note-8th",
+        "note-16th",
+        "note-32nd",
+        "dot",
+        "double-dot",
+        "chord",
+        "beam",
+        "flag",
+        "grace",
+        "ledger-above",
+        "ledger-below"
+      ],
+      "layout": "piano",
+      "expected": {
+        "parts": [
+          "Piano"
+        ],
+        "must_not_split": true,
+        "staves_per_part": {
+          "Piano": 2
+        },
+        "measures": 10,
+        "first_measure_number": 1,
+        "notes": "ONE part (Piano), grand staff, 10 bars of 4/4, one voice per staff."
+      },
+      "counts": {
+        "barline-final": 1,
+        "beam": 20,
+        "chord": 17,
+        "clef-bass": 1,
+        "clef-treble": 1,
+        "dot": 6,
+        "double-dot": 1,
+        "flag": 3,
+        "grace": 4,
+        "grace-slash": 2,
+        "key-0": 1,
+        "ledger-above": 23,
+        "ledger-below": 14,
+        "note-16th": 35,
+        "note-32nd": 16,
+        "note-8th": 35,
+        "note-half": 10,
+        "note-quarter": 51,
+        "note-whole": 6,
+        "rest-8th": 1,
+        "rest-quarter": 1,
+        "slur": 1,
+        "stem-down": 79,
+        "stem-up": 41,
+        "system-break": 2,
+        "time-4-4": 1
+      },
+      "counts_detail": {
+        "beam-level-1-begin": 20,
+        "beam-level-1-continue": 39,
+        "beam-level-1-end": 20,
+        "beam-level-2-backward-hook": 2,
+        "beam-level-2-begin": 9,
+        "beam-level-2-continue": 30,
+        "beam-level-2-end": 9,
+        "beam-level-3-begin": 2,
+        "beam-level-3-continue": 12,
+        "beam-level-3-end": 2,
+        "chord-2-notes": 6,
+        "chord-3-notes": 8,
+        "chord-4-notes": 3,
+        "flag-16th": 1,
+        "flag-eighth": 2,
+        "grace-beam-groups": 1,
+        "ledger-above-1": 11,
+        "ledger-above-2": 7,
+        "ledger-above-3": 4,
+        "ledger-above-4": 1,
+        "ledger-below-1": 5,
+        "ledger-below-2": 3,
+        "ledger-below-3": 4,
+        "ledger-below-4": 1,
+        "ledger-below-5": 1
+      },
+      "notes": [
+        "Every stemmed note carries <stem>: the engraving is forced to exactly that direction (standard middle-line rule, the extreme note of a chord / beam group / two-note tremolo decides, middle line goes down; graces up; explicit \\stemUp/\\stemDown passages kept). Whole notes and breves carry no <stem>.",
+        "<beam> elements reproduce the engraved beams level by level (manual beaming): level 1 joins the whole group, a secondary level joins neighbours that both carry it; a rest inside a beam carries no <beam> element but a 16th rest between 16ths keeps the secondary beam continuous (as LilyPond draws it), so the note after it continues the level; beamlets are forward/backward hooks.",
+        "Grace notes are <grace/> notes without <duration>; slash=\"yes\" for acciaccaturas and \\slashedGrace notes only (both single notes). The slur LilyPond draws for \\acciaccatura / \\appoggiatura is slur number 2. Grace notes are excluded from all note-value, stem, beam, flag and ledger counts."
+      ],
+      "degradations": {
+        "scan.pdf": {
+          "seed": 961001,
+          "level": "typical",
+          "recipe": "typical-office-scan",
+          "render_dpi": 300,
+          "dpi": 300,
+          "color": "gray",
+          "format": "jpeg",
+          "jpeg_quality": 50,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                245,
+                244,
+                240
+              ],
+              "texture": 2
+            },
+            {
+              "op": "rotate",
+              "deg": -1.4,
+              "bg": [
+                232,
+                232,
+                232
+              ]
+            },
+            {
+              "op": "gradient",
+              "strength": 0.06
+            },
+            {
+              "op": "blur",
+              "sigma": 0.5
+            },
+            {
+              "op": "noise",
+              "sigma": 3.0
+            }
+          ],
+          "tags": [
+            "paper_texture",
+            "rotation_-1.4deg",
+            "gradient",
+            "blur",
+            "noise",
+            "jpeg_q50"
+          ],
+          "output_pages": 1,
+          "pixel_size": [
+            2567,
+            3568
+          ],
+          "image_mode": "L",
+          "bytes": 332344,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        },
+        "scan-severe.pdf": {
+          "seed": 961002,
+          "level": "severe",
+          "recipe": "recompressed-150",
+          "render_dpi": 150,
+          "dpi": 150,
+          "color": "gray",
+          "format": "jpeg",
+          "jpeg_quality": 20,
+          "jpeg_passes": 3,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                244,
+                243,
+                238
+              ],
+              "texture": 3
+            },
+            {
+              "op": "rotate",
+              "deg": 3.0,
+              "bg": 220
+            },
+            {
+              "op": "blur",
+              "sigma": 0.9
+            },
+            {
+              "op": "noise",
+              "sigma": 8
+            }
+          ],
+          "tags": [
+            "paper_texture",
+            "rotation_+3deg",
+            "blur",
+            "noise",
+            "jpeg_q20"
+          ],
+          "output_pages": 1,
+          "pixel_size": [
+            1333,
+            1818
+          ],
+          "image_mode": "L",
+          "bytes": 150267,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        }
+      },
+      "dpi": 300,
+      "pages": 1,
+      "license": "CC0",
+      "license_detail": "CC0-1.0: composition, engraving, truth and scans created for this corpus",
+      "composer": "OMR coverage corpus (CC0)",
+      "files": {
+        "truth": "truth.musicxml",
+        "engraving": "engraving.ly",
+        "clean": "clean.pdf",
+        "scan": "scan.pdf",
+        "scan_severe": "scan-severe.pdf",
+        "attribution": "ATTRIBUTION.txt"
+      },
+      "clean": {
+        "dpi": 300,
+        "pages": 1,
+        "ops": [],
+        "note": "undamaged raster render (PNG)",
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "text_chars": 0
+      },
+      "validation": {
+        "truth_xsd_valid": true,
+        "music21_reparse_matches_model": true,
+        "engraving_event_dump_matches_truth": true,
+        "engraving_events_compared": 203,
+        "stem_grobs_compared": 124,
+        "notehead_grobs_compared": 157,
+        "printed_accidentals_compared": 0,
+        "time_signatures_compared": 2,
+        "midi_attacks_match_truth": true,
+        "midi_attacks": 153,
+        "midi_grace_notes_excluded": 4,
+        "counts_truth_equal_engraving": true,
+        "engraved_counts": {
+          "note-8th": 35,
+          "stem-down": 79,
+          "note-16th": 35,
+          "ledger-above": 23,
+          "note-quarter": 51,
+          "chord": 17,
+          "grace": 4,
+          "note-32nd": 16,
+          "note-half": 10,
+          "flag": 3,
+          "stem-up": 41,
+          "note-whole": 6,
+          "beam": 20,
+          "ledger-below": 14
+        },
+        "lilypond_warnings": [],
+        "method": "LilyPond 2.24 run with an instrumented dump (nsynth/dump.ly): every note/rest event (onset, pitch, notated type, dots, tuplet scale, grace offset), tie, beam start/stop, slur, tremolo, time signature, bar number/measure position; every Stem of the final layout (direction, duration log, beamed, beams/beamlets left and right, stem-tremolo strokes, heads) and every NoteHead (staff position -> ledger lines, head type, font size for grace/cue); every printed accidental. All compared with the model the truth is written from; plus LilyPond MIDI attacks, a music21 re-parse of truth.musicxml and xmllint against MusicXML 4.0 XSD. The symbol counts in this file are read back from truth.musicxml (nsynth/counts.py) and must equal the counts measured on the engraving."
+      },
+      "generator": "corpus/coverage/notes/_tools/run_all.py (nsynth/items.py, build.py, scan.py)",
+      "path": "notes/nt10-piano-etude"
+    }
+  ]
+}

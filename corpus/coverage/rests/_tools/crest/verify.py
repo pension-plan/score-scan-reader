@@ -401,7 +401,8 @@ def layout_records(events_path):
         key = (f[1], F(f[2]) * 4, F(f[3]) * 4)
         if f[6] == 'stem':
             log, d = _num(f[7]), _num(f[8])
-            if log is not None and log >= 1:
+            heads = int(f[9]) if len(f) > 9 else 1
+            if log is not None and log >= 1 and heads > 0:      # rests get head-less stems in LilyPond
                 stems.setdefault(key, []).append(int(d))
         elif f[6] == 'restpos':
             rests.setdefault(key, []).append(('rest', int(_num(f[7])), _num(f[8]), _num(f[9]), _num(f[10])))
@@ -435,6 +436,61 @@ def expected_rest_positions(score: Score):
     return out, problems
 
 
+def measured_pos(kind, log, ev, rec):
+    """engraved staff position of a rest: from the glyph extent (base extent + pos/2) where the glyph is
+    known, else from the staff-position property.  Returns (pos, note)."""
+    gk, glog, gpos, lo, hi = rec
+    if kind == 'rest':
+        base = REST_BASE.get(log)
+    elif ev.multirest > 1:
+        base = None            # church-rest / H-bar block: glyph depends on the bar count
+    else:
+        base = MMR_BASE['breve' if ev.dur >= 8 else 'whole']
+    if base is None or lo is None:
+        return (0.0 if gpos is None else gpos), 'property'
+    s1, s2 = lo - base[0], hi - base[1]
+    cands = [x for x in (s1, s2) if abs(2 * x - round(2 * x)) < 0.04]
+    if abs(s1 - s2) < 0.02:
+        sh = s1
+    elif len(cands) == 1:
+        sh = cands[0]          # one bound grew by a ledger line
+    else:
+        return None, f'extent {lo:.3f}..{hi:.3f} inconsistent with base {base}'
+    pos = round(2 * sh)
+    if gpos is not None and abs(gpos - pos) > 1e-6:
+        return None, f'staff-position {gpos} but extent shift {sh:.3f}'
+    return float(pos), 'extent'
+
+
+def assign_auto_rest_positions(score: Score, events_path: str):
+    """Rests entered without a position that LilyPond moved anyway (e.g. clear of a beam in a single
+    voice): write the engraved position into the model (display + display_auto)."""
+    from .model import clef_at, clef_timeline, pitch_at_pos
+    rests, _ = layout_records(events_path)
+    exp, _ = expected_rest_positions(score)
+    tl = clef_timeline(score)
+    moved = []
+    for key, (kind, log, pos, i, ev) in exp.items():
+        if ev.display is not None:
+            continue
+        got = rests.get(key, [])
+        if len(got) != 1:
+            continue
+        mp, why = measured_pos(kind, log, ev, got[0])
+        if mp is None or mp == 0:
+            continue
+        pid = next(p.id for p in score.parts for v in p.voices if vname(p.id, v.key) == key[0])
+        part = score.part(pid)
+        vk = next(v.key for v in part.voices if vname(pid, v.key) == key[0])
+        evs = part.measures[i].get(vk, [])
+        k = next(j for j, e in enumerate(evs) if e is ev)
+        clef = clef_at(tl, pid, part.voice(vk).staff, key[1], k)
+        ev.display = pitch_at_pos(int(mp), clef)
+        ev.display_auto = True
+        moved.append(f'{key[0]} t={key[1]} {kind}/{log} -> pos {int(mp)} ({ev.display[0]}{ev.display[2]})')
+    return {'moved_by_layout': len(moved), 'list': moved}
+
+
 def check_rest_layout(score: Score, events_path: str):
     rests, _ = layout_records(events_path)
     exp, problems = expected_rest_positions(score)
@@ -445,31 +501,24 @@ def check_rest_layout(score: Score, events_path: str):
         if len(got) != 1:
             bad.append(f'{key}: {len(got)} engraved rest grobs')
             continue
-        gk, glog, gpos, lo, hi = got[0]
+        gk, glog = got[0][0], got[0][1]
         if gk != kind or (kind == 'rest' and glog != log):
             bad.append(f'{key}: engraved {gk}/{glog}, truth {kind}/{log}')
             continue
-        if gpos is None:
-            gpos = 0.0
-        if abs(gpos - pos) > 1e-6:
-            bad.append(f'{key}: staff-position {gpos} != {pos}')
+        mp, why = measured_pos(kind, log, ev, got[0])
+        if mp is None:
+            bad.append(f'{key}: {why}')
             continue
-        if kind == 'rest':
-            base = REST_BASE[log]
-        elif ev.multirest > 1:
-            base = None            # church-rest / H-bar block: glyph depends on the bar count
-        else:
-            base = MMR_BASE['breve' if ev.dur >= 8 else 'whole']
-        if base is not None and lo is not None:
-            if not (abs(lo - (base[0] + pos / 2)) < 0.02 or abs(hi - (base[1] + pos / 2)) < 0.02):
-                bad.append(f'{key}: extent {lo:.3f}..{hi:.3f} != base {base} + {pos}/2')
-                continue
+        if abs(mp - pos) > 1e-6:
+            bad.append(f'{key}: engraved staff position {mp} ({why}) != truth {pos}')
+            continue
         n_ok += 1
     extra = [k for k in rests if k not in exp]
     for k in extra:
         bad.append(f'{k}: engraved rest not in truth')
     return {'ok': not bad, 'rests_checked': len(exp), 'rests_ok': n_ok,
-            'explicit_positions': sum(1 for x in exp.values() if x[4].display is not None),
+            'explicit_positions': sum(1 for x in exp.values() if x[4].display is not None and not x[4].display_auto),
+            'layout_positions': sum(1 for x in exp.values() if x[4].display_auto),
             'problems': bad[:20]}
 
 

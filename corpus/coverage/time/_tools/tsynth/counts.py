@@ -13,8 +13,8 @@ from fractions import Fraction as F
 COUNT_RULES = {
     'note-<type>': 'one per pitched, non-grace, non-cue <note> element with that <type> (chord members '
                    'count individually, tie continuations count)',
-    'dot / double-dot': 'one per non-grace <note> element (notes AND rests, chord members individually) '
-                        'with exactly one / two <dot/>',
+    'dot / double-dot': 'one per pitched, non-grace notehead (<note> element, chord members individually) '
+                        'with exactly one / two <dot/>; dotted rests are counted only as rest-dotted',
     'chord': 'one per chord (a <note> followed by <chord/> members)',
     'beam': 'one per beam group (level-1 <beam>begin</beam> on a non-chord-member note)',
     'flag': 'one per stem (non-grace, non-chord-member note of type eighth or shorter) without any <beam>',
@@ -34,6 +34,10 @@ COUNT_RULES = {
                     'both staves but the truth has one <time>); 4/4 and 2/2 printed as C / cut are '
                     'time-common / time-cut, NOT time-4-4 / time-2-2',
     'time-change': 'one per <time> element after the first measure of the part',
+    'x-time-courtesy': 'one per <time> in the first measure of a system (after the first system): the '
+                       'engraving ALSO prints a courtesy copy at the end of the previous system, which has no '
+                       'element of its own in the truth (the count tells how many extra time-signature glyphs '
+                       'are printed per part)',
     'pickup': 'one per part whose first measure is implicit="yes" (anacrusis)',
     'tuplet-<n>': 'one per tuplet group (<tuplet type="start">, every nesting level) by its actual '
                   'number (tuplet-actual/tuplet-number, else time-modification/actual-notes); 4:3 '
@@ -56,6 +60,9 @@ COUNT_RULES = {
     'lyrics-melisma': 'one per syllable sung on more than one attack (a later non-tied note of the '
                       'same voice before the next syllable of that verse)',
     'lyrics-multi-verse': 'number of lyric lines (verses) when more than one',
+    'stem-up / stem-down': 'one per stem (non-chord-member, non-grace note shorter than a whole), counted '
+                           'ONLY when the truth gives <stem> for every such note (two voices on one staff); '
+                           'otherwise absent because stem direction is left to the engraver',
 }
 
 TYPES = ['breve', 'whole', 'half', 'quarter', 'eighth', '16th', '32nd', '64th']
@@ -159,6 +166,8 @@ def count_truth(path):
                             add(f'time-{b}-{bt}', mnum)
                         if mi > 0:
                             add('time-change', mnum)
+                        if mi > 0 and pr is not None and 'yes' in (pr.get('new-system'), pr.get('new-page')):
+                            add('x-time-courtesy', mnum)
                     for c in el.findall('clef'):
                         sign, line = c.findtext('sign'), int(c.findtext('line', '0') or 0)
                         oc = int(c.findtext('clef-octave-change', '0'))
@@ -236,10 +245,6 @@ def _note(el, mnum, mi, add, clefs, open_ties, sys_idx, page_idx, in_multirest, 
             add(f'rest-{TAG_TYPE.get(typ, typ)}', mnum)
             if ndots:
                 add('rest-dotted', mnum)
-            if ndots == 1:
-                add('dot', mnum)
-            elif ndots == 2:
-                add('double-dot', mnum)
     else:
         p = el.find('pitch')
         step, octv = p.findtext('step'), int(p.findtext('octave'))
@@ -363,10 +368,34 @@ def count_chords(path):
     return n, where
 
 
+def count_stems(path):
+    """stem-up / stem-down per stem, but only when the truth gives <stem> for EVERY stemmed note
+    (else None: single-voice staves leave the direction to the engraver and it is not in truth)."""
+    root = ET.parse(path).getroot()
+    c, w = Counter(), defaultdict(list)
+    for part in root.findall('part'):
+        for m in part.findall('measure'):
+            for el in m.findall('note'):
+                if el.find('rest') is not None or el.find('chord') is not None:
+                    continue
+                if el.findtext('type') in ('whole', 'breve') or el.find('grace') is not None:
+                    continue
+                st = el.findtext('stem')
+                if st not in ('up', 'down'):
+                    return None
+                c['stem-' + st] += 1
+                w['stem-' + st].append(m.get('number'))
+    return c, w
+
+
 def count_all(path):
     c, w = count_truth(path)
     n, wh = count_chords(path)
     if n:
         c['chord'] = n
         w['chord'] = wh
+    st = count_stems(path)
+    if st:
+        c.update(st[0])
+        w.update(st[1])
     return dict(sorted(c.items())), dict(sorted(w.items()))

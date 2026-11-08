@@ -1,0 +1,325 @@
+{
+  "id": "choir-ttbb-evening-bells",
+  "family": "layouts",
+  "title": "Evening Bells - TTBB male choir in closed score",
+  "layout": "choir-ttbb",
+  "symbols": [
+    "clef-bass",
+    "clef-treble-8vb",
+    "dyn-mf",
+    "dyn-p",
+    "dyn-pp",
+    "fermata",
+    "key-f2",
+    "ledger-above",
+    "lyrics",
+    "lyrics-hyphen",
+    "metronome",
+    "note-half",
+    "note-quarter",
+    "stem-down",
+    "stem-up",
+    "system-break",
+    "tempo-mark",
+    "time-4-4",
+    "x-group-bracket",
+    "x-measures",
+    "x-parts",
+    "x-staves"
+  ],
+  "counts": {
+    "clef-bass": 2,
+    "clef-treble-8vb": 2,
+    "dyn-mf": 2,
+    "dyn-p": 2,
+    "dyn-pp": 2,
+    "fermata": 8,
+    "key-f2": 1,
+    "ledger-above": 3,
+    "lyrics": 28,
+    "lyrics-hyphen": 6,
+    "metronome": 1,
+    "note-half": 16,
+    "note-quarter": 96,
+    "stem-down": 56,
+    "stem-up": 56,
+    "system-break": 1,
+    "tempo-mark": 1,
+    "time-4-4": 1,
+    "x-group-bracket": 1,
+    "x-measures": 8,
+    "x-parts": 4,
+    "x-staves": 4
+  },
+  "expected": {
+    "parts": [
+      "Tenor I",
+      "Tenor II",
+      "Baritone",
+      "Bass"
+    ],
+    "must_not_split": false,
+    "shared_staves": [
+      [
+        "Tenor I",
+        "Tenor II"
+      ],
+      [
+        "Baritone",
+        "Bass"
+      ]
+    ],
+    "staves_per_part": {
+      "Tenor I": 1,
+      "Tenor II": 1,
+      "Baritone": 1,
+      "Bass": 1
+    },
+    "lyrics": [
+      {
+        "part": "Tenor I",
+        "verses": 1
+      }
+    ],
+    "notes": "FOUR parts: Tenor I + Tenor II share the upper staff (treble clef with 8 below = sounds an octave lower; truth pitches are sounding), Baritone + Bass share the bass staff; split each staff by stem direction (upper part stems up). Lyrics between the staves belong to Tenor I."
+  },
+  "notes": [
+    "Lyrics are encoded on Tenor I only."
+  ],
+  "layout_description": "A4 portrait, staff size 20, 2 systems of 4 measures, bracketed two-staff closed score",
+  "pages": 1,
+  "measures": 8,
+  "systems": 2,
+  "noteheads_in_truth": 112,
+  "hidden_staff_segments": [],
+  "dpi": 300,
+  "degradations": {
+    "clean.pdf": {
+      "seed": null,
+      "dpi": 300,
+      "format": "png (8-bit grey)",
+      "summary": "undamaged raster of the engraving",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "size_px": [
+            2481,
+            3508
+          ]
+        }
+      ],
+      "bytes": 118334
+    },
+    "scan.pdf": {
+      "seed": 7081,
+      "render_dpi": 300,
+      "dpi": 300,
+      "format": "jpeg q80",
+      "colour": "rgb",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            2481,
+            3508
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              3
+            ],
+            [
+              "paper_colour",
+              [
+                243,
+                236,
+                214
+              ]
+            ],
+            [
+              "skew_rotation_deg",
+              0.4
+            ],
+            [
+              "focus_blur_sigma",
+              0.4
+            ],
+            [
+              "gaussian_noise_sigma",
+              3
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 300,
+        "mode": "rgb",
+        "paper_rgb": [
+          243,
+          236,
+          214
+        ],
+        "texture": 3,
+        "rotate": 0.4,
+        "blur": 0.4,
+        "noise": 3,
+        "jpeg": 80
+      },
+      "summary": "300 dpi colour scan on cream paper, 0.4 deg skew, noise, JPEG q80",
+      "bytes": 785429
+    },
+    "scan-severe.pdf": {
+      "seed": 7082,
+      "render_dpi": 200,
+      "dpi": 200,
+      "format": "png1",
+      "colour": "bw",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1654,
+            2339
+          ],
+          "ops": [
+            [
+              "ink_weight",
+              1
+            ],
+            [
+              "punch_holes",
+              {
+                "side": "left",
+                "centers_px": [
+                  [
+                    87,
+                    854
+                  ],
+                  [
+                    87,
+                    1485
+                  ]
+                ]
+              }
+            ],
+            [
+              "staple",
+              {
+                "corner": "tl",
+                "pos_px": [
+                  99,
+                  94
+                ]
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              2.5
+            ],
+            [
+              "focus_blur_sigma",
+              0.9
+            ],
+            [
+              "gaussian_noise_sigma",
+              12
+            ],
+            [
+              "salt_pepper",
+              0.002
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 200,
+                "noise": 20
+              }
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 200,
+        "ink_weight": 1,
+        "rotate": 2.5,
+        "punch_holes": {
+          "n": 2,
+          "side": "left",
+          "level": 10
+        },
+        "staple": {
+          "corner": "tl"
+        },
+        "blur": 0.9,
+        "noise": 12,
+        "binarize": 200,
+        "binarize_noise": 20,
+        "saltpepper": 0.002,
+        "format": "png1"
+      },
+      "summary": "thick dark binarised photocopy at 200 dpi: ink spread, 2.5 deg skew, staple, two punch holes, salt & pepper",
+      "bytes": 144889
+    }
+  },
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "scan-severe.pdf",
+    "scan.pdf",
+    "truth.musicxml"
+  ],
+  "license": "CC0",
+  "license_detail": "CC0-1.0: composition, arrangement, engraving and scans",
+  "source": "self-authored for the coverage suite (2026)",
+  "engraver": "internal model -> LilyPond 2.24 (coverage-suite writer: explicit beams and stems)",
+  "validation": {
+    "xsd_valid": true,
+    "music21_parse": "4 112",
+    "midi_attacks_match_truth": true,
+    "attacks": 112,
+    "grob_log_matches_truth": true,
+    "printed_summary": {
+      "noteheads": 112,
+      "stems_up": 56,
+      "stems_down": 56,
+      "accidentals": 0,
+      "rests": 0,
+      "beams": 0,
+      "flags": 0,
+      "slurs": 0,
+      "ties": 0,
+      "scripts": {
+        "fermata": 8
+      },
+      "dynamics": {
+        "p": 2,
+        "mf": 2,
+        "pp": 2
+      },
+      "lyric_syllables": 28,
+      "hyphens": 6,
+      "extenders": 0,
+      "chord_names": 0,
+      "system_delimiters": {
+        "SystemStartBracket": 2
+      }
+    },
+    "lilypond_warnings": [],
+    "lyric_syllables_found_in_engraving": 1.0,
+    "lyric_syllables": 28,
+    "pages_planned": 1,
+    "image_only": {
+      "clean.pdf": true,
+      "scan.pdf": true,
+      "scan-severe.pdf": true
+    }
+  }
+}

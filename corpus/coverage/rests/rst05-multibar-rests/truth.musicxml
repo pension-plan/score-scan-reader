@@ -1,0 +1,826 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="4.0">
+  <work><work-title>Tacet Interludes</work-title></work>
+  <identification>
+    <creator type="composer">OMR coverage corpus (CC0)</creator>
+    <rights>CC0 1.0</rights>
+    <encoding>
+      <software>OMR coverage corpus builder (rests family)</software>
+      <encoding-date>2026-11-08</encoding-date>
+    </encoding>
+  </identification>
+  <part-list>
+    <score-part id="P1">
+      <part-name>Trumpet in C</part-name>
+      <part-abbreviation>Tpt.</part-abbreviation>
+    </score-part>
+  </part-list>
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>2</divisions>
+        <key><fifths>0</fifths><mode>major</mode></key>
+        <time><beats>4</beats><beat-type>4</beat-type></time>
+        <clef><sign>G</sign><line>2</line></clef>
+        <measure-style><multiple-rest use-symbols="no">16</multiple-rest></measure-style>
+      </attributes>
+      <direction placement="above"><direction-type><words font-weight="bold">Allegro</words></direction-type></direction>
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="2">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="3">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="4">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="5">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="6">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="7">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="8">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="9">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="10">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="11">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="12">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="13">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="14">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="15">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="16">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="17">
+      <direction placement="above"><direction-type><rehearsal>A</rehearsal></direction-type></direction>
+      <note>
+        <pitch><step>C</step><octave>5</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem>down</stem>
+      </note>
+      <note>
+        <pitch><step>E</step><octave>5</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem>down</stem>
+      </note>
+      <note>
+        <pitch><step>G</step><octave>5</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem>down</stem>
+      </note>
+      <note>
+        <pitch><step>E</step><octave>5</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem>down</stem>
+      </note>
+    </measure>
+    <measure number="18">
+      <attributes>
+        <measure-style><multiple-rest use-symbols="yes">2</multiple-rest></measure-style>
+      </attributes>
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="19">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="20">
+      <note>
+        <pitch><step>G</step><octave>4</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem>up</stem>
+      </note>
+      <note>
+        <pitch><step>C</step><octave>5</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem>down</stem>
+      </note>
+      <note>
+        <pitch><step>E</step><octave>5</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem>down</stem>
+      </note>
+      <note>
+        <pitch><step>G</step><octave>5</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem>down</stem>
+      </note>
+    </measure>
+    <measure number="21">
+      <print new-system="yes"/>
+      <attributes>
+        <measure-style><multiple-rest use-symbols="yes">3</multiple-rest></measure-style>
+      </attributes>
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="22">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="23">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="24">
+      <note>
+        <pitch><step>C</step><octave>6</octave></pitch>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <stem>down</stem>
+      </note>
+      <note>
+        <pitch><step>G</step><octave>5</octave></pitch>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <stem>down</stem>
+      </note>
+    </measure>
+    <measure number="25">
+      <attributes>
+        <measure-style><multiple-rest use-symbols="yes">4</multiple-rest></measure-style>
+      </attributes>
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="26">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="27">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="28">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="29">
+      <print new-system="yes"/>
+      <attributes>
+        <time><beats>3</beats><beat-type>4</beat-type></time>
+        <measure-style><multiple-rest use-symbols="yes">6</multiple-rest></measure-style>
+      </attributes>
+      <direction placement="above"><direction-type><rehearsal>B</rehearsal></direction-type></direction>
+      <note>
+        <rest measure="yes"/>
+        <duration>6</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="30">
+      <note>
+        <rest measure="yes"/>
+        <duration>6</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="31">
+      <note>
+        <rest measure="yes"/>
+        <duration>6</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="32">
+      <note>
+        <rest measure="yes"/>
+        <duration>6</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="33">
+      <note>
+        <rest measure="yes"/>
+        <duration>6</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="34">
+      <note>
+        <rest measure="yes"/>
+        <duration>6</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="35">
+      <note>
+        <pitch><step>E</step><octave>5</octave></pitch>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <stem>down</stem>
+      </note>
+      <note>
+        <pitch><step>D</step><octave>5</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem>down</stem>
+      </note>
+    </measure>
+    <measure number="36">
+      <attributes>
+        <measure-style><multiple-rest use-symbols="no">5</multiple-rest></measure-style>
+      </attributes>
+      <note>
+        <rest measure="yes"/>
+        <duration>6</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="37">
+      <note>
+        <rest measure="yes"/>
+        <duration>6</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="38">
+      <note>
+        <rest measure="yes"/>
+        <duration>6</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="39">
+      <note>
+        <rest measure="yes"/>
+        <duration>6</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="40">
+      <note>
+        <rest measure="yes"/>
+        <duration>6</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="41">
+      <print new-system="yes"/>
+      <attributes>
+        <time><beats>6</beats><beat-type>8</beat-type></time>
+      </attributes>
+      <note>
+        <pitch><step>C</step><octave>5</octave></pitch>
+        <duration>3</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <dot/>
+        <stem>down</stem>
+      </note>
+      <note>
+        <pitch><step>G</step><octave>4</octave></pitch>
+        <duration>3</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <dot/>
+        <stem>up</stem>
+      </note>
+    </measure>
+    <measure number="42">
+      <attributes>
+        <measure-style><multiple-rest use-symbols="no">12</multiple-rest></measure-style>
+      </attributes>
+      <note>
+        <rest measure="yes"/>
+        <duration>6</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="43">
+      <note>
+        <rest measure="yes"/>
+        <duration>6</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="44">
+      <note>
+        <rest measure="yes"/>
+        <duration>6</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="45">
+      <note>
+        <rest measure="yes"/>
+        <duration>6</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="46">
+      <note>
+        <rest measure="yes"/>
+        <duration>6</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="47">
+      <note>
+        <rest measure="yes"/>
+        <duration>6</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="48">
+      <note>
+        <rest measure="yes"/>
+        <duration>6</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="49">
+      <note>
+        <rest measure="yes"/>
+        <duration>6</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="50">
+      <note>
+        <rest measure="yes"/>
+        <duration>6</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="51">
+      <note>
+        <rest measure="yes"/>
+        <duration>6</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="52">
+      <note>
+        <rest measure="yes"/>
+        <duration>6</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="53">
+      <note>
+        <rest measure="yes"/>
+        <duration>6</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="54">
+      <attributes>
+        <time symbol="cut"><beats>2</beats><beat-type>2</beat-type></time>
+        <measure-style><multiple-rest use-symbols="yes">7</multiple-rest></measure-style>
+      </attributes>
+      <direction placement="above"><direction-type><rehearsal>C</rehearsal></direction-type></direction>
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="55">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="56">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="57">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="58">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="59">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="60">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="61">
+      <print new-system="yes"/>
+      <attributes>
+        <time><beats>4</beats><beat-type>4</beat-type></time>
+        <measure-style><multiple-rest use-symbols="no">32</multiple-rest></measure-style>
+      </attributes>
+      <direction placement="above"><direction-type><rehearsal>D</rehearsal></direction-type></direction>
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="62">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="63">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="64">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="65">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="66">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="67">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="68">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="69">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="70">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="71">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="72">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="73">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="74">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="75">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="76">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="77">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="78">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="79">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="80">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="81">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="82">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="83">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="84">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="85">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="86">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="87">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="88">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="89">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="90">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="91">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="92">
+      <note>
+        <rest measure="yes"/>
+        <duration>8</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <measure number="93">
+      <note>
+        <pitch><step>C</step><octave>5</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem>down</stem>
+      </note>
+      <note>
+        <pitch><step>E</step><octave>5</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem>down</stem>
+      </note>
+      <note>
+        <pitch><step>G</step><octave>5</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem>down</stem>
+      </note>
+      <note>
+        <pitch><step>C</step><octave>6</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem>down</stem>
+      </note>
+    </measure>
+    <measure number="94">
+      <note>
+        <pitch><step>C</step><octave>6</octave></pitch>
+        <duration>8</duration>
+        <voice>1</voice>
+        <type>whole</type>
+        <notations><fermata type="upright"/></notations>
+      </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
+    </measure>
+  </part>
+</score-partwise>

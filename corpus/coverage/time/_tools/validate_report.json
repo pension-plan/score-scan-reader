@@ -1,0 +1,1567 @@
+{
+ "n_items": 10,
+ "n_ok": 10,
+ "n_renders": 10,
+ "by_category": {
+  "time": {
+   "items": 10,
+   "ok": 10,
+   "scan_files": 20
+  }
+ },
+ "failed": [],
+ "warnings": [],
+ "items": [
+  {
+   "category": "time",
+   "id": "t01-simple-meters",
+   "problems": [],
+   "warnings": [],
+   "scans": [
+    "scan-severe.pdf",
+    "scan.pdf"
+   ],
+   "xsd": {
+    "truth.musicxml": true
+   },
+   "truth": {
+    "parts": [
+     "Flute"
+    ],
+    "n_notes": 41,
+    "n_rests": 0,
+    "measures": 13,
+    "attacks": 37,
+    "syllables": 0,
+    "graces": 0
+   },
+   "music21": {
+    "parts": 1,
+    "notes_and_chords": 41,
+    "rests": 0
+   },
+   "pdfs": {
+    "clean.pdf": {
+     "file": "clean.pdf",
+     "opens": true,
+     "pages": 1,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 1,
+     "image_ppi": [
+      300
+     ],
+     "image_px": [
+      [
+       2481,
+       3508
+      ]
+     ],
+     "image_color": [
+      "gray"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    },
+    "scan-severe.pdf": {
+     "file": "scan-severe.pdf",
+     "opens": true,
+     "pages": 1,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 1,
+     "image_ppi": [
+      150
+     ],
+     "image_px": [
+      [
+       1361,
+       1838
+      ]
+     ],
+     "image_color": [
+      "gray"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    },
+    "scan.pdf": {
+     "file": "scan.pdf",
+     "opens": true,
+     "pages": 1,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 1,
+     "image_ppi": [
+      300
+     ],
+     "image_px": [
+      [
+       2519,
+       3534
+      ]
+     ],
+     "image_color": [
+      "gray"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    }
+   },
+   "hash": {
+    "engraving": "78a27727c7a7ded1",
+    "truth": "0771b7af65e948ff",
+    "clean": "3f1e954a5cbdbb97"
+   },
+   "render": {
+    "lilypond_exit": 0,
+    "lilypond_warnings": [],
+    "midi_files": [
+     "out.midi"
+    ],
+    "midi": {
+     "midi_offset_quarters": 0.0,
+     "truth_attacks": 37,
+     "midi_attacks": 37,
+     "grace_extras": 0,
+     "missing": 0,
+     "extra": 0,
+     "set_missing": 0,
+     "set_extra": 0,
+     "missing_sample": [],
+     "extra_sample": [],
+     "truth_syllables": 0,
+     "midi_syllables": 0,
+     "lyr_missing": 0,
+     "lyr_extra": 0,
+     "lyr_missing_sample": [],
+     "lyr_extra_sample": [],
+     "notes_ok": true,
+     "notes_exact": true,
+     "lyrics_ok": true
+    },
+    "clean_dpi": 300,
+    "clean": {
+     "clean_pages": 1,
+     "ly_pages": 1,
+     "pages": [
+      {
+       "size_delta": [
+        0,
+        0
+       ],
+       "ink_clean": 245196,
+       "ink_ly": 231972,
+       "clean_in_ly": 1.0,
+       "ly_in_clean": 1.0
+      }
+     ],
+     "min_overlap": 1.0,
+     "ok": true
+    },
+    "ok": true
+   }
+  },
+  {
+   "category": "time",
+   "id": "t02-compound-irregular",
+   "problems": [],
+   "warnings": [],
+   "scans": [
+    "scan-severe.pdf",
+    "scan.pdf"
+   ],
+   "xsd": {
+    "truth.musicxml": true
+   },
+   "truth": {
+    "parts": [
+     "Violoncello"
+    ],
+    "n_notes": 59,
+    "n_rests": 2,
+    "measures": 12,
+    "attacks": 54,
+    "syllables": 0,
+    "graces": 0
+   },
+   "music21": {
+    "parts": 1,
+    "notes_and_chords": 59,
+    "rests": 2
+   },
+   "pdfs": {
+    "clean.pdf": {
+     "file": "clean.pdf",
+     "opens": true,
+     "pages": 1,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 1,
+     "image_ppi": [
+      300
+     ],
+     "image_px": [
+      [
+       2481,
+       3508
+      ]
+     ],
+     "image_color": [
+      "gray"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    },
+    "scan-severe.pdf": {
+     "file": "scan-severe.pdf",
+     "opens": true,
+     "pages": 1,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 1,
+     "image_ppi": [
+      120
+     ],
+     "image_px": [
+      [
+       1090,
+       1501
+      ]
+     ],
+     "image_color": [
+      "rgb"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    },
+    "scan.pdf": {
+     "file": "scan.pdf",
+     "opens": true,
+     "pages": 1,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 1,
+     "image_ppi": [
+      250
+     ],
+     "image_px": [
+      [
+       2113,
+       2958
+      ]
+     ],
+     "image_color": [
+      "rgb"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    }
+   },
+   "hash": {
+    "engraving": "88e698db077b448d",
+    "truth": "a66b55a99c76ff22",
+    "clean": "667f46321e1c3847"
+   },
+   "render": {
+    "lilypond_exit": 0,
+    "lilypond_warnings": [],
+    "midi_files": [
+     "out.midi"
+    ],
+    "midi": {
+     "midi_offset_quarters": 0.0,
+     "truth_attacks": 54,
+     "midi_attacks": 54,
+     "grace_extras": 0,
+     "missing": 0,
+     "extra": 0,
+     "set_missing": 0,
+     "set_extra": 0,
+     "missing_sample": [],
+     "extra_sample": [],
+     "truth_syllables": 0,
+     "midi_syllables": 0,
+     "lyr_missing": 0,
+     "lyr_extra": 0,
+     "lyr_missing_sample": [],
+     "lyr_extra_sample": [],
+     "notes_ok": true,
+     "notes_exact": true,
+     "lyrics_ok": true
+    },
+    "clean_dpi": 300,
+    "clean": {
+     "clean_pages": 1,
+     "ly_pages": 1,
+     "pages": [
+      {
+       "size_delta": [
+        0,
+        0
+       ],
+       "ink_clean": 295073,
+       "ink_ly": 281683,
+       "clean_in_ly": 1.0,
+       "ly_in_clean": 1.0
+      }
+     ],
+     "min_overlap": 1.0,
+     "ok": true
+    },
+    "ok": true
+   }
+  },
+  {
+   "category": "time",
+   "id": "t03-common-cut-piano",
+   "problems": [],
+   "warnings": [],
+   "scans": [
+    "scan-severe.pdf",
+    "scan.pdf"
+   ],
+   "xsd": {
+    "truth.musicxml": true
+   },
+   "truth": {
+    "parts": [
+     "Piano"
+    ],
+    "n_notes": 85,
+    "n_rests": 2,
+    "measures": 11,
+    "attacks": 76,
+    "syllables": 0,
+    "graces": 0
+   },
+   "music21": {
+    "parts": 2,
+    "notes_and_chords": 54,
+    "rests": 2
+   },
+   "pdfs": {
+    "clean.pdf": {
+     "file": "clean.pdf",
+     "opens": true,
+     "pages": 1,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 1,
+     "image_ppi": [
+      300
+     ],
+     "image_px": [
+      [
+       2481,
+       3508
+      ]
+     ],
+     "image_color": [
+      "gray"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    },
+    "scan-severe.pdf": {
+     "file": "scan-severe.pdf",
+     "opens": true,
+     "pages": 1,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 1,
+     "image_ppi": [
+      120
+     ],
+     "image_px": [
+      [
+       1156,
+       1514
+      ]
+     ],
+     "image_color": [
+      "gray"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    },
+    "scan.pdf": {
+     "file": "scan.pdf",
+     "opens": true,
+     "pages": 1,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 1,
+     "image_ppi": [
+      200
+     ],
+     "image_px": [
+      [
+       1700,
+       2371
+      ]
+     ],
+     "image_color": [
+      "gray"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    }
+   },
+   "hash": {
+    "engraving": "1c9cdf8771bbdaeb",
+    "truth": "a003dc145a9260c8",
+    "clean": "e222d8de525c0076"
+   },
+   "render": {
+    "lilypond_exit": 0,
+    "lilypond_warnings": [],
+    "midi_files": [
+     "out.midi"
+    ],
+    "midi": {
+     "midi_offset_quarters": 0.0,
+     "truth_attacks": 76,
+     "midi_attacks": 76,
+     "grace_extras": 0,
+     "missing": 0,
+     "extra": 0,
+     "set_missing": 0,
+     "set_extra": 0,
+     "missing_sample": [],
+     "extra_sample": [],
+     "truth_syllables": 0,
+     "midi_syllables": 0,
+     "lyr_missing": 0,
+     "lyr_extra": 0,
+     "lyr_missing_sample": [],
+     "lyr_extra_sample": [],
+     "notes_ok": true,
+     "notes_exact": true,
+     "lyrics_ok": true
+    },
+    "clean_dpi": 300,
+    "clean": {
+     "clean_pages": 1,
+     "ly_pages": 1,
+     "pages": [
+      {
+       "size_delta": [
+        0,
+        0
+       ],
+       "ink_clean": 349687,
+       "ink_ly": 318163,
+       "clean_in_ly": 1.0,
+       "ly_in_clean": 1.0
+      }
+     ],
+     "min_overlap": 1.0,
+     "ok": true
+    },
+    "ok": true
+   }
+  },
+  {
+   "category": "time",
+   "id": "t04-pickup-song",
+   "problems": [],
+   "warnings": [],
+   "scans": [
+    "scan-severe.pdf",
+    "scan.pdf"
+   ],
+   "xsd": {
+    "truth.musicxml": true
+   },
+   "truth": {
+    "parts": [
+     "Voice"
+    ],
+    "n_notes": 34,
+    "n_rests": 1,
+    "measures": 13,
+    "attacks": 31,
+    "syllables": 29,
+    "graces": 0
+   },
+   "music21": {
+    "parts": 1,
+    "notes_and_chords": 34,
+    "rests": 1
+   },
+   "pdfs": {
+    "clean.pdf": {
+     "file": "clean.pdf",
+     "opens": true,
+     "pages": 1,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 1,
+     "image_ppi": [
+      300
+     ],
+     "image_px": [
+      [
+       2481,
+       3508
+      ]
+     ],
+     "image_color": [
+      "gray"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    },
+    "scan-severe.pdf": {
+     "file": "scan-severe.pdf",
+     "opens": true,
+     "pages": 1,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 1,
+     "image_ppi": [
+      150
+     ],
+     "image_px": [
+      [
+       1333,
+       1818
+      ]
+     ],
+     "image_color": [
+      "gray"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    },
+    "scan.pdf": {
+     "file": "scan.pdf",
+     "opens": true,
+     "pages": 1,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 1,
+     "image_ppi": [
+      300
+     ],
+     "image_px": [
+      [
+       2507,
+       3526
+      ]
+     ],
+     "image_color": [
+      "gray"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    }
+   },
+   "hash": {
+    "engraving": "1db279ad2cd7e691",
+    "truth": "b81d6b5b7005948e",
+    "clean": "1cc86249221a5620"
+   },
+   "render": {
+    "lilypond_exit": 0,
+    "lilypond_warnings": [],
+    "midi_files": [
+     "out.midi"
+    ],
+    "midi": {
+     "midi_offset_quarters": 0.0,
+     "truth_attacks": 31,
+     "midi_attacks": 31,
+     "grace_extras": 0,
+     "missing": 0,
+     "extra": 0,
+     "set_missing": 0,
+     "set_extra": 0,
+     "missing_sample": [],
+     "extra_sample": [],
+     "truth_syllables": 29,
+     "midi_syllables": 29,
+     "lyr_missing": 0,
+     "lyr_extra": 0,
+     "lyr_missing_sample": [],
+     "lyr_extra_sample": [],
+     "notes_ok": true,
+     "notes_exact": true,
+     "lyrics_ok": true
+    },
+    "clean_dpi": 300,
+    "clean": {
+     "clean_pages": 1,
+     "ly_pages": 1,
+     "pages": [
+      {
+       "size_delta": [
+        0,
+        0
+       ],
+       "ink_clean": 227200,
+       "ink_ly": 217690,
+       "clean_in_ly": 1.0,
+       "ly_in_clean": 1.0
+      }
+     ],
+     "min_overlap": 1.0,
+     "ok": true
+    },
+    "ok": true
+   }
+  },
+  {
+   "category": "time",
+   "id": "t05-triplets-duplets",
+   "problems": [],
+   "warnings": [],
+   "scans": [
+    "scan-severe.pdf",
+    "scan.pdf"
+   ],
+   "xsd": {
+    "truth.musicxml": true
+   },
+   "truth": {
+    "parts": [
+     "Oboe"
+    ],
+    "n_notes": 59,
+    "n_rests": 3,
+    "measures": 12,
+    "attacks": 58,
+    "syllables": 0,
+    "graces": 0
+   },
+   "music21": {
+    "parts": 1,
+    "notes_and_chords": 59,
+    "rests": 3
+   },
+   "pdfs": {
+    "clean.pdf": {
+     "file": "clean.pdf",
+     "opens": true,
+     "pages": 1,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 1,
+     "image_ppi": [
+      300
+     ],
+     "image_px": [
+      [
+       2481,
+       3508
+      ]
+     ],
+     "image_color": [
+      "gray"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    },
+    "scan-severe.pdf": {
+     "file": "scan-severe.pdf",
+     "opens": true,
+     "pages": 1,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 1,
+     "image_ppi": [
+      150
+     ],
+     "image_px": [
+      [
+       1317,
+       1808
+      ]
+     ],
+     "image_color": [
+      "rgb"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    },
+    "scan.pdf": {
+     "file": "scan.pdf",
+     "opens": true,
+     "pages": 1,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 1,
+     "image_ppi": [
+      300
+     ],
+     "image_px": [
+      [
+       2567,
+       3568
+      ]
+     ],
+     "image_color": [
+      "rgb"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    }
+   },
+   "hash": {
+    "engraving": "c3d6daf3a5cce083",
+    "truth": "f5c98bda9626b677",
+    "clean": "d74adbc43101031b"
+   },
+   "render": {
+    "lilypond_exit": 0,
+    "lilypond_warnings": [],
+    "midi_files": [
+     "out.midi"
+    ],
+    "midi": {
+     "midi_offset_quarters": 0.0,
+     "truth_attacks": 58,
+     "midi_attacks": 58,
+     "grace_extras": 0,
+     "missing": 0,
+     "extra": 0,
+     "set_missing": 0,
+     "set_extra": 0,
+     "missing_sample": [],
+     "extra_sample": [],
+     "truth_syllables": 0,
+     "midi_syllables": 0,
+     "lyr_missing": 0,
+     "lyr_extra": 0,
+     "lyr_missing_sample": [],
+     "lyr_extra_sample": [],
+     "notes_ok": true,
+     "notes_exact": true,
+     "lyrics_ok": true
+    },
+    "clean_dpi": 300,
+    "clean": {
+     "clean_pages": 1,
+     "ly_pages": 1,
+     "pages": [
+      {
+       "size_delta": [
+        0,
+        0
+       ],
+       "ink_clean": 239686,
+       "ink_ly": 237024,
+       "clean_in_ly": 1.0,
+       "ly_in_clean": 1.0
+      }
+     ],
+     "min_overlap": 1.0,
+     "ok": true
+    },
+    "ok": true
+   }
+  },
+  {
+   "category": "time",
+   "id": "t06-quint-sext-sept",
+   "problems": [],
+   "warnings": [],
+   "scans": [
+    "scan-severe.pdf",
+    "scan.pdf"
+   ],
+   "xsd": {
+    "truth.musicxml": true
+   },
+   "truth": {
+    "parts": [
+     "Flute"
+    ],
+    "n_notes": 78,
+    "n_rests": 1,
+    "measures": 9,
+    "attacks": 76,
+    "syllables": 0,
+    "graces": 0
+   },
+   "music21": {
+    "parts": 1,
+    "notes_and_chords": 78,
+    "rests": 1
+   },
+   "pdfs": {
+    "clean.pdf": {
+     "file": "clean.pdf",
+     "opens": true,
+     "pages": 1,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 1,
+     "image_ppi": [
+      300
+     ],
+     "image_px": [
+      [
+       2481,
+       3508
+      ]
+     ],
+     "image_color": [
+      "gray"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    },
+    "scan-severe.pdf": {
+     "file": "scan-severe.pdf",
+     "opens": true,
+     "pages": 1,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 1,
+     "image_ppi": [
+      100
+     ],
+     "image_px": [
+      [
+       926,
+       1237
+      ]
+     ],
+     "image_color": [
+      "gray"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    },
+    "scan.pdf": {
+     "file": "scan.pdf",
+     "opens": true,
+     "pages": 1,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 1,
+     "image_ppi": [
+      250
+     ],
+     "image_px": [
+      [
+       2103,
+       2950
+      ]
+     ],
+     "image_color": [
+      "gray"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    }
+   },
+   "hash": {
+    "engraving": "682a0ccd9d977ed9",
+    "truth": "7a346efade80250a",
+    "clean": "cfff64c742aca98f"
+   },
+   "render": {
+    "lilypond_exit": 0,
+    "lilypond_warnings": [],
+    "midi_files": [
+     "out.midi"
+    ],
+    "midi": {
+     "midi_offset_quarters": 0.0,
+     "truth_attacks": 76,
+     "midi_attacks": 76,
+     "grace_extras": 0,
+     "missing": 0,
+     "extra": 0,
+     "set_missing": 0,
+     "set_extra": 0,
+     "missing_sample": [],
+     "extra_sample": [],
+     "truth_syllables": 0,
+     "midi_syllables": 0,
+     "lyr_missing": 0,
+     "lyr_extra": 0,
+     "lyr_missing_sample": [],
+     "lyr_extra_sample": [],
+     "notes_ok": true,
+     "notes_exact": true,
+     "lyrics_ok": true
+    },
+    "clean_dpi": 300,
+    "clean": {
+     "clean_pages": 1,
+     "ly_pages": 1,
+     "pages": [
+      {
+       "size_delta": [
+        0,
+        0
+       ],
+       "ink_clean": 239602,
+       "ink_ly": 236820,
+       "clean_in_ly": 1.0,
+       "ly_in_clean": 1.0
+      }
+     ],
+     "min_overlap": 1.0,
+     "ok": true
+    },
+    "ok": true
+   }
+  },
+  {
+   "category": "time",
+   "id": "t07-nested-tuplets",
+   "problems": [],
+   "warnings": [],
+   "scans": [
+    "scan-severe.pdf",
+    "scan.pdf"
+   ],
+   "xsd": {
+    "truth.musicxml": true
+   },
+   "truth": {
+    "parts": [
+     "Violin"
+    ],
+    "n_notes": 52,
+    "n_rests": 1,
+    "measures": 7,
+    "attacks": 51,
+    "syllables": 0,
+    "graces": 0
+   },
+   "music21": {
+    "parts": 1,
+    "notes_and_chords": 52,
+    "rests": 1
+   },
+   "pdfs": {
+    "clean.pdf": {
+     "file": "clean.pdf",
+     "opens": true,
+     "pages": 1,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 1,
+     "image_ppi": [
+      300
+     ],
+     "image_px": [
+      [
+       2481,
+       3508
+      ]
+     ],
+     "image_color": [
+      "gray"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    },
+    "scan-severe.pdf": {
+     "file": "scan-severe.pdf",
+     "opens": true,
+     "pages": 1,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 1,
+     "image_ppi": [
+      200
+     ],
+     "image_px": [
+      [
+       1890,
+       2501
+      ]
+     ],
+     "image_color": [
+      "gray"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    },
+    "scan.pdf": {
+     "file": "scan.pdf",
+     "opens": true,
+     "pages": 1,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 1,
+     "image_ppi": [
+      300
+     ],
+     "image_px": [
+      [
+       2501,
+       3522
+      ]
+     ],
+     "image_color": [
+      "gray"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    }
+   },
+   "hash": {
+    "engraving": "eb0b7da20be0198f",
+    "truth": "56eb916a62a0231c",
+    "clean": "20589e0d66f28bac"
+   },
+   "render": {
+    "lilypond_exit": 0,
+    "lilypond_warnings": [],
+    "midi_files": [
+     "out.midi"
+    ],
+    "midi": {
+     "midi_offset_quarters": 0.0,
+     "truth_attacks": 51,
+     "midi_attacks": 51,
+     "grace_extras": 0,
+     "missing": 0,
+     "extra": 0,
+     "set_missing": 0,
+     "set_extra": 0,
+     "missing_sample": [],
+     "extra_sample": [],
+     "truth_syllables": 0,
+     "midi_syllables": 0,
+     "lyr_missing": 0,
+     "lyr_extra": 0,
+     "lyr_missing_sample": [],
+     "lyr_extra_sample": [],
+     "notes_ok": true,
+     "notes_exact": true,
+     "lyrics_ok": true
+    },
+    "clean_dpi": 300,
+    "clean": {
+     "clean_pages": 1,
+     "ly_pages": 1,
+     "pages": [
+      {
+       "size_delta": [
+        0,
+        0
+       ],
+       "ink_clean": 259629,
+       "ink_ly": 245557,
+       "clean_in_ly": 1.0,
+       "ly_in_clean": 1.0
+      }
+     ],
+     "min_overlap": 1.0,
+     "ok": true
+    },
+    "ok": true
+   }
+  },
+  {
+   "category": "time",
+   "id": "t08-ties-systems-pages",
+   "problems": [],
+   "warnings": [],
+   "scans": [
+    "scan-severe.pdf",
+    "scan.pdf"
+   ],
+   "xsd": {
+    "truth.musicxml": true
+   },
+   "truth": {
+    "parts": [
+     "Piano"
+    ],
+    "n_notes": 77,
+    "n_rests": 2,
+    "measures": 16,
+    "attacks": 51,
+    "syllables": 0,
+    "graces": 0
+   },
+   "music21": {
+    "parts": 2,
+    "notes_and_chords": 69,
+    "rests": 2
+   },
+   "pdfs": {
+    "clean.pdf": {
+     "file": "clean.pdf",
+     "opens": true,
+     "pages": 2,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 2,
+     "image_ppi": [
+      300
+     ],
+     "image_px": [
+      [
+       2481,
+       3508
+      ],
+      [
+       2481,
+       3508
+      ]
+     ],
+     "image_color": [
+      "gray"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    },
+    "scan-severe.pdf": {
+     "file": "scan-severe.pdf",
+     "opens": true,
+     "pages": 1,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 1,
+     "image_ppi": [
+      150
+     ],
+     "image_px": [
+      [
+       2683,
+       1952
+      ]
+     ],
+     "image_color": [
+      "rgb"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    },
+    "scan.pdf": {
+     "file": "scan.pdf",
+     "opens": true,
+     "pages": 2,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 2,
+     "image_ppi": [
+      200
+     ],
+     "image_px": [
+      [
+       1688,
+       2363
+      ],
+      [
+       1676,
+       2355
+      ]
+     ],
+     "image_color": [
+      "gray"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    }
+   },
+   "hash": {
+    "engraving": "0f8ad30e3cd0fc7b",
+    "truth": "ef3c5e1e97f85071",
+    "clean": "c1644d92c4353416"
+   },
+   "render": {
+    "lilypond_exit": 0,
+    "lilypond_warnings": [],
+    "midi_files": [
+     "out.midi"
+    ],
+    "midi": {
+     "midi_offset_quarters": 0.0,
+     "truth_attacks": 51,
+     "midi_attacks": 51,
+     "grace_extras": 0,
+     "missing": 0,
+     "extra": 0,
+     "set_missing": 0,
+     "set_extra": 0,
+     "missing_sample": [],
+     "extra_sample": [],
+     "truth_syllables": 0,
+     "midi_syllables": 0,
+     "lyr_missing": 0,
+     "lyr_extra": 0,
+     "lyr_missing_sample": [],
+     "lyr_extra_sample": [],
+     "notes_ok": true,
+     "notes_exact": true,
+     "lyrics_ok": true
+    },
+    "clean_dpi": 300,
+    "clean": {
+     "clean_pages": 2,
+     "ly_pages": 2,
+     "pages": [
+      {
+       "size_delta": [
+        0,
+        0
+       ],
+       "ink_clean": 313446,
+       "ink_ly": 297821,
+       "clean_in_ly": 1.0,
+       "ly_in_clean": 1.0
+      },
+      {
+       "size_delta": [
+        0,
+        0
+       ],
+       "ink_clean": 286990,
+       "ink_ly": 272646,
+       "clean_in_ly": 1.0,
+       "ly_in_clean": 1.0
+      }
+     ],
+     "min_overlap": 1.0,
+     "ok": true
+    },
+    "ok": true
+   }
+  },
+  {
+   "category": "time",
+   "id": "t09-two-voices-guitar",
+   "problems": [],
+   "warnings": [],
+   "scans": [
+    "scan-severe.pdf",
+    "scan.pdf"
+   ],
+   "xsd": {
+    "truth.musicxml": true
+   },
+   "truth": {
+    "parts": [
+     "Guitar"
+    ],
+    "n_notes": 37,
+    "n_rests": 1,
+    "measures": 8,
+    "attacks": 31,
+    "syllables": 0,
+    "graces": 0
+   },
+   "music21": {
+    "parts": 1,
+    "notes_and_chords": 37,
+    "rests": 1
+   },
+   "pdfs": {
+    "clean.pdf": {
+     "file": "clean.pdf",
+     "opens": true,
+     "pages": 1,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 1,
+     "image_ppi": [
+      300
+     ],
+     "image_px": [
+      [
+       2481,
+       3508
+      ]
+     ],
+     "image_color": [
+      "gray"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    },
+    "scan-severe.pdf": {
+     "file": "scan-severe.pdf",
+     "opens": true,
+     "pages": 1,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 1,
+     "image_ppi": [
+      200
+     ],
+     "image_px": [
+      [
+       1814,
+       2449
+      ]
+     ],
+     "image_color": [
+      "gray"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    },
+    "scan.pdf": {
+     "file": "scan.pdf",
+     "opens": true,
+     "pages": 1,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 1,
+     "image_ppi": [
+      300
+     ],
+     "image_px": [
+      [
+       2543,
+       3552
+      ]
+     ],
+     "image_color": [
+      "gray"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    }
+   },
+   "hash": {
+    "engraving": "3485b4ea53ef8798",
+    "truth": "e610a44be884d99e",
+    "clean": "cf64fafe1a42c17f"
+   },
+   "render": {
+    "lilypond_exit": 0,
+    "lilypond_warnings": [],
+    "midi_files": [
+     "out.midi"
+    ],
+    "midi": {
+     "midi_offset_quarters": 0.0,
+     "truth_attacks": 31,
+     "midi_attacks": 31,
+     "grace_extras": 0,
+     "missing": 0,
+     "extra": 0,
+     "set_missing": 0,
+     "set_extra": 0,
+     "missing_sample": [],
+     "extra_sample": [],
+     "truth_syllables": 0,
+     "midi_syllables": 0,
+     "lyr_missing": 0,
+     "lyr_extra": 0,
+     "lyr_missing_sample": [],
+     "lyr_extra_sample": [],
+     "notes_ok": true,
+     "notes_exact": true,
+     "lyrics_ok": true
+    },
+    "clean_dpi": 300,
+    "clean": {
+     "clean_pages": 1,
+     "ly_pages": 1,
+     "pages": [
+      {
+       "size_delta": [
+        0,
+        0
+       ],
+       "ink_clean": 135597,
+       "ink_ly": 134275,
+       "clean_in_ly": 1.0,
+       "ly_in_clean": 1.0
+      }
+     ],
+     "min_overlap": 1.0,
+     "ok": true
+    },
+    "ok": true
+   }
+  },
+  {
+   "category": "time",
+   "id": "t10-quartet-meters",
+   "problems": [],
+   "warnings": [],
+   "scans": [
+    "scan-severe.pdf",
+    "scan.pdf"
+   ],
+   "xsd": {
+    "truth.musicxml": true
+   },
+   "truth": {
+    "parts": [
+     "Violin I",
+     "Violin II",
+     "Viola",
+     "Violoncello"
+    ],
+    "n_notes": 89,
+    "n_rests": 0,
+    "measures": 8,
+    "attacks": 84,
+    "syllables": 0,
+    "graces": 0
+   },
+   "music21": {
+    "parts": 4,
+    "notes_and_chords": 89,
+    "rests": 0
+   },
+   "pdfs": {
+    "clean.pdf": {
+     "file": "clean.pdf",
+     "opens": true,
+     "pages": 1,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 1,
+     "image_ppi": [
+      300
+     ],
+     "image_px": [
+      [
+       2481,
+       3508
+      ]
+     ],
+     "image_color": [
+      "gray"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    },
+    "scan-severe.pdf": {
+     "file": "scan-severe.pdf",
+     "opens": true,
+     "pages": 1,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 1,
+     "image_ppi": [
+      110
+     ],
+     "image_px": [
+      [
+       1000,
+       1377
+      ]
+     ],
+     "image_color": [
+      "rgb"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    },
+    "scan.pdf": {
+     "file": "scan.pdf",
+     "opens": true,
+     "pages": 1,
+     "fonts": 0,
+     "text_chars": 0,
+     "images": 1,
+     "image_ppi": [
+      250
+     ],
+     "image_px": [
+      [
+       2113,
+       2958
+      ]
+     ],
+     "image_color": [
+      "gray"
+     ],
+     "renders": true,
+     "image_only": true,
+     "ok": true
+    }
+   },
+   "hash": {
+    "engraving": "73bc08c83f948e63",
+    "truth": "77e549992d873db0",
+    "clean": "a666b39432f541c2"
+   },
+   "render": {
+    "lilypond_exit": 0,
+    "lilypond_warnings": [],
+    "midi_files": [
+     "out.midi"
+    ],
+    "midi": {
+     "midi_offset_quarters": 0.0,
+     "truth_attacks": 84,
+     "midi_attacks": 84,
+     "grace_extras": 0,
+     "missing": 0,
+     "extra": 0,
+     "set_missing": 0,
+     "set_extra": 0,
+     "missing_sample": [],
+     "extra_sample": [],
+     "truth_syllables": 0,
+     "midi_syllables": 0,
+     "lyr_missing": 0,
+     "lyr_extra": 0,
+     "lyr_missing_sample": [],
+     "lyr_extra_sample": [],
+     "notes_ok": true,
+     "notes_exact": true,
+     "lyrics_ok": true
+    },
+    "clean_dpi": 300,
+    "clean": {
+     "clean_pages": 1,
+     "ly_pages": 1,
+     "pages": [
+      {
+       "size_delta": [
+        0,
+        0
+       ],
+       "ink_clean": 516718,
+       "ink_ly": 483961,
+       "clean_in_ly": 1.0,
+       "ly_in_clean": 1.0
+      }
+     ],
+     "min_overlap": 1.0,
+     "ok": true
+    },
+    "ok": true
+   }
+  }
+ ]
+}

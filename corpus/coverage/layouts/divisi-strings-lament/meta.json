@@ -1,0 +1,371 @@
+{
+  "id": "divisi-strings-lament",
+  "family": "layouts",
+  "title": "Lament - string orchestra with divisi (two voices on one staff, and chords)",
+  "layout": "divisi",
+  "symbols": [
+    "acc-sharp",
+    "beam",
+    "chord",
+    "clef-alto",
+    "clef-bass",
+    "clef-treble",
+    "dyn-f",
+    "dyn-mf",
+    "fermata",
+    "hairpin-cresc",
+    "key-s1",
+    "ledger-above",
+    "ledger-below",
+    "metronome",
+    "note-8th",
+    "note-half",
+    "note-quarter",
+    "note-whole",
+    "stem-down",
+    "stem-up",
+    "system-break",
+    "tempo-mark",
+    "text-expression",
+    "time-4-4",
+    "x-group-bracket",
+    "x-measures",
+    "x-parts",
+    "x-staves",
+    "x-two-voice-staff-measure"
+  ],
+  "counts": {
+    "acc-sharp": 6,
+    "beam": 4,
+    "chord": 11,
+    "clef-alto": 1,
+    "clef-bass": 1,
+    "clef-treble": 2,
+    "dyn-f": 4,
+    "dyn-mf": 4,
+    "fermata": 5,
+    "hairpin-cresc": 4,
+    "key-s1": 1,
+    "ledger-above": 4,
+    "ledger-below": 1,
+    "metronome": 1,
+    "note-8th": 8,
+    "note-half": 18,
+    "note-quarter": 84,
+    "note-whole": 5,
+    "stem-down": 73,
+    "stem-up": 37,
+    "system-break": 1,
+    "tempo-mark": 1,
+    "text-expression": 5,
+    "time-4-4": 1,
+    "x-group-bracket": 1,
+    "x-measures": 8,
+    "x-parts": 4,
+    "x-staves": 4,
+    "x-two-voice-staff-measure": 4
+  },
+  "expected": {
+    "parts": [
+      "Violin I",
+      "Violin II",
+      "Viola",
+      "Violoncello"
+    ],
+    "must_not_split": true,
+    "shared_staves": [],
+    "staves_per_part": {
+      "Violin I": 1,
+      "Violin II": 1,
+      "Viola": 1,
+      "Violoncello": 1
+    },
+    "lyrics": [],
+    "notes": "FOUR parts: Violin I, Violin II, Viola, Violoncello. Violin I is \"div.\" in mm.3-4 and mm.7-8: two voices on its staff (upper stems up, lower stems down) that BOTH belong to the Violin I part (truth: voice 1 and voice 2) - do not create a fifth part. Violin II plays its divisi as two-note chords (mm.3-4, 7-8): chords stay chords. \"div.\"/\"unis.\" are words directions."
+  },
+  "notes": [
+    "Violin I voice 2 exists only in the divisi measures; elsewhere it is empty (<forward>)."
+  ],
+  "layout_description": "A4 portrait, staff size 19, 2 systems of 4 measures on 4 bracketed staves",
+  "pages": 1,
+  "measures": 8,
+  "systems": 2,
+  "noteheads_in_truth": 126,
+  "hidden_staff_segments": [],
+  "dpi": 200,
+  "degradations": {
+    "clean.pdf": {
+      "seed": null,
+      "dpi": 300,
+      "format": "png (8-bit grey)",
+      "summary": "undamaged raster of the engraving",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "size_px": [
+            2481,
+            3508
+          ]
+        }
+      ],
+      "bytes": 111857
+    },
+    "scan.pdf": {
+      "seed": 7161,
+      "render_dpi": 200,
+      "dpi": 200,
+      "format": "jpeg q70",
+      "colour": "gray",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1654,
+            2339
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              3
+            ],
+            [
+              "skew_rotation_deg",
+              -0.9
+            ],
+            [
+              "lighting_gradient",
+              {
+                "strength": 0.05,
+                "angle_deg": 2.6
+              }
+            ],
+            [
+              "focus_blur_sigma",
+              0.5
+            ],
+            [
+              "gaussian_noise_sigma",
+              4
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 200,
+        "mode": "gray",
+        "texture": 3,
+        "rotate": -0.9,
+        "gradient": 0.05,
+        "blur": 0.5,
+        "noise": 4,
+        "jpeg": 70
+      },
+      "summary": "200 dpi grey office scan, -0.9 deg skew, slight lighting gradient, noise, JPEG q70",
+      "bytes": 337162
+    },
+    "scan-severe.pdf": {
+      "seed": 7162,
+      "render_dpi": 150,
+      "dpi": 150,
+      "format": "jpeg q30",
+      "colour": "rgb",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1241,
+            1754
+          ],
+          "ops": [
+            [
+              "pencil_annotations",
+              {
+                "circled": [
+                  [
+                    752,
+                    673
+                  ],
+                  [
+                    182,
+                    689
+                  ]
+                ],
+                "marks": [
+                  [
+                    840,
+                    258
+                  ],
+                  [
+                    972,
+                    348
+                  ],
+                  [
+                    440,
+                    883
+                  ]
+                ],
+                "texts": [
+                  [
+                    "rit.",
+                    954,
+                    861
+                  ],
+                  [
+                    "breathe",
+                    469,
+                    637
+                  ],
+                  [
+                    "p!",
+                    628,
+                    669
+                  ]
+                ],
+                "lines": 1
+              }
+            ],
+            [
+              "bleed_through",
+              {
+                "strength": 0.12,
+                "shift_px": -10
+              }
+            ],
+            [
+              "paper_texture",
+              6
+            ],
+            [
+              "paper_colour",
+              [
+                236,
+                226,
+                198
+              ]
+            ],
+            [
+              "stains",
+              {
+                "coffee": [
+                  [
+                    580,
+                    692,
+                    124
+                  ]
+                ],
+                "foxing": 40
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              2.0
+            ],
+            [
+              "focus_blur_sigma",
+              0.7
+            ],
+            [
+              "gaussian_noise_sigma",
+              6
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 150,
+        "mode": "rgb",
+        "paper_rgb": [
+          236,
+          226,
+          198
+        ],
+        "texture": 6,
+        "bleed": 0.12,
+        "foxing": {
+          "n": 40
+        },
+        "coffee": {
+          "n": 1,
+          "r": 0.1,
+          "strength": 0.9
+        },
+        "pencil": {
+          "circles": 2,
+          "marks": 3,
+          "texts": [
+            "rit.",
+            "breathe",
+            "p!"
+          ],
+          "lines": 1
+        },
+        "rotate": 2.0,
+        "blur": 0.7,
+        "noise": 6,
+        "jpeg": 30
+      },
+      "summary": "old yellowed copy: bleed-through, foxing, coffee ring, pencil annotations, 150 dpi colour, 2 deg skew, JPEG q30",
+      "bytes": 120035
+    }
+  },
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "scan-severe.pdf",
+    "scan.pdf",
+    "truth.musicxml"
+  ],
+  "license": "CC0",
+  "license_detail": "CC0-1.0: composition, arrangement, engraving and scans",
+  "source": "self-authored for the coverage suite (2026)",
+  "engraver": "internal model -> LilyPond 2.24 (coverage-suite writer: explicit beams and stems)",
+  "validation": {
+    "xsd_valid": true,
+    "music21_parse": "4 115",
+    "midi_attacks_match_truth": true,
+    "attacks": 126,
+    "grob_log_matches_truth": true,
+    "printed_summary": {
+      "noteheads": 126,
+      "stems_up": 37,
+      "stems_down": 73,
+      "accidentals": 6,
+      "rests": 0,
+      "beams": 4,
+      "flags": 0,
+      "slurs": 0,
+      "ties": 0,
+      "scripts": {
+        "fermata": 5
+      },
+      "dynamics": {
+        "mf": 4,
+        "f": 4
+      },
+      "lyric_syllables": 0,
+      "hyphens": 0,
+      "extenders": 0,
+      "chord_names": 0,
+      "system_delimiters": {
+        "SystemStartBracket": 2
+      }
+    },
+    "lilypond_warnings": [],
+    "lyric_syllables_found_in_engraving": null,
+    "lyric_syllables": 0,
+    "pages_planned": 1,
+    "image_only": {
+      "clean.pdf": true,
+      "scan.pdf": true,
+      "scan-severe.pdf": true
+    }
+  }
+}

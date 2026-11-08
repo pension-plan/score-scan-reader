@@ -1,0 +1,521 @@
+{
+  "id": "melody-cello-elegy-2page",
+  "family": "layouts",
+  "title": "Elegy - two-page solo cello melody (bass clef, tenor-clef passage)",
+  "layout": "melody",
+  "symbols": [
+    "acc-sharp",
+    "accent",
+    "beam",
+    "clef-bass",
+    "clef-change",
+    "clef-tenor",
+    "dot",
+    "dyn-f",
+    "dyn-mf",
+    "dyn-p",
+    "fermata",
+    "flag",
+    "hairpin-dim",
+    "key-f2",
+    "ledger-above",
+    "ledger-below",
+    "metronome",
+    "multi-page",
+    "note-8th",
+    "note-half",
+    "note-quarter",
+    "page-break",
+    "rest-quarter",
+    "slur",
+    "stem-down",
+    "stem-up",
+    "system-break",
+    "tempo-mark",
+    "tenuto",
+    "tie",
+    "time-3-4",
+    "x-measures",
+    "x-parts",
+    "x-staves"
+  ],
+  "counts": {
+    "acc-sharp": 2,
+    "accent": 3,
+    "beam": 3,
+    "clef-bass": 2,
+    "clef-change": 2,
+    "clef-tenor": 1,
+    "dot": 4,
+    "dyn-f": 1,
+    "dyn-mf": 1,
+    "dyn-p": 2,
+    "fermata": 1,
+    "flag": 1,
+    "hairpin-dim": 1,
+    "key-f2": 1,
+    "ledger-above": 3,
+    "ledger-below": 1,
+    "metronome": 1,
+    "multi-page": 1,
+    "note-8th": 7,
+    "note-half": 5,
+    "note-quarter": 28,
+    "page-break": 1,
+    "rest-quarter": 3,
+    "slur": 7,
+    "stem-down": 29,
+    "stem-up": 11,
+    "system-break": 2,
+    "tempo-mark": 1,
+    "tenuto": 2,
+    "tie": 1,
+    "time-3-4": 1,
+    "x-measures": 16,
+    "x-parts": 1,
+    "x-staves": 1
+  },
+  "expected": {
+    "parts": [
+      "Violoncello"
+    ],
+    "must_not_split": false,
+    "shared_staves": [],
+    "staves_per_part": {
+      "Violoncello": 1
+    },
+    "lyrics": [],
+    "notes": "ONE part \"Violoncello\", one staff, one voice, two pages (forced page break before m.9). The clef changes to tenor clef at m.9 (start of page 2) and back to bass clef at m.13 (start of the last system); pitches are unaffected by the clef changes."
+  },
+  "notes": [
+    "Page numbers are printed (page 2) and recorded only as a <credit> on page 2."
+  ],
+  "layout_description": "A4 portrait, staff size 24, page 1: title + 2 systems, page 2: 2 systems; full name on the first system, \"Vc.\" afterwards",
+  "pages": 2,
+  "measures": 16,
+  "systems": 4,
+  "noteheads_in_truth": 40,
+  "hidden_staff_segments": [],
+  "dpi": 240,
+  "degradations": {
+    "clean.pdf": {
+      "seed": null,
+      "dpi": 300,
+      "format": "png (8-bit grey)",
+      "summary": "undamaged raster of the engraving",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "size_px": [
+            2481,
+            3508
+          ]
+        },
+        {
+          "image": 2,
+          "size_px": [
+            2481,
+            3508
+          ]
+        }
+      ],
+      "bytes": 100219
+    },
+    "scan.pdf": {
+      "seed": 7201,
+      "render_dpi": 240,
+      "dpi": 240,
+      "format": "jpeg q72",
+      "colour": "gray",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1985,
+            2807
+          ],
+          "ops": [
+            [
+              "bleed_through",
+              {
+                "strength": 0.04,
+                "shift_px": 7
+              }
+            ],
+            [
+              "paper_texture",
+              2
+            ],
+            [
+              "skew_rotation_deg",
+              -0.5
+            ],
+            [
+              "focus_blur_sigma",
+              0.45
+            ],
+            [
+              "gaussian_noise_sigma",
+              3
+            ]
+          ]
+        },
+        {
+          "image": 2,
+          "source_pages": [
+            2
+          ],
+          "size_px": [
+            1985,
+            2807
+          ],
+          "ops": [
+            [
+              "bleed_through",
+              {
+                "strength": 0.04,
+                "shift_px": 2
+              }
+            ],
+            [
+              "paper_texture",
+              2
+            ],
+            [
+              "skew_rotation_deg",
+              -0.5
+            ],
+            [
+              "focus_blur_sigma",
+              0.45
+            ],
+            [
+              "gaussian_noise_sigma",
+              3
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 240,
+        "mode": "gray",
+        "texture": 2,
+        "rotate": -0.5,
+        "bleed": 0.04,
+        "blur": 0.45,
+        "noise": 3,
+        "jpeg": 72
+      },
+      "summary": "240 dpi grey scan, -0.5 deg skew, faint bleed-through, JPEG q72",
+      "bytes": 517043
+    },
+    "scan-severe.pdf": {
+      "seed": 7202,
+      "render_dpi": 150,
+      "dpi": 150,
+      "format": "jpeg q30",
+      "colour": "rgb",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1241,
+            1754
+          ],
+          "ops": [
+            [
+              "pencil_annotations",
+              {
+                "circled": [
+                  [
+                    1058,
+                    553
+                  ],
+                  [
+                    513,
+                    325
+                  ]
+                ],
+                "marks": [
+                  [
+                    703,
+                    310
+                  ],
+                  [
+                    346,
+                    519
+                  ],
+                  [
+                    298,
+                    313
+                  ]
+                ],
+                "texts": [
+                  [
+                    "rit.",
+                    633,
+                    294
+                  ],
+                  [
+                    "breathe",
+                    623,
+                    542
+                  ],
+                  [
+                    "p!",
+                    589,
+                    261
+                  ]
+                ],
+                "lines": 1
+              }
+            ],
+            [
+              "bleed_through",
+              {
+                "strength": 0.12,
+                "shift_px": 1
+              }
+            ],
+            [
+              "paper_texture",
+              6
+            ],
+            [
+              "paper_colour",
+              [
+                236,
+                226,
+                198
+              ]
+            ],
+            [
+              "stains",
+              {
+                "coffee": [
+                  [
+                    207,
+                    614,
+                    124
+                  ]
+                ],
+                "foxing": 40
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              2.0
+            ],
+            [
+              "focus_blur_sigma",
+              0.7
+            ],
+            [
+              "gaussian_noise_sigma",
+              6
+            ]
+          ]
+        },
+        {
+          "image": 2,
+          "source_pages": [
+            2
+          ],
+          "size_px": [
+            1241,
+            1754
+          ],
+          "ops": [
+            [
+              "pencil_annotations",
+              {
+                "circled": [
+                  [
+                    190,
+                    180
+                  ],
+                  [
+                    172,
+                    410
+                  ]
+                ],
+                "marks": [
+                  [
+                    637,
+                    146
+                  ],
+                  [
+                    152,
+                    146
+                  ],
+                  [
+                    565,
+                    121
+                  ]
+                ],
+                "texts": [
+                  [
+                    "rit.",
+                    580,
+                    417
+                  ],
+                  [
+                    "breathe",
+                    771,
+                    393
+                  ],
+                  [
+                    "p!",
+                    537,
+                    124
+                  ]
+                ],
+                "lines": 1
+              }
+            ],
+            [
+              "bleed_through",
+              {
+                "strength": 0.12,
+                "shift_px": -2
+              }
+            ],
+            [
+              "paper_texture",
+              6
+            ],
+            [
+              "paper_colour",
+              [
+                236,
+                226,
+                198
+              ]
+            ],
+            [
+              "stains",
+              {
+                "coffee": [
+                  [
+                    750,
+                    1024,
+                    124
+                  ]
+                ],
+                "foxing": 40
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              2.0
+            ],
+            [
+              "focus_blur_sigma",
+              0.7
+            ],
+            [
+              "gaussian_noise_sigma",
+              6
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 150,
+        "mode": "rgb",
+        "paper_rgb": [
+          236,
+          226,
+          198
+        ],
+        "texture": 6,
+        "bleed": 0.12,
+        "foxing": {
+          "n": 40
+        },
+        "coffee": {
+          "n": 1,
+          "r": 0.1,
+          "strength": 0.9
+        },
+        "pencil": {
+          "circles": 2,
+          "marks": 3,
+          "texts": [
+            "rit.",
+            "breathe",
+            "p!"
+          ],
+          "lines": 1
+        },
+        "rotate": 2.0,
+        "blur": 0.7,
+        "noise": 6,
+        "jpeg": 30
+      },
+      "summary": "old yellowed copy: bleed-through, foxing, coffee ring, pencil annotations, 150 dpi colour, 2 deg skew, JPEG q30",
+      "bytes": 145980
+    }
+  },
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "scan-severe.pdf",
+    "scan.pdf",
+    "truth.musicxml"
+  ],
+  "license": "CC0",
+  "license_detail": "CC0-1.0: composition, arrangement, engraving and scans",
+  "source": "self-authored for the coverage suite (2026)",
+  "engraver": "internal model -> LilyPond 2.24 (coverage-suite writer: explicit beams and stems)",
+  "validation": {
+    "xsd_valid": true,
+    "music21_parse": "1 40",
+    "midi_attacks_match_truth": true,
+    "attacks": 39,
+    "grob_log_matches_truth": true,
+    "printed_summary": {
+      "noteheads": 40,
+      "stems_up": 11,
+      "stems_down": 29,
+      "accidentals": 2,
+      "rests": 3,
+      "beams": 3,
+      "flags": 1,
+      "slurs": 7,
+      "ties": 1,
+      "scripts": {
+        "sforzato": 3,
+        "tenuto": 2,
+        "fermata": 1
+      },
+      "dynamics": {
+        "p": 2,
+        "mf": 1,
+        "f": 1
+      },
+      "lyric_syllables": 0,
+      "hyphens": 0,
+      "extenders": 0,
+      "chord_names": 0,
+      "system_delimiters": {}
+    },
+    "lilypond_warnings": [],
+    "lyric_syllables_found_in_engraving": null,
+    "lyric_syllables": 0,
+    "pages_planned": 2,
+    "image_only": {
+      "clean.pdf": true,
+      "scan.pdf": true,
+      "scan-severe.pdf": true
+    }
+  }
+}

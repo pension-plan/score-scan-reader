@@ -1,0 +1,304 @@
+{
+  "id": "divisi-choir-bright-new-day",
+  "family": "layouts",
+  "title": "Bright New Day - open SATB with soprano divisi (two voices) and bass octave divisi (chords)",
+  "layout": "divisi",
+  "symbols": [
+    "chord",
+    "clef-bass",
+    "clef-treble",
+    "clef-treble-8vb",
+    "dyn-f",
+    "dyn-mf",
+    "fermata",
+    "key-0",
+    "ledger-below",
+    "lyrics",
+    "lyrics-hyphen",
+    "metronome",
+    "note-half",
+    "note-quarter",
+    "stem-down",
+    "stem-up",
+    "system-break",
+    "tempo-mark",
+    "text-expression",
+    "time-4-4",
+    "x-group-bracket",
+    "x-measures",
+    "x-parts",
+    "x-staves",
+    "x-two-voice-staff-measure"
+  ],
+  "counts": {
+    "chord": 7,
+    "clef-bass": 1,
+    "clef-treble": 2,
+    "clef-treble-8vb": 1,
+    "dyn-f": 1,
+    "dyn-mf": 4,
+    "fermata": 4,
+    "key-0": 1,
+    "ledger-below": 4,
+    "lyrics": 112,
+    "lyrics-hyphen": 16,
+    "metronome": 1,
+    "note-half": 17,
+    "note-quarter": 102,
+    "stem-down": 55,
+    "stem-up": 64,
+    "system-break": 1,
+    "tempo-mark": 1,
+    "text-expression": 3,
+    "time-4-4": 1,
+    "x-group-bracket": 1,
+    "x-measures": 8,
+    "x-parts": 4,
+    "x-staves": 4,
+    "x-two-voice-staff-measure": 2
+  },
+  "expected": {
+    "parts": [
+      "Soprano",
+      "Alto",
+      "Tenor",
+      "Bass"
+    ],
+    "must_not_split": true,
+    "shared_staves": [],
+    "staves_per_part": {
+      "Soprano": 1,
+      "Alto": 1,
+      "Tenor": 1,
+      "Bass": 1
+    },
+    "lyrics": [
+      {
+        "part": "Soprano",
+        "verses": 1
+      },
+      {
+        "part": "Alto",
+        "verses": 1
+      },
+      {
+        "part": "Tenor",
+        "verses": 1
+      },
+      {
+        "part": "Bass",
+        "verses": 1
+      }
+    ],
+    "notes": "FOUR parts, one per staff: Soprano, Alto, Tenor (treble-8 clef, sounding pitches), Bass. In mm.5-6 the Soprano staff is \"div.\": two voices (stems up/down) that both belong to the Soprano part (truth: voice 1 and 2; only voice 1 carries the lyrics) - back to \"unis.\" in m.7. In mm.7-8 the Bass sings octave chords (\"div.\"), which stay chords in the Bass part. Every staff has its own lyric line."
+  },
+  "notes": [
+    "Soprano voice 2 exists only in mm.5-6 (elsewhere <forward>); it carries no lyrics."
+  ],
+  "layout_description": "A4 portrait, staff size 18, 2 systems of 4 measures on 4 bracketed staves",
+  "pages": 1,
+  "measures": 8,
+  "systems": 2,
+  "noteheads_in_truth": 126,
+  "hidden_staff_segments": [],
+  "dpi": 250,
+  "degradations": {
+    "clean.pdf": {
+      "seed": null,
+      "dpi": 300,
+      "format": "png (8-bit grey)",
+      "summary": "undamaged raster of the engraving",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "size_px": [
+            2481,
+            3508
+          ]
+        }
+      ],
+      "bytes": 182082
+    },
+    "scan.pdf": {
+      "seed": 7171,
+      "render_dpi": 250,
+      "dpi": 250,
+      "format": "jpeg q65",
+      "colour": "gray",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            2067,
+            2924
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              3
+            ],
+            [
+              "skew_rotation_deg",
+              1.2
+            ],
+            [
+              "focus_blur_sigma",
+              0.6
+            ],
+            [
+              "gaussian_noise_sigma",
+              4
+            ],
+            [
+              "speckles_per_mpx",
+              20
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 250,
+        "mode": "gray",
+        "texture": 3,
+        "rotate": 1.2,
+        "blur": 0.6,
+        "noise": 4,
+        "speckle": 20,
+        "jpeg": 65
+      },
+      "summary": "250 dpi grey scan, 1.2 deg skew, soft focus, toner specks, JPEG q65",
+      "bytes": 472406
+    },
+    "scan-severe.pdf": {
+      "seed": 7172,
+      "render_dpi": 300,
+      "dpi": 150,
+      "format": "png1",
+      "colour": "bw",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1240,
+            1754
+          ],
+          "ops": [
+            [
+              "faded_ink",
+              0.12
+            ],
+            [
+              "skew_rotation_deg",
+              3.0
+            ],
+            [
+              "focus_blur_sigma",
+              0.6
+            ],
+            [
+              "gaussian_noise_sigma",
+              8
+            ],
+            [
+              "salt_pepper",
+              0.0015
+            ],
+            [
+              "speckles_per_mpx",
+              120
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 118,
+                "noise": 20
+              }
+            ],
+            [
+              "resampled_dpi",
+              [
+                300,
+                150
+              ]
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 300,
+        "out_dpi": 150,
+        "ink_dropout": 0.12,
+        "rotate": 3.0,
+        "blur": 0.6,
+        "noise": 8,
+        "binarize": 118,
+        "binarize_noise": 20,
+        "saltpepper": 0.0015,
+        "speckle": 120,
+        "format": "png1"
+      },
+      "summary": "thin, faded binarised photocopy at 150 dpi (rendered 300): ink dropout, 3 deg skew, broken lines, salt & pepper, toner specks",
+      "bytes": 37846
+    }
+  },
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "scan-severe.pdf",
+    "scan.pdf",
+    "truth.musicxml"
+  ],
+  "license": "CC0",
+  "license_detail": "CC0-1.0: composition, arrangement, engraving and scans",
+  "source": "self-authored for the coverage suite (2026)",
+  "engraver": "internal model -> LilyPond 2.24 (coverage-suite writer: explicit beams and stems)",
+  "validation": {
+    "xsd_valid": true,
+    "music21_parse": "4 119",
+    "midi_attacks_match_truth": true,
+    "attacks": 126,
+    "grob_log_matches_truth": true,
+    "printed_summary": {
+      "noteheads": 126,
+      "stems_up": 64,
+      "stems_down": 55,
+      "accidentals": 0,
+      "rests": 0,
+      "beams": 0,
+      "flags": 0,
+      "slurs": 0,
+      "ties": 0,
+      "scripts": {
+        "fermata": 4
+      },
+      "dynamics": {
+        "mf": 4,
+        "f": 1
+      },
+      "lyric_syllables": 112,
+      "hyphens": 16,
+      "extenders": 0,
+      "chord_names": 0,
+      "system_delimiters": {
+        "SystemStartBracket": 2
+      }
+    },
+    "lilypond_warnings": [],
+    "lyric_syllables_found_in_engraving": 1.0,
+    "lyric_syllables": 112,
+    "pages_planned": 1,
+    "image_only": {
+      "clean.pdf": true,
+      "scan.pdf": true,
+      "scan-severe.pdf": true
+    }
+  }
+}

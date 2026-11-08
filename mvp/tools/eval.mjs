@@ -535,7 +535,7 @@ async function main() {
   const log = (...m) => { if (!args.quiet) console.error(...m); };
   log(`eval: ${items.length} items, jobs=${jobs}, ocr=${args.ocr}, dpi=${args.dpi}, src=${args.src}, schema=${schema || 'none (well-formedness only)'}`);
 
-  const results = await pool(items, jobs, async (it) => {
+  const results0 = await pool(items, jobs, async (it) => {
     const res = { id: it.id, set: it.set, crash: 0 };
     if (it.set === 'challenge') Object.assign(res, { category: it.category, item: it.item, variant: it.variant });
     if (it.set === 'coverage') Object.assign(res, { family: it.family, item: it.item, variant: it.variant, key: it.key });
@@ -586,12 +586,20 @@ async function main() {
     } catch (e) {
       res.crash = 1; res.error = String(e.stack || e).split('\n').slice(0, 3).join(' | ');
       Object.assign(res, { pitch: 0, duration: 0, rests: 0, lyrics: 0, parts: 0, xml_valid: 0 });
+      // coverage generators rewrite their folders: an input that vanished mid-run is not an app crash
+      if (it.set === 'coverage') {
+        let changed = false; try { changed = fs.statSync(it.pdf).mtimeMs >= t0 || fs.statSync(it.truth).mtimeMs >= t0; } catch { changed = true; }
+        if ((e && e.code === 'ENOENT') || changed) res.skipped = 'input missing or rewritten during the run (corpus being regenerated)';
+      }
     }
     res.aggregate = aggOf(res);
-    log(`  ${res.crash ? 'CRASH' : 'done '} ${it.key}  agg=${res.aggregate.toFixed(3)}  ${((Date.now() - tStart) / 1000).toFixed(1)}s${res.error ? '  ' + res.error.slice(0, 160) : ''}`);
+    log(`  ${res.skipped ? 'SKIP ' : res.crash ? 'CRASH' : 'done '} ${it.key}  agg=${res.aggregate.toFixed(3)}  ${((Date.now() - tStart) / 1000).toFixed(1)}s${res.error ? '  ' + res.error.slice(0, 160) : ''}`);
     return res;
   });
 
+  const skipped = results0.filter(r => r.skipped).map(r => ({ id: r.id, why: r.skipped }));
+  const results = results0.filter(r => !r.skipped);
+  if (skipped.length) log(`skipped ${skipped.length} item(s) whose input vanished during the run: ${skipped.map(s => s.id).join(', ')}`);
   const keys = ['aggregate', 'pitch', 'duration', 'rests', 'lyrics', 'lyrics_lenient', 'parts', 'xml_valid'];
   const summarize = rs => {
     const o = { n: rs.length };
@@ -631,7 +639,7 @@ async function main() {
   const report = {
     when: new Date().toISOString(), wall_s: Math.round((Date.now() - t0) / 100) / 10,
     config: { ocr: args.ocr, dpi: args.dpi, jobs, src: args.src, src_hash: srcHash(args.src), schema, weights: W, outputs: outDir, ...(chal.length ? { set: 'challenge' } : {}), ...(cov.length ? { set: 'coverage', coverage_dir: COVERAGE, cpus: os.cpus().length, loadavg: os.loadavg().map(x => +x.toFixed(1)) } : {}) },
-    summary, items: results,
+    summary, items: results, ...(skipped.length ? { skipped } : {}),
   };
   fs.writeFileSync(args.out, JSON.stringify(report, null, 1));
 

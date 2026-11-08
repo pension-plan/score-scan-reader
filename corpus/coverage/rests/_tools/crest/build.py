@@ -1,10 +1,14 @@
-"""Build one rhythm-challenge item:
+"""Build one coverage/rests item (copied from corpus/challenge/rhythm/_tools/rsynth/build.py and
+adapted to the coverage meta format):
+  engraving.ly   (model -> LilyPond, explicit beams / breaks / rest positions)
+  LilyPond run   (with the event-dump engraver crest/dump.ly)
+  stems          (engraved stem directions read back into the model -> <stem> in the truth)
   truth.musicxml (model -> MusicXML 4.0, XSD-validated)
-  engraving.ly   (model -> LilyPond, explicit beams / breaks)
-  verification   (LilyPond event dump == model; MIDI attacks == truth; music21 re-parse
-                  of truth == model; lyric syllables present in the vector PDF)
-  clean.pdf      (undamaged 300 dpi raster of the engraving, image-only)
-  scan*.pdf      (damaged image-only PDFs, see scan.py; params + seed in meta.json)
+  verification   (event dump == model; rest vertical positions == truth display-step/octave;
+                  MIDI attacks == truth; music21 re-parse of truth == model)
+  counts         (taxonomy tag counts parsed from truth.musicxml, cross-checked with the model)
+  clean.pdf      (undamaged 300 dpi raster, image-only)
+  scan.pdf, scan-severe.pdf (damaged image-only PDFs, see scan.py; params + seed in meta.json)
 """
 from __future__ import annotations
 
@@ -21,10 +25,12 @@ from PIL import Image
 from . import scan as S
 from . import verify as V
 from .lily import LilyWriter
+from .counts import count_truth, model_rest_counts
 from .model import check, compute_extenders, fix_unbalanced_slurs, sanitize_ties, voices_with_lyrics
 from .mxl import write_musicxml
 
-ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))   # corpus/challenge/rhythm
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))   # corpus/coverage/rests
+FAMILY = 'rests'
 CLEAN_DPI = 300
 
 
@@ -73,55 +79,82 @@ def build_item(item: dict, keep_work=False):
     for f in os.listdir(outdir):
         os.remove(os.path.join(outdir, f))
     log = {'id': iid}
+    timing = {}
     try:
         score, layout, opts = item['make']()
         sanitize_ties(score)
         fix_unbalanced_slurs(score)
         compute_extenders(score)
         check(score)
+        ly = os.path.join(workdir, 'engraving.ly')
+        open(ly, 'w', encoding='utf-8').write(LilyWriter(score, layout, opts).document())
+        t1 = time.time()
+        rc, warns, err, pdf, mid, evp = V.lilypond(ly, workdir)
+        timing['lilypond_s'] = round(time.time() - t1, 2)
+        if rc != 0:
+            raise RuntimeError('lilypond failed: ' + err[-1500:])
+        stems = V.assign_stems(score, evp)
+        auto_rests = V.assign_auto_rest_positions(score, evp)
         truth = os.path.join(outdir, 'truth.musicxml')
         write_musicxml(score, truth)
         xsd = V.xsd_validate(truth)
-        ly = os.path.join(workdir, 'engraving.ly')
-        open(ly, 'w', encoding='utf-8').write(LilyWriter(score, layout, opts).document())
-        rc, warns, err, pdf, mid, evp = V.lilypond(ly, workdir)
-        if rc != 0:
-            raise RuntimeError('lilypond failed: ' + err[-1500:])
         eng = V.compare_engraving(score, layout, evp)
+        restpos = V.check_rest_layout(score, evp)
         midi = V.compare_midi(score, mid)
         m21 = V.compare_music21(score, truth)
         lyr = lyric_text_check(score, pdf)
         rc_, info, _ = run(['pdfinfo', pdf])
         vec_pages = int(re.search(r'Pages:\s+(\d+)', info).group(1))
-        want_pages = len(item.get('pages_expected', [])) or None
         bad_warn = [w for w in warns if not re.search(r'already have slur', w)]
-        log['validation'] = {'xsd': xsd, 'engraving_vs_truth': eng, 'midi': midi, 'music21_truth_reparse': m21,
-                             'lyric_text_found_in_engraving': lyr, 'lilypond_warnings': warns,
-                             'vector_pages': vec_pages}
+        counts = count_truth(truth, vec_pages)
+        mcounts = model_rest_counts(score)
+        count_diff = {k: (v, counts.get(k, 0)) for k, v in mcounts.items() if counts.get(k, 0) != v}
+        for k in ('rest-whole-bar', 'rest-multibar', 'x-rest-in-tuplet', 'x-rest-fermata'):
+            if k in counts and k not in mcounts:
+                count_diff[k] = (0, counts[k])
+        log['validation'] = {'xsd': xsd, 'engraving_vs_truth': eng, 'rest_positions': restpos, 'stems': stems,
+                             'rests_moved_by_layout': auto_rests,
+                             'midi': midi, 'music21_truth_reparse': m21, 'lyric_text_found_in_engraving': lyr,
+                             'lilypond_warnings': warns, 'vector_pages': vec_pages,
+                             'model_vs_truth_rest_counts': {'ok': not count_diff, 'diff': count_diff}}
         problems = []
         if not xsd['ok']:
             problems.append('xsd')
         if not eng['ok']:
             problems.append('engraving dump != truth')
+        if not restpos['ok']:
+            problems.append('rest positions != truth')
+        if not stems['ok']:
+            problems.append('stem read-back incomplete')
         if not midi['ok']:
             problems.append('midi != truth')
         if not m21['ok']:
             problems.append('music21 reparse != truth')
+        if count_diff:
+            problems.append(f'rest counts model != truth {count_diff}')
         if bad_warn:
             problems.append('lilypond warnings: ' + '; '.join(bad_warn[:5]))
         if lyr is not None and lyr < 1.0:
             problems.append(f'lyric text found {lyr}')
         if item.get('pages') and vec_pages != item['pages']:
             problems.append(f'pages {vec_pages} != {item["pages"]}')
+        for tag, n in item.get('min_counts', {}).items():
+            if counts.get(tag, 0) < n:
+                problems.append(f'count {tag} = {counts.get(tag, 0)} < required {n}')
         if problems:
             raise RuntimeError('verification failed: ' + ' | '.join(problems) + '\n' +
                                json.dumps(log['validation'], default=str)[:6000])
         shutil.copy(ly, os.path.join(outdir, 'engraving.ly'))
         # clean raster
+        t1 = time.time()
         pages = S.render_pages(pdf, CLEAN_DPI, workdir)
         S.save_pdf([Image.fromarray(p) for p in pages], CLEAN_DPI, os.path.join(outdir, 'clean.pdf'), fmt='png')
-        files = {'clean.pdf': {'dpi': CLEAN_DPI, 'pages': len(pages), 'ops': [], 'note': 'undamaged raster render'}}
-        files['clean.pdf'].update(image_only(os.path.join(outdir, 'clean.pdf')))
+        clean = {'dpi': CLEAN_DPI, 'pages': len(pages), 'ops': [], 'note': 'undamaged raster render (PNG, gray)',
+                 'pixel_size': [int(pages[0].shape[1]), int(pages[0].shape[0])],
+                 'bytes': os.path.getsize(os.path.join(outdir, 'clean.pdf'))}
+        clean.update(image_only(os.path.join(outdir, 'clean.pdf')))
+        if not clean['image_only']:
+            raise RuntimeError(f'clean.pdf is not image-only: {clean}')
         # damaged variants
         degr = {}
         for fname, Vv in item['variants'].items():
@@ -138,51 +171,66 @@ def build_item(item: dict, keep_work=False):
                            'color': Vv.get('color', 'gray'), 'format': fmt,
                            'jpeg_quality': Vv.get('jpeg') if fmt == 'jpeg' else None,
                            'jpeg_passes': Vv.get('jpeg_passes', 1) if fmt == 'jpeg' else None,
-                           'ops': Vv['ops'], 'tags': S.describe(Vv), 'output_pages': io_['pages'],
-                           'pixel_size': list(imgs[0].size), 'image_mode': imgs[0].mode,
-                           'bytes': os.path.getsize(outp), 'image_only_check': io_, 'op_log': oplog}
+                           'ops': Vv['ops'], 'tags': S.describe(Vv), 'severity': Vv.get('severity'),
+                           'output_pages': io_['pages'], 'pixel_size': list(imgs[0].size),
+                           'image_mode': imgs[0].mode, 'bytes': os.path.getsize(outp), 'image_only_check': io_,
+                           'op_log': oplog}
+        timing['raster_and_damage_s'] = round(time.time() - t1, 2)
         # metadata
-        lyr_parts = [{'part': score.part(pid).name, 'voice': vk, 'verses': len(vs)}
-                     for pid, vk, vs in voices_with_lyrics(score)]
-        exp = dict(item['expected'])
-        exp.setdefault('lyrics', lyr_parts)
-        exp['measures'] = len(score.measures)
+        nmeas = len(score.measures)
+        drawn = nmeas - sum(max(0, ev.multirest - 1) for p_ in score.parts[:1] for mm in p_.measures
+                            for evs in mm.values() for ev in evs if ev.multirest)
+        exp = {'parts': item['expected']['parts'], 'must_not_split': item['expected']['must_not_split']}
+        for k, v in item['expected'].items():
+            exp.setdefault(k, v)
+        exp['measures'] = nmeas
+        exp['bars_drawn'] = drawn
         exp['first_measure_number'] = score.measures[0].number
+        exp['systems'] = 1 + sum(1 for m in score.measures if m.new_system or m.new_page)
         main = degr['scan.pdf']
         meta = {
-            'id': iid, 'category': 'rhythm', 'title': item['title'],
-            'composer': score.composer, 'lyricist': score.lyricist,
-            'edge_cases': item['edge_cases'],
+            'id': iid, 'family': FAMILY, 'title': item['title'],
+            'symbols': sorted(counts),
+            'layout': item['layout'],
             'expected': exp,
-            'truth_limitations': item.get('truth_limitations', []),
+            'counts': counts,
             'degradations': degr,
             'dpi': main['dpi'],
-            'license': item['license'],
-            'source': item['source'],
             'pages': vec_pages,
+            'license': 'CC0',
+            'license_detail': 'CC0-1.0: music composed for this corpus; engraving, truth and scans generated '
+                              'by corpus/coverage/rests/_tools',
+            'composer': score.composer,
+            'focus': item['focus'],
+            'notes': item.get('notes', []),
             'files': {'truth': 'truth.musicxml', 'engraving': 'engraving.ly', 'clean': 'clean.pdf',
-                      'scan': 'scan.pdf', 'scan_mild': 'scan-mild.pdf' if 'scan-mild.pdf' in degr else None,
-                      'scan_severe': 'scan-severe.pdf' if 'scan-severe.pdf' in degr else None,
-                      'attribution': 'ATTRIBUTION.txt'},
-            'clean': files['clean.pdf'],
+                      'scan': 'scan.pdf', 'scan_severe': 'scan-severe.pdf', 'attribution': 'ATTRIBUTION.txt'},
+            'clean': clean,
             'validation': {
                 'truth_xsd_valid': xsd['ok'],
                 'engraving_event_dump_matches_truth': eng['ok'],
                 'engraving_events_compared': sum(v['n_expected'] for v in eng['voices'].values()),
-                'lyric_events_compared': sum(v.get('n_expected', 0) for v in eng['lyrics'].values()),
                 'time_signatures_compared': sum(v['n_expected'] for v in eng['timesig'].values()),
+                'rest_positions_match_truth': restpos['ok'],
+                'rests_position_checked': restpos['rests_checked'],
+                'rests_with_explicit_display_position': restpos['explicit_positions'],
+                'rests_with_display_position_read_from_layout': restpos['layout_positions'],
+                'stems_read_from_engraving': stems['stems'],
                 'midi_attacks_match_truth': midi['ok'], 'midi_attacks': midi['expected_attacks'],
-                'midi_grace_notes_excluded': midi['grace_notes'],
                 'music21_reparse_matches_model': m21['ok'],
-                'lyric_text_found_in_engraving': lyr,
+                'rest_counts_model_equal_truth': not count_diff,
                 'lilypond_warnings': warns,
-                'method': 'LilyPond event-dump engraver (rsynth/dump.ly) compared with the model the truth is '
-                          'written from: every note/rest/multi-bar rest (onset, pitch, notated type, dots, '
-                          'tuplet scale), grace offsets, ties, beam starts/stops, slurs, fermatas, lyric '
-                          'syllables/hyphens/extenders, bar numbers/measure positions and time signatures; '
-                          'plus MIDI attack multiset and a music21 re-parse of truth.musicxml.',
+                'method': 'LilyPond event-dump engraver (_tools/crest/dump.ly) compared with the model the truth '
+                          'is written from: every note/rest/multi-bar rest (onset, pitch, notated type, dots, '
+                          'tuplet scale), ties, beam starts/stops, slurs, articulations/fermatas, bar numbers, '
+                          'measure positions and time signatures; post-layout read-back of every Rest / '
+                          'MultiMeasureRest grob (staff-position and Y extent vs. the truth display-step/'
+                          'display-octave) and of every Stem direction (written to <stem>); LilyPond MIDI attack '
+                          'multiset; music21 re-parse of truth.musicxml; xmllint against the MusicXML 4.0 XSD; '
+                          'counts parsed from truth.musicxml and cross-checked with the model for rest tags.',
             },
-            'generator': 'corpus/challenge/rhythm/_tools/run_all.py (rsynth/items.py, build.py, scan.py)',
+            'build_timing': timing,
+            'generator': 'corpus/coverage/rests/_tools/run_all.py (crest/items.py, catalog.py, build.py, scan.py)',
         }
         with open(os.path.join(outdir, 'meta.json'), 'w') as f:
             json.dump(meta, f, indent=2, default=str, ensure_ascii=False)

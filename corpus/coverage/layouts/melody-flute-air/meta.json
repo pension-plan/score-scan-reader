@@ -1,0 +1,352 @@
+{
+  "id": "melody-flute-air",
+  "family": "layouts",
+  "title": "Air for Flute - single-staff instrumental melody",
+  "layout": "melody",
+  "symbols": [
+    "acc-natural",
+    "acc-sharp",
+    "accent",
+    "beam",
+    "breath",
+    "clef-treble",
+    "dot",
+    "dyn-f",
+    "dyn-mf",
+    "dyn-mp",
+    "dyn-p",
+    "fermata",
+    "flag",
+    "hairpin-cresc",
+    "hairpin-dim",
+    "key-s2",
+    "ledger-above",
+    "metronome",
+    "note-16th",
+    "note-8th",
+    "note-half",
+    "note-quarter",
+    "rehearsal-mark",
+    "rest-8th",
+    "rest-quarter",
+    "slur",
+    "staccato",
+    "stem-down",
+    "stem-up",
+    "system-break",
+    "tempo-mark",
+    "tenuto",
+    "tie",
+    "tie-across-system",
+    "time-2-4",
+    "trill",
+    "tuplet-3",
+    "x-measures",
+    "x-parts",
+    "x-staves"
+  ],
+  "counts": {
+    "acc-natural": 2,
+    "acc-sharp": 1,
+    "accent": 1,
+    "beam": 23,
+    "breath": 1,
+    "clef-treble": 1,
+    "dot": 2,
+    "dyn-f": 1,
+    "dyn-mf": 1,
+    "dyn-mp": 1,
+    "dyn-p": 1,
+    "fermata": 1,
+    "flag": 1,
+    "hairpin-cresc": 1,
+    "hairpin-dim": 1,
+    "key-s2": 1,
+    "ledger-above": 3,
+    "metronome": 1,
+    "note-16th": 6,
+    "note-8th": 44,
+    "note-half": 2,
+    "note-quarter": 3,
+    "rehearsal-mark": 1,
+    "rest-8th": 1,
+    "rest-quarter": 1,
+    "slur": 8,
+    "staccato": 5,
+    "stem-down": 48,
+    "stem-up": 7,
+    "system-break": 3,
+    "tempo-mark": 1,
+    "tenuto": 4,
+    "tie": 1,
+    "tie-across-system": 1,
+    "time-2-4": 1,
+    "trill": 1,
+    "tuplet-3": 1,
+    "x-measures": 16,
+    "x-parts": 1,
+    "x-staves": 1
+  },
+  "expected": {
+    "parts": [
+      "Flute"
+    ],
+    "must_not_split": false,
+    "shared_staves": [],
+    "staves_per_part": {
+      "Flute": 1
+    },
+    "lyrics": [],
+    "notes": "ONE part \"Flute\", one treble staff, one voice. 16 measures of 2/4 on 4 systems; triplet in m.7, trill in m.4, breath mark in m.8, tie across the system break m.12-13, rehearsal mark A at m.9."
+  },
+  "notes": [],
+  "layout_description": "A4 portrait, staff size 20, 4 systems of 4 measures, instrument name on the first system",
+  "pages": 1,
+  "measures": 16,
+  "systems": 4,
+  "noteheads_in_truth": 55,
+  "hidden_staff_segments": [],
+  "dpi": 200,
+  "degradations": {
+    "clean.pdf": {
+      "seed": null,
+      "dpi": 300,
+      "format": "png (8-bit grey)",
+      "summary": "undamaged raster of the engraving",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "size_px": [
+            2481,
+            3508
+          ]
+        }
+      ],
+      "bytes": 80292
+    },
+    "scan.pdf": {
+      "seed": 7011,
+      "render_dpi": 200,
+      "dpi": 200,
+      "format": "jpeg q70",
+      "colour": "gray",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1654,
+            2339
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              3
+            ],
+            [
+              "skew_rotation_deg",
+              -0.9
+            ],
+            [
+              "lighting_gradient",
+              {
+                "strength": 0.05,
+                "angle_deg": 23.7
+              }
+            ],
+            [
+              "focus_blur_sigma",
+              0.5
+            ],
+            [
+              "gaussian_noise_sigma",
+              4
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 200,
+        "mode": "gray",
+        "texture": 3,
+        "rotate": -0.9,
+        "gradient": 0.05,
+        "blur": 0.5,
+        "noise": 4,
+        "jpeg": 70
+      },
+      "summary": "200 dpi grey office scan, -0.9 deg skew, slight lighting gradient, noise, JPEG q70",
+      "bytes": 281172
+    },
+    "scan-severe.pdf": {
+      "seed": 7012,
+      "render_dpi": 150,
+      "dpi": 150,
+      "format": "jpeg q25",
+      "colour": "rgb",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1389,
+            1902
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              6
+            ],
+            [
+              "paper_colour",
+              [
+                243,
+                236,
+                214
+              ]
+            ],
+            [
+              "skew_rotation_deg",
+              -2.5
+            ],
+            [
+              "perspective_phone",
+              {
+                "margin": 0.06,
+                "bg": 50,
+                "jitter": 0.035,
+                "keystone": 0.06,
+                "corners_src": [
+                  [
+                    -85,
+                    49
+                  ],
+                  [
+                    1491,
+                    28
+                  ],
+                  [
+                    1360,
+                    1958
+                  ],
+                  [
+                    -13,
+                    1939
+                  ]
+                ]
+              }
+            ],
+            [
+              "uneven_lighting",
+              0.25
+            ],
+            [
+              "vignette",
+              0.3
+            ],
+            [
+              "motion_blur",
+              {
+                "len": 5,
+                "angle": 25
+              }
+            ],
+            [
+              "gaussian_noise_sigma",
+              6
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 150,
+        "mode": "rgb",
+        "paper_rgb": [
+          243,
+          236,
+          214
+        ],
+        "texture": 6,
+        "rotate": -2.5,
+        "phone": {
+          "margin": 0.06,
+          "bg": 50,
+          "jitter": 0.035,
+          "keystone": 0.06
+        },
+        "blotch": 0.25,
+        "vignette": 0.3,
+        "motion_blur": {
+          "len": 5,
+          "angle": 25
+        },
+        "noise": 6,
+        "jpeg": 25
+      },
+      "summary": "phone photo of the page: perspective/keystone, uneven light, vignette, motion blur, 150 dpi, JPEG q25",
+      "bytes": 77100
+    }
+  },
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "scan-severe.pdf",
+    "scan.pdf",
+    "truth.musicxml"
+  ],
+  "license": "CC0",
+  "license_detail": "CC0-1.0: composition, arrangement, engraving and scans",
+  "source": "self-authored for the coverage suite (2026)",
+  "engraver": "internal model -> LilyPond 2.24 (coverage-suite writer: explicit beams and stems)",
+  "validation": {
+    "xsd_valid": true,
+    "music21_parse": "1 55",
+    "midi_attacks_match_truth": true,
+    "attacks": 54,
+    "grob_log_matches_truth": true,
+    "printed_summary": {
+      "noteheads": 55,
+      "stems_up": 7,
+      "stems_down": 48,
+      "accidentals": 3,
+      "rests": 2,
+      "beams": 23,
+      "flags": 1,
+      "slurs": 8,
+      "ties": 1,
+      "scripts": {
+        "staccato": 5,
+        "trill": 1,
+        "sforzato": 1,
+        "tenuto": 4,
+        "fermata": 1
+      },
+      "dynamics": {
+        "mf": 1,
+        "f": 1,
+        "p": 1,
+        "mp": 1
+      },
+      "lyric_syllables": 0,
+      "hyphens": 0,
+      "extenders": 0,
+      "chord_names": 0,
+      "system_delimiters": {}
+    },
+    "lilypond_warnings": [],
+    "lyric_syllables_found_in_engraving": null,
+    "lyric_syllables": 0,
+    "pages_planned": 1,
+    "image_only": {
+      "clean.pdf": true,
+      "scan.pdf": true,
+      "scan-severe.pdf": true
+    }
+  }
+}

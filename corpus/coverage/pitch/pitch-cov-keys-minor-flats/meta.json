@@ -1,0 +1,358 @@
+{
+  "id": "pitch-cov-keys-minor-flats",
+  "family": "pitch",
+  "title": "Minor Keys with Flats",
+  "symbols": [
+    "acc-natural",
+    "acc-sharp",
+    "barline-double",
+    "barline-final",
+    "clef-alto",
+    "dot",
+    "flag",
+    "key-change",
+    "key-f1",
+    "key-f2",
+    "key-f3",
+    "key-f4",
+    "key-f5",
+    "key-f6",
+    "key-f7",
+    "ledger-above",
+    "note-8th",
+    "note-quarter",
+    "stem-down",
+    "stem-up",
+    "system-break",
+    "time-6-8",
+    "x-key-minor"
+  ],
+  "focus": [
+    "key-f1",
+    "key-f2",
+    "key-f3",
+    "key-f4",
+    "key-f5",
+    "key-f6",
+    "key-f7",
+    "x-key-minor",
+    "key-change",
+    "acc-natural",
+    "acc-sharp",
+    "clef-alto"
+  ],
+  "layout": "melody",
+  "expected": {
+    "parts": [
+      "Viola"
+    ],
+    "must_not_split": false,
+    "staves": 1,
+    "notes": "One part (Viola), alto clef, 14 bars of 6/8, 4 systems (4+4+4+2).  Seven harmonic-minor keys, 2 bars each: D minor (bars 1-2), G (3-4), C (5-6), F (7-8), Bb (9-10), Eb (11-12), Ab minor (13-14).  The raised leading note is printed as a sharp (C# in D minor, F# in G minor) or a natural (B, E, A, D, G natural).  Key signatures are drawn in alto-clef positions.  <mode> (major/minor) is encoded but is not printed: a key signature looks the same for the major key and its relative minor, so evaluators should compare <fifths> and treat mode as unobservable."
+  },
+  "counts": {
+    "acc-natural": 5,
+    "acc-sharp": 2,
+    "barline-double": 4,
+    "barline-final": 1,
+    "clef-alto": 1,
+    "dot": 7,
+    "flag": 21,
+    "key-change": 6,
+    "key-f1": 1,
+    "key-f2": 1,
+    "key-f3": 1,
+    "key-f4": 1,
+    "key-f5": 1,
+    "key-f6": 1,
+    "key-f7": 1,
+    "ledger-above": 1,
+    "note-8th": 21,
+    "note-quarter": 28,
+    "stem-down": 29,
+    "stem-up": 20,
+    "system-break": 3,
+    "time-6-8": 1,
+    "x-key-minor": 7
+  },
+  "count_conventions": {
+    "note-*, dot, double-dot, acc-*, ledger-*, tie": "per notehead (chord notes counted individually)",
+    "chord, stem-up, stem-down, flag": "per stem (one per chord)",
+    "beam": "number of level-1 beam groups",
+    "clef-*": "initial clef of every staff + every clef change (system-start reprints and courtesy clefs not counted)",
+    "clef-change": "clef elements after the initial clefs",
+    "key-*": "initial key + every key change (system-start reprints and courtesy key signatures not counted); key-0 = no sharps/flats",
+    "key-change": "key elements after measure 1; x-key-cancel = key changes that print cancellation naturals",
+    "key-* / time-* / key-change per part": "counted per MusicXML <key>/<time> element, i.e. once per part: a multi-staff part (piano, organ) has one <key> for all its staves, so the printed signatures are N_staves times more numerous",
+    "x-key-minor": "key statements in minor mode",
+    "time-*": "time signature statements (time-common / time-cut replace time-4-4 / time-2-2 when the symbol is used)",
+    "ottava-*": "octave-shift brackets (start elements); x-ottava-15mb = 15ma bassa",
+    "ledger-above / ledger-below": "noteheads needing >= 1 ledger line (displayed staff position >= 6 or <= -6 half-spaces from the middle line, after clef / clef-octave-change / ottava)",
+    "acc-courtesy": "accidentals with cautionary=\"yes\" (also counted under their glyph tag); x-acc-courtesy-paren = the parenthesised subset",
+    "x-acc-natural-sharp / x-acc-natural-flat": "LilyPond \"extra natural\" before a single sharp/flat that follows a double sharp/flat in the same bar (natural-sharp / natural-flat)",
+    "system-break / page-break": "explicit <print new-system/new-page> in the first part"
+  },
+  "degradations": {
+    "scan.pdf": {
+      "dpi": 200,
+      "seed": 37001,
+      "level": "typical",
+      "color": "rgb",
+      "encoding": "jpeg q60",
+      "pages_in_pdf": 1,
+      "pixel_size": [
+        1654,
+        2339
+      ],
+      "summary": "typical office scan: 200 dpi RGB, -0.6 deg skew, light paper texture, slight blur, noise sigma 3, JPEG q60",
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            243,
+            238,
+            226
+          ],
+          "texture": 2
+        },
+        {
+          "op": "rotate",
+          "deg": -0.6
+        },
+        {
+          "op": "blur",
+          "radius_px300": 0.4
+        },
+        {
+          "op": "noise",
+          "sigma": 3
+        }
+      ],
+      "generator": "corpus/coverage/pitch/_tools/cvp/scanfx.py run_pipeline(seed)"
+    },
+    "scan-severe.pdf": {
+      "dpi": 200,
+      "seed": 37002,
+      "level": "severe",
+      "color": "rgb",
+      "encoding": "jpeg q25",
+      "pages_in_pdf": 1,
+      "pixel_size": [
+        1661,
+        2439
+      ],
+      "summary": "halftone-screened reproduction (100 lpi, 45 deg) rescanned -> moire, bluish recycled paper, page cropped 1.5 mm into the staff starts (cuts into clef + key signature), 4 deg skew, JPEG q25",
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            226,
+            231,
+            236
+          ],
+          "texture": 4,
+          "ink_rgb": [
+            35,
+            38,
+            45
+          ]
+        },
+        {
+          "op": "crop",
+          "left_into_mm": 1.5
+        },
+        {
+          "op": "halftone",
+          "lpi": 100,
+          "angle": 45,
+          "oversample": 2
+        },
+        {
+          "op": "rotate",
+          "deg": 4.0,
+          "expand": true,
+          "fill": [
+            236,
+            236,
+            236
+          ]
+        },
+        {
+          "op": "noise",
+          "sigma": 5
+        }
+      ],
+      "generator": "corpus/coverage/pitch/_tools/cvp/scanfx.py run_pipeline(seed)",
+      "crop_px_LRTB": [
+        [
+          153,
+          0,
+          0,
+          0
+        ]
+      ]
+    }
+  },
+  "dpi": {
+    "clean.pdf": 300,
+    "scan.pdf": 200,
+    "scan-severe.pdf": 200
+  },
+  "pages": 1,
+  "measures": 14,
+  "systems": 4,
+  "license": "CC0",
+  "notes": [
+    "Courtesy clefs / key signatures / time signatures printed at the end of a system before a change are not separate MusicXML elements (they are implied by the change in the next measure) and are not counted.",
+    "Clefs and key signatures reprinted at every system start are implied in MusicXML and not counted; counts cover the initial statement of every staff and every change.",
+    "Stem directions and beams in the truth are copied from the instrumented LilyPond render and cross-checked (stems, flags, beam groups); they describe this engraving.",
+    "System breaks are explicit in the engraving and encoded as <print new-system=\"yes\"/>.",
+    "<mode> (major/minor) is encoded but is not printed: a key signature looks the same for the major key and its relative minor, so evaluators should compare <fifths> and treat mode as unobservable."
+  ],
+  "engraving": {
+    "engraver": "GNU LilyPond 2.24.3",
+    "paper": "a4",
+    "staff_size_pt": 20,
+    "ottava_style": "numbers",
+    "layout_desc": "single alto staff, 4 systems (4+4+4+2 bars)"
+  },
+  "validation": {
+    "xsd_valid": true,
+    "music21": {
+      "ok": true,
+      "parts": 1,
+      "notes_and_chords": 49,
+      "rests": 0
+    },
+    "midi_attacks_match_truth_file": true,
+    "attacks": 49,
+    "printed_accidentals_match": true,
+    "accidentals": {
+      "expected": 7,
+      "printed": 7,
+      "extra_natural": 0,
+      "parenthesized": 0,
+      "double": 0,
+      "tie_at_line_start": 0
+    },
+    "clefs": {
+      "stP1": {
+        "expected_changes": 0,
+        "rendered_changes": 0,
+        "sequence": [
+          "0:clefs.C@0"
+        ]
+      }
+    },
+    "keys": {
+      "stP1": {
+        "expected": [
+          "0:-1",
+          "6:-2",
+          "12:-3",
+          "18:-4",
+          "24:-5",
+          "30:-6",
+          "36:-7"
+        ],
+        "rendered": [
+          "0:-1",
+          "6:-2",
+          "12:-3",
+          "18:-4",
+          "24:-5",
+          "30:-6",
+          "36:-7"
+        ],
+        "cancellations": {}
+      }
+    },
+    "ottava": {
+      "stP1": {
+        "expected": [],
+        "rendered": [],
+        "pieces": 0
+      }
+    },
+    "time_signatures": {
+      "stP1": [
+        "0:6/8"
+      ]
+    },
+    "line_start_measures": [
+      1,
+      5,
+      9,
+      13
+    ],
+    "stems_beams_from_engraving": {
+      "stems": 49,
+      "up": 20,
+      "down": 29,
+      "beamed": 0,
+      "flags": 21,
+      "beam_groups": 0
+    },
+    "truth_vs_engraving_cross_checks": {
+      "accidentals_truth_vs_printed": [
+        7,
+        7
+      ],
+      "double_accidentals_truth_vs_printed": [
+        0,
+        0
+      ],
+      "extra_naturals_truth_vs_printed": [
+        0,
+        0
+      ],
+      "parenthesized_truth_vs_printed": [
+        0,
+        0
+      ],
+      "stems_up_truth_vs_engraved": [
+        20,
+        20
+      ],
+      "stems_down_truth_vs_engraved": [
+        29,
+        29
+      ],
+      "flags_truth_vs_engraved": [
+        21,
+        21
+      ],
+      "beam_groups_truth_vs_engraved": [
+        0,
+        0
+      ],
+      "clef_changes_truth_vs_engraved": [
+        0,
+        0
+      ],
+      "system_breaks_truth_vs_engraved": [
+        3,
+        3
+      ],
+      "noteheads_with_positions_checked": [
+        49,
+        49
+      ]
+    },
+    "twin_layout_diff": 0.0,
+    "scan_files_image_only": {
+      "scan.pdf": true,
+      "scan-severe.pdf": true
+    }
+  },
+  "source": "composed for this corpus (CC0)",
+  "files": [
+    "engraving.ly",
+    "truth.musicxml",
+    "clean.pdf",
+    "scan.pdf",
+    "scan-severe.pdf",
+    "meta.json",
+    "ATTRIBUTION.txt"
+  ]
+}

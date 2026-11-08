@@ -36,6 +36,12 @@ def steps(p: Pitch) -> int:
     return p[2] * 7 + STEPS.index(p[0])
 
 
+def pitch_at_pos(pos: int, clef: str) -> Pitch:
+    """natural pitch at staff position pos in clef"""
+    n = steps(CLEF_MIDLINE[clef]) + pos
+    return (STEPS[n % 7], 0, n // 7)
+
+
 def staff_pos(p: Pitch, clef: str) -> int:
     """staff position (0 = middle line, +1 per step up) of pitch p in clef"""
     return steps(p) - steps(CLEF_MIDLINE[clef])
@@ -123,6 +129,7 @@ class Event:
     # --- coverage/rests extensions
     display: Optional[Pitch] = None   # rest drawn at this staff position (pitched rest / MMR staff-position)
     stem: Optional[str] = None        # 'up' | 'down' as engraved (filled from the layout dump)
+    display_auto: bool = False        # display position read back from the layout (LilyPond moved the rest)
 
     @property
     def is_note(self):

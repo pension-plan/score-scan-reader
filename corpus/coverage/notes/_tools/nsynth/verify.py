@@ -512,3 +512,75 @@ def compare_accidentals(score: Score, layout, events_path: str):
                 got.append((sid,) + r[1:])
     d = _diff(exp, got)
     return d
+
+
+# ---------------------------------------------------------------- counts measured on the engraving
+
+DLOG_TAG = {-1: 'note-breve', 0: 'note-whole', 1: 'note-half', 2: 'note-quarter', 3: 'note-8th', 4: 'note-16th',
+            5: 'note-32nd', 6: 'note-64th'}
+
+
+def engraved_counts(score: Score, events_path: str):
+    """notes-family counts measured on LilyPond's final layout (grob dump) and event stream, for the
+    cross-check against the counts read from truth.musicxml"""
+    from collections import Counter as C_
+    from .model import ledgers
+    grobs = parse_grobs(events_path)
+    evs = parse_events(events_path)
+    cue_voices = set()
+    names = []
+    for p in score.parts:
+        for v in p.voices:
+            nm = vname(p.id, v.key)
+            names.append(nm)
+            if any(e.cue for m in p.measures for e in m.get(v.key, [])):
+                cue_voices.add(nm)
+    c = C_()
+    for nm in names:
+        cue = nm in cue_voices
+        for r in grobs.get(nm, []):
+            if r[0] == 'head':
+                _, t, g, pos, dlog, fs = r
+                if g != 0:
+                    c['grace'] += 1
+                    continue
+                if cue:
+                    c['cue-note'] += 1
+                    continue
+                n = ledgers(pos)
+                if n > 0:
+                    c['ledger-above'] += 1
+                elif n < 0:
+                    c['ledger-below'] += 1
+            else:
+                _, t, g, d, dlog, beamed, lc, rc, trem, nh = r
+                if g != 0 or cue or nh == 0:
+                    continue
+                c[DLOG_TAG[dlog]] += nh
+                if nh >= 2:
+                    c['chord'] += 1
+                if dlog >= 1:
+                    c['stem-up' if d == 1 else 'stem-down'] += 1
+                if dlog >= 3 and not beamed:
+                    c['flag'] += 1
+                if trem:
+                    c['tremolo'] += 1
+        for r in dump_records(evs.get(nm, [])):
+            if cue:
+                continue
+            if r[0] == 'beam' and r[3] == -1 and r[2] == 0:
+                c['beam'] += 1
+            if r[0] == 'tremspan' and r[3] == -1:
+                c['tremolo'] += 1
+    return dict(c)
+
+
+NOTE_FAMILY_TAGS = ['note-breve', 'note-whole', 'note-half', 'note-quarter', 'note-8th', 'note-16th', 'note-32nd',
+                    'note-64th', 'chord', 'beam', 'flag', 'stem-up', 'stem-down', 'ledger-above', 'ledger-below',
+                    'grace', 'cue-note', 'tremolo']
+
+
+def crosscheck_counts(truth_counts: dict, eng: dict):
+    bad = {t: (truth_counts.get(t, 0), eng.get(t, 0)) for t in NOTE_FAMILY_TAGS
+           if truth_counts.get(t, 0) != eng.get(t, 0)}
+    return {'ok': not bad, 'compared_tags': NOTE_FAMILY_TAGS, 'mismatch_truth_vs_engraving': bad}

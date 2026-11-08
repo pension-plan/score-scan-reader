@@ -1,0 +1,304 @@
+{
+  "id": "str04-segno-coda-ds",
+  "family": "structure",
+  "title": "Round Trip - Segno, To Coda, D.S. al Coda, Coda (violin)",
+  "symbols": [
+    "barline-double",
+    "barline-final",
+    "beam",
+    "clef-treble",
+    "coda",
+    "dot",
+    "ds",
+    "flag",
+    "key-f2",
+    "ledger-above",
+    "metronome",
+    "note-8th",
+    "note-half",
+    "note-quarter",
+    "note-whole",
+    "rest-half",
+    "segno",
+    "stem-down",
+    "stem-up",
+    "system-break",
+    "tempo-mark",
+    "time-4-4",
+    "x-to-coda"
+  ],
+  "focus_symbols": [
+    "segno",
+    "coda",
+    "x-to-coda",
+    "ds",
+    "barline-double",
+    "barline-final"
+  ],
+  "layout": "melody",
+  "expected": {
+    "parts": [
+      "Violin"
+    ],
+    "must_not_split": false,
+    "staves_per_part": {
+      "Violin": 1
+    },
+    "lyrics": [],
+    "structure": "Notated order (do not unroll): intro mm.1-2 (double bar), Segno sign at m.3, \"To Coda\" + coda sign after m.8, \"D.S. al Coda\" after m.12 (double bar), Coda sign at m.13 (start of the last system), final bar after m.16. Played form: 1-12, 3-8, 13-16.",
+    "notes": "One part (Violin), B-flat major, 4/4. Jumps as directions with playback: <segno/> + <sound segno=\"segno\"/> at m.3; words \"To Coda\" + <coda/> + <sound tocoda=\"coda\"/> at the end of m.8; words \"D.S. al Coda\" + <sound dalsegno=\"segno\"/> at the end of m.12; <coda/> + <sound coda=\"coda\"/> at m.13. Tempo \"Moderato\" with metronome quarter = 96."
+  },
+  "counts": {
+    "barline-double": 2,
+    "barline-final": 1,
+    "beam": 5,
+    "clef-treble": 1,
+    "coda": 2,
+    "dot": 1,
+    "ds": 1,
+    "flag": 1,
+    "key-f2": 1,
+    "ledger-above": 5,
+    "metronome": 1,
+    "note-8th": 11,
+    "note-half": 4,
+    "note-quarter": 40,
+    "note-whole": 2,
+    "rest-half": 1,
+    "segno": 1,
+    "stem-down": 52,
+    "stem-up": 3,
+    "system-break": 3,
+    "tempo-mark": 1,
+    "time-4-4": 1,
+    "x-to-coda": 1
+  },
+  "counts_by_part": {
+    "Violin": {
+      "beam": 5,
+      "clef-treble": 1,
+      "dot": 1,
+      "flag": 1,
+      "ledger-above": 5,
+      "note-8th": 11,
+      "note-half": 4,
+      "note-quarter": 40,
+      "note-whole": 2,
+      "rest-half": 1,
+      "stem-down": 52,
+      "stem-up": 3
+    }
+  },
+  "count_rules": "Coverage-taxonomy symbol counts read from truth.musicxml.\n\nCounting rules (also written to meta.json 'count_rules'):\n  * score-wide tags are counted ONCE per score position even when MusicXML repeats them in every\n    part: barline-double, barline-final, repeat-start, repeat-end, volta-N, segno, coda, dc, ds,\n    fine, x-to-coda, system-break, page-break, multi-page, rehearsal-mark, tempo-mark, metronome,\n    key-*, key-change, time-*, time-change, pickup;\n  * every other tag is counted per occurrence in every part (also listed per part in\n    'counts_by_part'):\n      note-<type>  note events (a chord counts once, as its stem/duration), no grace / cue notes\n      chord        note events with two or more noteheads\n      dot / double-dot  dotted / double-dotted note events;  rest-dotted  dotted rests\n      beam         beam groups (<beam number=\"1\">begin);  flag  unbeamed note events of 8th or shorter\n      stem-up / stem-down  note events with that <stem>\n      ledger-above / ledger-below  noteheads on or beyond the first ledger line (per clef in force)\n      rest-<type>  rests that are not whole-bar rests;  rest-whole-bar  <rest measure=\"yes\"/>\n      clef-*       <clef> elements (initial and changes);  clef-change  clefs after the first measure\n      acc-*        printed <accidental> elements;  acc-courtesy  cautionary / parenthesised ones\n      tie          <tie type=\"start\"> per notehead;  tie-across-system  ties whose end note starts a\n                   new system or page\n      slur, staccato, accent, tenuto, ..., fermata   per element;  dyn-*  per dynamic;  hairpin-*  per\n      wedge start;  pedal  per pedal start;  text-expression  words that are not tempo / jump text\n      lyrics  <lyric> syllables;  lyrics-hyphen  begin/middle syllables;  lyrics-extender  <extend>\n      lyrics-multi-verse  syllables of verse 2 and higher",
+  "degradations": {
+    "clean.pdf": {
+      "seed": null,
+      "render_dpi": 300,
+      "dpi": 300,
+      "format": "png (lossless)",
+      "colour": "gray",
+      "params": {},
+      "summary": "undamaged raster of the engraving",
+      "bytes": 77142
+    },
+    "scan.pdf": {
+      "seed": 44001,
+      "render_dpi": 200,
+      "dpi": 200,
+      "format": "jpeg q70",
+      "colour": "gray",
+      "params": {
+        "dpi": 200,
+        "mode": "gray",
+        "texture": 3,
+        "rotate": -1.2,
+        "blur": 0.4,
+        "noise": 4,
+        "jpeg": 70
+      },
+      "summary": "flatbed scan, 200 dpi grey, -1.2 deg skew, paper texture, noise, JPEG q70",
+      "bytes": 280317,
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1654,
+            2339
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              3
+            ],
+            [
+              "skew_rotation_deg",
+              -1.2
+            ],
+            [
+              "focus_blur_sigma",
+              0.4
+            ],
+            [
+              "gaussian_noise_sigma",
+              4
+            ]
+          ]
+        }
+      ]
+    },
+    "scan-severe.pdf": {
+      "seed": 44002,
+      "render_dpi": 150,
+      "dpi": 150,
+      "format": "jpeg q20",
+      "colour": "rgb",
+      "params": {
+        "dpi": 150,
+        "mode": "rgb",
+        "paper_rgb": [
+          232,
+          219,
+          186
+        ],
+        "texture": 6,
+        "rotate": 7.0,
+        "bleed": 0.15,
+        "foxing": {
+          "n": 60
+        },
+        "coffee": {
+          "n": 1,
+          "r": 0.1,
+          "strength": 0.9
+        },
+        "blur": 1.3,
+        "noise": 8,
+        "jpeg": 20
+      },
+      "summary": "old yellowed copy, 150 dpi RGB: 7 deg skew, strong bleed-through, foxing and a coffee ring, focus blur, JPEG q20",
+      "bytes": 67883,
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1241,
+            1754
+          ],
+          "ops": [
+            [
+              "bleed_through",
+              {
+                "strength": 0.15,
+                "shift_px": -4
+              }
+            ],
+            [
+              "paper_texture",
+              6
+            ],
+            [
+              "paper_colour",
+              [
+                232,
+                219,
+                186
+              ]
+            ],
+            [
+              "stains",
+              {
+                "coffee": [
+                  [
+                    977,
+                    1047,
+                    124
+                  ]
+                ],
+                "foxing": 60
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              7.0
+            ],
+            [
+              "focus_blur_sigma",
+              1.3
+            ],
+            [
+              "gaussian_noise_sigma",
+              8
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "dpi": 200,
+  "pages": 1,
+  "systems_per_page": [
+    4
+  ],
+  "system_start_measures": [
+    [
+      "1",
+      "5",
+      "9",
+      "13"
+    ]
+  ],
+  "measures": 16,
+  "noteheads_in_truth": 57,
+  "license": "CC0",
+  "license_detail": "CC0 1.0 Universal - composition, engraving, truth and scans",
+  "notes": "Truth limitation: the coda glyph printed after the words \"To Coda\" is encoded as a second direction-type <coda/> in the same <direction> as the words, so counts.coda = 2 (that glyph + the Coda sign at m.13). Segno/coda are directions (not <barline> children).",
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "truth.musicxml",
+    "scan-severe.pdf",
+    "scan.pdf"
+  ],
+  "generator": "corpus/coverage/structure/_tools (model -> MusicXML 4.0 truth + LilyPond 2.24 engraving)",
+  "validation": {
+    "xsd_valid": true,
+    "music21_parse": "1 57",
+    "engraving_matches_truth": true,
+    "checked": [
+      "notes",
+      "rests",
+      "full-bar rests",
+      "ties",
+      "beams",
+      "slurs",
+      "stems",
+      "articulations",
+      "dynamics/hairpins/text",
+      "lyrics",
+      "clefs",
+      "keys",
+      "times",
+      "bar-line glyphs",
+      "volta spans",
+      "segno/coda/text/rehearsal/metronome marks",
+      "system and page starts",
+      "MIDI attacks"
+    ],
+    "midi_attacks": 57,
+    "lilypond_warnings": [],
+    "lyric_syllables_found_in_engraving": null,
+    "image_only": {
+      "clean.pdf": true,
+      "scan.pdf": true,
+      "scan-severe.pdf": true
+    }
+  }
+}

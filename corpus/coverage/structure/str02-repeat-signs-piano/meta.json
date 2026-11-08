@@ -1,0 +1,320 @@
+{
+  "id": "str02-repeat-signs-piano",
+  "family": "structure",
+  "title": "Waltz in Repeats - start/end repeat signs in every position (piano)",
+  "symbols": [
+    "barline-double",
+    "beam",
+    "chord",
+    "clef-bass",
+    "clef-treble",
+    "dot",
+    "key-f1",
+    "ledger-above",
+    "note-8th",
+    "note-half",
+    "note-quarter",
+    "repeat-end",
+    "repeat-start",
+    "rest-quarter",
+    "stem-down",
+    "stem-up",
+    "system-break",
+    "time-3-4"
+  ],
+  "focus_symbols": [
+    "repeat-start",
+    "repeat-end",
+    "barline-double",
+    "system-break"
+  ],
+  "layout": "piano",
+  "expected": {
+    "parts": [
+      "Piano"
+    ],
+    "must_not_split": true,
+    "staves_per_part": {
+      "Piano": 2
+    },
+    "lyrics": [],
+    "structure": "Notated order (do not unroll): ||: implied :|| after m.4 (no start sign at m.1); start repeat m.5 (system start); end+start repeat between mm.6|7 (one :|.|: glyph); end repeat after m.8 at the end of system 2 and start repeat at the beginning of system 3 (m.9) - LilyPond splits the combined glyph across the line break; end repeat after m.10; double bar after m.12; start repeat m.13 (system start); end repeat after m.16 closes the piece. Played form: 1-4,1-4,5-6,5-6,7-8,7-8,9-10,9-10,11-12,13-16,13-16.",
+    "notes": "One part (Piano) on a grand staff (2 staves, must NOT be split), F major, 3/4. Repeat signs: forward repeats on the LEFT barline of mm. 5, 7, 9, 13 (<repeat direction=\"forward\"/>, heavy-light); backward repeats on the RIGHT barline of mm. 4, 6, 8, 10, 16 (<repeat direction=\"backward\"/>, light-heavy). The repeat at m.1 is implied, so measure 1 has NO forward repeat."
+  },
+  "counts": {
+    "barline-double": 1,
+    "beam": 5,
+    "chord": 32,
+    "clef-bass": 1,
+    "clef-treble": 1,
+    "dot": 3,
+    "key-f1": 1,
+    "ledger-above": 27,
+    "note-8th": 10,
+    "note-half": 5,
+    "note-quarter": 77,
+    "repeat-end": 5,
+    "repeat-start": 4,
+    "rest-quarter": 1,
+    "stem-down": 68,
+    "stem-up": 24,
+    "system-break": 3,
+    "time-3-4": 1
+  },
+  "counts_by_part": {
+    "Piano": {
+      "beam": 5,
+      "chord": 32,
+      "clef-bass": 1,
+      "clef-treble": 1,
+      "dot": 3,
+      "ledger-above": 27,
+      "note-8th": 10,
+      "note-half": 5,
+      "note-quarter": 77,
+      "rest-quarter": 1,
+      "stem-down": 68,
+      "stem-up": 24
+    }
+  },
+  "count_rules": "Coverage-taxonomy symbol counts read from truth.musicxml.\n\nCounting rules (also written to meta.json 'count_rules'):\n  * score-wide tags are counted ONCE per score position even when MusicXML repeats them in every\n    part: barline-double, barline-final, repeat-start, repeat-end, volta-N, segno, coda, dc, ds,\n    fine, x-to-coda, system-break, page-break, multi-page, rehearsal-mark, tempo-mark, metronome,\n    key-*, key-change, time-*, time-change, pickup;\n  * every other tag is counted per occurrence in every part (also listed per part in\n    'counts_by_part'):\n      note-<type>  note events (a chord counts once, as its stem/duration), no grace / cue notes\n      chord        note events with two or more noteheads\n      dot / double-dot  dotted / double-dotted note events;  rest-dotted  dotted rests\n      beam         beam groups (<beam number=\"1\">begin);  flag  unbeamed note events of 8th or shorter\n      stem-up / stem-down  note events with that <stem>\n      ledger-above / ledger-below  noteheads on or beyond the first ledger line (per clef in force)\n      rest-<type>  rests that are not whole-bar rests;  rest-whole-bar  <rest measure=\"yes\"/>\n      clef-*       <clef> elements (initial and changes);  clef-change  clefs after the first measure\n      acc-*        printed <accidental> elements;  acc-courtesy  cautionary / parenthesised ones\n      tie          <tie type=\"start\"> per notehead;  tie-across-system  ties whose end note starts a\n                   new system or page\n      slur, staccato, accent, tenuto, ..., fermata   per element;  dyn-*  per dynamic;  hairpin-*  per\n      wedge start;  pedal  per pedal start;  text-expression  words that are not tempo / jump text\n      lyrics  <lyric> syllables;  lyrics-hyphen  begin/middle syllables;  lyrics-extender  <extend>\n      lyrics-multi-verse  syllables of verse 2 and higher",
+  "degradations": {
+    "clean.pdf": {
+      "seed": null,
+      "render_dpi": 300,
+      "dpi": 300,
+      "format": "png (lossless)",
+      "colour": "gray",
+      "params": {},
+      "summary": "undamaged raster of the engraving",
+      "bytes": 88410
+    },
+    "scan.pdf": {
+      "seed": 42001,
+      "render_dpi": 250,
+      "dpi": 250,
+      "format": "jpeg q75",
+      "colour": "gray",
+      "params": {
+        "dpi": 250,
+        "mode": "gray",
+        "texture": 3,
+        "rotate": -0.8,
+        "bleed": 0.04,
+        "blur": 0.4,
+        "noise": 3,
+        "jpeg": 75
+      },
+      "summary": "flatbed scan, 250 dpi grey, -0.8 deg skew, paper texture, faint bleed-through, JPEG q75",
+      "bytes": 477346,
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            2067,
+            2924
+          ],
+          "ops": [
+            [
+              "bleed_through",
+              {
+                "strength": 0.04,
+                "shift_px": -16
+              }
+            ],
+            [
+              "paper_texture",
+              3
+            ],
+            [
+              "skew_rotation_deg",
+              -0.8
+            ],
+            [
+              "focus_blur_sigma",
+              0.4
+            ],
+            [
+              "gaussian_noise_sigma",
+              3
+            ]
+          ]
+        }
+      ]
+    },
+    "scan-severe.pdf": {
+      "seed": 42002,
+      "render_dpi": 150,
+      "dpi": 150,
+      "format": "jpeg q22",
+      "colour": "rgb",
+      "params": {
+        "dpi": 150,
+        "mode": "rgb",
+        "paper_rgb": [
+          243,
+          236,
+          214
+        ],
+        "texture": 6,
+        "rotate": -3.0,
+        "phone": {
+          "margin": 0.06,
+          "bg": 55,
+          "jitter": 0.04,
+          "keystone": 0.07
+        },
+        "blotch": 0.3,
+        "vignette": 0.35,
+        "motion_blur": {
+          "len": 5,
+          "angle": 25
+        },
+        "noise": 7,
+        "jpeg": 22
+      },
+      "summary": "phone photo of the page: perspective/keystone, uneven lamp light and vignette, motion blur, cream paper, 150 dpi, JPEG q22",
+      "bytes": 99246,
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1389,
+            1902
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              6
+            ],
+            [
+              "paper_colour",
+              [
+                243,
+                236,
+                214
+              ]
+            ],
+            [
+              "skew_rotation_deg",
+              -3.0
+            ],
+            [
+              "perspective_phone",
+              {
+                "margin": 0.06,
+                "bg": 55,
+                "jitter": 0.04,
+                "keystone": 0.07,
+                "corners_src": [
+                  [
+                    -132,
+                    -9
+                  ],
+                  [
+                    1495,
+                    41
+                  ],
+                  [
+                    1428,
+                    1931
+                  ],
+                  [
+                    25,
+                    1908
+                  ]
+                ]
+              }
+            ],
+            [
+              "uneven_lighting",
+              0.3
+            ],
+            [
+              "vignette",
+              0.35
+            ],
+            [
+              "motion_blur",
+              {
+                "len": 5,
+                "angle": 25
+              }
+            ],
+            [
+              "gaussian_noise_sigma",
+              7
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "dpi": 250,
+  "pages": 1,
+  "systems_per_page": [
+    4
+  ],
+  "system_start_measures": [
+    [
+      "1",
+      "5",
+      "9",
+      "13"
+    ]
+  ],
+  "measures": 16,
+  "noteheads_in_truth": 164,
+  "license": "CC0",
+  "license_detail": "CC0 1.0 Universal - composition, engraving, truth and scans",
+  "notes": "No truth limitations. Repeat barlines appear in the truth once per part (one part here); in the engraving the repeat dots appear on both staves of the grand staff.",
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "truth.musicxml",
+    "scan-severe.pdf",
+    "scan.pdf"
+  ],
+  "generator": "corpus/coverage/structure/_tools (model -> MusicXML 4.0 truth + LilyPond 2.24 engraving)",
+  "validation": {
+    "xsd_valid": true,
+    "music21_parse": "2 92",
+    "engraving_matches_truth": true,
+    "checked": [
+      "notes",
+      "rests",
+      "full-bar rests",
+      "ties",
+      "beams",
+      "slurs",
+      "stems",
+      "articulations",
+      "dynamics/hairpins/text",
+      "lyrics",
+      "clefs",
+      "keys",
+      "times",
+      "bar-line glyphs",
+      "volta spans",
+      "segno/coda/text/rehearsal/metronome marks",
+      "system and page starts",
+      "MIDI attacks"
+    ],
+    "midi_attacks": 164,
+    "lilypond_warnings": [],
+    "lyric_syllables_found_in_engraving": null,
+    "image_only": {
+      "clean.pdf": true,
+      "scan.pdf": true,
+      "scan-severe.pdf": true
+    }
+  }
+}

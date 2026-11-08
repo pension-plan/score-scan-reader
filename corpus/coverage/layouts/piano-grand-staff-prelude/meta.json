@@ -1,0 +1,306 @@
+{
+  "id": "piano-grand-staff-prelude",
+  "family": "layouts",
+  "title": "Prelude in G - solo piano on a braced grand staff",
+  "layout": "piano",
+  "symbols": [
+    "acc-flat",
+    "acc-natural",
+    "acc-sharp",
+    "arpeggio",
+    "barline-double",
+    "beam",
+    "chord",
+    "clef-bass",
+    "clef-treble",
+    "dot",
+    "dyn-f",
+    "dyn-mf",
+    "dyn-p",
+    "fermata",
+    "fingering",
+    "flag",
+    "hairpin-cresc",
+    "hairpin-dim",
+    "key-s1",
+    "ledger-above",
+    "ledger-below",
+    "metronome",
+    "note-16th",
+    "note-8th",
+    "note-half",
+    "note-quarter",
+    "note-whole",
+    "pedal",
+    "slur",
+    "staccato",
+    "stem-down",
+    "stem-up",
+    "system-break",
+    "tempo-mark",
+    "time-4-4",
+    "x-measures",
+    "x-multi-staff-part",
+    "x-parts",
+    "x-staves"
+  ],
+  "counts": {
+    "acc-flat": 2,
+    "acc-natural": 1,
+    "acc-sharp": 2,
+    "arpeggio": 2,
+    "barline-double": 1,
+    "beam": 31,
+    "chord": 10,
+    "clef-bass": 1,
+    "clef-treble": 1,
+    "dot": 1,
+    "dyn-f": 1,
+    "dyn-mf": 1,
+    "dyn-p": 2,
+    "fermata": 2,
+    "fingering": 6,
+    "flag": 1,
+    "hairpin-cresc": 2,
+    "hairpin-dim": 1,
+    "key-s1": 1,
+    "ledger-above": 5,
+    "ledger-below": 5,
+    "metronome": 1,
+    "note-16th": 4,
+    "note-8th": 61,
+    "note-half": 5,
+    "note-quarter": 42,
+    "note-whole": 3,
+    "pedal": 2,
+    "slur": 7,
+    "staccato": 8,
+    "stem-down": 68,
+    "stem-up": 44,
+    "system-break": 2,
+    "tempo-mark": 1,
+    "time-4-4": 1,
+    "x-measures": 12,
+    "x-multi-staff-part": 1,
+    "x-parts": 1,
+    "x-staves": 2
+  },
+  "expected": {
+    "parts": [
+      "Piano"
+    ],
+    "must_not_split": true,
+    "shared_staves": [],
+    "staves_per_part": {
+      "Piano": 2
+    },
+    "lyrics": [],
+    "notes": "ONE part \"Piano\" with two staves (treble + bass) joined by a brace; it must not be split into two parts. Chords (incl. rolled chords) stay chords. 12 measures, 3 systems of 4 measures."
+  },
+  "notes": [
+    "Sustain-pedal marks are <pedal type=\"start\"/\"stop\" sign=\"yes\" line=\"no\">."
+  ],
+  "layout_description": "A4 portrait, staff size 20, 3 systems of 4 measures, instrument name on the first system only",
+  "pages": 1,
+  "measures": 12,
+  "systems": 3,
+  "noteheads_in_truth": 131,
+  "hidden_staff_segments": [],
+  "dpi": 300,
+  "degradations": {
+    "clean.pdf": {
+      "seed": null,
+      "dpi": 300,
+      "format": "png (8-bit grey)",
+      "summary": "undamaged raster of the engraving",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "size_px": [
+            2481,
+            3508
+          ]
+        }
+      ],
+      "bytes": 110005
+    },
+    "scan.pdf": {
+      "seed": 7031,
+      "render_dpi": 300,
+      "dpi": 300,
+      "format": "jpeg q75",
+      "colour": "gray",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            2481,
+            3508
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              2
+            ],
+            [
+              "skew_rotation_deg",
+              0.6
+            ],
+            [
+              "focus_blur_sigma",
+              0.4
+            ],
+            [
+              "gaussian_noise_sigma",
+              3
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 300,
+        "mode": "gray",
+        "texture": 2,
+        "rotate": 0.6,
+        "blur": 0.4,
+        "noise": 3,
+        "jpeg": 75
+      },
+      "summary": "300 dpi grey flatbed scan, 0.6 deg skew, light paper texture and noise, JPEG q75",
+      "bytes": 593833
+    },
+    "scan-severe.pdf": {
+      "seed": 7032,
+      "render_dpi": 300,
+      "dpi": 150,
+      "format": "png1",
+      "colour": "bw",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1240,
+            1754
+          ],
+          "ops": [
+            [
+              "faded_ink",
+              0.12
+            ],
+            [
+              "skew_rotation_deg",
+              3.0
+            ],
+            [
+              "focus_blur_sigma",
+              0.6
+            ],
+            [
+              "gaussian_noise_sigma",
+              8
+            ],
+            [
+              "salt_pepper",
+              0.0015
+            ],
+            [
+              "speckles_per_mpx",
+              120
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 118,
+                "noise": 20
+              }
+            ],
+            [
+              "resampled_dpi",
+              [
+                300,
+                150
+              ]
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 300,
+        "out_dpi": 150,
+        "ink_dropout": 0.12,
+        "rotate": 3.0,
+        "blur": 0.6,
+        "noise": 8,
+        "binarize": 118,
+        "binarize_noise": 20,
+        "saltpepper": 0.0015,
+        "speckle": 120,
+        "format": "png1"
+      },
+      "summary": "thin, faded binarised photocopy at 150 dpi (rendered 300): ink dropout, 3 deg skew, broken lines, salt & pepper, toner specks",
+      "bytes": 28349
+    }
+  },
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "scan-severe.pdf",
+    "scan.pdf",
+    "truth.musicxml"
+  ],
+  "license": "CC0",
+  "license_detail": "CC0-1.0: composition, arrangement, engraving and scans",
+  "source": "self-authored for the coverage suite (2026)",
+  "engraver": "internal model -> LilyPond 2.24 (coverage-suite writer: explicit beams and stems)",
+  "validation": {
+    "xsd_valid": true,
+    "music21_parse": "2 115",
+    "midi_attacks_match_truth": true,
+    "attacks": 131,
+    "grob_log_matches_truth": true,
+    "printed_summary": {
+      "noteheads": 131,
+      "stems_up": 44,
+      "stems_down": 68,
+      "accidentals": 5,
+      "rests": 0,
+      "beams": 31,
+      "flags": 1,
+      "slurs": 7,
+      "ties": 0,
+      "scripts": {
+        "staccato": 8,
+        "fermata": 2
+      },
+      "dynamics": {
+        "p": 2,
+        "mf": 1,
+        "f": 1
+      },
+      "lyric_syllables": 0,
+      "hyphens": 0,
+      "extenders": 0,
+      "chord_names": 0,
+      "system_delimiters": {
+        "SystemStartBrace": 3
+      }
+    },
+    "lilypond_warnings": [],
+    "lyric_syllables_found_in_engraving": null,
+    "lyric_syllables": 0,
+    "pages_planned": 1,
+    "image_only": {
+      "clean.pdf": true,
+      "scan.pdf": true,
+      "scan-severe.pdf": true
+    }
+  }
+}

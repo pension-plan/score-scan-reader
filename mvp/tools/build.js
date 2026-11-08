@@ -15,7 +15,11 @@ const DIST = path.join(ROOT, 'dist');
 const UI = path.join(ROOT, 'ui');
 const quiet = process.argv.includes('--quiet');
 const MB = 1024 * 1024;
-const REQUIRED_ASSETS = ['tesseract-worker.min.js', 'tesseract-core-simd-lstm.wasm.js', 'eng.traineddata.gz', 'sample-st-anselm.pdf', 'sample-maple-leaf-rag.pdf'];
+// ML: the optional copista-2m detector (src/ml.js): model, onnxruntime-web wasm, and the
+// licence / notice files that must ship with them (copy with node assets-src/ml/sync.js).
+const ML_ASSETS = ['copista2m-dense.int8w.onnx', 'copista2m-rel.int8w.onnx', 'copista2m-classes.json', 'ort-wasm-simd-threaded.wasm',
+  'LICENSE.copista-Apache-2.0.txt', 'NOTICE.copista-2m', 'NOTICE.copisteria', 'LICENSE.onnxruntime-web-MIT.txt', 'NOTICE.ml.txt'];
+const REQUIRED_ASSETS = ['tesseract-worker.min.js', 'tesseract-core-simd-lstm.wasm.js', 'eng.traineddata.gz', 'deu.traineddata.gz', 'sample-st-anselm.pdf', 'sample-maple-leaf-rag.pdf', ...ML_ASSETS];
 const SCRIPTS = [
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',
@@ -35,7 +39,9 @@ if (!mods.includes('omr')) fail('src/omr.js is missing');
 // The bundle is one named function, called once on the page; the page also
 // starts a Web Worker from its source text (with ui/session.js), so recognition
 // runs off the main thread without a second copy of the code.
-let bundle = 'function __omrBundle(){\nconst defs={},cache={};\nfunction req(n){n=n.replace(/^\\.\\//,"").replace(/\\.js$/,"");if(cache[n])return cache[n].exports;if(!defs[n])return {};const m={exports:{}};cache[n]=m;defs[n](req,m,m.exports);return m.exports;}\n';
+// Node-only debug switches (process.env.X) in a module must not throw in the
+// page: the bundle sees an empty process.env (in Node the modules run unbundled).
+let bundle = 'function __omrBundle(){\nconst process=(typeof globalThis!=="undefined"&&globalThis.process&&globalThis.process.env)?globalThis.process:{env:{}};\nconst defs={},cache={};\nfunction req(n){n=n.replace(/^\\.\\//,"").replace(/\\.js$/,"");if(cache[n])return cache[n].exports;if(!defs[n])return {};const m={exports:{}};cache[n]=m;defs[n](req,m,m.exports);return m.exports;}\n';
 for (const m of mods) {
   const code = fs.readFileSync(path.join(SRC, m + '.js'), 'utf8');
   for (const r of code.matchAll(/require\(\s*['"]\.\/([\w.-]+?)(?:\.js)?['"]\s*\)/g)) {
@@ -95,6 +101,10 @@ if (!/:root\s*{/.test(css) || !/prefers-color-scheme:\s*dark/.test(css) || !/:ro
 if (!/max\(16px,\s*env\(safe-area-inset-left/.test(css)) fail('side gutter does not use max(16px, env(safe-area-inset-left))');
 
 // ---- assets
+// every language the pipeline's OCR config names (src/lyrics.js OCR_CONFIG) ships as traineddata
+const lyrSrc = fs.existsSync(path.join(SRC, 'lyrics.js')) ? fs.readFileSync(path.join(SRC, 'lyrics.js'), 'utf8') : '';
+const ocrLangs = ((lyrSrc.match(/OCR_CONFIG\s*=\s*{[\s\S]*?langs:\s*['"]([\w+]+)['"]/) || [])[1] || 'eng').split('+');
+for (const l of ocrLangs) if (!fs.existsSync(path.join(DIST, 'assets', `${l}.traineddata.gz`))) fail(`OCR_CONFIG names ${l}, but dist/assets/${l}.traineddata.gz is missing`);
 const rows = [];
 let total = 0;
 for (const a of REQUIRED_ASSETS) if (!fs.existsSync(path.join(DIST, 'assets', a))) fail(`missing asset dist/assets/${a}`);

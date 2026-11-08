@@ -91,8 +91,10 @@ class Ev:
     breath: bool = False
     tempo: Optional[dict] = None
     clef: Optional[str] = None
-    # filled later
+    # filled later (read back from the engraving)
     stem: Optional[str] = None
+    mark_dirs: List[str] = field(default_factory=list)       # engraved side of each entry of marks
+    finger_dirs: List[str] = field(default_factory=list)     # engraved side of each entry of fingering
     accidentals: Dict[Pitch, str] = field(default_factory=dict)
 
     @property

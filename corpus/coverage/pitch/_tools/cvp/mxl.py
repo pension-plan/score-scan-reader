@@ -178,7 +178,7 @@ def write_musicxml(score: Score, path: str, software='coverage corpus builder (p
                         st = f'<staff>{staff_attr}</staff>' if staff_attr else ''
                         if ev.ottava == 0:
                             size = ott_size.pop(v.key, 8)
-                            w(f'      <direction><direction-type><octave-shift type="stop" size="{size}" number="1"/>'
+                            w(f'      <direction><direction-type><octave-shift type="stop" size="{size}" number="{staff_attr or 1}"/>'
                               f'</direction-type><voice>{vnum[v.key]}</voice>{st}</direction>')
                         else:
                             size = 15 if abs(ev.ottava) == 2 else 8
@@ -186,7 +186,7 @@ def write_musicxml(score: Score, path: str, software='coverage corpus builder (p
                             pl = 'above' if ev.ottava > 0 else 'below'
                             ott_size[v.key] = size
                             w(f'      <direction placement="{pl}"><direction-type><octave-shift type="{typ}" '
-                              f'size="{size}" number="1"/></direction-type><voice>{vnum[v.key]}</voice>{st}</direction>')
+                              f'size="{size}" number="{staff_attr or 1}"/></direction-type><voice>{vnum[v.key]}</voice>{st}</direction>')
                         continue
                     d = int(ev.dur * div)
                     if ev.kind == 'space':

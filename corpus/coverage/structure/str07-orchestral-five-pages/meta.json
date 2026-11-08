@@ -1,0 +1,728 @@
+{
+  "id": "str07-orchestral-five-pages",
+  "family": "structure",
+  "title": "Little Overture - rehearsal marks, Segno, Fine, D.S. al Fine, endings across a page turn (orchestra, 5 pages)",
+  "symbols": [
+    "acc-sharp",
+    "barline-double",
+    "barline-final",
+    "beam",
+    "clef-alto",
+    "clef-bass",
+    "clef-treble",
+    "dot",
+    "ds",
+    "dyn-f",
+    "dyn-mf",
+    "dyn-p",
+    "fine",
+    "key-s1",
+    "ledger-above",
+    "ledger-below",
+    "metronome",
+    "multi-page",
+    "note-8th",
+    "note-half",
+    "note-quarter",
+    "note-whole",
+    "page-break",
+    "rehearsal-mark",
+    "repeat-end",
+    "repeat-start",
+    "rest-half",
+    "rest-quarter",
+    "rest-whole-bar",
+    "segno",
+    "stem-down",
+    "stem-up",
+    "system-break",
+    "tempo-mark",
+    "time-common",
+    "volta-1",
+    "volta-2"
+  ],
+  "focus_symbols": [
+    "multi-page",
+    "page-break",
+    "system-break",
+    "segno",
+    "fine",
+    "ds",
+    "volta-1",
+    "volta-2",
+    "repeat-start",
+    "repeat-end",
+    "barline-final",
+    "barline-double",
+    "rehearsal-mark"
+  ],
+  "layout": "orchestral",
+  "expected": {
+    "parts": [
+      "Flute",
+      "Oboe",
+      "Bassoon",
+      "Violin I",
+      "Violin II",
+      "Viola",
+      "Violoncello"
+    ],
+    "must_not_split": false,
+    "staves_per_part": {
+      "Flute": 1,
+      "Oboe": 1,
+      "Bassoon": 1,
+      "Violin I": 1,
+      "Violin II": 1,
+      "Viola": 1,
+      "Violoncello": 1
+    },
+    "lyrics": [],
+    "structure": "5 pages x 2 systems x 4 bars (page breaks before mm.9, 17, 25, 33; system breaks before mm.5, 13, 21, 29, 37). Intro mm.1-4; [A] + Segno m.5; \"Fine\" + final bar after m.16 (end of page 2); [B] start repeat m.17 (top of page 3, combined with the final bar of m.16 at the page turn); 1st ending mm.24-25 crossing the page turn 3|4 (end repeat after m.25); 2nd ending mm.26-27 (double bar); [C] m.28; repeat mm.29-32 (end of page 4); [D] mm.33-40, \"D.S. al Fine\" + double bar. Played form: 1-25, 17-23, 26-32, 29-40, 5-16.",
+    "notes": "Seven parts, one staff each, all non-transposing: Flute, Oboe, Bassoon (bracket) and Violin I, Violin II, Viola (alto clef), Violoncello (bracket). G major, common-time symbol. Winds are tacet in some sections (whole-bar rests; no multi-bar rests). Directions (tempo, rehearsal, segno, Fine, D.S.) are in the Flute part (top staff) of the truth."
+  },
+  "counts": {
+    "acc-sharp": 5,
+    "barline-double": 2,
+    "barline-final": 1,
+    "beam": 8,
+    "clef-alto": 1,
+    "clef-bass": 2,
+    "clef-treble": 4,
+    "dot": 2,
+    "ds": 1,
+    "dyn-f": 11,
+    "dyn-mf": 8,
+    "dyn-p": 5,
+    "fine": 1,
+    "key-s1": 1,
+    "ledger-above": 46,
+    "ledger-below": 24,
+    "metronome": 1,
+    "multi-page": 5,
+    "note-8th": 16,
+    "note-half": 181,
+    "note-quarter": 502,
+    "note-whole": 9,
+    "page-break": 4,
+    "rehearsal-mark": 4,
+    "repeat-end": 2,
+    "repeat-start": 2,
+    "rest-half": 2,
+    "rest-quarter": 2,
+    "rest-whole-bar": 51,
+    "segno": 1,
+    "stem-down": 411,
+    "stem-up": 288,
+    "system-break": 5,
+    "tempo-mark": 1,
+    "time-common": 1,
+    "volta-1": 1,
+    "volta-2": 1
+  },
+  "counts_by_part": {
+    "Flute": {
+      "beam": 4,
+      "clef-treble": 1,
+      "dyn-f": 1,
+      "dyn-mf": 1,
+      "ledger-above": 14,
+      "note-8th": 8,
+      "note-half": 3,
+      "note-quarter": 56,
+      "note-whole": 3,
+      "rest-half": 1,
+      "rest-whole-bar": 20,
+      "stem-down": 66,
+      "stem-up": 1
+    },
+    "Oboe": {
+      "acc-sharp": 2,
+      "clef-treble": 1,
+      "dot": 1,
+      "dyn-f": 1,
+      "dyn-mf": 1,
+      "dyn-p": 1,
+      "ledger-above": 13,
+      "note-half": 7,
+      "note-quarter": 72,
+      "note-whole": 2,
+      "rest-quarter": 1,
+      "rest-whole-bar": 16,
+      "stem-down": 74,
+      "stem-up": 5
+    },
+    "Bassoon": {
+      "clef-bass": 1,
+      "dyn-f": 1,
+      "dyn-mf": 2,
+      "ledger-below": 4,
+      "note-quarter": 100,
+      "rest-whole-bar": 15,
+      "stem-down": 59,
+      "stem-up": 41
+    },
+    "Violin I": {
+      "acc-sharp": 2,
+      "beam": 4,
+      "clef-treble": 1,
+      "dot": 1,
+      "dyn-f": 2,
+      "dyn-mf": 1,
+      "dyn-p": 1,
+      "ledger-above": 19,
+      "note-8th": 8,
+      "note-half": 11,
+      "note-quarter": 114,
+      "note-whole": 4,
+      "rest-half": 1,
+      "rest-quarter": 1,
+      "stem-down": 127,
+      "stem-up": 6
+    },
+    "Violin II": {
+      "acc-sharp": 1,
+      "clef-treble": 1,
+      "dyn-f": 2,
+      "dyn-mf": 1,
+      "dyn-p": 1,
+      "ledger-below": 8,
+      "note-half": 80,
+      "stem-up": 80
+    },
+    "Viola": {
+      "clef-alto": 1,
+      "dyn-f": 2,
+      "dyn-mf": 1,
+      "dyn-p": 1,
+      "note-half": 80,
+      "stem-up": 80
+    },
+    "Violoncello": {
+      "clef-bass": 1,
+      "dyn-f": 2,
+      "dyn-mf": 1,
+      "dyn-p": 1,
+      "ledger-below": 12,
+      "note-quarter": 160,
+      "stem-down": 85,
+      "stem-up": 75
+    }
+  },
+  "count_rules": "Coverage-taxonomy symbol counts read from truth.musicxml.\n\nCounting rules (also written to meta.json 'count_rules'):\n  * score-wide tags are counted ONCE per score position even when MusicXML repeats them in every\n    part: barline-double, barline-final, repeat-start, repeat-end, volta-N, segno, coda, dc, ds,\n    fine, x-to-coda, system-break, page-break, multi-page, rehearsal-mark, tempo-mark, metronome,\n    key-*, key-change, time-*, time-change, pickup;\n  * every other tag is counted per occurrence in every part (also listed per part in\n    'counts_by_part'):\n      note-<type>  note events (a chord counts once, as its stem/duration), no grace / cue notes\n      chord        note events with two or more noteheads\n      dot / double-dot  dotted / double-dotted note events;  rest-dotted  dotted rests\n      beam         beam groups (<beam number=\"1\">begin);  flag  unbeamed note events of 8th or shorter\n      stem-up / stem-down  note events with that <stem>\n      ledger-above / ledger-below  noteheads on or beyond the first ledger line (per clef in force)\n      rest-<type>  rests that are not whole-bar rests;  rest-whole-bar  <rest measure=\"yes\"/>\n      clef-*       <clef> elements (initial and changes);  clef-change  clefs after the first measure\n      acc-*        printed <accidental> elements;  acc-courtesy  cautionary / parenthesised ones\n      tie          <tie type=\"start\"> per notehead;  tie-across-system  ties whose end note starts a\n                   new system or page\n      slur, staccato, accent, tenuto, ..., fermata   per element;  dyn-*  per dynamic;  hairpin-*  per\n      wedge start;  pedal  per pedal start;  text-expression  words that are not tempo / jump text\n      lyrics  <lyric> syllables;  lyrics-hyphen  begin/middle syllables;  lyrics-extender  <extend>\n      lyrics-multi-verse  syllables of verse 2 and higher",
+  "degradations": {
+    "clean.pdf": {
+      "seed": null,
+      "render_dpi": 300,
+      "dpi": 300,
+      "format": "png (lossless)",
+      "colour": "gray",
+      "params": {},
+      "summary": "undamaged raster of the engraving",
+      "bytes": 442977
+    },
+    "scan.pdf": {
+      "seed": 47001,
+      "render_dpi": 300,
+      "dpi": 300,
+      "format": "jpeg q75",
+      "colour": "gray",
+      "params": {
+        "dpi": 300,
+        "mode": "gray",
+        "texture": 2,
+        "rotate_pages": {
+          "0": 0.5,
+          "1": -0.8,
+          "2": 1.1,
+          "3": -0.4,
+          "4": -1.0
+        },
+        "blur": 0.35,
+        "noise": 3,
+        "jpeg": 75
+      },
+      "summary": "sheet-fed scan of 5 pages, 300 dpi grey, a different small skew per page (-1.0..1.1 deg), light noise, JPEG q75",
+      "bytes": 3614381,
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            2481,
+            3508
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              2
+            ],
+            [
+              "skew_rotation_deg",
+              0.5
+            ],
+            [
+              "focus_blur_sigma",
+              0.35
+            ],
+            [
+              "gaussian_noise_sigma",
+              3
+            ]
+          ]
+        },
+        {
+          "image": 2,
+          "source_pages": [
+            2
+          ],
+          "size_px": [
+            2481,
+            3508
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              2
+            ],
+            [
+              "skew_rotation_deg",
+              -0.8
+            ],
+            [
+              "focus_blur_sigma",
+              0.35
+            ],
+            [
+              "gaussian_noise_sigma",
+              3
+            ]
+          ]
+        },
+        {
+          "image": 3,
+          "source_pages": [
+            3
+          ],
+          "size_px": [
+            2481,
+            3508
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              2
+            ],
+            [
+              "skew_rotation_deg",
+              1.1
+            ],
+            [
+              "focus_blur_sigma",
+              0.35
+            ],
+            [
+              "gaussian_noise_sigma",
+              3
+            ]
+          ]
+        },
+        {
+          "image": 4,
+          "source_pages": [
+            4
+          ],
+          "size_px": [
+            2481,
+            3508
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              2
+            ],
+            [
+              "skew_rotation_deg",
+              -0.4
+            ],
+            [
+              "focus_blur_sigma",
+              0.35
+            ],
+            [
+              "gaussian_noise_sigma",
+              3
+            ]
+          ]
+        },
+        {
+          "image": 5,
+          "source_pages": [
+            5
+          ],
+          "size_px": [
+            2481,
+            3508
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              2
+            ],
+            [
+              "skew_rotation_deg",
+              -1.0
+            ],
+            [
+              "focus_blur_sigma",
+              0.35
+            ],
+            [
+              "gaussian_noise_sigma",
+              3
+            ]
+          ]
+        }
+      ]
+    },
+    "scan-severe.pdf": {
+      "seed": 47002,
+      "render_dpi": 200,
+      "dpi": 200,
+      "format": "png1",
+      "colour": "bw",
+      "params": {
+        "dpi": 200,
+        "rotate_pages": {
+          "0": 2.5,
+          "1": -3.5,
+          "2": 6.0,
+          "3": -2.0,
+          "4": 4.0
+        },
+        "page_rotate": {
+          "3": 180
+        },
+        "scale_pages": {
+          "1": 0.97
+        },
+        "ink_dropout": 0.1,
+        "blur": 0.7,
+        "noise": 9,
+        "binarize": 125,
+        "binarize_noise": 18,
+        "saltpepper": 0.0015,
+        "speckle": 120,
+        "format": "png1"
+      },
+      "summary": "worn photocopy set, 200 dpi binarised: per-page skew up to 6 deg, page 4 fed upside down, page 2 at 97 % scale, toner speckles, broken thin lines",
+      "bytes": 339696,
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1654,
+            2339
+          ],
+          "ops": [
+            [
+              "faded_ink",
+              0.1
+            ],
+            [
+              "skew_rotation_deg",
+              2.5
+            ],
+            [
+              "focus_blur_sigma",
+              0.7
+            ],
+            [
+              "gaussian_noise_sigma",
+              9
+            ],
+            [
+              "salt_pepper",
+              0.0015
+            ],
+            [
+              "speckles_per_mpx",
+              120
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 125,
+                "noise": 18
+              }
+            ]
+          ]
+        },
+        {
+          "image": 2,
+          "source_pages": [
+            2
+          ],
+          "size_px": [
+            1654,
+            2339
+          ],
+          "ops": [
+            [
+              "faded_ink",
+              0.1
+            ],
+            [
+              "skew_rotation_deg",
+              -3.5
+            ],
+            [
+              "scale",
+              0.97
+            ],
+            [
+              "focus_blur_sigma",
+              0.7
+            ],
+            [
+              "gaussian_noise_sigma",
+              9
+            ],
+            [
+              "salt_pepper",
+              0.0015
+            ],
+            [
+              "speckles_per_mpx",
+              120
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 125,
+                "noise": 18
+              }
+            ]
+          ]
+        },
+        {
+          "image": 3,
+          "source_pages": [
+            3
+          ],
+          "size_px": [
+            1654,
+            2339
+          ],
+          "ops": [
+            [
+              "faded_ink",
+              0.1
+            ],
+            [
+              "skew_rotation_deg",
+              6.0
+            ],
+            [
+              "focus_blur_sigma",
+              0.7
+            ],
+            [
+              "gaussian_noise_sigma",
+              9
+            ],
+            [
+              "salt_pepper",
+              0.0015
+            ],
+            [
+              "speckles_per_mpx",
+              120
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 125,
+                "noise": 18
+              }
+            ]
+          ]
+        },
+        {
+          "image": 4,
+          "source_pages": [
+            4
+          ],
+          "size_px": [
+            1654,
+            2339
+          ],
+          "ops": [
+            [
+              "faded_ink",
+              0.1
+            ],
+            [
+              "skew_rotation_deg",
+              -2.0
+            ],
+            [
+              "focus_blur_sigma",
+              0.7
+            ],
+            [
+              "gaussian_noise_sigma",
+              9
+            ],
+            [
+              "salt_pepper",
+              0.0015
+            ],
+            [
+              "speckles_per_mpx",
+              120
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 125,
+                "noise": 18
+              }
+            ],
+            [
+              "page_rotated_deg",
+              180
+            ]
+          ]
+        },
+        {
+          "image": 5,
+          "source_pages": [
+            5
+          ],
+          "size_px": [
+            1654,
+            2339
+          ],
+          "ops": [
+            [
+              "faded_ink",
+              0.1
+            ],
+            [
+              "skew_rotation_deg",
+              4.0
+            ],
+            [
+              "focus_blur_sigma",
+              0.7
+            ],
+            [
+              "gaussian_noise_sigma",
+              9
+            ],
+            [
+              "salt_pepper",
+              0.0015
+            ],
+            [
+              "speckles_per_mpx",
+              120
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 125,
+                "noise": 18
+              }
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "dpi": 300,
+  "pages": 5,
+  "systems_per_page": [
+    2,
+    2,
+    2,
+    2,
+    2
+  ],
+  "system_start_measures": [
+    [
+      "1",
+      "5"
+    ],
+    [
+      "9",
+      "13"
+    ],
+    [
+      "17",
+      "21"
+    ],
+    [
+      "25",
+      "29"
+    ],
+    [
+      "33",
+      "37"
+    ]
+  ],
+  "measures": 40,
+  "noteheads_in_truth": 708,
+  "license": "CC0",
+  "license_detail": "CC0 1.0 Universal - composition, engraving, truth and scans",
+  "notes": "Truth limitations: the page numbers printed on pages 2-5 are not encoded; staff-group brackets are <part-group> elements. Score-wide marks (tempo, rehearsal marks, segno, Fine, D.S.) are stored once, in the top part; endings, repeats and bar styles are stored in every part.",
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "truth.musicxml",
+    "scan-severe.pdf",
+    "scan.pdf"
+  ],
+  "generator": "corpus/coverage/structure/_tools (model -> MusicXML 4.0 truth + LilyPond 2.24 engraving)",
+  "validation": {
+    "xsd_valid": true,
+    "music21_parse": "7 708",
+    "engraving_matches_truth": true,
+    "checked": [
+      "notes",
+      "rests",
+      "full-bar rests",
+      "ties",
+      "beams",
+      "slurs",
+      "stems",
+      "articulations",
+      "dynamics/hairpins/text",
+      "lyrics",
+      "clefs",
+      "keys",
+      "times",
+      "bar-line glyphs",
+      "volta spans",
+      "segno/coda/text/rehearsal/metronome marks",
+      "system and page starts",
+      "MIDI attacks"
+    ],
+    "midi_attacks": 708,
+    "lilypond_warnings": [],
+    "lyric_syllables_found_in_engraving": null,
+    "image_only": {
+      "clean.pdf": true,
+      "scan.pdf": true,
+      "scan-severe.pdf": true
+    }
+  }
+}

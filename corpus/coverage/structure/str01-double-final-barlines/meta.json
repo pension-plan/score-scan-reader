@@ -1,0 +1,273 @@
+{
+  "id": "str01-double-final-barlines",
+  "family": "structure",
+  "title": "Sectional Study - double and final bar lines (flute)",
+  "symbols": [
+    "barline-double",
+    "barline-final",
+    "beam",
+    "clef-treble",
+    "dot",
+    "flag",
+    "key-0",
+    "ledger-above",
+    "note-8th",
+    "note-half",
+    "note-quarter",
+    "note-whole",
+    "rest-quarter",
+    "stem-down",
+    "stem-up",
+    "system-break",
+    "time-4-4"
+  ],
+  "focus_symbols": [
+    "barline-double",
+    "barline-final",
+    "system-break"
+  ],
+  "layout": "melody",
+  "expected": {
+    "parts": [
+      "Flute"
+    ],
+    "must_not_split": false,
+    "staves_per_part": {
+      "Flute": 1
+    },
+    "lyrics": [],
+    "structure": "16 bars in 4 systems of 4. Double bar lines close mm. 2, 4, 6, 10, 11, 12, 14 (mm. 4 and 12 at system ends, mm. 11 and 12 back to back); final bar lines close m. 8 (mid-piece, end of system 2) and m. 16. No repeats, no jumps: the piece is played straight through.",
+    "notes": "One part (Flute), treble clef, C major, 4/4. Every double bar must be <bar-style>light-light</bar-style> and every final bar light-heavy on the right barline of its measure; ordinary bar lines need no <barline> element. A final bar line in the middle of the piece does not end the piece."
+  },
+  "counts": {
+    "barline-double": 7,
+    "barline-final": 2,
+    "beam": 8,
+    "clef-treble": 1,
+    "dot": 2,
+    "flag": 1,
+    "key-0": 1,
+    "ledger-above": 6,
+    "note-8th": 17,
+    "note-half": 8,
+    "note-quarter": 33,
+    "note-whole": 1,
+    "rest-quarter": 1,
+    "stem-down": 54,
+    "stem-up": 4,
+    "system-break": 3,
+    "time-4-4": 1
+  },
+  "counts_by_part": {
+    "Flute": {
+      "beam": 8,
+      "clef-treble": 1,
+      "dot": 2,
+      "flag": 1,
+      "ledger-above": 6,
+      "note-8th": 17,
+      "note-half": 8,
+      "note-quarter": 33,
+      "note-whole": 1,
+      "rest-quarter": 1,
+      "stem-down": 54,
+      "stem-up": 4
+    }
+  },
+  "count_rules": "Coverage-taxonomy symbol counts read from truth.musicxml.\n\nCounting rules (also written to meta.json 'count_rules'):\n  * score-wide tags are counted ONCE per score position even when MusicXML repeats them in every\n    part: barline-double, barline-final, repeat-start, repeat-end, volta-N, segno, coda, dc, ds,\n    fine, x-to-coda, system-break, page-break, multi-page, rehearsal-mark, tempo-mark, metronome,\n    key-*, key-change, time-*, time-change, pickup;\n  * every other tag is counted per occurrence in every part (also listed per part in\n    'counts_by_part'):\n      note-<type>  note events (a chord counts once, as its stem/duration), no grace / cue notes\n      chord        note events with two or more noteheads\n      dot / double-dot  dotted / double-dotted note events;  rest-dotted  dotted rests\n      beam         beam groups (<beam number=\"1\">begin);  flag  unbeamed note events of 8th or shorter\n      stem-up / stem-down  note events with that <stem>\n      ledger-above / ledger-below  noteheads on or beyond the first ledger line (per clef in force)\n      rest-<type>  rests that are not whole-bar rests;  rest-whole-bar  <rest measure=\"yes\"/>\n      clef-*       <clef> elements (initial and changes);  clef-change  clefs after the first measure\n      acc-*        printed <accidental> elements;  acc-courtesy  cautionary / parenthesised ones\n      tie          <tie type=\"start\"> per notehead;  tie-across-system  ties whose end note starts a\n                   new system or page\n      slur, staccato, accent, tenuto, ..., fermata   per element;  dyn-*  per dynamic;  hairpin-*  per\n      wedge start;  pedal  per pedal start;  text-expression  words that are not tempo / jump text\n      lyrics  <lyric> syllables;  lyrics-hyphen  begin/middle syllables;  lyrics-extender  <extend>\n      lyrics-multi-verse  syllables of verse 2 and higher",
+  "degradations": {
+    "clean.pdf": {
+      "seed": null,
+      "render_dpi": 300,
+      "dpi": 300,
+      "format": "png (lossless)",
+      "colour": "gray",
+      "params": {},
+      "summary": "undamaged raster of the engraving",
+      "bytes": 63550
+    },
+    "scan.pdf": {
+      "seed": 41001,
+      "render_dpi": 300,
+      "dpi": 300,
+      "format": "jpeg q80",
+      "colour": "gray",
+      "params": {
+        "dpi": 300,
+        "mode": "gray",
+        "texture": 2,
+        "rotate": 0.6,
+        "blur": 0.3,
+        "noise": 3,
+        "jpeg": 80
+      },
+      "summary": "office flatbed scan, 300 dpi grey, 0.6 deg skew, light paper texture and noise, JPEG q80",
+      "bytes": 649143,
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            2481,
+            3508
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              2
+            ],
+            [
+              "skew_rotation_deg",
+              0.6
+            ],
+            [
+              "focus_blur_sigma",
+              0.3
+            ],
+            [
+              "gaussian_noise_sigma",
+              3
+            ]
+          ]
+        }
+      ]
+    },
+    "scan-severe.pdf": {
+      "seed": 41002,
+      "render_dpi": 300,
+      "dpi": 150,
+      "format": "png1",
+      "colour": "bw",
+      "params": {
+        "dpi": 300,
+        "out_dpi": 150,
+        "ink_dropout": 0.18,
+        "rotate": 4.5,
+        "blur": 0.7,
+        "noise": 9,
+        "binarize": 120,
+        "binarize_noise": 18,
+        "saltpepper": 0.0015,
+        "speckle": 120,
+        "format": "png1"
+      },
+      "summary": "faded binarised photocopy, 150 dpi (from 300), 4.5 deg skew, ink drop-out breaking thin lines, salt & pepper and toner speckles",
+      "bytes": 21234,
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1240,
+            1754
+          ],
+          "ops": [
+            [
+              "faded_ink",
+              0.18
+            ],
+            [
+              "skew_rotation_deg",
+              4.5
+            ],
+            [
+              "focus_blur_sigma",
+              0.7
+            ],
+            [
+              "gaussian_noise_sigma",
+              9
+            ],
+            [
+              "salt_pepper",
+              0.0015
+            ],
+            [
+              "speckles_per_mpx",
+              120
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 120,
+                "noise": 18
+              }
+            ],
+            [
+              "resampled_dpi",
+              [
+                300,
+                150
+              ]
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "dpi": 300,
+  "pages": 1,
+  "systems_per_page": [
+    4
+  ],
+  "system_start_measures": [
+    [
+      "1",
+      "5",
+      "9",
+      "13"
+    ]
+  ],
+  "measures": 16,
+  "noteheads_in_truth": 59,
+  "license": "CC0",
+  "license_detail": "CC0 1.0 Universal - composition, engraving, truth and scans",
+  "notes": "No truth limitations: all symbols of this item are represented exactly. System breaks are encoded as <print new-system=\"yes\"/>.",
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "truth.musicxml",
+    "scan-severe.pdf",
+    "scan.pdf"
+  ],
+  "generator": "corpus/coverage/structure/_tools (model -> MusicXML 4.0 truth + LilyPond 2.24 engraving)",
+  "validation": {
+    "xsd_valid": true,
+    "music21_parse": "1 59",
+    "engraving_matches_truth": true,
+    "checked": [
+      "notes",
+      "rests",
+      "full-bar rests",
+      "ties",
+      "beams",
+      "slurs",
+      "stems",
+      "articulations",
+      "dynamics/hairpins/text",
+      "lyrics",
+      "clefs",
+      "keys",
+      "times",
+      "bar-line glyphs",
+      "volta spans",
+      "segno/coda/text/rehearsal/metronome marks",
+      "system and page starts",
+      "MIDI attacks"
+    ],
+    "midi_attacks": 59,
+    "lilypond_warnings": [],
+    "lyric_syllables_found_in_engraving": null,
+    "image_only": {
+      "clean.pdf": true,
+      "scan.pdf": true,
+      "scan-severe.pdf": true
+    }
+  }
+}

@@ -64,6 +64,23 @@ def key_alters(fifths):
 
 # ------------------------------------------------------------------ layout helpers
 
+def iter_staves(groups):
+    """all staves of a (possibly nested) group list, top to bottom"""
+    for g in groups:
+        for st in g['staves']:
+            if 'staves' in st:
+                yield from iter_staves([st])
+            else:
+                yield st
+
+
+def iter_groups(groups):
+    """all groups (nested ones included)"""
+    for g in groups:
+        yield g
+        yield from iter_groups([st for st in g['staves'] if 'staves' in st])
+
+
 def segments_of(score, layout):
     segs = layout.get('segments')
     if not segs:
@@ -78,8 +95,8 @@ def staff_tables(score, layout):
     for seg in segments_of(score, layout):
         ids, order, clef0, voices = {}, {}, {}, {}
         k = 0
-        for g in seg['groups']:
-            for st in g['staves']:
+        for st in iter_staves(seg['groups']):
+            if True:
                 order[st['id']] = k
                 k += 1
                 clef0[st['id']] = st['clef']

@@ -4,7 +4,11 @@
 // sample at 1280 px (light, dark) and 400 px (light, dark), and checks: console errors,
 // horizontal scroll, the 7-step stepper (structure, aria, states painted during the run),
 // drag-depth dropzone, a real drop conversion, overlay toggle, per-part provenance,
-// code block line numbers, Copy (clipboard and fallback), token contrast in both themes.
+// code block line numbers, Copy (clipboard and fallback), token contrast in both themes,
+// the default sample (Maple Leaf Rag) and the second sample button (St. Anselm: four
+// parts with lyrics, OCR languages), the hidden attribute honoured by the page's own
+// CSS (the shell adds no [hidden] rule), and a two-up spread dropped from the corpus
+// (page caption, heads coloured by part).
 // Prints a JSON report; the score is passed checks / total checks.
 const http = require('http'), fs = require('fs'), path = require('path');
 const MVP = path.join(__dirname, '../..');
@@ -14,6 +18,8 @@ const HTML = path.resolve(arg('--html', path.join(MVP, 'dist/index.html')));
 const OUT = arg('--out', null);
 const SHOTS = arg('--shots', null);
 const DIST = path.join(MVP, 'dist');
+const CORPUS = path.join(MVP, '../corpus');
+const SPREAD = 'challenge/degradation/twinkle-piano2p-spread/scan.pdf';
 const CSP = "default-src 'self'; script-src https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com 'unsafe-inline' 'wasm-unsafe-eval' blob:; connect-src 'self' blob: data:; worker-src 'self' blob:; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com";
 const types = { '.html': 'text/html', '.js': 'text/javascript', '.pdf': 'application/pdf', '.gz': 'application/gzip' };
 
@@ -21,7 +27,15 @@ const srv = http.createServer((req, res) => {
   const p = decodeURIComponent(req.url.split('?')[0]);
   if (p === '/') {
     res.writeHead(200, { 'Content-Type': 'text/html', 'Content-Security-Policy': CSP });
-    return res.end('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>[hidden]{display:none!important}</style></head><body>' + fs.readFileSync(HTML, 'utf8') + '</body></html>');
+    // no [hidden] rule here: the page's own CSS must honour the attribute
+    return res.end('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body>' + fs.readFileSync(HTML, 'utf8') + '</body></html>');
+  }
+  if (p.startsWith('/fixture/')) {
+    // test-only: a corpus scan to drop (not part of the artifact)
+    const f = path.join(CORPUS, p.slice('/fixture/'.length));
+    if (!f.startsWith(CORPUS) || !fs.existsSync(f)) { res.writeHead(404); return res.end(); }
+    res.writeHead(200, { 'Content-Type': 'application/pdf' });
+    return fs.createReadStream(f).pipe(res);
   }
   const f = path.join(DIST, p);
   if (!f.startsWith(DIST) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404); return res.end(); }
@@ -74,6 +88,10 @@ srv.listen(0, async () => {
     if (SHOTS) await page.screenshot({ path: `${SHOTS}-${tag}.png`, fullPage: width === 1280 && scheme === 'light' });
 
     if (tag === '1280') {
+      ok('sample: Maple Leaf Rag converts on load as one piano part', res && res.file === 'sample-maple-leaf-rag.pdf' && res.parts.length === 1 && /piano/i.test(res.parts[0]), res && { file: res.file, parts: res.parts });
+      // every element with the hidden attribute is really hidden (component display rules must not win)
+      const hid = await page.evaluate(() => [...document.querySelectorAll('[hidden]')].filter((e) => getComputedStyle(e).display !== 'none').map((e) => e.id || e.className || e.tagName));
+      ok('hidden attribute: every [hidden] element is display:none by the page CSS', hid.length === 0, hid);
       // recognition off the main thread, and the page strip only for several pages
       const eng = await page.evaluate(() => ({ engine: window.__omrResult && window.__omrResult.engine, pages: window.__omrResult && window.__omrResult.pages, nav: document.getElementById('pageNav') ? document.getElementById('pageNav').hidden : null }));
       ok('engine: recognition runs in a Web Worker', eng.engine === 'worker', eng.engine);
@@ -165,8 +183,36 @@ srv.listen(0, async () => {
         try { await page.waitForFunction(() => window.__omrResult, null, { timeout: 120000 }); dres = await page.evaluate(() => ({ r: window.__omrResult, title: (document.getElementById('dropTitle') || {}).textContent, file: (document.getElementById('fileName') || {}).textContent, tick: !!document.querySelector('#fileDone:not([hidden])') })); } catch (e) { dres = { err: e.message }; }
         ok('dropzone: dropping a PDF converts it; title and file row report it', dres && dres.r && !dres.r.error && /dropped-hymn\.pdf converted/.test(dres.title || '') && dres.file === 'dropped-hymn.pdf' && dres.tick, dres && { title: dres.title, file: dres.file, tick: dres.tick, err: dres.err });
       }
+      // second sample: the hymn (closed-score SATB with lyrics)
+      await page.evaluate(() => { window.__omrResult = null; });
+      await page.click('#sampleHymn');
+      let hres = null;
+      try { await page.waitForFunction(() => window.__omrResult, null, { timeout: 120000 }); hres = await page.evaluate(() => ({ r: window.__omrResult, title: document.getElementById('dropTitle').textContent, verses: document.querySelectorAll('#lyrics .verse').length })); } catch (e) { hres = { err: e.message }; }
+      info.hymn = hres && hres.r && { parts: hres.r.parts, lyrics: hres.r.lyrics, ocrLangs: hres.r.ocrLangs, secs: hres.r.secs, verses: hres.verses };
+      ok('sample: St. Anselm button gives four parts with lyrics', hres && hres.r && hres.r.file === 'sample-st-anselm.pdf' && hres.r.parts.length === 4 && hres.r.lyrics > 0 && hres.verses > 0 && /sample hymn converted/i.test(hres.title || ''), info.hymn || hres);
+      ok('ocr: reads with the pipeline language set (eng+deu)', hres && hres.r && hres.r.ocrLangs === 'eng+deu', hres && hres.r && hres.r.ocrLangs);
+      // a two-up spread: the caption says how the page was read and the heads take part colours
+      await page.evaluate(() => { window.__omrResult = null; });
+      await page.evaluate(async (u) => {
+        const buf = await (await fetch(u)).arrayBuffer();
+        const dt = new DataTransfer(); dt.items.add(new File([buf], 'spread.pdf', { type: 'application/pdf' }));
+        document.getElementById('drop').dispatchEvent(new DragEvent('drop', { bubbles: true, cancelable: true, dataTransfer: dt }));
+      }, '/fixture/' + SPREAD);
+      let sres = null;
+      try {
+        await page.waitForFunction(() => window.__omrResult, null, { timeout: 120000 });
+        sres = await page.evaluate(() => {
+          const svg = document.querySelector('#pages .ov');
+          const n = (sel) => [...(svg ? svg.querySelectorAll(sel) : [])].reduce((a, e) => a + ((e.getAttribute('d') || '').match(/M/g) || []).length, 0);
+          const none = n('path[stroke-dasharray]'), all = n('path');
+          return { notes: [...document.querySelectorAll('#pages .pagenotes li')].map((e) => e.textContent), heads: all, coloured: all ? +((all - none) / all).toFixed(3) : 0, clean: (window.__omrResult.steps.find((s) => s.id === 'cleanup') || {}).detail };
+        });
+      } catch (e) { sres = { err: e.message }; }
+      info.spread = sres;
+      ok('spread: page caption says two book pages were read', sres && (sres.notes || []).some((t) => /two book pages/i.test(t)) && /2-up/.test(sres.clean || ''), sres);
+      ok('spread: at least 90% of drawn heads carry a part colour', sres && sres.heads > 50 && sres.coloured >= 0.9, sres);
       // keyboard reachability
-      ok('keyboard: main controls are focusable buttons', await page.evaluate(() => ['choose', 'sample', 'overlayToggle', 'copy'].every((id) => { const e = document.getElementById(id); return e && e.tagName === 'BUTTON' && e.tabIndex >= 0; })));
+      ok('keyboard: main controls are focusable buttons', await page.evaluate(() => ['choose', 'sample', 'sampleHymn', 'overlayToggle', 'copy'].every((id) => { const e = document.getElementById(id); return e && e.tagName === 'BUTTON' && e.tabIndex >= 0; })));
       ok('status: aria-live progress region', await page.evaluate(() => { const s = document.getElementById('status'); return !!s && (s.getAttribute('aria-live') === 'polite' || s.getAttribute('role') === 'status'); }));
     }
     if (tag === '400') {

@@ -1,0 +1,344 @@
+{
+  "id": "pitch-cov-clef-changes-piano",
+  "family": "pitch",
+  "title": "Changing Hands",
+  "symbols": [
+    "barline-final",
+    "beam",
+    "clef-bass",
+    "clef-change",
+    "clef-treble",
+    "dot",
+    "key-f1",
+    "ledger-above",
+    "ledger-below",
+    "note-8th",
+    "note-half",
+    "note-quarter",
+    "stem-down",
+    "stem-up",
+    "system-break",
+    "time-3-4"
+  ],
+  "focus": [
+    "clef-treble",
+    "clef-bass",
+    "clef-change",
+    "key-f1",
+    "ledger-below",
+    "ledger-above"
+  ],
+  "layout": "piano",
+  "expected": {
+    "parts": [
+      "Piano"
+    ],
+    "must_not_split": true,
+    "staves": 2,
+    "notes": "One part (Piano) with 2 staves (must not be split), 12 bars of 3/4 in F major, 4 systems x 3 bars.  Ten clef changes: right hand to bass mid-bar (bar 5 beat 2), back to treble at a system start (bar 7, courtesy clef at the end of system 2), to bass at a system start (bar 10) and back to treble mid-bar (bar 11 beat 2); left hand to treble mid-bar (bar 2 beat 3), back to bass at a system start (bar 4), two changes in bar 8 (treble on beat 1, bass on beat 3), treble on beat 2 of bar 11 and bass at bar 12.  Both staves may use the same clef at once (bars 5-6 both bass; bar 8 beats 1-2 and bar 11 beats 2-3 both treble).  Each <clef> must carry the right staff number."
+  },
+  "counts": {
+    "barline-final": 1,
+    "beam": 2,
+    "clef-bass": 6,
+    "clef-change": 10,
+    "clef-treble": 6,
+    "dot": 2,
+    "key-f1": 1,
+    "ledger-above": 1,
+    "ledger-below": 7,
+    "note-8th": 4,
+    "note-half": 5,
+    "note-quarter": 58,
+    "stem-down": 26,
+    "stem-up": 41,
+    "system-break": 3,
+    "time-3-4": 1
+  },
+  "count_conventions": {
+    "note-*, dot, double-dot, acc-*, ledger-*, tie": "per notehead (chord notes counted individually)",
+    "chord, stem-up, stem-down, flag": "per stem (one per chord)",
+    "beam": "number of level-1 beam groups",
+    "clef-*": "initial clef of every staff + every clef change (system-start reprints and courtesy clefs not counted)",
+    "clef-change": "clef elements after the initial clefs",
+    "key-*": "initial key + every key change (system-start reprints and courtesy key signatures not counted); key-0 = no sharps/flats",
+    "key-change": "key elements after measure 1; x-key-cancel = key changes that print cancellation naturals",
+    "key-* / time-* / key-change per part": "counted per MusicXML <key>/<time> element, i.e. once per part: a multi-staff part (piano, organ) has one <key> for all its staves, so the printed signatures are N_staves times more numerous",
+    "x-key-minor": "key statements in minor mode",
+    "time-*": "time signature statements (time-common / time-cut replace time-4-4 / time-2-2 when the symbol is used)",
+    "ottava-*": "octave-shift brackets (start elements); x-ottava-15mb = 15ma bassa",
+    "ledger-above / ledger-below": "noteheads needing >= 1 ledger line (displayed staff position >= 6 or <= -6 half-spaces from the middle line, after clef / clef-octave-change / ottava)",
+    "acc-courtesy": "accidentals with cautionary=\"yes\" (also counted under their glyph tag); x-acc-courtesy-paren = the parenthesised subset",
+    "x-acc-natural-sharp / x-acc-natural-flat": "LilyPond \"extra natural\" before a single sharp/flat that follows a double sharp/flat in the same bar (natural-sharp / natural-flat)",
+    "system-break / page-break": "explicit <print new-system/new-page> in the first part"
+  },
+  "degradations": {
+    "scan.pdf": {
+      "dpi": 250,
+      "seed": 32001,
+      "level": "typical",
+      "color": "gray",
+      "encoding": "jpeg q65",
+      "pages_in_pdf": 1,
+      "pixel_size": [
+        2067,
+        2924
+      ],
+      "summary": "typical office scan: 250 dpi grey, -0.9 deg skew, light paper texture, slight blur, noise sigma 3, JPEG q65",
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            245,
+            244,
+            240
+          ],
+          "texture": 2
+        },
+        {
+          "op": "rotate",
+          "deg": -0.9
+        },
+        {
+          "op": "blur",
+          "radius_px300": 0.4
+        },
+        {
+          "op": "noise",
+          "sigma": 3
+        },
+        {
+          "op": "gray"
+        }
+      ],
+      "generator": "corpus/coverage/pitch/_tools/cvp/scanfx.py run_pipeline(seed)"
+    },
+    "scan-severe.pdf": {
+      "dpi": 150,
+      "seed": 32002,
+      "level": "severe",
+      "color": "bilevel",
+      "encoding": "png (1-bit)",
+      "pages_in_pdf": 1,
+      "pixel_size": [
+        1333,
+        1818
+      ],
+      "summary": "thin light binarised photocopy at 150 dpi: -3 deg skew, low threshold (108) with noise -> broken staff lines and thin stems, salt-and-pepper, 1-bit PNG",
+      "ops": [
+        {
+          "op": "ink",
+          "weight": -1
+        },
+        {
+          "op": "paper",
+          "rgb": [
+            244,
+            244,
+            242
+          ],
+          "texture": 2
+        },
+        {
+          "op": "rotate",
+          "deg": -3.0,
+          "expand": true
+        },
+        {
+          "op": "noise",
+          "saltpepper": 0.003
+        },
+        {
+          "op": "binarize",
+          "threshold": 108,
+          "noise": 18,
+          "pre_blur_px300": 0.6
+        }
+      ],
+      "generator": "corpus/coverage/pitch/_tools/cvp/scanfx.py run_pipeline(seed)"
+    }
+  },
+  "dpi": {
+    "clean.pdf": 300,
+    "scan.pdf": 250,
+    "scan-severe.pdf": 150
+  },
+  "pages": 1,
+  "measures": 12,
+  "systems": 4,
+  "license": "CC0",
+  "notes": [
+    "Courtesy clefs / key signatures / time signatures printed at the end of a system before a change are not separate MusicXML elements (they are implied by the change in the next measure) and are not counted.",
+    "Clefs and key signatures reprinted at every system start are implied in MusicXML and not counted; counts cover the initial statement of every staff and every change.",
+    "Stem directions and beams in the truth are copied from the instrumented LilyPond render and cross-checked (stems, flags, beam groups); they describe this engraving.",
+    "System breaks are explicit in the engraving and encoded as <print new-system=\"yes\"/>."
+  ],
+  "engraving": {
+    "engraver": "GNU LilyPond 2.24.3",
+    "paper": "a4",
+    "staff_size_pt": 20,
+    "ottava_style": "numbers",
+    "layout_desc": "grand staff (PianoStaff), 4 systems x 3 bars, explicit system breaks"
+  },
+  "validation": {
+    "xsd_valid": true,
+    "music21": {
+      "ok": true,
+      "parts": 2,
+      "notes_and_chords": 67,
+      "rests": 0
+    },
+    "midi_attacks_match_truth_file": true,
+    "attacks": 67,
+    "printed_accidentals_match": true,
+    "accidentals": {
+      "expected": 0,
+      "printed": 0,
+      "extra_natural": 0,
+      "parenthesized": 0,
+      "double": 0,
+      "tie_at_line_start": 0
+    },
+    "clefs": {
+      "stP1s1": {
+        "expected_changes": 4,
+        "rendered_changes": 4,
+        "sequence": [
+          "0:clefs.G@-2",
+          "13:clefs.F@2",
+          "18:clefs.G@-2",
+          "27:clefs.F@2",
+          "31:clefs.G@-2"
+        ]
+      },
+      "stP1s2": {
+        "expected_changes": 6,
+        "rendered_changes": 6,
+        "sequence": [
+          "0:clefs.F@2",
+          "5:clefs.G@-2",
+          "9:clefs.F@2",
+          "21:clefs.G@-2",
+          "23:clefs.F@2",
+          "31:clefs.G@-2",
+          "33:clefs.F@2"
+        ]
+      }
+    },
+    "keys": {
+      "stP1s1": {
+        "expected": [
+          "0:-1"
+        ],
+        "rendered": [
+          "0:-1"
+        ],
+        "cancellations": {}
+      },
+      "stP1s2": {
+        "expected": [
+          "0:-1"
+        ],
+        "rendered": [
+          "0:-1"
+        ],
+        "cancellations": {}
+      }
+    },
+    "ottava": {
+      "stP1s1": {
+        "expected": [],
+        "rendered": [],
+        "pieces": 0
+      },
+      "stP1s2": {
+        "expected": [],
+        "rendered": [],
+        "pieces": 0
+      }
+    },
+    "time_signatures": {
+      "stP1s1": [
+        "0:3/4"
+      ],
+      "stP1s2": [
+        "0:3/4"
+      ]
+    },
+    "line_start_measures": [
+      1,
+      4,
+      7,
+      10
+    ],
+    "stems_beams_from_engraving": {
+      "stems": 67,
+      "up": 41,
+      "down": 26,
+      "beamed": 4,
+      "flags": 0,
+      "beam_groups": 2
+    },
+    "truth_vs_engraving_cross_checks": {
+      "accidentals_truth_vs_printed": [
+        0,
+        0
+      ],
+      "double_accidentals_truth_vs_printed": [
+        0,
+        0
+      ],
+      "extra_naturals_truth_vs_printed": [
+        0,
+        0
+      ],
+      "parenthesized_truth_vs_printed": [
+        0,
+        0
+      ],
+      "stems_up_truth_vs_engraved": [
+        41,
+        41
+      ],
+      "stems_down_truth_vs_engraved": [
+        26,
+        26
+      ],
+      "flags_truth_vs_engraved": [
+        0,
+        0
+      ],
+      "beam_groups_truth_vs_engraved": [
+        2,
+        2
+      ],
+      "clef_changes_truth_vs_engraved": [
+        10,
+        10
+      ],
+      "system_breaks_truth_vs_engraved": [
+        3,
+        3
+      ],
+      "noteheads_with_positions_checked": [
+        67,
+        67
+      ]
+    },
+    "twin_layout_diff": 0.0,
+    "scan_files_image_only": {
+      "scan.pdf": true,
+      "scan-severe.pdf": true
+    }
+  },
+  "source": "composed for this corpus (CC0)",
+  "files": [
+    "engraving.ly",
+    "truth.musicxml",
+    "clean.pdf",
+    "scan.pdf",
+    "scan-severe.pdf",
+    "meta.json",
+    "ATTRIBUTION.txt"
+  ]
+}

@@ -352,7 +352,9 @@ def _note(w, ev, pit, chord, d, voice, staff, role, acc, first):
     if ev.tuplet:
         w(f'        <time-modification><actual-notes>{ev.tuplet[0]}</actual-notes>'
           f'<normal-notes>{ev.tuplet[1]}</normal-notes></time-modification>')
-    if ev.kind == 'note' and ev.stem:
+    if ev.kind == 'note' and ev.dtype in ('whole', 'breve'):
+        pass
+    elif ev.kind == 'note' and ev.stem:
         w(f'        <stem>{ev.stem}</stem>')
     elif ev.kind == 'note' and role in (1, 3):
         w('        <stem>up</stem>')

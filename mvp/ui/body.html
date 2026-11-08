@@ -1,7 +1,7 @@
 <div class="wrap">
   <header class="masthead">
     <h1>Score Scan Reader</h1>
-    <p class="lede">Turns a scanned hymn or part-song into MusicXML 4.0. Lyrics are kept, closed-score SATB is split into four parts, and piano grand staves stay together. Your file never leaves this browser.</p>
+    <p class="lede">Turns a scanned hymn, part-song or piano piece into MusicXML 4.0. Lyrics are kept, closed-score SATB is split into four parts, and piano grand staves stay together. Your file never leaves this browser.</p>
   </header>
 
   <section class="drop" id="drop" aria-labelledby="dropTitle" data-state="idle">
@@ -10,7 +10,11 @@
       <p class="drop-hint" id="dropHint">A PDF, or one or more PNG or JPG pages.</p>
       <div class="drop-actions">
         <button class="btn primary" id="choose" type="button">Choose PDF or image</button>
-        <button class="btn" id="sample" type="button">Load sample</button>
+        <div class="samples" role="group" aria-labelledby="samplesLabel">
+          <span class="samples-label" id="samplesLabel">Samples</span>
+          <button class="btn" id="sample" type="button" title="Piano rag, two staves kept together (converted when the page opens)">Maple Leaf Rag</button>
+          <button class="btn" id="sampleHymn" type="button" title="Real 1905 hymnal scan: closed-score SATB split into four parts, with lyrics">St. Anselm hymn</button>
+        </div>
       </div>
       <input id="file" class="sr-only" type="file" accept="application/pdf,image/png,image/jpeg" multiple tabindex="-1" aria-hidden="true">
       <p class="sr-only" id="dropLive" aria-live="polite"></p>

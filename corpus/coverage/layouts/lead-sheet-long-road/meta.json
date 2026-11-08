@@ -1,0 +1,290 @@
+{
+  "id": "lead-sheet-long-road",
+  "family": "layouts",
+  "title": "The Long Road - lead sheet: melody, chord symbols, two verses, 1st/2nd endings",
+  "layout": "lead-sheet",
+  "symbols": [
+    "barline-double",
+    "chord-symbol",
+    "clef-treble",
+    "dot",
+    "dyn-mf",
+    "fermata",
+    "flag",
+    "key-f2",
+    "lyrics",
+    "lyrics-hyphen",
+    "lyrics-multi-verse",
+    "metronome",
+    "note-8th",
+    "note-half",
+    "note-quarter",
+    "note-whole",
+    "repeat-end",
+    "rest-quarter",
+    "stem-down",
+    "system-break",
+    "tempo-mark",
+    "time-4-4",
+    "volta-1",
+    "volta-2",
+    "x-measures",
+    "x-parts",
+    "x-staves"
+  ],
+  "counts": {
+    "barline-double": 1,
+    "chord-symbol": 31,
+    "clef-treble": 1,
+    "dot": 2,
+    "dyn-mf": 1,
+    "fermata": 1,
+    "flag": 5,
+    "key-f2": 1,
+    "lyrics": 71,
+    "lyrics-hyphen": 11,
+    "lyrics-multi-verse": 25,
+    "metronome": 1,
+    "note-8th": 5,
+    "note-half": 5,
+    "note-quarter": 33,
+    "note-whole": 4,
+    "repeat-end": 1,
+    "rest-quarter": 1,
+    "stem-down": 43,
+    "system-break": 3,
+    "tempo-mark": 1,
+    "time-4-4": 1,
+    "volta-1": 1,
+    "volta-2": 1,
+    "x-measures": 16,
+    "x-parts": 1,
+    "x-staves": 1
+  },
+  "expected": {
+    "parts": [
+      "Melody"
+    ],
+    "must_not_split": false,
+    "shared_staves": [],
+    "staves_per_part": {
+      "Melody": 1
+    },
+    "lyrics": [
+      {
+        "part": "Melody",
+        "verses": 2
+      }
+    ],
+    "notes": "ONE part (melody, no instrument name) with chord symbols above the staff (31 <harmony> elements, some changing in the middle of a whole note: <offset>) and two lyric lines under the repeated A section (verse 1 continues into the 1st ending and the B section, verse 2 into the 2nd ending). Repeat with 1st ending (m.8) and 2nd ending (m.9), notated order."
+  },
+  "notes": [
+    "Chord symbols are <harmony> (root/kind/bass); LilyPond prints them in its own style (e.g. superscript 7, \"m7\"); the stanza numbers \"1.\"/\"2.\" are not encoded."
+  ],
+  "layout_description": "A4 portrait, staff size 20, 4 systems (4+5+4+3 measures), chord names above the staff",
+  "pages": 1,
+  "measures": 16,
+  "systems": 4,
+  "noteheads_in_truth": 47,
+  "hidden_staff_segments": [],
+  "dpi": 240,
+  "degradations": {
+    "clean.pdf": {
+      "seed": null,
+      "dpi": 300,
+      "format": "png (8-bit grey)",
+      "summary": "undamaged raster of the engraving",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "size_px": [
+            2481,
+            3508
+          ]
+        }
+      ],
+      "bytes": 143042
+    },
+    "scan.pdf": {
+      "seed": 7141,
+      "render_dpi": 240,
+      "dpi": 240,
+      "format": "jpeg q72",
+      "colour": "gray",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1985,
+            2807
+          ],
+          "ops": [
+            [
+              "bleed_through",
+              {
+                "strength": 0.04,
+                "shift_px": 4
+              }
+            ],
+            [
+              "paper_texture",
+              2
+            ],
+            [
+              "skew_rotation_deg",
+              -0.5
+            ],
+            [
+              "focus_blur_sigma",
+              0.45
+            ],
+            [
+              "gaussian_noise_sigma",
+              3
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 240,
+        "mode": "gray",
+        "texture": 2,
+        "rotate": -0.5,
+        "bleed": 0.04,
+        "blur": 0.45,
+        "noise": 3,
+        "jpeg": 72
+      },
+      "summary": "240 dpi grey scan, -0.5 deg skew, faint bleed-through, JPEG q72",
+      "bytes": 371438
+    },
+    "scan-severe.pdf": {
+      "seed": 7142,
+      "render_dpi": 300,
+      "dpi": 150,
+      "format": "png1",
+      "colour": "bw",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1240,
+            1754
+          ],
+          "ops": [
+            [
+              "faded_ink",
+              0.12
+            ],
+            [
+              "skew_rotation_deg",
+              3.0
+            ],
+            [
+              "focus_blur_sigma",
+              0.6
+            ],
+            [
+              "gaussian_noise_sigma",
+              8
+            ],
+            [
+              "salt_pepper",
+              0.0015
+            ],
+            [
+              "speckles_per_mpx",
+              120
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 118,
+                "noise": 20
+              }
+            ],
+            [
+              "resampled_dpi",
+              [
+                300,
+                150
+              ]
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 300,
+        "out_dpi": 150,
+        "ink_dropout": 0.12,
+        "rotate": 3.0,
+        "blur": 0.6,
+        "noise": 8,
+        "binarize": 118,
+        "binarize_noise": 20,
+        "saltpepper": 0.0015,
+        "speckle": 120,
+        "format": "png1"
+      },
+      "summary": "thin, faded binarised photocopy at 150 dpi (rendered 300): ink dropout, 3 deg skew, broken lines, salt & pepper, toner specks",
+      "bytes": 27710
+    }
+  },
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "scan-severe.pdf",
+    "scan.pdf",
+    "truth.musicxml"
+  ],
+  "license": "CC0",
+  "license_detail": "CC0-1.0: composition, arrangement, engraving and scans",
+  "source": "self-authored for the coverage suite (2026)",
+  "engraver": "internal model -> LilyPond 2.24 (coverage-suite writer: explicit beams and stems)",
+  "validation": {
+    "xsd_valid": true,
+    "music21_parse": "1 78",
+    "midi_attacks_match_truth": true,
+    "attacks": 47,
+    "grob_log_matches_truth": true,
+    "printed_summary": {
+      "noteheads": 47,
+      "stems_up": 0,
+      "stems_down": 43,
+      "accidentals": 0,
+      "rests": 1,
+      "beams": 0,
+      "flags": 5,
+      "slurs": 0,
+      "ties": 0,
+      "scripts": {
+        "fermata": 1
+      },
+      "dynamics": {
+        "mf": 1
+      },
+      "lyric_syllables": 71,
+      "hyphens": 11,
+      "extenders": 0,
+      "chord_names": 31,
+      "system_delimiters": {}
+    },
+    "lilypond_warnings": [],
+    "lyric_syllables_found_in_engraving": 1.0,
+    "lyric_syllables": 71,
+    "pages_planned": 1,
+    "image_only": {
+      "clean.pdf": true,
+      "scan.pdf": true,
+      "scan-severe.pdf": true
+    }
+  }
+}

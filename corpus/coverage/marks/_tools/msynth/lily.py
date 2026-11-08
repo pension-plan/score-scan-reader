@@ -228,6 +228,6 @@ class LilyWriter:
         for x in o.get('layout_extra', []):
             L.append('    ' + x)
         L.append('  }')
-        L.append('  \\midi { }')
+        L.append('  \\midi { \\context { \\ChordNames \\remove "Note_performer" } }')
         L.append('}')
         return '\n'.join(L) + '\n'

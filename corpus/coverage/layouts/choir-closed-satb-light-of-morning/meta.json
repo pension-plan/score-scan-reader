@@ -1,0 +1,284 @@
+{
+  "id": "choir-closed-satb-light-of-morning",
+  "family": "layouts",
+  "title": "Light of Morning - SATB choir in closed score (two staves)",
+  "layout": "choir-closed-satb",
+  "symbols": [
+    "beam",
+    "clef-bass",
+    "clef-treble",
+    "dyn-mf",
+    "dyn-p",
+    "fermata",
+    "hairpin-cresc",
+    "key-s2",
+    "ledger-above",
+    "ledger-below",
+    "lyrics",
+    "lyrics-extender",
+    "lyrics-hyphen",
+    "lyrics-melisma",
+    "metronome",
+    "note-8th",
+    "note-half",
+    "note-quarter",
+    "slur",
+    "stem-down",
+    "stem-up",
+    "system-break",
+    "tempo-mark",
+    "time-4-4",
+    "x-group-bracket",
+    "x-measures",
+    "x-parts",
+    "x-staves"
+  ],
+  "counts": {
+    "beam": 4,
+    "clef-bass": 2,
+    "clef-treble": 2,
+    "dyn-mf": 2,
+    "dyn-p": 2,
+    "fermata": 8,
+    "hairpin-cresc": 1,
+    "key-s2": 1,
+    "ledger-above": 6,
+    "ledger-below": 6,
+    "lyrics": 28,
+    "lyrics-extender": 1,
+    "lyrics-hyphen": 4,
+    "lyrics-melisma": 1,
+    "metronome": 1,
+    "note-8th": 8,
+    "note-half": 16,
+    "note-quarter": 92,
+    "slur": 4,
+    "stem-down": 58,
+    "stem-up": 58,
+    "system-break": 1,
+    "tempo-mark": 1,
+    "time-4-4": 1,
+    "x-group-bracket": 1,
+    "x-measures": 8,
+    "x-parts": 4,
+    "x-staves": 4
+  },
+  "expected": {
+    "parts": [
+      "Soprano",
+      "Alto",
+      "Tenor",
+      "Bass"
+    ],
+    "must_not_split": false,
+    "shared_staves": [
+      [
+        "Soprano",
+        "Alto"
+      ],
+      [
+        "Tenor",
+        "Bass"
+      ]
+    ],
+    "staves_per_part": {
+      "Soprano": 1,
+      "Alto": 1,
+      "Tenor": 1,
+      "Bass": 1
+    },
+    "lyrics": [
+      {
+        "part": "Soprano",
+        "verses": 1
+      }
+    ],
+    "notes": "FOUR parts: Soprano, Alto, Tenor, Bass. Soprano (stems up) and Alto (stems down) share the treble staff; Tenor (up) and Bass (down) share the bass staff - split each staff by stem direction. One verse of lyrics between the staves, aligned to the Soprano. Fermatas on every voice at the phrase ends."
+  },
+  "notes": [
+    "Lyrics are encoded on the Soprano only (they are printed once between the staves)."
+  ],
+  "layout_description": "A4 portrait, staff size 20, 2 systems of 4 measures, bracketed choir staves with two-line names",
+  "pages": 1,
+  "measures": 8,
+  "systems": 2,
+  "noteheads_in_truth": 116,
+  "hidden_staff_segments": [],
+  "dpi": 300,
+  "degradations": {
+    "clean.pdf": {
+      "seed": null,
+      "dpi": 300,
+      "format": "png (8-bit grey)",
+      "summary": "undamaged raster of the engraving",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "size_px": [
+            2481,
+            3508
+          ]
+        }
+      ],
+      "bytes": 116944
+    },
+    "scan.pdf": {
+      "seed": 7051,
+      "render_dpi": 300,
+      "dpi": 300,
+      "format": "jpeg q75",
+      "colour": "gray",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            2481,
+            3508
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              2
+            ],
+            [
+              "skew_rotation_deg",
+              0.6
+            ],
+            [
+              "focus_blur_sigma",
+              0.4
+            ],
+            [
+              "gaussian_noise_sigma",
+              3
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 300,
+        "mode": "gray",
+        "texture": 2,
+        "rotate": 0.6,
+        "blur": 0.4,
+        "noise": 3,
+        "jpeg": 75
+      },
+      "summary": "300 dpi grey flatbed scan, 0.6 deg skew, light paper texture and noise, JPEG q75",
+      "bytes": 565454
+    },
+    "scan-severe.pdf": {
+      "seed": 7052,
+      "render_dpi": 240,
+      "dpi": 120,
+      "format": "jpeg q20",
+      "colour": "gray",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            992,
+            1403
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              6
+            ],
+            [
+              "skew_rotation_deg",
+              -4.0
+            ],
+            [
+              "focus_blur_sigma",
+              1.3
+            ],
+            [
+              "gaussian_noise_sigma",
+              10
+            ],
+            [
+              "resampled_dpi",
+              [
+                240,
+                120
+              ]
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 240,
+        "out_dpi": 120,
+        "mode": "gray",
+        "texture": 6,
+        "rotate": -4.0,
+        "blur": 1.3,
+        "noise": 10,
+        "jpeg": 20
+      },
+      "summary": "low-resolution 120 dpi grey scan, -4 deg skew, heavy blur and noise, JPEG q20",
+      "bytes": 39338
+    }
+  },
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "scan-severe.pdf",
+    "scan.pdf",
+    "truth.musicxml"
+  ],
+  "license": "CC0",
+  "license_detail": "CC0-1.0: composition, arrangement, engraving and scans",
+  "source": "self-authored for the coverage suite (2026)",
+  "engraver": "internal model -> LilyPond 2.24 (coverage-suite writer: explicit beams and stems)",
+  "validation": {
+    "xsd_valid": true,
+    "music21_parse": "4 116",
+    "midi_attacks_match_truth": true,
+    "attacks": 116,
+    "grob_log_matches_truth": true,
+    "printed_summary": {
+      "noteheads": 116,
+      "stems_up": 58,
+      "stems_down": 58,
+      "accidentals": 0,
+      "rests": 0,
+      "beams": 4,
+      "flags": 0,
+      "slurs": 4,
+      "ties": 0,
+      "scripts": {
+        "fermata": 8
+      },
+      "dynamics": {
+        "mf": 2,
+        "p": 2
+      },
+      "lyric_syllables": 28,
+      "hyphens": 4,
+      "extenders": 1,
+      "chord_names": 0,
+      "system_delimiters": {
+        "SystemStartBracket": 2
+      }
+    },
+    "lilypond_warnings": [],
+    "lyric_syllables_found_in_engraving": 1.0,
+    "lyric_syllables": 28,
+    "pages_planned": 1,
+    "image_only": {
+      "clean.pdf": true,
+      "scan.pdf": true,
+      "scan-severe.pdf": true
+    }
+  }
+}

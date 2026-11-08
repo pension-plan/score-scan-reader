@@ -1,6 +1,6 @@
 """Symbol counts (coverage taxonomy tags) computed from a truth.musicxml file.
 
-Counting rules (documented in coverage/rests/README.md):
+Counting rules (also in coverage/rests/manifest.json "counting_rules"):
   * an "event" is a <note> without <chord/> together with the <chord/> notes that follow it;
     note-<type>, chord, dot, double-dot, stem-*, flag, grace count events; ledger-* and tie count
     note heads

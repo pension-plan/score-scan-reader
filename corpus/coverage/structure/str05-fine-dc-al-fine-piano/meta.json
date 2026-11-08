@@ -1,0 +1,293 @@
+{
+  "id": "str05-fine-dc-al-fine-piano",
+  "family": "structure",
+  "title": "Minuet and Trio - Fine with a mid-piece final bar, D.C. al Fine (piano)",
+  "symbols": [
+    "barline-final",
+    "beam",
+    "chord",
+    "clef-bass",
+    "clef-treble",
+    "dc",
+    "dot",
+    "fine",
+    "key-s1",
+    "ledger-above",
+    "note-8th",
+    "note-half",
+    "note-quarter",
+    "repeat-end",
+    "repeat-start",
+    "stem-down",
+    "stem-up",
+    "system-break",
+    "tempo-mark",
+    "text-expression",
+    "time-3-4"
+  ],
+  "focus_symbols": [
+    "fine",
+    "dc",
+    "barline-final",
+    "repeat-start",
+    "repeat-end"
+  ],
+  "layout": "piano",
+  "expected": {
+    "parts": [
+      "Piano"
+    ],
+    "must_not_split": true,
+    "staves_per_part": {
+      "Piano": 2
+    },
+    "lyrics": [],
+    "structure": "Notated order (do not unroll): Menuet ||: mm.1-4 :|| (implied start) mm.5-8, \"Fine\" + final bar after m.8; Trio (heading) ||: mm.9-12 :||: mm.13-16 :|| (the combined repeat sits on the system break 12|13), \"D.C. al Fine\" after m.16. Played form: 1-4,1-4,5-8,9-12,9-12,13-16,13-16,1-8 (repeats are customarily not taken after D.C.).",
+    "notes": "One part (Piano), grand staff (must NOT be split), G major, 3/4. \"Fine\" = words + <sound fine=\"yes\"/> at the end of m.8, whose right barline is light-heavy (a final bar in the middle of the piece); \"D.C. al Fine\" = words + <sound dacapo=\"yes\"/> at the end of m.16. \"Trio\" is a section heading (text), \"Tempo di Minuetto\" a tempo text without metronome mark."
+  },
+  "counts": {
+    "barline-final": 1,
+    "beam": 10,
+    "chord": 32,
+    "clef-bass": 1,
+    "clef-treble": 1,
+    "dc": 1,
+    "dot": 4,
+    "fine": 1,
+    "key-s1": 1,
+    "ledger-above": 15,
+    "note-8th": 20,
+    "note-half": 4,
+    "note-quarter": 74,
+    "repeat-end": 3,
+    "repeat-start": 2,
+    "stem-down": 71,
+    "stem-up": 27,
+    "system-break": 3,
+    "tempo-mark": 1,
+    "text-expression": 1,
+    "time-3-4": 1
+  },
+  "counts_by_part": {
+    "Piano": {
+      "beam": 10,
+      "chord": 32,
+      "clef-bass": 1,
+      "clef-treble": 1,
+      "dot": 4,
+      "ledger-above": 15,
+      "note-8th": 20,
+      "note-half": 4,
+      "note-quarter": 74,
+      "stem-down": 71,
+      "stem-up": 27,
+      "text-expression": 1
+    }
+  },
+  "count_rules": "Coverage-taxonomy symbol counts read from truth.musicxml.\n\nCounting rules (also written to meta.json 'count_rules'):\n  * score-wide tags are counted ONCE per score position even when MusicXML repeats them in every\n    part: barline-double, barline-final, repeat-start, repeat-end, volta-N, segno, coda, dc, ds,\n    fine, x-to-coda, system-break, page-break, multi-page, rehearsal-mark, tempo-mark, metronome,\n    key-*, key-change, time-*, time-change, pickup;\n  * every other tag is counted per occurrence in every part (also listed per part in\n    'counts_by_part'):\n      note-<type>  note events (a chord counts once, as its stem/duration), no grace / cue notes\n      chord        note events with two or more noteheads\n      dot / double-dot  dotted / double-dotted note events;  rest-dotted  dotted rests\n      beam         beam groups (<beam number=\"1\">begin);  flag  unbeamed note events of 8th or shorter\n      stem-up / stem-down  note events with that <stem>\n      ledger-above / ledger-below  noteheads on or beyond the first ledger line (per clef in force)\n      rest-<type>  rests that are not whole-bar rests;  rest-whole-bar  <rest measure=\"yes\"/>\n      clef-*       <clef> elements (initial and changes);  clef-change  clefs after the first measure\n      acc-*        printed <accidental> elements;  acc-courtesy  cautionary / parenthesised ones\n      tie          <tie type=\"start\"> per notehead;  tie-across-system  ties whose end note starts a\n                   new system or page\n      slur, staccato, accent, tenuto, ..., fermata   per element;  dyn-*  per dynamic;  hairpin-*  per\n      wedge start;  pedal  per pedal start;  text-expression  words that are not tempo / jump text\n      lyrics  <lyric> syllables;  lyrics-hyphen  begin/middle syllables;  lyrics-extender  <extend>\n      lyrics-multi-verse  syllables of verse 2 and higher",
+  "degradations": {
+    "clean.pdf": {
+      "seed": null,
+      "render_dpi": 300,
+      "dpi": 300,
+      "format": "png (lossless)",
+      "colour": "gray",
+      "params": {},
+      "summary": "undamaged raster of the engraving",
+      "bytes": 101966
+    },
+    "scan.pdf": {
+      "seed": 45001,
+      "render_dpi": 300,
+      "dpi": 300,
+      "format": "jpeg q85",
+      "colour": "gray",
+      "params": {
+        "dpi": 300,
+        "mode": "gray",
+        "texture": 2,
+        "rotate": 0.4,
+        "gradient": 0.05,
+        "blur": 0.3,
+        "noise": 3,
+        "jpeg": 85
+      },
+      "summary": "flatbed scan, 300 dpi grey, 0.4 deg skew, mild gradient lighting, noise, JPEG q85",
+      "bytes": 999985,
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            2481,
+            3508
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              2
+            ],
+            [
+              "skew_rotation_deg",
+              0.4
+            ],
+            [
+              "lighting_gradient",
+              {
+                "strength": 0.05,
+                "angle_deg": 13.4
+              }
+            ],
+            [
+              "focus_blur_sigma",
+              0.3
+            ],
+            [
+              "gaussian_noise_sigma",
+              3
+            ]
+          ]
+        }
+      ]
+    },
+    "scan-severe.pdf": {
+      "seed": 45002,
+      "render_dpi": 300,
+      "dpi": 100,
+      "format": "png1",
+      "colour": "bw",
+      "params": {
+        "dpi": 300,
+        "out_dpi": 100,
+        "rotate": 3.0,
+        "page_rotate": {
+          "0": 180
+        },
+        "ink_dropout": 0.12,
+        "blur": 0.8,
+        "noise": 10,
+        "binarize": 115,
+        "binarize_noise": 15,
+        "speckle": 100,
+        "format": "png1"
+      },
+      "summary": "page fed upside down (180 deg) through a fax-like copier: 100 dpi (from 300) binarised, 3 deg skew, broken thin lines, speckles",
+      "bytes": 18290,
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            827,
+            1169
+          ],
+          "ops": [
+            [
+              "faded_ink",
+              0.12
+            ],
+            [
+              "skew_rotation_deg",
+              3.0
+            ],
+            [
+              "focus_blur_sigma",
+              0.8
+            ],
+            [
+              "gaussian_noise_sigma",
+              10
+            ],
+            [
+              "speckles_per_mpx",
+              100
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 115,
+                "noise": 15
+              }
+            ],
+            [
+              "page_rotated_deg",
+              180
+            ],
+            [
+              "resampled_dpi",
+              [
+                300,
+                100
+              ]
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "dpi": 300,
+  "pages": 1,
+  "systems_per_page": [
+    4
+  ],
+  "system_start_measures": [
+    [
+      "1",
+      "5",
+      "9",
+      "13"
+    ]
+  ],
+  "measures": 16,
+  "noteheads_in_truth": 168,
+  "license": "CC0",
+  "license_detail": "CC0 1.0 Universal - composition, engraving, truth and scans",
+  "notes": "Truth limitation: whether repeats are taken after the D.C. is a performance convention and is not encoded. Fine/D.C. are words directions with <sound> playback attributes (the only MusicXML encoding).",
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "truth.musicxml",
+    "scan-severe.pdf",
+    "scan.pdf"
+  ],
+  "generator": "corpus/coverage/structure/_tools (model -> MusicXML 4.0 truth + LilyPond 2.24 engraving)",
+  "validation": {
+    "xsd_valid": true,
+    "music21_parse": "2 98",
+    "engraving_matches_truth": true,
+    "checked": [
+      "notes",
+      "rests",
+      "full-bar rests",
+      "ties",
+      "beams",
+      "slurs",
+      "stems",
+      "articulations",
+      "dynamics/hairpins/text",
+      "lyrics",
+      "clefs",
+      "keys",
+      "times",
+      "bar-line glyphs",
+      "volta spans",
+      "segno/coda/text/rehearsal/metronome marks",
+      "system and page starts",
+      "MIDI attacks"
+    ],
+    "midi_attacks": 168,
+    "lilypond_warnings": [],
+    "lyric_syllables_found_in_engraving": null,
+    "image_only": {
+      "clean.pdf": true,
+      "scan.pdf": true,
+      "scan-severe.pdf": true
+    }
+  }
+}

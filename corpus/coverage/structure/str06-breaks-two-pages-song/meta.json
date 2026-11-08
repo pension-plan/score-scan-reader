@@ -1,0 +1,462 @@
+{
+  "id": "str06-breaks-two-pages-song",
+  "family": "structure",
+  "title": "Morning and Evening - explicit system/page breaks, 1st ending across a page turn (voice and piano, 2 pages)",
+  "symbols": [
+    "barline-double",
+    "barline-final",
+    "chord",
+    "clef-bass",
+    "clef-treble",
+    "dyn-mf",
+    "dyn-p",
+    "key-f3",
+    "ledger-below",
+    "lyrics",
+    "lyrics-extender",
+    "lyrics-hyphen",
+    "lyrics-multi-verse",
+    "metronome",
+    "multi-page",
+    "note-half",
+    "note-quarter",
+    "note-whole",
+    "page-break",
+    "repeat-end",
+    "repeat-start",
+    "rest-quarter",
+    "rest-whole-bar",
+    "slur",
+    "stem-down",
+    "stem-up",
+    "system-break",
+    "tempo-mark",
+    "tie",
+    "tie-across-system",
+    "time-4-4",
+    "volta-1",
+    "volta-2"
+  ],
+  "focus_symbols": [
+    "system-break",
+    "page-break",
+    "multi-page",
+    "tie-across-system",
+    "volta-1",
+    "volta-2",
+    "repeat-start",
+    "repeat-end"
+  ],
+  "layout": "voice-piano",
+  "expected": {
+    "parts": [
+      "Voice",
+      "Piano"
+    ],
+    "must_not_split": true,
+    "staves_per_part": {
+      "Voice": 1,
+      "Piano": 2
+    },
+    "lyrics": [
+      {
+        "part": "Voice",
+        "verses": 2
+      }
+    ],
+    "structure": "Page 1: systems mm.1-2 | 3-5 | 6-7 | 8-9; page 2: mm.10-12 | 13-14 | 15-16 (all breaks explicit: <print new-system=\"yes\"/> at mm.3, 6, 8, 13, 15 and <print new-page=\"yes\"/> at m.10). Piano introduction mm.1-2 (voice tacet, whole-bar rests; double bar), start repeat at m.3 (system start), 1st ending mm.9-10 crossing the page turn (end repeat after m.10, mid-system on page 2), 2nd ending mm.11-12, final bar after m.16. Ties cross the system breaks 5|6 (voice + piano) and 12|13 (voice, both piano hands) and the page break 9|10 (piano right hand). Stanza 1 is sung in mm.3-10, stanza 2 in mm.3-8 and 11-16. Played form: 1-10, 3-8, 11-16.",
+    "notes": "Two parts: Voice (with 2 lyric lines) and Piano (grand staff, ONE part, must NOT be split). E-flat major, 4/4. Lyrics: line 1 under mm.3-10, line 2 under mm.3-8 and 11-16. A score that ignores page/system breaks is still musically correct; <print> elements measure layout recognition."
+  },
+  "counts": {
+    "barline-double": 1,
+    "barline-final": 1,
+    "chord": 30,
+    "clef-bass": 1,
+    "clef-treble": 2,
+    "dyn-mf": 1,
+    "dyn-p": 1,
+    "key-f3": 1,
+    "ledger-below": 5,
+    "lyrics": 55,
+    "lyrics-extender": 4,
+    "lyrics-hyphen": 17,
+    "lyrics-multi-verse": 33,
+    "metronome": 1,
+    "multi-page": 2,
+    "note-half": 46,
+    "note-quarter": 40,
+    "note-whole": 12,
+    "page-break": 1,
+    "repeat-end": 1,
+    "repeat-start": 1,
+    "rest-quarter": 4,
+    "rest-whole-bar": 2,
+    "slur": 1,
+    "stem-down": 24,
+    "stem-up": 62,
+    "system-break": 5,
+    "tempo-mark": 1,
+    "tie": 12,
+    "tie-across-system": 12,
+    "time-4-4": 1,
+    "volta-1": 1,
+    "volta-2": 1
+  },
+  "counts_by_part": {
+    "Voice": {
+      "clef-treble": 1,
+      "dyn-mf": 1,
+      "lyrics": 55,
+      "lyrics-extender": 4,
+      "lyrics-hyphen": 17,
+      "lyrics-multi-verse": 33,
+      "note-half": 4,
+      "note-quarter": 34,
+      "note-whole": 3,
+      "rest-quarter": 2,
+      "rest-whole-bar": 2,
+      "slur": 1,
+      "stem-down": 17,
+      "stem-up": 21,
+      "tie": 2,
+      "tie-across-system": 2
+    },
+    "Piano": {
+      "chord": 30,
+      "clef-bass": 1,
+      "clef-treble": 1,
+      "dyn-p": 1,
+      "ledger-below": 5,
+      "note-half": 42,
+      "note-quarter": 6,
+      "note-whole": 9,
+      "rest-quarter": 2,
+      "stem-down": 7,
+      "stem-up": 41,
+      "tie": 10,
+      "tie-across-system": 10
+    }
+  },
+  "count_rules": "Coverage-taxonomy symbol counts read from truth.musicxml.\n\nCounting rules (also written to meta.json 'count_rules'):\n  * score-wide tags are counted ONCE per score position even when MusicXML repeats them in every\n    part: barline-double, barline-final, repeat-start, repeat-end, volta-N, segno, coda, dc, ds,\n    fine, x-to-coda, system-break, page-break, multi-page, rehearsal-mark, tempo-mark, metronome,\n    key-*, key-change, time-*, time-change, pickup;\n  * every other tag is counted per occurrence in every part (also listed per part in\n    'counts_by_part'):\n      note-<type>  note events (a chord counts once, as its stem/duration), no grace / cue notes\n      chord        note events with two or more noteheads\n      dot / double-dot  dotted / double-dotted note events;  rest-dotted  dotted rests\n      beam         beam groups (<beam number=\"1\">begin);  flag  unbeamed note events of 8th or shorter\n      stem-up / stem-down  note events with that <stem>\n      ledger-above / ledger-below  noteheads on or beyond the first ledger line (per clef in force)\n      rest-<type>  rests that are not whole-bar rests;  rest-whole-bar  <rest measure=\"yes\"/>\n      clef-*       <clef> elements (initial and changes);  clef-change  clefs after the first measure\n      acc-*        printed <accidental> elements;  acc-courtesy  cautionary / parenthesised ones\n      tie          <tie type=\"start\"> per notehead;  tie-across-system  ties whose end note starts a\n                   new system or page\n      slur, staccato, accent, tenuto, ..., fermata   per element;  dyn-*  per dynamic;  hairpin-*  per\n      wedge start;  pedal  per pedal start;  text-expression  words that are not tempo / jump text\n      lyrics  <lyric> syllables;  lyrics-hyphen  begin/middle syllables;  lyrics-extender  <extend>\n      lyrics-multi-verse  syllables of verse 2 and higher",
+  "degradations": {
+    "clean.pdf": {
+      "seed": null,
+      "render_dpi": 300,
+      "dpi": 300,
+      "format": "png (lossless)",
+      "colour": "gray",
+      "params": {},
+      "summary": "undamaged raster of the engraving",
+      "bytes": 232613
+    },
+    "scan.pdf": {
+      "seed": 46001,
+      "render_dpi": 300,
+      "dpi": 300,
+      "format": "jpeg q75",
+      "colour": "gray",
+      "params": {
+        "dpi": 300,
+        "mode": "gray",
+        "texture": 2,
+        "rotate_pages": {
+          "0": 0.7,
+          "1": -0.9
+        },
+        "bleed": 0.05,
+        "blur": 0.3,
+        "noise": 3,
+        "jpeg": 75
+      },
+      "summary": "two-page flatbed scan, 300 dpi grey, pages skewed 0.7 and -0.9 deg, light texture, faint bleed-through of the other page, JPEG q75",
+      "bytes": 1358471,
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            2481,
+            3508
+          ],
+          "ops": [
+            [
+              "bleed_through",
+              {
+                "strength": 0.05,
+                "shift_px": -20
+              }
+            ],
+            [
+              "paper_texture",
+              2
+            ],
+            [
+              "skew_rotation_deg",
+              0.7
+            ],
+            [
+              "focus_blur_sigma",
+              0.3
+            ],
+            [
+              "gaussian_noise_sigma",
+              3
+            ]
+          ]
+        },
+        {
+          "image": 2,
+          "source_pages": [
+            2
+          ],
+          "size_px": [
+            2481,
+            3508
+          ],
+          "ops": [
+            [
+              "bleed_through",
+              {
+                "strength": 0.05,
+                "shift_px": 5
+              }
+            ],
+            [
+              "paper_texture",
+              2
+            ],
+            [
+              "skew_rotation_deg",
+              -0.9
+            ],
+            [
+              "focus_blur_sigma",
+              0.3
+            ],
+            [
+              "gaussian_noise_sigma",
+              3
+            ]
+          ]
+        }
+      ]
+    },
+    "scan-severe.pdf": {
+      "seed": 46002,
+      "render_dpi": 150,
+      "dpi": 150,
+      "format": "jpeg q25",
+      "colour": "rgb",
+      "params": {
+        "dpi": 150,
+        "mode": "rgb",
+        "paper_rgb": [
+          236,
+          226,
+          198
+        ],
+        "texture": 6,
+        "spread": [
+          [
+            0,
+            1
+          ]
+        ],
+        "gutter": {
+          "side": "inner",
+          "width": 0.08,
+          "dark": 0.7
+        },
+        "curl": {
+          "side": "inner",
+          "amp": 40,
+          "width": 0.3
+        },
+        "rotate": -2.5,
+        "vignette": 0.3,
+        "motion_blur": {
+          "len": 5,
+          "angle": 10
+        },
+        "noise": 7,
+        "jpeg": 25
+      },
+      "summary": "book-style capture: both pages as ONE 2-up image (double-page spread) with gutter shadow and page curl, yellowed paper, -2.5 deg rotation, vignette, motion blur, 150 dpi RGB, JPEG q25",
+      "bytes": 237520,
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1,
+            2
+          ],
+          "size_px": [
+            2482,
+            1754
+          ],
+          "ops": [
+            [
+              "p1",
+              "page_curl",
+              {
+                "side": "right",
+                "amp": 40,
+                "width": 0.3
+              }
+            ],
+            [
+              "p1",
+              "paper_texture",
+              6
+            ],
+            [
+              "p1",
+              "paper_colour",
+              [
+                236,
+                226,
+                198
+              ]
+            ],
+            [
+              "p1",
+              "gutter_shadow",
+              {
+                "side": "right",
+                "width": 0.08,
+                "dark": 0.7
+              }
+            ],
+            [
+              "p2",
+              "page_curl",
+              {
+                "side": "left",
+                "amp": 40,
+                "width": 0.3
+              }
+            ],
+            [
+              "p2",
+              "paper_texture",
+              6
+            ],
+            [
+              "p2",
+              "paper_colour",
+              [
+                236,
+                226,
+                198
+              ]
+            ],
+            [
+              "p2",
+              "gutter_shadow",
+              {
+                "side": "left",
+                "width": 0.08,
+                "dark": 0.7
+              }
+            ],
+            [
+              "spread_2up",
+              [
+                1,
+                2
+              ]
+            ],
+            [
+              "skew_rotation_deg",
+              -2.5
+            ],
+            [
+              "vignette",
+              0.3
+            ],
+            [
+              "motion_blur",
+              {
+                "len": 5,
+                "angle": 10
+              }
+            ],
+            [
+              "gaussian_noise_sigma",
+              7
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "dpi": 300,
+  "pages": 2,
+  "systems_per_page": [
+    4,
+    3
+  ],
+  "system_start_measures": [
+    [
+      "1",
+      "3",
+      "6",
+      "8"
+    ],
+    [
+      "10",
+      "13",
+      "15"
+    ]
+  ],
+  "measures": 16,
+  "noteheads_in_truth": 158,
+  "license": "CC0",
+  "license_detail": "CC0 1.0 Universal - composition, engraving, truth and scans",
+  "notes": "Truth limitations: (1) the printed stanza numbers \"1.\" and \"2.\" are not encoded as text (they are implied by <lyric number=\"1|2\">); (2) the page number printed on page 2 is not encoded as a <credit>. System and page breaks are encoded in every part (<print> in each part).",
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "truth.musicxml",
+    "scan-severe.pdf",
+    "scan.pdf"
+  ],
+  "generator": "corpus/coverage/structure/_tools (model -> MusicXML 4.0 truth + LilyPond 2.24 engraving)",
+  "validation": {
+    "xsd_valid": true,
+    "music21_parse": "3 98",
+    "engraving_matches_truth": true,
+    "checked": [
+      "notes",
+      "rests",
+      "full-bar rests",
+      "ties",
+      "beams",
+      "slurs",
+      "stems",
+      "articulations",
+      "dynamics/hairpins/text",
+      "lyrics",
+      "clefs",
+      "keys",
+      "times",
+      "bar-line glyphs",
+      "volta spans",
+      "segno/coda/text/rehearsal/metronome marks",
+      "system and page starts",
+      "MIDI attacks"
+    ],
+    "midi_attacks": 146,
+    "lilypond_warnings": [],
+    "lyric_syllables_found_in_engraving": 1.0,
+    "image_only": {
+      "clean.pdf": true,
+      "scan.pdf": true,
+      "scan-severe.pdf": true
+    }
+  }
+}

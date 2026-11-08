@@ -1,0 +1,293 @@
+{
+  "id": "two-voices-piano-song-without-words",
+  "family": "layouts",
+  "title": "Song without Words - piano right hand with two voices on one staff",
+  "layout": "two-voices-one-staff-instrument",
+  "symbols": [
+    "chord",
+    "clef-bass",
+    "clef-treble",
+    "dot",
+    "dyn-mf",
+    "dyn-p",
+    "fermata",
+    "key-s4",
+    "ledger-below",
+    "metronome",
+    "note-half",
+    "note-quarter",
+    "rest-quarter",
+    "slur",
+    "stem-down",
+    "stem-up",
+    "system-break",
+    "tempo-mark",
+    "time-3-4",
+    "x-measures",
+    "x-multi-staff-part",
+    "x-parts",
+    "x-staves",
+    "x-two-voice-staff-measure"
+  ],
+  "counts": {
+    "chord": 15,
+    "clef-bass": 1,
+    "clef-treble": 1,
+    "dot": 4,
+    "dyn-mf": 1,
+    "dyn-p": 1,
+    "fermata": 3,
+    "key-s4": 1,
+    "ledger-below": 1,
+    "metronome": 1,
+    "note-half": 12,
+    "note-quarter": 43,
+    "rest-quarter": 1,
+    "slur": 4,
+    "stem-down": 33,
+    "stem-up": 22,
+    "system-break": 1,
+    "tempo-mark": 1,
+    "time-3-4": 1,
+    "x-measures": 8,
+    "x-multi-staff-part": 1,
+    "x-parts": 1,
+    "x-staves": 2,
+    "x-two-voice-staff-measure": 8
+  },
+  "expected": {
+    "parts": [
+      "Piano"
+    ],
+    "must_not_split": true,
+    "shared_staves": [],
+    "staves_per_part": {
+      "Piano": 2
+    },
+    "lyrics": [],
+    "notes": "ONE part \"Piano\" (two staves, brace). The treble staff carries TWO voices: melody (voice 1, stems up) and inner voice (voice 2, stems down, with a quarter rest in m.4); both stay in the Piano part - this is NOT a closed choir score and must not be split into extra parts. Left hand: bass note + two-note chords."
+  },
+  "notes": [],
+  "layout_description": "A4 portrait, staff size 20, 2 systems of 4 measures",
+  "pages": 1,
+  "measures": 8,
+  "systems": 2,
+  "noteheads_in_truth": 70,
+  "hidden_staff_segments": [],
+  "dpi": 300,
+  "degradations": {
+    "clean.pdf": {
+      "seed": null,
+      "dpi": 300,
+      "format": "png (8-bit grey)",
+      "summary": "undamaged raster of the engraving",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "size_px": [
+            2481,
+            3508
+          ]
+        }
+      ],
+      "bytes": 79076
+    },
+    "scan.pdf": {
+      "seed": 7191,
+      "render_dpi": 300,
+      "dpi": 300,
+      "format": "jpeg q75",
+      "colour": "gray",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            2481,
+            3508
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              2
+            ],
+            [
+              "skew_rotation_deg",
+              0.6
+            ],
+            [
+              "focus_blur_sigma",
+              0.4
+            ],
+            [
+              "gaussian_noise_sigma",
+              3
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 300,
+        "mode": "gray",
+        "texture": 2,
+        "rotate": 0.6,
+        "blur": 0.4,
+        "noise": 3,
+        "jpeg": 75
+      },
+      "summary": "300 dpi grey flatbed scan, 0.6 deg skew, light paper texture and noise, JPEG q75",
+      "bytes": 518959
+    },
+    "scan-severe.pdf": {
+      "seed": 7192,
+      "render_dpi": 200,
+      "dpi": 200,
+      "format": "png1",
+      "colour": "bw",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1654,
+            2339
+          ],
+          "ops": [
+            [
+              "ink_weight",
+              1
+            ],
+            [
+              "punch_holes",
+              {
+                "side": "left",
+                "centers_px": [
+                  [
+                    87,
+                    854
+                  ],
+                  [
+                    87,
+                    1485
+                  ]
+                ]
+              }
+            ],
+            [
+              "staple",
+              {
+                "corner": "tl",
+                "pos_px": [
+                  99,
+                  94
+                ]
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              2.5
+            ],
+            [
+              "focus_blur_sigma",
+              0.9
+            ],
+            [
+              "gaussian_noise_sigma",
+              12
+            ],
+            [
+              "salt_pepper",
+              0.002
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 200,
+                "noise": 20
+              }
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 200,
+        "ink_weight": 1,
+        "rotate": 2.5,
+        "punch_holes": {
+          "n": 2,
+          "side": "left",
+          "level": 10
+        },
+        "staple": {
+          "corner": "tl"
+        },
+        "blur": 0.9,
+        "noise": 12,
+        "binarize": 200,
+        "binarize_noise": 20,
+        "saltpepper": 0.002,
+        "format": "png1"
+      },
+      "summary": "thick dark binarised photocopy at 200 dpi: ink spread, 2.5 deg skew, staple, two punch holes, salt & pepper",
+      "bytes": 137651
+    }
+  },
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "scan-severe.pdf",
+    "scan.pdf",
+    "truth.musicxml"
+  ],
+  "license": "CC0",
+  "license_detail": "CC0-1.0: composition, arrangement, engraving and scans",
+  "source": "self-authored for the coverage suite (2026)",
+  "engraver": "internal model -> LilyPond 2.24 (coverage-suite writer: explicit beams and stems)",
+  "validation": {
+    "xsd_valid": true,
+    "music21_parse": "2 55",
+    "midi_attacks_match_truth": true,
+    "attacks": 70,
+    "grob_log_matches_truth": true,
+    "printed_summary": {
+      "noteheads": 70,
+      "stems_up": 22,
+      "stems_down": 33,
+      "accidentals": 0,
+      "rests": 1,
+      "beams": 0,
+      "flags": 0,
+      "slurs": 4,
+      "ties": 0,
+      "scripts": {
+        "fermata": 3
+      },
+      "dynamics": {
+        "p": 1,
+        "mf": 1
+      },
+      "lyric_syllables": 0,
+      "hyphens": 0,
+      "extenders": 0,
+      "chord_names": 0,
+      "system_delimiters": {
+        "SystemStartBrace": 2
+      }
+    },
+    "lilypond_warnings": [],
+    "lyric_syllables_found_in_engraving": null,
+    "lyric_syllables": 0,
+    "pages_planned": 1,
+    "image_only": {
+      "clean.pdf": true,
+      "scan.pdf": true,
+      "scan-severe.pdf": true
+    }
+  }
+}

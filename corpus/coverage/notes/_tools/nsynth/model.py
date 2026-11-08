@@ -227,7 +227,7 @@ def attacks(score: Score):
     for p in score.parts:
         for v in p.voices:
             for i, t, ev in voice_events(score, p, v.key):
-                if ev.kind == 'note' and not ev.grace:
+                if ev.kind == 'note' and not ev.grace and not ev.cue:
                     for pit in ev.pitches:
                         if pit not in ev.tie_stop:
                             out.append((t, midi(pit), p.id, v.key))
@@ -543,6 +543,9 @@ def staff_roles(voice_keys_contents):
     """voice_keys_contents: ordered list of (vkey, events) sharing one staff in
     one measure.  Returns dict vkey -> role (0 = single voice, 1..4 = voiceOne..)."""
     present = [k for k, evs in voice_keys_contents if any(e.kind in ('note', 'rest') for e in evs)]
+    # coverage/notes: a cue voice is always the upper voice (voiceOne) of its staff
+    cue = {k for k, evs in voice_keys_contents if any(e.kind == 'note' and e.cue for e in evs)}
+    present = sorted(present, key=lambda k: k not in cue)
     roles = {}
     if len(present) <= 1:
         for k, _ in voice_keys_contents:

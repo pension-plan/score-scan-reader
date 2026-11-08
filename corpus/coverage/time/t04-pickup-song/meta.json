@@ -1,0 +1,465 @@
+{
+  "id": "t04-pickup-song",
+  "family": "time",
+  "title": "The Tyger (voice, pickup and meter changes with lyrics)",
+  "composer": "OMR coverage suite (CC0)",
+  "lyricist": "William Blake (1794)",
+  "symbols": [
+    "barline-final",
+    "beam",
+    "clef-treble",
+    "dot",
+    "flag",
+    "key-f1",
+    "ledger-below",
+    "lyrics",
+    "lyrics-extender",
+    "lyrics-hyphen",
+    "lyrics-melisma",
+    "note-8th",
+    "note-half",
+    "note-quarter",
+    "pickup",
+    "rest-8th",
+    "system-break",
+    "tempo-mark",
+    "tie",
+    "tie-across-system",
+    "time-2-4",
+    "time-3-4",
+    "time-6-8",
+    "time-change",
+    "x-time-courtesy"
+  ],
+  "target_symbols": [
+    "pickup",
+    "time-3-4",
+    "time-6-8",
+    "time-2-4",
+    "time-change",
+    "tie",
+    "tie-across-system",
+    "lyrics"
+  ],
+  "layout": "melody-lyrics",
+  "expected": {
+    "parts": [
+      "Voice"
+    ],
+    "must_not_split": false,
+    "notes": "One voice staff with one lyric line, 13 measures: quarter pickup (m0, implicit, syllable \"Ty-\") and an incomplete final bar of 2 beats (m12, NOT padded). Meters 3/4, 6/8 (m5, system start: courtesy 6/8 ends system 1), 2/4 (m7, mid-system), 3/4 (m9, mid-system). Ties: c'' inside m2, f' m4->m5 (across the system break AND 3/4 -> 6/8; the tie continuation carries no syllable), g' m10->m11 (across the system break). One syllable per attack; melisma \"hand\" over 3 notes (m7-m8) with an extender; \"for- ests\" is split by an eighth rest. Key F major.",
+    "lyrics": [
+      {
+        "part": "Voice",
+        "voice": "1",
+        "verses": 1
+      }
+    ],
+    "measures": 13,
+    "first_measure_number": 0
+  },
+  "counts": {
+    "barline-final": 1,
+    "beam": 3,
+    "clef-treble": 1,
+    "dot": 4,
+    "flag": 5,
+    "key-f1": 1,
+    "ledger-below": 3,
+    "lyrics": 29,
+    "lyrics-extender": 2,
+    "lyrics-hyphen": 9,
+    "lyrics-melisma": 1,
+    "note-8th": 12,
+    "note-half": 3,
+    "note-quarter": 19,
+    "pickup": 1,
+    "rest-8th": 1,
+    "system-break": 3,
+    "tempo-mark": 1,
+    "tie": 3,
+    "tie-across-system": 2,
+    "time-2-4": 1,
+    "time-3-4": 2,
+    "time-6-8": 1,
+    "time-change": 3,
+    "x-time-courtesy": 1
+  },
+  "count_locations": {
+    "barline-final": [
+      "12"
+    ],
+    "beam": [
+      "5",
+      "7",
+      "7"
+    ],
+    "clef-treble": [
+      "0"
+    ],
+    "dot": [
+      "1",
+      "4",
+      "6",
+      "9"
+    ],
+    "flag": [
+      "1",
+      "2",
+      "2",
+      "6",
+      "9"
+    ],
+    "key-f1": [
+      "0"
+    ],
+    "ledger-below": [
+      "0",
+      "8",
+      "11"
+    ],
+    "lyrics": [
+      "0",
+      "1",
+      "1",
+      "1",
+      "2",
+      "2",
+      "3",
+      "3",
+      "3",
+      "4",
+      "5",
+      "5",
+      "5",
+      "6",
+      "6",
+      "6",
+      "7",
+      "7",
+      "7",
+      "8",
+      "9",
+      "9",
+      "9",
+      "10",
+      "10",
+      "10",
+      "11",
+      "11",
+      "12"
+    ],
+    "lyrics-extender": [
+      "7",
+      "10"
+    ],
+    "lyrics-hyphen": [
+      "0",
+      "1",
+      "2",
+      "4",
+      "6",
+      "7",
+      "10",
+      "11",
+      "11"
+    ],
+    "lyrics-melisma": [
+      "7"
+    ],
+    "note-8th": [
+      "1",
+      "2",
+      "2",
+      "5",
+      "5",
+      "5",
+      "6",
+      "7",
+      "7",
+      "7",
+      "7",
+      "9"
+    ],
+    "note-half": [
+      "2",
+      "4",
+      "12"
+    ],
+    "note-quarter": [
+      "0",
+      "1",
+      "1",
+      "3",
+      "3",
+      "3",
+      "5",
+      "6",
+      "6",
+      "8",
+      "8",
+      "9",
+      "9",
+      "10",
+      "10",
+      "10",
+      "11",
+      "11",
+      "11"
+    ],
+    "pickup": [
+      "0"
+    ],
+    "rest-8th": [
+      "5"
+    ],
+    "system-break": [
+      "5",
+      "8",
+      "11"
+    ],
+    "tempo-mark": [
+      "0"
+    ],
+    "tie": [
+      "2",
+      "4",
+      "10"
+    ],
+    "tie-across-system": [
+      "5",
+      "11"
+    ],
+    "time-2-4": [
+      "7"
+    ],
+    "time-3-4": [
+      "0",
+      "9"
+    ],
+    "time-6-8": [
+      "5"
+    ],
+    "time-change": [
+      "5",
+      "7",
+      "9"
+    ],
+    "x-time-courtesy": [
+      "5"
+    ]
+  },
+  "counting_rules": {
+    "note-<type>": "one per pitched, non-grace, non-cue <note> element with that <type> (chord members count individually, tie continuations count)",
+    "dot / double-dot": "one per pitched, non-grace notehead (<note> element, chord members individually) with exactly one / two <dot/>; dotted rests are counted only as rest-dotted",
+    "chord": "one per chord (a <note> followed by <chord/> members)",
+    "beam": "one per beam group (level-1 <beam>begin</beam> on a non-chord-member note)",
+    "flag": "one per stem (non-grace, non-chord-member note of type eighth or shorter) without any <beam>",
+    "ledger-above / ledger-below": "one per notehead that needs ledger lines above / below its staff (position computed from pitch and the clef in force)",
+    "grace / grace-slash": "one per grace <note> element / with slash=\"yes\"",
+    "rest-<type>": "one per non-measure <rest> with that <type>",
+    "rest-dotted": "one per dotted non-measure rest",
+    "rest-whole-bar": "one per <rest measure=\"yes\"> not inside a multi-bar rest block",
+    "rest-multibar": "one per <multiple-rest> block",
+    "clef-<kind>": "one per <clef> element (initial clefs included; a piano grand staff has two)",
+    "clef-change": "one per <clef> element after the first measure's initial attributes",
+    "key-0 / key-sN / key-fN": "one per <key> element (per part)",
+    "key-change": "one per <key> element after measure 1",
+    "acc-<kind>": "one per <accidental> element; acc-courtesy = cautionary/parenthesized accidentals",
+    "time-<n>-<d>": "one per <time> element printed as numbers (per part; a grand staff prints it on both staves but the truth has one <time>); 4/4 and 2/2 printed as C / cut are time-common / time-cut, NOT time-4-4 / time-2-2",
+    "time-change": "one per <time> element after the first measure of the part",
+    "x-time-courtesy": "one per <time> in the first measure of a system (after the first system): the engraving ALSO prints a courtesy copy at the end of the previous system, which has no element of its own in the truth (the count tells how many extra time-signature glyphs are printed per part)",
+    "pickup": "one per part whose first measure is implicit=\"yes\" (anacrusis)",
+    "tuplet-<n>": "one per tuplet group (<tuplet type=\"start\">, every nesting level) by its actual number (tuplet-actual/tuplet-number, else time-modification/actual-notes); 4:3 quadruplets are x-tuplet-4",
+    "tuplet-nested": "one per tuplet group nested inside another tuplet (<tuplet number=\"2\"> or deeper)",
+    "tie": "one per <tied type=\"start\"> (per notehead: a 3-note chord tie counts 3)",
+    "tie-across-system": "ties whose stop lies after a system break (print new-system OR new-page) relative to the start; x-tie-across-page = the subset across a page break",
+    "slur": "one per <slur type=\"start\">",
+    "staccato/accent/tenuto/fermata/...": "one per notation element",
+    "dyn-<x>": "one per dynamics element",
+    "tempo-mark": "one per bold <words> direction at a measure start (engraved with \\tempo)",
+    "rehearsal-mark": "one per <rehearsal>",
+    "barline-<x> / repeat-<x>": "one per <barline> of that style",
+    "system-break / page-break": "one per <print new-system=\"yes\"> / <print new-page=\"yes\"> (part 1 only)",
+    "multi-page": "1 when the truth has at least one page break",
+    "lyrics": "one per <lyric> element (syllable)",
+    "lyrics-hyphen": "one per syllable with syllabic begin/middle (a hyphen follows)",
+    "lyrics-extender": "one per <extend/>",
+    "lyrics-melisma": "one per syllable sung on more than one attack (a later non-tied note of the same voice before the next syllable of that verse)",
+    "lyrics-multi-verse": "number of lyric lines (verses) when more than one",
+    "stem-up / stem-down": "one per stem (non-chord-member, non-grace note shorter than a whole), counted ONLY when the truth gives <stem> for every such note (two voices on one staff); otherwise absent because stem direction is left to the engraver"
+  },
+  "notes": [
+    "Courtesy time signatures that LilyPond prints at the end of a system before a meter change are NOT separate <time> elements in the truth (MusicXML has no courtesy-time element; the change is the <time> in the first measure of the next system). Do not count them as extra time changes.",
+    "Ties are per notehead (<tie>/<tied> on each tied chord member). A tie across a system or page break is engraved as two half-ties (one at the end of the first system, one at the start of the next); the truth has ONE tie (start on the last note of the system, stop on the first note of the next).",
+    "Stem directions are not in the truth for single-voice staves (LilyPond chooses them); stem-up / stem-down are therefore neither listed nor counted for this item.",
+    "<beam> elements reproduce the engraved beam groups exactly (manual beaming, \\autoBeamOff); a rest inside a beam carries no <beam>.",
+    "Counts follow meta.counting_rules: time-4-4 / time-2-2 count numeric signatures only, C and cut count as time-common / time-cut; a piano grand staff prints each time signature on both staves but the truth (and the count) has one <time> per measure.",
+    "Lyric hyphens may be omitted by LilyPond where syllables are close; truth keeps syllabic begin/middle/end as entered."
+  ],
+  "degradations": {
+    "scan.pdf": {
+      "seed": 730401,
+      "render_dpi": 300,
+      "dpi": 300,
+      "color": "gray",
+      "format": "jpeg",
+      "jpeg_quality": 75,
+      "jpeg_passes": 1,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            247,
+            247,
+            245
+          ],
+          "texture": 2
+        },
+        {
+          "op": "rotate",
+          "deg": -0.4,
+          "bg": 238
+        },
+        {
+          "op": "noise",
+          "sigma": 2
+        }
+      ],
+      "tags": [
+        "paper_texture",
+        "rotation_-0.4deg",
+        "noise",
+        "jpeg_q75"
+      ],
+      "output_pages": 1,
+      "pixel_size": [
+        2507,
+        3526
+      ],
+      "image_mode": "L",
+      "bytes": 443362,
+      "image_only_check": {
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "pages": 1,
+        "text_chars": 0
+      },
+      "op_log": []
+    },
+    "scan-severe.pdf": {
+      "seed": 730402,
+      "render_dpi": 150,
+      "dpi": 150,
+      "color": "gray",
+      "format": "png1",
+      "jpeg_quality": null,
+      "jpeg_passes": null,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            250,
+            250,
+            250
+          ]
+        },
+        {
+          "op": "punch_holes",
+          "n": 2,
+          "side": "left",
+          "bg": 20
+        },
+        {
+          "op": "rotate",
+          "deg": 3.0,
+          "bg": 255
+        },
+        {
+          "op": "speckle",
+          "per_mpx": 80
+        },
+        {
+          "op": "binarize",
+          "threshold": 95,
+          "pre_blur": 0.6,
+          "noise": 18
+        }
+      ],
+      "tags": [
+        "punch_holes",
+        "rotation_+3deg",
+        "speckle",
+        "binarized_photocopy_thin"
+      ],
+      "output_pages": 1,
+      "pixel_size": [
+        1333,
+        1818
+      ],
+      "image_mode": "1",
+      "bytes": 19691,
+      "image_only_check": {
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "pages": 1,
+        "text_chars": 0
+      },
+      "op_log": [
+        {
+          "punch_holes_xy_px": [
+            [
+              70,
+              640
+            ],
+            [
+              70,
+              1113
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "dpi": 300,
+  "pages": 1,
+  "license": "CC0",
+  "license_detail": "Text public domain (Blake 1794); music, engraving, truth and scans CC0-1.0",
+  "source": "Text: William Blake, \"The Tyger\", Songs of Experience (1794), public domain. Melody composed for this corpus (CC0).",
+  "files": {
+    "truth": "truth.musicxml",
+    "engraving": "engraving.ly",
+    "clean": "clean.pdf",
+    "scan": "scan.pdf",
+    "scan_severe": "scan-severe.pdf",
+    "attribution": "ATTRIBUTION.txt"
+  },
+  "clean": {
+    "dpi": 300,
+    "pages": 1,
+    "ops": [],
+    "note": "undamaged raster render",
+    "image_only": true,
+    "fonts": [],
+    "images": 1,
+    "text_chars": 0
+  },
+  "validation": {
+    "truth_xsd_valid": true,
+    "engraving_event_dump_matches_truth": true,
+    "engraving_events_compared": 44,
+    "lyric_events_compared": 40,
+    "time_signatures_compared": 4,
+    "tuplet_brackets_match_truth": true,
+    "tuplet_brackets_compared": 0,
+    "midi_attacks_match_truth": true,
+    "midi_attacks": 31,
+    "music21_reparse_matches_model": true,
+    "lyric_text_found_in_engraving": 1.0,
+    "lilypond_warnings": [],
+    "method": "LilyPond event-dump engraver (tsynth/dump.ly) compared with the model the truth is written from: every note/rest (onset, pitch, notated type, dots, tuplet scale incl. nested products), ties, beam starts/stops, slurs, fermatas, lyric syllables/hyphens/extenders, bar numbers/measure positions and every printed time-signature grob (fraction + C/numbered style) per staff; every printed TupletBracket (onset, ratio, visible or not) vs the truth bracket attribute; LilyPond MIDI attack multiset; music21 re-parse of truth.musicxml; xmllint XSD. Counts are read back from truth.musicxml by tsynth/counts.py."
+  },
+  "generator": "corpus/coverage/time/_tools/run_all.py (tsynth/items.py, catalog.py, build.py, scan.py)"
+}

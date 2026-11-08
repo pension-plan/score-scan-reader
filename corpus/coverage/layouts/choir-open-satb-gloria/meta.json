@@ -1,0 +1,315 @@
+{
+  "id": "choir-open-satb-gloria",
+  "family": "layouts",
+  "title": "Gloria - SATB choir in open score with imitative entries",
+  "layout": "choir-open-satb",
+  "symbols": [
+    "beam",
+    "clef-bass",
+    "clef-treble",
+    "clef-treble-8vb",
+    "dyn-f",
+    "dyn-mf",
+    "fermata",
+    "flag",
+    "hairpin-dim",
+    "key-s3",
+    "lyrics",
+    "lyrics-hyphen",
+    "lyrics-melisma",
+    "metronome",
+    "note-8th",
+    "note-half",
+    "note-quarter",
+    "note-whole",
+    "rest-quarter",
+    "rest-whole-bar",
+    "slur",
+    "stem-down",
+    "stem-up",
+    "tempo-mark",
+    "time-4-4",
+    "x-group-bracket",
+    "x-measures",
+    "x-parts",
+    "x-staves"
+  ],
+  "counts": {
+    "beam": 3,
+    "clef-bass": 1,
+    "clef-treble": 2,
+    "clef-treble-8vb": 1,
+    "dyn-f": 4,
+    "dyn-mf": 4,
+    "fermata": 4,
+    "flag": 16,
+    "hairpin-dim": 4,
+    "key-s3": 1,
+    "lyrics": 58,
+    "lyrics-hyphen": 32,
+    "lyrics-melisma": 11,
+    "metronome": 1,
+    "note-8th": 22,
+    "note-half": 11,
+    "note-quarter": 38,
+    "note-whole": 4,
+    "rest-quarter": 1,
+    "rest-whole-bar": 6,
+    "slur": 11,
+    "stem-down": 37,
+    "stem-up": 34,
+    "tempo-mark": 1,
+    "time-4-4": 1,
+    "x-group-bracket": 1,
+    "x-measures": 7,
+    "x-parts": 4,
+    "x-staves": 4
+  },
+  "expected": {
+    "parts": [
+      "Soprano",
+      "Alto",
+      "Tenor",
+      "Bass"
+    ],
+    "must_not_split": false,
+    "shared_staves": [],
+    "staves_per_part": {
+      "Soprano": 1,
+      "Alto": 1,
+      "Tenor": 1,
+      "Bass": 1
+    },
+    "lyrics": [
+      {
+        "part": "Soprano",
+        "verses": 1
+      },
+      {
+        "part": "Alto",
+        "verses": 1
+      },
+      {
+        "part": "Tenor",
+        "verses": 1
+      },
+      {
+        "part": "Bass",
+        "verses": 1
+      }
+    ],
+    "notes": "FOUR parts, one staff each: Soprano, Alto, Tenor (treble clef with a small 8 below: sounds an octave lower; truth pitches are sounding pitches), Bass. Voices enter one after another (whole-bar rests before each entry). Every staff has its own lyric line (Latin) that belongs to that part."
+  },
+  "notes": [
+    "The tenor clef is <clef><sign>G</sign><line>2</line><clef-octave-change>-1</clef-octave-change>; its pitches are written at sounding pitch as usual for vocal tenor parts."
+  ],
+  "layout_description": "A4 portrait, staff size 19, one system of 7 measures on 4 bracketed staves, every staff named",
+  "pages": 1,
+  "measures": 7,
+  "systems": 1,
+  "noteheads_in_truth": 75,
+  "hidden_staff_segments": [],
+  "dpi": 200,
+  "degradations": {
+    "clean.pdf": {
+      "seed": null,
+      "dpi": 300,
+      "format": "png (8-bit grey)",
+      "summary": "undamaged raster of the engraving",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "size_px": [
+            2481,
+            3508
+          ]
+        }
+      ],
+      "bytes": 122486
+    },
+    "scan.pdf": {
+      "seed": 7061,
+      "render_dpi": 200,
+      "dpi": 200,
+      "format": "jpeg q70",
+      "colour": "gray",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1654,
+            2339
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              3
+            ],
+            [
+              "skew_rotation_deg",
+              -0.9
+            ],
+            [
+              "lighting_gradient",
+              {
+                "strength": 0.05,
+                "angle_deg": 54.6
+              }
+            ],
+            [
+              "focus_blur_sigma",
+              0.5
+            ],
+            [
+              "gaussian_noise_sigma",
+              4
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 200,
+        "mode": "gray",
+        "texture": 3,
+        "rotate": -0.9,
+        "gradient": 0.05,
+        "blur": 0.5,
+        "noise": 4,
+        "jpeg": 70
+      },
+      "summary": "200 dpi grey office scan, -0.9 deg skew, slight lighting gradient, noise, JPEG q70",
+      "bytes": 306246
+    },
+    "scan-severe.pdf": {
+      "seed": 7062,
+      "render_dpi": 300,
+      "dpi": 150,
+      "format": "png1",
+      "colour": "bw",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1240,
+            1754
+          ],
+          "ops": [
+            [
+              "faded_ink",
+              0.12
+            ],
+            [
+              "skew_rotation_deg",
+              3.0
+            ],
+            [
+              "focus_blur_sigma",
+              0.6
+            ],
+            [
+              "gaussian_noise_sigma",
+              8
+            ],
+            [
+              "salt_pepper",
+              0.0015
+            ],
+            [
+              "speckles_per_mpx",
+              120
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 118,
+                "noise": 20
+              }
+            ],
+            [
+              "resampled_dpi",
+              [
+                300,
+                150
+              ]
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 300,
+        "out_dpi": 150,
+        "ink_dropout": 0.12,
+        "rotate": 3.0,
+        "blur": 0.6,
+        "noise": 8,
+        "binarize": 118,
+        "binarize_noise": 20,
+        "saltpepper": 0.0015,
+        "speckle": 120,
+        "format": "png1"
+      },
+      "summary": "thin, faded binarised photocopy at 150 dpi (rendered 300): ink dropout, 3 deg skew, broken lines, salt & pepper, toner specks",
+      "bytes": 24586
+    }
+  },
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "scan-severe.pdf",
+    "scan.pdf",
+    "truth.musicxml"
+  ],
+  "license": "CC0",
+  "license_detail": "CC0-1.0: composition, arrangement, engraving and scans",
+  "source": "self-authored for the coverage suite (2026)",
+  "engraver": "internal model -> LilyPond 2.24 (coverage-suite writer: explicit beams and stems)",
+  "validation": {
+    "xsd_valid": true,
+    "music21_parse": "4 75",
+    "midi_attacks_match_truth": true,
+    "attacks": 75,
+    "grob_log_matches_truth": true,
+    "printed_summary": {
+      "noteheads": 75,
+      "stems_up": 34,
+      "stems_down": 37,
+      "accidentals": 0,
+      "rests": 7,
+      "beams": 3,
+      "flags": 16,
+      "slurs": 11,
+      "ties": 0,
+      "scripts": {
+        "fermata": 4
+      },
+      "dynamics": {
+        "mf": 4,
+        "f": 4
+      },
+      "lyric_syllables": 58,
+      "hyphens": 32,
+      "extenders": 0,
+      "chord_names": 0,
+      "system_delimiters": {
+        "SystemStartBracket": 1
+      }
+    },
+    "lilypond_warnings": [],
+    "lyric_syllables_found_in_engraving": 1.0,
+    "lyric_syllables": 58,
+    "pages_planned": 1,
+    "image_only": {
+      "clean.pdf": true,
+      "scan.pdf": true,
+      "scan-severe.pdf": true
+    }
+  }
+}

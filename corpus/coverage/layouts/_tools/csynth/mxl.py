@@ -249,10 +249,11 @@ def write_musicxml(score: Score, path: str, software='layout-challenge corpus bu
                 if p.id == marks_pid and v is order[0]:
                     hq = sorted((F(o), sym) for (hi, o, sym) in score.harmonies if hi == i)
                 for ev in evs:
-                    while hq and hq[0][0] <= pos and ev.kind != 'clef':
-                        if hq[0][0] != pos:
-                            raise ValueError(f'harmony at {hq[0][0]} not on an event onset in measure {i + 1}')
-                        w(harmony_xml(hq.pop(0)[1], f'<staff>{1}</staff>' if p.staves > 1 else ''))
+                    while hq and ev.kind != 'clef' and ev.dur > 0 and hq[0][0] < pos + ev.dur:
+                        if hq[0][0] < pos:
+                            raise ValueError(f'harmony at {hq[0][0]} before the event at {pos} in measure {i + 1}')
+                        off = int((hq[0][0] - pos) * div)
+                        w(harmony_xml(hq.pop(0)[1], f'<staff>{1}</staff>' if p.staves > 1 else '', off))
                     st_num = (ev.staff or v.staff) if p.staves > 1 else None
                     if ev.kind == 'clef':
                         w('      <attributes>')
@@ -411,7 +412,7 @@ HKIND = {'': ('major', ''), 'm': ('minor', 'm'), '7': ('dominant', '7'), 'm7': (
          '6': ('major-sixth', '6'), 'm6': ('minor-sixth', 'm6'), '9': ('dominant-ninth', '9')}
 
 
-def harmony_xml(sym, staff=''):
+def harmony_xml(sym, staff='', offset=0):
     import re as _re
     m = _re.match(r'^(?P<r>[A-G])(?P<ra>#|b)?(?P<q>maj7|m7|m6|m|dim|sus4|7|6|9)?(?:/(?P<b>[A-G])(?P<ba>#|b)?)?$', sym)
     if not m:
@@ -428,4 +429,5 @@ def harmony_xml(sym, staff=''):
         if al[m.group('ba')]:
             r += f'<bass-alter>{al[m.group("ba")]}</bass-alter>'
         r += '</bass>'
-    return f'      <harmony print-frame="no">{r}{staff}</harmony>'
+    off = f'<offset>{offset}</offset>' if offset else ''
+    return f'      <harmony print-frame="no">{r}{off}{staff}</harmony>'

@@ -1,0 +1,338 @@
+{
+  "id": "rst03-whole-bar-rests-simple",
+  "family": "rests",
+  "title": "Whole-Bar Rests I (violin): simple meters",
+  "symbols": [
+    "barline-final",
+    "clef-treble",
+    "dot",
+    "fermata",
+    "key-0",
+    "ledger-above",
+    "note-breve",
+    "note-half",
+    "note-quarter",
+    "note-whole",
+    "rest-whole-bar",
+    "stem-down",
+    "system-break",
+    "tempo-mark",
+    "time-2-4",
+    "time-3-2",
+    "time-3-4",
+    "time-4-4",
+    "time-5-4",
+    "time-change",
+    "time-common",
+    "time-cut",
+    "x-rest-fermata",
+    "x-time-4-2"
+  ],
+  "layout": "melody",
+  "expected": {
+    "parts": [
+      "Violin"
+    ],
+    "must_not_split": false,
+    "notes": "16 bars alternating one bar of notes and one whole-bar rest per meter: 2/4, 3/4, 4/4 (numeric), C, cut time, 3/2, 5/4 (rest with fermata = general pause) and 4/2 (whole-bar rest drawn as a breve rest). Every whole-bar rest must last the full bar of its meter (2, 3, 4, 4, 4, 6, 5, 8 quarters).",
+    "measures": 16,
+    "bars_drawn": 16,
+    "first_measure_number": 1,
+    "systems": 4
+  },
+  "counts": {
+    "barline-final": 1,
+    "clef-treble": 1,
+    "dot": 2,
+    "fermata": 1,
+    "key-0": 1,
+    "ledger-above": 1,
+    "note-breve": 1,
+    "note-half": 1,
+    "note-quarter": 3,
+    "note-whole": 5,
+    "rest-whole-bar": 8,
+    "stem-down": 4,
+    "system-break": 3,
+    "tempo-mark": 1,
+    "time-2-4": 1,
+    "time-3-2": 1,
+    "time-3-4": 1,
+    "time-4-4": 1,
+    "time-5-4": 1,
+    "time-change": 7,
+    "time-common": 1,
+    "time-cut": 1,
+    "x-rest-fermata": 1,
+    "x-time-4-2": 1
+  },
+  "degradations": {
+    "scan.pdf": {
+      "seed": 810301,
+      "render_dpi": 300,
+      "dpi": 300,
+      "color": "gray",
+      "format": "jpeg",
+      "jpeg_quality": 60,
+      "jpeg_passes": 1,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            244,
+            242,
+            236
+          ],
+          "texture": 3
+        },
+        {
+          "op": "rotate",
+          "deg": 1.1,
+          "bg": 235
+        },
+        {
+          "op": "gradient",
+          "strength": 0.06
+        },
+        {
+          "op": "blur",
+          "sigma": 0.5
+        },
+        {
+          "op": "noise",
+          "sigma": 5
+        }
+      ],
+      "tags": [
+        "paper_texture",
+        "rotation_+1.1deg",
+        "gradient",
+        "blur",
+        "noise",
+        "jpeg_q60"
+      ],
+      "severity": "typical",
+      "output_pages": 1,
+      "pixel_size": [
+        2549,
+        3556
+      ],
+      "image_mode": "L",
+      "bytes": 546439,
+      "image_only_check": {
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "pages": 1,
+        "text_chars": 0
+      },
+      "op_log": []
+    },
+    "scan-severe.pdf": {
+      "seed": 810302,
+      "render_dpi": 150,
+      "dpi": 150,
+      "color": "rgb",
+      "format": "jpeg",
+      "jpeg_quality": 25,
+      "jpeg_passes": 1,
+      "ops": [
+        {
+          "op": "ink_weight",
+          "px": 1
+        },
+        {
+          "op": "paper",
+          "rgb": [
+            240,
+            236,
+            226
+          ],
+          "texture": 5
+        },
+        {
+          "op": "pencil",
+          "circles": 3,
+          "ticks": 3,
+          "fingerings": 2,
+          "words": [
+            "tacet?"
+          ]
+        },
+        {
+          "op": "perspective",
+          "margin": 0.04,
+          "jitter": 0.02,
+          "keystone": 0.035,
+          "bg": [
+            60,
+            55,
+            50
+          ]
+        },
+        {
+          "op": "vignette",
+          "strength": 0.3
+        },
+        {
+          "op": "motion_blur",
+          "length": 4,
+          "angle": 15
+        },
+        {
+          "op": "noise",
+          "sigma": 8,
+          "chroma": 2
+        }
+      ],
+      "tags": [
+        "ink_weight",
+        "coloured_paper_rgb",
+        "paper_texture",
+        "pencil",
+        "perspective_phone_capture",
+        "vignette",
+        "motion_blur",
+        "noise",
+        "jpeg_q25"
+      ],
+      "severity": "severe",
+      "output_pages": 1,
+      "pixel_size": [
+        1339,
+        1852
+      ],
+      "image_mode": "RGB",
+      "bytes": 108677,
+      "image_only_check": {
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "pages": 1,
+        "text_chars": 0
+      },
+      "op_log": [
+        {
+          "pencil_marks": [
+            [
+              "circle",
+              75,
+              441
+            ],
+            [
+              "circle",
+              80,
+              444
+            ],
+            [
+              "circle",
+              615,
+              573
+            ],
+            [
+              "fake_3",
+              442,
+              384
+            ],
+            [
+              "digit",
+              529
+            ],
+            [
+              "digit",
+              299
+            ],
+            [
+              "tick",
+              576
+            ],
+            [
+              "tick",
+              532
+            ],
+            [
+              "tick",
+              1075
+            ],
+            [
+              "word",
+              "tacet?",
+              1029
+            ],
+            [
+              "bracket",
+              662
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "dpi": 300,
+  "pages": 1,
+  "license": "CC0",
+  "license_detail": "CC0-1.0: music composed for this corpus; engraving, truth and scans generated by corpus/coverage/rests/_tools",
+  "composer": "OMR coverage corpus (CC0)",
+  "focus": [
+    "rest-whole-bar",
+    "time-2-4",
+    "time-3-4",
+    "time-4-4",
+    "time-common",
+    "time-cut",
+    "time-3-2",
+    "time-5-4",
+    "x-time-4-2"
+  ],
+  "notes": [
+    "Whole-bar rests are <rest measure=\"yes\"/> with the bar duration and no <type> (the glyph is a whole rest, or a breve rest in 4/2). A multi-bar rest is one measure per bar, each with a measure rest; the first bar carries <measure-style><multiple-rest use-symbols=\"yes|no\">n</multiple-rest>. The number printed above the rest is implied by n; the exact church-rest glyph combination (longa / breve / whole rest symbols) is not encoded beyond use-symbols=\"yes\".",
+    "The 5/4 whole-bar rest (bar 14) carries a fermata (general pause); no \"G.P.\" text is printed.",
+    "Bar 7 restates 4/4 as the C symbol after a numeric 4/4 (a time-signature style change, counted as time-change).",
+    "<stem> is written for every stemmed note from the engraved stem direction (read back from the layout)."
+  ],
+  "files": {
+    "truth": "truth.musicxml",
+    "engraving": "engraving.ly",
+    "clean": "clean.pdf",
+    "scan": "scan.pdf",
+    "scan_severe": "scan-severe.pdf",
+    "attribution": "ATTRIBUTION.txt"
+  },
+  "clean": {
+    "dpi": 300,
+    "pages": 1,
+    "ops": [],
+    "note": "undamaged raster render (PNG, gray)",
+    "pixel_size": [
+      2481,
+      3508
+    ],
+    "bytes": 73088,
+    "image_only": true,
+    "fonts": [],
+    "images": 1,
+    "text_chars": 0
+  },
+  "validation": {
+    "truth_xsd_valid": true,
+    "engraving_event_dump_matches_truth": true,
+    "engraving_events_compared": 19,
+    "time_signatures_compared": 8,
+    "rest_positions_match_truth": true,
+    "rests_position_checked": 8,
+    "rests_with_explicit_display_position": 0,
+    "rests_with_display_position_read_from_layout": 0,
+    "stems_read_from_engraving": 4,
+    "midi_attacks_match_truth": true,
+    "midi_attacks": 10,
+    "music21_reparse_matches_model": true,
+    "rest_counts_model_equal_truth": true,
+    "lilypond_warnings": [],
+    "method": "LilyPond event-dump engraver (_tools/crest/dump.ly) compared with the model the truth is written from: every note/rest/multi-bar rest (onset, pitch, notated type, dots, tuplet scale), ties, beam starts/stops, slurs, articulations/fermatas, bar numbers, measure positions and time signatures; post-layout read-back of every Rest / MultiMeasureRest grob (staff-position and Y extent vs. the truth display-step/display-octave) and of every Stem direction (written to <stem>); LilyPond MIDI attack multiset; music21 re-parse of truth.musicxml; xmllint against the MusicXML 4.0 XSD; counts parsed from truth.musicxml and cross-checked with the model for rest tags."
+  },
+  "build_timing": {
+    "lilypond_s": 2.24,
+    "raster_and_damage_s": 5.22
+  },
+  "generator": "corpus/coverage/rests/_tools/run_all.py (crest/items.py, catalog.py, build.py, scan.py)"
+}

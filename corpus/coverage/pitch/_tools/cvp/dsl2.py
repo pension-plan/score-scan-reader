@@ -42,6 +42,8 @@ def parse_voice(text):
     directives = {}
     last_d, last_dots = '4', 0
     toks = []
+    # keep chords <c' e' g'> together as one token
+    text = re.sub(r'<([^>]*)>', lambda m: '<' + '\u00a7'.join(m.group(1).split()) + '>', text)
     for raw in text.split():
         if raw.startswith('\\bar='):
             toks.append(raw)
@@ -87,7 +89,7 @@ def parse_voice(text):
         nd = last_dots
         ev = Event('rest' if p == 'r' else 'note', display_ql(dtype, nd), dtype=dtype, dots=nd)
         if p != 'r':
-            items = p[1:-1].split() if p.startswith('<') else [p]
+            items = p[1:-1].split('\u00a7') if p.startswith('<') else [p]
             for x in items:
                 pit, mark = parse_pitch(x)
                 ev.pitches.append(pit)

@@ -9,7 +9,12 @@
   const MAX_CODE_LINES = 3000;
   const PREVIEW_MEASURES = 48; // a longer score previews this many measures first
   const THUMB_W = 1400; // on-screen copy of each page (overlay keeps full-res coordinates)
-  const SAMPLE = { url: 'assets/sample-maple-leaf-rag.pdf', name: 'sample-maple-leaf-rag.pdf', label: 'Maple Leaf Rag (Scott Joplin, 1899), scanned copy' };
+  // Two bundled samples: the rag (piano grand staff, converted on load) and a
+  // real 1905 hymnal scan (closed-score SATB with lyrics: the four-part split).
+  const SAMPLES = {
+    rag: { url: 'assets/sample-maple-leaf-rag.pdf', name: 'sample-maple-leaf-rag.pdf', title: 'the sample rag', label: 'Maple Leaf Rag (Scott Joplin, 1899), engraved and aged like a scan' },
+    hymn: { url: 'assets/sample-st-anselm.pdf', name: 'sample-st-anselm.pdf', title: 'the sample hymn', label: 'St. Anselm (Methodist Hymnal, 1905), a real scan' },
+  };
   let busy = false;
   let stopAsked = false;
   let lastXML = '';
@@ -28,6 +33,17 @@
   const fmtSecs = (s) => s < 60 ? `${Math.max(1, Math.round(s))} s` : `${Math.floor(s / 60)} min ${String(Math.round(s % 60)).padStart(2, '0')} s`;
 
   // ---------------------------------------------------------------- OCR ---
+  // Languages, engine and page mode come from the pipeline (lyrics.js
+  // OCR_CONFIG), so the page reads text the way the benchmark does.
+  function ocrConfig() {
+    const def = { langs: 'eng', oem: 1, params: { tessedit_pageseg_mode: '7', user_defined_dpi: '300' } };
+    try {
+      const c = omrRequire('./lyrics').OCR_CONFIG;
+      if (c && typeof c.langs === 'string' && /^[a-z_]+(\+[a-z_]+)*$/.test(c.langs)) return { langs: c.langs, oem: c.oem == null ? 1 : c.oem, params: Object.assign({}, def.params, c.params || {}) };
+    } catch (e) { /* bundle without lyrics config */ }
+    return def;
+  }
+  let ocrLangs = '';
   let ocrWorkerP = null;
   function getOCR() {
     if (!ocrWorkerP) {
@@ -42,13 +58,19 @@
           return URL.createObjectURL(new Blob([await r.text()], { type: 'text/javascript' }));
         };
         const [workerURL, coreURL] = await Promise.all([blobOf('tesseract-worker.min.js'), blobOf('tesseract-core-simd-lstm.wasm.js')]);
-        const w = await Tesseract.createWorker('eng', 1, {
+        const cfg = ocrConfig();
+        const make = (langs) => Tesseract.createWorker(langs, cfg.oem, {
           workerPath: workerURL,
           corePath: coreURL + '#core.js',
           langPath: base.replace(/\/$/, ''),
           gzip: true, workerBlobURL: false, cacheMethod: 'none',
         });
-        await w.setParameters({ tessedit_pageseg_mode: '7', user_defined_dpi: '300' });
+        // the pipeline's language set (eng+deu: umlauts and German words), or
+        // English alone if a language file is missing
+        let w, langs = cfg.langs;
+        try { w = await make(langs); } catch (e) { if (langs === 'eng') throw e; langs = 'eng'; w = await make(langs); }
+        await w.setParameters(cfg.params);
+        ocrLangs = langs;
         return w;
       })();
       ocrWorkerP.catch(() => {});
@@ -510,6 +532,15 @@
         return;
       }
       host.appendChild(this.frame(p));
+      // how the page was read: turned, smoothed, split as a spread, straightened
+      const notes = Sess.pageNotes(p.view);
+      if (notes.length) {
+        const ul = document.createElement('ul');
+        ul.className = 'pagenotes';
+        ul.setAttribute('aria-label', `How page ${i + 1} was read`);
+        ul.innerHTML = notes.map((t) => `<li>${esc(t)}</li>`).join('');
+        host.appendChild(ul);
+      }
     },
     frame(p) {
       const v = p.view;
@@ -702,7 +733,13 @@
     const maxSkew = views.length ? Math.max(...views.map((v) => Math.abs(v.skew || 0))) : 0;
     const read = book.pages.filter((p) => p.state === 'done' || p.state === 'empty').length;
     stepper.set('render', null, read < book.total ? `${read} of ${plural(book.total, 'page')}` : plural(read, 'page'));
-    stepper.set('cleanup', null, maxSkew >= 0.05 ? `deskewed ${maxSkew.toFixed(1)}°` : 'no skew');
+    const turned = views.filter((v) => v.orientation).length, smooth = views.filter((v) => v.mode && v.mode !== 'default').length, spreads = views.filter((v) => v.spread).length;
+    const clean = [];
+    if (turned) clean.push(views.length > 1 ? `${turned} turned` : `turned ${views.find((v) => v.orientation).orientation}°`);
+    if (spreads) clean.push(views.length > 1 ? `${spreads} split` : '2-up split');
+    if (smooth) clean.push(views.length > 1 ? `${smooth} smoothed` : 'smoothed');
+    clean.push(maxSkew >= 0.05 ? `deskewed ${maxSkew.toFixed(1)}°` : 'no skew');
+    stepper.set('cleanup', null, clean.join(' · '));
     stepper.set('staves', null, `${plural(sum((v) => v.nStaves), 'staff', 'staves')} · ${plural(sum((v) => v.nSystems), 'system')}`);
     stepper.set('notes', null, plural(sum((v) => v.heads.length), 'head'));
     const verses = Object.values(res.lyricsBySystem || {}).flat();
@@ -808,6 +845,7 @@
   function setBusy(b) {
     busy = b;
     $('sample').disabled = b;
+    $('sampleHymn').disabled = b;
     $('choose').disabled = b;
   }
   // the previous result stays visible but dimmed while a new scan is read
@@ -986,6 +1024,8 @@
         parts: res.score.parts.map((p) => p.name), nNotes: res.score.nNotes, measures: res.score.measures,
         lyrics: Object.values(res.lyricsBySystem).flat().length, warnings: res.warnings, xmlLength: (res.score.xml || '').length,
         steps: stepper.snapshot(), engine: engineKind, pages: { total, n, read, states: book.pages.map((p) => p.state) },
+        ocrLangs: ocrUsed ? ocrLangs : null, file: file.name,
+        pageNotes: book.pages.map((p) => Sess.pageNotes(p.view)),
         secs: +((performance.now() - t0) / 1000).toFixed(2),
       };
     } catch (e) {
@@ -1029,22 +1069,24 @@
     }, { name, size, title: ok.length > 1 ? `${ok.length} files` : null });
   }
 
-  function loadSample() {
+  function loadSample(kind) {
+    const S = SAMPLES[kind] || SAMPLES.rag;
     run(async () => {
-      const r = await fetch(SAMPLE.url);
+      const r = await fetch(S.url);
       if (!r.ok) throw new Error('the sample file was not found (' + r.status + ')');
       const buf = new Uint8Array(await r.arrayBuffer());
       const size = buf.length; // read before pdf.js transfers (detaches) the buffer
-      const src = await pdfSource(buf, SAMPLE.name);
+      const src = await pdfSource(buf, S.name);
       return { pages: src.pages, size, close: src.close };
-    }, { name: SAMPLE.name, title: 'the sample rag', label: 'sample: ' + SAMPLE.label, size: null });
+    }, { name: S.name, title: S.title, label: 'sample: ' + S.label, size: null });
   }
 
   // ---------------------------------------------------------------- wire ---
   stepper.build();
   $('choose').addEventListener('click', () => $('file').click());
   $('file').addEventListener('change', (e) => { const fs = Array.prototype.slice.call(e.target.files || []); e.target.value = ''; handleFiles(fs); });
-  $('sample').addEventListener('click', loadSample);
+  $('sample').addEventListener('click', () => loadSample('rag'));
+  $('sampleHymn').addEventListener('click', () => loadSample('hymn'));
   $('copy').addEventListener('click', copyXML);
   $('copy').disabled = true;
   $('stop').addEventListener('click', () => {
@@ -1110,5 +1152,5 @@
   legend(null);
   renderWarnings([]);
   if (typeof pdfjsLib === 'undefined') status('The PDF reader did not load; PNG and JPG files still work.');
-  loadSample();
+  loadSample('rag');
 })();

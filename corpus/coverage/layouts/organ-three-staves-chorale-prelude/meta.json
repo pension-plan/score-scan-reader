@@ -1,0 +1,307 @@
+{
+  "id": "organ-three-staves-chorale-prelude",
+  "family": "layouts",
+  "title": "Chorale Prelude - organ on three staves (manuals + pedal)",
+  "layout": "organ",
+  "symbols": [
+    "acc-sharp",
+    "beam",
+    "clef-bass",
+    "clef-treble",
+    "dyn-f",
+    "dyn-mf",
+    "fermata",
+    "key-0",
+    "ledger-above",
+    "ledger-below",
+    "metronome",
+    "note-8th",
+    "note-half",
+    "note-quarter",
+    "note-whole",
+    "stem-down",
+    "stem-up",
+    "system-break",
+    "tempo-mark",
+    "text-expression",
+    "time-4-4",
+    "x-measures",
+    "x-multi-staff-part",
+    "x-parts",
+    "x-staves",
+    "x-two-voice-staff-measure"
+  ],
+  "counts": {
+    "acc-sharp": 8,
+    "beam": 4,
+    "clef-bass": 2,
+    "clef-treble": 1,
+    "dyn-f": 1,
+    "dyn-mf": 1,
+    "fermata": 16,
+    "key-0": 1,
+    "ledger-above": 9,
+    "ledger-below": 6,
+    "metronome": 1,
+    "note-8th": 8,
+    "note-half": 16,
+    "note-quarter": 76,
+    "note-whole": 4,
+    "stem-down": 64,
+    "stem-up": 36,
+    "system-break": 1,
+    "tempo-mark": 1,
+    "text-expression": 3,
+    "time-4-4": 1,
+    "x-measures": 8,
+    "x-multi-staff-part": 1,
+    "x-parts": 1,
+    "x-staves": 3,
+    "x-two-voice-staff-measure": 8
+  },
+  "expected": {
+    "parts": [
+      "Organ"
+    ],
+    "must_not_split": true,
+    "shared_staves": [],
+    "staves_per_part": {
+      "Organ": 3
+    },
+    "lyrics": [],
+    "notes": "ONE part \"Organ\" with THREE staves: manual I (treble, two voices: soprano stems up, alto stems down), manual II (bass clef) and pedal (bass clef). The brace joins only the two manual staves; the pedal staff is outside the brace (labelled \"Pedal\") but belongs to the same Organ part - must not be split into 2 or 3 parts, and the two manual-I voices are not choir parts. Registration texts are words directions."
+  },
+  "notes": [
+    "Organ = one part with <staves>3</staves> and <part-symbol top-staff=\"1\" bottom-staff=\"2\">brace</part-symbol>; voices 1+2 on staff 1, voice 5 on staff 2, voice 9 on staff 3."
+  ],
+  "layout_description": "A4 portrait, staff size 19, 2 systems of 4 measures, braced manuals + separate pedal staff",
+  "pages": 1,
+  "measures": 8,
+  "systems": 2,
+  "noteheads_in_truth": 104,
+  "hidden_staff_segments": [],
+  "dpi": 200,
+  "degradations": {
+    "clean.pdf": {
+      "seed": null,
+      "dpi": 300,
+      "format": "png (8-bit grey)",
+      "summary": "undamaged raster of the engraving",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "size_px": [
+            2481,
+            3508
+          ]
+        }
+      ],
+      "bytes": 108132
+    },
+    "scan.pdf": {
+      "seed": 7111,
+      "render_dpi": 200,
+      "dpi": 200,
+      "format": "jpeg q70",
+      "colour": "gray",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1654,
+            2339
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              3
+            ],
+            [
+              "skew_rotation_deg",
+              -0.9
+            ],
+            [
+              "lighting_gradient",
+              {
+                "strength": 0.05,
+                "angle_deg": 340.2
+              }
+            ],
+            [
+              "focus_blur_sigma",
+              0.5
+            ],
+            [
+              "gaussian_noise_sigma",
+              4
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 200,
+        "mode": "gray",
+        "texture": 3,
+        "rotate": -0.9,
+        "gradient": 0.05,
+        "blur": 0.5,
+        "noise": 4,
+        "jpeg": 70
+      },
+      "summary": "200 dpi grey office scan, -0.9 deg skew, slight lighting gradient, noise, JPEG q70",
+      "bytes": 314337
+    },
+    "scan-severe.pdf": {
+      "seed": 7112,
+      "render_dpi": 200,
+      "dpi": 200,
+      "format": "png1",
+      "colour": "bw",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1654,
+            2339
+          ],
+          "ops": [
+            [
+              "ink_weight",
+              1
+            ],
+            [
+              "punch_holes",
+              {
+                "side": "left",
+                "centers_px": [
+                  [
+                    87,
+                    854
+                  ],
+                  [
+                    87,
+                    1485
+                  ]
+                ]
+              }
+            ],
+            [
+              "staple",
+              {
+                "corner": "tl",
+                "pos_px": [
+                  99,
+                  94
+                ]
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              2.5
+            ],
+            [
+              "focus_blur_sigma",
+              0.9
+            ],
+            [
+              "gaussian_noise_sigma",
+              12
+            ],
+            [
+              "salt_pepper",
+              0.002
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 200,
+                "noise": 20
+              }
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 200,
+        "ink_weight": 1,
+        "rotate": 2.5,
+        "punch_holes": {
+          "n": 2,
+          "side": "left",
+          "level": 10
+        },
+        "staple": {
+          "corner": "tl"
+        },
+        "blur": 0.9,
+        "noise": 12,
+        "binarize": 200,
+        "binarize_noise": 20,
+        "saltpepper": 0.002,
+        "format": "png1"
+      },
+      "summary": "thick dark binarised photocopy at 200 dpi: ink spread, 2.5 deg skew, staple, two punch holes, salt & pepper",
+      "bytes": 145220
+    }
+  },
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "scan-severe.pdf",
+    "scan.pdf",
+    "truth.musicxml"
+  ],
+  "license": "CC0",
+  "license_detail": "CC0-1.0: composition, arrangement, engraving and scans",
+  "source": "self-authored for the coverage suite (2026)",
+  "engraver": "internal model -> LilyPond 2.24 (coverage-suite writer: explicit beams and stems)",
+  "validation": {
+    "xsd_valid": true,
+    "music21_parse": "3 104",
+    "midi_attacks_match_truth": true,
+    "attacks": 104,
+    "grob_log_matches_truth": true,
+    "printed_summary": {
+      "noteheads": 104,
+      "stems_up": 36,
+      "stems_down": 64,
+      "accidentals": 8,
+      "rests": 0,
+      "beams": 4,
+      "flags": 0,
+      "slurs": 0,
+      "ties": 0,
+      "scripts": {
+        "fermata": 16
+      },
+      "dynamics": {
+        "mf": 1,
+        "f": 1
+      },
+      "lyric_syllables": 0,
+      "hyphens": 0,
+      "extenders": 0,
+      "chord_names": 0,
+      "system_delimiters": {
+        "SystemStartBrace": 2
+      }
+    },
+    "lilypond_warnings": [],
+    "lyric_syllables_found_in_engraving": null,
+    "lyric_syllables": 0,
+    "pages_planned": 1,
+    "image_only": {
+      "clean.pdf": true,
+      "scan.pdf": true,
+      "scan-severe.pdf": true
+    }
+  }
+}

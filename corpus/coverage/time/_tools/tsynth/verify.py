@@ -92,6 +92,8 @@ def dump_records(recs):
             out.append(('mmrest', t, _dur_ql(int(log), int(dots), F(scale))))
         elif k in ('tie',):
             out.append(('tie', t, g))
+        elif k == 'notetie':
+            out.append(('notetie', t, g, int(a[0])))
         elif k in ('beam', 'slur'):
             out.append((k, t, g, int(a[0])))
         elif k in ('artic', 'mmartic'):
@@ -133,7 +135,12 @@ def expected_voice(score: Score, part, vkey):
                 for p in ev.pitches:
                     out.append(('note', t, g, midi(p), LOG[ev.dtype], ev.dots, scale))
                 if ev.tie_start:
-                    out.append(('tie', t, g))
+                    if len(ev.pitches) > 1 and not all(p in ev.tie_start for p in ev.pitches):
+                        for p in ev.pitches:            # partial chord tie: <f' a'~> (per-note articulation)
+                            if p in ev.tie_start:
+                                out.append(('notetie', t, g, midi(p)))
+                    else:
+                        out.append(('tie', t, g))
             elif ev.kind == 'rest':
                 if ev.measure_rest:
                     if not ev.multirest_cont:
@@ -385,7 +392,8 @@ def compare_brackets(score: Score, events_path: str):
     for r in ev.get('tuplets', []):
         if r['kind'] == 'bracket':
             a = r['args']
-            got.append((r['t'], int(a[0]), int(a[1]), int(a[2])))
+            # the tuplet-span-event carries the time-scale fraction: numerator = normal, denominator = actual
+            got.append((r['t'], int(a[1]), int(a[0]), int(a[2])))
     exp = []
     offs = score.measure_offsets()
     for p in score.parts:

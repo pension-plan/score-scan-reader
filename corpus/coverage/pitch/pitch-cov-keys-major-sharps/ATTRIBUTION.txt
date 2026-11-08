@@ -1,0 +1,4 @@
+"Sharps Ascending" - composed for the OMR coverage suite, pitch family (2026), engraved with GNU LilyPond 2.24.
+No third-party material.
+
+Composition, engraving, rasterisation and damage simulation produced for the OMR coverage suite (corpus/coverage/pitch/_tools, derived from corpus/challenge/pitch/_tools); dedicated to the public domain (CC0 1.0).

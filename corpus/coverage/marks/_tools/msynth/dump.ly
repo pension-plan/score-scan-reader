@@ -5,7 +5,8 @@
 %%   ctxtype ctxid moment-main moment-grace currentBarNumber measurePosition kind args...
 %% Voice: every music event (notes with the fingerings inside chords, rests, ties, beams,
 %%   slurs, articulations/ornaments/fermatas, dynamics, hairpins, pedal, fingering, text
-%%   scripts, arpeggios, breath marks) and, at the end, every Stem with its final direction.
+%%   scripts, arpeggios, breath marks) and, at the end, every Stem, Script (articulation, ornament,
+%%   fermata) and Fingering grob with its final direction.
 %% ChordNames: the pitches of every chord.  Score: tempo and mark events, and one 'G' line per
 %%   grob created anywhere in the score (name, creating context id, text / script glyph).
 #(define tc-port #f)
@@ -36,7 +37,7 @@
          (ly:event-property ev 'articulations))
     ","))
 #(define (tc-voice-engraver ctx)
-   (let ((stems '()))
+   (let ((stems '()) (scripts '()) (fingers '()))
      (make-engraver
       (listeners
        ((note-event engraver ev)
@@ -64,8 +65,24 @@
        ((breathing-event engraver ev) (tc-out ctx "breathe")))
       (acknowledgers
        ((stem-interface engraver grob source-engraver)
-        (set! stems (cons (cons grob (ly:moment-main (ly:context-current-moment ctx))) stems))))
+        (set! stems (cons (cons grob (ly:moment-main (ly:context-current-moment ctx))) stems)))
+       ((script-interface engraver grob source-engraver)
+        (if (eq? (grob::name grob) 'Script)
+            (set! scripts (cons (cons grob (ly:moment-main (ly:context-current-moment ctx))) scripts))))
+       ((finger-interface engraver grob source-engraver)
+        (set! fingers (cons (cons grob (ly:moment-main (ly:context-current-moment ctx))) fingers))))
       ((finalize engraver)
+       (for-each
+        (lambda (sm)
+          (let ((c (event-cause (car sm))))
+            (tc-out ctx "scriptdir" (cdr sm) (ly:event-property c 'articulation-type)
+                    (ly:grob-property (car sm) 'direction))))
+        (reverse scripts))
+       (for-each
+        (lambda (sm)
+          (let ((c (event-cause (car sm))))
+            (tc-out ctx "fingerdir" (cdr sm) (ly:event-property c 'digit) (ly:grob-property (car sm) 'direction))))
+        (reverse fingers))
        (for-each
         (lambda (sm)
           (let* ((st (car sm))

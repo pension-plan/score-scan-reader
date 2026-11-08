@@ -37,9 +37,11 @@ async function makeOCR() {
 }
 
 (async () => {
-  const dirs = fs.existsSync(CACHE) ? fs.readdirSync(CACHE).filter((d) => !d.startsWith('challenge')) : [];
+  // challenge items (category__id__variant) only when asked for by id; their plain scan variant
+  const all = fs.existsSync(CACHE) ? fs.readdirSync(CACHE) : [];
+  const dirs = all.filter((d) => !d.startsWith('challenge'));
   const want = only || DEFAULT;
-  const items = want.map((id) => [id, dirs.find((d) => d.split('__')[1] === id)]).filter(([, d]) => d);
+  const items = want.map((id) => [id, dirs.find((d) => d.split('__')[1] === id) || (only && all.find((d) => d.startsWith('challenge') && d.split('__')[2] === id && /__scan__r\d+$/.test(d)))]).filter(([, d]) => d);
   const { ocr, done } = await makeOCR();
   const rows = [];
   for (const [id, d] of items) {
@@ -55,7 +57,7 @@ async function makeOCR() {
     for (let i = 0; i < pages.length; i++) {
       const e = await s.addPage(pages[i], i, pages.length);
       pages[i] = null;
-      if (e) { views.push(Sess.pageView(e, i)); Sess.shrink(e.fr.gray, 1400); if (s.releasePage) s.releasePage(e); }
+      if (e) { views.push(Sess.pageView(e, i)); Sess.shrink(e.fr.gray, 1400); if (s.releasePage) { s.releasePage(e); (e.spread || []).forEach((h) => s.releasePage(h)); } }
     }
     const got = s.finish();
     const tGot = Date.now() - t;
@@ -67,7 +69,8 @@ async function makeOCR() {
       xml: ref.score.xml === got.score.xml,
       warnings: JSON.stringify(ref.warnings) === JSON.stringify(got.warnings),
       lyrics: lyr(ref) === lyr(got),
-      heads: JSON.stringify(ref.pages.map((p) => p.fr.heads.map((h) => h.parts || []))) === JSON.stringify(summary.pages.map((p) => p.parts)),
+      // the halves of a spread (index i, i + 0.5) are one page on screen
+      heads: JSON.stringify([...ref.pages.reduce((m, p) => m.set(Math.floor(p.index), (m.get(Math.floor(p.index)) || []).concat(p.fr.heads.map((h) => h.parts || []))), new Map()).values()]) === JSON.stringify(summary.pages.map((p) => p.parts)),
       parts: (got.score.parts || []).map((p) => p.name).join(' '),
       ms: { convert: tRef, session: tGot },
     };

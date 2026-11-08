@@ -1,0 +1,329 @@
+{
+  "id": "choir-sab-summer-song",
+  "family": "layouts",
+  "title": "Summer Song - SAB choir on three bracketed staves",
+  "layout": "choir-sab",
+  "symbols": [
+    "clef-bass",
+    "clef-treble",
+    "dyn-f",
+    "dyn-mp",
+    "fermata",
+    "hairpin-dim",
+    "key-s1",
+    "ledger-below",
+    "lyrics",
+    "lyrics-hyphen",
+    "metronome",
+    "note-half",
+    "note-quarter",
+    "stem-down",
+    "stem-up",
+    "system-break",
+    "tempo-mark",
+    "time-common",
+    "x-group-bracket",
+    "x-measures",
+    "x-parts",
+    "x-staves"
+  ],
+  "counts": {
+    "clef-bass": 1,
+    "clef-treble": 2,
+    "dyn-f": 3,
+    "dyn-mp": 3,
+    "fermata": 3,
+    "hairpin-dim": 3,
+    "key-s1": 1,
+    "ledger-below": 2,
+    "lyrics": 84,
+    "lyrics-hyphen": 6,
+    "metronome": 1,
+    "note-half": 12,
+    "note-quarter": 72,
+    "stem-down": 38,
+    "stem-up": 46,
+    "system-break": 1,
+    "tempo-mark": 1,
+    "time-common": 1,
+    "x-group-bracket": 1,
+    "x-measures": 8,
+    "x-parts": 3,
+    "x-staves": 3
+  },
+  "expected": {
+    "parts": [
+      "Soprano",
+      "Alto",
+      "Baritone"
+    ],
+    "must_not_split": false,
+    "shared_staves": [],
+    "staves_per_part": {
+      "Soprano": 1,
+      "Alto": 1,
+      "Baritone": 1
+    },
+    "lyrics": [
+      {
+        "part": "Soprano",
+        "verses": 1
+      },
+      {
+        "part": "Alto",
+        "verses": 1
+      },
+      {
+        "part": "Baritone",
+        "verses": 1
+      }
+    ],
+    "notes": "THREE parts, one staff each: Soprano, Alto (both treble clef) and Baritone (bass clef). The two treble staves are separate parts, not a piano right hand. Each staff has its own copy of the lyrics (same text, same rhythm). Common-time signature symbol."
+  },
+  "notes": [],
+  "layout_description": "A4 portrait, staff size 19, 2 systems of 4 measures on 3 bracketed staves, full then short names",
+  "pages": 1,
+  "measures": 8,
+  "systems": 2,
+  "noteheads_in_truth": 84,
+  "hidden_staff_segments": [],
+  "dpi": 240,
+  "degradations": {
+    "clean.pdf": {
+      "seed": null,
+      "dpi": 300,
+      "format": "png (8-bit grey)",
+      "summary": "undamaged raster of the engraving",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "size_px": [
+            2481,
+            3508
+          ]
+        }
+      ],
+      "bytes": 155901
+    },
+    "scan.pdf": {
+      "seed": 7071,
+      "render_dpi": 240,
+      "dpi": 240,
+      "format": "jpeg q72",
+      "colour": "gray",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1985,
+            2807
+          ],
+          "ops": [
+            [
+              "bleed_through",
+              {
+                "strength": 0.04,
+                "shift_px": 4
+              }
+            ],
+            [
+              "paper_texture",
+              2
+            ],
+            [
+              "skew_rotation_deg",
+              -0.5
+            ],
+            [
+              "focus_blur_sigma",
+              0.45
+            ],
+            [
+              "gaussian_noise_sigma",
+              3
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 240,
+        "mode": "gray",
+        "texture": 2,
+        "rotate": -0.5,
+        "bleed": 0.04,
+        "blur": 0.45,
+        "noise": 3,
+        "jpeg": 72
+      },
+      "summary": "240 dpi grey scan, -0.5 deg skew, faint bleed-through, JPEG q72",
+      "bytes": 404418
+    },
+    "scan-severe.pdf": {
+      "seed": 7072,
+      "render_dpi": 150,
+      "dpi": 150,
+      "format": "jpeg q25",
+      "colour": "rgb",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1389,
+            1902
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              6
+            ],
+            [
+              "paper_colour",
+              [
+                243,
+                236,
+                214
+              ]
+            ],
+            [
+              "skew_rotation_deg",
+              -2.5
+            ],
+            [
+              "perspective_phone",
+              {
+                "margin": 0.06,
+                "bg": 50,
+                "jitter": 0.035,
+                "keystone": 0.06,
+                "corners_src": [
+                  [
+                    -130,
+                    31
+                  ],
+                  [
+                    1427,
+                    -46
+                  ],
+                  [
+                    1349,
+                    1881
+                  ],
+                  [
+                    14,
+                    1855
+                  ]
+                ]
+              }
+            ],
+            [
+              "uneven_lighting",
+              0.25
+            ],
+            [
+              "vignette",
+              0.3
+            ],
+            [
+              "motion_blur",
+              {
+                "len": 5,
+                "angle": 25
+              }
+            ],
+            [
+              "gaussian_noise_sigma",
+              6
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 150,
+        "mode": "rgb",
+        "paper_rgb": [
+          243,
+          236,
+          214
+        ],
+        "texture": 6,
+        "rotate": -2.5,
+        "phone": {
+          "margin": 0.06,
+          "bg": 50,
+          "jitter": 0.035,
+          "keystone": 0.06
+        },
+        "blotch": 0.25,
+        "vignette": 0.3,
+        "motion_blur": {
+          "len": 5,
+          "angle": 25
+        },
+        "noise": 6,
+        "jpeg": 25
+      },
+      "summary": "phone photo of the page: perspective/keystone, uneven light, vignette, motion blur, 150 dpi, JPEG q25",
+      "bytes": 107749
+    }
+  },
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "scan-severe.pdf",
+    "scan.pdf",
+    "truth.musicxml"
+  ],
+  "license": "CC0",
+  "license_detail": "CC0-1.0: composition, arrangement, engraving and scans",
+  "source": "self-authored for the coverage suite (2026)",
+  "engraver": "internal model -> LilyPond 2.24 (coverage-suite writer: explicit beams and stems)",
+  "validation": {
+    "xsd_valid": true,
+    "music21_parse": "3 84",
+    "midi_attacks_match_truth": true,
+    "attacks": 84,
+    "grob_log_matches_truth": true,
+    "printed_summary": {
+      "noteheads": 84,
+      "stems_up": 46,
+      "stems_down": 38,
+      "accidentals": 0,
+      "rests": 0,
+      "beams": 0,
+      "flags": 0,
+      "slurs": 0,
+      "ties": 0,
+      "scripts": {
+        "fermata": 3
+      },
+      "dynamics": {
+        "mp": 3,
+        "f": 3
+      },
+      "lyric_syllables": 84,
+      "hyphens": 6,
+      "extenders": 0,
+      "chord_names": 0,
+      "system_delimiters": {
+        "SystemStartBracket": 2
+      }
+    },
+    "lilypond_warnings": [],
+    "lyric_syllables_found_in_engraving": 1.0,
+    "lyric_syllables": 84,
+    "pages_planned": 1,
+    "image_only": {
+      "clean.pdf": true,
+      "scan.pdf": true,
+      "scan-severe.pdf": true
+    }
+  }
+}

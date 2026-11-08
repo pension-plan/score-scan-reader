@@ -66,8 +66,10 @@
            (apply tc-out-at cn ci mom bn mp "mmrestpos" (tc-num (ly:grob-property g 'staff-position))
                   (tc-ystaff g)))
           ((eq? kind 'stem)
-           (tc-out-at cn ci mom bn mp "stem" (tc-num (ly:grob-property g 'duration-log))
-                      (tc-num (ly:grob-property g 'direction)))))))))
+           (let ((heads (ly:grob-object g 'note-heads)))
+             (tc-out-at cn ci mom bn mp "stem" (tc-num (ly:grob-property g 'duration-log))
+                        (tc-num (ly:grob-property g 'direction))
+                        (if (ly:grob-array? heads) (ly:grob-array-length heads) 0)))))))))
 #(define (tc-voice-engraver ctx)
    (make-engraver
     (acknowledgers

@@ -27,7 +27,13 @@
     (listeners
      ((note-event engraver ev)
       (let ((p (ly:event-property ev 'pitch)))
-        (tc-out ctx "note" (+ 60 (ly:pitch-semitones p)) (tc-dur (ly:event-property ev 'duration)))))
+        (tc-out ctx "note" (+ 60 (ly:pitch-semitones p)) (tc-dur (ly:event-property ev 'duration)))
+        ;; coverage/time: a tie written inside a chord (<c'~ e'>) is an articulation of the note
+        ;; event and is not heard as a separate tie-event
+        (for-each (lambda (a)
+                    (if (ly:in-event-class? a 'tie-event)
+                        (tc-out ctx "notetie" (+ 60 (ly:pitch-semitones p)))))
+                  (ly:event-property ev 'articulations '()))))
      ((rest-event engraver ev)
       (tc-out ctx "rest" (tc-dur (ly:event-property ev 'duration))))
      ((multi-measure-rest-event engraver ev)
@@ -47,8 +53,8 @@
      ((time-signature-interface engraver grob source-engraver)
       (let ((fr (ly:grob-property grob 'fraction)))
         (tc-out ctx "timesig" (car fr) (cdr fr) (ly:grob-property grob 'style)))))))
-;; coverage/time: every printed TupletBracket (stencil callback wraps the default print):
-;;   Grob tuplets <moment-main of left bound> <grace> 0 ? bracket <numerator> <denominator> <visible 0/1>
+%% coverage/time: every printed TupletBracket (stencil callback wraps the default print):
+%%   Grob tuplets <moment-main of left bound> <grace> 0 ? bracket <numerator> <denominator> <visible 0/1>
 #(define (tc-raw . vals)
    (if (not tc-port)
        (set! tc-port (open-file (string-append (ly:parser-output-name) ".events") "w")))

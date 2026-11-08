@@ -332,6 +332,9 @@ CONVENTIONS = {
     'key-*': 'initial key + every key change (system-start reprints and courtesy key signatures not counted); '
              'key-0 = no sharps/flats',
     'key-change': 'key elements after measure 1; x-key-cancel = key changes that print cancellation naturals',
+    'key-* / time-* / key-change per part': 'counted per MusicXML <key>/<time> element, i.e. once per part: a '
+                                            'multi-staff part (piano, organ) has one <key> for all its staves, so '
+                                            'the printed signatures are N_staves times more numerous',
     'x-key-minor': 'key statements in minor mode',
     'time-*': 'time signature statements (time-common / time-cut replace time-4-4 / time-2-2 when the symbol is used)',
     'ottava-*': 'octave-shift brackets (start elements); x-ottava-15mb = 15ma bassa',

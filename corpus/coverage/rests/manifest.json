@@ -1,0 +1,2708 @@
+{
+  "family": "rests",
+  "description": "Coverage family \"rests\": every rest value (breve..64th), dotted and double-dotted rests, whole-bar rests in 16 meters, multi-bar rests (H-bar and church-rest symbols), raised / lowered rests in two-voice staves, rests inside tuplets and under beams, rests in the piano left hand and in a string quartet. Each item: engraving.ly, truth.musicxml (MusicXML 4.0, XSD-valid), clean.pdf, scan.pdf (typical scan), scan-severe.pdf (heavy damage), meta.json, ATTRIBUTION.txt.",
+  "counting_rules": "* an \"event\" is a <note> without <chord/> together with the <chord/> notes that follow it;\n    note-<type>, chord, dot, double-dot, stem-*, flag, grace count events; ledger-* and tie count\n    note heads\n  * note-<type>: non-grace, non-cue pitched events by <type>; rests are not notes\n  * dot / double-dot: events (notes AND rests, grace excluded) with exactly 1 / 2 <dot/>\n  * beam: beam groups (<beam number=\"1\">begin</beam>); flag: unbeamed events of eighth or shorter\n  * ledger-above / ledger-below: note heads at staff position >= +6 / <= -6 (they need ledger lines)\n  * rest-<type>: <rest/> without measure=\"yes\", by <type>; rest-dotted: such rests with >= 1 dot\n  * rest-whole-bar: <rest measure=\"yes\"/> outside a multi-bar rest block; rest-multibar: blocks\n    (<multiple-rest>); the bars inside a block are not counted again\n  * clef-*: every <clef> element (initial and changes); clef-change: <clef> after the first measure\n  * key-0 / key-sN / key-fN, time-*: every <key> / <time> element; *-change: after the first measure\n  * system-break / page-break: <print new-system/new-page> (first part only)\n  * x-rest-raised / x-rest-lowered: rests with <display-step>/<display-octave> above / below the middle\n    line (the normal position); x-rest-in-tuplet: rests with <time-modification>; x-rest-in-beam: rests\n    inside an open beam group of their voice; x-rest-fermata: rests with <fermata>;\n    x-rest-multibar-symbols / x-rest-multibar-hbar: <multiple-rest use-symbols=\"yes\"/\"no\">;\n    x-rest-whole-bar-shared-staff: whole-bar rests in a measure where another voice of the same staff\n    has notes or rests",
+  "license": "CC0",
+  "generator": "corpus/coverage/rests/_tools/run_all.py",
+  "n_items": 9,
+  "symbol_totals": {
+    "barline-final": 12,
+    "beam": 34,
+    "chord": 2,
+    "clef-alto": 2,
+    "clef-bass": 3,
+    "clef-treble": 8,
+    "dot": 56,
+    "double-dot": 4,
+    "fermata": 20,
+    "flag": 74,
+    "key-0": 8,
+    "key-f1": 4,
+    "ledger-above": 40,
+    "ledger-below": 3,
+    "note-16th": 67,
+    "note-32nd": 16,
+    "note-64th": 11,
+    "note-8th": 70,
+    "note-breve": 1,
+    "note-half": 39,
+    "note-quarter": 144,
+    "note-whole": 11,
+    "rehearsal-mark": 4,
+    "rest-16th": 57,
+    "rest-32nd": 22,
+    "rest-64th": 10,
+    "rest-8th": 79,
+    "rest-breve": 2,
+    "rest-dotted": 28,
+    "rest-half": 18,
+    "rest-multibar": 9,
+    "rest-quarter": 83,
+    "rest-whole": 3,
+    "rest-whole-bar": 38,
+    "stem-down": 261,
+    "stem-up": 86,
+    "system-break": 31,
+    "tempo-mark": 9,
+    "time-12-8": 2,
+    "time-2-4": 1,
+    "time-3-2": 1,
+    "time-3-4": 9,
+    "time-4-4": 10,
+    "time-5-4": 1,
+    "time-5-8": 1,
+    "time-6-8": 4,
+    "time-7-8": 1,
+    "time-9-8": 2,
+    "time-change": 27,
+    "time-common": 1,
+    "time-cut": 2,
+    "tuplet-2": 2,
+    "tuplet-3": 10,
+    "tuplet-5": 2,
+    "tuplet-6": 2,
+    "tuplet-7": 2,
+    "x-rest-fermata": 8,
+    "x-rest-in-beam": 36,
+    "x-rest-in-tuplet": 28,
+    "x-rest-lowered": 21,
+    "x-rest-multibar-hbar": 4,
+    "x-rest-multibar-symbols": 5,
+    "x-rest-raised": 51,
+    "x-rest-whole-bar-shared-staff": 4,
+    "x-time-3-8": 1,
+    "x-time-4-2": 2,
+    "x-time-6-4": 1,
+    "x-tuplet-4": 1
+  },
+  "layouts": [
+    "melody",
+    "piano",
+    "string-quartet",
+    "two-voices-one-staff-instrument"
+  ],
+  "items": [
+    {
+      "id": "rst01-rest-values",
+      "family": "rests",
+      "title": "Rest Values (oboe): every rest from breve to 64th",
+      "symbols": [
+        "barline-final",
+        "clef-treble",
+        "fermata",
+        "flag",
+        "key-0",
+        "ledger-above",
+        "note-16th",
+        "note-32nd",
+        "note-64th",
+        "note-8th",
+        "note-half",
+        "note-quarter",
+        "note-whole",
+        "rest-16th",
+        "rest-32nd",
+        "rest-64th",
+        "rest-8th",
+        "rest-breve",
+        "rest-half",
+        "rest-quarter",
+        "rest-whole",
+        "stem-down",
+        "stem-up",
+        "system-break",
+        "tempo-mark",
+        "time-4-4",
+        "time-change",
+        "x-time-4-2"
+      ],
+      "layout": "melody",
+      "expected": {
+        "parts": [
+          "Oboe"
+        ],
+        "must_not_split": false,
+        "notes": "16 bars, one staff. 4/4 bars 1-11: quarter, half, eighth, 16th, 32nd and 64th rests, many as \"rest ladders\" (64th+32nd+16th+8th+quarter rests after one short note, bars 9-11). 4/2 bars 12-16: whole rests (bars 12, 14, 16), half rests and two ordinary breve rests (bars 13, 15) that fill the 4/2 bar but are entered as breve rests (type breve), not as whole-bar rests.",
+        "measures": 16,
+        "bars_drawn": 16,
+        "first_measure_number": 1,
+        "systems": 6
+      },
+      "counts": {
+        "barline-final": 1,
+        "clef-treble": 1,
+        "fermata": 1,
+        "flag": 26,
+        "key-0": 1,
+        "ledger-above": 5,
+        "note-16th": 7,
+        "note-32nd": 4,
+        "note-64th": 10,
+        "note-8th": 5,
+        "note-half": 3,
+        "note-quarter": 3,
+        "note-whole": 1,
+        "rest-16th": 21,
+        "rest-32nd": 14,
+        "rest-64th": 10,
+        "rest-8th": 26,
+        "rest-breve": 2,
+        "rest-half": 4,
+        "rest-quarter": 9,
+        "rest-whole": 3,
+        "stem-down": 30,
+        "stem-up": 2,
+        "system-break": 5,
+        "tempo-mark": 1,
+        "time-4-4": 1,
+        "time-change": 1,
+        "x-time-4-2": 1
+      },
+      "degradations": {
+        "scan.pdf": {
+          "seed": 810101,
+          "render_dpi": 300,
+          "dpi": 300,
+          "color": "gray",
+          "format": "jpeg",
+          "jpeg_quality": 65,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                244,
+                242,
+                236
+              ],
+              "texture": 3
+            },
+            {
+              "op": "rotate",
+              "deg": 0.6,
+              "bg": 235
+            },
+            {
+              "op": "gradient",
+              "strength": 0.06
+            },
+            {
+              "op": "blur",
+              "sigma": 0.5
+            },
+            {
+              "op": "noise",
+              "sigma": 4
+            }
+          ],
+          "tags": [
+            "paper_texture",
+            "rotation_+0.6deg",
+            "gradient",
+            "blur",
+            "noise",
+            "jpeg_q65"
+          ],
+          "severity": "typical",
+          "output_pages": 1,
+          "pixel_size": [
+            2519,
+            3534
+          ],
+          "image_mode": "L",
+          "bytes": 590887,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        },
+        "scan-severe.pdf": {
+          "seed": 810102,
+          "render_dpi": 200,
+          "dpi": 150,
+          "color": "rgb",
+          "format": "jpeg",
+          "jpeg_quality": 25,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "ink_dropout",
+              "amount": 0.2
+            },
+            {
+              "op": "paper",
+              "rgb": [
+                236,
+                230,
+                214
+              ],
+              "texture": 6,
+              "bleed": {
+                "strength": 0.25
+              }
+            },
+            {
+              "op": "rotate",
+              "deg": -3.2,
+              "bg": [
+                90,
+                85,
+                80
+              ]
+            },
+            {
+              "op": "gradient",
+              "strength": 0.25
+            },
+            {
+              "op": "blur",
+              "sigma": 1.1
+            },
+            {
+              "op": "noise",
+              "sigma": 9,
+              "chroma": 2
+            },
+            {
+              "op": "speckle",
+              "per_mpx": 120
+            },
+            {
+              "op": "downsample",
+              "dpi": 150
+            }
+          ],
+          "tags": [
+            "ink_dropout",
+            "coloured_paper_rgb",
+            "paper_texture",
+            "bleed_through",
+            "rotation_-3.2deg",
+            "gradient",
+            "blur",
+            "noise",
+            "speckle",
+            "downsampled_150dpi",
+            "jpeg_q25"
+          ],
+          "severity": "severe",
+          "output_pages": 1,
+          "pixel_size": [
+            1336,
+            1821
+          ],
+          "image_mode": "RGB",
+          "bytes": 105978,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        }
+      },
+      "dpi": 300,
+      "pages": 1,
+      "license": "CC0",
+      "license_detail": "CC0-1.0: music composed for this corpus; engraving, truth and scans generated by corpus/coverage/rests/_tools",
+      "composer": "OMR coverage corpus (CC0)",
+      "focus": [
+        "rest-breve",
+        "rest-whole",
+        "rest-half",
+        "rest-quarter",
+        "rest-8th",
+        "rest-16th",
+        "rest-32nd",
+        "rest-64th"
+      ],
+      "notes": [
+        "Bars 13 and 15 contain an ordinary breve rest (<rest/><type>breve</type>), not a whole-bar rest: LilyPond places it at the left like a note value, whereas a whole-bar rest is centred. A converter that writes <rest measure=\"yes\"/> there has the right duration but the wrong rest kind.",
+        "<stem> is written for every stemmed note from the engraved stem direction (read back from the layout).",
+        "<beam> elements reproduce the engraved beam groups (manual beaming); notes only: a rest under a beam carries no <beam> element (the beam is continued by the notes either side; secondary beams around a rest are written as hooks)."
+      ],
+      "files": {
+        "truth": "truth.musicxml",
+        "engraving": "engraving.ly",
+        "clean": "clean.pdf",
+        "scan": "scan.pdf",
+        "scan_severe": "scan-severe.pdf",
+        "attribution": "ATTRIBUTION.txt"
+      },
+      "clean": {
+        "dpi": 300,
+        "pages": 1,
+        "ops": [],
+        "note": "undamaged raster render (PNG, gray)",
+        "pixel_size": [
+          2481,
+          3508
+        ],
+        "bytes": 98158,
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "text_chars": 0
+      },
+      "validation": {
+        "truth_xsd_valid": true,
+        "engraving_event_dump_matches_truth": true,
+        "engraving_events_compared": 123,
+        "time_signatures_compared": 2,
+        "rest_positions_match_truth": true,
+        "rests_position_checked": 89,
+        "rests_with_explicit_display_position": 0,
+        "rests_with_display_position_read_from_layout": 0,
+        "stems_read_from_engraving": 32,
+        "midi_attacks_match_truth": true,
+        "midi_attacks": 33,
+        "music21_reparse_matches_model": true,
+        "rest_counts_model_equal_truth": true,
+        "lilypond_warnings": [],
+        "method": "LilyPond event-dump engraver (_tools/crest/dump.ly) compared with the model the truth is written from: every note/rest/multi-bar rest (onset, pitch, notated type, dots, tuplet scale), ties, beam starts/stops, slurs, articulations/fermatas, bar numbers, measure positions and time signatures; post-layout read-back of every Rest / MultiMeasureRest grob (staff-position and Y extent vs. the truth display-step/display-octave) and of every Stem direction (written to <stem>); LilyPond MIDI attack multiset; music21 re-parse of truth.musicxml; xmllint against the MusicXML 4.0 XSD; counts parsed from truth.musicxml and cross-checked with the model for rest tags."
+      },
+      "build_timing": {
+        "lilypond_s": 2.14,
+        "raster_and_damage_s": 7.55
+      },
+      "generator": "corpus/coverage/rests/_tools/run_all.py (crest/items.py, catalog.py, build.py, scan.py)",
+      "path": "corpus/coverage/rests/rst01-rest-values",
+      "scan_files": [
+        "scan-severe.pdf",
+        "scan.pdf"
+      ]
+    },
+    {
+      "id": "rst02-dotted-rests",
+      "family": "rests",
+      "title": "Dotted Rests (violoncello): dotted and double-dotted rests",
+      "symbols": [
+        "barline-final",
+        "beam",
+        "clef-bass",
+        "dot",
+        "double-dot",
+        "fermata",
+        "flag",
+        "key-0",
+        "ledger-above",
+        "note-16th",
+        "note-32nd",
+        "note-64th",
+        "note-8th",
+        "note-half",
+        "note-quarter",
+        "rest-16th",
+        "rest-32nd",
+        "rest-8th",
+        "rest-dotted",
+        "rest-half",
+        "rest-quarter",
+        "stem-down",
+        "stem-up",
+        "system-break",
+        "tempo-mark",
+        "time-12-8",
+        "time-3-4",
+        "time-4-4",
+        "time-6-8",
+        "time-9-8",
+        "time-change"
+      ],
+      "layout": "melody",
+      "expected": {
+        "parts": [
+          "Violoncello"
+        ],
+        "must_not_split": false,
+        "notes": "16 bars, bass clef. Dotted rests of every value: dotted half (bar 1; dotted half in 12/8 bar 14), dotted quarter (2, 9, 11-15), dotted eighth (3, 10, 16), dotted 16th (4), dotted 32nd (5), double-dotted quarter (6), double-dotted eighth (7, 16), double-dotted half (8). Meters 4/4, 3/4 (9), 6/8 (11), 9/8 (13), 12/8 (14), 4/4 (16). Each dotted rest is followed by the short note that completes its beat.",
+        "measures": 16,
+        "bars_drawn": 16,
+        "first_measure_number": 1,
+        "systems": 4
+      },
+      "counts": {
+        "barline-final": 1,
+        "beam": 2,
+        "clef-bass": 1,
+        "dot": 20,
+        "double-dot": 4,
+        "fermata": 1,
+        "flag": 14,
+        "key-0": 1,
+        "ledger-above": 2,
+        "note-16th": 5,
+        "note-32nd": 3,
+        "note-64th": 1,
+        "note-8th": 10,
+        "note-half": 3,
+        "note-quarter": 12,
+        "rest-16th": 1,
+        "rest-32nd": 1,
+        "rest-8th": 8,
+        "rest-dotted": 20,
+        "rest-half": 5,
+        "rest-quarter": 13,
+        "stem-down": 33,
+        "stem-up": 1,
+        "system-break": 3,
+        "tempo-mark": 1,
+        "time-12-8": 1,
+        "time-3-4": 1,
+        "time-4-4": 2,
+        "time-6-8": 1,
+        "time-9-8": 1,
+        "time-change": 5
+      },
+      "degradations": {
+        "scan.pdf": {
+          "seed": 810201,
+          "render_dpi": 200,
+          "dpi": 200,
+          "color": "gray",
+          "format": "jpeg",
+          "jpeg_quality": 70,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                244,
+                242,
+                236
+              ],
+              "texture": 3
+            },
+            {
+              "op": "rotate",
+              "deg": -0.9,
+              "bg": 235
+            },
+            {
+              "op": "gradient",
+              "strength": 0.06
+            },
+            {
+              "op": "blur",
+              "sigma": 0.4
+            },
+            {
+              "op": "noise",
+              "sigma": 3
+            }
+          ],
+          "tags": [
+            "paper_texture",
+            "rotation_-0.9deg",
+            "gradient",
+            "blur",
+            "noise",
+            "jpeg_q70"
+          ],
+          "severity": "typical",
+          "output_pages": 1,
+          "pixel_size": [
+            1692,
+            2365
+          ],
+          "image_mode": "L",
+          "bytes": 265900,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        },
+        "scan-severe.pdf": {
+          "seed": 810202,
+          "render_dpi": 200,
+          "dpi": 200,
+          "color": "gray",
+          "format": "png1",
+          "jpeg_quality": null,
+          "jpeg_passes": null,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                250,
+                250,
+                250
+              ]
+            },
+            {
+              "op": "rotate",
+              "deg": 2.4,
+              "bg": 255
+            },
+            {
+              "op": "speckle",
+              "per_mpx": 250
+            },
+            {
+              "op": "binarize",
+              "threshold": 165,
+              "pre_blur": 1.1,
+              "noise": 28
+            },
+            {
+              "op": "saltpepper",
+              "amount": 0.003
+            }
+          ],
+          "tags": [
+            "rotation_+2.4deg",
+            "speckle",
+            "binarized_photocopy_thick",
+            "saltpepper"
+          ],
+          "severity": "severe",
+          "output_pages": 1,
+          "pixel_size": [
+            1752,
+            2407
+          ],
+          "image_mode": "1",
+          "bytes": 66840,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        }
+      },
+      "dpi": 200,
+      "pages": 1,
+      "license": "CC0",
+      "license_detail": "CC0-1.0: music composed for this corpus; engraving, truth and scans generated by corpus/coverage/rests/_tools",
+      "composer": "OMR coverage corpus (CC0)",
+      "focus": [
+        "rest-dotted",
+        "double-dot",
+        "dot"
+      ],
+      "notes": [
+        "dot / double-dot counts include rests (an augmentation dot after a rest is the same glyph).",
+        "<stem> is written for every stemmed note from the engraved stem direction (read back from the layout).",
+        "<beam> elements reproduce the engraved beam groups (manual beaming); notes only: a rest under a beam carries no <beam> element (the beam is continued by the notes either side; secondary beams around a rest are written as hooks)."
+      ],
+      "files": {
+        "truth": "truth.musicxml",
+        "engraving": "engraving.ly",
+        "clean": "clean.pdf",
+        "scan": "scan.pdf",
+        "scan_severe": "scan-severe.pdf",
+        "attribution": "ATTRIBUTION.txt"
+      },
+      "clean": {
+        "dpi": 300,
+        "pages": 1,
+        "ops": [],
+        "note": "undamaged raster render (PNG, gray)",
+        "pixel_size": [
+          2481,
+          3508
+        ],
+        "bytes": 81195,
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "text_chars": 0
+      },
+      "validation": {
+        "truth_xsd_valid": true,
+        "engraving_event_dump_matches_truth": true,
+        "engraving_events_compared": 67,
+        "time_signatures_compared": 6,
+        "rest_positions_match_truth": true,
+        "rests_position_checked": 28,
+        "rests_with_explicit_display_position": 0,
+        "rests_with_display_position_read_from_layout": 0,
+        "stems_read_from_engraving": 34,
+        "midi_attacks_match_truth": true,
+        "midi_attacks": 34,
+        "music21_reparse_matches_model": true,
+        "rest_counts_model_equal_truth": true,
+        "lilypond_warnings": [],
+        "method": "LilyPond event-dump engraver (_tools/crest/dump.ly) compared with the model the truth is written from: every note/rest/multi-bar rest (onset, pitch, notated type, dots, tuplet scale), ties, beam starts/stops, slurs, articulations/fermatas, bar numbers, measure positions and time signatures; post-layout read-back of every Rest / MultiMeasureRest grob (staff-position and Y extent vs. the truth display-step/display-octave) and of every Stem direction (written to <stem>); LilyPond MIDI attack multiset; music21 re-parse of truth.musicxml; xmllint against the MusicXML 4.0 XSD; counts parsed from truth.musicxml and cross-checked with the model for rest tags."
+      },
+      "build_timing": {
+        "lilypond_s": 2.78,
+        "raster_and_damage_s": 3.22
+      },
+      "generator": "corpus/coverage/rests/_tools/run_all.py (crest/items.py, catalog.py, build.py, scan.py)",
+      "path": "corpus/coverage/rests/rst02-dotted-rests",
+      "scan_files": [
+        "scan-severe.pdf",
+        "scan.pdf"
+      ]
+    },
+    {
+      "id": "rst03-whole-bar-rests-simple",
+      "family": "rests",
+      "title": "Whole-Bar Rests I (violin): simple meters",
+      "symbols": [
+        "barline-final",
+        "clef-treble",
+        "dot",
+        "fermata",
+        "key-0",
+        "ledger-above",
+        "note-breve",
+        "note-half",
+        "note-quarter",
+        "note-whole",
+        "rest-whole-bar",
+        "stem-down",
+        "system-break",
+        "tempo-mark",
+        "time-2-4",
+        "time-3-2",
+        "time-3-4",
+        "time-4-4",
+        "time-5-4",
+        "time-change",
+        "time-common",
+        "time-cut",
+        "x-rest-fermata",
+        "x-time-4-2"
+      ],
+      "layout": "melody",
+      "expected": {
+        "parts": [
+          "Violin"
+        ],
+        "must_not_split": false,
+        "notes": "16 bars alternating one bar of notes and one whole-bar rest per meter: 2/4, 3/4, 4/4 (numeric), C, cut time, 3/2, 5/4 (rest with fermata = general pause) and 4/2 (whole-bar rest drawn as a breve rest). Every whole-bar rest must last the full bar of its meter (2, 3, 4, 4, 4, 6, 5, 8 quarters).",
+        "measures": 16,
+        "bars_drawn": 16,
+        "first_measure_number": 1,
+        "systems": 4
+      },
+      "counts": {
+        "barline-final": 1,
+        "clef-treble": 1,
+        "dot": 2,
+        "fermata": 1,
+        "key-0": 1,
+        "ledger-above": 1,
+        "note-breve": 1,
+        "note-half": 1,
+        "note-quarter": 3,
+        "note-whole": 5,
+        "rest-whole-bar": 8,
+        "stem-down": 4,
+        "system-break": 3,
+        "tempo-mark": 1,
+        "time-2-4": 1,
+        "time-3-2": 1,
+        "time-3-4": 1,
+        "time-4-4": 1,
+        "time-5-4": 1,
+        "time-change": 7,
+        "time-common": 1,
+        "time-cut": 1,
+        "x-rest-fermata": 1,
+        "x-time-4-2": 1
+      },
+      "degradations": {
+        "scan.pdf": {
+          "seed": 810301,
+          "render_dpi": 300,
+          "dpi": 300,
+          "color": "gray",
+          "format": "jpeg",
+          "jpeg_quality": 60,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                244,
+                242,
+                236
+              ],
+              "texture": 3
+            },
+            {
+              "op": "rotate",
+              "deg": 1.1,
+              "bg": 235
+            },
+            {
+              "op": "gradient",
+              "strength": 0.06
+            },
+            {
+              "op": "blur",
+              "sigma": 0.5
+            },
+            {
+              "op": "noise",
+              "sigma": 5
+            }
+          ],
+          "tags": [
+            "paper_texture",
+            "rotation_+1.1deg",
+            "gradient",
+            "blur",
+            "noise",
+            "jpeg_q60"
+          ],
+          "severity": "typical",
+          "output_pages": 1,
+          "pixel_size": [
+            2549,
+            3556
+          ],
+          "image_mode": "L",
+          "bytes": 546439,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        },
+        "scan-severe.pdf": {
+          "seed": 810302,
+          "render_dpi": 150,
+          "dpi": 150,
+          "color": "rgb",
+          "format": "jpeg",
+          "jpeg_quality": 25,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "ink_weight",
+              "px": 1
+            },
+            {
+              "op": "paper",
+              "rgb": [
+                240,
+                236,
+                226
+              ],
+              "texture": 5
+            },
+            {
+              "op": "pencil",
+              "circles": 3,
+              "ticks": 3,
+              "fingerings": 2,
+              "words": [
+                "tacet?"
+              ]
+            },
+            {
+              "op": "perspective",
+              "margin": 0.04,
+              "jitter": 0.02,
+              "keystone": 0.035,
+              "bg": [
+                60,
+                55,
+                50
+              ]
+            },
+            {
+              "op": "vignette",
+              "strength": 0.3
+            },
+            {
+              "op": "motion_blur",
+              "length": 4,
+              "angle": 15
+            },
+            {
+              "op": "noise",
+              "sigma": 8,
+              "chroma": 2
+            }
+          ],
+          "tags": [
+            "ink_weight",
+            "coloured_paper_rgb",
+            "paper_texture",
+            "pencil",
+            "perspective_phone_capture",
+            "vignette",
+            "motion_blur",
+            "noise",
+            "jpeg_q25"
+          ],
+          "severity": "severe",
+          "output_pages": 1,
+          "pixel_size": [
+            1339,
+            1852
+          ],
+          "image_mode": "RGB",
+          "bytes": 108677,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": [
+            {
+              "pencil_marks": [
+                [
+                  "circle",
+                  75,
+                  441
+                ],
+                [
+                  "circle",
+                  80,
+                  444
+                ],
+                [
+                  "circle",
+                  615,
+                  573
+                ],
+                [
+                  "fake_3",
+                  442,
+                  384
+                ],
+                [
+                  "digit",
+                  529
+                ],
+                [
+                  "digit",
+                  299
+                ],
+                [
+                  "tick",
+                  576
+                ],
+                [
+                  "tick",
+                  532
+                ],
+                [
+                  "tick",
+                  1075
+                ],
+                [
+                  "word",
+                  "tacet?",
+                  1029
+                ],
+                [
+                  "bracket",
+                  662
+                ]
+              ]
+            }
+          ]
+        }
+      },
+      "dpi": 300,
+      "pages": 1,
+      "license": "CC0",
+      "license_detail": "CC0-1.0: music composed for this corpus; engraving, truth and scans generated by corpus/coverage/rests/_tools",
+      "composer": "OMR coverage corpus (CC0)",
+      "focus": [
+        "rest-whole-bar",
+        "time-2-4",
+        "time-3-4",
+        "time-4-4",
+        "time-common",
+        "time-cut",
+        "time-3-2",
+        "time-5-4",
+        "x-time-4-2"
+      ],
+      "notes": [
+        "Whole-bar rests are <rest measure=\"yes\"/> with the bar duration and no <type> (the glyph is a whole rest, or a breve rest in 4/2). A multi-bar rest is one measure per bar, each with a measure rest; the first bar carries <measure-style><multiple-rest use-symbols=\"yes|no\">n</multiple-rest>. The number printed above the rest is implied by n; the exact church-rest glyph combination (longa / breve / whole rest symbols) is not encoded beyond use-symbols=\"yes\".",
+        "The 5/4 whole-bar rest (bar 14) carries a fermata (general pause); no \"G.P.\" text is printed.",
+        "Bar 7 restates 4/4 as the C symbol after a numeric 4/4 (a time-signature style change, counted as time-change).",
+        "<stem> is written for every stemmed note from the engraved stem direction (read back from the layout)."
+      ],
+      "files": {
+        "truth": "truth.musicxml",
+        "engraving": "engraving.ly",
+        "clean": "clean.pdf",
+        "scan": "scan.pdf",
+        "scan_severe": "scan-severe.pdf",
+        "attribution": "ATTRIBUTION.txt"
+      },
+      "clean": {
+        "dpi": 300,
+        "pages": 1,
+        "ops": [],
+        "note": "undamaged raster render (PNG, gray)",
+        "pixel_size": [
+          2481,
+          3508
+        ],
+        "bytes": 73088,
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "text_chars": 0
+      },
+      "validation": {
+        "truth_xsd_valid": true,
+        "engraving_event_dump_matches_truth": true,
+        "engraving_events_compared": 19,
+        "time_signatures_compared": 8,
+        "rest_positions_match_truth": true,
+        "rests_position_checked": 8,
+        "rests_with_explicit_display_position": 0,
+        "rests_with_display_position_read_from_layout": 0,
+        "stems_read_from_engraving": 4,
+        "midi_attacks_match_truth": true,
+        "midi_attacks": 10,
+        "music21_reparse_matches_model": true,
+        "rest_counts_model_equal_truth": true,
+        "lilypond_warnings": [],
+        "method": "LilyPond event-dump engraver (_tools/crest/dump.ly) compared with the model the truth is written from: every note/rest/multi-bar rest (onset, pitch, notated type, dots, tuplet scale), ties, beam starts/stops, slurs, articulations/fermatas, bar numbers, measure positions and time signatures; post-layout read-back of every Rest / MultiMeasureRest grob (staff-position and Y extent vs. the truth display-step/display-octave) and of every Stem direction (written to <stem>); LilyPond MIDI attack multiset; music21 re-parse of truth.musicxml; xmllint against the MusicXML 4.0 XSD; counts parsed from truth.musicxml and cross-checked with the model for rest tags."
+      },
+      "build_timing": {
+        "lilypond_s": 2.24,
+        "raster_and_damage_s": 5.22
+      },
+      "generator": "corpus/coverage/rests/_tools/run_all.py (crest/items.py, catalog.py, build.py, scan.py)",
+      "path": "corpus/coverage/rests/rst03-whole-bar-rests-simple",
+      "scan_files": [
+        "scan-severe.pdf",
+        "scan.pdf"
+      ]
+    },
+    {
+      "id": "rst04-whole-bar-rests-compound",
+      "family": "rests",
+      "title": "Whole-Bar Rests II (viola): compound and irregular meters",
+      "symbols": [
+        "barline-final",
+        "beam",
+        "clef-alto",
+        "dot",
+        "fermata",
+        "key-0",
+        "note-8th",
+        "note-half",
+        "note-quarter",
+        "note-whole",
+        "rest-whole-bar",
+        "stem-down",
+        "system-break",
+        "tempo-mark",
+        "time-12-8",
+        "time-3-4",
+        "time-5-8",
+        "time-6-8",
+        "time-7-8",
+        "time-9-8",
+        "time-change",
+        "x-rest-fermata",
+        "x-time-3-8",
+        "x-time-6-4"
+      ],
+      "layout": "melody",
+      "expected": {
+        "parts": [
+          "Viola"
+        ],
+        "must_not_split": false,
+        "notes": "16 bars in alto clef alternating one bar of notes and one whole-bar rest per meter: 3/8, 6/8, 9/8, 12/8, 5/8, 7/8, 6/4 and 3/4 (last rest with fermata). Every whole-bar rest is a whole-rest glyph centred in the bar and must last the full bar (1.5, 3, 4.5, 6, 2.5, 3.5, 6, 3 quarters).",
+        "measures": 16,
+        "bars_drawn": 16,
+        "first_measure_number": 1,
+        "systems": 4
+      },
+      "counts": {
+        "barline-final": 1,
+        "beam": 1,
+        "clef-alto": 1,
+        "dot": 13,
+        "fermata": 1,
+        "key-0": 1,
+        "note-8th": 3,
+        "note-half": 1,
+        "note-quarter": 14,
+        "note-whole": 1,
+        "rest-whole-bar": 8,
+        "stem-down": 18,
+        "system-break": 3,
+        "tempo-mark": 1,
+        "time-12-8": 1,
+        "time-3-4": 1,
+        "time-5-8": 1,
+        "time-6-8": 1,
+        "time-7-8": 1,
+        "time-9-8": 1,
+        "time-change": 7,
+        "x-rest-fermata": 1,
+        "x-time-3-8": 1,
+        "x-time-6-4": 1
+      },
+      "degradations": {
+        "scan.pdf": {
+          "seed": 810401,
+          "render_dpi": 200,
+          "dpi": 200,
+          "color": "gray",
+          "format": "jpeg",
+          "jpeg_quality": 60,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                246,
+                244,
+                240
+              ],
+              "texture": 3
+            },
+            {
+              "op": "rotate",
+              "deg": 0.4,
+              "bg": 235
+            },
+            {
+              "op": "gradient",
+              "strength": 0.06
+            },
+            {
+              "op": "blur",
+              "sigma": 0.6
+            },
+            {
+              "op": "noise",
+              "sigma": 4
+            }
+          ],
+          "tags": [
+            "paper_texture",
+            "rotation_+0.4deg",
+            "gradient",
+            "blur",
+            "noise",
+            "jpeg_q60"
+          ],
+          "severity": "typical",
+          "output_pages": 1,
+          "pixel_size": [
+            1672,
+            2351
+          ],
+          "image_mode": "L",
+          "bytes": 221189,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        },
+        "scan-severe.pdf": {
+          "seed": 810402,
+          "render_dpi": 200,
+          "dpi": 200,
+          "color": "rgb",
+          "format": "jpeg",
+          "jpeg_quality": 22,
+          "jpeg_passes": 2,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                232,
+                224,
+                200
+              ],
+              "texture": 7,
+              "ink_var": 30
+            },
+            {
+              "op": "foxing",
+              "n": 50
+            },
+            {
+              "op": "coffee",
+              "n": 1
+            },
+            {
+              "op": "rotate",
+              "deg": -4.0,
+              "bg": [
+                70,
+                70,
+                70
+              ]
+            },
+            {
+              "op": "shadow",
+              "pos": 0.2,
+              "strength": 0.45
+            },
+            {
+              "op": "blur",
+              "sigma": 1.3
+            },
+            {
+              "op": "noise",
+              "sigma": 10,
+              "chroma": 3
+            }
+          ],
+          "tags": [
+            "coloured_paper_rgb",
+            "paper_texture",
+            "foxing",
+            "coffee",
+            "rotation_-4deg",
+            "shadow",
+            "blur",
+            "noise",
+            "jpeg_q22"
+          ],
+          "severity": "severe",
+          "output_pages": 1,
+          "pixel_size": [
+            1814,
+            2449
+          ],
+          "image_mode": "RGB",
+          "bytes": 284353,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        }
+      },
+      "dpi": 200,
+      "pages": 1,
+      "license": "CC0",
+      "license_detail": "CC0-1.0: music composed for this corpus; engraving, truth and scans generated by corpus/coverage/rests/_tools",
+      "composer": "OMR coverage corpus (CC0)",
+      "focus": [
+        "rest-whole-bar",
+        "clef-alto",
+        "time-6-8",
+        "time-9-8",
+        "time-12-8",
+        "time-5-8",
+        "time-7-8",
+        "x-time-3-8",
+        "x-time-6-4"
+      ],
+      "notes": [
+        "Whole-bar rests are <rest measure=\"yes\"/> with the bar duration and no <type> (the glyph is a whole rest, or a breve rest in 4/2). A multi-bar rest is one measure per bar, each with a measure rest; the first bar carries <measure-style><multiple-rest use-symbols=\"yes|no\">n</multiple-rest>. The number printed above the rest is implied by n; the exact church-rest glyph combination (longa / breve / whole rest symbols) is not encoded beyond use-symbols=\"yes\".",
+        "<stem> is written for every stemmed note from the engraved stem direction (read back from the layout).",
+        "<beam> elements reproduce the engraved beam groups (manual beaming); notes only: a rest under a beam carries no <beam> element (the beam is continued by the notes either side; secondary beams around a rest are written as hooks)."
+      ],
+      "files": {
+        "truth": "truth.musicxml",
+        "engraving": "engraving.ly",
+        "clean": "clean.pdf",
+        "scan": "scan.pdf",
+        "scan_severe": "scan-severe.pdf",
+        "attribution": "ATTRIBUTION.txt"
+      },
+      "clean": {
+        "dpi": 300,
+        "pages": 1,
+        "ops": [],
+        "note": "undamaged raster render (PNG, gray)",
+        "pixel_size": [
+          2481,
+          3508
+        ],
+        "bytes": 71515,
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "text_chars": 0
+      },
+      "validation": {
+        "truth_xsd_valid": true,
+        "engraving_event_dump_matches_truth": true,
+        "engraving_events_compared": 30,
+        "time_signatures_compared": 8,
+        "rest_positions_match_truth": true,
+        "rests_position_checked": 8,
+        "rests_with_explicit_display_position": 0,
+        "rests_with_display_position_read_from_layout": 0,
+        "stems_read_from_engraving": 18,
+        "midi_attacks_match_truth": true,
+        "midi_attacks": 19,
+        "music21_reparse_matches_model": true,
+        "rest_counts_model_equal_truth": true,
+        "lilypond_warnings": [],
+        "method": "LilyPond event-dump engraver (_tools/crest/dump.ly) compared with the model the truth is written from: every note/rest/multi-bar rest (onset, pitch, notated type, dots, tuplet scale), ties, beam starts/stops, slurs, articulations/fermatas, bar numbers, measure positions and time signatures; post-layout read-back of every Rest / MultiMeasureRest grob (staff-position and Y extent vs. the truth display-step/display-octave) and of every Stem direction (written to <stem>); LilyPond MIDI attack multiset; music21 re-parse of truth.musicxml; xmllint against the MusicXML 4.0 XSD; counts parsed from truth.musicxml and cross-checked with the model for rest tags."
+      },
+      "build_timing": {
+        "lilypond_s": 2.22,
+        "raster_and_damage_s": 8.12
+      },
+      "generator": "corpus/coverage/rests/_tools/run_all.py (crest/items.py, catalog.py, build.py, scan.py)",
+      "path": "corpus/coverage/rests/rst04-whole-bar-rests-compound",
+      "scan_files": [
+        "scan-severe.pdf",
+        "scan.pdf"
+      ]
+    },
+    {
+      "id": "rst05-multibar-rests",
+      "family": "rests",
+      "title": "Tacet Interludes (trumpet part): multi-bar rests",
+      "symbols": [
+        "barline-final",
+        "clef-treble",
+        "dot",
+        "fermata",
+        "key-0",
+        "ledger-above",
+        "note-half",
+        "note-quarter",
+        "note-whole",
+        "rehearsal-mark",
+        "rest-multibar",
+        "stem-down",
+        "stem-up",
+        "system-break",
+        "tempo-mark",
+        "time-3-4",
+        "time-4-4",
+        "time-6-8",
+        "time-change",
+        "time-cut",
+        "x-rest-multibar-hbar",
+        "x-rest-multibar-symbols"
+      ],
+      "layout": "melody",
+      "expected": {
+        "parts": [
+          "Trumpet in C"
+        ],
+        "must_not_split": false,
+        "notes": "94 measures although only 16 bars are drawn. Multi-bar rests must be expanded to the right number of measures: H-bar 16 (bars 1-16, 4/4), church-rest symbols 2 (18-19), 3 (21-23), 4 (25-28, a longa rest), 6 in 3/4 (29-34), forced H-bar 5 in 3/4 (36-40), H-bar 12 in 6/8 (42-53), church-rest symbols 7 in cut time (54-60), H-bar 32 in 4/4 (61-92); rehearsal marks A (17), B (29), C (54), D (61). Bars of notes: 17, 20, 24, 35, 41, 93, 94.",
+        "measures": 94,
+        "bars_drawn": 16,
+        "first_measure_number": 1,
+        "systems": 5
+      },
+      "counts": {
+        "barline-final": 1,
+        "clef-treble": 1,
+        "dot": 2,
+        "fermata": 1,
+        "key-0": 1,
+        "ledger-above": 3,
+        "note-half": 3,
+        "note-quarter": 15,
+        "note-whole": 1,
+        "rehearsal-mark": 4,
+        "rest-multibar": 9,
+        "stem-down": 16,
+        "stem-up": 2,
+        "system-break": 4,
+        "tempo-mark": 1,
+        "time-3-4": 1,
+        "time-4-4": 2,
+        "time-6-8": 1,
+        "time-change": 4,
+        "time-cut": 1,
+        "x-rest-multibar-hbar": 4,
+        "x-rest-multibar-symbols": 5
+      },
+      "degradations": {
+        "scan.pdf": {
+          "seed": 810501,
+          "render_dpi": 300,
+          "dpi": 300,
+          "color": "gray",
+          "format": "jpeg",
+          "jpeg_quality": 70,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                244,
+                242,
+                236
+              ],
+              "texture": 3
+            },
+            {
+              "op": "rotate",
+              "deg": -0.5,
+              "bg": 235
+            },
+            {
+              "op": "gradient",
+              "strength": 0.06
+            },
+            {
+              "op": "blur",
+              "sigma": 0.5
+            },
+            {
+              "op": "noise",
+              "sigma": 3
+            }
+          ],
+          "tags": [
+            "paper_texture",
+            "rotation_-0.5deg",
+            "gradient",
+            "blur",
+            "noise",
+            "jpeg_q70"
+          ],
+          "severity": "typical",
+          "output_pages": 1,
+          "pixel_size": [
+            2513,
+            3530
+          ],
+          "image_mode": "L",
+          "bytes": 533150,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        },
+        "scan-severe.pdf": {
+          "seed": 810502,
+          "render_dpi": 200,
+          "dpi": 150,
+          "color": "gray",
+          "format": "jpeg",
+          "jpeg_quality": 30,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "ink_dropout",
+              "amount": 0.3
+            },
+            {
+              "op": "paper",
+              "rgb": [
+                244,
+                240,
+                230
+              ],
+              "texture": 4
+            },
+            {
+              "op": "halftone",
+              "lpi": 85,
+              "angle": 45
+            },
+            {
+              "op": "rotate",
+              "deg": 3.0,
+              "bg": 30
+            },
+            {
+              "op": "noise",
+              "sigma": 7
+            },
+            {
+              "op": "saltpepper",
+              "amount": 0.002
+            },
+            {
+              "op": "downsample",
+              "dpi": 150
+            }
+          ],
+          "tags": [
+            "ink_dropout",
+            "paper_texture",
+            "halftone",
+            "rotation_+3deg",
+            "noise",
+            "saltpepper",
+            "downsampled_150dpi",
+            "jpeg_q30"
+          ],
+          "severity": "severe",
+          "output_pages": 1,
+          "pixel_size": [
+            1332,
+            1817
+          ],
+          "image_mode": "L",
+          "bytes": 217149,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        }
+      },
+      "dpi": 300,
+      "pages": 1,
+      "license": "CC0",
+      "license_detail": "CC0-1.0: music composed for this corpus; engraving, truth and scans generated by corpus/coverage/rests/_tools",
+      "composer": "OMR coverage corpus (CC0)",
+      "focus": [
+        "rest-multibar",
+        "x-rest-multibar-hbar",
+        "x-rest-multibar-symbols",
+        "rehearsal-mark"
+      ],
+      "notes": [
+        "Whole-bar rests are <rest measure=\"yes\"/> with the bar duration and no <type> (the glyph is a whole rest, or a breve rest in 4/2). A multi-bar rest is one measure per bar, each with a measure rest; the first bar carries <measure-style><multiple-rest use-symbols=\"yes|no\">n</multiple-rest>. The number printed above the rest is implied by n; the exact church-rest glyph combination (longa / breve / whole rest symbols) is not encoded beyond use-symbols=\"yes\".",
+        "The four time-signature changes fall at the start of a multi-bar rest (bars 29, 54, 61) or of a bar of notes (41).",
+        "<stem> is written for every stemmed note from the engraved stem direction (read back from the layout)."
+      ],
+      "files": {
+        "truth": "truth.musicxml",
+        "engraving": "engraving.ly",
+        "clean": "clean.pdf",
+        "scan": "scan.pdf",
+        "scan_severe": "scan-severe.pdf",
+        "attribution": "ATTRIBUTION.txt"
+      },
+      "clean": {
+        "dpi": 300,
+        "pages": 1,
+        "ops": [],
+        "note": "undamaged raster render (PNG, gray)",
+        "pixel_size": [
+          2481,
+          3508
+        ],
+        "bytes": 87507,
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "text_chars": 0
+      },
+      "validation": {
+        "truth_xsd_valid": true,
+        "engraving_event_dump_matches_truth": true,
+        "engraving_events_compared": 29,
+        "time_signatures_compared": 5,
+        "rest_positions_match_truth": true,
+        "rests_position_checked": 9,
+        "rests_with_explicit_display_position": 0,
+        "rests_with_display_position_read_from_layout": 0,
+        "stems_read_from_engraving": 18,
+        "midi_attacks_match_truth": true,
+        "midi_attacks": 19,
+        "music21_reparse_matches_model": true,
+        "rest_counts_model_equal_truth": true,
+        "lilypond_warnings": [],
+        "method": "LilyPond event-dump engraver (_tools/crest/dump.ly) compared with the model the truth is written from: every note/rest/multi-bar rest (onset, pitch, notated type, dots, tuplet scale), ties, beam starts/stops, slurs, articulations/fermatas, bar numbers, measure positions and time signatures; post-layout read-back of every Rest / MultiMeasureRest grob (staff-position and Y extent vs. the truth display-step/display-octave) and of every Stem direction (written to <stem>); LilyPond MIDI attack multiset; music21 re-parse of truth.musicxml; xmllint against the MusicXML 4.0 XSD; counts parsed from truth.musicxml and cross-checked with the model for rest tags."
+      },
+      "build_timing": {
+        "lilypond_s": 1.97,
+        "raster_and_damage_s": 7.72
+      },
+      "generator": "corpus/coverage/rests/_tools/run_all.py (crest/items.py, catalog.py, build.py, scan.py)",
+      "path": "corpus/coverage/rests/rst05-multibar-rests",
+      "scan_files": [
+        "scan-severe.pdf",
+        "scan.pdf"
+      ]
+    },
+    {
+      "id": "rst06-two-voice-rests",
+      "family": "rests",
+      "title": "Hocket for Two Flutes: raised and lowered rests on one staff",
+      "symbols": [
+        "barline-final",
+        "clef-treble",
+        "dot",
+        "fermata",
+        "flag",
+        "key-0",
+        "ledger-above",
+        "note-16th",
+        "note-8th",
+        "note-half",
+        "note-quarter",
+        "rest-16th",
+        "rest-8th",
+        "rest-dotted",
+        "rest-half",
+        "rest-quarter",
+        "rest-whole-bar",
+        "stem-down",
+        "stem-up",
+        "system-break",
+        "tempo-mark",
+        "time-4-4",
+        "x-rest-lowered",
+        "x-rest-raised",
+        "x-rest-whole-bar-shared-staff"
+      ],
+      "layout": "two-voices-one-staff-instrument",
+      "expected": {
+        "parts": [
+          "Flutes 1.2"
+        ],
+        "must_not_split": true,
+        "notes": "12 bars, ONE part (instrumental staff \"Flutes 1.2\") with two voices: voice 1 stems up, voice 2 stems down. Every rest of voice 1 is raised (quarter/eighth/16th/half/dotted-quarter rests at the F5 position, whole-bar rests hanging from the top line), every rest of voice 2 lowered (E4 position, whole-bar rests hanging from the bottom line). The voices alternate (hocket), so most rests of one voice sound against notes of the other; bars 8 and 10 have rests in both voices at once and bar 9 a whole-bar rest in each voice. A converter should keep one part with two voices and assign each rest to its voice by its height.",
+        "measures": 12,
+        "bars_drawn": 12,
+        "first_measure_number": 1,
+        "systems": 4
+      },
+      "counts": {
+        "barline-final": 1,
+        "clef-treble": 1,
+        "dot": 2,
+        "fermata": 2,
+        "flag": 16,
+        "key-0": 1,
+        "ledger-above": 8,
+        "note-16th": 4,
+        "note-8th": 12,
+        "note-half": 11,
+        "note-quarter": 22,
+        "rest-16th": 4,
+        "rest-8th": 10,
+        "rest-dotted": 2,
+        "rest-half": 5,
+        "rest-quarter": 12,
+        "rest-whole-bar": 4,
+        "stem-down": 24,
+        "stem-up": 25,
+        "system-break": 3,
+        "tempo-mark": 1,
+        "time-4-4": 1,
+        "x-rest-lowered": 18,
+        "x-rest-raised": 17,
+        "x-rest-whole-bar-shared-staff": 4
+      },
+      "degradations": {
+        "scan.pdf": {
+          "seed": 810601,
+          "render_dpi": 300,
+          "dpi": 300,
+          "color": "gray",
+          "format": "jpeg",
+          "jpeg_quality": 65,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                244,
+                242,
+                236
+              ],
+              "texture": 3
+            },
+            {
+              "op": "rotate",
+              "deg": 0.8,
+              "bg": 235
+            },
+            {
+              "op": "gradient",
+              "strength": 0.06
+            },
+            {
+              "op": "blur",
+              "sigma": 0.5
+            },
+            {
+              "op": "noise",
+              "sigma": 4
+            }
+          ],
+          "tags": [
+            "paper_texture",
+            "rotation_+0.8deg",
+            "gradient",
+            "blur",
+            "noise",
+            "jpeg_q65"
+          ],
+          "severity": "typical",
+          "output_pages": 1,
+          "pixel_size": [
+            2531,
+            3544
+          ],
+          "image_mode": "L",
+          "bytes": 543571,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        },
+        "scan-severe.pdf": {
+          "seed": 810602,
+          "render_dpi": 200,
+          "dpi": 200,
+          "color": "rgb",
+          "format": "jpeg",
+          "jpeg_quality": 24,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                238,
+                232,
+                216
+              ],
+              "texture": 6,
+              "bleed": {
+                "strength": 0.3
+              }
+            },
+            {
+              "op": "perspective",
+              "margin": 0.05,
+              "jitter": 0.025,
+              "keystone": 0.04,
+              "bg": [
+                50,
+                45,
+                40
+              ]
+            },
+            {
+              "op": "gradient",
+              "strength": 0.3,
+              "angle": 30
+            },
+            {
+              "op": "blur",
+              "sigma": 1.2
+            },
+            {
+              "op": "noise",
+              "sigma": 9,
+              "chroma": 2
+            },
+            {
+              "op": "speckle",
+              "per_mpx": 100
+            }
+          ],
+          "tags": [
+            "coloured_paper_rgb",
+            "paper_texture",
+            "bleed_through",
+            "perspective_phone_capture",
+            "gradient",
+            "blur",
+            "noise",
+            "speckle",
+            "jpeg_q24"
+          ],
+          "severity": "severe",
+          "output_pages": 1,
+          "pixel_size": [
+            1818,
+            2503
+          ],
+          "image_mode": "RGB",
+          "bytes": 168433,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        }
+      },
+      "dpi": 300,
+      "pages": 1,
+      "license": "CC0",
+      "license_detail": "CC0-1.0: music composed for this corpus; engraving, truth and scans generated by corpus/coverage/rests/_tools",
+      "composer": "OMR coverage corpus (CC0)",
+      "focus": [
+        "x-rest-raised",
+        "x-rest-lowered",
+        "x-rest-whole-bar-shared-staff",
+        "stem-up",
+        "stem-down"
+      ],
+      "notes": [
+        "Rest vertical positions: a rest drawn away from its normal place carries <display-step>/<display-octave> = the pitch whose staff position it takes (LilyPond pitched rest, or MultiMeasureRest staff-position). The middle staff line is the normal position for EVERY rest value (so display B4 in treble clef = a whole rest hanging from the 4th line as usual, the MuseScore convention); other pitches shift the symbol by the same number of staff steps. Rests without <display-step> are at their normal position. Every rest position was read back from the LilyPond layout (staff-position and glyph extent) and matches the truth.",
+        "Bars 4, 5, 9: whole-bar rests of one voice (or both) in a two-voice staff are <rest measure=\"yes\"> in that voice, with display-step/octave.",
+        "<stem> is written for every stemmed note from the engraved stem direction (read back from the layout)."
+      ],
+      "files": {
+        "truth": "truth.musicxml",
+        "engraving": "engraving.ly",
+        "clean": "clean.pdf",
+        "scan": "scan.pdf",
+        "scan_severe": "scan-severe.pdf",
+        "attribution": "ATTRIBUTION.txt"
+      },
+      "clean": {
+        "dpi": 300,
+        "pages": 1,
+        "ops": [],
+        "note": "undamaged raster render (PNG, gray)",
+        "pixel_size": [
+          2481,
+          3508
+        ],
+        "bytes": 86527,
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "text_chars": 0
+      },
+      "validation": {
+        "truth_xsd_valid": true,
+        "engraving_event_dump_matches_truth": true,
+        "engraving_events_compared": 86,
+        "time_signatures_compared": 1,
+        "rest_positions_match_truth": true,
+        "rests_position_checked": 35,
+        "rests_with_explicit_display_position": 35,
+        "rests_with_display_position_read_from_layout": 0,
+        "stems_read_from_engraving": 49,
+        "midi_attacks_match_truth": true,
+        "midi_attacks": 49,
+        "music21_reparse_matches_model": true,
+        "rest_counts_model_equal_truth": true,
+        "lilypond_warnings": [],
+        "method": "LilyPond event-dump engraver (_tools/crest/dump.ly) compared with the model the truth is written from: every note/rest/multi-bar rest (onset, pitch, notated type, dots, tuplet scale), ties, beam starts/stops, slurs, articulations/fermatas, bar numbers, measure positions and time signatures; post-layout read-back of every Rest / MultiMeasureRest grob (staff-position and Y extent vs. the truth display-step/display-octave) and of every Stem direction (written to <stem>); LilyPond MIDI attack multiset; music21 re-parse of truth.musicxml; xmllint against the MusicXML 4.0 XSD; counts parsed from truth.musicxml and cross-checked with the model for rest tags."
+      },
+      "build_timing": {
+        "lilypond_s": 5.18,
+        "raster_and_damage_s": 8.0
+      },
+      "generator": "corpus/coverage/rests/_tools/run_all.py (crest/items.py, catalog.py, build.py, scan.py)",
+      "path": "corpus/coverage/rests/rst06-two-voice-rests",
+      "scan_files": [
+        "scan-severe.pdf",
+        "scan.pdf"
+      ]
+    },
+    {
+      "id": "rst07-piano-rests",
+      "family": "rests",
+      "title": "Left-Hand Silences (piano): rests in both hands",
+      "symbols": [
+        "barline-final",
+        "beam",
+        "chord",
+        "clef-bass",
+        "clef-treble",
+        "dot",
+        "fermata",
+        "flag",
+        "key-0",
+        "ledger-above",
+        "ledger-below",
+        "note-16th",
+        "note-32nd",
+        "note-8th",
+        "note-half",
+        "note-quarter",
+        "note-whole",
+        "rest-16th",
+        "rest-32nd",
+        "rest-8th",
+        "rest-dotted",
+        "rest-half",
+        "rest-quarter",
+        "rest-whole-bar",
+        "stem-down",
+        "stem-up",
+        "system-break",
+        "tempo-mark",
+        "time-3-4",
+        "time-4-4",
+        "time-change",
+        "x-rest-fermata",
+        "x-rest-lowered",
+        "x-rest-raised"
+      ],
+      "layout": "piano",
+      "expected": {
+        "parts": [
+          "Piano"
+        ],
+        "must_not_split": true,
+        "notes": "14 bars, ONE part with two staves (grand staff). Left-hand rests: quarter (1), eighth (2), 16th (3, before beamed 16ths), whole-bar (5, 4/4; 10, 3/4), half (6), dotted quarter (7), 32nd/16th/eighth/quarter ladder (8), dotted eighth (9); bars 11-12: two left-hand voices with raised (A3 position) and lowered (G2 position) rests. Right-hand rests: whole-bar (4), half (6), eighth and quarter (7), quarter (9, 12). Bar 13: whole-bar rests with fermatas in both hands (general pause). Meters 4/4, 3/4 (9-12), 4/4 (13-14).",
+        "measures": 14,
+        "bars_drawn": 14,
+        "first_measure_number": 1,
+        "systems": 4
+      },
+      "counts": {
+        "barline-final": 1,
+        "beam": 2,
+        "chord": 2,
+        "clef-bass": 1,
+        "clef-treble": 1,
+        "dot": 7,
+        "fermata": 4,
+        "flag": 10,
+        "key-0": 1,
+        "ledger-above": 1,
+        "ledger-below": 1,
+        "note-16th": 9,
+        "note-32nd": 2,
+        "note-8th": 5,
+        "note-half": 11,
+        "note-quarter": 21,
+        "note-whole": 3,
+        "rest-16th": 4,
+        "rest-32nd": 2,
+        "rest-8th": 9,
+        "rest-dotted": 5,
+        "rest-half": 2,
+        "rest-quarter": 18,
+        "rest-whole-bar": 5,
+        "stem-down": 28,
+        "stem-up": 20,
+        "system-break": 3,
+        "tempo-mark": 1,
+        "time-3-4": 1,
+        "time-4-4": 2,
+        "time-change": 2,
+        "x-rest-fermata": 2,
+        "x-rest-lowered": 3,
+        "x-rest-raised": 3
+      },
+      "degradations": {
+        "scan.pdf": {
+          "seed": 810701,
+          "render_dpi": 200,
+          "dpi": 200,
+          "color": "gray",
+          "format": "jpeg",
+          "jpeg_quality": 65,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                244,
+                242,
+                236
+              ],
+              "texture": 3
+            },
+            {
+              "op": "rotate",
+              "deg": -0.7,
+              "bg": 235
+            },
+            {
+              "op": "gradient",
+              "strength": 0.06
+            },
+            {
+              "op": "blur",
+              "sigma": 0.5
+            },
+            {
+              "op": "noise",
+              "sigma": 4
+            }
+          ],
+          "tags": [
+            "paper_texture",
+            "rotation_-0.7deg",
+            "gradient",
+            "blur",
+            "noise",
+            "jpeg_q65"
+          ],
+          "severity": "typical",
+          "output_pages": 1,
+          "pixel_size": [
+            1684,
+            2361
+          ],
+          "image_mode": "L",
+          "bytes": 321380,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        },
+        "scan-severe.pdf": {
+          "seed": 810702,
+          "render_dpi": 150,
+          "dpi": 150,
+          "color": "gray",
+          "format": "jpeg",
+          "jpeg_quality": 28,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                242,
+                238,
+                228
+              ],
+              "texture": 5
+            },
+            {
+              "op": "crop",
+              "side": "right",
+              "into_staff": 0.4,
+              "bg": 255
+            },
+            {
+              "op": "punch_holes",
+              "n": 3,
+              "side": "left",
+              "bg": 25
+            },
+            {
+              "op": "rotate",
+              "deg": 3.6,
+              "bg": 255
+            },
+            {
+              "op": "curl",
+              "side": "right",
+              "amp": 20,
+              "width": 0.25
+            },
+            {
+              "op": "blur",
+              "sigma": 1.0
+            },
+            {
+              "op": "noise",
+              "sigma": 8
+            }
+          ],
+          "tags": [
+            "paper_texture",
+            "crop",
+            "punch_holes",
+            "rotation_+3.6deg",
+            "curl",
+            "blur",
+            "noise",
+            "jpeg_q28"
+          ],
+          "severity": "severe",
+          "output_pages": 1,
+          "pixel_size": [
+            1349,
+            1830
+          ],
+          "image_mode": "L",
+          "bytes": 143924,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": [
+            {
+              "crop_x": 1175
+            },
+            {
+              "punch_holes_xy_px": [
+                [
+                  70,
+                  638
+                ],
+                [
+                  70,
+                  921
+                ],
+                [
+                  70,
+                  1199
+                ]
+              ]
+            }
+          ]
+        }
+      },
+      "dpi": 200,
+      "pages": 1,
+      "license": "CC0",
+      "license_detail": "CC0-1.0: music composed for this corpus; engraving, truth and scans generated by corpus/coverage/rests/_tools",
+      "composer": "OMR coverage corpus (CC0)",
+      "focus": [
+        "rest-quarter",
+        "rest-8th",
+        "rest-16th",
+        "rest-32nd",
+        "rest-half",
+        "rest-dotted",
+        "rest-whole-bar",
+        "x-rest-raised",
+        "x-rest-lowered"
+      ],
+      "notes": [
+        "Rest vertical positions: a rest drawn away from its normal place carries <display-step>/<display-octave> = the pitch whose staff position it takes (LilyPond pitched rest, or MultiMeasureRest staff-position). The middle staff line is the normal position for EVERY rest value (so display B4 in treble clef = a whole rest hanging from the 4th line as usual, the MuseScore convention); other pitches shift the symbol by the same number of staff steps. Rests without <display-step> are at their normal position. Every rest position was read back from the LilyPond layout (staff-position and glyph extent) and matches the truth.",
+        "Whole-bar rests are <rest measure=\"yes\"/> with the bar duration and no <type> (the glyph is a whole rest, or a breve rest in 4/2). A multi-bar rest is one measure per bar, each with a measure rest; the first bar carries <measure-style><multiple-rest use-symbols=\"yes|no\">n</multiple-rest>. The number printed above the rest is implied by n; the exact church-rest glyph combination (longa / breve / whole rest symbols) is not encoded beyond use-symbols=\"yes\".",
+        "Voice 6 (second left-hand voice) only sounds in bars 11-12; elsewhere it is absent (<forward>), not resting.",
+        "<stem> is written for every stemmed note from the engraved stem direction (read back from the layout).",
+        "<beam> elements reproduce the engraved beam groups (manual beaming); notes only: a rest under a beam carries no <beam> element (the beam is continued by the notes either side; secondary beams around a rest are written as hooks)."
+      ],
+      "files": {
+        "truth": "truth.musicxml",
+        "engraving": "engraving.ly",
+        "clean": "clean.pdf",
+        "scan": "scan.pdf",
+        "scan_severe": "scan-severe.pdf",
+        "attribution": "ATTRIBUTION.txt"
+      },
+      "clean": {
+        "dpi": 300,
+        "pages": 1,
+        "ops": [],
+        "note": "undamaged raster render (PNG, gray)",
+        "pixel_size": [
+          2481,
+          3508
+        ],
+        "bytes": 107100,
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "text_chars": 0
+      },
+      "validation": {
+        "truth_xsd_valid": true,
+        "engraving_event_dump_matches_truth": true,
+        "engraving_events_compared": 102,
+        "time_signatures_compared": 6,
+        "rest_positions_match_truth": true,
+        "rests_position_checked": 40,
+        "rests_with_explicit_display_position": 6,
+        "rests_with_display_position_read_from_layout": 0,
+        "stems_read_from_engraving": 48,
+        "midi_attacks_match_truth": true,
+        "midi_attacks": 54,
+        "music21_reparse_matches_model": true,
+        "rest_counts_model_equal_truth": true,
+        "lilypond_warnings": [],
+        "method": "LilyPond event-dump engraver (_tools/crest/dump.ly) compared with the model the truth is written from: every note/rest/multi-bar rest (onset, pitch, notated type, dots, tuplet scale), ties, beam starts/stops, slurs, articulations/fermatas, bar numbers, measure positions and time signatures; post-layout read-back of every Rest / MultiMeasureRest grob (staff-position and Y extent vs. the truth display-step/display-octave) and of every Stem direction (written to <stem>); LilyPond MIDI attack multiset; music21 re-parse of truth.musicxml; xmllint against the MusicXML 4.0 XSD; counts parsed from truth.musicxml and cross-checked with the model for rest tags."
+      },
+      "build_timing": {
+        "lilypond_s": 2.19,
+        "raster_and_damage_s": 2.35
+      },
+      "generator": "corpus/coverage/rests/_tools/run_all.py (crest/items.py, catalog.py, build.py, scan.py)",
+      "path": "corpus/coverage/rests/rst07-piano-rests",
+      "scan_files": [
+        "scan-severe.pdf",
+        "scan.pdf"
+      ]
+    },
+    {
+      "id": "rst08-tuplet-beam-rests",
+      "family": "rests",
+      "title": "Rests in Tuplets and Beams (flute)",
+      "symbols": [
+        "barline-final",
+        "beam",
+        "clef-treble",
+        "dot",
+        "fermata",
+        "flag",
+        "key-0",
+        "ledger-above",
+        "note-16th",
+        "note-32nd",
+        "note-8th",
+        "note-quarter",
+        "rest-16th",
+        "rest-32nd",
+        "rest-8th",
+        "rest-half",
+        "rest-quarter",
+        "stem-down",
+        "system-break",
+        "tempo-mark",
+        "time-4-4",
+        "time-6-8",
+        "time-change",
+        "tuplet-2",
+        "tuplet-3",
+        "tuplet-5",
+        "tuplet-6",
+        "tuplet-7",
+        "x-rest-in-beam",
+        "x-rest-in-tuplet",
+        "x-rest-raised",
+        "x-tuplet-4"
+      ],
+      "layout": "melody",
+      "expected": {
+        "parts": [
+          "Flute"
+        ],
+        "must_not_split": false,
+        "notes": "12 bars. Rests at the start, middle and end of tuplets: eighth triplets (1, 8), quarter triplets (2), 16th quintuplets and sextuplets (3), septuplets (4), 16th triplets (8), duplets in 6/8 (9) and a quadruplet (12). Beams that continue over eighth, 16th and 32nd rests (bars 1, 3-8, 10-12): the rest is inside the beam group and keeps its own duration. Meters 4/4 (1-8), 6/8 (9-12).",
+        "measures": 12,
+        "bars_drawn": 12,
+        "first_measure_number": 1,
+        "systems": 6
+      },
+      "counts": {
+        "barline-final": 1,
+        "beam": 26,
+        "clef-treble": 1,
+        "dot": 1,
+        "fermata": 1,
+        "flag": 3,
+        "key-0": 1,
+        "ledger-above": 19,
+        "note-16th": 41,
+        "note-32nd": 7,
+        "note-8th": 25,
+        "note-quarter": 5,
+        "rest-16th": 27,
+        "rest-32nd": 5,
+        "rest-8th": 17,
+        "rest-half": 1,
+        "rest-quarter": 5,
+        "stem-down": 78,
+        "system-break": 5,
+        "tempo-mark": 1,
+        "time-4-4": 1,
+        "time-6-8": 1,
+        "time-change": 1,
+        "tuplet-2": 2,
+        "tuplet-3": 10,
+        "tuplet-5": 2,
+        "tuplet-6": 2,
+        "tuplet-7": 2,
+        "x-rest-in-beam": 36,
+        "x-rest-in-tuplet": 28,
+        "x-rest-raised": 31,
+        "x-tuplet-4": 1
+      },
+      "degradations": {
+        "scan.pdf": {
+          "seed": 810801,
+          "render_dpi": 300,
+          "dpi": 300,
+          "color": "gray",
+          "format": "jpeg",
+          "jpeg_quality": 55,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                244,
+                242,
+                236
+              ],
+              "texture": 3
+            },
+            {
+              "op": "rotate",
+              "deg": 0.3,
+              "bg": 235
+            },
+            {
+              "op": "gradient",
+              "strength": 0.06
+            },
+            {
+              "op": "blur",
+              "sigma": 0.6
+            },
+            {
+              "op": "noise",
+              "sigma": 5
+            }
+          ],
+          "tags": [
+            "paper_texture",
+            "rotation_+0.3deg",
+            "gradient",
+            "blur",
+            "noise",
+            "jpeg_q55"
+          ],
+          "severity": "typical",
+          "output_pages": 1,
+          "pixel_size": [
+            2501,
+            3522
+          ],
+          "image_mode": "L",
+          "bytes": 486662,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        },
+        "scan-severe.pdf": {
+          "seed": 810802,
+          "render_dpi": 200,
+          "dpi": 150,
+          "color": "gray",
+          "format": "jpeg",
+          "jpeg_quality": 22,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "ink_weight",
+              "px": -1
+            },
+            {
+              "op": "paper",
+              "rgb": [
+                248,
+                246,
+                240
+              ],
+              "texture": 3
+            },
+            {
+              "op": "rotate",
+              "deg": -2.8,
+              "bg": 245
+            },
+            {
+              "op": "wave",
+              "amp": 6,
+              "period": 0.7
+            },
+            {
+              "op": "blur",
+              "sigma": 0.9
+            },
+            {
+              "op": "noise",
+              "sigma": 10
+            },
+            {
+              "op": "downsample",
+              "dpi": 150
+            }
+          ],
+          "tags": [
+            "ink_weight",
+            "paper_texture",
+            "rotation_-2.8deg",
+            "wave",
+            "blur",
+            "noise",
+            "downsampled_150dpi",
+            "jpeg_q22"
+          ],
+          "severity": "severe",
+          "output_pages": 1,
+          "pixel_size": [
+            1326,
+            1814
+          ],
+          "image_mode": "L",
+          "bytes": 52725,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        }
+      },
+      "dpi": 300,
+      "pages": 1,
+      "license": "CC0",
+      "license_detail": "CC0-1.0: music composed for this corpus; engraving, truth and scans generated by corpus/coverage/rests/_tools",
+      "composer": "OMR coverage corpus (CC0)",
+      "focus": [
+        "x-rest-in-tuplet",
+        "x-rest-in-beam",
+        "tuplet-3",
+        "tuplet-5",
+        "tuplet-6",
+        "tuplet-7",
+        "tuplet-2",
+        "beam"
+      ],
+      "notes": [
+        "<tuplet bracket=\"yes|no\"> follows LilyPond's default (bracket omitted only when one beam spans exactly the tuplet); rests inside tuplets carry <time-modification> and may start/stop the tuplet.",
+        "<beam> elements reproduce the engraved beam groups (manual beaming); notes only: a rest under a beam carries no <beam> element (the beam is continued by the notes either side; secondary beams around a rest are written as hooks).",
+        "Rests under a beam are moved up or down by LilyPond to clear the beam (single voice, no explicit position in the source); their engraved staff position was read back from the layout and written as <display-step>/<display-octave>, so they also count as x-rest-raised / x-rest-lowered. Rest vertical positions: a rest drawn away from its normal place carries <display-step>/<display-octave> = the pitch whose staff position it takes (LilyPond pitched rest, or MultiMeasureRest staff-position). The middle staff line is the normal position for EVERY rest value (so display B4 in treble clef = a whole rest hanging from the 4th line as usual, the MuseScore convention); other pitches shift the symbol by the same number of staff steps. Rests without <display-step> are at their normal position. Every rest position was read back from the LilyPond layout (staff-position and glyph extent) and matches the truth.",
+        "No nested tuplets in this item (tuplet-nested is not covered by the rests family).",
+        "<stem> is written for every stemmed note from the engraved stem direction (read back from the layout)."
+      ],
+      "files": {
+        "truth": "truth.musicxml",
+        "engraving": "engraving.ly",
+        "clean": "clean.pdf",
+        "scan": "scan.pdf",
+        "scan_severe": "scan-severe.pdf",
+        "attribution": "ATTRIBUTION.txt"
+      },
+      "clean": {
+        "dpi": 300,
+        "pages": 1,
+        "ops": [],
+        "note": "undamaged raster render (PNG, gray)",
+        "pixel_size": [
+          2481,
+          3508
+        ],
+        "bytes": 114368,
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "text_chars": 0
+      },
+      "validation": {
+        "truth_xsd_valid": true,
+        "engraving_event_dump_matches_truth": true,
+        "engraving_events_compared": 186,
+        "time_signatures_compared": 2,
+        "rest_positions_match_truth": true,
+        "rests_position_checked": 55,
+        "rests_with_explicit_display_position": 0,
+        "rests_with_display_position_read_from_layout": 31,
+        "stems_read_from_engraving": 78,
+        "midi_attacks_match_truth": true,
+        "midi_attacks": 78,
+        "music21_reparse_matches_model": true,
+        "rest_counts_model_equal_truth": true,
+        "lilypond_warnings": [],
+        "method": "LilyPond event-dump engraver (_tools/crest/dump.ly) compared with the model the truth is written from: every note/rest/multi-bar rest (onset, pitch, notated type, dots, tuplet scale), ties, beam starts/stops, slurs, articulations/fermatas, bar numbers, measure positions and time signatures; post-layout read-back of every Rest / MultiMeasureRest grob (staff-position and Y extent vs. the truth display-step/display-octave) and of every Stem direction (written to <stem>); LilyPond MIDI attack multiset; music21 re-parse of truth.musicxml; xmllint against the MusicXML 4.0 XSD; counts parsed from truth.musicxml and cross-checked with the model for rest tags."
+      },
+      "build_timing": {
+        "lilypond_s": 2.35,
+        "raster_and_damage_s": 9.7
+      },
+      "generator": "corpus/coverage/rests/_tools/run_all.py (crest/items.py, catalog.py, build.py, scan.py)",
+      "path": "corpus/coverage/rests/rst08-tuplet-beam-rests",
+      "scan_files": [
+        "scan-severe.pdf",
+        "scan.pdf"
+      ]
+    },
+    {
+      "id": "rst09-quartet-rests",
+      "family": "rests",
+      "title": "Quartet Fughetta: rests in a string quartet",
+      "symbols": [
+        "barline-final",
+        "beam",
+        "clef-alto",
+        "clef-bass",
+        "clef-treble",
+        "dot",
+        "fermata",
+        "flag",
+        "key-f1",
+        "ledger-above",
+        "ledger-below",
+        "note-16th",
+        "note-8th",
+        "note-half",
+        "note-quarter",
+        "rest-8th",
+        "rest-dotted",
+        "rest-half",
+        "rest-quarter",
+        "rest-whole-bar",
+        "stem-down",
+        "stem-up",
+        "system-break",
+        "tempo-mark",
+        "time-3-4",
+        "x-rest-fermata"
+      ],
+      "layout": "string-quartet",
+      "expected": {
+        "parts": [
+          "Violin I",
+          "Violin II",
+          "Viola",
+          "Violoncello"
+        ],
+        "must_not_split": false,
+        "notes": "12 bars in 3/4, F major, four parts on four staves (bracket): treble, treble, alto and bass clef. Staggered fugato entries: Violin II rests bars 1-2, viola bars 1-4 (whole-bar rests, one per bar, no multi-bar rests in a score), cello bars 1-2. Bar 9 is a general pause: a whole-bar rest with fermata in every part. Quarter, eighth, half and dotted-eighth rests throughout; dotted-quarter notes followed by eighth rests (bar 11).",
+        "measures": 12,
+        "bars_drawn": 12,
+        "first_measure_number": 1,
+        "systems": 3
+      },
+      "counts": {
+        "barline-final": 4,
+        "beam": 3,
+        "clef-alto": 1,
+        "clef-bass": 1,
+        "clef-treble": 2,
+        "dot": 9,
+        "fermata": 8,
+        "flag": 5,
+        "key-f1": 4,
+        "ledger-above": 1,
+        "ledger-below": 2,
+        "note-16th": 1,
+        "note-8th": 10,
+        "note-half": 6,
+        "note-quarter": 49,
+        "rest-8th": 9,
+        "rest-dotted": 1,
+        "rest-half": 1,
+        "rest-quarter": 26,
+        "rest-whole-bar": 13,
+        "stem-down": 30,
+        "stem-up": 36,
+        "system-break": 2,
+        "tempo-mark": 1,
+        "time-3-4": 4,
+        "x-rest-fermata": 4
+      },
+      "degradations": {
+        "scan.pdf": {
+          "seed": 810901,
+          "render_dpi": 300,
+          "dpi": 300,
+          "color": "gray",
+          "format": "jpeg",
+          "jpeg_quality": 65,
+          "jpeg_passes": 1,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                244,
+                242,
+                236
+              ],
+              "texture": 3
+            },
+            {
+              "op": "rotate",
+              "deg": -1.0,
+              "bg": 235
+            },
+            {
+              "op": "gradient",
+              "strength": 0.06
+            },
+            {
+              "op": "blur",
+              "sigma": 0.5
+            },
+            {
+              "op": "noise",
+              "sigma": 4
+            }
+          ],
+          "tags": [
+            "paper_texture",
+            "rotation_-1deg",
+            "gradient",
+            "blur",
+            "noise",
+            "jpeg_q65"
+          ],
+          "severity": "typical",
+          "output_pages": 1,
+          "pixel_size": [
+            2543,
+            3552
+          ],
+          "image_mode": "L",
+          "bytes": 710339,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        },
+        "scan-severe.pdf": {
+          "seed": 810902,
+          "render_dpi": 200,
+          "dpi": 200,
+          "color": "gray",
+          "format": "png1",
+          "jpeg_quality": null,
+          "jpeg_passes": null,
+          "ops": [
+            {
+              "op": "paper",
+              "rgb": [
+                250,
+                250,
+                250
+              ]
+            },
+            {
+              "op": "rotate",
+              "deg": -2.2,
+              "bg": 255
+            },
+            {
+              "op": "speckle",
+              "per_mpx": 180
+            },
+            {
+              "op": "binarize",
+              "threshold": 95,
+              "pre_blur": 0.8,
+              "noise": 22
+            },
+            {
+              "op": "saltpepper",
+              "amount": 0.004
+            }
+          ],
+          "tags": [
+            "rotation_-2.2deg",
+            "speckle",
+            "binarized_photocopy_thin",
+            "saltpepper"
+          ],
+          "severity": "severe",
+          "output_pages": 1,
+          "pixel_size": [
+            1744,
+            2401
+          ],
+          "image_mode": "1",
+          "bytes": 75072,
+          "image_only_check": {
+            "image_only": true,
+            "fonts": [],
+            "images": 1,
+            "pages": 1,
+            "text_chars": 0
+          },
+          "op_log": []
+        }
+      },
+      "dpi": 300,
+      "pages": 1,
+      "license": "CC0",
+      "license_detail": "CC0-1.0: music composed for this corpus; engraving, truth and scans generated by corpus/coverage/rests/_tools",
+      "composer": "OMR coverage corpus (CC0)",
+      "focus": [
+        "rest-whole-bar",
+        "rest-quarter",
+        "rest-8th",
+        "rest-16th",
+        "rest-half",
+        "rest-dotted",
+        "x-rest-fermata",
+        "clef-alto",
+        "clef-bass"
+      ],
+      "notes": [
+        "Whole-bar rests are <rest measure=\"yes\"/> with the bar duration and no <type> (the glyph is a whole rest, or a breve rest in 4/2). A multi-bar rest is one measure per bar, each with a measure rest; the first bar carries <measure-style><multiple-rest use-symbols=\"yes|no\">n</multiple-rest>. The number printed above the rest is implied by n; the exact church-rest glyph combination (longa / breve / whole rest symbols) is not encoded beyond use-symbols=\"yes\".",
+        "<stem> is written for every stemmed note from the engraved stem direction (read back from the layout).",
+        "<beam> elements reproduce the engraved beam groups (manual beaming); notes only: a rest under a beam carries no <beam> element (the beam is continued by the notes either side; secondary beams around a rest are written as hooks)."
+      ],
+      "files": {
+        "truth": "truth.musicxml",
+        "engraving": "engraving.ly",
+        "clean": "clean.pdf",
+        "scan": "scan.pdf",
+        "scan_severe": "scan-severe.pdf",
+        "attribution": "ATTRIBUTION.txt"
+      },
+      "clean": {
+        "dpi": 300,
+        "pages": 1,
+        "ops": [],
+        "note": "undamaged raster render (PNG, gray)",
+        "pixel_size": [
+          2481,
+          3508
+        ],
+        "bytes": 113621,
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "text_chars": 0
+      },
+      "validation": {
+        "truth_xsd_valid": true,
+        "engraving_event_dump_matches_truth": true,
+        "engraving_events_compared": 129,
+        "time_signatures_compared": 4,
+        "rest_positions_match_truth": true,
+        "rests_position_checked": 49,
+        "rests_with_explicit_display_position": 0,
+        "rests_with_display_position_read_from_layout": 0,
+        "stems_read_from_engraving": 66,
+        "midi_attacks_match_truth": true,
+        "midi_attacks": 66,
+        "music21_reparse_matches_model": true,
+        "rest_counts_model_equal_truth": true,
+        "lilypond_warnings": [],
+        "method": "LilyPond event-dump engraver (_tools/crest/dump.ly) compared with the model the truth is written from: every note/rest/multi-bar rest (onset, pitch, notated type, dots, tuplet scale), ties, beam starts/stops, slurs, articulations/fermatas, bar numbers, measure positions and time signatures; post-layout read-back of every Rest / MultiMeasureRest grob (staff-position and Y extent vs. the truth display-step/display-octave) and of every Stem direction (written to <stem>); LilyPond MIDI attack multiset; music21 re-parse of truth.musicxml; xmllint against the MusicXML 4.0 XSD; counts parsed from truth.musicxml and cross-checked with the model for rest tags."
+      },
+      "build_timing": {
+        "lilypond_s": 2.11,
+        "raster_and_damage_s": 9.28
+      },
+      "generator": "corpus/coverage/rests/_tools/run_all.py (crest/items.py, catalog.py, build.py, scan.py)",
+      "path": "corpus/coverage/rests/rst09-quartet-rests",
+      "scan_files": [
+        "scan-severe.pdf",
+        "scan.pdf"
+      ]
+    }
+  ]
+}

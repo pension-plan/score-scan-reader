@@ -1,0 +1,339 @@
+{
+  "id": "choir-piano-song-of-rejoicing",
+  "family": "layouts",
+  "title": "Song of Rejoicing - closed SATB choir with piano accompaniment",
+  "layout": "choir-piano",
+  "symbols": [
+    "chord",
+    "clef-bass",
+    "clef-treble",
+    "dyn-f",
+    "dyn-mf",
+    "fermata",
+    "hairpin-cresc",
+    "key-0",
+    "ledger-above",
+    "ledger-below",
+    "lyrics",
+    "lyrics-hyphen",
+    "metronome",
+    "note-half",
+    "note-quarter",
+    "note-whole",
+    "rest-whole-bar",
+    "stem-down",
+    "stem-up",
+    "system-break",
+    "tempo-mark",
+    "time-4-4",
+    "x-group-bracket",
+    "x-measures",
+    "x-multi-staff-part",
+    "x-parts",
+    "x-staves"
+  ],
+  "counts": {
+    "chord": 24,
+    "clef-bass": 3,
+    "clef-treble": 3,
+    "dyn-f": 3,
+    "dyn-mf": 3,
+    "fermata": 2,
+    "hairpin-cresc": 1,
+    "key-0": 1,
+    "ledger-above": 9,
+    "ledger-below": 31,
+    "lyrics": 28,
+    "lyrics-hyphen": 5,
+    "metronome": 1,
+    "note-half": 34,
+    "note-quarter": 132,
+    "note-whole": 2,
+    "rest-whole-bar": 8,
+    "stem-down": 61,
+    "stem-up": 105,
+    "system-break": 1,
+    "tempo-mark": 1,
+    "time-4-4": 1,
+    "x-group-bracket": 1,
+    "x-measures": 10,
+    "x-multi-staff-part": 1,
+    "x-parts": 5,
+    "x-staves": 6
+  },
+  "expected": {
+    "parts": [
+      "Soprano",
+      "Alto",
+      "Tenor",
+      "Bass",
+      "Piano"
+    ],
+    "must_not_split": true,
+    "shared_staves": [
+      [
+        "Soprano",
+        "Alto"
+      ],
+      [
+        "Tenor",
+        "Bass"
+      ]
+    ],
+    "staves_per_part": {
+      "Soprano": 1,
+      "Alto": 1,
+      "Tenor": 1,
+      "Bass": 1,
+      "Piano": 2
+    },
+    "lyrics": [
+      {
+        "part": "Soprano",
+        "verses": 1
+      }
+    ],
+    "notes": "FIVE parts: Soprano, Alto, Tenor, Bass (closed score: S+A share the treble staff, T+B the bass staff; split by stem direction) and Piano (ONE part with two staves joined by a brace - must not be split). The choir is silent in m.1 and m.10 (piano intro/outro): each choir staff shows two whole-bar rests (one per part). Lyrics between the choir staves belong to the Soprano."
+  },
+  "notes": [
+    "Lyrics are encoded on the Soprano only."
+  ],
+  "layout_description": "A4 portrait, staff size 18, 2 systems (5 + 5 measures) of 4 staves: bracketed choir + braced piano",
+  "pages": 1,
+  "measures": 10,
+  "systems": 2,
+  "noteheads_in_truth": 215,
+  "hidden_staff_segments": [],
+  "dpi": 300,
+  "degradations": {
+    "clean.pdf": {
+      "seed": null,
+      "dpi": 300,
+      "format": "png (8-bit grey)",
+      "summary": "undamaged raster of the engraving",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "size_px": [
+            2481,
+            3508
+          ]
+        }
+      ],
+      "bytes": 132541
+    },
+    "scan.pdf": {
+      "seed": 7101,
+      "render_dpi": 300,
+      "dpi": 300,
+      "format": "jpeg q75",
+      "colour": "gray",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            2481,
+            3508
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              2
+            ],
+            [
+              "skew_rotation_deg",
+              0.6
+            ],
+            [
+              "focus_blur_sigma",
+              0.4
+            ],
+            [
+              "gaussian_noise_sigma",
+              3
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 300,
+        "mode": "gray",
+        "texture": 2,
+        "rotate": 0.6,
+        "blur": 0.4,
+        "noise": 3,
+        "jpeg": 75
+      },
+      "summary": "300 dpi grey flatbed scan, 0.6 deg skew, light paper texture and noise, JPEG q75",
+      "bytes": 650963
+    },
+    "scan-severe.pdf": {
+      "seed": 7102,
+      "render_dpi": 150,
+      "dpi": 150,
+      "format": "jpeg q25",
+      "colour": "rgb",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1389,
+            1902
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              6
+            ],
+            [
+              "paper_colour",
+              [
+                243,
+                236,
+                214
+              ]
+            ],
+            [
+              "skew_rotation_deg",
+              -2.5
+            ],
+            [
+              "perspective_phone",
+              {
+                "margin": 0.06,
+                "bg": 50,
+                "jitter": 0.035,
+                "keystone": 0.06,
+                "corners_src": [
+                  [
+                    -59,
+                    23
+                  ],
+                  [
+                    1467,
+                    24
+                  ],
+                  [
+                    1424,
+                    1951
+                  ],
+                  [
+                    -16,
+                    1853
+                  ]
+                ]
+              }
+            ],
+            [
+              "uneven_lighting",
+              0.25
+            ],
+            [
+              "vignette",
+              0.3
+            ],
+            [
+              "motion_blur",
+              {
+                "len": 5,
+                "angle": 25
+              }
+            ],
+            [
+              "gaussian_noise_sigma",
+              6
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 150,
+        "mode": "rgb",
+        "paper_rgb": [
+          243,
+          236,
+          214
+        ],
+        "texture": 6,
+        "rotate": -2.5,
+        "phone": {
+          "margin": 0.06,
+          "bg": 50,
+          "jitter": 0.035,
+          "keystone": 0.06
+        },
+        "blotch": 0.25,
+        "vignette": 0.3,
+        "motion_blur": {
+          "len": 5,
+          "angle": 25
+        },
+        "noise": 6,
+        "jpeg": 25
+      },
+      "summary": "phone photo of the page: perspective/keystone, uneven light, vignette, motion blur, 150 dpi, JPEG q25",
+      "bytes": 110293
+    }
+  },
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "scan-severe.pdf",
+    "scan.pdf",
+    "truth.musicxml"
+  ],
+  "license": "CC0",
+  "license_detail": "CC0-1.0: composition, arrangement, engraving and scans",
+  "source": "self-authored for the coverage suite (2026)",
+  "engraver": "internal model -> LilyPond 2.24 (coverage-suite writer: explicit beams and stems)",
+  "validation": {
+    "xsd_valid": true,
+    "music21_parse": "6 168",
+    "midi_attacks_match_truth": true,
+    "attacks": 215,
+    "grob_log_matches_truth": true,
+    "printed_summary": {
+      "noteheads": 215,
+      "stems_up": 105,
+      "stems_down": 61,
+      "accidentals": 0,
+      "rests": 8,
+      "beams": 0,
+      "flags": 0,
+      "slurs": 0,
+      "ties": 0,
+      "scripts": {
+        "fermata": 2
+      },
+      "dynamics": {
+        "mf": 3,
+        "f": 3
+      },
+      "lyric_syllables": 28,
+      "hyphens": 5,
+      "extenders": 0,
+      "chord_names": 0,
+      "system_delimiters": {
+        "SystemStartBracket": 2,
+        "SystemStartBrace": 2
+      }
+    },
+    "lilypond_warnings": [],
+    "lyric_syllables_found_in_engraving": 1.0,
+    "lyric_syllables": 28,
+    "pages_planned": 1,
+    "image_only": {
+      "clean.pdf": true,
+      "scan.pdf": true,
+      "scan-severe.pdf": true
+    }
+  }
+}

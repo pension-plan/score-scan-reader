@@ -47,7 +47,7 @@ function strokeShape(rows, sp) {
   for (let i = rows.length - 1; i >= 0; i--) {
     const r = rows[i];
     if (r.a < 0) continue;
-    if (r.b - r.a + 1 > 0.42 * sp || r.runs > 1) break;
+    if (r.b - r.a + 1 > 0.5 * sp || r.runs > 1) break;
     n++;
   }
   const t0 = rows[rows.length - 1], t1 = rows[Math.max(0, rows.length - n)];
@@ -199,15 +199,24 @@ function detectRests({ R, comps, s, xa, xb, debug }) {
     if (f.h < 0.3 || f.w < 0.3 || f.w > 14 || f.h > 5.6) continue;
     // must sit on the staff
     if (Math.min(f.bot, 4) - Math.max(f.top, 0) < 0.3) continue;
-    // part of a note (head, stem, flag)
-    if (heads.some(hd => hd.x + 0.6 * sp >= c.x0 && hd.x - 0.6 * sp <= c.x1 && hd.y + 0.5 * sp >= c.y0 && hd.y - 0.5 * sp <= c.y1)) continue;
+    // part of a note (head, stem, flag); but a heavy eighth rest's blob is
+    // easily read as a notehead: one head at the top of a short glyph whose
+    // thin tail slants down to the left (a stem is straight, and longer)
+    const on = heads.filter(hd => hd.x + 0.6 * sp >= c.x0 && hd.x - 0.6 * sp <= c.x1 && hd.y + 0.5 * sp >= c.y0 && hd.y - 0.5 * sp <= c.y1);
+    let onHead = null;
+    if (on.length) {
+      if (on.length > 1 || f.h < 1.4 || f.h > 2.6 || f.w > 1.5 || on[0].y > c.y0 + 0.9 * sp) continue;
+      const sh = strokeShape(rowProfile(R, c), sp);
+      if (!(sh.tail >= 0.6 && sh.slant >= 0.05 && sh.rise < 0.25)) continue;
+      onHead = on[0];
+    }
     let kind = null, q = 0, bars = 0, multi = 0;
     const fr = f.cy - Math.floor(f.cy);
-    if (f.fill >= 0.65 && f.h >= 0.3 && f.h <= 0.85 && f.w >= 0.8 && f.w <= 1.8 && f.top >= -0.2 && f.bot <= 4.2) {
+    if (f.fill >= 0.65 && f.h >= 0.3 && f.h <= 1.0 && f.w >= 0.8 && f.w <= 2.0 && f.top >= -0.2 && f.bot <= 4.2) {
       // block hanging from a line (whole) or sitting on one (half)
       if (fr > 0.05 && fr < 0.5) { kind = 'whole'; q = 4; bars = 1; } else { kind = 'half'; q = 2; }
-    } else if (f.fill >= 0.65 && f.h >= 0.8 && f.h <= 1.3 && f.w >= 0.3 && f.w <= 0.8) { kind = 'breve'; q = 8; bars = 2; }
-    else if (f.fill >= 0.65 && f.h >= 1.7 && f.h <= 2.3 && f.w >= 0.3 && f.w <= 0.8) { kind = 'long'; q = 16; bars = 4; }
+    } else if (f.fill >= 0.8 && f.h >= 0.85 && f.h <= 1.25 && f.w >= 0.35 && f.w <= 0.75 && Math.abs(f.cy - 1.5) < 0.25) { kind = 'breve'; q = 8; bars = 2; }
+    else if (f.fill >= 0.8 && f.h >= 1.75 && f.h <= 2.3 && f.w >= 0.35 && f.w <= 0.75 && Math.abs(f.cy - 2) < 0.3) { kind = 'long'; q = 16; bars = 4; }
     else if (f.w >= 2.5 && f.h <= 2.8 && f.cy > 1.2 && f.cy < 2.8) {
       // H-bar: rows spanning nearly the whole width around the middle line
       const rows = rowProfile(R, c);
@@ -225,14 +234,21 @@ function detectRests({ R, comps, s, xa, xb, debug }) {
       const sh = strokeShape(rows, sp), nh = hookCount(rows, sp);
       if (debug) debug('  shape', Math.round(f.xc), 'tail', sh.tail.toFixed(2), 'slant', sh.slant.toFixed(2), 'rise', sh.rise.toFixed(2), 'hooks', nh);
       if (f.h >= 2.2 && f.h <= 3.4 && f.w <= 1.5 && sh.tail < 0.75 && sh.rise >= 0.25 && f.fill >= 0.25) { kind = 'quarter'; q = 1; }
-      else if (sh.tail >= 0.55 && sh.slant >= 0.1 && nh >= 1) {
+      else if (sh.tail >= 0.55 && sh.slant >= 0.05 && nh >= 1) {
         const byH = Math.max(1, Math.min(4, Math.round(f.h - 0.9)));
-        const n = Math.abs(byH - nh) <= 1 ? byH : Math.min(nh, 4);
-        kind = 'flag' + n; q = 0.5 / Math.pow(2, n - 1);
+        if (Math.abs(byH - nh) <= 1) { kind = 'flag' + byH; q = 0.5 / Math.pow(2, byH - 1); }
       }
     }
     if (debug) debug('cand', Math.round(f.xc), Math.round(c.y0), 'w', f.w.toFixed(2), 'h', f.h.toFixed(2), 'top', f.top.toFixed(2), 'fill', f.fill.toFixed(2), '->', kind);
     if (!kind) continue;
+    // a block rest stands clear of other symbols (a detached flag, a clef or
+    // a beam fragment does not); dots aside
+    if (bars || q === 2) {
+      const pad = (kind === 'breve' || kind === 'long' ? 1.2 : 0.9) * sp;
+      if (heads.some(hd => hd.x > c.x0 - 2 * sp && hd.x < c.x1 + 2 * sp && kind !== 'multi')) continue;
+      if (near.some(o => o !== c && o.area >= 0.1 * sp * sp && (o.x1 - o.x0 > 0.75 * sp || o.y1 - o.y0 > 0.75 * sp) &&
+        o.x1 > c.x0 - pad && o.x0 < c.x1 + pad && o.y1 > c.y0 - sp && o.y0 < c.y1 + sp)) continue;
+    }
     // a glyph directly left of a notehead at its height is an accidental
     if (q <= 1 && f.h < 3.4 && heads.some(hd => hd.x - c.x1 >= -0.2 * sp && hd.x - c.x1 <= 1.5 * sp && hd.y >= c.y0 - 0.3 * sp && hd.y <= c.y1 + 0.3 * sp)) continue;
     // a time signature: two glyphs stacked on the staff
@@ -251,7 +267,8 @@ function detectRests({ R, comps, s, xa, xb, debug }) {
       dots++; dx = d.x1;
     }
     if (dots) q *= dots === 1 ? 1.5 : 1.75;
-    out.push({ x: f.xc, pos: f.cy, q, dots, kind, box: c, bars, multi });
+    if (onHead && !/^flag/.test(kind)) continue;
+    out.push({ x: f.xc, pos: f.cy, q, dots, kind, box: c, bars, multi, onHead });
   }
   return out.sort((a, b) => a.x - b.x);
 }
@@ -267,6 +284,8 @@ module.exports = { detectRests, readNumber, _features: features, _rowProfile: ro
 function mergeRests(evs, rests, voice, sp) {
   if (!rests.length) return evs;
   let rs = rests;
+  // a note read on a rest glyph goes
+  for (const r of rs) if (r.onHead) evs = evs.filter(e => !(e.heads && e.heads.length === 1 && e.heads[0] === r.onHead));
   if (voice === 1) rs = rs.filter(r => r.pos <= 2.4);
   else if (voice === 2) rs = rs.filter(r => r.pos >= 1.6);
   rs = rs.filter(r => !evs.some(e => !e.rest && e.x != null && Math.abs(e.x - r.x) < 0.8 * sp));

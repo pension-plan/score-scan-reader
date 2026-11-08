@@ -123,7 +123,10 @@ class LilyWriter:
             elif right == 'repeat-end':
                 bar = ':|.'
             elif left_next == 'repeat-start':
-                bar = '.|:'
+                # start repeat; at a line break the end-of-line glyph shows the closing bar of measure i
+                bar = {'double': '.|:-||', 'final': '.|:-|.'}.get(right, '.|:-|')
+                if right in ('double', 'final') and not s.measures[i + 1].brk:
+                    raise ValueError(f'{right} bar + start repeat mid-system after measure {i + 1}: not engravable')
             elif right == 'final':
                 bar = '|.'
             elif right == 'double':
@@ -383,7 +386,11 @@ class LilyWriter:
         toks = []
         for m in part.measures[seg['start']:seg['end']]:
             for ev in m.get(vkey, []):
-                if ev.kind != 'note' or ev.is_tie_continuation():
+                if ev.kind != 'note':
+                    continue
+                if ev.is_tie_continuation():
+                    # melismaBusyProperties is '() in lyric voices, so a tied note takes a syllable unless skipped
+                    toks.append('_')
                     continue
                 ly = ev.lyrics.get(verse)
                 if ly is None:

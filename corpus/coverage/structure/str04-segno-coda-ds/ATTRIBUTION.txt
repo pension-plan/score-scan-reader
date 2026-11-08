@@ -1,0 +1,3 @@
+"Round Trip" for violin, composed for this corpus (2026) - CC0 1.0.
+
+Engraving, truth, rasterisation and damage simulation produced by the coverage-corpus generator (corpus/coverage/structure/_tools); all files of this item are dedicated to the public domain (CC0 1.0).

@@ -1,0 +1,3 @@
+Light of Ages - tune, harmonisation (corpus voice-leading solver) and the four stanzas composed for the OMR coverage suite (2026) - CC0 1.0.
+
+Composition, arrangement, engraving, rasterisation and damage simulation produced for the OMR coverage suite (corpus/coverage/layouts/_tools, 2026). All files of this item are dedicated to the public domain (CC0 1.0 Universal).

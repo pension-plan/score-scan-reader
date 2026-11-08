@@ -1,0 +1,377 @@
+{
+  "id": "orchestral-festive-march-9-staves",
+  "family": "layouts",
+  "title": "Festive March - 9-staff orchestral full score, two pages",
+  "layout": "orchestral",
+  "symbols": [
+    "beam",
+    "chord",
+    "clef-alto",
+    "clef-bass",
+    "clef-treble",
+    "dot",
+    "dyn-f",
+    "dyn-ff",
+    "dyn-mf",
+    "fermata",
+    "flag",
+    "hairpin-cresc",
+    "key-s2",
+    "ledger-above",
+    "ledger-below",
+    "metronome",
+    "multi-page",
+    "note-16th",
+    "note-8th",
+    "note-half",
+    "note-quarter",
+    "note-whole",
+    "page-break",
+    "rehearsal-mark",
+    "rest-half",
+    "rest-quarter",
+    "rest-whole-bar",
+    "stem-down",
+    "stem-up",
+    "tempo-mark",
+    "time-4-4",
+    "x-group-bracket",
+    "x-group-square",
+    "x-measures",
+    "x-parts",
+    "x-staves"
+  ],
+  "counts": {
+    "beam": 36,
+    "chord": 4,
+    "clef-alto": 1,
+    "clef-bass": 3,
+    "clef-treble": 5,
+    "dot": 2,
+    "dyn-f": 9,
+    "dyn-ff": 9,
+    "dyn-mf": 8,
+    "fermata": 9,
+    "flag": 2,
+    "hairpin-cresc": 9,
+    "key-s2": 1,
+    "ledger-above": 22,
+    "ledger-below": 1,
+    "metronome": 1,
+    "multi-page": 1,
+    "note-16th": 8,
+    "note-8th": 70,
+    "note-half": 15,
+    "note-quarter": 144,
+    "note-whole": 9,
+    "page-break": 1,
+    "rehearsal-mark": 1,
+    "rest-half": 9,
+    "rest-quarter": 10,
+    "rest-whole-bar": 3,
+    "stem-down": 181,
+    "stem-up": 56,
+    "tempo-mark": 1,
+    "time-4-4": 1,
+    "x-group-bracket": 2,
+    "x-group-square": 1,
+    "x-measures": 8,
+    "x-parts": 9,
+    "x-staves": 9
+  },
+  "expected": {
+    "parts": [
+      "Flute",
+      "Oboe",
+      "Bassoon",
+      "Trumpet in C",
+      "Timpani",
+      "Violin I",
+      "Violin II",
+      "Viola",
+      "Violoncello"
+    ],
+    "must_not_split": true,
+    "shared_staves": [],
+    "staves_per_part": {
+      "Flute": 1,
+      "Oboe": 1,
+      "Bassoon": 1,
+      "Trumpet in C": 1,
+      "Timpani": 1,
+      "Violin I": 1,
+      "Violin II": 1,
+      "Viola": 1,
+      "Violoncello": 1
+    },
+    "lyrics": [],
+    "notes": "NINE parts, one per staff: Flute, Oboe, Bassoon (bracketed woodwinds), Trumpet in C (written at sounding pitch, no transposition), Timpani, Violin I, Violin II (square sub-bracket inside the strings bracket), Viola (alto clef), Violoncello. One system per page; page 2 uses short names. Violin double stops in m.4/m.8 are chords. Trumpet and timpani have whole-bar rests."
+  },
+  "notes": [
+    "Part groups: woodwinds bracket, strings bracket, violins square (nested part-group); trumpet and timpani are not grouped."
+  ],
+  "layout_description": "A4 portrait, staff size 15, page 1: title + one 9-staff system (mm.1-4), page 2: one system (mm.5-8) with abbreviated names",
+  "pages": 2,
+  "measures": 8,
+  "systems": 2,
+  "noteheads_in_truth": 250,
+  "hidden_staff_segments": [],
+  "dpi": 250,
+  "degradations": {
+    "clean.pdf": {
+      "seed": null,
+      "dpi": 300,
+      "format": "png (8-bit grey)",
+      "summary": "undamaged raster of the engraving",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "size_px": [
+            2481,
+            3508
+          ]
+        },
+        {
+          "image": 2,
+          "size_px": [
+            2481,
+            3508
+          ]
+        }
+      ],
+      "bytes": 177565
+    },
+    "scan.pdf": {
+      "seed": 7131,
+      "render_dpi": 250,
+      "dpi": 250,
+      "format": "jpeg q65",
+      "colour": "gray",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            2067,
+            2924
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              3
+            ],
+            [
+              "skew_rotation_deg",
+              1.2
+            ],
+            [
+              "focus_blur_sigma",
+              0.6
+            ],
+            [
+              "gaussian_noise_sigma",
+              4
+            ],
+            [
+              "speckles_per_mpx",
+              20
+            ]
+          ]
+        },
+        {
+          "image": 2,
+          "source_pages": [
+            2
+          ],
+          "size_px": [
+            2067,
+            2924
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              3
+            ],
+            [
+              "skew_rotation_deg",
+              1.2
+            ],
+            [
+              "focus_blur_sigma",
+              0.6
+            ],
+            [
+              "gaussian_noise_sigma",
+              4
+            ],
+            [
+              "speckles_per_mpx",
+              20
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 250,
+        "mode": "gray",
+        "texture": 3,
+        "rotate": 1.2,
+        "blur": 0.6,
+        "noise": 4,
+        "speckle": 20,
+        "jpeg": 65
+      },
+      "summary": "250 dpi grey scan, 1.2 deg skew, soft focus, toner specks, JPEG q65",
+      "bytes": 831345
+    },
+    "scan-severe.pdf": {
+      "seed": 7132,
+      "render_dpi": 240,
+      "dpi": 120,
+      "format": "jpeg q20",
+      "colour": "gray",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            992,
+            1403
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              6
+            ],
+            [
+              "skew_rotation_deg",
+              -4.0
+            ],
+            [
+              "focus_blur_sigma",
+              1.3
+            ],
+            [
+              "gaussian_noise_sigma",
+              10
+            ],
+            [
+              "resampled_dpi",
+              [
+                240,
+                120
+              ]
+            ]
+          ]
+        },
+        {
+          "image": 2,
+          "source_pages": [
+            2
+          ],
+          "size_px": [
+            992,
+            1403
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              6
+            ],
+            [
+              "skew_rotation_deg",
+              -4.0
+            ],
+            [
+              "focus_blur_sigma",
+              1.3
+            ],
+            [
+              "gaussian_noise_sigma",
+              10
+            ],
+            [
+              "resampled_dpi",
+              [
+                240,
+                120
+              ]
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 240,
+        "out_dpi": 120,
+        "mode": "gray",
+        "texture": 6,
+        "rotate": -4.0,
+        "blur": 1.3,
+        "noise": 10,
+        "jpeg": 20
+      },
+      "summary": "low-resolution 120 dpi grey scan, -4 deg skew, heavy blur and noise, JPEG q20",
+      "bytes": 85442
+    }
+  },
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "scan-severe.pdf",
+    "scan.pdf",
+    "truth.musicxml"
+  ],
+  "license": "CC0",
+  "license_detail": "CC0-1.0: composition, arrangement, engraving and scans",
+  "source": "self-authored for the coverage suite (2026)",
+  "engraver": "internal model -> LilyPond 2.24 (coverage-suite writer: explicit beams and stems)",
+  "validation": {
+    "xsd_valid": true,
+    "music21_parse": "9 246",
+    "midi_attacks_match_truth": true,
+    "attacks": 250,
+    "grob_log_matches_truth": true,
+    "printed_summary": {
+      "noteheads": 250,
+      "stems_up": 56,
+      "stems_down": 181,
+      "accidentals": 0,
+      "rests": 22,
+      "beams": 36,
+      "flags": 2,
+      "slurs": 0,
+      "ties": 0,
+      "scripts": {
+        "fermata": 9
+      },
+      "dynamics": {
+        "f": 9,
+        "mf": 8,
+        "ff": 9
+      },
+      "lyric_syllables": 0,
+      "hyphens": 0,
+      "extenders": 0,
+      "chord_names": 0,
+      "system_delimiters": {
+        "SystemStartBracket": 4,
+        "SystemStartSquare": 2
+      }
+    },
+    "lilypond_warnings": [],
+    "lyric_syllables_found_in_engraving": null,
+    "lyric_syllables": 0,
+    "pages_planned": 2,
+    "image_only": {
+      "clean.pdf": true,
+      "scan.pdf": true,
+      "scan-severe.pdf": true
+    }
+  }
+}

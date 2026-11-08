@@ -1,0 +1,336 @@
+{
+  "id": "voice-piano-night-song",
+  "family": "layouts",
+  "title": "Night Song - voice with lyrics above a piano grand staff",
+  "layout": "voice-piano",
+  "symbols": [
+    "beam",
+    "chord",
+    "clef-bass",
+    "clef-treble",
+    "dot",
+    "dyn-mf",
+    "dyn-mp",
+    "dyn-p",
+    "fermata",
+    "flag",
+    "hairpin-cresc",
+    "hairpin-dim",
+    "key-f3",
+    "ledger-above",
+    "ledger-below",
+    "lyrics",
+    "lyrics-extender",
+    "lyrics-hyphen",
+    "lyrics-melisma",
+    "metronome",
+    "note-8th",
+    "note-half",
+    "note-quarter",
+    "note-whole",
+    "pedal",
+    "rest-half",
+    "rest-quarter",
+    "rest-whole-bar",
+    "slur",
+    "stem-down",
+    "stem-up",
+    "system-break",
+    "tempo-mark",
+    "time-4-4",
+    "x-measures",
+    "x-multi-staff-part",
+    "x-parts",
+    "x-staves"
+  ],
+  "counts": {
+    "beam": 8,
+    "chord": 23,
+    "clef-bass": 1,
+    "clef-treble": 2,
+    "dot": 2,
+    "dyn-mf": 1,
+    "dyn-mp": 1,
+    "dyn-p": 1,
+    "fermata": 3,
+    "flag": 3,
+    "hairpin-cresc": 1,
+    "hairpin-dim": 1,
+    "key-f3": 1,
+    "ledger-above": 1,
+    "ledger-below": 2,
+    "lyrics": 28,
+    "lyrics-extender": 1,
+    "lyrics-hyphen": 2,
+    "lyrics-melisma": 1,
+    "metronome": 1,
+    "note-8th": 19,
+    "note-half": 31,
+    "note-quarter": 36,
+    "note-whole": 3,
+    "pedal": 1,
+    "rest-half": 1,
+    "rest-quarter": 5,
+    "rest-whole-bar": 1,
+    "slur": 3,
+    "stem-down": 54,
+    "stem-up": 32,
+    "system-break": 2,
+    "tempo-mark": 1,
+    "time-4-4": 1,
+    "x-measures": 11,
+    "x-multi-staff-part": 1,
+    "x-parts": 2,
+    "x-staves": 3
+  },
+  "expected": {
+    "parts": [
+      "Voice",
+      "Piano"
+    ],
+    "must_not_split": true,
+    "shared_staves": [],
+    "staves_per_part": {
+      "Voice": 1,
+      "Piano": 2
+    },
+    "lyrics": [
+      {
+        "part": "Voice",
+        "verses": 1
+      }
+    ],
+    "notes": "TWO parts: \"Voice\" (one staff, lyrics) and \"Piano\" (ONE part, two staves joined by a brace; must not be split). The voice is silent in m.1 (whole-bar rest) and enters on beat 4 of m.2. The voice staff is not connected to the piano brace. Piano chords stay chords."
+  },
+  "notes": [
+    "Lyrics belong to the Voice part only."
+  ],
+  "layout_description": "A4 portrait, staff size 19, 3 systems (4+4+3 measures) of voice staff + piano grand staff",
+  "pages": 1,
+  "measures": 11,
+  "systems": 3,
+  "noteheads_in_truth": 122,
+  "hidden_staff_segments": [],
+  "dpi": 250,
+  "degradations": {
+    "clean.pdf": {
+      "seed": null,
+      "dpi": 300,
+      "format": "png (8-bit grey)",
+      "summary": "undamaged raster of the engraving",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "size_px": [
+            2481,
+            3508
+          ]
+        }
+      ],
+      "bytes": 136551
+    },
+    "scan.pdf": {
+      "seed": 7041,
+      "render_dpi": 250,
+      "dpi": 250,
+      "format": "jpeg q65",
+      "colour": "gray",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            2067,
+            2924
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              3
+            ],
+            [
+              "skew_rotation_deg",
+              1.2
+            ],
+            [
+              "focus_blur_sigma",
+              0.6
+            ],
+            [
+              "gaussian_noise_sigma",
+              4
+            ],
+            [
+              "speckles_per_mpx",
+              20
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 250,
+        "mode": "gray",
+        "texture": 3,
+        "rotate": 1.2,
+        "blur": 0.6,
+        "noise": 4,
+        "speckle": 20,
+        "jpeg": 65
+      },
+      "summary": "250 dpi grey scan, 1.2 deg skew, soft focus, toner specks, JPEG q65",
+      "bytes": 450371
+    },
+    "scan-severe.pdf": {
+      "seed": 7042,
+      "render_dpi": 200,
+      "dpi": 200,
+      "format": "png1",
+      "colour": "bw",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1654,
+            2339
+          ],
+          "ops": [
+            [
+              "ink_weight",
+              1
+            ],
+            [
+              "punch_holes",
+              {
+                "side": "left",
+                "centers_px": [
+                  [
+                    87,
+                    854
+                  ],
+                  [
+                    87,
+                    1485
+                  ]
+                ]
+              }
+            ],
+            [
+              "staple",
+              {
+                "corner": "tl",
+                "pos_px": [
+                  99,
+                  94
+                ]
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              2.5
+            ],
+            [
+              "focus_blur_sigma",
+              0.9
+            ],
+            [
+              "gaussian_noise_sigma",
+              12
+            ],
+            [
+              "salt_pepper",
+              0.002
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 200,
+                "noise": 20
+              }
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 200,
+        "ink_weight": 1,
+        "rotate": 2.5,
+        "punch_holes": {
+          "n": 2,
+          "side": "left",
+          "level": 10
+        },
+        "staple": {
+          "corner": "tl"
+        },
+        "blur": 0.9,
+        "noise": 12,
+        "binarize": 200,
+        "binarize_noise": 20,
+        "saltpepper": 0.002,
+        "format": "png1"
+      },
+      "summary": "thick dark binarised photocopy at 200 dpi: ink spread, 2.5 deg skew, staple, two punch holes, salt & pepper",
+      "bytes": 151911
+    }
+  },
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "scan-severe.pdf",
+    "scan.pdf",
+    "truth.musicxml"
+  ],
+  "license": "CC0",
+  "license_detail": "CC0-1.0: composition, arrangement, engraving and scans",
+  "source": "self-authored for the coverage suite (2026)",
+  "engraver": "internal model -> LilyPond 2.24 (coverage-suite writer: explicit beams and stems)",
+  "validation": {
+    "xsd_valid": true,
+    "music21_parse": "3 89",
+    "midi_attacks_match_truth": true,
+    "attacks": 122,
+    "grob_log_matches_truth": true,
+    "printed_summary": {
+      "noteheads": 122,
+      "stems_up": 32,
+      "stems_down": 54,
+      "accidentals": 0,
+      "rests": 7,
+      "beams": 8,
+      "flags": 3,
+      "slurs": 3,
+      "ties": 0,
+      "scripts": {
+        "fermata": 3
+      },
+      "dynamics": {
+        "p": 1,
+        "mp": 1,
+        "mf": 1
+      },
+      "lyric_syllables": 28,
+      "hyphens": 2,
+      "extenders": 1,
+      "chord_names": 0,
+      "system_delimiters": {
+        "SystemStartBrace": 3
+      }
+    },
+    "lilypond_warnings": [],
+    "lyric_syllables_found_in_engraving": 1.0,
+    "lyric_syllables": 28,
+    "pages_planned": 1,
+    "image_only": {
+      "clean.pdf": true,
+      "scan.pdf": true,
+      "scan-severe.pdf": true
+    }
+  }
+}

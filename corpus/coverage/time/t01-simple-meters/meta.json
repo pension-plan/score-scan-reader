@@ -1,0 +1,420 @@
+{
+  "id": "t01-simple-meters",
+  "family": "time",
+  "title": "Simple Meters (flute)",
+  "composer": "OMR coverage suite (CC0)",
+  "lyricist": "",
+  "symbols": [
+    "barline-final",
+    "beam",
+    "clef-treble",
+    "dot",
+    "flag",
+    "key-s1",
+    "note-8th",
+    "note-half",
+    "note-quarter",
+    "pickup",
+    "system-break",
+    "tempo-mark",
+    "tie",
+    "tie-across-system",
+    "time-2-2",
+    "time-2-4",
+    "time-3-2",
+    "time-3-4",
+    "time-4-4",
+    "time-5-4",
+    "time-change",
+    "x-time-courtesy"
+  ],
+  "target_symbols": [
+    "time-2-4",
+    "time-3-4",
+    "time-4-4",
+    "time-5-4",
+    "time-2-2",
+    "time-3-2",
+    "time-change",
+    "x-time-courtesy",
+    "pickup",
+    "tie",
+    "tie-across-system"
+  ],
+  "layout": "melody",
+  "expected": {
+    "parts": [
+      "Flute"
+    ],
+    "must_not_split": false,
+    "notes": "One flute staff, 13 measures (quarter-note pickup = measure 0, implicit). The meter changes in every bar after m1, cycling twice through numeric 2/4 (m0, m7), 3/4 (m2, m8), 4/4 printed as numbers NOT C (m3, m9), 5/4 (m4, m10), 2/2 printed as numbers NOT cut (m5, m11) and 3/2 (m6, m12): 12 time signatures, 11 changes; m4, m6, m9 and m11 start systems, so courtesy signatures end the previous systems. Ties a' m3->m4, e'' m5->m6, d'' m8->m9 and c'' m10->m11 each cross a system break AND a meter change. Key G major.",
+    "lyrics": [],
+    "measures": 13,
+    "first_measure_number": 0
+  },
+  "counts": {
+    "barline-final": 1,
+    "beam": 3,
+    "clef-treble": 1,
+    "dot": 3,
+    "flag": 2,
+    "key-s1": 1,
+    "note-8th": 12,
+    "note-half": 12,
+    "note-quarter": 17,
+    "pickup": 1,
+    "system-break": 4,
+    "tempo-mark": 1,
+    "tie": 4,
+    "tie-across-system": 4,
+    "time-2-2": 2,
+    "time-2-4": 2,
+    "time-3-2": 2,
+    "time-3-4": 2,
+    "time-4-4": 2,
+    "time-5-4": 2,
+    "time-change": 11,
+    "x-time-courtesy": 4
+  },
+  "count_locations": {
+    "barline-final": [
+      "12"
+    ],
+    "beam": [
+      "1",
+      "2",
+      "7"
+    ],
+    "clef-treble": [
+      "0"
+    ],
+    "dot": [
+      "3",
+      "6",
+      "10"
+    ],
+    "flag": [
+      "3",
+      "6"
+    ],
+    "key-s1": [
+      "0"
+    ],
+    "note-8th": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "2",
+      "2",
+      "3",
+      "6",
+      "7",
+      "7",
+      "7",
+      "7"
+    ],
+    "note-half": [
+      "5",
+      "5",
+      "6",
+      "6",
+      "8",
+      "9",
+      "10",
+      "11",
+      "11",
+      "12",
+      "12",
+      "12"
+    ],
+    "note-quarter": [
+      "0",
+      "2",
+      "2",
+      "3",
+      "3",
+      "3",
+      "4",
+      "4",
+      "4",
+      "4",
+      "4",
+      "6",
+      "8",
+      "9",
+      "9",
+      "10",
+      "10"
+    ],
+    "pickup": [
+      "0"
+    ],
+    "system-break": [
+      "4",
+      "6",
+      "9",
+      "11"
+    ],
+    "tempo-mark": [
+      "0"
+    ],
+    "tie": [
+      "3",
+      "5",
+      "8",
+      "10"
+    ],
+    "tie-across-system": [
+      "4",
+      "6",
+      "9",
+      "11"
+    ],
+    "time-2-2": [
+      "5",
+      "11"
+    ],
+    "time-2-4": [
+      "0",
+      "7"
+    ],
+    "time-3-2": [
+      "6",
+      "12"
+    ],
+    "time-3-4": [
+      "2",
+      "8"
+    ],
+    "time-4-4": [
+      "3",
+      "9"
+    ],
+    "time-5-4": [
+      "4",
+      "10"
+    ],
+    "time-change": [
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11",
+      "12"
+    ],
+    "x-time-courtesy": [
+      "4",
+      "6",
+      "9",
+      "11"
+    ]
+  },
+  "counting_rules": {
+    "note-<type>": "one per pitched, non-grace, non-cue <note> element with that <type> (chord members count individually, tie continuations count)",
+    "dot / double-dot": "one per pitched, non-grace notehead (<note> element, chord members individually) with exactly one / two <dot/>; dotted rests are counted only as rest-dotted",
+    "chord": "one per chord (a <note> followed by <chord/> members)",
+    "beam": "one per beam group (level-1 <beam>begin</beam> on a non-chord-member note)",
+    "flag": "one per stem (non-grace, non-chord-member note of type eighth or shorter) without any <beam>",
+    "ledger-above / ledger-below": "one per notehead that needs ledger lines above / below its staff (position computed from pitch and the clef in force)",
+    "grace / grace-slash": "one per grace <note> element / with slash=\"yes\"",
+    "rest-<type>": "one per non-measure <rest> with that <type>",
+    "rest-dotted": "one per dotted non-measure rest",
+    "rest-whole-bar": "one per <rest measure=\"yes\"> not inside a multi-bar rest block",
+    "rest-multibar": "one per <multiple-rest> block",
+    "clef-<kind>": "one per <clef> element (initial clefs included; a piano grand staff has two)",
+    "clef-change": "one per <clef> element after the first measure's initial attributes",
+    "key-0 / key-sN / key-fN": "one per <key> element (per part)",
+    "key-change": "one per <key> element after measure 1",
+    "acc-<kind>": "one per <accidental> element; acc-courtesy = cautionary/parenthesized accidentals",
+    "time-<n>-<d>": "one per <time> element printed as numbers (per part; a grand staff prints it on both staves but the truth has one <time>); 4/4 and 2/2 printed as C / cut are time-common / time-cut, NOT time-4-4 / time-2-2",
+    "time-change": "one per <time> element after the first measure of the part",
+    "x-time-courtesy": "one per <time> in the first measure of a system (after the first system): the engraving ALSO prints a courtesy copy at the end of the previous system, which has no element of its own in the truth (the count tells how many extra time-signature glyphs are printed per part)",
+    "pickup": "one per part whose first measure is implicit=\"yes\" (anacrusis)",
+    "tuplet-<n>": "one per tuplet group (<tuplet type=\"start\">, every nesting level) by its actual number (tuplet-actual/tuplet-number, else time-modification/actual-notes); 4:3 quadruplets are x-tuplet-4",
+    "tuplet-nested": "one per tuplet group nested inside another tuplet (<tuplet number=\"2\"> or deeper)",
+    "tie": "one per <tied type=\"start\"> (per notehead: a 3-note chord tie counts 3)",
+    "tie-across-system": "ties whose stop lies after a system break (print new-system OR new-page) relative to the start; x-tie-across-page = the subset across a page break",
+    "slur": "one per <slur type=\"start\">",
+    "staccato/accent/tenuto/fermata/...": "one per notation element",
+    "dyn-<x>": "one per dynamics element",
+    "tempo-mark": "one per bold <words> direction at a measure start (engraved with \\tempo)",
+    "rehearsal-mark": "one per <rehearsal>",
+    "barline-<x> / repeat-<x>": "one per <barline> of that style",
+    "system-break / page-break": "one per <print new-system=\"yes\"> / <print new-page=\"yes\"> (part 1 only)",
+    "multi-page": "1 when the truth has at least one page break",
+    "lyrics": "one per <lyric> element (syllable)",
+    "lyrics-hyphen": "one per syllable with syllabic begin/middle (a hyphen follows)",
+    "lyrics-extender": "one per <extend/>",
+    "lyrics-melisma": "one per syllable sung on more than one attack (a later non-tied note of the same voice before the next syllable of that verse)",
+    "lyrics-multi-verse": "number of lyric lines (verses) when more than one",
+    "stem-up / stem-down": "one per stem (non-chord-member, non-grace note shorter than a whole), counted ONLY when the truth gives <stem> for every such note (two voices on one staff); otherwise absent because stem direction is left to the engraver"
+  },
+  "notes": [
+    "Courtesy time signatures that LilyPond prints at the end of a system before a meter change are NOT separate <time> elements in the truth (MusicXML has no courtesy-time element; the change is the <time> in the first measure of the next system). Do not count them as extra time changes.",
+    "Ties are per notehead (<tie>/<tied> on each tied chord member). A tie across a system or page break is engraved as two half-ties (one at the end of the first system, one at the start of the next); the truth has ONE tie (start on the last note of the system, stop on the first note of the next).",
+    "Stem directions are not in the truth for single-voice staves (LilyPond chooses them); stem-up / stem-down are therefore neither listed nor counted for this item.",
+    "<beam> elements reproduce the engraved beam groups exactly (manual beaming, \\autoBeamOff); a rest inside a beam carries no <beam>.",
+    "Counts follow meta.counting_rules: time-4-4 / time-2-2 count numeric signatures only, C and cut count as time-common / time-cut; a piano grand staff prints each time signature on both staves but the truth (and the count) has one <time> per measure."
+  ],
+  "degradations": {
+    "scan.pdf": {
+      "seed": 730101,
+      "render_dpi": 300,
+      "dpi": 300,
+      "color": "gray",
+      "format": "jpeg",
+      "jpeg_quality": 70,
+      "jpeg_passes": 1,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            246,
+            246,
+            243
+          ],
+          "texture": 2
+        },
+        {
+          "op": "rotate",
+          "deg": 0.6,
+          "bg": 235
+        },
+        {
+          "op": "blur",
+          "sigma": 0.4
+        },
+        {
+          "op": "noise",
+          "sigma": 3
+        }
+      ],
+      "tags": [
+        "paper_texture",
+        "rotation_+0.6deg",
+        "blur",
+        "noise",
+        "jpeg_q70"
+      ],
+      "output_pages": 1,
+      "pixel_size": [
+        2519,
+        3534
+      ],
+      "image_mode": "L",
+      "bytes": 498318,
+      "image_only_check": {
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "pages": 1,
+        "text_chars": 0
+      },
+      "op_log": []
+    },
+    "scan-severe.pdf": {
+      "seed": 730102,
+      "render_dpi": 150,
+      "dpi": 150,
+      "color": "gray",
+      "format": "png1",
+      "jpeg_quality": null,
+      "jpeg_passes": null,
+      "ops": [
+        {
+          "op": "ink_weight",
+          "px": 1
+        },
+        {
+          "op": "paper",
+          "rgb": [
+            248,
+            248,
+            248
+          ]
+        },
+        {
+          "op": "rotate",
+          "deg": -4.0,
+          "bg": 255
+        },
+        {
+          "op": "binarize",
+          "threshold": 175,
+          "pre_blur": 1.0,
+          "noise": 22
+        },
+        {
+          "op": "saltpepper",
+          "amount": 0.002
+        }
+      ],
+      "tags": [
+        "ink_weight",
+        "rotation_-4deg",
+        "binarized_photocopy_thick",
+        "saltpepper"
+      ],
+      "output_pages": 1,
+      "pixel_size": [
+        1361,
+        1838
+      ],
+      "image_mode": "1",
+      "bytes": 33818,
+      "image_only_check": {
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "pages": 1,
+        "text_chars": 0
+      },
+      "op_log": []
+    }
+  },
+  "dpi": 300,
+  "pages": 1,
+  "license": "CC0",
+  "license_detail": "CC0-1.0 (music composed for this corpus; engraving, truth and scans CC0)",
+  "source": "Composed for this corpus (CC0).",
+  "files": {
+    "truth": "truth.musicxml",
+    "engraving": "engraving.ly",
+    "clean": "clean.pdf",
+    "scan": "scan.pdf",
+    "scan_severe": "scan-severe.pdf",
+    "attribution": "ATTRIBUTION.txt"
+  },
+  "clean": {
+    "dpi": 300,
+    "pages": 1,
+    "ops": [],
+    "note": "undamaged raster render",
+    "image_only": true,
+    "fonts": [],
+    "images": 1,
+    "text_chars": 0
+  },
+  "validation": {
+    "truth_xsd_valid": true,
+    "engraving_event_dump_matches_truth": true,
+    "engraving_events_compared": 51,
+    "lyric_events_compared": 0,
+    "time_signatures_compared": 12,
+    "tuplet_brackets_match_truth": true,
+    "tuplet_brackets_compared": 0,
+    "midi_attacks_match_truth": true,
+    "midi_attacks": 37,
+    "music21_reparse_matches_model": true,
+    "lyric_text_found_in_engraving": null,
+    "lilypond_warnings": [],
+    "method": "LilyPond event-dump engraver (tsynth/dump.ly) compared with the model the truth is written from: every note/rest (onset, pitch, notated type, dots, tuplet scale incl. nested products), ties, beam starts/stops, slurs, fermatas, lyric syllables/hyphens/extenders, bar numbers/measure positions and every printed time-signature grob (fraction + C/numbered style) per staff; every printed TupletBracket (onset, ratio, visible or not) vs the truth bracket attribute; LilyPond MIDI attack multiset; music21 re-parse of truth.musicxml; xmllint XSD. Counts are read back from truth.musicxml by tsynth/counts.py."
+  },
+  "generator": "corpus/coverage/time/_tools/run_all.py (tsynth/items.py, catalog.py, build.py, scan.py)"
+}

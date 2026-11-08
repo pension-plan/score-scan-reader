@@ -52,11 +52,11 @@
       (let ((fr (ly:grob-property grob 'fraction)))
         (tc-out ctx "timesig" (car fr) (cdr fr) (ly:grob-property grob 'style))))
      ((clef-interface engraver grob source-engraver)
-      (if (eq? (grob::name grob) 'Clef)
+      (if (and (eq? (grob::name grob) 'Clef) (eq? #t (ly:grob-property-data grob 'non-default)))
           (tc-out ctx "clef" (ly:context-property ctx 'clefGlyph) (ly:context-property ctx 'clefPosition)
                   (ly:context-property ctx 'clefTransposition))))
      ((key-signature-interface engraver grob source-engraver)
-      (if (eq? (grob::name grob) 'KeySignature)
+      (if (and (eq? (grob::name grob) 'KeySignature) (eq? #t (ly:grob-property-data grob 'non-default)))
           (let ((alist (ly:grob-property grob 'alteration-alist)))
             (tc-out ctx "key"
                     (apply + (map (lambda (x) (let ((a (cdr x))) (if (> a 0) 1 (if (< a 0) -1 0)))) alist)))))))))

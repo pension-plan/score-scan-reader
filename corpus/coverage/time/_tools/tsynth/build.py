@@ -1,4 +1,5 @@
-"""Build one rhythm-challenge item:
+"""[coverage/time copy of corpus/challenge/rhythm/_tools/rsynth/build.py]
+Build one coverage item (family 'time'):
   truth.musicxml (model -> MusicXML 4.0, XSD-validated)
   engraving.ly   (model -> LilyPond, explicit beams / breaks)
   verification   (LilyPond event dump == model; MIDI attacks == truth; music21 re-parse
@@ -21,10 +22,11 @@ from PIL import Image
 from . import scan as S
 from . import verify as V
 from .lily import LilyWriter
+from .counts import COUNT_RULES, count_all
 from .model import check, compute_extenders, fix_unbalanced_slurs, sanitize_ties, voices_with_lyrics
 from .mxl import write_musicxml
 
-ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))   # corpus/challenge/rhythm
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))   # corpus/coverage/time
 CLEAN_DPI = 300
 
 
@@ -90,6 +92,7 @@ def build_item(item: dict, keep_work=False):
         eng = V.compare_engraving(score, layout, evp)
         midi = V.compare_midi(score, mid)
         m21 = V.compare_music21(score, truth)
+        brk = V.compare_brackets(score, evp)
         lyr = lyric_text_check(score, pdf)
         rc_, info, _ = run(['pdfinfo', pdf])
         vec_pages = int(re.search(r'Pages:\s+(\d+)', info).group(1))
@@ -97,7 +100,7 @@ def build_item(item: dict, keep_work=False):
         bad_warn = [w for w in warns if not re.search(r'already have slur', w)]
         log['validation'] = {'xsd': xsd, 'engraving_vs_truth': eng, 'midi': midi, 'music21_truth_reparse': m21,
                              'lyric_text_found_in_engraving': lyr, 'lilypond_warnings': warns,
-                             'vector_pages': vec_pages}
+                             'vector_pages': vec_pages, 'tuplet_brackets': brk}
         problems = []
         if not xsd['ok']:
             problems.append('xsd')
@@ -107,6 +110,8 @@ def build_item(item: dict, keep_work=False):
             problems.append('midi != truth')
         if not m21['ok']:
             problems.append('music21 reparse != truth')
+        if not brk['ok']:
+            problems.append('tuplet brackets printed != truth bracket attribute')
         if bad_warn:
             problems.append('lilypond warnings: ' + '; '.join(bad_warn[:5]))
         if lyr is not None and lyr < 1.0:
@@ -142,6 +147,8 @@ def build_item(item: dict, keep_work=False):
                            'pixel_size': list(imgs[0].size), 'image_mode': imgs[0].mode,
                            'bytes': os.path.getsize(outp), 'image_only_check': io_, 'op_log': oplog}
         # metadata
+        counts, where = count_all(truth)
+        symbols = sorted(k for k, v in counts.items() if v)
         lyr_parts = [{'part': score.part(pid).name, 'voice': vk, 'verses': len(vs)}
                      for pid, vk, vs in voices_with_lyrics(score)]
         exp = dict(item['expected'])
@@ -149,21 +156,26 @@ def build_item(item: dict, keep_work=False):
         exp['measures'] = len(score.measures)
         exp['first_measure_number'] = score.measures[0].number
         main = degr['scan.pdf']
+        notes = list(item.get('truth_limitations', []))
         meta = {
-            'id': iid, 'category': 'rhythm', 'title': item['title'],
+            'id': iid, 'family': 'time', 'title': item['title'],
             'composer': score.composer, 'lyricist': score.lyricist,
-            'edge_cases': item['edge_cases'],
+            'symbols': symbols,
+            'target_symbols': item['targets'],
+            'layout': item['layout'],
             'expected': exp,
-            'truth_limitations': item.get('truth_limitations', []),
+            'counts': counts,
+            'count_locations': where,
+            'counting_rules': COUNT_RULES,
+            'notes': notes,
             'degradations': degr,
             'dpi': main['dpi'],
-            'license': item['license'],
-            'source': item['source'],
             'pages': vec_pages,
+            'license': 'CC0',
+            'license_detail': item['license'],
+            'source': item['source'],
             'files': {'truth': 'truth.musicxml', 'engraving': 'engraving.ly', 'clean': 'clean.pdf',
-                      'scan': 'scan.pdf', 'scan_mild': 'scan-mild.pdf' if 'scan-mild.pdf' in degr else None,
-                      'scan_severe': 'scan-severe.pdf' if 'scan-severe.pdf' in degr else None,
-                      'attribution': 'ATTRIBUTION.txt'},
+                      'scan': 'scan.pdf', 'scan_severe': 'scan-severe.pdf', 'attribution': 'ATTRIBUTION.txt'},
             'clean': files['clean.pdf'],
             'validation': {
                 'truth_xsd_valid': xsd['ok'],
@@ -171,18 +183,21 @@ def build_item(item: dict, keep_work=False):
                 'engraving_events_compared': sum(v['n_expected'] for v in eng['voices'].values()),
                 'lyric_events_compared': sum(v.get('n_expected', 0) for v in eng['lyrics'].values()),
                 'time_signatures_compared': sum(v['n_expected'] for v in eng['timesig'].values()),
+                'tuplet_brackets_match_truth': brk['ok'], 'tuplet_brackets_compared': brk['n_expected'],
                 'midi_attacks_match_truth': midi['ok'], 'midi_attacks': midi['expected_attacks'],
-                'midi_grace_notes_excluded': midi['grace_notes'],
                 'music21_reparse_matches_model': m21['ok'],
                 'lyric_text_found_in_engraving': lyr,
                 'lilypond_warnings': warns,
-                'method': 'LilyPond event-dump engraver (rsynth/dump.ly) compared with the model the truth is '
-                          'written from: every note/rest/multi-bar rest (onset, pitch, notated type, dots, '
-                          'tuplet scale), grace offsets, ties, beam starts/stops, slurs, fermatas, lyric '
-                          'syllables/hyphens/extenders, bar numbers/measure positions and time signatures; '
-                          'plus MIDI attack multiset and a music21 re-parse of truth.musicxml.',
+                'method': 'LilyPond event-dump engraver (tsynth/dump.ly) compared with the model the truth is '
+                          'written from: every note/rest (onset, pitch, notated type, dots, tuplet scale incl. '
+                          'nested products), ties, beam starts/stops, slurs, fermatas, lyric syllables/hyphens/'
+                          'extenders, bar numbers/measure positions and every printed time-signature grob '
+                          '(fraction + C/numbered style) per staff; every printed TupletBracket (onset, ratio, '
+                          'visible or not) vs the truth bracket attribute; LilyPond MIDI attack multiset; '
+                          'music21 re-parse of truth.musicxml; xmllint XSD. Counts are read back from '
+                          'truth.musicxml by tsynth/counts.py.',
             },
-            'generator': 'corpus/challenge/rhythm/_tools/run_all.py (rsynth/items.py, build.py, scan.py)',
+            'generator': 'corpus/coverage/time/_tools/run_all.py (tsynth/items.py, catalog.py, build.py, scan.py)',
         }
         with open(os.path.join(outdir, 'meta.json'), 'w') as f:
             json.dump(meta, f, indent=2, default=str, ensure_ascii=False)

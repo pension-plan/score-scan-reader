@@ -82,8 +82,9 @@ class LilyWriter:
         self.staff_ids = []
         for seg in segs:
             ids = {}
-            for g in seg['groups']:
-                for st in g['staves']:
+            from .notation import iter_staves
+            for st in iter_staves(seg['groups']):
+                if True:
                     for pid, vk in st['voices']:
                         sn = score.part(pid).voice(vk).staff
                         ids.setdefault((pid, sn), st['id'])
@@ -290,9 +291,12 @@ class LilyWriter:
                 out.append(f'\\change Staff = "{self._ids[(self._pid, want)]}"')
                 self._cur_staff = want
             # explicit stems (decided by notation.prepare for every stemmed note)
-            if ev.kind == 'note' and ev.stem_dir and ev.stem_dir != self._stem:
-                out.append({'up': '\\stemUp', 'down': '\\stemDown'}[ev.stem_dir])
-                self._stem = ev.stem_dir
+            if ev.kind == 'note' and ev.stem_dir:
+                # kneed cross-staff beams: LilyPond's own knee (verified against the truth by the grob log)
+                want = None if getattr(ev, 'stem_auto', False) else ev.stem_dir
+                if want != self._stem:
+                    out.append({'up': '\\stemUp', 'down': '\\stemDown', None: '\\stemNeutral'}[want])
+                    self._stem = want
             # cue size
             if ev.cue and not self._cue:
                 out.append('\\set fontSize = #-4')
@@ -422,6 +426,30 @@ class LilyWriter:
             lines.append(' '.join(cur))
         return '\n      '.join(lines)
 
+    def group_ly(self, si, g, ind0):
+        L = []
+        gt = g.get('type')
+        ind = ind0
+        if gt:
+            with_ = []
+            if g.get('name'):
+                with_.append(f'instrumentName = {self._markup_name(g["name"])}')
+            if g.get('short'):
+                with_.append(f'shortInstrumentName = {self._markup_name(g["short"])}')
+            with_ += g.get('with', [])
+            w = (' \\with { ' + ' '.join(with_) + ' }') if with_ else ''
+            L.append(f'{ind0}\\new {gt}{w} <<')
+            ind = ind0 + '  '
+        for st in g['staves']:
+            if 'staves' in st:
+                L.extend(self.group_ly(si, st, ind))
+                continue
+            L.append(self.staff_ly(si, st, ind))
+            L.extend(self.lyrics_ly(si, st, ind))
+        if gt:
+            L.append(f'{ind0}>>')
+        return L
+
     # ------------------------------------------------------------------ chord symbols
     def chordnames(self, seg_idx):
         s = self.s
@@ -531,23 +559,7 @@ class LilyWriter:
             if chn:
                 L.append(chn)
             for g in seg['groups']:
-                gt = g.get('type')
-                ind = '    '
-                if gt:
-                    with_ = []
-                    if g.get('name'):
-                        with_.append(f'instrumentName = {self._markup_name(g["name"])}')
-                    if g.get('short'):
-                        with_.append(f'shortInstrumentName = {self._markup_name(g["short"])}')
-                    with_ += g.get('with', [])
-                    w = (' \\with { ' + ' '.join(with_) + ' }') if with_ else ''
-                    L.append(f'    \\new {gt}{w} <<')
-                    ind = '      '
-                for st in g['staves']:
-                    L.append(self.staff_ly(si, st, ind))
-                    L.extend(self.lyrics_ly(si, st, ind))
-                if gt:
-                    L.append('    >>')
+                L.extend(self.group_ly(si, g, '    '))
             L.append('  >>')
             L.append('  \\layout {')
             if seg.get('staff_size'):
@@ -558,7 +570,8 @@ class LilyWriter:
                 L.append('    ' + x)
             L.append('  }')
             L.append('  \\midi { \\tempo 4 = 90 \\context { \\Staff \\remove "Staff_performer" } '
-                     '\\context { \\Voice \\consists "Staff_performer" } }')
+                     '\\context { \\Voice \\consists "Staff_performer" } '
+                     '\\context { \\ChordNames \\remove "Note_performer" } }')
             L.append('}')
         for x in o.get('after_markup', []):
             L.append(x)

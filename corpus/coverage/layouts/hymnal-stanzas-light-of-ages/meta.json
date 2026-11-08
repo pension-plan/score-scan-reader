@@ -1,0 +1,358 @@
+{
+  "id": "hymnal-stanzas-light-of-ages",
+  "family": "layouts",
+  "title": "Light of Ages - hymnal page: closed SATB with four stanzas between the staves",
+  "layout": "hymnal-stanzas",
+  "symbols": [
+    "clef-bass",
+    "clef-treble",
+    "fermata",
+    "key-s1",
+    "ledger-above",
+    "ledger-below",
+    "lyrics",
+    "lyrics-hyphen",
+    "lyrics-multi-verse",
+    "metronome",
+    "note-quarter",
+    "pickup",
+    "stem-down",
+    "stem-up",
+    "system-break",
+    "tempo-mark",
+    "time-4-4",
+    "x-group-bracket",
+    "x-measures",
+    "x-parts",
+    "x-staves"
+  ],
+  "counts": {
+    "clef-bass": 2,
+    "clef-treble": 2,
+    "fermata": 16,
+    "key-s1": 1,
+    "ledger-above": 3,
+    "ledger-below": 9,
+    "lyrics": 128,
+    "lyrics-hyphen": 11,
+    "lyrics-multi-verse": 96,
+    "metronome": 1,
+    "note-quarter": 128,
+    "pickup": 1,
+    "stem-down": 64,
+    "stem-up": 64,
+    "system-break": 1,
+    "tempo-mark": 1,
+    "time-4-4": 1,
+    "x-group-bracket": 1,
+    "x-measures": 9,
+    "x-parts": 4,
+    "x-staves": 4
+  },
+  "expected": {
+    "parts": [
+      "Soprano",
+      "Alto",
+      "Tenor",
+      "Bass"
+    ],
+    "must_not_split": false,
+    "shared_staves": [
+      [
+        "Soprano",
+        "Alto"
+      ],
+      [
+        "Tenor",
+        "Bass"
+      ]
+    ],
+    "staves_per_part": {
+      "Soprano": 1,
+      "Alto": 1,
+      "Tenor": 1,
+      "Bass": 1
+    },
+    "lyrics": [
+      {
+        "part": "Soprano",
+        "verses": 4
+      }
+    ],
+    "notes": "FOUR parts (Soprano, Alto, Tenor, Bass) in hymnal closed score without part names: S+A share the treble staff, T+B the bass staff (split by stem direction). FOUR stanzas are interlined between the staves (lyric lines 1-4, numbered \"1.\"-\"4.\" at the start), aligned to the Soprano. Pickup measure, fermatas at the line ends, no bar numbers."
+  },
+  "notes": [
+    "All four stanzas are encoded on the Soprano (<lyric number=\"1\"..\"4\">); stanza numbers are not encoded."
+  ],
+  "layout_description": "A4 portrait, staff size 19, 2 systems (pickup + 4, 4 measures), lyrics between the staves",
+  "pages": 1,
+  "measures": 9,
+  "systems": 2,
+  "noteheads_in_truth": 128,
+  "hidden_staff_segments": [],
+  "dpi": 300,
+  "degradations": {
+    "clean.pdf": {
+      "seed": null,
+      "dpi": 300,
+      "format": "png (8-bit grey)",
+      "summary": "undamaged raster of the engraving",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "size_px": [
+            2481,
+            3508
+          ]
+        }
+      ],
+      "bytes": 167579
+    },
+    "scan.pdf": {
+      "seed": 7151,
+      "render_dpi": 300,
+      "dpi": 300,
+      "format": "jpeg q75",
+      "colour": "gray",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            2481,
+            3508
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              2
+            ],
+            [
+              "skew_rotation_deg",
+              0.6
+            ],
+            [
+              "focus_blur_sigma",
+              0.4
+            ],
+            [
+              "gaussian_noise_sigma",
+              3
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 300,
+        "mode": "gray",
+        "texture": 2,
+        "rotate": 0.6,
+        "blur": 0.4,
+        "noise": 3,
+        "jpeg": 75
+      },
+      "summary": "300 dpi grey flatbed scan, 0.6 deg skew, light paper texture and noise, JPEG q75",
+      "bytes": 653762
+    },
+    "scan-severe.pdf": {
+      "seed": 7152,
+      "render_dpi": 150,
+      "dpi": 150,
+      "format": "jpeg q30",
+      "colour": "rgb",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1241,
+            1754
+          ],
+          "ops": [
+            [
+              "pencil_annotations",
+              {
+                "circled": [
+                  [
+                    966,
+                    513
+                  ],
+                  [
+                    474,
+                    509
+                  ]
+                ],
+                "marks": [
+                  [
+                    159,
+                    494
+                  ],
+                  [
+                    803,
+                    966
+                  ],
+                  [
+                    949,
+                    347
+                  ]
+                ],
+                "texts": [
+                  [
+                    "rit.",
+                    403,
+                    923
+                  ],
+                  [
+                    "breathe",
+                    559,
+                    518
+                  ],
+                  [
+                    "p!",
+                    440,
+                    354
+                  ]
+                ],
+                "lines": 1
+              }
+            ],
+            [
+              "bleed_through",
+              {
+                "strength": 0.12,
+                "shift_px": 3
+              }
+            ],
+            [
+              "paper_texture",
+              6
+            ],
+            [
+              "paper_colour",
+              [
+                236,
+                226,
+                198
+              ]
+            ],
+            [
+              "stains",
+              {
+                "coffee": [
+                  [
+                    776,
+                    1016,
+                    124
+                  ]
+                ],
+                "foxing": 40
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              2.0
+            ],
+            [
+              "focus_blur_sigma",
+              0.7
+            ],
+            [
+              "gaussian_noise_sigma",
+              6
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 150,
+        "mode": "rgb",
+        "paper_rgb": [
+          236,
+          226,
+          198
+        ],
+        "texture": 6,
+        "bleed": 0.12,
+        "foxing": {
+          "n": 40
+        },
+        "coffee": {
+          "n": 1,
+          "r": 0.1,
+          "strength": 0.9
+        },
+        "pencil": {
+          "circles": 2,
+          "marks": 3,
+          "texts": [
+            "rit.",
+            "breathe",
+            "p!"
+          ],
+          "lines": 1
+        },
+        "rotate": 2.0,
+        "blur": 0.7,
+        "noise": 6,
+        "jpeg": 30
+      },
+      "summary": "old yellowed copy: bleed-through, foxing, coffee ring, pencil annotations, 150 dpi colour, 2 deg skew, JPEG q30",
+      "bytes": 122835
+    }
+  },
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "scan-severe.pdf",
+    "scan.pdf",
+    "truth.musicxml"
+  ],
+  "license": "CC0",
+  "license_detail": "CC0-1.0: composition, arrangement, engraving and scans",
+  "source": "self-authored for the coverage suite (2026)",
+  "engraver": "internal model -> LilyPond 2.24 (coverage-suite writer: explicit beams and stems)",
+  "validation": {
+    "xsd_valid": true,
+    "music21_parse": "4 128",
+    "midi_attacks_match_truth": true,
+    "attacks": 128,
+    "grob_log_matches_truth": true,
+    "printed_summary": {
+      "noteheads": 128,
+      "stems_up": 64,
+      "stems_down": 64,
+      "accidentals": 0,
+      "rests": 0,
+      "beams": 0,
+      "flags": 0,
+      "slurs": 0,
+      "ties": 0,
+      "scripts": {
+        "fermata": 16
+      },
+      "dynamics": {},
+      "lyric_syllables": 128,
+      "hyphens": 11,
+      "extenders": 0,
+      "chord_names": 0,
+      "system_delimiters": {
+        "SystemStartBracket": 2
+      }
+    },
+    "lilypond_warnings": [],
+    "lyric_syllables_found_in_engraving": 1.0,
+    "lyric_syllables": 128,
+    "pages_planned": 1,
+    "image_only": {
+      "clean.pdf": true,
+      "scan.pdf": true,
+      "scan-severe.pdf": true
+    }
+  }
+}

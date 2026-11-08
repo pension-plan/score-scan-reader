@@ -162,6 +162,23 @@ def image_only(pdf):
 
 
 
+def _dilate(m):
+    out = m.copy()
+    out[1:, :] |= m[:-1, :]
+    out[:-1, :] |= m[1:, :]
+    o2 = out.copy()
+    o2[:, 1:] |= out[:, :-1]
+    o2[:, :-1] |= out[:, 1:]
+    return o2
+
+
+def twin_diff(a, b):
+    """fraction of pixels that are ink in one render but have no ink within 1 px in the other
+    (tolerates anti-aliasing differences of the coloured note heads, catches any layout shift)"""
+    ma, mb = a < 200, b < 200
+    return float(np.mean((ma & ~_dilate(mb)) | (mb & ~_dilate(ma))))
+
+
 def music21_check(path):
     code = ('import sys, music21\n'
             's = music21.converter.parse(sys.argv[1], format="musicxml")\n'
@@ -286,9 +303,11 @@ def build_item(item: dict, keep_work=False):
         # layout identity of instrumented twin
         g_clean = render_gray(pdf, 100, workdir, 'lc')
         g_inst = render_gray(pdf_i, 100, workdir, 'li')
-        log['twin_layout_diff'] = float(np.mean([np.mean((a < 200) != (b < 200))
-                                                 for a, b in zip(g_clean, g_inst)])) if len(g_clean) == len(g_inst) else 1.0
-        if log['twin_layout_diff'] > 0.0005:
+        log['twin_layout_diff_exact'] = float(np.mean([np.mean((a < 200) != (b < 200))
+                                                       for a, b in zip(g_clean, g_inst)])) if len(g_clean) == len(g_inst) else 1.0
+        log['twin_layout_diff'] = float(np.mean([twin_diff(a, b) for a, b in zip(g_clean, g_inst)])) \
+            if len(g_clean) == len(g_inst) else 1.0
+        if log['twin_layout_diff'] > 0.0002:
             raise RuntimeError(f'instrumented layout differs: {log["twin_layout_diff"]}')
         shutil.copy(ly, os.path.join(outdir, 'engraving.ly'))
         # clean raster

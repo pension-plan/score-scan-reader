@@ -74,6 +74,9 @@ function __omrSessionModule() {
     if (fr.gray) fr.gray = { width: fr.gray.width, height: fr.gray.height, data: null, released: true };
     fr.B = null;
     fr.L = null;
+    // a spread's halves hold their own copies (the converter's own release
+    // frees only the sheet)
+    (entry.spread || []).forEach(release);
   }
 
   // Area-average downscale of a gray page (for the on-screen copy).
@@ -98,11 +101,52 @@ function __omrSessionModule() {
     return { width: w, height: h, data: out };
   }
 
+  // A two-up spread (omr.js) is read as two pages: each half is cropped from
+  // the straightened sheet at x0, then may be rescaled and straightened again
+  // by its own front end. This maps a point of a half's frame back onto the
+  // sheet (the inverse of front.js clean(): resample, then rotateGray).
+  function halfToSheet(hfr, x0) {
+    const w = hfr.gray.width, h = hfr.gray.height, f = hfr.scale || 1;
+    const ang = hfr.skew && Math.abs(hfr.skew.angle || 0) >= 0.05 ? (-hfr.skew.angle * Math.PI) / 180 : 0;
+    const c = Math.cos(ang), s = Math.sin(ang), cx = (w - 1) / 2, cy = (h - 1) / 2;
+    return (x, y) => {
+      const dx = x - cx, dy = y - cy;
+      const rx = cx + c * dx - s * dy, ry = cy + s * dx + c * dy;
+      return [x0 + (rx + 0.5) / f - 0.5, (ry + 0.5) / f - 0.5];
+    };
+  }
+  // The halves of a spread entry that can be drawn on the sheet, in reading
+  // order (the order buildScore received them), each with its x offset.
+  function spreadHalves(entry) {
+    const halves = (entry && entry.spread) || [];
+    if (!halves.length) return null;
+    const W = entry.fr.gray.width;
+    const out = [];
+    for (const hv of halves) {
+      const hfr = hv.fr;
+      // a half that its own front end turned cannot be mapped back simply
+      if (!hfr || !hfr.gray || (hfr.orientation || 0) % 360) return null;
+      const right = hv.index - Math.floor(hv.index) > 0.25;
+      const x0 = typeof hv.x0 === 'number' ? hv.x0 : right ? W - hfr.gray.width / (hfr.scale || 1) : 0;
+      out.push({ hv, map: halfToSheet(hfr, x0) });
+    }
+    return out;
+  }
+
   // Plain, cloneable overlay data for one page, in the deskewed frame.
   function pageView(entry, index) {
     const fr = entry.fr;
     const W = fr.gray.width, H = fr.gray.height;
     const r1 = (v) => Math.round(v * 10) / 10;
+    // a spread's notes (and their parts) belong to its halves, so its heads
+    // are the halves' heads drawn back on the whole sheet
+    const halves = spreadHalves(entry);
+    const heads = halves
+      ? halves.flatMap(({ hv, map }) => (hv.fr.heads || []).map((h) => {
+        const [x, y] = map(h.x, h.y);
+        return [r1(x), r1(y), r1(((h.sp || hv.fr.ss) * 0.62) / (hv.fr.scale || 1))];
+      }))
+      : (fr.heads || []).map((h) => [r1(h.x), r1(h.y), r1((h.sp || fr.ss) * 0.62)]);
     const staves = fr.staves.map((st) => {
       const edge = (k) => {
         const pts = [];
@@ -117,10 +161,35 @@ function __omrSessionModule() {
       skew: (fr.skew && fr.skew.angle) || 0,
       staves,
       barlines: (fr.barlines || []).map((b) => [r1(b.x), r1(b.top), r1(b.bot)]),
-      heads: (fr.heads || []).map((h) => [r1(h.x), r1(h.y), r1((h.sp || fr.ss) * 0.62)]),
+      heads,
       nStaves: fr.staves.length,
-      nSystems: (entry.asm && entry.asm.systems && entry.asm.systems.length) || (fr.systems || []).length,
+      nSystems: halves
+        ? halves.reduce((a, { hv }) => a + ((hv.asm && hv.asm.systems && hv.asm.systems.length) || (hv.fr.systems || []).length), 0)
+        : (entry.asm && entry.asm.systems && entry.asm.systems.length) || (fr.systems || []).length,
+      // how the page was read: quarter turns (front end, or the converter's
+      // own retry), the clean-up mode, and the halves of a two-up spread
+      orientation: (((fr.orientation || 0) + 90 * (entry.turns || 0)) % 360 + 360) % 360,
+      mode: fr.mode || 'default',
+      spread: halves ? halves.length : 0,
     };
+  }
+
+  // Plain sentences about how a page was read, for its caption.
+  const MODE_NOTE = {
+    raw: 'Read without the noise filter, which would erase its thin staff lines.',
+    blur1: 'Smoothed before reading (a halftone screen or a broken photocopy).',
+    blur2: 'Smoothed strongly before reading (a coarse halftone screen or a broken photocopy).',
+  };
+  function pageNotes(v) {
+    const out = [];
+    if (!v) return out;
+    if (v.orientation === 180) out.push('The scan was upside down; it was read turned the right way up.');
+    else if (v.orientation === 90 || v.orientation === 270) out.push(`The scan was on its side; it was read turned a quarter ${v.orientation === 90 ? 'clockwise' : 'anticlockwise'}.`);
+    if (v.spread === 2) out.push('Two book pages side by side: the left page was read first, then the right.');
+    else if (v.spread === 1) out.push('Two book pages side by side: only one of them had staves.');
+    if (MODE_NOTE[v.mode]) out.push(MODE_NOTE[v.mode]);
+    if (Math.abs(v.skew || 0) >= 0.5) out.push(`Straightened by ${Math.abs(v.skew).toFixed(1)}°.`);
+    return out;
   }
 
   // Cloneable copy: plain objects and arrays to a depth, no functions or
@@ -153,11 +222,20 @@ function __omrSessionModule() {
       score: scoreSummary(res.score),
       lyricsBySystem: plain(res.lyricsBySystem, 6) || {},
       warnings: (res.warnings || []).slice(),
-      pages: res.pages.map((p) => ({
-        index: p.index,
-        parts: (p.fr.heads || []).map((h) => (h.parts ? h.parts.slice() : [])),
-      })),
+      pages: pageParts(res.pages),
     };
+  }
+  // Parts of each drawn head, per page shown. The halves of a spread (index
+  // i and i + 0.5) are one page on screen, so their lists join in reading
+  // order, the order pageView() draws their heads in.
+  function pageParts(pages) {
+    const by = new Map();
+    for (const p of pages.slice().sort((a, b) => a.index - b.index)) {
+      const k = Math.floor(p.index);
+      if (!by.has(k)) by.set(k, []);
+      for (const h of p.fr.heads || []) by.get(k).push(h.parts ? h.parts.slice() : []);
+    }
+    return [...by].map(([index, parts]) => ({ index, parts }));
   }
 
   // ------------------------------------------------------------ worker side
@@ -200,7 +278,7 @@ function __omrSessionModule() {
         const view = pageView(entry, m.i);
         const thumb = shrink(entry.fr.gray, m.maxW || 1400);
         // only a session that says what it can spare frees page buffers
-        if (session.releasePage) session.releasePage(entry);
+        if (session.releasePage) { session.releasePage(entry); (entry.spread || []).forEach((h) => session.releasePage(h)); }
         post({ t: 'page-done', i: m.i, ms: Date.now() - t0, view, thumb }, [thumb.data.buffer]);
       } else if (m.t === 'finish') {
         const res = session.finish();
@@ -210,6 +288,6 @@ function __omrSessionModule() {
     post({ t: 'alive' });
   }
 
-  return { createSession, release, shrink, pageView, plain, scoreSummary, resultSummary, workerMain };
+  return { createSession, release, shrink, pageView, pageNotes, plain, scoreSummary, resultSummary, workerMain };
 }
 if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessionModule;

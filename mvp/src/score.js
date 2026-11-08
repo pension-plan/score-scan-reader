@@ -504,6 +504,72 @@ function splitTwoVoices(chordal, sp, trust) {
   return out;
 }
 
+// Two voices inside one staff of a keyboard part (L17): a melody with stems
+// up over an accompaniment with stems down (or the reverse), printed in
+// the same columns but with their own note values. The chordal reading gives
+// every head of a column the shortest value there and loses a head shared by
+// both voices (one notehead, two stems). Split only on direct evidence that
+// two rhythms run at once: a head with both stems, or a column whose
+// up-stem and down-stem heads have different values. Voice 1 takes the
+// up-stem (and stemless) heads as chords, voice 2 the down-stem heads (a
+// shared head with the value read on its down stem). Voice 2's onsets are
+// taken from voice 1 where both have a column at the same x (simultaneous
+// notes are printed aligned); a hole before such an onset is a rest. Returns
+// {1, 2} or null (no evidence, or the voices do not line up: keep chordal).
+function keyboardVoices(chordal, rests, sp) {
+  let evidence = 0;
+  const up = [], dn = [];
+  for (const ev of chordal) {
+    const hs = ev.heads;
+    const u = hs.filter(h => h.stemDir !== -1), d = hs.filter(h => h.stemDir === -1 || h.stemDir === 2);
+    const qd = (h) => ((h.stemDir === 2 && h.dur.down) || h.dur);
+    // a shared head whose two stems carry different values
+    if (hs.some(h => h.stemDir === 2 && Math.abs(qd(h).q - h.dur.q) > EPS)) evidence++;
+    if (u.some(h => h.stemDir === 1) && d.some(h => h.stemDir === -1)) {
+      const a = Math.min(...u.map(h => h.dur.q)), b = Math.min(...d.map(h => qd(h).q));
+      if (Math.abs(a - b) > EPS) evidence++;
+    }
+    if (u.length) {
+      const q = Math.min(...u.map(h => h.dur.q)), h0 = u.find(h => Math.abs(h.dur.q - q) < EPS) || u[0];
+      up.push({ x: ev.x, heads: u, q, dots: h0.dur.dots });
+    }
+    if (d.length) {
+      const q = Math.min(...d.map(h => qd(h).q)), h0 = d.find(h => Math.abs(qd(h).q - q) < EPS) || d[0];
+      dn.push({ x: ev.x, heads: d, q, dots: qd(h0).dots, low: true });
+    }
+  }
+  if (process.env.KBDEBUG && evidence && up.length && dn.length) console.error('KB', evidence, 'v2notes', dn.length, 'both', chordal.filter(e => e.heads.some(h => h.stemDir === 2)).map(e => e.heads.filter(h => h.stemDir === 2).map(h => h.dur.q + '/' + (h.dur.down ? h.dur.down.q : '-')).join(',')).join(' '), 'mixed', chordal.filter(e => e.heads.some(h => h.stemDir === 1) && e.heads.some(h => h.stemDir === -1)).length);
+  // one sign and one lone lower note is as likely a stray stem or flag
+  if (!evidence || !up.length || !dn.length || (evidence < 2 && dn.length < 2 && !process.env.KBWEAK)) return null;
+  const v1 = mergeRests(up, rests, 1, sp);
+  const anchors = [];
+  let t = 0;
+  for (const e of v1) { if (e.x != null) anchors.push({ x: e.x, t }); t += e.q; }
+  const total = t, v2 = [];
+  // a hole in voice 2 shows as a rest only where a low rest is printed in
+  // it; keyboard engraving often leaves a resting inner voice unmarked, and
+  // an unprinted rest stays a hidden <forward>
+  const low = (rests || []).filter(r => r.pos > 2.4);
+  const fill = (q, xa, xb) => (low.some(r => r.x > xa && r.x < xb)
+    ? restsFor(q).map(v => ({ rest: true, glyph: true, q: v, dots: qToType(v) ? qToType(v).dots : 0, x: Number.isFinite(xb) ? xb - 0.5 * sp : undefined }))
+    : [{ forward: true, hidden: true, q }]);
+  let cur = 0, px = -Infinity;
+  for (const e of dn) {
+    const a = anchors.filter(z => Math.abs(z.x - e.x) <= 0.8 * sp).sort((p, q) => Math.abs(p.x - e.x) - Math.abs(q.x - e.x))[0];
+    if (a) {
+      if (a.t < cur - EPS) return null; // voice 2 would overlap itself
+      if (a.t > cur + EPS) v2.push(...fill(a.t - cur, px, e.x));
+      cur = a.t;
+    }
+    v2.push(e);
+    cur += e.q;
+    px = e.x;
+  }
+  if (cur > total + EPS) return null;
+  if (total - cur > EPS) v2.push(...fill(total - cur, px, Infinity));
+  return { 1: v1, 2: v2 };
+}
+
 // printed value of a note inside a tuplet (assemble.js h.dur.tuplet {actual,
 // normal}): q * actual / normal is the plain value it is drawn as
 const tupletOf = (e) => (!e.rest && e.heads && e.heads[0] && e.heads[0].dur && e.heads[0].dur.tuplet) || null;
@@ -544,13 +610,28 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   const trust = layout.stats.map(st => st.mix >= 0.25);
   // rests printed on each staff (rests.js) go into every voice at their x
   // position, so rhythm repair counts them
+  // streams written per part: one per source staff; a keyboard part also has
+  // an optional second voice on each staff (L17), empty unless that staff
+  // shows two rhythms at once in a bar. p.src stays the staff list.
+  parts.forEach(p => {
+    const multi = p.src.length > 1;
+    p.streams = p.src.map((s, k) => ({ ...s, staffNo: k + 1, vno: multi ? 1 + 4 * k : 1 }));
+    if (p.kind === 'keyboard') p.src.forEach((s, k) => p.streams.push({ staff: s.staff, voice: 'kb2', staffNo: k + 1, vno: 2 + 4 * k, optional: true }));
+  });
+  let kbSplit = 0;
   const segEv = segs.map(m => {
     const cache = {}, restCache = {};
-    return parts.map(p => p.src.map(src => {
+    return parts.map(p => p.streams.map(src => {
       const s = m.sy.staves[src.staff];
       if (!s) return [];
       const c = (cache[src.staff] ||= staffMeasureEvents(m.sy.fr, m.sy.fr.R, m.sy.comps, s, m.xa, m.xb));
       const rs = (restCache[src.staff] ||= m.sy.fr.R ? detectRests({ R: m.sy.fr.R, comps: m.sy.comps || [], s, xa: m.xa, xb: m.xb }) : []);
+      if (p.kind === 'keyboard' && !process.env.NOKB2) {
+        if (c.kb === undefined) { c.kb = keyboardVoices(c.chordal, rs, s.st.space); if (c.kb) kbSplit++; }
+        if (src.voice === 'kb2') return c.kb ? c.kb[2] : [];
+        if (c.kb) return c.kb[1];
+      }
+      if (src.voice === 'kb2') return [];
       if (src.voice === 1 || src.voice === 2) {
         c.split ||= splitTwoVoices(c.chordal, s.st.space, !!trust[src.staff]);
         return mergeRests(c.split[src.voice], rs, src.voice, s.st.space);
@@ -572,10 +653,21 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   // short segments (phrase barlines / measures split across systems)
   const votes = {};
   const vote = (v, wgt) => { const r = Math.round(v * 2) / 2; if (r > 0) votes[r] = (votes[r] || 0) + wgt; };
-  segSum.forEach((v, i) => { vote(v, 1); if (i + 1 < segSum.length) vote(v + segSum[i + 1], 0.6); });
   // prior: common metres need less evidence than rare ones (measure length
   // in quarters: 4 = 4/4, 3 = 3/4 or 6/8, 2 = 2/4, 6 = 6/4 or 3/2, ...)
   const PRIOR = { 4: 1, 3: 0.9, 2: 0.75, 6: 0.45, 1.5: 0.4, 5: 0.25, 3.5: 0.15 };
+  segSum.forEach(v => vote(v, 1));
+  // a pair of neighbours votes for their sum unless both are already full
+  // bars of the best single-segment metre: two short halves of one bar
+  // (a phrase barline, a bar split at a system break) are evidence, but two
+  // whole 2/4 bars side by side are not a 4/4 bar
+  const rnd = (v) => Math.round(v * 2) / 2;
+  const single = +((Object.entries(votes).filter(([k]) => +k >= 1.5 && PRIOR[+k]).map(([k, v]) => [k, v * PRIOR[+k]]).sort((a, b) => b[1] - a[1])[0] || [0])[0]);
+  segSum.forEach((v, i) => {
+    if (i + 1 >= segSum.length) return;
+    if (!process.env.OLDPAIRS && single && rnd(v) === single && rnd(segSum[i + 1]) === single) return;
+    vote(v + segSum[i + 1], 0.6);
+  });
   let mq = +(Object.entries(votes).filter(([k]) => +k >= 1.5 && PRIOR[+k]).map(([k, v]) => [k, v * PRIOR[+k]]).sort((a, b) => b[1] - a[1])[0] || [4])[0];
   let time = { beats: 4, type: 4 };
   if (Number.isInteger(mq) && mq >= 2 && mq <= 6) time = { beats: mq, type: 4 };
@@ -653,9 +745,16 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     if (sa < mLen - 1e-6 && sb > 1e-6 && Math.abs(sa + sb - mLen) < 1e-6) { a.segs.push(...b.segs); measures.splice(k + 1, 1); }
   }
   if (opts.debug) segs.forEach((sg, i) => opts.debug.push(`seg ${i} sys ${sg.sy.page}:${sg.sy.index} x ${Math.round(sg.xa)}-${Math.round(sg.xb)} sum ${segSum[i]} streams ${segEv[i].map(ps => ps.map(evs => evs.map(e => (e.rest ? 'r' : '') + e.q).join(',')).join('/')).join(' | ')}`));
-  const perPart = parts.map((p, pi) => measures.map(m => p.src.map((src, k) => ({
-    staff: src.staff, events: m.segs.flatMap(si => segEv[si][pi][k]),
-  }))));
+  // an optional voice found in only some segments of a bar keeps its time
+  // through the others (the length of that staff's main voice there)
+  const perPart = parts.map((p, pi) => measures.map(m => p.streams.map((src, k) => {
+    if (src.optional && m.segs.length > 1 && m.segs.some(si => segEv[si][pi][k].length)) {
+      const main = p.streams.findIndex(s => !s.optional && s.staffNo === src.staffNo);
+      return { staff: src.staff, events: m.segs.flatMap(si => (segEv[si][pi][k].length ? segEv[si][pi][k] : qsum(segEv[si][pi][main]) > EPS ? [{ forward: true, q: qsum(segEv[si][pi][main]) }] : [])) };
+    }
+    return { staff: src.staff, events: m.segs.flatMap(si => segEv[si][pi][k]) };
+  })));
+  if (kbSplit) warnings.push(`Keyboard: two voices on one staff (stems up and down with their own note values) in ${kbSplit} staff-bars, written as voices 1 and 2.`);
   measures.forEach(m => { m.sy = segs[m.segs[0]].sy; m.sys = m.segs.map(si => segs[si].sy); });
   // remember which parts each head ended up in (overlay colouring)
   perPart.forEach((pm, pi) => pm.forEach(streams => streams.forEach(st => st.events.forEach(e => (e.heads || []).forEach(h => {
@@ -812,16 +911,14 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     });
     streams.forEach((st, i) => {
       let evs = st.events;
-      if (sums[i] <= 1e-6) evs = [{ rest: true, q: target, dots: 0, whole: true }];
+      if (sums[i] <= 1e-6 && parts[st.pi].streams[st.k].optional) evs = [];
+      else if (sums[i] <= 1e-6) evs = [{ rest: true, q: target, dots: 0, whole: true }];
       else if (Math.abs(sums[i] - target) > 1e-6) {
         const r = repairStream(evs, target, anchors.filter(a => a.i !== i), sp);
         evs = r.events;
         if (r.ok) repaired++; else mismatch++;
       }
       if (evs.some(e => e.glyph && !e.bar)) restsFound++;
-      // a gap left in a voice is shown as rests (a <forward> would leave a
-      // hole in the notation)
-      if (!process.env.NOFWD && evs.some(e => e.forward)) evs = evs.flatMap(e => (e.forward ? restsFor(e.q).map(q => ({ rest: true, q, dots: qToType(q) ? qToType(q).dots : 0 })) : [e]));
       (partMeasures[st.pi][mi] ||= [])[st.k] = { staff: st.staff, events: evs, implicit };
     });
   });
@@ -1095,15 +1192,20 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
         });
         if (ch.length) L.push(`      <attributes>${ch.join('')}</attributes>`);
       }
-      streams.forEach((s, si) => {
-        if (si > 0) {
-          const prev = streams[si - 1].events.reduce((a, e) => a + Math.max(1, Math.round(e.q * DIV)), 0);
-          if (prev) L.push(`      <backup><duration>${prev}</duration></backup>`);
-        }
+      // streams in staff then voice order; an empty optional voice is left
+      // out; <backup> returns to the bar start after each written voice
+      const ps = p.streams || p.src.map((s, k) => ({ ...s, staffNo: k + 1, vno: multi ? 1 + 4 * k : 1 }));
+      const order = streams.map((_, k) => k).filter(k => streams[k] && !(ps[k] && ps[k].optional && !streams[k].events.length))
+        .sort((a, b) => (ps[a].staffNo - ps[b].staffNo) || (ps[a].vno - ps[b].vno));
+      let pos = 0;
+      order.forEach((k) => {
+        const s = streams[k], si = ps[k].staffNo - 1;
+        if (pos > 0) L.push(`      <backup><duration>${pos}</duration></backup>`);
+        pos = s.events.reduce((a, e) => a + Math.max(1, Math.round(e.q * DIV)), 0);
         const clef = clefAt(mi, s.staff);
         const line = accLine.get(mi + ':' + s.staff) || [];
         let et = 0;
-        const voice = multi ? 1 + 4 * si : 1;
+        const voice = ps[k].vno;
         const staffTag = multi ? `<staff>${si + 1}</staff>` : '';
         for (const e of s.events) {
           const t0 = et;
@@ -1139,7 +1241,9 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
             const acc = h.acc && !e.tieStop ? `<accidental>${h.acc}</accidental>` : '';
             const tie = (e.tieStop ? '<tie type="stop"/>' : '') + (e.tieStart ? '<tie type="start"/>' : '');
             const tied = e.tieStop || e.tieStart ? `<notations>${e.tieStop ? '<tied type="stop"/>' : ''}${e.tieStart ? '<tied type="start"/>' : ''}</notations>` : '';
-            const stem = h.stemDir === 1 ? '<stem>up</stem>' : h.stemDir === -1 ? '<stem>down</stem>' : '';
+            // a head with both stems: up in the upper voice, down in the lower
+            const sd = h.stemDir === 2 ? (e.low ? -1 : 1) : h.stemDir;
+            const stem = sd === 1 ? '<stem>up</stem>' : sd === -1 ? '<stem>down</stem>' : '';
             let lyr = '';
             if (hi === 0 && (e.lyrics || e.lyrExt)) {
               const nums = new Set([...Object.keys(e.lyrics || {}), ...Object.keys(e.lyrExt || {})]);

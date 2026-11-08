@@ -26,6 +26,24 @@ ARTIC_TAG = {'staccato': 'staccato', 'staccatissimo': 'staccatissimo', 'accent':
 DYN_TAG = {'pp': 'dyn-pp', 'p': 'dyn-p', 'mp': 'dyn-mp', 'mf': 'dyn-mf', 'f': 'dyn-f', 'ff': 'dyn-ff',
            'sfz': 'dyn-sfz'}
 
+TAXONOMY = set("""
+note-breve note-whole note-half note-quarter note-8th note-16th note-32nd note-64th dot double-dot chord beam flag
+stem-up stem-down ledger-above ledger-below grace grace-slash cue-note tremolo
+rest-breve rest-whole rest-half rest-quarter rest-8th rest-16th rest-32nd rest-64th rest-dotted rest-whole-bar
+rest-multibar
+clef-treble clef-bass clef-alto clef-tenor clef-soprano clef-treble-8vb clef-treble-8va clef-bass-8vb clef-change
+key-0 key-s1 key-s2 key-s3 key-s4 key-s5 key-s6 key-s7 key-f1 key-f2 key-f3 key-f4 key-f5 key-f6 key-f7 key-change
+acc-sharp acc-flat acc-natural acc-double-sharp acc-double-flat acc-courtesy ottava-8va ottava-8vb ottava-15ma
+time-2-4 time-3-4 time-4-4 time-2-2 time-3-2 time-6-8 time-9-8 time-12-8 time-5-4 time-5-8 time-7-8 time-common
+time-cut time-change pickup tuplet-3 tuplet-2 tuplet-5 tuplet-6 tuplet-7 tuplet-nested tie tie-across-system
+slur staccato staccatissimo accent tenuto marcato fermata trill mordent turn arpeggio breath dyn-pp dyn-p dyn-mp
+dyn-mf dyn-f dyn-ff dyn-sfz hairpin-cresc hairpin-dim pedal fingering text-expression tempo-mark metronome
+rehearsal-mark chord-symbol
+barline-double barline-final repeat-start repeat-end volta-1 volta-2 segno coda dc ds fine system-break page-break
+multi-page
+lyrics lyrics-multi-verse lyrics-melisma lyrics-extender lyrics-hyphen lyrics-elision lyrics-non-ascii stanza-text
+""".split())
+
 COUNT_RULES = {
     '_scope': 'Counts are read from truth.musicxml. "Main notes" = <note> elements with <pitch> that are neither '
               '<grace/> nor <cue/>; note-family tags count main notes only, grace and cue notes are counted by '
@@ -179,17 +197,11 @@ def truth_counts(path, pages=1):
                                 c[f'volta-{num}'] += 1
                 elif tag == 'note':
                     _count_note(el, c, detail, clefs, chord_size)
-        for (pid_v, start), n in chord_size.items():
-            pass
-    # chord sizes
-    for size in [v for v in _CHORDS]:
-        pass
     if pages > 1:
         c['multi-page'] = 1
+    # anything outside the canonical taxonomy is reported with the x- prefix
+    c = Counter({(k if (k in TAXONOMY or k.startswith('x-')) else 'x-' + k): v for k, v in c.items()})
     return c, detail
-
-
-_CHORDS = []
 
 
 def _count_note(el, c, detail, clefs, chord_size):
@@ -284,12 +296,9 @@ def _count_note(el, c, detail, clefs, chord_size):
     elif nl < 0:
         c['ledger-below'] += 1
         detail[f'ledger-below-{-nl}'] += 1
-    key = (staff, voice)
     if is_chord:
-        chord_size[key][-1] += 1
         return
-    # new stem event
-    chord_size.setdefault(key, []).append(1)
+    # new stem event (chord tones above were counted as heads only)
     two_note = False
     if notations is not None:
         for orn in notations.findall('ornaments'):
