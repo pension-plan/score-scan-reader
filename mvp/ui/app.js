@@ -1566,10 +1566,10 @@
   }
   function updateUnkNav() {
     const n = unkList().length, m = ident.all().length, read = book.pages.some((p) => p.view);
-    $('unkCount').textContent = !read ? 'Not recognised: none yet' : `Not recognised: ${n}`;
+    $('unkCount').textContent = `${read ? n : 0} unrecognised`;
     $('unkPrev').disabled = !n; $('unkNext').disabled = !n;
     $('identCount').hidden = !m;
-    $('identCount').textContent = `Identified by you: ${m}`;
+    $('identCount').textContent = `${m} labelled by you`;
     $('identCopy').hidden = !m;
   }
   const unkMsg = (t) => { $('unkMsg').textContent = t; };

@@ -89,7 +89,7 @@ const srv = http.createServer((req, res) => {
       const accRe = isFlat ? /<accidental>flat<\/accidental>/g : /<accidental>natural<\/accidental>/g;
       r.naturals = [(xml0.match(accRe) || []).length, (xml1.match(accRe) || []).length];
       if (i1.done !== 1 || i1.n !== i0.n - 1) fail(tag + ': after saving ' + JSON.stringify([i0.n, i1.n, i1.done]));
-      if (!/Identified by you: 1/.test(i1.ident)) fail(tag + ': identified count ' + i1.ident);
+      if (!/^1 labelled by you/.test(i1.ident)) fail(tag + ': identified count ' + i1.ident);
       if (!(r.effect || '').trim()) fail(tag + ': no effect text');
       if (isFlat && !/^Makes/.test(r.effect)) fail(tag + ': the flat in bar 8 found no note: ' + r.effect);
       if (/Makes/.test(r.effect) && !(r.naturals[1] > r.naturals[0])) fail(tag + ': the natural was not applied to the MusicXML ' + JSON.stringify(r.naturals));

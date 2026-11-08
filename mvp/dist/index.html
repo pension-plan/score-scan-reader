@@ -575,10 +575,10 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
         </div>
       </div>
       <div class="unknav" id="unkNav" role="group" aria-label="Marks the reading did not recognise">
-        <p class="unk-count"><span class="unk-swatch" aria-hidden="true"></span><span id="unkCount">Not recognised: none yet</span></p>
+        <p class="unk-count"><span class="unk-swatch" aria-hidden="true"></span><span id="unkCount">0 unrecognised</span></p>
         <div class="unk-btns">
-          <button class="btn small" id="unkPrev" type="button" aria-keyshortcuts="P" disabled>Previous</button>
-          <button class="btn small" id="unkNext" type="button" aria-keyshortcuts="N" disabled>Next unrecognised</button>
+          <button class="btn small" id="unkPrev" type="button" aria-keyshortcuts="P" aria-label="Previous unrecognised mark" disabled>Previous</button>
+          <button class="btn small" id="unkNext" type="button" aria-keyshortcuts="N" aria-label="Next unrecognised mark" disabled>Next</button>
         </div>
         <p class="unk-count done-count" id="identCount" hidden></p>
         <button class="btn small" id="identCopy" type="button" hidden>Copy labelled examples (JSON)</button>
@@ -13393,10 +13393,10 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
   }
   function updateUnkNav() {
     const n = unkList().length, m = ident.all().length, read = book.pages.some((p) => p.view);
-    $('unkCount').textContent = !read ? 'Not recognised: none yet' : `Not recognised: ${n}`;
+    $('unkCount').textContent = `${read ? n : 0} unrecognised`;
     $('unkPrev').disabled = !n; $('unkNext').disabled = !n;
     $('identCount').hidden = !m;
-    $('identCount').textContent = `Identified by you: ${m}`;
+    $('identCount').textContent = `${m} labelled by you`;
     $('identCopy').hidden = !m;
   }
   const unkMsg = (t) => { $('unkMsg').textContent = t; };
