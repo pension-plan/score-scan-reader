@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.29.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.28.1...score-scan-reader-v0.29.0) (2026-11-08)
+
+
+### Features
+
+* pedal bracket lines, circled rehearsal numbers; looser digit thresholds; flat strokes no longer elisions ([15ec03e](https://github.com/pension-plan/score-scan-reader/commit/15ec03e5af42c97000c8f01c05f2ce0871fbd8aa))
+
 ## [0.28.1](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.28.0...score-scan-reader-v0.28.1) (2026-11-08)
 
 
