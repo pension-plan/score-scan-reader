@@ -2,6 +2,66 @@
 
 Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
 
+## Update: dewarp of photographed / curled pages, flatten for severe phone shots (plain JS)
+
+**Dewarp** (`cv.js` `dewarpPage`, `dewarpReading`; hook in `omr.js` `analyse`). After the global deskew a phone
+shot still has staves at different slopes, and its barlines and staff ends lean (perspective). Systems then split
+and barlines go unfound (`andantino-piano-phone` severe: 6 systems of 1–2 staves, 1 measure each).
+- Mesh warp from the staves: each staff's middle line and space (a quadratic fit along it, so a misread line end
+  cannot bend the page) become a horizontal line with one common space; gaps between staves are rescaled by the
+  local space; the right margin (justified staff ends) is made upright, and the left margin too when its staff
+  starts lie on one line (keystone), otherwise a plain shear. The map is computed on an 8 px grid.
+- Tried first and dropped: a single homography fitted to the staff geometry (photographed pages are not flat
+  enough: fit errors of 1–2 staff spaces), and a horizontal rescale from the staff space (the space shrinks
+  differently across and down the page; it sheared barlines between the staves of a system).
+- Gated twice: the page's staves must disagree (slope spread > 0.6 %, bend > 0.5 space, or right-margin lean
+  > 1.5 %; clean pages measure ≤ 0.13 %, ≤ 0.05, ≤ 1.2 %), **and** the plain reading must look broken (systems of
+  unequal size, or under two measures per system). The page is then read again and the second reading is kept
+  only if it has clearly more staff-measure cells (a system split into single staves gains nothing). Two-up
+  spreads, their halves and landscape sheets are left alone (dewarping them lost up to 0.47).
+
+**Flatten for severe phone shots**: `mid` > 0.5, `bgLow` > 0.33, `bgStd` > 4.5, `speck` < 200 (milder phone
+shots lose with it). If a repaired page shows no staves at all (`wind-melody-phone` severe: noise in the dark
+surround amplified into texture), `front()` reads the page as it was.
+
+A/B, same src otherwise (`spike/opencv/results/r5-*.txt`):
+
+| set | aggregate | items changed |
+|---|---|---|
+| challenge (no OCR, 365) | 0.8228 → **0.8265** (pitch +0.006, duration +0.006, rests +0.011) | 9, all up; none down |
+| coverage (no OCR, 306) | 0.7770 → **0.7818** | 7, all up (up to +0.44); none down |
+| benchmark with OCR (20) | 0.9499 → 0.9499, real 0.9295 = | 0 |
+
+| class (challenge) | all | scan | scan-mild | scan-severe |
+|---|---|---|---|---|
+| phone | 0.824 → **0.865** | = | = | 0.708 → **0.829** |
+| book | 0.888 → 0.892 | = | = | 0.883 → 0.896 |
+| combo | 0.856 → 0.862 | 0.856 → 0.873 | = | = |
+
+| item | before | after | what changed |
+|---|---|---|---|
+| andantino-piano-phone severe | 0.576 | **0.924** | dewarp (4 systems × 2 staves, 3–4 measures each) + flatten |
+| agrace-satb-phone severe | 0.638 | **0.763** | flatten |
+| twinkle-piano2p-phone severe | 0.891 | 0.900 | flatten |
+| twinkle-piano2p-book severe | 0.942 | **0.993** | dewarp |
+| L19 satb-closed-lyrics-both-staves-de severe | 0.545 | **0.635** (duration 0.298 → 0.613) | flatten |
+| L11 hymn-descant-cue-notes-amen-small severe | 0.113 | 0.113 | not fixed |
+| wind-melody-phone severe | 0.727 | 0.727 | flatten tried, no staves → plain reading kept |
+| other phone / book items | | unchanged | |
+| elsewhere: nocturne-cross-staff scan +0.219, song-one-system-poem-block severe +0.354, lyr07 severe +0.078, twinkle combo scan +0.069; coverage choir-piano-song-of-rejoicing severe +0.442, perf-hymn 150/200 dpi severe +0.26 / +0.22 | | | |
+
+**L19 diagnosis**: it is a phone shot (dark surround, slight perspective, 12 px staff space). The page's binary had
+lost the faint staff lines and stems (lines dashed, stems gone), so barlines went unfound and each system read as
+one measure: duration 0.298. Flattening the paper first restores them (duration 0.613). Its dewarp reread was
+rejected by the coherence check. Remaining: lyrics (OCR off here) and pitch 0.70.
+
+**L11 diagnosis**: page and recipe: 100 dpi (from 300) binarised photocopy of a halftoned page, 2.5° skew. At 100 dpi
+the staff space is ~6 px, and the 1-px staff lines survive only as dashes covering well under half their length.
+No staff is found on either page, so nothing downstream (cue-size notes, the 14-pt Amen staff) is reached. Tried:
+deskew + grey closing along rows with windows of 9–23 px (up to two spaces): the dashes do not join into lines
+the staff finder accepts (still 0 staves). This needs a staff finder that accepts dashed collinear runs (a Hough /
+RANSAC line fit over short runs at a common spacing), which is a change to `staves.js`, not a pre-clean; not done.
+
 ## Update: pre-clean moved to plain JS; OpenCV.js removed from the app
 
 The five pre-clean repairs (below) were ported to plain JS (separable Gaussian, running max / min,

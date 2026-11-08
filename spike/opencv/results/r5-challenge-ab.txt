@@ -1,0 +1,20 @@
+n 365 aggregate 0.8228 -> 0.8265 (+0.0037) | pitch 0.8995 -> 0.9056 (+0.0061) | duration 0.8664 -> 0.8726 (+0.0062) | rests 0.7713 -> 0.7827 (+0.0114) | parts 0.9351 -> 0.9383 (+0.0032) | lyrics 0.463 -> 0.463 (+0.0000) | xml_valid 1 -> 1 (+0.0000) | crashes 0 -> 0 (+0.0000) | runtime_ms_mean 2398 -> 2481 (+83)
+  by_variant scan           n=123 agg 0.8447 -> 0.8471 (+0.0024)  dur 0.9079->0.9115 pitch 0.9343->0.9378 rests 0.8212->0.8361
+  by_variant scan-mild      n=123 agg 0.8574 -> 0.8574 (+0.0000)  dur 0.9387->0.9387 pitch 0.9511->0.9511 rests 0.8864->0.8864
+  by_variant scan-severe    n=119 agg 0.7643 -> 0.7731 (+0.0088)  dur 0.749->0.7642 pitch 0.8103->0.8253 rests 0.6006->0.6203
+  by_category degradation    n=251 agg 0.8673 -> 0.8697 (+0.0024)  dur 0.9201->0.9251 pitch 0.9472->0.9509 rests 0.8572->0.8667
+  by_category layout         n=21 agg 0.7103 -> 0.7376 (+0.0273)  dur 0.6696->0.6947 pitch 0.6789->0.73 rests 0.3271->0.3668
+  by_category lyrics         n=24 agg 0.7194 -> 0.7227 (+0.0033)  dur 0.8382->0.8443 pitch 0.8984->0.904 rests 0.6795->0.7017
+  by_category pitch          n=24 agg 0.7017 -> 0.7017 (+0.0000)  dur 0.7474->0.7474 pitch 0.7192->0.7192 rests 0.5697->0.5697
+  by_category rhythm         n=24 agg 0.8141 -> 0.8141 (+0.0000)  dur 0.6965->0.6965 pitch 0.8488->0.8488 rests 0.7403->0.7403
+  by_category voices         n=21 agg 0.6698 -> 0.6741 (+0.0043)  dur 0.7849->0.7999 pitch 0.8152->0.8192 rests 0.5595->0.5786
+items changed: 9/365; first time signature right: off 352/365, on 354/365
+  +0.0093 degradation/twinkle-piano2p-phone/scan-severe  agg 0.8910247093023255->0.9003350174556021 dur 0.7441860465116279->0.7610208816705336 time 4/4->4/4 (truth 4/4)
+  +0.0516 degradation/twinkle-piano2p-book/scan-severe  agg 0.9418491484184915->0.9934579439252337 dur 0.8223844282238443->0.9813084112149533 time 4/4->4/4 (truth 4/4)
+  +0.0690 degradation/twinkle-piano2p-combo/scan  agg 0.919608942317175->0.988631090487239 dur 0.796420581655481->0.9466357308584686 time 4/4->4/4 (truth 4/4)
+  +0.0778 lyrics/lyr07-tu-scendi-elisions-it/scan-severe  agg 0.6513848230998189->0.729206236711552 dur 0.7887323943661971->0.9333333333333333 time 6/8->6/8 (truth 6/8)
+  +0.0892 voices/satb-closed-lyrics-both-staves-de/scan-severe  agg 0.5454336714442862->0.6346247480025541 dur 0.2980392156862745->0.6132404181184669 time 4/4->4/4 (truth 4/4)
+  +0.1254 degradation/agrace-satb-phone/scan-severe  agg 0.6378258693354913->0.7632302405498282 dur 0.5323741007194245->0.8934707903780069 time 3/4->3/4 (truth 3/4)
+  +0.2193 layout/nocturne-cross-staff-pedal-ds-coda/scan  agg 0.7252380952380951->0.9445292247493274 dur 0.5166666666666667->0.8183908045977012 time 6/8->6/8 (truth 6/8)
+  +0.3479 degradation/andantino-piano-phone/scan-severe  agg 0.57640585536828->0.9242654606997197 dur 0.16379310344827586->0.7453874538745388 time 7/8->4/4 (truth 4/4)
+  +0.3541 layout/song-one-system-poem-block/scan-severe  agg 0.20433947772657451->0.5584505639571719 dur 0.2857142857142857->0.5108225108225108 time 2/4->4/4 (truth 4/4)

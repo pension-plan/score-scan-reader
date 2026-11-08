@@ -13,7 +13,7 @@ const { readPageText } = require('./text');
 const { pageMarks } = require('./symbols');
 const { buildScore } = require('./score');
 const { makeGray } = require('./image');
-const { readHeaders } = require('./cv');
+const { readHeaders, dewarpReading } = require('./cv');
 
 // gray page turned clockwise by quarter turns (1, 2 or 3)
 function turnGray(g, turns) {
@@ -36,10 +36,14 @@ function cropGray(g, x0, x1) {
 }
 
 // front end + measure assembly of one page image; clefs: staves whose clef was read
-function analyse(gray, idx, frOpts) {
-  const fr = front(gray, frOpts);
+function analyse(gray, idx, frOpts, dewarp = true) {
+  let fr = front(gray, frOpts);
   if (!fr.staves.length) return { fr, asm: null, n: 0, read: 0 };
-  const asm = assemblePage(fr, idx);
+  let asm = assemblePage(fr, idx);
+  // a photographed / curled page whose reading came out broken: read it again dewarped (src/cv.js);
+  // not a two-up spread or one of its halves (the gutter's curl misleads it there)
+  const dw = dewarp && spreadGutter(fr) == null && dewarpReading(fr, asm, (g) => { const f = front(g, Object.assign({}, frOpts, { preclean: false })); return f.staves.length ? { fr: f, asm: assemblePage(f, idx) } : null; });
+  if (dw) ({ fr, asm } = dw);
   let n = 0, read = 0;
   for (const sy of asm.systems) for (const s of sy.staves) { n++; if (!s.hdr.clefGuessed) read++; }
   // header glyphs the parse left unread (time-signature numbers, unread clefs): template
@@ -126,7 +130,7 @@ function createConverter(opts = {}) {
         const g = a.fr.gray, halves = [];
         for (const [k, x0, x1] of [[0, 0, gx], [1, gx, g.width]]) {
           let h;
-          try { h = analyse(cropGray(g, x0, x1), i + 0.5 * k, frOpts); } catch (e) { continue; }
+          try { h = analyse(cropGray(g, x0, x1), i + 0.5 * k, frOpts, false); } catch (e) { continue; }
           if (!h.n) continue;
           const entry = { fr: h.fr, asm: h.asm, index: i + 0.5 * k };
           pages.push(entry);

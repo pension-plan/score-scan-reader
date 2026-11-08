@@ -226,6 +226,7 @@ function* frontSteps(gray0, opts = {}) {
   // degraded scans are repaired first (src/cv.js, OpenCV); a page that looks clean comes back
   // unchanged (the same object), so clean pages are read exactly as before
   gray0 = precleanPage(gray0, opts);
+  const precleaned = !!gray0.preclean;
   yield 'cleanup';
   let ctx = clean(gray0, (opts.mode && MODES.find(m => m.name === opts.mode)) || MODES[0]);
   yield 'staves';
@@ -256,7 +257,7 @@ function* frontSteps(gray0, opts = {}) {
   if (!staves.length) {
     warnings.push('No staves found on this page.');
     // orientation left unset: nothing settled it, a caller may still try turns
-    return { gray, B, R: B, scale, skew, ss: sp.ss, lt: sp.lt, staves: [], systems: [], heads: [], beams: [], barlines: [], warnings, mode: ctx.mode };
+    return { gray, B, R: B, scale, skew, ss: sp.ss, lt: sp.lt, staves: [], systems: [], heads: [], beams: [], barlines: [], warnings, mode: ctx.mode, precleaned };
   }
   let R = removeStaffLines(B, staves, sp.lt).binary;
   if (opts.orient !== false && invertedShare(R, staves) >= 0.6) {
@@ -315,6 +316,8 @@ function front(gray, opts = {}) {
     if (opts.onProgress) opts.onProgress(STAGE_TEXT[r.value] || r.value, { stage: r.value });
     r = it.next();
   }
+  // a repair that left no staves to find (noise amplified into texture): read the page as it was
+  if (r.value.precleaned && !r.value.staves.length) return front(gray, Object.assign({}, opts, { preclean: false }));
   return r.value;
 }
 

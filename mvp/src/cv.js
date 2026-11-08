@@ -12,7 +12,8 @@
 //   - clefs the header could not read (clef guessed): G / F / C at the staff start.
 // Matching stays inside the header region (a few glyphs per staff). docs/spike-opencv.md.
 //
-// precleanPage(gray) (front.js) repairs degraded scans before binarisation; see its section.
+// precleanPage(gray) (front.js) repairs degraded scans before binarisation; dewarpReading (omr.js)
+// rereads photographed / curled pages straightened from their staves; see their sections.
 const { labelComponents } = require('./cc');
 
 const BANK_SP = 24;
@@ -306,7 +307,9 @@ function readHeaders(fr, asm, opts = {}, stats = {}) {
 //              until the staff lines are about a tenth of a space thick
 //   close      thin photocopies whose strokes fell apart into loose dots: grow the ink by 1 px
 //   sharpen    heavy blur: unsharp mask
-// Phone shots, noise and JPEG are left alone: every repair tried on them measured worse.
+// Severe phone shots get flatten only (milder ones read better as they are); noise and JPEG are left
+// alone: every repair tried on them measured worse. If a repaired page shows no staves, front()
+// reads the page as it was.
 const { estimateStaffSpace } = require('./staffspace');
 
 function pageQuality(g) {
@@ -364,7 +367,8 @@ function precleanPlan(q, force) {
   if (q.speck > 25000 && q.bgStd > 4) return ['descreen'];
   // stained / yellowed paper, heavy combined damage (not phone shots: the binariser handles their
   // shading better, and flattening their dark surround adds texture)
-  if (q.mid > 0.15 && ((q.bgUneven < 0.4 && q.bgLow > 0.12 && q.midShare > 0.8) || q.bgStd > 6.8)) ops.push('flatten');
+  // (severe phone shots too: dark, uneven, grainy paper; milder ones read better as they are)
+  if (q.mid > 0.15 && ((q.bgUneven < 0.4 && q.bgLow > 0.12 && q.midShare > 0.8) || q.bgStd > 6.8 || (q.mid > 0.5 && q.bgLow > 0.33 && q.bgStd > 4.5 && q.speck < 200))) ops.push('flatten');
   // heavy blur: nearly no ink pixel is dark any more
   if (!ops.length && q.midShare > 0.94 && q.p1 > 100) ops.push('sharpen');
   return ops;
@@ -511,6 +515,136 @@ function precleanPage(gray, opts = {}) {
   return out;
 }
 
+// ---------------------------------------------------------------- dewarp (phone shots, book curl)
+// After the global deskew a photographed or curled page still has staves at different slopes or
+// bent, barlines and stems leaning, staff ends drifting sideways: systems split and barlines go
+// unfound. dewarpPage(fr) straightens the page with a mesh built from the staves themselves: every
+// staff line becomes horizontal (its own detected curve, so curl is followed exactly), every staff
+// gets the same space (gaps between staves rescaled by the local space), and the staff ends are
+// brought to one left and one right margin (indented first systems excluded from the left one).
+// The map is computed on a coarse grid and interpolated. Gated: only when the staves' slopes
+// differ, the staves bend, or the staff ends lean, beyond what a flat scan shows; else null.
+// y = c0 + c1 t + c2 t^2 through (x, y), t = x scaled to [-1, 1]; returns the fitted function
+function quadFit(X, Y) {
+  const n = X.length, x0 = X[0], x1 = X[n - 1], sc = (x) => (x1 > x0 ? (2 * (x - x0)) / (x1 - x0) - 1 : 0);
+  const M = [[0, 0, 0], [0, 0, 0], [0, 0, 0]], r = [0, 0, 0];
+  for (let i = 0; i < n; i++) { const t = sc(X[i]), v = [1, t, t * t]; for (let a = 0; a < 3; a++) { r[a] += v[a] * Y[i]; for (let b = 0; b < 3; b++) M[a][b] += v[a] * v[b]; } }
+  for (let c = 0; c < 3; c++) { let p = c; for (let q = c + 1; q < 3; q++) if (Math.abs(M[q][c]) > Math.abs(M[p][c])) p = q; [M[c], M[p]] = [M[p], M[c]]; [r[c], r[p]] = [r[p], r[c]];
+    if (Math.abs(M[c][c]) < 1e-9) { const m = Y.reduce((a, b) => a + b, 0) / n; return () => m; }
+    for (let q = 0; q < 3; q++) if (q !== c) { const f = M[q][c] / M[c][c]; for (let k = c; k < 3; k++) M[q][k] -= f * M[c][k]; r[q] -= f * r[c]; } }
+  const c = r.map((v, i) => v / M[i][i]);
+  return (x) => { const t = sc(x); return c[0] + c[1] * t + c[2] * t * t; };
+}
+const lineFit = (P) => { // x = a + b y, least squares
+  const n = P.length, my = P.reduce((s, p) => s + p[1], 0) / n, mx = P.reduce((s, p) => s + p[0], 0) / n;
+  let sxy = 0, syy = 0; for (const [x, y] of P) { sxy += (x - mx) * (y - my); syy += (y - my) ** 2; }
+  const b = syy ? sxy / syy : 0; return { a: mx - b * my, b, at: (y) => mx - b * my + b * y };
+};
+function dewarpPage(fr, opts = {}) {
+  const st = (fr.staves || []).filter(s => s.right - s.left > 10 * s.space);
+  if (st.length < 2 || !fr.gray || !fr.gray.data) return null;
+  const { width: w, height: h, data } = fr.gray;
+  const STEP = 8, NX = Math.ceil(w / STEP) + 1;
+  const S = st.map(s => {
+    // middle line and space sampled every STEP px (extended flat beyond the staff's ends)
+    // a smooth (quadratic) fit of the staff's middle line and space: curl and perspective are
+    // smooth, a locally misread line end is not and must not bend the page
+    const xs = [], ym = [], ys = [];
+    for (let x = s.left; x <= s.right; x += STEP) { xs.push(x); ym.push(s.yAt(2, x)); ys.push((s.yAt(4, x) - s.yAt(0, x)) / 4); }
+    const qm = quadFit(xs, ym), qs = quadFit(xs, ys);
+    const mid = new Float64Array(NX), sp = new Float64Array(NX);
+    for (let i = 0; i < NX; i++) { const x = Math.min(s.right, Math.max(s.left, i * STEP)); mid[i] = qm(x); sp[i] = qs(x); }
+    const xm = (s.left + s.right) / 2, ia = Math.round(s.left / STEP), ib = Math.round(s.right / STEP), im = Math.round(xm / STEP);
+    // bend: the middle line's largest departure from its chord, in spaces
+    let bend = 0; for (let i = ia; i <= ib; i++) bend = Math.max(bend, Math.abs(mid[i] - (mid[ia] + (mid[ib] - mid[ia]) * (i - ia) / Math.max(1, ib - ia))));
+    return { s, mid, sp, xa: s.left, xb: s.right, ym: mid[im], spm: sp[im], slope: (mid[ib] - mid[ia]) / Math.max(1, (ib - ia) * STEP), bend: bend / sp[im] };
+  }).sort((a, b) => a.ym - b.ym);
+  const sp0 = S.reduce((a, o) => a + o.spm, 0) / S.length;
+  const slopes = S.map(o => o.slope), spread = Math.max(...slopes) - Math.min(...slopes), bend = Math.max(...S.map(o => o.bend));
+  // margins: lines through the staff ends, leaving out ends far inside the others (indented first
+  // systems on the left, a short last system on the right)
+  const margin = (key, inside) => {
+    let f = lineFit(S.map(o => [o[key], o.ym]));
+    for (let it = 0; it < 2; it++) { const keep = S.filter(o => inside(o[key] - f.at(o.ym)) < 2 * sp0); if (keep.length >= 2) f = lineFit(keep.map(o => [o[key], o.ym])); }
+    f.n = S.filter(o => inside(o[key] - f.at(o.ym)) < 2 * sp0).length;
+    return f;
+  };
+  const left = margin('xa', d => d), right = margin('xb', d => -d);
+  // the right margin is the reliable one (justified); lean counts only with three staves on it
+  const lean = right.n >= 3 ? Math.abs(right.b) : 0;
+  if (spread < (opts.minSpread ?? 0.006) && bend < (opts.minBend ?? 0.5) && lean < (opts.minLean ?? 0.015)) return null;
+  // targets
+  const Yt = [S[0].ym];
+  for (let i = 1; i < S.length; i++) Yt.push(Yt[i - 1] + (S[i].ym - S[i - 1].ym) * sp0 / ((S[i].spm + S[i - 1].spm) / 2));
+  const yRef = S[S.length >> 1].ym, XR = right.at(yRef), XL = left.at(yRef);
+  // the left margin is used only when its staves sit on one line (no brace or name offsets) and it
+  // leans differently from the right one
+  const keptL = S.filter(o => o.xa - left.at(o.ym) < 2 * sp0);
+  const keystone = left.n >= 3 && keptL.every(o => Math.abs(o.xa - left.at(o.ym)) < 0.5 * sp0) && Math.abs(left.b - right.b) > 0.01;
+  const sample = (arr, x) => { const f = Math.min(NX - 1.001, Math.max(0, x / STEP)), i = Math.floor(f), t = f - i; return arr[i] * (1 - t) + arr[i + 1] * t; };
+  // source y on staff i's frame for target height v at source column x
+  const onStaff = (i, v, x) => sample(S[i].mid, x) + (v - Yt[i]) * sample(S[i].sp, x) / sp0;
+  const map = (u, v) => {
+    let k = 0; while (k < S.length - 1 && Yt[k + 1] < v) k++;
+    let x = u, y = v;
+    for (let it = 0; it < 2; it++) {
+      // horizontal: the target's place between the margins, at the source row
+      // the right margin upright; the left one too when it is clean (keystone), else a plain shear
+      const R = right.at(y);
+      if (keystone) { const L = left.at(y); x = L + (u - XL) * (R - L) / (XR - XL); } else x = R - (XR - u);
+      if (v <= Yt[0]) y = onStaff(0, v, x);
+      else if (v >= Yt[S.length - 1]) y = onStaff(S.length - 1, v, x);
+      else { const t0 = (v - Yt[k]) / (Yt[k + 1] - Yt[k]), t = t0 * t0 * (3 - 2 * t0); y = (1 - t) * onStaff(k, v, x) + t * onStaff(k + 1, v, x); }
+    }
+    return [x, y];
+  };
+  const GX = Math.ceil(w / STEP) + 1, GY = Math.ceil(h / STEP) + 1, MX = new Float32Array(GX * GY), MY = new Float32Array(GX * GY);
+  for (let gy = 0; gy < GY; gy++) for (let gx = 0; gx < GX; gx++) { const [x, y] = map(gx * STEP, gy * STEP); MX[gy * GX + gx] = x; MY[gy * GX + gx] = y; }
+  const out = new Uint8Array(w * h);
+  for (let y = 0; y < h; y++) {
+    const fy = y / STEP, gy = Math.min(GY - 2, Math.floor(fy)), ty = fy - gy;
+    for (let x = 0; x < w; x++) {
+      const fx = x / STEP, gx = Math.min(GX - 2, Math.floor(fx)), tx = fx - gx, i = gy * GX + gx;
+      const xs = (MX[i] * (1 - tx) + MX[i + 1] * tx) * (1 - ty) + (MX[i + GX] * (1 - tx) + MX[i + GX + 1] * tx) * ty;
+      const ys = (MY[i] * (1 - tx) + MY[i + 1] * tx) * (1 - ty) + (MY[i + GX] * (1 - tx) + MY[i + GX + 1] * tx) * ty;
+      const x0 = Math.floor(xs), y0 = Math.floor(ys);
+      if (x0 < 0 || y0 < 0 || x0 >= w - 1 || y0 >= h - 1) { out[y * w + x] = 255; continue; }
+      const ax = xs - x0, ay = ys - y0, j = y0 * w + x0;
+      out[y * w + x] = Math.round((data[j] * (1 - ax) + data[j + 1] * ax) * (1 - ay) + (data[j + w] * (1 - ax) + data[j + w + 1] * ax) * ay);
+    }
+  }
+  return { width: w, height: h, data: out, dewarped: true };
+}
+
+// A page reading that looks broken (systems of unequal size, or about one measure per system) on
+// a page whose staves disagree in slope, bend or lean is read again from the dewarped page; the
+// second reading is kept only if it is clearly more coherent. reread(gray) -> {fr, asm}.
+function readingQuality(asm) {
+  if (!asm || !asm.systems.length) return -1e9;
+  // staff-measure cells (a system split into single staves does not gain any), less a penalty
+  // per system smaller than the page's largest
+  const sizes = asm.systems.map(s => s.staves.length), top = Math.max(...sizes);
+  const cells = asm.systems.reduce((a, s) => a + s.measures.length * s.staves.length, 0);
+  return cells - 3 * sizes.filter(n => n < top).length;
+}
+function dewarpReading(fr, asm, reread, stats = {}) {
+  if (!asm || (typeof process !== 'undefined' && process.env && process.env.OMR_DEWARP === 'off')) return null;
+  // landscape sheets (two-up spreads with a page missed, landscape layouts) are left alone
+  if (!fr.gray || fr.gray.width > 1.1 * fr.gray.height) return null;
+  const sizes = asm.systems.map(s => s.staves.length), top = Math.max(...sizes);
+  const perSystem = asm.systems.reduce((a, s) => a + s.measures.length, 0) / asm.systems.length;
+  if (!(sizes.some(n => n < top) || perSystem < 2)) return null;
+  const g = dewarpPage(fr);
+  if (!g) return null;
+  const alt = reread(g);
+  if (!alt || !alt.asm || alt.fr.staves.length < fr.staves.length) return null;
+  const q0 = readingQuality(asm), q1 = readingQuality(alt.asm);
+  if (q1 < q0 + 2) return null;
+  stats.dewarped = (stats.dewarped || 0) + 1;
+  alt.fr.dewarped = true;
+  return alt;
+}
+
 const BANK = {"digit-0":[43,48,"AAD8AwAAAPx/AAAA+P8PAADwH/8BAMB/8D8AAP8B/wMA/g/wPwDwP4D/AcD/AfwfAP8HwP8B/D8A/h/g/wHw/4D/BwD/D/w/APh/4P8BwP+D/w8A/j/8fwDw/+H/A4D/D/8fAPz//H8AwP/n/wMA/j//HwDw//n/AID/z/8HAPx//j8A4P/z/wEA/5//DwD4//x/AMD/5/8HAP4//z8A+P/x/wHA/4f/DwD+P/x/APD/wf8DgP8H/h8A/D/g/wHw/wH/D4D/B/B/APw/gP8H8P8A+D+A/wOA/wP+DwD8H/B/AID/wf8BAPi//wcAgP//DwAA+P8/AAAA/j8AAACAfwAA"],"digit-1":[29,48,"APh/AID/HwD4/wMA/38A4P8PAP7/AcD/PwD8/weA//8A+P8fAP//A/D/fwD+/w/A//8B/P8/gO//B/j8/wCf/x/w8f8DPv5/4MP/Dzz4/4EH/z944P8HD/z/AID/HwDw/wMA/n8AwP8PAPj/AQD/PwDg/wcA/P8AgP8fAPD/AwD+fwDA/w8A+P8BAP8/AOD/BwD8/wCA/x8A8P8DAP9/APD/P8D//x/8//8D//9/"],"digit-2":[40,50,"AAAAAAAA8P8PAAD+/38AgB/A/wHABwD/A+ADAP8P8AMA/h/4BwD+H/wPAPw//D8A/H/+fwD8f/7/APx//v8A/P/+/wD8//7/APz//v8A/P/+/wD+//z/AP7//P8A/v/4fwD/f/B/AP9/4D+A/z+AD4D/HwAAwP8PAADg/wcAAPD/AQAA+H8AAAD8DwAAAP4BAACAfwAAAMAfAAAA8AcAAAD4AQAAAPwAAGAA/x4AYID//wNwwP//H3DA////fOD///9/8P///z/w////P/j///8/+P///x/8////H/zH//8P/gD//wd+APz/Az4A+P8BHADAfwAIAAAAAA=="],"digit-3":[38,48,"AMA/AAAA/v8AAPD//wAA//D/AOAP4P8A/AHwf4B/APg/4H8A/g/8fwD/B/8fwP/B/w/wf/D/A/w//P8A/w//P8D/gf8P8H/g/wH+H/B/gP8H+A/w/wBwAPwfAADA/wMAAPw/AADg/wEAgP8/AADw/z8AAPj/fwAAAP9/AAAA/z8AAAD/HwAAwP8P8AHg/wP/AfD/4f8A/H/8fwD/H/8fwP/v/wfw//v/Afx//v8A/5//H8D/5/8H8P/5/wD+P/w/gP8P/w/w/4H/Af4/4P/A/wfw////APD//w8A8P9/AADg/wMA"],"digit-4":[42,49,"AAAAAAAAAP//AAAA/v8DAAD4/wcAAOD/HwAAgP8/AAAA/n8AAAD4/wEAAPD/AwAAwP8HAAAA/x8cAAD8P3gAAPh/8AEA4P/gBwCA/4MfAAD/B38AAPwP/gEA+B/8BwDgf/gfAMD/8H8AAP/B/wEA/oP/BwD4B/8fAPAf/H8AwD/w/wGAf8D/BwD+AP8fAPwB/H8A+APw/wHgB8D/B8APAP8fgB8A/H8A///////9//////f/////n/////8/AADw/wEAAMD/BwAAAP8fAAAA/H8AAADw/wEAAMD/BwAAAP8fAAAA/n8AAAD8/wMAAP7/fwAA/P//AwDw//8PAMD//x8A"],"digit-5":[37,48,"AAAAAAD+//8f4P///wP8//9/gP///w/w////AP7//x/A////Afj//x8A////AeD//w8APPgHAIAHAAAA8AAAAAAeAAAAwAEAAAA4AAAAAAf+fwDg+P8/APz//w+AP/D/B/gD+P8BHwD8P+ABAP8PGADg/wMAAPh/AAAA/x8AAMD/A/4A+H/wfwD/H/4f4P/j/wP8f/7/gP/P/x/w//n/A/4//3/A/+f/D/j//P+B/4//H/D/8f8B/h/8H+D/g/8B/D/gH+D/A/wH/j8A////A4D//z8A4P//AADA/wMA"],"digit-6":[39,48,"AAD4AwAAwP8fAAD4wz8AAP/APwDAP+A/APgP+D8A/gP+HwD/Af8fwP/A/w/wP+D/B/gf8P8B/g/4/wD/B/h/wP8D/B/g/wD8B/h/APgA/D8AAAD+HwAAAP8PAADA/wf4AOD/g/8B8P/x/wP4//3/B/z///8H/v/H/wf//8D/h/9/wP/H/x/g/+P/D+D/8/8D8P/x/wH4//j/APx//H8A/H/+PwD+P/4fAP8P/w+A/4f/B8D/g/8D4P+B/wH4f8D/APw/wP8A/g/Af4D/B+B/wP8BwD/wfwDAP/wfAMD//wMAgP9/AAAA/wMA"],"digit-7":[39,48,"APADAAAA/g8AXMD/HwBu8P8fgHf8/x/A+///H/D9//8f+P7//z9+/////7//////3//////nn/////MD////+QD+/388AP7/Px4A/P8fBwD854cDAPDxwwEAAPxgAAAAfiAAAIA/AAAA4A8AAAD4BwAAAP4BAACA/wAAAOA/AAAA+B8AAAD+DwAAgP8DAADg/wEAAPj/AAAA/j8AAID/HwAAwP8PAADw/wMAAPz/AQAA/v8AAID/fwAAwP8/AADw/x8AAPj/BwAA/v8DAAD//wEAgP//AADA/38AAOD/PwAA8P8fAAB4gAcA"],"digit-8":[39,50,"AAA/AAAA+P8HAID//w8A8D/wHwD8A8A/AH8AgB/AHwCAH/APAIAf/AMAwA/+AQDAB/8BAOCH/wAA8MN/AAD48X8AAPzw/wAAPvj/AIAf/P8D4A/+/wf4A///H/4A////f4D///8PgP///wOA////B4D///8HgP///wcA////B4D///8H4P///wf8+f//Az/w///BD+D///EDwP///ACA/39+AAD/vx8AAP/fDwAA/+8DAID/8wEAgP/5AQDA//wAAOB/fgAA8B9+AAD4Dz8AAP4DPwAA/wB/AMB/AP8A+A8A/4f/AwD+/38AAPz/DwAA4H8AAA=="],"digit-9":[39,48,"AMA/AAAA/v8BAMD//wcA+D/8BwD+D/wHgP8H/AfA/wH+B/D/AP4H/D8A/wP+H4D/A/8PwP/B/wfg/+H/A+D/8P8B8P/4/wD4f/x/AP4//j8A/z//H4D/H/8PwP+P/w/g/8f/B/j/w/8H/v/B/wf//8D/5/9/4P///z/A/3//H8D/j/8PgP/B/wcAAOD/AwAA8P8BAAD4/wAAAPw/AD8A/h/AfwD/D/A/gP8D/D/A/wH/H/B/gP8P+D/A/wf8D+D/A/4D8P+B/wH4f8B/APgf8B8A/A/4BwD8A/4AAPzDPwAA+P8DAADgPwAA"],"time-C":[41,50,"AAAAAAAAAP4HAAAA/38AAID/gAcAwH8AHADAfwBwAMA/AOABwH8AwAfAfwDAD8B/APA/gP8A8H+A/wHw/4H/AfD/A/8D4P8H/gfA/w/+B4D/H/wPAP8//B8A/n/4PwD8f/B/APD/4P8A4P/g/wGA/8D/AwB8gP8HAAAA/w8AAAD+HwAAAPw/AAAA+H8AAADw/wAAAOD/AQAAnP8DAAA4/wcAAHD+HwAA4Pw/AADA8X8AAIDj/wAAAMP/AwAAB/8HAAAO/g8AAA74PwAAHOB/AAAcwP8BADwA/wcAPAD8HwA8APB/AD4AwP8DPwAA/v8fAAD4/w8AAID/AwAAAAAAAAA="],"time-cut":[41,70,"AAAOAAAAABwAAAAAOAAAAABwAAAAAOAAAAAAwAEAAACAAwAAAAAHAAAAAA4AAAAAHAAAAAB4AAAAAPg/AAAA/v8DAAD/Bx4AAP8HcACA/wfAA4D/D4APgP8fAB8A/zkAfwD/ccD/AP/j4P8D/sPB/wf+h8P/D/wPh/8f/B8O/z/4Hxz+f/A/OPz/8H9w+P/h/+Dw/8H/wcH/g/+DA/+D/wcH/AP/Dw7AAP4fHAAA/D84AAD4f3AAAPD/4AAA4P/BAQDA/4MDAID/BwcAcP4PDgDg/B8cAMD5fzgAgPP/cAAAx//hAACG/8MBAA7+jwMAHPwfBwAY8D8OADjg/xwAMID/OQBwAP5/AHAA+P8AeADg/wH8AID/B34AAP7/fwAA8P8/AACA/w8AAAB8AAAAAHAAAAAA4AAAAADAAQAAAIADAAAAAAcAAAAADgAAAAAcAAAAADgAAAAAcAAAAADgAAAAAAAAAAA="],"clef-G":[66,170,"AAAAAAAAAAAAAAAAAPAAAAAAAAAA4AcAAAAAAADAPwAAAAAAAID/AQAAAAAAAP8PAAAAAAAA/j8AAAAAAAD8/wEAAAAAAPD/BwAAAAAA4P8/AAAAAACA//8AAAAAAAD//wcAAAAAAP7/HwAAAAAA+P//AAAAAADg//8DAAAAAMD//w8AAAAAAP8HfgAAAAAA/AfwAQAAAAD4D4AHAAAAAOAfAB4AAAAAgH8AcAAAAAAA/gDAAwAAAAD8AQAPAAAAAPAHADwAAAAAwA8A8AAAAAAAPwDAAwAAAAB8AAAPAAAAAPgBAD4AAAAA4AcA+AAAAACAHwDgAwAAAAA+AIAPAAAAAPgAAD8AAAAA4AMA/AAAAACADwD4AwAAAAA+AOAHAAAAAPgAwB8AAAAA4AOAfwAAAACABwD+AQAAAAAeAPwHAAAAAHgA+A8AAAAA4AHwPwAAAACAB+D/AAAAAAAewP8BAAAAAHiA/wcAAAAA4AH/DwAAAAAAD/4/AAAAAAA8/P8AAAAAAPD4/wEAAAAAwPP/BwAAAAAA//8PAAAAAAD8/x8AAAAAAPD/fwAAAAAAwP//AAAAAACA//8BAAAAAAD//wcAAAAAAP7/DwAAAAAA/v8fAAAAAAD8/z8AAAAAAPj//wAAAAAA8P//AQAAAADg//8DAAAAAMD//wcAAAAAgP//DwAAAAAA//8fAAAAAAD+/z8AAAAAAPz/fwAAAAAA+P//AQAAAADw//8HAAAAAOD//zwAAAAAgP//8QAAAAAA///BAwAAAAD+/wMPAAAAAPz/BzwAAAAA+P8P8AEAAADg/x+ABwAAAMD/PwAeAAAAgP9/AHgAAAAA/v8A4AEAAAD8/wGABwAAAPD/AwA+AAAA4P8HAPAAAACA/w8AwAMAAAD/HwCA/w8AAPw/AAD//wMA+H8AgP//PwDg/wEA////AYD/AwD///8fAP8HAP7///8A/B8A/P///wfwPwD4////P8B/APD/////gP8B4P////8H/geA/////z/4DwD//////+A/APz/////h/8A+P/z4P8f/gHg/8MD/v/4B4D/Aw/w/+MfAP4HPAD/j38A/A/gAfg//gHwH4AHwP/5B8A/AB4A/+cfAP8AeAD4nz8A/AHgAcB//gHwB4AHAP/xB4AfADwA/McfAH4A8ADgH38A+AHAA4B/+AHgBwAPAP7hBwAfADwA+Ic/AHwA8ADgD/wA4AOAB4A/8AOADwAeAP6AHwB8AHgA+AN+AOAD4AHgB/ADAB+AB8AfgA8A+AEeAD8AfgCAD/AA/gDwAwB4wAP4AYAfAAAAD/ADAPwAAAA84AcA4AcAAPDADwAAfwAAwIMfAAD4BwAAnj8AAIB/AAD4fwAAAPgPAOB/AAAAwP8f8P8AAAAA/P//fwAAAACA////AAAAAADA/+8DAAAAAAAAAA8AAAAAAAAAPAAAAAAAAADwAAAAAAAAAMADAAAAAAAAAB8AAAAAAAAAeAAAAAAAAADgAQAAAAAAAIAHAAAAAAAAAB4AAAAAAAAAeAAAAAAAAADgAQAAAAAAAIAPAAAAAAAAADwAAAAA/gMA8AAAAAD8PwDAAwAAAPj/AQAPAAAA8P8HADwAAADg/z8A8AAAAID//wDAAwAAAP//BwAPAAAA/P8fADwAAADw/38A8AAAAMD//wHAAwAAAP//BwAPAAAA/P8fADwAAADw/38A+AAAAMD//wDgAQAAAP//A4AHAAAA/P8HAB8AAADg/w8APAAAAID/DwD4AAAAAPwPAPABAAAA8A8A4AcAAACAPwDADwAAAAD8AeAfAAAAAOA/8D8AAAAAAP7/PwAAAAAA8P8/AAAAAAAA/B8AAAAAAAAAAAAAAAA="],"clef-F":[67,87,"AAAAAAAAAAAAAID/BwAAAAAAwP//AwAAAADA//9/AAAAAID/4P8PAAAAAP4A8P8BAAAA+AAA/h8AAADgAwDg/wEAAIAHAAD+HwAAAB4AAPD/AcAH+AAAAP8fgH/gAwAA8P8B/AcPAACA/w/wP3wAAAD4/4D/4QMAAMD/B/yPHwAAAP5/4H/8AAAA4P8D/uP/HwAA/z/wj///AQD4/wE+/P8/AMD/DwDg//8BAP5/AAD//x8A4P8HAPj//wAA/z8AwP//DwD4/wEA/v9/AMD/DwDw//8DAP5/AAD//x8A8P8DAPj//wCA/x8AwP//BwD8/wAA/P8/AOD/BwDg//8AAP8/AAD+/wcA+P8BAPD/HwDA/w8AAP9/AAD+f8AH8P8BAPD/A38A/gcAgP8f/AcAAAAA/P/wPwAAAADg/4P/AQAAAID/H/wPAAAAAPz/4H8AAAAA4P8H/gMAAAAA/x/gDwAAAAD4/wA+AAAAAMD/BwAAAAAAAP8/AAAAAAAA+P8AAAAAAADA/wcAAAAAAAD+HwAAAAAAAPj/AAAAAAAAwP8DAAAAAAAA/h8AAAAAAAD4fwAAAAAAAMD/AwAAAAAAAP8PAAAAAAAA+H8AAAAAAADg/wEAAAAAAAD/BwAAAAAAAPw/AAAAAAAA4P8AAAAAAACA/wMAAAAAAAD+DwAAAAAAAPA/AAAAAAAAwP8AAAAAAAAA/wcAAAAAAAD8HwAAAAAAAOA/AAAAAAAAgP8AAAAAAAAA/gMAAAAAAAD4DwAAAAAAAOA/AAAAAAAAgP8AAAAAAAAA/gEAAAAAAAD4BwAAAAAAAOAfAAAAAAAAwD8AAAAAAAAA/wAAAAAAAAD8AwAAAAAAAPgHAAAAAAAA4A8AAAAAAACAPwAAAAAAAAB/AAAAAAAAAP4AAAAAAAAA+AMAAAAAAADwBwAAAAAAAOAPAAAAAAAAAB8AAAAAAAAAGAAAAAAAAAAA"],"clef-C":[67,98,"AAAAAAAAAADwf8AAAP4/AMD/Aw8A/v8PAP4feAD4//8B8P/AA/AH+D+A/wcewAcA/wf8P/AAPwDwf+D/gQf4AwD/B/8PPOB/APA/+H/gAf8HgP/D/wMP/H8A/D/+H3jg/wPA//H/wAP/PwD+n/8HHvj/AfD//D/wwP8PgP/v/4EH/n8A/H//Dzzg/wHg//t/4AH/DwD///8DD/A/APj//x94AP8AwP///8ADwAEA/v//Bx4AAADw//8/8AAAAID///+BBwAAAPz//w88AAAA4P//f+ABAAAA////Aw8AAAD4//8feAAAAMD/9//AAwAAAP6//wcegAEA8P/9P/AAHACA/+//gQfwAAD8P/8PPIAPAOD/+X/gAXwAAP/H/wMP4AMA/D/+H3iAPwDg//D/wAP8AwD/h/8HHuAfAPwf/D/wgP8B8H/g/4EH/D/A/wH/Dzzw////A/h/4IH///8PwP8DD/7//x8A/h94+H/wDwDw/8Dj/wEAAID/B/7/DwAAAPw/8P8/AAAA4P+B//8BAAAA/w/8/wcAAAD4f+D/PwAAAMD/A///AwAAAP4f+P8fAAAA8P/A//8BAACA/wce/w8AAAD8P/Dw/8AfAOD/gQf///8PAP8PPPD///8B+H/gAf///z/A/wMP+H+A/wP+H3jA/wD4P/D/wAP8A4D/g/8HHuAfAPg//D/wAH8AwP/h/4EH8AEA/h//DzyADwDg//l/4AF8AAD/z/8DD+ABAPh//h94AA4AwP/3/8ADMAAA/r//Bx4AAADw//0/8AAAAID/7/+BBwAAAPz//w88AAAA4P//f+ABAAAA////Aw8AAAD4//8feAAAAMD////AAwAAAP7//wceAA4A8P//P/AA/gGA////gQf4HwD8//8PPOD/AeD//3/gAf8PAP/f/wMP/P8A+P/+H3jg/wfA//f/wAP/PwD+n/8HHvj/AfD//D/wwP8HwP/j/4EH/j8A/h//Dzzg/wDwf/h/4AH/A8D/wf8DD/AHAP4P/h94gB8A+D/w/8AD+ADgf4D/Bx6AP8D/Afw/8ADw//8D4P+BBwD//wcA/g8YAMD/BwAAAAAAAAAAAAA="],"rest-quarter":[26,72,"EAAA4AEAgA8AAH4AAPABAMAPAAB+AADwAwDAHwAA/gAA+AcAwD8AAP8AAPwHAOA/AID/AQD+DwD4fwDg/wGA/w8A/38A/P8B8P8D4P8PgP8fAP8/AP7/APz/Afj/B+D/D8D/PwD/fwD8/wHg/weA/w8A/D8A4P8AAP8DAPgPAOA/AAD/AAD4AwDAHwAAfwAA+AEAwA8AAH8A8PwB8P8P4P9/wP//A///D/7/f/j///P//9///3//P4D/fwDg/wCA/wEA/gcA8B8AgH8AAP4BAPAHAIA/AAD8AADgBwAAPwAA+AEAwAcAABwA"],"rest-8th":[24,41,"8AEA+ANg/Afw/g94/w98/x9+/x9///8///8//v8//P8f+D8f8AcfAAAfAIAPAIAPAIAPAMAPAMAHAMAHAOAHAOADAOADAPADAPADAPgBAPgBAPgBAPwAAPwAAPwAAP4AAH4AAH4AAH8AAD8AAD8AAD8AgD8AgB8AAA8A"],"rest-16th":[31,65,"APgAAAD/ATjA/wEO4P+AB/j/4AP8f/gB/j9/AP//P4D//x+A//8PgP//A4D/8QEAP/gAAAB8AAAAHwAAgA8AAMAHAADwAQAA+AAAAHwAAAAeAACADwAAwAcAAOAD8AH4AP4DfID/Az/A/4EP8P/BB/j/8AP8f/wA/v9/AP7/PwD//w8A//8HAP/3AwB++AEAAHwAAAA/AACAHwAAwAcAAPADAAD4AQAAfAAAAD8AAIAfAADADwAA8AMAAPgBAAD8AAAAPwAAgB8AAMAPAADwAwAA+AEAAPwAAAA/AACAHwAAwA8AAPAHAAD4AQAA/AAAAH8AAIAfAACABwAA"],"acc-sharp":[25,68,"AAAAAAAOAAAcAAA4AABwABzgADjAAXCAA+AAB8ABDoADHAAHOAAOcAAc4AA4wD9wgH/ggP/Agf+B4/8D//8H/v8P//+f//+f//8P//8P/v8P/H8c+D848B9w4B/gwD3AAXCAA+AABsABDoADHAAHOAAOcAwc4B84wD9wwH/gwP/A4f+B//+D///H///P///H//+D//8D//8H/h8O/A8c+Ac48A9wYBzgADjAAXCAA+AAB8ABDoADHAAHOAAOcAAc4AA4wAFwAADgAADAAQCAAwAAAAAA"],"acc-flat":[23,60,"AAAADgCABwDAAwDgAQDwAAB4AAA8AAAeAAAPAIAHAMADAOABAPAAAHgAADwAAB4AAA8AgAcAwAMA4AEA8AAAeAAAPAAAHgAADwCABwDAAwDggQ/w8B94/D/8/z/+/x//4Z8/4M8P8OcD8PcA+HsA/DwAfh4APw+AnwfgxwPw4wH88AB+eIAfPOAHHvgBD36Ahx/A9wfg/wDgPwDwDwD4AQB8AAAeAAADAAAAAAA="],"acc-natural":[16,66,"BgAPAA8ADwAPAA8ADwAPAA8ADwAPAA8ADwAPAA8AD8AP+I/////////////////////////wH/AP8A/wD/AP8A/wD/AP8A/wD/AP+A/+j/////////////////////////9/8A/wA/AA8ADwAPAA8ADwAPAA8ADwAPAA8ADwAPAA4AAA"],"head-filled":[30,24,"AAB/AAD8fwDA/38A/P8/gP//D/D//wf+///B//9/8P//H/7//8f////x//8//P//j////+P//3/4//8P/v//g///f+D//wfw//8A/P8fAP7/AQD+HwAAfgAA"],"head-half":[29,25,"AMA/AAD/PwD4/w/A//8D/D/4wP8AHvwHgMN/AHD8AwCOHwDA+QEAPB8AwOcBAHweAMDPAwD8OADgHwcA/uEA8D8cgP8DB/w/4PP/A/j/HwD+/wAA/wEAAAAAAA=="]};
 
-module.exports = { applyOpsJs, readHeaders, precleanPage, pageQuality, precleanPlan, precleanStats, readTime, readClefAt, makeJsApi };
+module.exports = { dewarpPage, dewarpReading, applyOpsJs, readHeaders, precleanPage, pageQuality, precleanPlan, precleanStats, readTime, readClefAt, makeJsApi };

@@ -1,0 +1,22 @@
+n 306 aggregate 0.777 -> 0.7818 (+0.0048) | pitch 0.7607 -> 0.7668 (+0.0061) | duration 0.69 -> 0.6971 (+0.0071) | rests 0.6317 -> 0.6452 (+0.0135) | parts 0.7793 -> 0.787 (+0.0077) | lyrics 0.7745 -> 0.7745 (+0.0000) | xml_valid 1 -> 1 (+0.0000) | crashes 0 -> 0 (+0.0000) | runtime_ms_mean 3567 -> 3574 (+7)
+  by_family layouts        n=60 agg 0.7137 -> 0.7211 (+0.0074)  dur 0.7687->0.7788 pitch 0.7321->0.7431 rests 0.629->0.6412
+  by_family lyrics         n=6 agg 0.7842 -> 0.7842 (+0.0000)  dur 0.9414->0.9414 pitch 0.9862->0.9862 rests 0.8333->0.8333
+  by_family marks          n=27 agg 0.8476 -> 0.8476 (+0.0000)  dur 0.743->0.743 pitch 0.8664->0.8664 rests 0.7811->0.7811
+  by_family notes          n=30 agg 0.8129 -> 0.8186 (+0.0057)  dur 0.5729->0.5734 pitch 0.8096->0.813 rests 0.7081->0.7081
+  by_family percussion     n=3 agg 0.6139 -> 0.6139 (+0.0000)  dur 0.2278->0.2278 pitch 0.5242->0.5242 rests 0.0243->0.0243
+  by_family perf           n=63 agg 0.8212 -> 0.8288 (+0.0076)  dur 0.7623->0.7743 pitch 0.8263->0.8362 rests 0.623->0.6388
+  by_family pitch          n=36 agg 0.7832 -> 0.7846 (+0.0014)  dur 0.7089->0.7136 pitch 0.6359->0.6374 rests 0.6944->0.7222
+  by_family rests          n=27 agg 0.7236 -> 0.7283 (+0.0047)  dur 0.4918->0.504 pitch 0.653->0.6603 rests 0.457->0.4718
+  by_family structure      n=24 agg 0.7856 -> 0.7936 (+0.0080)  dur 0.7362->0.7487 pitch 0.7427->0.752 rests 0.7004->0.7421
+  by_family time           n=30 agg 0.7599 -> 0.7599 (+0.0000)  dur 0.5651->0.5651 pitch 0.7762->0.7762 rests 0.4924->0.4924
+  by_variant clean          n=102 agg 0.8111 -> 0.8111 (+0.0000)  dur 0.7571->0.7571 pitch 0.816->0.816 rests 0.7098->0.7098
+  by_variant scan           n=102 agg 0.8028 -> 0.8028 (+0.0000)  dur 0.7384->0.7384 pitch 0.8006->0.8006 rests 0.6853->0.6853
+  by_variant scan-severe    n=102 agg 0.7171 -> 0.7314 (+0.0143)  dur 0.5745->0.5958 pitch 0.6656->0.6838 rests 0.5001->0.5406
+items changed: 7/306; first time signature right: off 270/306, on 269/306
+  +0.0504 pitch/pitch-cov-ottava-ledger-melody/scan-severe  agg 0.7207867494824017->0.7711711711711712 dur 0.8285714285714286->1 time 2/4->2/4 (truth 2/4)
+  +0.1247 rests/rst03-whole-bar-rests-simple/scan-severe  agg 0.5766025641025642->0.7013136288998357 dur 0.15384615384615385->0.4827586206896552 time 2/4->4/4 (truth 2/4)
+  +0.1708 notes/nt09-tremolos/scan-severe  agg 0.45928814315911093->0.6300855826201449 dur 0.08602150537634409->0.10204081632653061 time 4/4->2/4 (truth 4/4)
+  +0.1933 structure/str02-repeat-signs-piano/scan-severe  agg 0.7867303710781971->0.980031055900621 dur 0.676923076923077->0.9751552795031055 time 3/1->3/4 (truth 3/4)
+  +0.2220 perf/perf-hymn-a4-200dpi/scan-severe  agg 0.5147025388404699->0.7366653216438624 dur 0.5714285714285714->0.944206008583691 time 3/4->3/4 (truth 3/4)
+  +0.2556 perf/perf-hymn-a4-150dpi/scan-severe  agg 0.5113268295824077->0.7669645073219161 dur 0.5588235294117647->0.9367088607594937 time 3/4->3/4 (truth 3/4)
+  +0.4424 layouts/choir-piano-song-of-rejoicing/scan-severe  agg 0.3298969886025218->0.7723000443958677 dur 0.31266846361185985->0.9160997732426304 time 4/4->4/4 (truth 4/4)
