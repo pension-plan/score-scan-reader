@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.8.0...score-scan-reader-v0.9.0) (2026-11-08)
+
+
+### Features
+
+* ship fix-forward round 3 (benchmark 0.948, real scans 0.926, challenge 0.910) ([7ae1200](https://github.com/pension-plan/score-scan-reader/commit/7ae1200feb5f99495b1333b749fbab1d0259500f))
+
 ## [0.8.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.7.0...score-scan-reader-v0.8.0) (2026-11-08)
 
 
