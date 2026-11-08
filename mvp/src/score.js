@@ -872,7 +872,18 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
         if (prev && !(sg.sy.meters || []).some(m => m.header)) cur = { beats: prev.beats, type: prev.type, symbol: prev.symbol || '' };
         const here = (sg.sy.meters || []).filter(m => !m.courtesy && m.x <= sg.xa + 0.5 * sp);
         if (here.length && (i === 0 || segs[i - 1].sy !== sg.sy || here[here.length - 1].x > segs[i - 1].xa + 0.5 * sp)) {
-          const m = here[here.length - 1];
+          let m = here[here.length - 1];
+          // a worn signature (meter.js: candidates): the candidate whose bar length the following
+          // bars fill (up to four, until the next signature or system header)
+          if (m.weak && m.cands && m.cands.length > 1) {
+            const run = [];
+            for (let j = i; j < segs.length && run.length < 4; j++) {
+              if (j > i && (segs[j].sy !== sg.sy ? (segs[j].sy.meters || []).some(o => o.header) : (sg.sy.meters || []).some(o => !o.courtesy && o !== m && o.x > sg.xa + 0.5 * sp && o.x <= segs[j].xa + 0.5 * sp))) break;
+              run.push(segSum[j]);
+            }
+            const fit = (c) => { const L = (c.beats * 4) / c.type; return run.filter(v => Math.abs(v - L) < 1e-6).length; };
+            m = m.cands.reduce((b, c) => (fit(c) > fit(b) ? c : b), m.cands[0]);
+          }
           cur = { beats: m.beats, type: m.type, symbol: m.symbol || '' };
         }
         segTime[i] = cur;

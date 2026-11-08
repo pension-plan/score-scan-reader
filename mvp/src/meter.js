@@ -14,6 +14,7 @@
 // change of meter, and writes <time> where it changes.
 const { readTime, makeJsApi } = require('./cv');
 const { labelComponents } = require('./cc');
+const { detectRests } = require('./rests');
 
 let api0 = null;
 const matcher = () => (api0 ||= makeJsApi());
@@ -53,7 +54,7 @@ function heal(img, n) {
 const C_OTHERS = ['head-filled', 'head-half', 'rest-quarter', 'rest-8th', 'acc-sharp', 'acc-flat', 'acc-natural', 'clef-C', 'digit-2', 'digit-3', 'digit-4', 'digit-6', 'digit-8', 'digit-9'];
 // a C or cut C starting within [xa, xb]: centred on the middle line, about two spaces high
 // (the cut stroke reaches further up and down)
-function readCommon(R, st, xa, xb, sp) {
+function readCommon(R, st, xa, xb, sp, minScore = 0.5) {
   const xm = (xa + xb) / 2, l0 = st.yAt(0, xm), l2 = st.yAt(2, xm), l4 = st.yAt(4, xm);
   // the glyph's first piece starts in [xa, xb]; the rest of it (the C's terminals and the
   // cut stroke, cut apart by staff-line removal) within 1.5 spaces of it
@@ -69,7 +70,7 @@ function readCommon(R, st, xa, xb, sp) {
   const sc = matcher().scores(heal(g.img, Math.max(2, Math.round(0.18 * sp))), sp, ['time-C', 'time-cut'].concat(C_OTHERS));
   const k = sc['time-cut'] > sc['time-C'] ? 'time-cut' : 'time-C';
   const other = Math.max(...C_OTHERS.map(n => sc[n]));
-  if (sc[k] < 0.5 || sc[k] - other < 0.05) return null;
+  if (sc[k] < minScore || sc[k] - other < (minScore < 0.5 ? 0.02 : 0.05)) return null;
   // the cut stroke runs well past the C's top and bottom
   const cut = k === 'time-cut' && h >= 2.6;
   return { beats: cut ? 2 : 4, type: cut ? 2 : 4, symbol: cut ? 'cut' : 'common', x0: g.x0, x1: g.x1, score: sc[k] };
@@ -94,7 +95,7 @@ const TYPES = new Set([1, 2, 4, 8, 16, 32]);
 // the number in one half of the staff read from all the ink in the band (not by components: on
 // a worn scan staff-line removal breaks the digits into pieces, and the two numbers run together
 // across the middle line). The number's columns: from the first ink column on, to a gap.
-function bandNumber(R, x0, x1, ya, yb, sp) {
+function bandNumber(R, x0, x1, ya, yb, sp, weak = false) {
   const W = R.width, X0 = Math.max(0, Math.round(x0)), X1 = Math.min(W - 1, Math.round(x1)), Y0 = Math.max(0, Math.round(ya)), Y1 = Math.min(R.height - 1, Math.round(yb));
   const col = (x) => { let n = 0; for (let y = Y0; y <= Y1; y++) n += R.data[y * W + x] ? 1 : 0; return n; };
   // (past the barline's columns, ink from top to bottom of the band)
@@ -106,6 +107,14 @@ function bandNumber(R, x0, x1, ya, yb, sp) {
   for (let x = a; x <= X1 && x - a < 2.4 * sp; x++) { if (col(x) >= 1) { b = x; gap = 0; } else if (++gap > 0.3 * sp) break; }
   const w = b - a + 1;
   if (w < 0.4 * sp || w > 2.4 * sp) return null;
+  if (weak) {
+    // a worn number: every single digit it might be (0.42 and up), best first
+    const g = crop(R, { x0: a, x1: b, y0: Y0, y1: Y1 }, 2);
+    if (!g || g.y1 - g.y0 + 1 < 1.0 * sp || w > 1.5 * sp) return null;
+    const sc = matcher().scores(heal(g.img, Math.max(2, Math.round(0.18 * sp))), sp, DIGITS);
+    const cands = DIGITS.map((n, v) => ({ v, score: sc[n] })).filter(c => c.score >= 0.42 && c.v > 0).sort((p, q) => q.score - p.score).slice(0, 3);
+    return cands.length ? { cands, x0: a, x1: b } : null;
+  }
   const read = (xa, xb) => {
     const g = crop(R, { x0: xa, x1: xb, y0: Y0, y1: Y1 }, 2);
     if (!g || g.y1 - g.y0 + 1 < 1.0 * sp) return null;
@@ -139,13 +148,33 @@ function bandTime(R, st, x, sp) {
   return { beats: top.n, type: bot.n, x0: Math.min(top.x0, bot.x0), x1: Math.max(top.x1, bot.x1), score: Math.min(top.score, bot.score) };
 }
 
+// a worn signature after a barline: a digit-like glyph in each half of the staff, one over the
+// other, that reads only weakly. {weak, cands: [{beats, type, score}], x0, x1}; buildScore picks the
+// candidate the following bars fit (or the C / cut C pair for a weak C)
+function weakTime(R, st, x, sp) {
+  const xm = x + sp, l0 = st.yAt(0, xm), l2 = st.yAt(2, xm), l4 = st.yAt(4, xm);
+  const top = bandNumber(R, x, x + 3 * sp, l0 - 0.3 * sp, l2 - 0.08 * sp, sp, true);
+  const bot = top && bandNumber(R, x, x + 3 * sp, l2 + 0.08 * sp, l4 + 0.3 * sp, sp, true);
+  if (top && bot && top.x0 < x + 1.3 * sp && Math.min(top.x1, bot.x1) - Math.max(top.x0, bot.x0) >= 0.3 * sp) {
+    const cands = [];
+    for (const t of top.cands) for (const u of bot.cands) {
+      const m = { beats: t.v, type: u.v, score: Math.min(t.score, u.score) };
+      if (plausible(m)) cands.push(m);
+    }
+    if (cands.length) return { weak: true, cands, beats: cands[0].beats, type: cands[0].type, symbol: '', x0: Math.min(top.x0, bot.x0), x1: Math.max(top.x1, bot.x1), score: cands[0].score };
+  }
+  const c = readCommon(R, st, x - 0.1 * sp, x + 1.3 * sp, sp, 0.42);
+  if (c) return { ...c, weak: true, cands: [{ beats: 4, type: 4, symbol: 'common', score: c.score }, { beats: 2, type: 2, symbol: 'cut', score: c.score }] };
+  return null;
+}
+
 // a time signature on staff s starting at about x (after a barline or a key change)
 function meterAt(R, s, x, sp) {
   const st = s.st, api = matcher();
   const t = readTime(api, R, st, x - 0.1 * sp, x + 3.4 * sp, sp, 0.55) || bandTime(R, st, x - 0.1 * sp, sp);
   if (t && t.x0 < x + 1.3 * sp && t.beats >= 1) return { beats: t.beats, type: t.type, symbol: '', x0: t.x0, x1: t.x1, score: t.score };
   const c = readCommon(R, st, x - 0.1 * sp, x + 1.3 * sp, sp);
-  return c;
+  return c || weakTime(R, st, x - 0.1 * sp, sp);
 }
 
 const valueOf = (m) => `${m.beats}/${m.type}/${m.symbol || ''}`;
@@ -165,8 +194,10 @@ function readMeters(fr, asm, stats = {}) {
       const drop = []; // x ranges whose 'heads' are digits
       try {
         // the header (the first system's numbers are read by cv.js readHeaders)
-        if (h.time && !h.time.beats && si > 0) {
-          const t = readTime(matcher(), R, st, h.time.x0 - 0.3 * sp, h.time.x1 + 0.3 * sp, sp, 0.45);
+        if (h.time && !h.time.beats) {
+          // (the first system's numbers were tried by cv.js readHeaders: worn ones are read again
+          // from the ink in each half of the staff)
+          const t = (si > 0 && readTime(matcher(), R, st, h.time.x0 - 0.3 * sp, h.time.x1 + 0.3 * sp, sp, 0.45)) || bandTime(R, st, h.time.x0 - 0.3 * sp, sp);
           if (t) { h.time.beats = t.beats; h.time.type = t.type; h.time.cv = true; stats.timeRead = (stats.timeRead || 0) + 1; }
         } else if (!h.time) {
           const x0 = h.end - 0.4 * sp;
@@ -226,7 +257,17 @@ function readMeters(fr, asm, stats = {}) {
     }
     const hdr = found.filter(f => f.header);
     if (hdr.length) groups.unshift(hdr);
-    for (const fs of groups) {
+    for (let fs of groups) {
+      // a clear reading on any staff wins over worn ones; worn readings pool their candidates
+      if (fs.some(g => !g.m.weak)) fs = fs.filter(g => !g.m.weak);
+      else if (!fs[0].header) {
+        const cands = [];
+        for (const g of fs) for (const c of g.m.cands) if (!cands.some(o => o.beats === c.beats && o.type === c.type && (o.symbol || '') === (c.symbol || ''))) cands.push(c);
+        meters.push({ x: Math.min(...fs.map(g => g.x)), beats: cands[0].beats, type: cands[0].type, symbol: cands[0].symbol || '', weak: true, cands });
+        const xa = Math.min(...fs.map(g => g.m.x0)) - 0.3 * fr.ss, xb = Math.max(...fs.map(g => g.m.x1)) + 0.3 * fr.ss;
+        for (const s of sy.staves) s.chords = s.chords.filter(c => c.x < xa || c.x > xb);
+        continue;
+      }
       const cnt = {};
       for (const f of fs) if (plausible(f.m)) cnt[valueOf(f.m)] = (cnt[valueOf(f.m)] || 0) + 1;
       if (!Object.keys(cnt).length) continue;
@@ -246,6 +287,50 @@ function readMeters(fr, asm, stats = {}) {
       }
     }
     meters.sort((a, b) => a.x - b.x);
+    // a 'barline' inside the headers (a stroke of one staff's longer key signature or time
+    // signature, read as a barline on that staff): no bar ends there
+    const hdrEnd = Math.max(...sy.staves.map(s => (s.hdr && s.hdr.end != null ? s.hdr.end : -Infinity)));
+    // the header time signature stands at one x on every staff: 'heads' there on a staff whose
+    // header parse stopped early are its digits
+    const tb = sy.staves.map(s => s.hdr && s.hdr.time).filter(t => t && t.x0 != null);
+    if (tb.length && tb.length < sy.staves.length) {
+      const xa = Math.min(...tb.map(t => t.x0)) - 0.3 * fr.ss, xb = Math.max(...tb.map(t => t.x1)) + 0.3 * fr.ss;
+      for (const s of sy.staves) if (!(s.hdr && s.hdr.time)) {
+        const n = s.chords.length;
+        s.chords = s.chords.filter(c => c.x < xa || c.x > xb);
+        stats.headsDropped = (stats.headsDropped || 0) + n - s.chords.length;
+      }
+    }
+    if (sy.measures.length >= 2 && sy.measures[0][1] <= hdrEnd + 0.5 * fr.ss) {
+      sy.measures.splice(0, 2, [sy.measures[0][0], sy.measures[1][1]]);
+      stats.headerBars = (stats.headerBars || 0) + 1;
+    }
+    // a 'barline' seen on one staff only of a system whose other barlines run through all its
+    // staves, cutting off a sliver, is a stem or a beam end: the bars on either side are one
+    if (sy.staves.length >= 2 && sy.measures.length >= 3) {
+      const sis = sy.staves.map(s => s.si);
+      const seen = (x) => new Set(fr.barlines.filter(b => sis.includes(b.staff) && Math.abs(b.x - x) < 1.2 * fr.ss).map(b => b.staff)).size;
+      const inner = sy.measures.slice(1).map(m => m[0]);
+      const full = inner.filter(x => seen(x) === sis.length).length;
+      if (full >= 2 && full >= 0.5 * inner.length) {
+        // (only where it cuts off a sliver of a bar: a barline missed on the other staff leaves
+        // two full bars, which bar grouping sorts out by their contents)
+        const sliver = (m) => m && m[1] - m[0] < 4 * fr.ss;
+        for (let k = sy.measures.length - 2; k >= 1; k--) {
+          // a sliver between two such 'barlines' (a stem on each staff) goes with both
+          const m = sy.measures[k];
+          if (!sliver(m) || seen(m[0]) > 1 || seen(m[1]) > 1 || k + 1 >= sy.measures.length) continue;
+          sy.measures.splice(k - 1, 3, [sy.measures[k - 1][0], sy.measures[k + 1][1]]);
+          stats.oneStaffBars = (stats.oneStaffBars || 0) + 2;
+          k--;
+        }
+        for (let k = sy.measures.length - 1; k >= 1; k--) {
+          if (seen(sy.measures[k][0]) > 1 || !(sliver(sy.measures[k]) || sliver(sy.measures[k - 1]))) continue;
+          sy.measures.splice(k - 1, 2, [sy.measures[k - 1][0], sy.measures[k][1]]);
+          stats.oneStaffBars = (stats.oneStaffBars || 0) + 1;
+        }
+      }
+    }
     // a signature with no barline before it: the bar is split there
     for (const m of meters) {
       if (!m.split) continue;
@@ -259,14 +344,22 @@ function readMeters(fr, asm, stats = {}) {
       if (m.header) continue;
       const later = bars.filter(b => b > m.x + 0.5 * fr.ss);
       const notes = sy.staves.some(s => s.chords.some(c => c.x > m.x + 0.5 * fr.ss));
-      if (!later.length && !notes && right - m.x < 6 * fr.ss) m.courtesy = true;
+      // (with a courtesy key change before it the signatures run up to about 16 spaces; a bar of
+      // rest after a change of meter is a bar, not a courtesy signature)
+      const rests = () => sy.staves.some(s => { try { return detectRests({ R, comps: asm.comps, s, xa: m.x, xb: right + 1 }).length > 0; } catch (e) { return false; } });
+      if (!later.length && !notes && (right - m.x < 6 * fr.ss || (right - m.x < 18 * fr.ss && !rests()))) m.courtesy = true;
     }
     // bars left empty by the digits dropped (the courtesy signature's 'bar')
     const before = sy.measures.length;
     sy.measures = sy.measures.filter(([xa, xb]) => {
       const sp = fr.ss;
-      if (xb - xa > 6 * sp) return true;
       if (sy.staves.some(s => s.chords.some(c => c.x > xa && c.x < xb))) return true;
+      if (meters.some(m => m.courtesy && m.x >= xa - sp && m.x <= xb)) return false;
+      // the system's last 'bar' holding only a courtesy key signature (a key change read there)
+      const last = xb >= Math.max(...sy.staves.map(s => s.st.right)) - sp;
+      if (last && sy.staves.some(s => (s.changes || []).some(ch => ch.fifths != null && ch.x > xa && ch.x <= xb)) &&
+        !sy.staves.some(s => { try { return detectRests({ R, comps: asm.comps, s, xa, xb }).length > 0; } catch (e) { return false; } })) return false;
+      if (xb - xa > 6 * sp) return true;
       return !meters.some(m => !m.header && m.x >= xa - sp && m.x <= xb);
     });
     stats.barsDropped = (stats.barsDropped || 0) + before - sy.measures.length;
