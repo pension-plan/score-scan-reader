@@ -112,7 +112,13 @@ const escX = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').repla
 function channelFor(i, drums) { if (drums) return 10; const c = (i % 15) + 1; return c >= 10 ? c + 1 : c; }
 function panFor(i, n, family) { if (n <= 1 || family === 'piano' || family === 'organ') return 0; return Math.round(-40 + (80 * i) / (n - 1)); }
 // <score-instrument> + <midi-instrument> for a <score-part> (after part-name / part-abbreviation, as the schema orders them)
+// ctx.kit: a drum kit ([{id, name, key}], percussion.js): one instrument per drum on channel 10,
+// its General MIDI key as <midi-unpitched> (1-based)
 function instrumentXML(part, i, n, ctx = {}) {
+  if (ctx.kit) {
+    return ctx.kit.map((k) => `<score-instrument id="${part.id}-${k.id}"><instrument-name>${escX(k.name)}</instrument-name></score-instrument>`).join('') +
+      ctx.kit.map((k) => `<midi-instrument id="${part.id}-${k.id}"><midi-channel>10</midi-channel><midi-unpitched>${k.key + 1}</midi-unpitched><volume>80</volume><pan>${panFor(i, n, 'drums')}</pan></midi-instrument>`).join('');
+  }
   const g = gmFor(part.name, { vocalParts: ctx.vocalParts, kind: part.kind });
   const id = `${part.id}-I1`;
   const drums = g.program < 0;
@@ -199,7 +205,11 @@ function readMeasure(meas, st) {
         const p = kid(el, 'pitch'), un = kid(el, 'unpitched');
         let midi = null, drum = false;
         if (p) midi = 12 * ((+txt(p, 'octave')) + 1) + (STEP[txt(p, 'step')] || 0) + Math.round(+txt(p, 'alter') || 0) + (st.transpose || 0);
-        else if (un) { drum = true; midi = st.drumNote || 38; }
+        else if (un) {
+          // the note's drum: its <instrument> (a kit's midi-unpitched), else the part's, else a snare
+          const ins = kid(el, 'instrument'), k = ins && st.drumKeys ? st.drumKeys[ins.attrs.id] : null;
+          drum = true; midi = k != null ? k : st.drumNote != null ? st.drumNote : 38;
+        }
         if (midi != null && midi >= 0 && midi <= 127) {
           const ties = kids(el, 'tie').map((t) => t.attrs.type).concat(nots ? kids(nots, 'tied').map((t) => t.attrs.type) : []);
           const art = nots ? kid(nots, 'articulations') : null;
@@ -274,10 +284,12 @@ function events(xml, opts = {}) {
   const pl = kid(sp, 'part-list');
   const spEls = pl ? kids(pl, 'score-part') : [];
   const partEls = kids(sp, 'part');
-  const nameOf = {}; const midiOf = {};
+  const nameOf = {}; const midiOf = {}; const drumKeysOf = {};
   for (const s of spEls) {
     nameOf[s.attrs.id] = txt(s, 'part-name');
     const mi = kid(s, 'midi-instrument'), un = mi && kid(mi, 'midi-unpitched');
+    // every drum of a kit (one midi-instrument per score-instrument)
+    for (const m of kids(s, 'midi-instrument')) { const u = kid(m, 'midi-unpitched'); if (u) (drumKeysOf[s.attrs.id] ||= {})[m.attrs.id] = +u.text - 1; }
     if (mi) midiOf[s.attrs.id] = { channel: +txt(mi, 'midi-channel') || 0, program: txt(mi, 'midi-program') ? +txt(mi, 'midi-program') - 1 : null, volume: txt(mi, 'volume') ? +txt(mi, 'volume') : null, pan: txt(mi, 'pan') ? +txt(mi, 'pan') : null, unpitched: un ? +un.text - 1 : null };
   }
   const vocalParts = partEls.filter((p) => { const n = nameOf[p.attrs.id] || ''; return !NAME_GM.some(([re]) => re.test(n)) && VOICE_RE.test(n); }).length;
@@ -285,7 +297,7 @@ function events(xml, opts = {}) {
   // read every part's measures
   const parts = partEls.map((p, pi) => {
     const id = p.attrs.id;
-    const st = { div: 1, beats: 4, beatType: 4, transpose: 0, staves: 1, drumNote: midiOf[id] && midiOf[id].unpitched != null ? midiOf[id].unpitched : null };
+    const st = { div: 1, beats: 4, beatType: 4, transpose: 0, staves: 1, drumNote: midiOf[id] && midiOf[id].unpitched != null ? midiOf[id].unpitched : null, drumKeys: drumKeysOf[id] || null };
     const meas = kids(p, 'measure').map((m) => { const r = readMeasure(m, st); r.number = m.attrs.number || ''; r.timeQ = (st.beats * 4) / st.beatType; r.beats = st.beats; r.beatType = st.beatType; return r; });
     const g = gmFor(nameOf[id], { vocalParts });
     const mo = midiOf[id] || {};

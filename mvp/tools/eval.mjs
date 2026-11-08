@@ -403,10 +403,13 @@ function extractScore(xml) {
           const on = chord ? last : t;
           if (!chord) { last = t; t += dur; }
           if (kid(c, 'cue')) continue;
-          const pt = kid(c, 'pitch');
-          const rest = !!kid(c, 'rest') || !pt;
+          const pt = kid(c, 'pitch'), un = kid(c, 'unpitched');
+          const rest = !!kid(c, 'rest') || (!pt && !un);
           let midi = null;
           if (pt) midi = (+txt(pt, 'octave') + 1) * 12 + STEP[txt(pt, 'step')] + Math.round(+txt(pt, 'alter') || 0);
+          // an unpitched (percussion) note: its staff position (display step and octave), kept apart
+          // from pitches (+1000) so a drum note matches only a drum note at the same position
+          else if (un) midi = 1000 + (+txt(un, 'display-octave') + 1) * 12 + STEP[txt(un, 'display-step')];
           const lyrics = kids(c, 'lyric').map((l, k) => ({
             num: l.attrs.number || String(k + 1),
             text: normText(kids(l, 'text').map(x => x.text).join('')),

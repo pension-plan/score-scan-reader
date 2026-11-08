@@ -564,6 +564,15 @@ changing between systems; labels misread. **Confidence.** Per part: the minimum 
    rest with `print-object="no"`.
 6. **Lyrics.** `<lyric number="v">` with `<syllabic>`, `<text>`, optional `<elision>`, and `<extend
    type="start|stop"/>`; melisma continuation notes get no lyric element [VOI §8].
+   **Percussion staves** (`src/percussion.js`): a staff whose header has the percussion clef (two upright
+   bars centred on the middle line, found on the staff-removed image) gets `<clef><sign>percussion</sign>`
+   and its notes are written `<unpitched>` with the position as `<display-step>`/`<display-octave>` (read like
+   a treble staff), an `<instrument id>` from the drum kit at that position (bass drum F4, floor tom A4, snare
+   C5, toms D5/E5; with an x head: pedal hi-hat D4, hi-hat E5/G5, ride F5, crash A5) and `<notehead>x</notehead>`
+   for x heads (a head on such a staff that is not solid, its position taken from the x's centre). The part
+   declares the kit as one `<score-instrument>`/`<midi-instrument>` per drum on channel 10 with its General
+   MIDI key (`<midi-unpitched>`), and playback.js plays each note on its own drum. A part with no read name
+   is called Drum Set. One-line percussion staves are not found yet (staves.js finds five-line staves).
 7. **Measures.** `number` sequential from 1 (0 for a pickup), `implicit="yes"` on pickups, `<barline>` for
    repeats, double and final bars. `<print new-system="yes">` and `new-page="yes"` mirror the scan's layout.
 8. **Escaping and identity.** XML-escape all text; `<identification><encoding>` with software name and date;

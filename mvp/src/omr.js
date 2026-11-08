@@ -14,6 +14,7 @@ const { pageMarks } = require('./symbols');
 const { buildScore } = require('./score');
 const { makeGray, keepPacked } = require('./image');
 const { readHeaders, dewarpReading } = require('./cv');
+const { markPercussion } = require('./percussion');
 const { regularSystems } = require('./staves');
 
 // gray page turned clockwise by quarter turns (1, 2 or 3)
@@ -54,6 +55,8 @@ function analyse(gray, idx, frOpts, dewarp = true) {
   // header glyphs the parse left unread (time-signature numbers, unread clefs): template
   // matching in src/cv.js; after the count above, so orientation still judges the plain reading
   readHeaders(fr, asm);
+  // percussion clefs (percussion.js): their staves are written as unpitched drum notes
+  markPercussion(fr, asm);
   return { fr, asm, n, read };
 }
 

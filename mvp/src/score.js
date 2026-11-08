@@ -9,6 +9,7 @@ const { readArticulations, readDoubleDots } = require('./artic');
 const { readOttavas } = require('./ottava');
 const { pageMarks } = require('./symbols');
 const { instrumentXML, soundDynamics, tempoFromWords } = require('./playback');
+const { KIT, kitAt } = require('./percussion');
 const { syllabify, detectLang } = require('./lyrics');
 
 const COLORS = ['#d1495b', '#edae49', '#00798c', '#30638e', '#7b5ea7', '#3a7d44'];
@@ -1691,6 +1692,7 @@ function clefXML(c, n) {
   if (c === 'F8va') return `<clef${num}><sign>F</sign><line>4</line><clef-octave-change>1</clef-octave-change></clef>`;
   if (c === 'G8va') return `<clef${num}><sign>G</sign><line>2</line><clef-octave-change>1</clef-octave-change></clef>`;
   if (/^C[1-5]$/.test(c)) return `<clef${num}><sign>C</sign><line>${c[1]}</line></clef>`;
+  if (c === 'perc') return `<clef${num}><sign>percussion</sign></clef>`;
   return `<clef${num}><sign>G</sign><line>2</line></clef>`;
 }
 
@@ -2295,7 +2297,10 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, unitTime, unitBar
   parts.forEach((p, i) => {
     if (groupChoir && i === vocalIdx[0]) L.push('    <part-group type="start" number="1"><group-name>Choir</group-name><group-symbol>bracket</group-symbol><group-barline>no</group-barline></part-group>');
     // General MIDI sound per part (playback.js), so exports and players carry it (OMR_NO_MIDI=1: left out)
-    const midi = process.env.OMR_NO_MIDI ? '' : instrumentXML(p, i, parts.length, { vocalParts: parts.filter(q => q.kind === 'vocal').length });
+    // a part on percussion staves (percussion.js): a drum kit, its notes unpitched
+    const perc = p.src.every(s => clefs[s.staff] === 'perc');
+    if (perc && /^(Voice|Part|Staff) \d+/.test(p.name)) p.name = 'Drum Set';
+    const midi = process.env.OMR_NO_MIDI ? '' : instrumentXML(p, i, parts.length, { vocalParts: parts.filter(q => q.kind === 'vocal').length, kit: perc ? KIT : null });
     L.push(`    <score-part id="${p.id}"><part-name>${esc(p.name)}</part-name>${p.abbrev ? `<part-abbreviation>${esc(p.abbrev)}</part-abbreviation>` : ''}${midi}</score-part>`);
     if (groupChoir && i === vocalIdx[vocalIdx.length - 1]) L.push('    <part-group type="stop" number="1"/>');
   });
@@ -2428,6 +2433,8 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, unitTime, unitBar
             // under an octave line (ottava.js: h.ott) the note sounds 1 or 2 octaves away
             const pt = h.ott && pw.octave + h.ott >= 0 && pw.octave + h.ott <= 9 ? { ...pw, octave: pw.octave + h.ott, d: pw.d + 7 * h.ott } : pw;
             h.pitch = pt;
+            // a percussion staff: the position (display step and octave) and the kit instrument there
+            const perc = hClef === 'perc', kit = perc ? kitAt(pk.step, pk.octave, !!h.xHead) : null;
             // (overlay only: the value written for this head, first part that writes it)
             h.shown ||= { q: e.q, type: tt ? tt.type : null, dots: tt ? tt.dots : 0, tuplet: tmod ? tu.actual : 0 };
             if (!noted.has(h)) { noted.add(h); noteAt.push([h, L.length]); }
@@ -2472,8 +2479,10 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, unitTime, unitBar
                 else lyr += `<lyric number="${n}"><extend type="stop"/></lyric>`;
               }
             }
-            L.push(`      <note>${hi > 0 ? '<chord/>' : ''}<pitch><step>${pt.step}</step>${pt.alter ? `<alter>${pt.alter}</alter>` : ''}<octave>${pt.octave}</octave></pitch>` +
-              `<duration>${dur}</duration>${tie}<voice>${voice}</voice>${typeXML}${acc}${tmod}${stem}${staffTag}${beamOf[ei] ? `<beam number="1">${beamOf[ei]}</beam>` : ''}${tied}${lyr}</note>`);
+            const what = perc ? `<unpitched><display-step>${pk.step}</display-step><display-octave>${pk.octave}</display-octave></unpitched>`
+              : `<pitch><step>${pt.step}</step>${pt.alter ? `<alter>${pt.alter}</alter>` : ''}<octave>${pt.octave}</octave></pitch>`;
+            L.push(`      <note>${hi > 0 ? '<chord/>' : ''}${what}` +
+              `<duration>${dur}</duration>${tie}${perc ? `<instrument id="${p.id}-${kit.id}"/>` : ''}<voice>${voice}</voice>${typeXML}${perc ? '' : acc}${tmod}${stem}${perc && h.xHead ? '<notehead>x</notehead>' : ''}${staffTag}${beamOf[ei] ? `<beam number="1">${beamOf[ei]}</beam>` : ''}${tied}${lyr}</note>`);
           });
         }
       });
