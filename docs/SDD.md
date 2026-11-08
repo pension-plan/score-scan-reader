@@ -166,6 +166,19 @@ all-in-one script as fallback); and the notation library loads once the text rea
 profile (4x CPU, Fast 3G): first result 54.5 to 48.8 s (results shown 52.1 to 45.5 s); desktop 4.1 to 4.0 s.
 On the phone profile the result is bound by the bytes: about 45 s of Fast 3G for what the first result needs.
 
+**Progressive first result.** With OCR on, the converter reads a page's text (lyrics, titles, text marks)
+after its step returns (`createConverter({deferText})`), one page after another in page order, so the next
+page's analysis does not wait for the text reader. When every page has been analysed and the text reader is
+still loading, the page shows a notes-only score (`preview()`: score assembly without lyrics or text; the page
+data is put back afterwards, because assembly marks what it used, such as fingerings set on heads) with the
+note that lyrics, titles and text are still being read; `settle()` then waits for the text and `finish()`
+builds the full score, identical to a run without the preview (benchmark, challenge lyrics/layout and
+multi-page coverage items: MusicXML and warnings byte-identical). Each page's overlay is sent again once its
+text is read. Phone profile, default sample: notes shown at 18.9 s instead of 45.6 s; the full result at
+48.5 s as before (bound by the OCR models' download). At most two pages wait for their text, holding their
+image buffers until then. The two models (eng, deu) load together; neither can be read without the other,
+so fetching eng first would not show text sooner.
+
 **Size budget.** Each supporting file ≤ 15 MB, the total ≤ 64 MB [WF]. Planned: phase 1 about 13–20 MB, phase
 2 with ONNX about 30–40 MB [OMR §9.3]. The build fails if a limit is exceeded (§9).
 

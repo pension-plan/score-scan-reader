@@ -427,12 +427,16 @@
         if (m.t === 'alive') {
           alive = true; clearTimeout(timer);
           resolveEngine(Object.assign(eng, {
-            init(useOcr) { const p = wait('ready', 60000); w.postMessage({ t: 'init', ocr: !!useOcr, ocrExtra: !!(useOcr && ocrFn && ocrFn.extra) }); return p; },
+            // with OCR, a page's text is read after its step (deferText): a slow text reader holds
+            // back only the text, and preview() gives the score from the notes meanwhile
+            init(useOcr) { const p = wait('ready', 60000); w.postMessage({ t: 'init', ocr: !!useOcr, ocrExtra: !!(useOcr && ocrFn && ocrFn.extra), deferText: !!useOcr }); return p; },
+            preview(o) { const p = wait('preview', 300000); if (!eng.dead) w.postMessage({ t: 'preview', opts: o || {} }); return p.then((m2) => m2.result); },
             addPage(gray, i, n) { const p = wait('page-done', 300000); if (!eng.dead) w.postMessage({ t: 'page', i, n, gray, maxW: THUMB_W }, [gray.data.buffer]); return p; },
             finish(o) { const p = wait('done', 300000); if (!eng.dead) w.postMessage({ t: 'finish', opts: o || {} }); return p.then((m2) => m2.result); },
             dispose() { eng.dead = true; w.terminate(); settle(false, new Error('stopped')); },
           }));
         } else if (m.t === 'progress') onProgress(m.msg, m.info);
+        else if (m.t === 'page-view') { if (eng.onPageView) eng.onPageView(m.i, m.view); }
         else if (m.t === 'ocr') {
           Promise.resolve().then(() => (m.extra && ocrFn.extra ? ocrFn.extra(m.img) : ocrFn(m.img))).then(
             (words) => w.postMessage({ t: 'ocr-res', id: m.id, words }),
@@ -1269,13 +1273,13 @@
       $('stop').disabled = false;
       $('stop').textContent = 'Stop after this page';
 
-      let ocr = null, ocrError = null;
+      let ocr = null, ocrError = null, ocrIn = false;
       try {
         // the text reader keeps loading while the first page is analysed: the first read waits
         // for it (at most 45 s from here, as before); if it does not come, reads return nothing
         // and the result says the text reader was unavailable
         const ocrReady = withTimeout(ocrP, 45000);
-        ocrReady.catch((e) => { ocrError = ocrError || (e && e.message) || String(e); });
+        ocrReady.then(() => { ocrIn = true; }, (e) => { ocrError = ocrError || (e && e.message) || String(e); });
         const w = { recognize: async (...a) => (await ocrReady).recognize(...a) };
         // the image goes to Tesseract as a binary PGM blob: the same pixels as the PNG a canvas
         // would make (identical words and boxes), without a canvas or a PNG encode on this thread.
@@ -1323,6 +1327,8 @@
         if (key !== lastStatusKey) { lastStatusKey = key; status(m.replace(/\s*\(\d+\/\d+ lines?\)/, '')); }
       };
       engine = await startEngine(ocr, onProgress);
+      // a page's view again once its text is read (deferText): titles and text marks on the overlay
+      engine.onPageView = (i, view) => { const p = book.pages[i]; if (!p || !p.view || !view) return; p.view = view; if (book.sel === i) book.show(i); };
       const engineKind = engine.kind;
       await engine.init(!!ocr);
 
@@ -1383,6 +1389,16 @@
       }
       $('stop').hidden = true;
       $('fileEta').hidden = true;
+      // the text reader still loading (a slow connection): the score from the notes first, the
+      // lyrics, titles and text marks when the reader has read them
+      if (engine.preview && ocr && !ocrIn && !ocrError && read) {
+        const pv = await engine.preview({ stanzasAsVerses: $('stanzaVerses').checked });
+        if (pv && pv.score && pv.score.parts && pv.score.parts.length) {
+          mark('preview');
+          status('Notes read; reading lyrics and text');
+          await showResult(pv, ['Lyrics, titles and text are still being read: the text reader is loading. The notes are shown first.'], null, read, true);
+        }
+      }
       mark('finish');
       const res = await engine.finish({ stanzasAsVerses: $('stanzaVerses').checked });
       mark('results');
@@ -1438,7 +1454,9 @@
   }
 
   // Everything drawn from a result: parts, lyrics, warnings, MusicXML and the preview.
-  async function showResult(res, pre, ocrError, read) {
+  // preview: the notes-only score shown while the text reader loads (the notation library is
+  // not fetched for it, so it does not compete with the text reader's download)
+  async function showResult(res, pre, ocrError, read, preview) {
     res.ocrError = ocrError;
     res.pagesRead = read;
     res.warnings = pre.concat(res.warnings || []);
@@ -1456,6 +1474,7 @@
     renderWarnings((res.warnings || []).concat(corrWarnings(corr)));
     renderCode(corr.xml);
     await nextPaint();
+    if (preview && typeof opensheetmusicdisplay === 'undefined') { $('osmd').textContent = ''; $('osmdNote').textContent = 'The notation is drawn once the text has been read.'; return; }
     await renderNotation(corr.xml, res.score.measures || 0, false);
   }
 
