@@ -74,7 +74,7 @@ const srv = http.createServer((req, res) => {
   if (p === '/__fixture/book.pdf') { res.writeHead(200, { 'Content-Type': 'application/pdf' }); return fs.createReadStream(fixPath).pipe(res); }
   const f = path.join(DIST, p);
   if (!f.startsWith(DIST) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404); return res.end(); }
-  res.writeHead(200, { 'Content-Security-Policy': CSP });
+  res.writeHead(200, { 'Content-Security-Policy': CSP, ...(f.endsWith('.wasm') ? { 'Content-Type': 'application/wasm' } : {}) });
   fs.createReadStream(f).pipe(res);
 });
 

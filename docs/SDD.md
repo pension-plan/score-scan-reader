@@ -155,6 +155,17 @@ the same terms in the same order, so scores are bit-identical), digit readers sc
 only for a glyph that reads as a digit, and `cc.js labelComponents` uses scalar neighbours instead of a
 per-pixel array: 300 dpi piano page 5.9 to 3.8 s, 5-page item 4.1 to 2.7 s per page, same MusicXML.
 
+**First load.** Before the default sample's first result the page downloads about 7.2 MB (live Pages,
+measured with Playwright): the OCR models (eng 2.8 MB + deu 1.3 MB, gzip files the reader unpacks), the
+Tesseract core, the sample PDF (0.74 MB), pdf.js and the page itself. The ML models, the soundfont, the extra
+OCR languages and the example PDFs are fetched only when used. Three things keep the first result early
+without changing it: the conversion starts while the text reader is still loading (the first read waits for
+it, at most 45 s as before); the Tesseract core is its 90 KB loader plus the wasm binary, served compressed
+(1.07 MB instead of 1.39 MB for the script with the wasm as base64; checked to be the same binary, with the
+all-in-one script as fallback); and the notation library loads once the text reader is in. Throttled phone
+profile (4x CPU, Fast 3G): first result 54.5 to 48.8 s (results shown 52.1 to 45.5 s); desktop 4.1 to 4.0 s.
+On the phone profile the result is bound by the bytes: about 45 s of Fast 3G for what the first result needs.
+
 **Size budget.** Each supporting file ≤ 15 MB, the total ≤ 64 MB [WF]. Planned: phase 1 about 13–20 MB, phase
 2 with ONNX about 30–40 MB [OMR §9.3]. The build fails if a limit is exceeded (§9).
 

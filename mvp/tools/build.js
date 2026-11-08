@@ -25,13 +25,14 @@ const ML_ASSETS = ['copista2m-dense.int8w.onnx', 'copista2m-rel.int8w.onnx', 'co
   'LICENSE.copista-Apache-2.0.txt', 'NOTICE.copista-2m', 'NOTICE.copisteria', 'LICENSE.onnxruntime-web-MIT.txt', 'NOTICE.ml.txt'];
 // playback: the sampled General MIDI subset (tools/soundfont.mjs) and its licence notice
 const SOUND_ASSETS = ['gm-piano.json', 'gm-organ.json', 'gm-choir.json', 'gm-oohs.json', 'gm-strings.json', 'gm-flute.json', 'gm-clarinet.json', 'gm-brass.json', 'NOTICE.soundfont.txt'];
-const REQUIRED_ASSETS = [...SOUND_ASSETS, 'tesseract-worker.min.js', 'tesseract-core-simd-lstm.wasm.js', 'eng.traineddata.gz', 'deu.traineddata.gz', 'sample-st-anselm.pdf', 'sample-maple-leaf-rag.pdf', 'samples.json', ...ML_ASSETS];
+const REQUIRED_ASSETS = [...SOUND_ASSETS, 'tesseract-worker.min.js', 'tesseract-core-simd-lstm.wasm.js', 'tesseract-core-simd-lstm.js', 'tesseract-core-simd-lstm.wasm', 'eng.traineddata.gz', 'deu.traineddata.gz', 'sample-st-anselm.pdf', 'sample-maple-leaf-rag.pdf', 'samples.json', ...ML_ASSETS];
 const SCRIPTS = [
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/7.0.0/tesseract.min.js',
-  'https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.8.9/build/opensheetmusicdisplay.min.js',
 ];
+// loaded by the page when first needed (ui/app.js loadOSMD), pinned there:
+//   https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.8.9/build/opensheetmusicdisplay.min.js
 const FONTS = 'https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400..600&display=swap';
 
 const errors = [];

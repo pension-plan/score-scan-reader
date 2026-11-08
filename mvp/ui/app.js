@@ -63,7 +63,21 @@
           if (!r.ok) throw new Error(name + ' ' + r.status);
           return URL.createObjectURL(new Blob([await r.text()], { type: 'text/javascript' }));
         };
-        const [workerURL, coreURL] = await Promise.all([blobOf('tesseract-worker.min.js'), blobOf('tesseract-core-simd-lstm.wasm.js')]);
+        // The core: the Emscripten loader (90 KB) with its wasm binary beside it (2.9 MB, which
+        // the server compresses), not the 3.9 MB script holding the same wasm as base64: about
+        // 0.4 MB less to download and no base64 to decode. The loader is told where its wasm is;
+        // if that core cannot start, the all-in-one script is used.
+        // (a core whose wasm is missing would hang in its worker, so the wasm is checked here)
+        const splitCore = async () => {
+          const [r, h] = await Promise.all([fetch(base + 'tesseract-core-simd-lstm.js'), fetch(base + 'tesseract-core-simd-lstm.wasm', { method: 'HEAD' })]);
+          if (!r.ok || !h.ok) throw new Error('split core ' + r.status + '/' + h.status);
+          const wasm = JSON.stringify(base + 'tesseract-core-simd-lstm.wasm');
+          const src = (await r.text()) + `\n;(function(){var f=TesseractCore;TesseractCore=function(o){return f(Object.assign({},o,{locateFile:function(){return ${wasm};}}));};})();\n`;
+          return URL.createObjectURL(new Blob([src], { type: 'text/javascript' }));
+        };
+        let [workerURL, coreURL] = await Promise.all([blobOf('tesseract-worker.min.js'), splitCore().catch(() => null)]);
+        let split = !!coreURL;
+        if (!split) coreURL = await blobOf('tesseract-core-simd-lstm.wasm.js');
         const cfg = ocrConfig();
         const make = (langs) => Tesseract.createWorker(langs, cfg.oem, {
           workerPath: workerURL,
@@ -75,9 +89,18 @@
         }, { user_words_suffix: '' });
         // the pipeline's language set (eng+deu: umlauts and German words), or
         // English alone if a language file is missing
-        ocrMake = async (l) => { const x = await make(l); await x.setParameters(cfg.params); return x; };
+        // a split core that does not start: the all-in-one core from then on
+        const start = async (l) => {
+          try { return await make(l); } catch (e) {
+            if (!split) throw e;
+            split = false;
+            coreURL = await blobOf('tesseract-core-simd-lstm.wasm.js');
+            return make(l);
+          }
+        };
+        ocrMake = async (l) => { const x = await start(l); await x.setParameters(cfg.params); return x; };
         let w, langs = cfg.langs;
-        try { w = await make(langs); } catch (e) { if (langs === 'eng') throw e; langs = 'eng'; w = await make(langs); }
+        try { w = await start(langs); } catch (e) { if (langs === 'eng') throw e; langs = 'eng'; w = await start(langs); }
         await w.setParameters(cfg.params);
         ocrLangs = langs;
         // a second reader with the same languages, started in the background: the pipeline starts
@@ -95,8 +118,15 @@
     const idle = [first], queue = [];
     const give = (w) => { const r = queue.shift(); if (r) r(w); else idle.push(w); };
     const take = () => (idle.length ? Promise.resolve(idle.pop()) : new Promise((r) => queue.push(r)));
-    more().then(give, () => {});
-    return { async recognize(...a) { const w = await take(); try { return await w.recognize(...a); } finally { give(w); } } };
+    // the second reader is started by the first read, not while the page is still loading
+    let started = false;
+    return {
+      async recognize(...a) {
+        if (!started) { started = true; more().then(give, () => {}); }
+        const w = await take();
+        try { return await w.recognize(...a); } finally { give(w); }
+      },
+    };
   }
   function withTimeout(p, ms) {
     return Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('timed out')), ms))]);
@@ -1132,11 +1162,29 @@
     return xml.replace(/<measure\b[^>]*\bnumber="(\d+)"[\s\S]*?<\/measure>\s*/g, (m, n) => (+n > upTo ? '' : m));
   }
   let osmd = null;
+  // The notation library is not needed until the first result: it is loaded once the text
+  // reader is in (so it does not compete with what the first conversion needs), or here.
+  const OSMD_URL = 'https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.8.9/build/opensheetmusicdisplay.min.js';
+  let osmdP = null;
+  function loadOSMD() {
+    if (!osmdP) {
+      osmdP = new Promise((resolve) => {
+        if (typeof opensheetmusicdisplay !== 'undefined') { resolve(true); return; }
+        const s = document.createElement('script');
+        s.src = OSMD_URL;
+        s.onload = () => resolve(true);
+        s.onerror = () => resolve(false);
+        document.head.appendChild(s);
+      });
+    }
+    return osmdP;
+  }
   async function renderNotation(xml, measures, all) {
     const host = $('osmd');
     const note = $('osmdNote');
     note.textContent = '';
     $('osmdAll').hidden = true;
+    await loadOSMD();
     if (!xml || typeof opensheetmusicdisplay === 'undefined') { note.textContent = 'The notation preview is unavailable because its library did not load.'; return; }
     // a long score draws its first measures; drawing all of it can hold the page for a while
     const capped = !all && measures > PREVIEW_MEASURES;
@@ -1195,6 +1243,7 @@
       status(`Reading ${file.label || file.name}`);
       stepper.go('render', null);
       const ocrP = getOCR();
+      ocrP.then(loadOSMD, loadOSMD);
       doc = await openDoc();
       const total = doc.pages.length;
       const n = Math.min(total, MAX_PAGES);
@@ -1210,8 +1259,12 @@
 
       let ocr = null, ocrError = null;
       try {
-        status('Loading the text reader');
-        const w = await withTimeout(ocrP, 45000);
+        // the text reader keeps loading while the first page is analysed: the first read waits
+        // for it (at most 45 s from here, as before); if it does not come, reads return nothing
+        // and the result says the text reader was unavailable
+        const ocrReady = withTimeout(ocrP, 45000);
+        ocrReady.catch((e) => { ocrError = ocrError || (e && e.message) || String(e); });
+        const w = { recognize: async (...a) => (await ocrReady).recognize(...a) };
         // the image goes to Tesseract as a binary PGM blob: the same pixels as the PNG a canvas
         // would make (identical words and boxes), without a canvas or a PNG encode on this thread.
         // The comment line keeps pixel bytes out of the first 500 bytes, where tesseract.js looks
@@ -1227,7 +1280,7 @@
         ocr = readWith(w);
         // accented rows are read again with more languages (lyrics.js), loaded only then
         const extraLangs = ocrConfig().extraLangs;
-        if (extraLangs && ocrMake) ocr.extra = async (img) => { ocrExtraP ||= ocrMake(extraLangs); return readWith(await ocrExtraP)(img); };
+        if (extraLangs) ocr.extra = async (img) => { await ocrReady; if (!ocrMake) return []; ocrExtraP ||= ocrMake(extraLangs); return readWith(await ocrExtraP)(img); };
         ocrUsed = true;
       } catch (e) { ocrError = e.message || String(e); }
 
@@ -1330,6 +1383,7 @@
       if (res.score && res.score.stanzas && res.score.stanzas.printed > 0) rebuild = { engine, pre, ocrError, read };
       else engine.dispose();
       engine = null;
+      if (ocrError) ocrUsed = false;
       stepper.go('xml');
       meter.set(0.97);
       status('Writing MusicXML');
