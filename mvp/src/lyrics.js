@@ -744,7 +744,7 @@ function preferredBreak(w, a, b, lang) {
 // s: syllable {text, x, x0, x1, syllabic}; voices: [[onset x...]] of the staff
 // above (one list, or upper / lower voice of a two-voice staff); r: where a
 // note sits within its syllable on this row (0.5 centred, ~0.2 left-aligned)
-function splitSyllable(s, voices, lang, r, hyphens) {
+function splitSyllable(s, voices, lang, r, hyphens, inkCol, rowH) {
   const text = s.text;
   if (s.x0 == null || text.length < 2) return [s];
   const cw = (s.x1 - s.x0) / text.length;
@@ -754,20 +754,22 @@ function splitSyllable(s, voices, lang, r, hyphens) {
     const pieces = cutAt(s, hy.map(x => ({ x })), lang, null);
     if (pieces.length > 1) return pieces.flatMap(p => splitSyllable(p, voices, lang, r, null));
   }
-  let inside = [];
-  for (const ons of voices) {
-    const ins = ons.filter(x => x > s.x0 + 0.5 * cw && x < s.x1 - 0.5 * cw);
-    if (ins.length > inside.length) inside = ins;
+  // the notes under the token; for word breaks also one near its right end (OCR boxes end
+  // at the last letter, a word stands centred over its note)
+  const under = (right) => { let best = []; for (const ons of voices) { const ins = ons.filter(x => x > s.x0 + 0.5 * cw && x < s.x1 - right * cw); if (ins.length > best.length) best = ins; } return best; };
+  const loose = under(0.1);
+  if (loose.length >= 2) {
+    // two words run together ("lonssans"): a common word at the token's start or end, or a
+    // word space still on the page, with a note on each side
+    const wb = wordSplit(s, lang) || spaceSplit(s, inkCol, rowH, loose);
+    if (wb) return wb;
   }
+  const inside = under(0.5);
   if (inside.length < 2) return [s];
   // target for each boundary: the next syllable starts r of its width left of its note
   const tgt = [];
   const k = inside.length;
   for (let m = 0; m + 1 < k; m++) tgt.push({ x: inside[m + 1] - r * (inside[m + 1] - inside[m]) });
-  // two words run together ("lonssans"): a common word at the token's start or end,
-  // with two notes under it, is cut off as its own word
-  const wb = wordSplit(s, lang);
-  if (wb) return wb;
   return cutAt(s, tgt, lang, inside);
 }
 
@@ -802,6 +804,38 @@ function wordSplit(s, lang) {
   const first = s.syllabic === 'middle' || s.syllabic === 'end', last = s.syllabic === 'begin' || s.syllabic === 'middle';
   const a = { ...s, text: text.slice(0, cut), x0: s.x0, x1: s.x0 + cut * cw, split: true, syllabic: first ? 'end' : 'single' };
   const b = { ...s, text: text.slice(cut), x0: s.x0 + cut * cw, x1: s.x1, split: true, syllabic: last ? 'begin' : 'single' };
+  a.x = (a.x0 + a.x1) / 2; b.x = (b.x0 + b.x1) / 2;
+  return [a, b];
+}
+
+// Two words OCR ran together whose space is still on the page ("Andring" for "And ring"):
+// under a token with two or more notes, a run of empty columns clearly wider than the gaps
+// between its letters (a quarter of the text height or more, twice the next widest) and
+// between its notes is a word space: the token is cut there into two words
+function spaceSplit(s, inkCol, rowH, inside) {
+  if (!inkCol || !rowH || s.x0 == null) return null;
+  const x0 = Math.round(s.x0), x1 = Math.round(s.x1), text = s.text;
+  if (x1 - x0 < 6 || text.length < 4) return null;
+  const runs = [];
+  let start = -1;
+  for (let x = x0; x <= x1; x++) {
+    const ink = inkCol(x);
+    if (!ink && start < 0) start = x;
+    if (ink && start >= 0) { if (start > x0) runs.push([start, x - 1]); start = -1; }
+  }
+  if (!runs.length) return null;
+  runs.sort((a, b) => (b[1] - b[0]) - (a[1] - a[0]));
+  const w = (r) => r[1] - r[0] + 1, best = runs[0];
+  if (w(best) < 0.25 * rowH || (runs[1] && w(best) < 2 * w(runs[1]))) return null;
+  const mid = (best[0] + best[1]) / 2;
+  // a note on each side of the space
+  if (!(inside.some(x => x < mid) && inside.some(x => x > mid))) return null;
+  const cw = (s.x1 - s.x0) / text.length;
+  const cut = Math.max(1, Math.min(text.length - 1, Math.round((mid - s.x0) / cw)));
+  if (!/\p{L}/u.test(text.slice(0, cut)) || !/\p{L}/u.test(text.slice(cut))) return null;
+  const first = s.syllabic === 'middle' || s.syllabic === 'end', last = s.syllabic === 'begin' || s.syllabic === 'middle';
+  const a = { ...s, text: text.slice(0, cut), x0: s.x0, x1: mid, split: true, syllabic: first ? 'end' : 'single' };
+  const b = { ...s, text: text.slice(cut), x0: mid, x1: s.x1, split: true, syllabic: last ? 'begin' : 'single' };
   a.x = (a.x0 + a.x1) / 2; b.x = (b.x0 + b.x1) / 2;
   return [a, b];
 }
@@ -1386,7 +1420,10 @@ async function readLyrics(fr, ocr, onProgress, opts) {
     for (const [v, g] of geo) {
       const voices = staffVoices(fr, g.staff, g.x0, g.x1, g.sp);
       const r = noteOffset(v.syllables, voices);
-      v.syllables = v.syllables.flatMap(s => splitSyllable(s, voices, lang, r, g.hyphens));
+      // the row's ink columns: where two words OCR ran together still show their space
+      const B = fr.B, y0 = Math.max(0, Math.round(v.y)), y1 = Math.min(B ? B.height - 1 : 0, Math.round(v.y1));
+      const inkCol = B && B.data && y1 > y0 ? (x) => { for (let y = y0; y <= y1; y++) if (B.data[y * B.width + x]) return true; return false; } : null;
+      v.syllables = v.syllables.flatMap(s => splitSyllable(s, voices, lang, r, g.hyphens, inkCol, y1 - y0 + 1));
     }
     Object.defineProperty(out, 'lang', { value: lang, enumerable: false });
   }

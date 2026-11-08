@@ -1408,7 +1408,12 @@ passes on benchmark (0.951) and challenge (0.831).
   Shorter pieces are left alone (they are too often syllables of one word: "be-fore", "no-ble").
   Coverage lyrics: lyr02 0.873 to 0.887 (clean), choir-closed-satb-light-of-morning 0.911 to 0.964; no
   item down.
-Not done: merged words without a common word in them ("Andring").
+- A word space OCR missed but still on the page: under a token with a note on each side, a run of empty
+  ink columns at least a quarter of the text height and twice the next widest gap cuts it into two
+  words. For these word breaks a note near the token's right end counts (OCR boxes end at the last
+  letter); syllable cuts keep the stricter test (melismas). golden1923-america "Andring" -> "And ring"
+  (lyrics 0.797 to 0.805).
+Not done: a missed hyphen placed one letter off ("nob-le" for "no-ble").
 
 **Overlay colours.** Text `--ov-text` #5e35b1, bar numbers `--ov-barno` #263238, dynamics and hairpins
 `--ov-dyn` #0277bd, slurs / ties / fermatas `--ov-slur` #f06292, braces and brackets `--ov-brace`
