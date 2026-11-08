@@ -2,6 +2,17 @@
 
 Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
 
+## Update: key signatures on blurred severe scans
+
+`pitch-keysig-odyssey` severe (structure traced it to `readKeySig`): blurred flats match the natural template about as
+well as the flat one (0.47 against 0.50), and the reader stopped after the first sign: five, seven and six flats read
+as one. Seven and six sharps were read but not used, because the parse had found no key and the first sign scored 0.51
+(0.55 needed). Now naturals compete for the first slot only (past it the zigzag of slot positions vouches for the
+kind), and with no key parsed, three or more signs averaging 0.48 also count. Odyssey's systems read 7 / −5 / −7 / 6 /
+−6 (were 0 / −1 / −1 / 0 / −1); challenge +0.0000 mean (odyssey severe +0.013), coverage +0.0001
+(`perf-piano-letter-300dpi` severe +0.031), benchmark unchanged; no item down. Not fixed: `andantino-piano-photocopy-thick`
+severe, whose sharps are filled solid and match the digit-4 template better (0.51 against 0.47).
+
 ## Update: missing heads, 1: ledger heads on scans
 
 Structure's wrong-pitch table (`scratchpad/stools/wp.py`, a global alignment of app and truth notes) puts missing notes

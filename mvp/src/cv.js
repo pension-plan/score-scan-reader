@@ -297,7 +297,7 @@ function readKeySig(api, R, st, clef, x0, sp, minScore = 0.42) {
   for (const kind of ['sharp', 'flat']) {
     const ps = KEY_SLOTS[kind][c].split(' ').map(n => diatonic(n) - diatonic(KEY_MID[c]));
     const name = 'acc-' + kind, other = kind === 'sharp' ? 'acc-flat' : 'acc-sharp';
-    let x = x0, n = 0, s0 = 0;
+    let x = x0, n = 0, s0 = 0, sum = 0;
     for (let i = 0; i < 7; i++) {
       // the first sign may touch the clef (its end then lies past the sign)
       let best = null;
@@ -313,11 +313,14 @@ function readKeySig(api, R, st, clef, x0, sp, minScore = 0.42) {
       if (!best || best.s < minScore) break;
       const so = api.scores(best.img, sp, KEY_OTHERS);
       const head = Math.max(so['head-filled'], so['head-half']), digit = Math.max(so['digit-2'], so['digit-3'], so['digit-4']);
-      if (best.s - head < 0.05 || best.s < digit || best.s < so['acc-natural'] || best.s < so[other]) break;
+      // (a blurred flat can look as much like a natural; past the first sign the slot pattern itself
+      // vouches for the kind, so naturals compete for the first slot only)
+      if (best.s - head < 0.05 || best.s < digit || (!i && best.s < so['acc-natural']) || best.s < so[other]) break;
       if (!i) s0 = best.s;
+      sum += best.s;
       n++; x = best.xc;
     }
-    out[kind] = { n, x1: x + 0.6 * sp, s0 };
+    out[kind] = { n, x1: x + 0.6 * sp, s0, mean: n ? sum / n : 0 };
   }
   return out;
 }
@@ -408,7 +411,8 @@ function readHeaders(fr, asm, opts = {}, stats = {}) {
           const k = readKeySig(api, R, st, h.clef, h.clefEnd, sp);
           const n0 = Math.abs(h.fifths | 0), kind0 = h.fifths < 0 ? 'flat' : h.fifths > 0 ? 'sharp' : null;
           const kind = k && (k.sharp.n > k.flat.n ? 'sharp' : k.flat.n > k.sharp.n ? 'flat' : null);
-          if (kind && (kind0 === kind || (!kind0 && k[kind].s0 >= 0.55)) && k[kind].n > n0) {
+          // (with no key read, the first sign must match well, or three or more signs fairly well)
+          if (kind && (kind0 === kind || (!kind0 && (k[kind].s0 >= 0.55 || (k[kind].n >= 3 && k[kind].mean >= 0.48)))) && k[kind].n > n0) {
             h.fifths = kind === 'flat' ? -k[kind].n : k[kind].n; h.keyN = k[kind].n; h.cvKey = true;
             const end = k[kind].x1 + 0.2 * sp;
             if (end > h.end && !(h.time && h.time.x0 < end)) {
