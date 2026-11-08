@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.34.1](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.34.0...score-scan-reader-v0.34.1) (2026-11-08)
+
+
+### Performance Improvements
+
+* **ui:** notes shown first while the text reader loads (progressive first result) ([f04634e](https://github.com/pension-plan/score-scan-reader/commit/f04634ed14b1b72d21f96848c27f0bbb2607c1ab))
+
 ## [0.34.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.33.1...score-scan-reader-v0.34.0) (2026-11-08)
 
 
