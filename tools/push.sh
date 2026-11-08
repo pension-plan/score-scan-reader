@@ -4,7 +4,7 @@
 # With paths, only those paths (plus the status page, timeline, orchestration scripts
 # and .gitignore) are committed, so one agent's push does not sweep in another agent's
 # work in progress; other changes stay in the working tree (autostashed over the rebase).
-# Without paths, everything is committed, as before.
+# Without paths it refuses, unless PUSH_ALL=1 is set (commits the whole tree).
 set -euo pipefail
 ROOT=/Users/d.sloane/music
 SCRATCH=/tmp/claude-501/-Users-d-sloane-music/69a237da-a02e-40d9-a1a9-90390e5b5eb2/scratchpad
@@ -21,8 +21,13 @@ python3 -I tools/timeline.py >/dev/null || echo 'timeline not written'
 cp /Users/d.sloane/.claude/projects/-Users-d-sloane-music/69a237da-a02e-40d9-a1a9-90390e5b5eb2/workflows/scripts/*.js orchestration/ 2>/dev/null || true
 if [ ${#PATHS[@]} -gt 0 ]; then
   git add -A -- "${PATHS[@]}" docs/status docs/TIMELINE.md orchestration .gitignore
-else
+elif [ "${PUSH_ALL:-}" = 1 ]; then
   git add -A
+else
+  # several agents share this working tree: a pathless push would sweep in their
+  # uncommitted work (it happened in d176663), so name your files
+  echo "refusing: name the paths to commit (tools/push.sh \"<subject>\" \"<body>\" <path> ...); PUSH_ALL=1 commits the whole tree" >&2
+  exit 1
 fi
 # refuse oversize files and anything that looks like a credential
 big=$(git diff --cached --name-only --diff-filter=AM -z | xargs -0 -r du -k 2>/dev/null | awk '$1>51200{print $2}' || true)
