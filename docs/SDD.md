@@ -1207,8 +1207,9 @@ syllable OCR read as one word ("ain" -> a‿in) into `<text>a</text><elision>‿
 </syllabic><text>in</text>`. Coverage (clean / scan / severe): lyrics-elision 0 to 63 / 50 / 63%,
 lyrics-multi-verse 85 to 91 / 90 / 75%, hyphen 82 to 87%, extender 79 to 84%; lyr02-non-ascii-four-languages
 lyrics 0.12 to 0.87; no item down. Non-ASCII letters stay at 0-5%: the eng+deu models drop most accents;
-adding fra+spa+ita+ces (6.7 MB more, 1.6x the OCR time) raises non-ASCII to 16-32% but lowers syllable
-and elision scores on the same items, so the language set is unchanged.
+adding fra+spa+ita+ces (6.7 MB more, 1.6x the OCR time) raises non-ASCII to 16-32% and the lyric
+syllables of these two items, but lowers elision recall (63 to 25% clean) and costs every page, so the
+language set is unchanged for now.
 
 **Overlay colours.** Text `--ov-text` #5e35b1, bar numbers `--ov-barno` #263238, dynamics and hairpins
 `--ov-dyn` #0277bd, slurs / ties / fermatas `--ov-slur` #f06292, braces and brackets `--ov-brace`
