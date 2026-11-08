@@ -976,7 +976,15 @@ default; `createConverter().finish({ stanzasAsVerses })` rebuilds the score from
 `finish` message takes `opts`) each stanza is split into words and syllables (`syllabify`, language from
 `detectLang`) and set, one syllable per note, on the notes of the part that carries the underlay where any printed
 verse has a syllable (so the printed verses' melismas are kept), as verse number = the stanza's printed number.
-A stanza whose syllable count differs from those notes by more than 15 % stays a credit. lyr06-amazing-grace
+Where a passage carries more printed lines than the rest (a repeated first section: lines 1-2 and 3-4 of the
+stanza stacked under the same notes, as in haupt1867-aus-meines-herzens-grunde), the walk takes that passage
+once per printed line, each pass under its own lyric number (line counts smoothed over seven notes so a missed
+syllable does not cut the passage); the walk whose length is nearer the syllable count is used. Syllables are
+placed by dynamic programming that keeps word starts on the printed verses' word starts (skipping a note costs
+1, dropping a syllable 1.5). A stanza whose syllable count is off by more than max(3, 20 %) of the walk stays a
+credit. Bundled examples with OCR: haupt1867 3 of 3 stanzas set (52 syllables on 37 notes + the 15-note
+repeat), each line under its own note row; golden1923-america 1 of 2 (the other block was read as 12 of its
+39 syllables). lyr06-amazing-grace
 against truth-underlaid.musicxml: lyrics 0.667 → 0.979 (scan), 0.664 → 0.931 (scan-mild); severe reads no
 stanzas. `score.stanzas = { printed, set }` tells the page whether to offer the option.
 

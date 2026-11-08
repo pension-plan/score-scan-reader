@@ -1215,11 +1215,15 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
       if (lines.length) credits.push({ page: Math.floor(pg.index || 0) + 1, label: st.label || (st.number ? st.number + '.' : ''), text: lines.join('\n'), number: st.number });
     }
   }
-  // opts.stanzasAsVerses (L5b, off by default): each such stanza that fits the
-  // tune is set under the notes as one more verse of the voice carrying the
-  // underlay, syllable by syllable on the notes the printed verses use (their
-  // melismas kept); a stanza whose syllable count is off by more than 15 % of
-  // those notes stays a credit
+  // opts.stanzasAsVerses (L5b, off by default): each such stanza is set under
+  // the notes of the voice carrying the underlay as one more verse, on the
+  // notes the printed verses use (their melismas kept). The notes are walked
+  // once, or, where a passage carries more printed lines than the rest (a
+  // repeated first section: lines 1 and 2 of the stanza stacked under the
+  // same notes), that passage once per line, each pass under its own lyric
+  // number. Syllables are matched to the notes by dynamic programming that
+  // keeps word starts on the printed verses' word starts; a stanza whose
+  // syllable count is off by more than max(3, 20 %) of the notes stays a credit
   const stanzas = { printed: credits.length, set: 0 };
   if (opts.stanzasAsVerses && credits.length) {
     let pi = -1, best = 0;
@@ -1227,19 +1231,53 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     const slots = [];
     if (pi >= 0) partMeasures[pi].forEach(m => m && m[0] && m[0].events.forEach(e => { if (!e.rest && e.lyrics && Object.keys(e.lyrics).length) slots.push(e); }));
     const used = new Set(slots.flatMap(e => Object.keys(e.lyrics).map(Number)));
+    const numsOf = (e) => Object.keys(e.lyrics).map(Number).filter(n => !e.lyrics[n].stanza).sort((a, b) => a - b);
+    const start = (sy) => !sy || sy.syllabic === 'single' || sy.syllabic === 'begin';
+    // the walks: plain (each note once, first printed line as reference) and
+    // repeated (runs of notes with more printed lines than the fewest, walked once per line)
+    const plain = slots.map(e => ({ e, pass: 0, ref: e.lyrics[numsOf(e)[0]] }));
+    const runs = [];
+    // line counts smoothed over seven notes: a syllable OCR missed in one
+    // printed line does not cut the repeated passage short
+    const ks = slots.map(e => numsOf(e).length);
+    slots.forEach((e, i) => {
+      const w = ks.slice(Math.max(0, i - 3), i + 4).sort((a, b) => a - b), k = w[w.length >> 1];
+      if (runs.length && runs[runs.length - 1].k === k) runs[runs.length - 1].es.push(e); else runs.push({ k, es: [e] });
+    });
+    const minK = Math.max(1, Math.min(...runs.map(r => r.k)));
+    const rep = [];
+    for (const r of runs) { const reps = Math.max(1, Math.round(r.k / minK)); for (let t = 0; t < reps; t++) for (const e of r.es) { const ns = numsOf(e); rep.push({ e, pass: reps > 1 ? t : 0, ref: e.lyrics[ns[Math.min(t, ns.length - 1)]] }); } }
     let set = 0;
     for (const c of credits.slice()) {
       const words = c.text.split(/\s+/).filter(w => /\p{L}/u.test(w));
       const lang = detectLang([c.text]);
       const syl = [];
       for (const w of words) {
-        const parts_ = syllabify(w, lang);
+        const parts_ = syllabify(w.replace(/^[^\p{L}]+/u, ''), lang);
         parts_.forEach((t, k) => syl.push({ text: t, syllabic: parts_.length === 1 ? 'single' : k === 0 ? 'begin' : k === parts_.length - 1 ? 'end' : 'middle' }));
       }
-      if (!slots.length || Math.abs(syl.length - slots.length) > 0.15 * slots.length) continue;
-      let num = c.number && !used.has(c.number) ? c.number : Math.max(0, ...used) + 1;
-      used.add(num);
-      syl.slice(0, slots.length).forEach((sy, k) => { slots[k].lyrics[num] = { text: sy.text, syllabic: sy.syllabic }; });
+      const walk = [plain, rep].sort((a, b) => Math.abs(a.length - syl.length) - Math.abs(b.length - syl.length))[0];
+      const n = syl.length, m = walk.length;
+      if (!m || Math.abs(n - m) > Math.max(3, 0.2 * m)) continue;
+      // D[i][j]: syllables < i on walk positions < j
+      const W = m + 1, D = new Float64Array((n + 1) * W).fill(Infinity), T = new Uint8Array((n + 1) * W);
+      D[0] = 0;
+      for (let i = 0; i <= n; i++) for (let j = 0; j <= m; j++) {
+        const h = D[i * W + j];
+        if (h === Infinity) continue;
+        if (i < n && j < m) { const v = h + (start(syl[i]) === start(walk[j].ref) ? 0 : 0.6); if (v < D[(i + 1) * W + j + 1]) { D[(i + 1) * W + j + 1] = v; T[(i + 1) * W + j + 1] = 1; } }
+        if (j < m) { const v = h + 1; if (v < D[i * W + j + 1]) { D[i * W + j + 1] = v; T[i * W + j + 1] = 2; } }
+        if (i < n) { const v = h + 1.5; if (v < D[(i + 1) * W + j]) { D[(i + 1) * W + j] = v; T[(i + 1) * W + j] = 3; } }
+      }
+      const passes = Math.max(...walk.map(w => w.pass)) + 1;
+      const base = c.number && passes === 1 && !used.has(c.number) ? c.number : Math.max(0, ...used) + 1;
+      for (let t = 0; t < passes; t++) used.add(base + t);
+      for (let i = n, j = m; i > 0 || j > 0;) {
+        const t = T[i * W + j];
+        if (t === 1) { const w = walk[j - 1]; w.e.lyrics[base + w.pass] = { text: syl[i - 1].text, syllabic: syl[i - 1].syllabic, stanza: true }; i--; j--; }
+        else if (t === 2) j--;
+        else i--;
+      }
       credits.splice(credits.indexOf(c), 1);
       set++;
     }
