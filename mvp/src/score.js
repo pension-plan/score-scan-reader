@@ -198,6 +198,21 @@ function readLabels(systems, nSt) {
   return per;
 }
 
+// Braces and system lines (text.js marks) joining staves k and k+1 of the
+// systems: {braces, lines} counted over systems
+function braceEvidence(sel, k) {
+  let braces = 0, lines = 0;
+  for (const sy of sel) {
+    const m = sy.fr && sy.fr._marks && sy.fr._marks.marks;
+    if (!m || !sy.staves[k + 1]) continue;
+    const a = sy.staves[k].si, b = sy.staves[k + 1].si;
+    const on = m.braces.filter(x => x.span && x.span.includes(a) && x.span.includes(b));
+    if (on.some(x => x.kind === 'brace')) braces++;
+    else if (on.length) lines++;
+  }
+  return { braces, lines };
+}
+
 // Decide the part layout for the whole piece (never per measure):
 //  - adjacent staves joined by barlines with no underlay between them are a
 //    keyboard grand staff: one part, never split (voices kept inside it);
@@ -254,6 +269,15 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
     // staff with its own voice or instrument name is not half of a grand staff
     if (labels[k].some(l => l.span && l.span.includes(k + 1) && l.names.some(n => n.kind === 'keyboard'))) kb = true;
     else if (own.length && !noise) kb = false;
+    // a grand staff is braced: where the systems' left edges were read (a
+    // system line joins the pair) and no system shows a brace over the pair,
+    // the two staves are two instruments (L18). Off unless opts.braceCheck: on
+    // the challenge set it fixed the two-instrument items but split pianos
+    // whose brace was not found (degraded copies)
+    if (kb && opts.braceCheck) {
+      const ev = braceEvidence(sel, k);
+      if (ev.lines >= 2 && !ev.braces) { kb = false; notes.push(`Staves ${k + 1}+${k + 2}: joined by a system line but no brace on any system: read as two parts, not a keyboard grand staff.`); }
+    }
     link.push(kb);
   }
   // organ: a pedal staff (bass clef, no text, no name of its own) under a
@@ -626,6 +650,8 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   const warnings = [];
   const systems = pages.flatMap(p => p.asm.systems.map(s => ({ ...s, fr: p.fr, comps: p.asm.comps })));
   if (!systems.length) return { parts: [], measures: 0, warnings: ['No music systems found.'], xml: emptyXML() };
+  // marks first (text.js via symbols.js): braces inform the layout
+  for (const p of pages) { try { pageMarks(p.fr, p.asm); } catch (e) { /* layout reads without them */ } }
   const layout = chooseLayout(systems, lyricsBySystem, opts);
   const { parts } = layout;
   const fifths = chooseKey(systems);
@@ -747,25 +773,59 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   for (let i0 = 0; i0 < segs.length;) {
     let i1 = i0;
     while (i1 + 1 < segs.length && segs[i1 + 1].sy === segs[i0].sy) i1++;
-    const n = i1 - i0 + 1, best = new Array(n + 1).fill(Infinity), from = new Array(n + 1).fill(-1);
-    best[0] = 0;
-    for (let j = 1; j <= n; j++) {
-      for (let i = Math.max(0, j - 5); i < j; i++) {
-        if (best[i] === Infinity) continue;
-        const a = i0 + i, b = i0 + j - 1;
-        const edge = a === 0 || b === segs.length - 1;
-        let c = 2 * groupDev(a, b, edge);
-        for (let t = a; t < b; t++) {
-          const sp = (segs[t].sy.staves[0] && segs[t].sy.staves[0].st.space) || 16;
-          const w = Math.min(segs[t].xb - segs[t].xa, segs[t + 1].xb - segs[t + 1].xa) / sp;
-          c += w < 4 ? 0.15 : 0.45;
-        }
-        if (best[i] + c < best[j] - 1e-9) { best[j] = best[i] + c; from[j] = i; }
+    const n = i1 - i0 + 1;
+    // the printed bar numbers may fix this system's bar count (checkBarNumbers,
+    // second pass): T bars, counting a group whose contents fill k bars as k
+    const sk = segs[i0].sy.page + ':' + segs[i0].sy.index;
+    const T = opts.barTargets && opts.barTargets[sk] ? opts.barTargets[sk] : 0;
+    const cost = (i, j) => {
+      const a = i0 + i, b = i0 + j - 1;
+      const edge = a === 0 || b === segs.length - 1;
+      let c = 2 * groupDev(a, b, edge);
+      for (let t = a; t < b; t++) {
+        const sp = (segs[t].sy.staves[0] && segs[t].sy.staves[0].st.space) || 16;
+        const w = Math.min(segs[t].xb - segs[t].xa, segs[t + 1].xb - segs[t + 1].xa) / sp;
+        c += w < 4 ? 0.15 : 0.45;
       }
+      return c;
+    };
+    // bars a group holds: one, or k when its contents fill k bars (a missed barline)
+    const barsIn = (i, j) => {
+      let S = 0;
+      for (let t = i0 + i; t < i0 + j; t++) S += segSum[t];
+      const k = Math.round(S / mLen);
+      return k >= 2 && Math.abs(S - k * mLen) <= 0.25 * mLen ? k : 1;
+    };
+    const groups = [], gBars = [];
+    if (T) {
+      // best[j][g]: first j segments holding g bars; the system holds exactly T
+      const best = Array.from({ length: n + 1 }, () => new Array(T + 1).fill(Infinity)), from = Array.from({ length: n + 1 }, () => new Array(T + 1).fill(-1));
+      best[0][0] = 0;
+      for (let j = 1; j <= n; j++) for (let i = Math.max(0, j - 5); i < j; i++) {
+        // an over-full merge is allowed here at a high price: the printed numbers say a barline is false
+        const k = barsIn(i, j), c = Math.min(20, cost(i, j));
+        for (let g = k; g <= T; g++) {
+          if (best[i][g - k] === Infinity) continue;
+          if (best[i][g - k] + c < best[j][g] - 1e-9) { best[j][g] = best[i][g - k] + c; from[j][g] = i; }
+        }
+      }
+      if (best[n][T] < Infinity) for (let j = n, g = T; j > 0;) { const i = from[j][g], k = barsIn(i, j); groups.unshift(Array.from({ length: j - i }, (_, t) => i0 + i + t)); gBars.unshift(k); g -= k; j = i; }
     }
-    const groups = [];
-    for (let j = n; j > 0; j = from[j]) groups.unshift(Array.from({ length: j - from[j] }, (_, t) => i0 + from[j] + t));
-    groups.forEach(g => measures.push({ segs: g }));
+    if (!groups.length) {
+      const best = new Array(n + 1).fill(Infinity), from = new Array(n + 1).fill(-1);
+      best[0] = 0;
+      for (let j = 1; j <= n; j++) {
+        for (let i = Math.max(0, j - 5); i < j; i++) {
+          if (best[i] === Infinity) continue;
+          const c = cost(i, j);
+          if (best[i] + c < best[j] - 1e-9) { best[j] = best[i] + c; from[j] = i; }
+        }
+      }
+      for (let j = n; j > 0; j = from[j]) groups.unshift(Array.from({ length: j - from[j] }, (_, t) => i0 + from[j] + t));
+    }
+    // with the bar count fixed, a group is cut into its bars by contents
+    // exactly when it holds several (forceSplit), never otherwise (noSplit)
+    groups.forEach((g, k) => measures.push(gBars.length ? { segs: g, forceSplit: gBars[k] > 1, noSplit: gBars[k] === 1 } : { segs: g }));
     i0 = i1 + 1;
   }
   // a bar split across a system break: two short halves that make one bar
@@ -891,7 +951,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     // many voices fill exactly one bar as run long, the long ones have false
     // notes in them (a tie end read as a half note), not a second bar
     const one = sums.filter(x => Math.abs(x - mLen) <= 0.25 * mLen).length;
-    if (k >= 2 && Math.abs(S - k * mLen) <= 0.25 * mLen && agree >= Math.max(1, 0.5 * sums.length) && agree > one) {
+    if (k >= 2 && Math.abs(S - k * mLen) <= 0.25 * mLen && ((agree >= Math.max(1, 0.5 * sums.length) && agree > one) || (m.forceSplit && agree >= 1)) && !m.noSplit) {
       splitBars += k - 1;
       const chunks = Array.from({ length: k }, () => byPart.map(sts => sts.map(st => ({ staff: st.staff, events: [] }))));
       byPart.forEach((sts, pi) => sts.forEach((st, si) => {
@@ -936,6 +996,8 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     const edge = mi === 0 || mi === units.length - 1;
     if (edge && ms > 1e-6 && ms < mLen - 1e-6 && agree >= Math.max(2, 0.5 * nz.length)) target = ms;
     else if (edge && ms > 1e-6 && ms < mLen - 1e-6 && nz.length === 1) target = ms;
+    // the printed bar numbers count the first bar as a pickup
+    else if (mi === 0 && opts.pickup && nz.length && Math.max(...nz) < mLen - 1e-6) target = Math.max(...nz);
     const implicit = mi === 0 && target < mLen - 1e-6;
     const sp = (m.sy.staves[0] && m.sy.staves[0].st.space) || 16;
     const anchors = [];
@@ -1011,8 +1073,27 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
         y0: Math.round(sts[0].st.yAt(0, sg.xa)), y1: Math.round(sts[sts.length - 1].st.yAt(4, sg.xa)) });
     }
   });
+  let barCheck = null;
+  try { barCheck = checkBarNumbers(pages, measureMap); } catch (e) { barCheck = null; }
+  // the printed bar numbers disagree with the bars read: read again with the
+  // bar counts they give (barTargets) and keep that reading when it agrees
+  // with more of them
+  // Off unless opts.barFix: on the benchmark it set the bar count right on 9 more
+  // systems but rhythm repair then did worse (duration -0.01 to -0.06 on 6 items)
+  if (opts.barFix && barCheck && barCheck.notes.length && !opts.barTargets) {
+    const hint = barHints(pages, measureMap, barCheck, partMeasures);
+    if (hint) {
+      let again = null;
+      try { again = buildScore(pages, lyricsBySystem, { ...opts, barTargets: hint.targets, pickup: hint.pickup }); } catch (e) { again = null; }
+      if (again && again.barCheck && again.barCheck.agree > barCheck.agree) {
+        again.warnings.unshift(`Bar count corrected from the printed bar numbers (${barCheck.agree} of ${barCheck.printed} agreed, now ${again.barCheck.agree}).`);
+        return again;
+      }
+    }
+  }
+  if (barCheck) barCheck.notes.forEach(n => warnings.push(n));
   // UI compares clefs with 'F'; 'G8' stays a treble clef there
-  return { parts, layout, fifths, time, timeRead, clefs, ranges, measures: units.length, nNotes, credits, title: read.head.title || null, composer: read.head.composer || null, warnings: warnings.concat(layout.notes), xml, measureMap };
+  return { parts, layout, fifths, time, timeRead, clefs, ranges, measures: units.length, nNotes, credits, title: read.head.title || null, composer: read.head.composer || null, warnings: warnings.concat(layout.notes), xml, measureMap, barCheck };
 }
 
 // Horizontal extent of a syllable: lyrics.js may report x0/x1; otherwise it is
@@ -1145,6 +1226,82 @@ function clefXML(c, n) {
   if (c === 'G8va') return `<clef${num}><sign>G</sign><line>2</line><clef-octave-change>1</clef-octave-change></clef>`;
   if (/^C[1-5]$/.test(c)) return `<clef${num}><sign>C</sign><line>${c[1]}</line></clef>`;
   return `<clef${num}><sign>G</sign><line>2</line></clef>`;
+}
+
+// Printed bar numbers (text.js role 'measure', read from their digit shapes
+// or by OCR) against the measures read: the written number of each system's
+// first measure (measureMap). A misread digit disagrees on one system only; a
+// missed or extra barline shifts every later system by the same amount, so a
+// change of the offset that the next system keeps is reported.
+// {systems: [{page, sys, printed, read}], printed, agree, notes}
+function checkBarNumbers(pages, measureMap) {
+  const out = { systems: [], printed: 0, agree: 0, notes: [] };
+  const seenFr = new Set();
+  for (const pg of pages) {
+    if (!pg.fr || !pg.asm || seenFr.has(pg.fr)) continue;
+    seenFr.add(pg.fr);
+    const m = pg.fr._marks && pg.fr._marks.asm === pg.asm ? pg.fr._marks.marks : pageMarks(pg.fr, pg.asm);
+    if (!m) continue;
+    for (const t of m.text) {
+      if (t.role !== 'measure' || !/^\d{1,4}$/.test(t.text) || t.sys < 0) continue;
+      const sy = pg.asm.systems[t.sys];
+      if (!sy) continue;
+      const ns = measureMap.filter(e => e.page === sy.page && e.sys === sy.index).map(e => e.n);
+      if (!ns.length) continue;
+      out.systems.push({ page: sy.page, sys: sy.index, printed: +t.text, read: Math.min(...ns) });
+    }
+  }
+  out.systems.sort((a, b) => a.page - b.page || a.sys - b.sys);
+  out.printed = out.systems.length;
+  out.agree = out.systems.filter(s => s.printed === s.read).length;
+  let prev = 0;
+  out.systems.forEach((s, i) => {
+    const d = s.printed - s.read, next = out.systems[i + 1];
+    // a spike between two systems that agree with each other is a misread digit
+    if (d !== prev && !(next && next.printed - next.read === prev)) {
+      const at = `system ${s.sys + 1}${pages.length > 1 ? ` of page ${Math.floor(s.page) + 1}` : ''}`;
+      out.notes.push(`Bar numbers say ${at} starts at bar ${s.printed}; the reading has it start at bar ${s.read} (${Math.abs(d - prev)} barline${Math.abs(d - prev) > 1 ? 's' : ''} ${d > prev ? 'missed' : 'too many'} before it).`);
+      prev = d;
+    }
+  });
+  return out;
+}
+
+// Bar counts per system from the printed bar numbers, where they change the
+// offset (checkBarNumbers) and the system to blame is known: the numbered
+// system before the change, when no unnumbered system lies between. A change
+// at the first numbered system with one bar too many read, and a first bar
+// not read as a pickup, makes the first bar a pickup.
+// {targets: {'page:sys': bars}, pickup} or null
+function barHints(pages, measureMap, bc, partMeasures) {
+  const order = [];
+  const seenFr = new Set();
+  for (const pg of pages) {
+    if (!pg.asm || seenFr.has(pg.fr)) continue;
+    seenFr.add(pg.fr);
+    for (const sy of pg.asm.systems) order.push(sy.page + ':' + sy.index);
+  }
+  const pos = (s) => order.indexOf(s.page + ':' + s.sys);
+  const count = (key) => new Set(measureMap.filter(e => e.page + ':' + e.sys === key).map(e => e.n)).size;
+  const targets = {};
+  let pickup = false, prev = 0, any = false;
+  bc.systems.forEach((s, i) => {
+    const d = s.printed - s.read, next = bc.systems[i + 1];
+    if (d === prev || (next && next.printed - next.read === prev)) return;
+    const a = bc.systems[i - 1];
+    if (!a) {
+      // the first numbered system: the bars before it are the first system's
+      const firstImplicit = partMeasures[0] && partMeasures[0][0] && partMeasures[0][0].every(st => st.implicit);
+      if (d === -1 && !firstImplicit) { pickup = true; any = true; }
+      else if (pos(s) === 1) { targets[order[0]] = count(order[0]) + d; if (targets[order[0]] >= 1) any = true; else delete targets[order[0]]; }
+    } else if (pos(s) - pos(a) === 1) {
+      const key = order[pos(a)];
+      targets[key] = count(key) + (d - prev);
+      if (targets[key] >= 1) any = true; else delete targets[key];
+    }
+    prev = d;
+  });
+  return any ? { targets, pickup } : null;
 }
 
 // ------------------------------------------------------------ text and marks

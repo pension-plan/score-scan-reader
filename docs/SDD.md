@@ -1096,7 +1096,10 @@ cached on `fr`), into these classes. The overlay shows them as the layers "Title
 "Dynamics, hairpins" and "Slurs, ties, fermatas, braces, ledger lines"; only what is left stays "Not
 recognised" (Maple Leaf Rag: 70 unrecognised marks before, 6 after, at 200 dpi; 4 in the app).
 
-- **Braces and system brackets**: tall, narrow ink at the staves' left edge.
+- **Braces, brackets and system lines**: tall, narrow ink at the staves' left edge, with the staves it
+  spans. Thin ink (under 0.28 staff space per row) is a system line; thick ink is a brace (its tip at
+  mid-height stands out left; two thick halves meeting between two staves are one brace) or a bracket
+  (hooks reaching right at both ends).
 - **Ledger lines**: short thin horizontal strokes off the staff beside a note head.
 - **Hairpins**: two thin lines meeting at one end, the gap growing steadily (crescendo opens right).
 - **Slurs and ties**: one thin bowed stroke; with a dot inside the bow of a short arc, a **fermata**.
@@ -1109,7 +1112,10 @@ recognised" (Maple Leaf Rag: 70 unrecognised marks before, 6 after, at 200 dpi; 
   OCR alone is not used: Tesseract does not read the dynamics font.
 - **Text lines**: the remaining letter-sized ink grouped into lines, with a role from where it stands:
   left of the first system = instrument name, left of later systems = abbreviation; small digits just
-  above a system's first staff = measure number; above the first system: the topmost large centred line =
+  above a system's first staff = bar number, read from the digit shapes (`src/digitglyphs.js`, made by
+  `mvp/tools/digitglyphs.js` from 1,482 OCR-labelled bar-number digits of the coverage corpus; Pearson
+  correlation on a grid of 8 x 12 cells, at least 0.55 and 0.06 clear of the next digit), OCR only where
+  that fails; above the first system: the topmost large centred line =
   title, other centred lines = subtitle, right-aligned = composer, left-aligned near the staff = tempo,
   else lyricist / credit; page top / bottom margins = header / footer; rows of three or more lines (or
   two wide ones) among the music = lyrics (lyrics.js reads those); other lines = expression. A lone glyph
@@ -1128,11 +1134,36 @@ widened by nearby heads; marks count 1.6x farther above a staff, so a dynamic be
 upper one unless clearly nearer the lower), in each part reading that staff, at the measure and onset of
 the nearest note by x, written before that note in the part's first voice (`<offset>` inside it).
 
+**Bar numbers against the bars read.** `score.js` `checkBarNumbers()` compares each printed system-start
+number with the written number of that system's first measure (`score.measureMap`) and keeps the result
+in `score.barCheck` ({systems: [{page, sys, printed, read}], printed, agree, notes}). A misread digit
+disagrees on one system only (its neighbours agree with each other) and is ignored; a missed or extra
+barline shifts every later system, and each such change becomes a warning ("Bar numbers say system 3
+starts at bar 11; the reading has it start at bar 9 (2 barlines missed before it)."). Printed numbers
+were read on 13 of 20 benchmark items (27 systems; 15 agree) and 276 of 365 challenge items (842 systems;
+691 agree). Feeding them back (`opts.barFix`: a second pass with the bar count of the system before each
+change fixed, over-full merges allowed at a high price, groups whose contents fill k bars cut into k, the
+first bar made a pickup when the numbers say so) raises agreement to 21/27 and 711/842, but rhythm repair
+then does worse (benchmark duration 0.918 to 0.914, pitch 0.945 to 0.943; challenge aggregate 0.8228 to
+0.8226, 8 items down), so it is off by default.
+
+**Braces and the part layout.** `score.js` `braceEvidence()` counts, per staff pair, the systems whose
+left edge shows a brace and those showing only a system line. A rule "a pair read as a keyboard grand
+staff with system lines on two systems or more and no brace on any is two instruments" (`opts.braceCheck`,
+off by default) fixes the two-instrument items of the challenge set (pitch-clef-carousel 0.57 to 0.85,
+pitch-ledger-ottava 0.59 to 0.78) but splits degraded pianos whose brace was not found (andantino
+copies 0.99 to 0.50), so it is not used yet; it needs a surer brace detector first.
+
+**Overlay colours.** Text `--ov-text` #5e35b1, bar numbers `--ov-barno` #263238, dynamics and hairpins
+`--ov-dyn` #0277bd, slurs / ties / fermatas `--ov-slur` #f06292, braces and brackets `--ov-brace`
+#8d6e63; ledger lines are drawn with the staff (`--ov-staff`). Each is a stroke plus a 0.26 multiplied
+fill, like every other symbol layer.
+
 **Accuracy** (coverage suite, recall on clean / scan / scan-severe; all were 0 before): see the dynamics,
 hairpin, tempo and text rows of `docs/COVERAGE.md`. Not done: grace notes (small heads with slashed stems
 are still read, or missed, as notes), slurs and fermatas are drawn on the overlay but not written to
 MusicXML (attaching them needs the head each curve starts and ends at), measure numbers are labelled but not
-used to check the measure count, rehearsal marks and chord symbols stay text or unknown. Pedal marks and
+used to change the bar count by default (see above), rehearsal marks and chord symbols stay text or unknown. Pedal marks and
 fingering are not classified.
 
 ### 8.8 Playback (General MIDI)

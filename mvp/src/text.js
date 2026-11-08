@@ -23,6 +23,8 @@ const { makeGray } = require('./image');
 // the engraved letters (LilyPond / Emmentaler, the corpus font); bold italic
 // letters of other engravers are close enough for the tolerant match below.
 const DYN_GLYPHS = require('./dynglyphs');
+// bar-number digits (src/digitglyphs.js, tools/digitglyphs.js), same form
+const DIGIT_GLYPHS = require('./digitglyphs');
 const DYN_WORDS = new Set(['ppp', 'pp', 'p', 'mp', 'mf', 'f', 'ff', 'fff', 'sf', 'sfz', 'sffz', 'sfp', 'sfpp', 'fz', 'fp', 'rf', 'rfz', 'pppp', 'ffff', 'sfzp', 'fzp', 'n']);
 
 // glyph image (its own ink only) resampled onto a GW x gh grid
@@ -87,6 +89,41 @@ function dynGlyph(R, c, sp) {
     if (!best || s > best.score) best = { text: t.text, score: s };
   }
   return best;
+}
+
+// Pearson correlation of a glyph grid (ink share per cell) with a template
+function corrGrid(g, t) {
+  const n = t.gw * t.gh;
+  let sa = 0, sb = 0, saa = 0, sbb = 0, sab = 0;
+  for (let i = 0; i < n; i++) { const a = g[i], b = t.cells[i]; sa += a; sb += b; saa += a * a; sbb += b * b; sab += a * b; }
+  const va = saa - sa * sa / n, vb = sbb - sb * sb / n;
+  return va > 0 && vb > 0 ? (sab - sa * sb / n) / Math.sqrt(va * vb) : 0;
+}
+
+let DTPL = null;
+// a bar number read from its digit shapes: '17', or '' when a glyph is not
+// clearly a digit
+function readDigits(R, comps, sp, dbg) {
+  DTPL ||= DIGIT_GLYPHS.map(([text, w, h, rows]) => {
+    const gh = rows.length, gw = rows[0].length, cells = new Uint8Array(gw * gh);
+    rows.forEach((r, y) => { for (let x = 0; x < gw; x++) cells[y * gw + x] = r[x] === '#' ? 1 : 0; });
+    return { text, w, h, gh, gw, cells };
+  });
+  let out = '';
+  for (const c of comps.slice().sort((a, b) => a.x0 - b.x0)) {
+    const w = (c.x1 - c.x0 + 1) / sp, h = (c.y1 - c.y0 + 1) / sp;
+    let best = null, second = 0;
+    const img = glyphImage(R, c);
+    for (const t of DTPL) {
+      if (Math.abs(h - t.h) > 0.3 * t.h || Math.abs(w - t.w) > 0.45 * t.w + 0.1) continue;
+      const sc = corrGrid(gridOf(img, t.gh, t.gw), t);
+      if (!best || sc > best.score) { if (best) second = Math.max(second, best.score); best = { text: t.text, score: sc }; } else second = Math.max(second, sc);
+    }
+    if (dbg) dbg.push([best && best.text, best && +best.score.toFixed(2), +second.toFixed(2)]);
+    if (!best || best.score < 0.55 || best.score - second < 0.06) return '';
+    out += best.text;
+  }
+  return out;
 }
 
 // ---------------------------------------------------------------- shapes
@@ -228,7 +265,23 @@ function classifyMarks(fr, asm, left) {
     const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1, cx = (c.x0 + c.x1) / 2, cy = (c.y0 + c.y1) / 2;
     const n = nearest(cx, cy), sp = n ? n.s.sp : ss;
     // brace / system bracket: tall, narrow, at the staves' left edge
-    if (h >= 3 * sp && w <= 1.6 * sp && n && cx <= n.s.left + 0.6 * sp && cx >= n.s.left - 2.5 * sp) { out.braces.push({ box: [c.x0, c.y0, c.x1, c.y1], kind: w <= 0.45 * sp ? 'line' : 'brace' }); continue; }
+    if (h >= 3 * sp && w <= 1.6 * sp && n && cx <= n.s.left + 0.6 * sp && cx >= n.s.left - 2.5 * sp) {
+      // the staves it spans (page staff indices) and its kind: a thin system
+      // line, a curly brace (its tip, mid-height, stands out left) or a bracket
+      const span = allSt.filter(s => s.bot(s.left) > c.y0 + 0.5 * sp && s.top(s.left) < c.y1 - 0.5 * sp).map(s => s.si);
+      // stroke thickness (ink per row): a system line is thin; a brace or
+      // bracket is thick. A brace's tip (mid-height) stands out left; a
+      // bracket has hooks reaching right at its ends
+      let kind = 'line';
+      if (c.area / h > 0.28 * sp) {
+        const img = glyphImage(R, c), lx = (f) => { const y = Math.round(f * (img.height - 1)); for (let x = 0; x < img.width; x++) if (img.data[y * img.width + x]) return x; return img.width; };
+        const wid = (f) => { const y = Math.round(f * (img.height - 1)); let a = -1, b = -1; for (let x = 0; x < img.width; x++) if (img.data[y * img.width + x]) { if (a < 0) a = x; b = x; } return a < 0 ? 0 : b - a + 1; };
+        const hook = Math.max(wid(0.01), wid(0.03), wid(0.05)) >= wid(0.5) + 0.6 * sp && Math.max(wid(0.99), wid(0.97), wid(0.95)) >= wid(0.5) + 0.6 * sp;
+        kind = hook && !(lx(0.5) + 0.2 * sp < Math.min(lx(0.3), lx(0.7))) ? 'bracket' : 'brace';
+      }
+      out.braces.push({ box: [c.x0, c.y0, c.x1, c.y1], kind, span });
+      continue;
+    }
     // ledger line: short, thin, horizontal, off the staff, by a note head
     if (h <= 0.4 * sp && w >= 0.9 * sp && w <= 3.6 * sp && n && !n.inside &&
       heads.some(hd => Math.abs(hd.x - cx) <= 1.5 * sp && Math.abs(hd.y - cy) <= 1.3 * sp + (n.above ? Math.max(0, cy - hd.y) : Math.max(0, hd.y - cy)))) {
@@ -248,6 +301,12 @@ function classifyMarks(fr, asm, left) {
     // letter-sized ink (text, dynamics)
     if (h >= 0.35 * sp && h <= 4.5 * sp && w <= 6 * sp && !(h < 0.6 * sp && w > 2.5 * h)) { letters.push(c); continue; }
     rest.push(c);
+  }
+  // a brace broken at its thin tip: two thick halves, one over each staff,
+  // meeting between them, are one brace over both
+  for (const a of out.braces) for (const b of out.braces) {
+    if (a === b || a.kind !== 'brace' || b.kind !== 'brace' || a.span.length !== 1 || b.span.length !== 1 || b.box[1] <= a.box[1]) continue;
+    if (b.box[1] - a.box[3] <= 1.5 * ss && Math.abs((a.box[0] + a.box[2]) - (b.box[0] + b.box[2])) <= 2 * ss) { const span = [a.span[0], b.span[0]]; a.span = span; b.span = span; }
   }
   // dynamics: a run of letters that all read as dynamics letters and spell a
   // dynamic, off the staff (or in a margin between staves)
@@ -290,7 +349,7 @@ function classifyMarks(fr, asm, left) {
     if (sts && l.x1 < sysLeft - 0.2 * sp && cy > sysTop - 1.5 * sp && cy < sysBot + 1.5 * sp) role = sysOf === 0 ? 'instrument' : 'abbrev';
     else if (l.y1 < 0.06 * H && l.h < 1.6 * ss && l.y1 < firstTop - 3 * ss) role = 'header';
     else if (l.y0 > 0.92 * H && l.y0 > lastBot + 2 * ss) role = 'footer';
-    else if (sts && l.y1 <= sysTop + 0.3 * sp && l.y1 >= sysTop - 3.2 * sp && l.x0 <= sysLeft + 2.5 * sp && l.x0 >= sysLeft - 3.5 * sp && l.h <= 1.3 * sp && l.mem.length <= 3 && l.words === 1 &&
+    else if (sts && l.y1 <= sysTop + 0.3 * sp && l.y1 >= sysTop - 3.2 * sp && l.x0 <= sysLeft + 2.5 * sp && l.x0 >= sysLeft - 3.5 * sp && l.h <= 1.3 * sp && l.mem.length <= 4 && l.words === 1 &&
       (l.y1 >= firstTop - 3.2 * sp || sysOf > 0)) role = 'measure';
     else if (l.y1 < firstTop - 0.5 * ss) {
       const centred = Math.abs(cx - pageMid) < 0.12 * wMusic && l.x0 > L0 + 0.1 * wMusic;
@@ -307,7 +366,9 @@ function classifyMarks(fr, asm, left) {
     // a lone glyph or specks among the music is more likely a symbol the
     // reader missed (a rest, a flag) than text: left unknown
     if ((role === 'expression' || role === 'text' || role === 'lyrics' || role === 'tempo') && (l.mem.length < 2 || l.h < 0.55 * sp)) { rest.push(...l.mem); continue; }
-    out.text.push({ box: [l.x0, l.y0, l.x1, l.y1], role, text: '', h: l.h, words: l.words, sys: sysOf, k: n ? n.k : -1, si: n ? n.s.si : -1, x: l.x0, comps: l.mem });
+    // bar numbers are read from their digit shapes (OCR, when on, only where these fail)
+    const digits = role === 'measure' ? readDigits(R, l.mem, sp) : '';
+    out.text.push({ box: [l.x0, l.y0, l.x1, l.y1], role, text: digits, shape: !!digits, h: l.h, words: l.words, sys: sysOf, k: n ? n.k : -1, si: n ? n.s.si : -1, x: l.x0, comps: l.mem });
   }
   // lyrics: syllables spaced under the notes fall apart into many short
   // lines on one row; a row of three or more among the music is underlay
@@ -427,6 +488,7 @@ async function readPageText(fr, marks, ocr, opts = {}) {
   let n = 0;
   for (const t of todo) {
     if (n >= maxLines) break;
+    if (t.shape) continue;
     if (t.role === 'abbrev') { const key = t.k; if (seenAbbr.has(key)) continue; seenAbbr.add(key); }
     // the instrument names lyrics.js already read (fr.partLabels)
     if (t.role === 'instrument' && fr.partLabels) {
@@ -479,4 +541,4 @@ function lineCrop(fr, b, h) {
   return img;
 }
 
-module.exports = { classifyMarks, readPageText, refineRole, ROLE_LABEL, DYN_WORDS, _dynGlyph: dynGlyph, _gridOf: gridOf, _hairpin: hairpin, _slurLike: slurLike, _groupLines: groupLines };
+module.exports = { _readDigits: readDigits, classifyMarks, readPageText, refineRole, ROLE_LABEL, DYN_WORDS, _dynGlyph: dynGlyph, _gridOf: gridOf, _lineCrop: lineCrop, _hairpin: hairpin, _slurLike: slurLike, _groupLines: groupLines };
