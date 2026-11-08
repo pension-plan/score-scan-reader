@@ -30,4 +30,14 @@ for key, font in FONTS.items():
         page(f'digits-{enc}-{key}', font, f'\\score {{ \\new Staff {{ \\time 4/4 {bars} }} \\layout {{ }} }}')
     seq = ' '.join(CHORDS)
     notes = ' '.join("c''1" + (' \\break' if (i + 1) % 6 == 0 else '') for i in range(len(CHORDS)))
-    page(f'chords-{key}', font, f'''\\score {{ << \\new ChordNames {{ \\chordmode {{ {seq} }} }} \\new Staff {{ \\time 4/4 {notes} }} >> \\layout {{ }} }}''')
+    # chord names in this page's font (LilyPond otherwise sets them in its default sans)
+    page(f'chords-{key}', font, f'''\\score {{ << \\new ChordNames \\with {{ \\override ChordName.font-family = #'roman }} {{ \\chordmode {{ {seq} }} }} \\new Staff {{ \\time 4/4 {notes} }} >> \\layout {{ }} }}''')
+# LilyPond's own chord-name look (its default sans), as most lead sheets engraved with it show
+seq = ' '.join(CHORDS)
+notes = ' '.join("c''1" + (' \\break' if (i + 1) % 6 == 0 else '') for i in range(len(CHORDS)))
+open('chords-default.ly', 'w').write(f'''\\version "2.24.0"
+\\paper {{ #(set-paper-size "letter") tagline = ##f }}
+\\score {{ << \\new ChordNames {{ \\chordmode {{ {seq} }} }} \\new Staff {{ \\time 4/4 {notes} }} >> \\layout {{ }} }}
+''')
+subprocess.run(['lilypond', '-s', 'chords-default.ly'], check=True)
+subprocess.run(['pdftoppm', '-gray', '-r', '200', 'chords-default.pdf', 'chords-default'], check=True)

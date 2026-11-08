@@ -166,19 +166,6 @@ all-in-one script as fallback); and the notation library loads once the text rea
 profile (4x CPU, Fast 3G): first result 54.5 to 48.8 s (results shown 52.1 to 45.5 s); desktop 4.1 to 4.0 s.
 On the phone profile the result is bound by the bytes: about 45 s of Fast 3G for what the first result needs.
 
-**Progressive first result.** With OCR on, the converter reads a page's text (lyrics, titles, text marks)
-after its step returns (`createConverter({deferText})`), one page after another in page order, so the next
-page's analysis does not wait for the text reader. When every page has been analysed and the text reader is
-still loading, the page shows a notes-only score (`preview()`: score assembly without lyrics or text; the page
-data is put back afterwards, because assembly marks what it used, such as fingerings set on heads) with the
-note that lyrics, titles and text are still being read; `settle()` then waits for the text and `finish()`
-builds the full score, identical to a run without the preview (benchmark, challenge lyrics/layout and
-multi-page coverage items: MusicXML and warnings byte-identical). Each page's overlay is sent again once its
-text is read. Phone profile, default sample: notes shown at 18.9 s instead of 45.6 s; the full result at
-48.5 s as before (bound by the OCR models' download). At most two pages wait for their text, holding their
-image buffers until then. The two models (eng, deu) load together; neither can be read without the other,
-so fetching eng first would not show text sooner.
-
 **Size budget.** Each supporting file ≤ 15 MB, the total ≤ 64 MB [WF]. Planned: phase 1 about 13–20 MB, phase
 2 with ONNX about 30–40 MB [OMR §9.3]. The build fails if a limit is exceeded (§9).
 
@@ -995,13 +982,7 @@ once per printed line, each pass under its own lyric number (line counts smoothe
 syllable does not cut the passage); the walk whose length is nearer the syllable count is used. Syllables are
 placed by dynamic programming that keeps word starts on the printed verses' word starts (skipping a note costs
 1, dropping a syllable 1.5). A stanza whose syllable count is off by more than max(3, 20 %) of the walk stays a
-credit. Reading the block (`lyrics.js stanzaChunks / readStanzas`): rows are found by page-wide baseline voting,
-then the letters near each row are split into columns and each column keeps its own baseline (on a skewed copy
-the two columns of a block do not share one row: the page-wide row cut the other column's line at its
-descenders); columns are chained from left edge to left edge, so indented lines stay in their stanza.
-`score.stanzas.verses = [{ number, numbers, text, part }]` lists the stanzas set (one lyric number per pass of
-a repeat) for the page's lyrics list. At the app's raster (2300 px wide, app OCR languages) golden1923-america
-now reads both stanzas whole and sets 2 of 2 (it read 1, partly, before). Bundled examples with OCR: haupt1867 3 of 3 stanzas set (52 syllables on 37 notes + the 15-note
+credit. Bundled examples with OCR: haupt1867 3 of 3 stanzas set (52 syllables on 37 notes + the 15-note
 repeat), each line under its own note row; golden1923-america 1 of 2 (the other block was read as 12 of its
 39 syllables). lyr06-amazing-grace
 against truth-underlaid.musicxml: lyrics 0.667 → 0.979 (scan), 0.664 → 0.931 (scan-mild); severe reads no
@@ -1420,7 +1401,13 @@ passes on benchmark (0.951) and challenge (0.831).
   runs). Held-out fonts Liberation Serif and DejaVu Sans: boxed letters 26 / 26 each, circled 23 / 24
   (two circles, M and W, not detected). A chord-symbol candidate whose glyphs all read (C ... B, m, 2-9,
   sus, Δ, °, ø, +, ♯, ♭, /) and parse as a chord is a chord without OCR; OCR reads the rest.
-  Coverage chord-symbol without OCR 0 to 84 / 85 / 48% (with OCR it was 56 / 52 / 46%).
+  Coverage chord-symbol without OCR 0 to 84 / 85 / 48% (with OCR it was 56 / 52 / 46%). Second round:
+  chord pages are also set in each page's serif font (`ChordName.font-family = #'roman`) and in
+  LilyPond's default chord look; a chord line near the first staff is a candidate even where its place
+  says title or composer (small type only); a superscript or a "+" left out of the line (or taken by the
+  note reader) is joined when the chord then still reads. Synthetic chords 46 / 46 (default look) and
+  42 / 46 in the held-out Liberation Serif and DejaVu Sans pages (the four misses are slash chords and
+  Am7); coverage chord-symbol without OCR 84 / 85 / 48% to 92 / 92 / 56%.
 - Two words OCR ran together under two or more notes ("lonssans"): a common word of three letters or
   more (English, German, French, Spanish, Italian, Latin, Czech function words) at the token's start or
   end, the rest three letters or more, is cut off as its own word (two words, no hyphen): "lons sans".

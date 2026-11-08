@@ -725,7 +725,9 @@ function classifyMarks(fr, asm, left) {
     // read by OCR; one that does not read as a chord stays what it was (or unknown)
     const top = n ? n.s.top(Math.max(n.s.left, Math.min(n.s.right, cx))) : 0;
     const chordCand = !!n && n.above && l.words === 1 && l.mem.length <= 7 && l.h >= 0.8 * sp && l.y1 <= top + 0.3 * sp && l.y1 >= top - 4.5 * sp &&
-      ['expression', 'tempo', 'credit', 'subtitle', 'lyricist', 'lyrics', 'text'].includes(role) && !(sysOf === 0 && l.y1 < firstTop - 5 * ss);
+      ['expression', 'tempo', 'credit', 'subtitle', 'lyricist', 'lyrics', 'text', 'title', 'composer'].includes(role) && !(sysOf === 0 && l.y1 < firstTop - 5 * ss) &&
+      // (a title or credit close over the first staff is a chord only in a small type)
+      !((role === 'title' || role === 'composer') && l.h > 2.2 * sp);
     if (chordCand && l.mem.length < 2) role = 'chordcand';
     // read by shape first (works without OCR); OCR reads the candidates this leaves
     const byShape = chordCand ? chordByShape(R, l.mem, sp) : null;
@@ -738,6 +740,27 @@ function classifyMarks(fr, asm, left) {
     out.text.push({ box: [l.x0, l.y0, l.x1, l.y1], role, chordCand, text: digits, shape: !!digits, h: l.h, words: l.words, sys: sysOf, k: n ? n.k : -1, si: n ? n.s.si : -1, x: l.x0, comps: l.mem });
   }
   out.text.push(...tempoItems);
+  // a superscript glyph (the 7 of "Em7") left out of its chord's line: joined when the chord
+  // then still reads
+  for (const t of out.text) {
+    if (t.role !== 'chord' || !t.comps) continue;
+    const sp = t.si >= 0 && allSt.find(q => q.si === t.si) ? allSt.find(q => q.si === t.si).sp : ss;
+    let sup = out.text.find(u => u !== t && (u.role === 'chordcand' || (u.chordCand && u.role !== 'chord')) && u.comps && u.comps.length <= 3 &&
+      u.box[0] - t.box[2] >= -0.2 * sp && u.box[0] - t.box[2] <= 0.6 * sp && u.box[1] <= t.box[1] + 0.3 * sp && u.box[3] <= t.box[3]);
+    // or a small sign the note reader took (a "+" read as other ink): any component just right of it
+    if (!sup) {
+      const q = (asm.comps || []).find(c => !t.comps.includes(c) && c.x0 - t.box[2] >= -0.1 * sp && c.x0 - t.box[2] <= 0.5 * sp &&
+        c.y0 >= t.box[1] - 0.3 * sp && c.y1 <= t.box[3] + 0.1 * sp && c.y1 - c.y0 + 1 <= t.box[3] - t.box[1] + 1);
+      if (q) sup = { box: [q.x0, q.y0, q.x1, q.y1], comps: [q] };
+    }
+    if (!sup) continue;
+    const both = chordByShape(R, t.comps.concat(sup.comps), sp);
+    if (!both) continue;
+    t.text = both.text; t.chord = parseChord(both.text); t.comps = t.comps.concat(sup.comps);
+    t.box = [t.box[0], Math.min(t.box[1], sup.box[1]), sup.box[2], Math.max(t.box[3], sup.box[3])];
+    sup.role = 'merged';
+  }
+  for (let i = out.text.length - 1; i >= 0; i--) if (out.text[i].role === 'merged') out.text.splice(i, 1);
   // lyrics: syllables spaced under the notes fall apart into many short
   // lines on one row; a row of three or more among the music is underlay
   const inMusic = out.text.filter(t => ['expression', 'tempo', 'lyrics', 'text'].includes(t.role) && t.sys >= 0 && !t.metro && !t.chordCand);

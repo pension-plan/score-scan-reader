@@ -21,7 +21,8 @@ const CHORD_TEXT = ['C', 'Cm', 'C7', 'Cm7', 'CΔ', 'C6', 'Cm6', 'C9', 'Csus4', '
 const enc = (g) => Array.from(g, v => Math.max(0, Math.min(9, Math.round(v * 9)))).join('');
 (async () => {
   const marks = [], chords = [];
-  for (const f of FONTS) {
+  for (const f of FONTS.concat(['default'])) {
+    if (f === 'default') { await chordPage(f); continue; }
     for (const kind of ['box', 'circle']) {
       const c = omr.createConverter({});
       const e = await c.addPage(readGray(path.join(DIR, `marks-${kind}-${f}-1.pgm`)), 0, 1);
@@ -51,6 +52,9 @@ const enc = (g) => Array.from(g, v => Math.max(0, Math.min(9, Math.round(v * 9))
         if (ig) marks.push(['1234567890'[k], +ig.asp.toFixed(3), enc(ig.g)]);
       });
     }
+    await chordPage(f);
+  }
+  async function chordPage(f) {
     const c = omr.createConverter({});
     const e = await c.addPage(readGray(path.join(DIR, `chords-${f}-1.pgm`)), 0, 1);
     const sp = e.fr.ss;
