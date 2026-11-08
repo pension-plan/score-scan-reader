@@ -1630,6 +1630,16 @@ passes on benchmark (0.951) and challenge (0.831).
   short tokens are often syllables whose hyphen was lost ("Suf" read as "But"). Not fixed: words the
   lists lack (archaic "erzürnet", compounds like "Lebenlang") and misreads that are real words ("Ans"
   for "Aus").
+- Circled rehearsal letters M and W: a circle round a wide letter stands 3.6 spaces tall, over the 3.5 a
+  box may reach, so round frames may now be 4 spaces tall; and a clear winner a little under the letter
+  match bar is taken (score at least 0.55 and 0.08 ahead: the circled F scored 0.598 against 0.505).
+  Synthetic circled A-Z pages (five fonts): 23 of 26 to 26 of 26 letters read; boxed unchanged (26 of 26).
+- A chord over the first bar whose root letter the note reader took (next to the time signature: the
+  "B" of B♭Δ) or that sits apart from its accidental: when the line does not read as a chord, a
+  letter-sized component just left of it on its baseline (within half a space; a flat hangs under it) is
+  joined and the line read again. mk06 lead sheet without OCR: clean 59 of 61 to 61 of 61 chord symbols,
+  scan 60 to 61; coverage harmony elements 190 to 197, no item score changed. Serif slash chords: the
+  synthetic chord pages read 46 of 46 in all five fonts on 0.44.0 (the misses noted above are gone).
 Not done: a missed hyphen placed one letter off ("nob-le" for "no-ble").
 
 **Overlay colours.** Text `--ov-text` #5e35b1, bar numbers `--ov-barno` #263238, dynamics and hairpins

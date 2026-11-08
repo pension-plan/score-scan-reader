@@ -170,7 +170,8 @@ function readMarkByShape(R, c, round) {
   const ig = inkGrid(markInterior(R, c, round));
   if (!ig) return '';
   const m = matchText(textTemplates().marks, ig);
-  return m && m.score >= 0.6 && m.score - m.second >= 0.04 ? m.ch : '';
+  // (a clear winner a little under the bar is taken: the circled F scores 0.598 against 0.505)
+  return m && (m.score >= 0.6 && m.score - m.second >= 0.04 || m.score >= 0.55 && m.score - m.second >= 0.08) ? m.ch : '';
 }
 
 // a chord symbol read glyph by glyph ("C", "A", "m", "7", "Δ", "°", "ø", "♭", "/" ...):
@@ -598,7 +599,8 @@ function classifyMarks(fr, asm, left) {
     const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1, n = staffUnder((c.x0 + c.x1) / 2, c.y1);
     if (!n) continue;
     const sp = n.s.sp;
-    if (w < 1.2 * sp || h < 1.2 * sp || w > 4.5 * sp || h > 3.5 * sp || c.area > 0.6 * w * h) continue;
+    // (a circle grows round a wide letter: a circled M or W stands 3.6 spaces tall where a box stays 3)
+    if (w < 1.2 * sp || h < 1.2 * sp || w > 4.5 * sp || h > (Math.abs(w - h) <= 0.25 * Math.max(w, h) ? 4 : 3.5) * sp || c.area > 0.6 * w * h) continue;
     const img = glyphImage(R, c), d = img.data;
     const rowInk = (y) => { let k = 0; for (let x = 0; x < w; x++) k += d[y * w + x]; return k; };
     const colInk = (x) => { let k = 0; for (let y = 0; y < h; y++) k += d[y * w + x]; return k; };
@@ -881,7 +883,14 @@ function classifyMarks(fr, asm, left) {
       !((role === 'title' || role === 'composer') && l.h > 2.2 * sp);
     if (chordCand && l.mem.length < 2) role = 'chordcand';
     // read by shape first (works without OCR); OCR reads the candidates this leaves
-    const byShape = chordCand ? chordByShape(R, l.mem, sp) : null;
+    let byShape = chordCand ? chordByShape(R, l.mem, sp) : null;
+    // the root letter taken by the note reader (a chord over the first bar, next to the time
+    // signature: "B" of B♭Δ): a letter-sized component just left of the line, on its baseline (a flat hangs under it)
+    if (chordCand && !byShape) {
+      const q = allComps.find(q => !l.mem.includes(q) && q.x1 < l.x0 + 2 && q.x1 >= l.x0 - 0.6 * sp && Math.abs(q.y1 - l.y1) <= 0.5 * sp && q.y1 - q.y0 + 1 >= 0.6 * l.h);
+      const b2 = q ? chordByShape(R, [q, ...l.mem], sp) : null;
+      if (b2) { byShape = b2; l.mem = [q, ...l.mem]; l.x0 = Math.min(l.x0, q.x0); l.y0 = Math.min(l.y0, q.y0); }
+    }
     if (byShape) { out.text.push({ box: [l.x0, l.y0, l.x1, l.y1], role: 'chord', chordCand, chord: parseChord(byShape.text), text: byShape.text, shape: true, h: l.h, words: l.words, sys: sysOf, k: n ? n.k : -1, si: n ? n.s.si : -1, x: l.x0, comps: l.mem }); continue; }
     // a lone glyph or specks among the music is more likely a symbol the
     // reader missed (a rest, a flag) than text: left unknown
