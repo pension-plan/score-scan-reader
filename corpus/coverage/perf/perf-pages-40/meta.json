@@ -14,10 +14,17 @@
   "barline-final",
   "beam",
   "breath",
+  "chord",
+  "clef-alto",
   "clef-bass",
   "clef-change",
+  "clef-soprano",
+  "clef-tenor",
   "clef-treble",
+  "clef-treble-8va",
+  "coda",
   "dot",
+  "ds",
   "dyn-f",
   "dyn-ff",
   "dyn-mf",
@@ -55,17 +62,25 @@
   "multi-page",
   "note-16th",
   "note-32nd",
+  "note-64th",
   "note-8th",
+  "note-breve",
   "note-half",
   "note-quarter",
   "note-whole",
+  "ottava-15ma",
   "ottava-8va",
   "ottava-8vb",
   "page-break",
   "pedal",
   "rehearsal-mark",
+  "rest-32nd",
+  "rest-64th",
+  "rest-breve",
   "rest-half",
   "rest-quarter",
+  "rest-whole",
+  "segno",
   "slur",
   "staccato",
   "stem-down",
@@ -73,12 +88,15 @@
   "system-break",
   "tempo-mark",
   "tenuto",
+  "text-expression",
   "time-12-8",
+  "time-2-2",
   "time-2-4",
   "time-3-2",
   "time-3-4",
   "time-4-4",
   "time-5-4",
+  "time-5-8",
   "time-6-8",
   "time-7-8",
   "time-9-8",
@@ -87,10 +105,13 @@
   "time-cut",
   "tremolo",
   "trill",
+  "tuplet-2",
   "tuplet-3",
   "tuplet-5",
   "tuplet-6",
-  "turn"
+  "tuplet-7",
+  "turn",
+  "x-time-4-2"
  ],
  "layout": "piano",
  "layout_also": [
@@ -104,30 +125,37 @@
   "notes": "One Piano part (grand staff) over 40 page(s); every page is one variation with its own key, metre, tempo + metronome mark and rehearsal number (1, 2, ...). Pages are separated by double barlines + page breaks; systems hold 4 bars."
  },
  "counts": {
-  "acc-courtesy": 7,
-  "acc-double-sharp": 68,
-  "acc-flat": 3,
-  "acc-natural": 153,
-  "acc-sharp": 187,
+  "acc-courtesy": 8,
+  "acc-double-sharp": 69,
+  "acc-flat": 4,
+  "acc-natural": 143,
+  "acc-sharp": 172,
   "accent": 90,
   "arpeggio": 60,
-  "barline-double": 39,
+  "barline-double": 40,
   "barline-final": 1,
-  "beam": 1280,
+  "beam": 1260,
   "breath": 10,
+  "chord": 1861,
+  "clef-alto": 5,
   "clef-bass": 11,
-  "clef-change": 20,
+  "clef-change": 40,
+  "clef-soprano": 5,
+  "clef-tenor": 5,
   "clef-treble": 11,
+  "clef-treble-8va": 5,
+  "coda": 1,
   "dot": 650,
+  "ds": 1,
   "dyn-f": 7,
   "dyn-ff": 6,
   "dyn-mf": 7,
   "dyn-mp": 7,
   "dyn-p": 6,
   "dyn-pp": 7,
-  "fermata": 38,
+  "fermata": 48,
   "fingering": 140,
-  "flag": 160,
+  "flag": 150,
   "grace": 80,
   "grace-slash": 40,
   "hairpin-cresc": 20,
@@ -148,50 +176,64 @@
   "key-s5": 2,
   "key-s6": 3,
   "key-s7": 3,
-  "ledger-above": 2280,
-  "ledger-below": 344,
+  "ledger-above": 2191,
+  "ledger-below": 352,
   "marcato": 40,
   "metronome": 40,
   "mordent": 20,
   "multi-page": 1,
-  "note-16th": 970,
-  "note-32nd": 320,
-  "note-8th": 3690,
-  "note-half": 1722,
-  "note-quarter": 3552,
-  "note-whole": 95,
-  "ottava-8va": 6,
+  "note-16th": 756,
+  "note-32nd": 290,
+  "note-64th": 10,
+  "note-8th": 3650,
+  "note-breve": 25,
+  "note-half": 1642,
+  "note-quarter": 3476,
+  "note-whole": 195,
+  "ottava-15ma": 3,
+  "ottava-8va": 3,
   "ottava-8vb": 4,
   "page-break": 39,
   "pedal": 80,
   "rehearsal-mark": 40,
+  "rest-32nd": 40,
+  "rest-64th": 10,
+  "rest-breve": 5,
   "rest-half": 10,
   "rest-quarter": 10,
+  "rest-whole": 4,
+  "segno": 1,
   "slur": 210,
-  "staccato": 530,
-  "stem-down": 6123,
-  "stem-up": 1662,
+  "staccato": 520,
+  "stem-down": 5774,
+  "stem-up": 1581,
   "system-break": 159,
   "tempo-mark": 40,
   "tenuto": 57,
+  "text-expression": 1,
   "time-12-8": 2,
+  "time-2-2": 1,
   "time-2-4": 3,
   "time-3-2": 2,
   "time-3-4": 3,
   "time-4-4": 9,
-  "time-5-4": 2,
+  "time-5-4": 1,
+  "time-5-8": 1,
   "time-6-8": 2,
   "time-7-8": 2,
   "time-9-8": 2,
-  "time-change": 30,
+  "time-change": 31,
   "time-common": 2,
-  "time-cut": 2,
+  "time-cut": 1,
   "tremolo": 80,
   "trill": 10,
+  "tuplet-2": 10,
   "tuplet-3": 160,
   "tuplet-5": 20,
-  "tuplet-6": 80,
-  "turn": 10
+  "tuplet-6": 24,
+  "tuplet-7": 16,
+  "turn": 10,
+  "x-time-4-2": 1
  },
  "degradations": {
   "clean.pdf": {
@@ -206,7 +248,7 @@
     2481,
     3508
    ],
-   "bytes": 5617652
+   "bytes": 5608468
   },
   "scan.pdf": {
    "seed": 53001,
@@ -308,7 +350,7 @@
     "dpi": 300
    },
    "summary": "typical sheet-fed scan of every page: grey, 0.2-1.0 deg skew that differs per page, light blur + noise, JPEG q80",
-   "bytes": 34256621,
+   "bytes": 34131625,
    "pdf_pages": [
     {
      "page": 1,
@@ -1734,7 +1776,7 @@
     "dpi": 300
    },
    "summary": "worn photocopies scanned in grey: 1.5-3.5 deg skew per page, bleed-through of the next page, strong lighting gradient, blur, noise, toner speckles, JPEG q35",
-   "bytes": 22614135,
+   "bytes": 22552867,
    "pdf_pages": [
     {
      "page": 1,
@@ -3516,14 +3558,14 @@
   "group": "pages",
   "engraving": "var-40",
   "file_bytes": {
-   "clean.pdf": 5617652,
-   "scan.pdf": 34256621,
-   "scan-severe.pdf": 22614135
+   "clean.pdf": 5608468,
+   "scan.pdf": 34131625,
+   "scan-severe.pdf": 22552867
   },
   "measures": 796,
   "systems": 199,
-  "notes_in_truth": 10349,
-  "rests_in_truth": 20,
+  "notes_in_truth": 10044,
+  "rests_in_truth": 79,
   "staff_size_pt": 18,
   "paper_mm": [
    210.0,
@@ -3540,16 +3582,16 @@
  "source": "own procedural composition for the coverage corpus (pieces/variations.py)",
  "validation": {
   "xsd_valid": true,
-  "music21_parse": "2 7833 20",
+  "music21_parse": "2 7458 79",
   "engraving_matches_model": {
    "ok": true,
-   "checked": 10449,
+   "checked": 10203,
    "n_problems": 0,
    "problems": []
   },
   "midi_vs_truth": {
-   "truth_attacks": 10349,
-   "midi_attacks": 10429,
+   "truth_attacks": 10044,
+   "midi_attacks": 10124,
    "grace_extras": 80,
    "missing": 0,
    "extra": 0,
@@ -3562,8 +3604,8 @@
    "lyr_missing_sample": []
   },
   "accidentals_cross_check": {
-   "printed": 411,
-   "simulated_per_part": 411,
+   "printed": 388,
+   "simulated_per_part": 388,
    "differences": []
   },
   "symbol_cross_check": {
@@ -3583,18 +3625,18 @@
     "ok": true
    },
    "beam": {
-    "truth": 1280,
-    "engraved": 1280,
+    "truth": 1260,
+    "engraved": 1260,
     "ok": true
    },
    "flag": {
-    "truth": 160,
-    "engraved": 160,
+    "truth": 150,
+    "engraved": 150,
     "ok": true
    },
    "staccato": {
-    "truth": 530,
-    "engraved": 530,
+    "truth": 520,
+    "engraved": 520,
     "ok": true
    },
    "staccatissimo": {
@@ -3618,8 +3660,8 @@
     "ok": true
    },
    "fermata": {
-    "truth": 38,
-    "engraved": 38,
+    "truth": 48,
+    "engraved": 48,
     "ok": true
    },
    "trill": {
@@ -3673,18 +3715,18 @@
     "ok": true
    },
    "accidentals(all)": {
-    "truth": 411,
-    "engraved": 411,
+    "truth": 388,
+    "engraved": 388,
     "ok": true
    },
    "acc-courtesy": {
-    "truth": 7,
-    "engraved": 7,
+    "truth": 8,
+    "engraved": 8,
     "ok": true
    },
    "ottava-8va": {
-    "truth": 6,
-    "engraved": 6,
+    "truth": 3,
+    "engraved": 3,
     "ok": true
    },
    "ottava-8vb": {
@@ -3693,18 +3735,18 @@
     "ok": true
    },
    "ottava-15ma": {
-    "truth": 0,
-    "engraved": 0,
+    "truth": 3,
+    "engraved": 3,
     "ok": true
    },
    "ledger-above": {
-    "truth": 2280,
-    "engraved": 2280,
+    "truth": 2191,
+    "engraved": 2191,
     "ok": true
    },
    "ledger-below": {
-    "truth": 344,
-    "engraved": 344,
+    "truth": 352,
+    "engraved": 352,
     "ok": true
    },
    "lyrics": {
@@ -3733,8 +3775,8 @@
     "ok": true
    },
    "clef-change": {
-    "truth": 20,
-    "engraved": 20,
+    "truth": 40,
+    "engraved": 40,
     "ok": true
    },
    "dyn-pp": {
@@ -3772,6 +3814,11 @@
     "engraved": 0,
     "ok": true
    },
+   "tuplet-2": {
+    "truth": 10,
+    "engraved": 10,
+    "ok": true
+   },
    "tuplet-3": {
     "truth": 160,
     "engraved": 160,
@@ -3783,8 +3830,13 @@
     "ok": true
    },
    "tuplet-6": {
-    "truth": 80,
-    "engraved": 80,
+    "truth": 24,
+    "engraved": 24,
+    "ok": true
+   },
+   "tuplet-7": {
+    "truth": 16,
+    "engraved": 16,
     "ok": true
    }
   },
@@ -4292,14 +4344,36 @@
   },
   {
    "variation": 23,
-   "texture": "Chorale",
+   "texture": "Antico",
+   "time": [
+    4,
+    2
+   ],
+   "symbol": null,
+   "key": [
+    -1,
+    "major"
+   ],
+   "tempo": [
+    "Stile antico",
+    "half",
+    72,
+    0
+   ],
+   "bars": 20,
+   "systems": 5,
+   "first_bar": 437
+  },
+  {
+   "variation": 24,
+   "texture": "Chorale II",
    "time": [
     4,
     4
    ],
    "symbol": "common",
    "key": [
-    -1,
+    5,
     "major"
    ],
    "tempo": [
@@ -4310,18 +4384,18 @@
    ],
    "bars": 20,
    "systems": 5,
-   "first_bar": 437
+   "first_bar": 457
   },
   {
-   "variation": 24,
-   "texture": "Alberti",
+   "variation": 25,
+   "texture": "Alberti II",
    "time": [
     4,
     4
    ],
    "symbol": null,
    "key": [
-    5,
+    -6,
     "major"
    ],
    "tempo": [
@@ -4332,19 +4406,19 @@
    ],
    "bars": 20,
    "systems": 5,
-   "first_bar": 457
+   "first_bar": 477
   },
   {
-   "variation": 25,
-   "texture": "Toccata",
+   "variation": 26,
+   "texture": "Toccata II",
    "time": [
     2,
     4
    ],
    "symbol": null,
    "key": [
-    -6,
-    "major"
+    5,
+    "minor"
    ],
    "tempo": [
     "Presto",
@@ -4354,18 +4428,18 @@
    ],
    "bars": 20,
    "systems": 5,
-   "first_bar": 477
+   "first_bar": 497
   },
   {
-   "variation": 26,
-   "texture": "Valse",
+   "variation": 27,
+   "texture": "Valse II",
    "time": [
     3,
     4
    ],
    "symbol": null,
    "key": [
-    5,
+    -3,
     "minor"
    ],
    "tempo": [
@@ -4376,18 +4450,18 @@
    ],
    "bars": 20,
    "systems": 5,
-   "first_bar": 497
+   "first_bar": 517
   },
   {
-   "variation": 27,
-   "texture": "Barcarolle",
+   "variation": 28,
+   "texture": "Barcarolle II",
    "time": [
     6,
     8
    ],
    "symbol": null,
    "key": [
-    -3,
+    0,
     "minor"
    ],
    "tempo": [
@@ -4398,33 +4472,11 @@
    ],
    "bars": 20,
    "systems": 5,
-   "first_bar": 517
-  },
-  {
-   "variation": 28,
-   "texture": "Triplets",
-   "time": [
-    4,
-    4
-   ],
-   "symbol": null,
-   "key": [
-    0,
-    "minor"
-   ],
-   "tempo": [
-    "Moderato",
-    "quarter",
-    88,
-    0
-   ],
-   "bars": 20,
-   "systems": 5,
    "first_bar": 537
   },
   {
    "variation": 29,
-   "texture": "Octaves",
+   "texture": "Triplets II",
    "time": [
     4,
     4
@@ -4435,9 +4487,9 @@
     "major"
    ],
    "tempo": [
-    "Con fuoco",
+    "Moderato",
     "quarter",
-    120,
+    88,
     0
    ],
    "bars": 20,
@@ -4446,7 +4498,7 @@
   },
   {
    "variation": 30,
-   "texture": "Duet",
+   "texture": "Octaves II",
    "time": [
     4,
     4
@@ -4457,9 +4509,9 @@
     "minor"
    ],
    "tempo": [
-    "Cantabile",
+    "Con fuoco",
     "quarter",
-    72,
+    120,
     0
    ],
    "bars": 20,
@@ -4468,14 +4520,36 @@
   },
   {
    "variation": 31,
-   "texture": "Sarabande",
+   "texture": "Duet II",
+   "time": [
+    4,
+    4
+   ],
+   "symbol": null,
+   "key": [
+    0,
+    "major"
+   ],
+   "tempo": [
+    "Cantabile",
+    "quarter",
+    72,
+    0
+   ],
+   "bars": 20,
+   "systems": 5,
+   "first_bar": 597
+  },
+  {
+   "variation": 32,
+   "texture": "Sarabande II",
    "time": [
     3,
     2
    ],
    "symbol": null,
    "key": [
-    0,
+    -4,
     "major"
    ],
    "tempo": [
@@ -4486,18 +4560,18 @@
    ],
    "bars": 20,
    "systems": 5,
-   "first_bar": 597
+   "first_bar": 617
   },
   {
-   "variation": 32,
-   "texture": "Etude",
+   "variation": 33,
+   "texture": "Etude II",
    "time": [
     4,
     4
    ],
    "symbol": null,
    "key": [
-    -4,
+    6,
     "major"
    ],
    "tempo": [
@@ -4508,19 +4582,19 @@
    ],
    "bars": 20,
    "systems": 5,
-   "first_bar": 617
+   "first_bar": 637
   },
   {
-   "variation": 33,
-   "texture": "Pastorale",
+   "variation": 34,
+   "texture": "Pastorale II",
    "time": [
     12,
     8
    ],
    "symbol": null,
    "key": [
-    6,
-    "major"
+    3,
+    "minor"
    ],
    "tempo": [
     "Pastorale",
@@ -4530,18 +4604,18 @@
    ],
    "bars": 20,
    "systems": 5,
-   "first_bar": 637
+   "first_bar": 657
   },
   {
-   "variation": 34,
-   "texture": "March",
+   "variation": 35,
+   "texture": "March II",
    "time": [
     2,
     2
    ],
-   "symbol": "cut",
+   "symbol": null,
    "key": [
-    3,
+    -7,
     "minor"
    ],
    "tempo": [
@@ -4552,19 +4626,19 @@
    ],
    "bars": 20,
    "systems": 5,
-   "first_bar": 657
+   "first_bar": 677
   },
   {
-   "variation": 35,
-   "texture": "Siciliano",
+   "variation": 36,
+   "texture": "Siciliano II",
    "time": [
     9,
     8
    ],
    "symbol": null,
    "key": [
-    -7,
-    "minor"
+    3,
+    "major"
    ],
    "tempo": [
     "Siciliano",
@@ -4574,41 +4648,41 @@
    ],
    "bars": 20,
    "systems": 5,
-   "first_bar": 677
-  },
-  {
-   "variation": 36,
-   "texture": "Five",
-   "time": [
-    5,
-    4
-   ],
-   "symbol": null,
-   "key": [
-    3,
-    "major"
-   ],
-   "tempo": [
-    "Inquieto",
-    "quarter",
-    132,
-    0
-   ],
-   "bars": 20,
-   "systems": 5,
    "first_bar": 697
   },
   {
    "variation": 37,
-   "texture": "Seven",
+   "texture": "Five II",
    "time": [
-    7,
+    5,
     8
    ],
    "symbol": null,
    "key": [
     1,
     "minor"
+   ],
+   "tempo": [
+    "Inquieto",
+    "eighth",
+    240,
+    0
+   ],
+   "bars": 20,
+   "systems": 5,
+   "first_bar": 717
+  },
+  {
+   "variation": 38,
+   "texture": "Seven II",
+   "time": [
+    7,
+    8
+   ],
+   "symbol": null,
+   "key": [
+    7,
+    "major"
    ],
    "tempo": [
     "Danza",
@@ -4618,33 +4692,11 @@
    ],
    "bars": 20,
    "systems": 5,
-   "first_bar": 717
-  },
-  {
-   "variation": 38,
-   "texture": "Tremolo",
-   "time": [
-    4,
-    4
-   ],
-   "symbol": null,
-   "key": [
-    7,
-    "major"
-   ],
-   "tempo": [
-    "Misterioso",
-    "quarter",
-    60,
-    0
-   ],
-   "bars": 20,
-   "systems": 5,
    "first_bar": 737
   },
   {
    "variation": 39,
-   "texture": "Clefs",
+   "texture": "Tremolo II",
    "time": [
     4,
     4
@@ -4655,9 +4707,9 @@
     "minor"
    ],
    "tempo": [
-    "Comodo",
+    "Misterioso",
     "quarter",
-    96,
+    60,
     0
    ],
    "bars": 20,
@@ -4666,7 +4718,7 @@
   },
   {
    "variation": 40,
-   "texture": "Sextuplets",
+   "texture": "Clefs II",
    "time": [
     4,
     4
@@ -4677,9 +4729,9 @@
     "major"
    ],
    "tempo": [
-    "Fluido",
+    "Comodo",
     "quarter",
-    69,
+    96,
     0
    ],
    "bars": 20,

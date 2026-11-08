@@ -1148,13 +1148,16 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
       return best && best.fifths != null ? best.fifths : null;
     };
     const drop = (r, c) => (r === 0 || Math.sign(r) === Math.sign(c)) && Math.abs(r) < Math.abs(c);
+    const multi = [...sysKeyOf.values()].some(r => r !== fifths && !drop(r, fifths));
     let cur = null;
     order.forEach((sy, i) => {
       const r = sysKeyOf.get(sy), next = order[i + 1] ? sysKeyOf.get(order[i + 1]) : undefined;
       let k;
-      // the first system: its own reading unless that is a dropout of a piece
-      // key read on two systems or more
-      if (cur == null) k = r != null && (keyOk(r) || !drop(r, fifths) || (seenKey[fifths] || 0) < 2) ? r : fifths;
+      // the first system: in a piece whose readings are all the piece's key
+      // or dropouts of it, the piece's key; in a piece that reads other keys
+      // too, its own reading unless that is a dropout of a piece key read on
+      // two systems or more
+      if (cur == null) k = r != null && (keyOk(r) || (multi && (!drop(r, fifths) || (seenKey[fifths] || 0) < 2))) ? r : fifths;
       else if (r == null || r === cur) k = cur;
       else if (drop(r, cur)) k = seenKey[r] >= 3 && seenKey[r] > 0.5 * allSys.size ? r : cur;
       else if (keyOk(r) || sy.staves.length >= 2 || next === r || Math.sign(r) !== Math.sign(cur) || Math.abs(r) >= Math.abs(cur) + 2) k = r;

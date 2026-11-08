@@ -12,9 +12,12 @@
   "barline-double",
   "barline-final",
   "beam",
+  "chord",
   "clef-bass",
   "clef-treble",
+  "coda",
   "dot",
+  "ds",
   "dyn-f",
   "dyn-ff",
   "dyn-mf",
@@ -45,6 +48,7 @@
   "pedal",
   "rehearsal-mark",
   "rest-quarter",
+  "segno",
   "slur",
   "staccato",
   "stem-down",
@@ -52,13 +56,15 @@
   "system-break",
   "tempo-mark",
   "tenuto",
+  "text-expression",
   "time-2-4",
   "time-3-4",
   "time-4-4",
   "time-6-8",
   "time-change",
   "time-common",
-  "trill"
+  "trill",
+  "tuplet-2"
  ],
  "layout": "piano",
  "layout_also": [],
@@ -76,19 +82,22 @@
   "acc-natural": 27,
   "acc-sharp": 18,
   "accent": 20,
-  "barline-double": 4,
+  "barline-double": 5,
   "barline-final": 1,
-  "beam": 175,
+  "beam": 180,
+  "chord": 176,
   "clef-bass": 1,
   "clef-treble": 1,
+  "coda": 1,
   "dot": 25,
+  "ds": 1,
   "dyn-f": 1,
   "dyn-ff": 1,
   "dyn-mf": 1,
   "dyn-mp": 1,
   "dyn-pp": 1,
   "fermata": 8,
-  "flag": 30,
+  "flag": 25,
   "grace": 10,
   "grace-slash": 10,
   "hairpin-cresc": 5,
@@ -104,14 +113,15 @@
   "metronome": 5,
   "multi-page": 1,
   "note-16th": 160,
-  "note-8th": 490,
+  "note-8th": 495,
   "note-half": 97,
-  "note-quarter": 277,
+  "note-quarter": 272,
   "note-whole": 20,
   "page-break": 4,
   "pedal": 40,
   "rehearsal-mark": 5,
   "rest-quarter": 5,
+  "segno": 1,
   "slur": 35,
   "staccato": 155,
   "stem-down": 739,
@@ -119,13 +129,15 @@
   "system-break": 19,
   "tempo-mark": 5,
   "tenuto": 12,
+  "text-expression": 1,
   "time-2-4": 1,
   "time-3-4": 1,
   "time-4-4": 1,
   "time-6-8": 1,
   "time-change": 4,
   "time-common": 1,
-  "trill": 5
+  "trill": 5,
+  "tuplet-2": 5
  },
  "degradations": {
   "clean.pdf": {
@@ -140,7 +152,7 @@
     2481,
     3508
    ],
-   "bytes": 712746
+   "bytes": 720880
   },
   "scan.pdf": {
    "seed": 53001,
@@ -172,7 +184,7 @@
     "dpi": 300
    },
    "summary": "typical sheet-fed scan of every page: grey, 0.2-1.0 deg skew that differs per page, light blur + noise, JPEG q80",
-   "bytes": 4241991,
+   "bytes": 4248169,
    "pdf_pages": [
     {
      "page": 1,
@@ -373,7 +385,7 @@
     "dpi": 300
    },
    "summary": "worn photocopies scanned in grey: 1.5-3.5 deg skew per page, bleed-through of the next page, strong lighting gradient, blur, noise, toner speckles, JPEG q35",
-   "bytes": 2802436,
+   "bytes": 2804852,
    "pdf_pages": [
     {
      "page": 1,
@@ -615,9 +627,9 @@
   "group": "pages",
   "engraving": "var-5",
   "file_bytes": {
-   "clean.pdf": 712746,
-   "scan.pdf": 4241991,
-   "scan-severe.pdf": 2802436
+   "clean.pdf": 720880,
+   "scan.pdf": 4248169,
+   "scan-severe.pdf": 2804852
   },
   "measures": 96,
   "systems": 24,
@@ -682,13 +694,13 @@
     "ok": true
    },
    "beam": {
-    "truth": 175,
-    "engraved": 175,
+    "truth": 180,
+    "engraved": 180,
     "ok": true
    },
    "flag": {
-    "truth": 30,
-    "engraved": 30,
+    "truth": 25,
+    "engraved": 25,
     "ok": true
    },
    "staccato": {
@@ -869,6 +881,11 @@
    "dyn-sfz": {
     "truth": 0,
     "engraved": 0,
+    "ok": true
+   },
+   "tuplet-2": {
+    "truth": 5,
+    "engraved": 5,
     "ok": true
    }
   },

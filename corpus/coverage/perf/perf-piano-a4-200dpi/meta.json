@@ -15,9 +15,11 @@
   "barline-final",
   "beam",
   "breath",
+  "chord",
   "clef-bass",
   "clef-change",
   "clef-treble",
+  "dc",
   "dot",
   "double-dot",
   "dyn-f",
@@ -28,6 +30,7 @@
   "dyn-pp",
   "dyn-sfz",
   "fermata",
+  "fine",
   "fingering",
   "flag",
   "grace",
@@ -97,7 +100,7 @@
    "Piano"
   ],
   "must_not_split": true,
-  "notes": "One Piano part on a grand staff (2 staves); bars 6-9 have two voices on the upper staff (stems up / down) that stay in the Piano part. Sounding pitches under the 8va (bar 10) and 8vb (bar 14) brackets are an octave above / below the written note heads. Bars 1-4 are repeated (1st ending bar 4, 2nd ending bar 5)."
+  "notes": "One Piano part on a grand staff (2 staves); bars 6-9 have two voices on the upper staff (stems up / down) that stay in the Piano part. Sounding pitches under the 8va (bar 10) and 8vb (bar 14) brackets are an octave above / below the written note heads. Bars 1-4 are repeated (1st ending bar 4, 2nd ending bar 5); \"Fine\" ends bar 13 and \"D.C. al Fine\" ends bar 18 (encoded as words + <sound fine/dacapo>)."
  },
  "counts": {
   "acc-courtesy": 2,
@@ -108,13 +111,15 @@
   "acc-sharp": 2,
   "accent": 1,
   "arpeggio": 1,
-  "barline-double": 3,
-  "barline-final": 1,
+  "barline-double": 2,
+  "barline-final": 2,
   "beam": 28,
   "breath": 1,
+  "chord": 25,
   "clef-bass": 2,
   "clef-change": 2,
   "clef-treble": 2,
+  "dc": 1,
   "dot": 16,
   "double-dot": 1,
   "dyn-f": 1,
@@ -125,6 +130,7 @@
   "dyn-pp": 1,
   "dyn-sfz": 1,
   "fermata": 5,
+  "fine": 1,
   "fingering": 5,
   "flag": 4,
   "grace": 3,
@@ -198,7 +204,7 @@
     1654,
     2339
    ],
-   "bytes": 127982
+   "bytes": 130299
   },
   "scan.pdf": {
    "seed": 52001,
@@ -220,7 +226,7 @@
     "dpi": 200
    },
    "summary": "typical flatbed scan: grey, -0.8 deg skew, slight lighting gradient, light blur + sensor noise, JPEG q80",
-   "bytes": 475327,
+   "bytes": 478186,
    "pdf_pages": [
     {
      "page": 1,
@@ -279,7 +285,7 @@
     "dpi": 200
    },
    "summary": "binarised (1-bit) photocopy: -3 deg skew, faded strokes, blur before thresholding, salt & pepper, toner speckles",
-   "bytes": 74616,
+   "bytes": 75010,
    "pdf_pages": [
     {
      "page": 1,
@@ -342,9 +348,9 @@
   "group": "piano",
   "engraving": "piano-A4",
   "file_bytes": {
-   "clean.pdf": 127982,
-   "scan.pdf": 475327,
-   "scan-severe.pdf": 74616
+   "clean.pdf": 130299,
+   "scan.pdf": 478186,
+   "scan-severe.pdf": 75010
   },
   "measures": 18,
   "systems": 5,

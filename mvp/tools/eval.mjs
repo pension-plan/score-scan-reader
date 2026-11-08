@@ -532,7 +532,7 @@ async function main() {
   const CAP = Math.max(1, +(process.env.OMR_MAX_JOBS || 16));
   const jobs = Math.min(CAP, items.length, args.jobs > 0 ? args.jobs : CAP);
   for (let w = 0; w < 30 && os.loadavg()[0] > 0.9 * os.cpus().length; w++) {
-    if (w === 0) log(`eval: host over 90% busy (load ${os.loadavg()[0].toFixed(0)}), waiting up to 5 min before starting`);
+    if (w === 0) console.error(`eval: host over 90% busy (load ${os.loadavg()[0].toFixed(0)}), waiting up to 5 min before starting`);
     await new Promise((r) => setTimeout(r, 10000));
   }
   const outDir = args.out.replace(/\.json$/i, '') + '.out';

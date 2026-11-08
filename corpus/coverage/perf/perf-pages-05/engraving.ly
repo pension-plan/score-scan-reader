@@ -59,7 +59,7 @@
     c'''4( aes''8 f''8) aes''4-. f'''4-. |
     bes''4( g''8 ees''8) g''4-. ees'''4-. |
     aes'2 c''4-. r4 \bar "||" |
-    \pageBreak \mark \markup { \box \bold "3" } \tempo "Var. 3  Presto" 4 = 152 \time 2/4 \key fis \major fis''16->\mp ais''16 cis'''16 fis'''16 fis'''16 cis'''16 ais''16 fis''16 |
+    \pageBreak \mark \markup { \box \bold "3" } \segnoMark 1 \tempo "Var. 3  Presto" 4 = 152 \time 2/4 \key fis \major fis''16->\mp ais''16 cis'''16 fis'''16 fis'''16 cis'''16 ais''16 fis''16 |
     b'16-> dis''16 fis''16 b''16 b''16 fis''16 dis''16 b'16 |
     cis''16-> eis''16 gis''16 cis'''16 cis'''16 gis''16 eis''16 cis''16 |
     fis''16-> ais''16 cis'''16 fis'''16 fis'''16 cis'''16 ais''16 fis''16 |
@@ -70,12 +70,12 @@
     \break fis''16-> ais''16 cis'''16 fis'''16 fis'''16 cis'''16 ais''16 fis''16 |
     b'16-> dis''16 fis''16 b''16 b''16 fis''16 dis''16 b'16 |
     cis''16-> eis''16 gis''16 cis'''16 cis'''16 gis''16 eis''16 cis''16 |
-    fis''16-> ais''16 cis'''16 fis'''16 fis'''16 cis'''16 ais''16 fis''16 |
+    fis''16-> ais''16 cis'''16 fis'''16 fis'''16 cis'''16 ais''16 fis''16 \textEndMark \markup { \italic "To Coda" } |
     \break dis''16-> fis''16 ais''16 dis'''16 dis'''16 ais''16 fis''16 dis''16 |
     b'16-> dis''16 fis''16 b''16 b''16 fis''16 dis''16 b'16 |
     fis''16-> ais''16 cis'''16 fis'''16 fis'''16 cis'''16 ais''16 fis''16 |
-    cis''16-> eis''16 gis''16 cis'''16 cis'''16 gis''16 eis''16 cis''16 |
-    \break fis''16-> ais''16 cis'''16 fis'''16 fis'''16 cis'''16 ais''16 fis''16 |
+    cis''16-> eis''16 gis''16 cis'''16 cis'''16 gis''16 eis''16 cis''16 \textEndMark \markup { \italic "D.S. al Coda" } \bar "||" |
+    \break \codaMark 1 fis''16-> ais''16 cis'''16 fis'''16 fis'''16 cis'''16 ais''16 fis''16 |
     gis'16-> bis'16 dis''16 gis''16 gis''16 dis''16 bis'16 gis'16 |
     cis''16-> eis''16 gis''16 cis'''16 cis'''16 gis''16 eis''16 cis''16 |
     fis''16-> ais''16 cis'''16 fis'''16 fis'''16 cis'''16 ais''16 fis''16 \bar "||" |
@@ -101,23 +101,23 @@
     fis''2.\trill \bar "||" |
     \pageBreak \mark \markup { \box \bold "5" } \tempo "Var. 5  Andante" 4. = 54 \time 6/8 \key aes \minor des''4.\ff\<( fes''4 bes'8) |
     g''4.( bes''4 ees''8\!) |
-    ces''4.\>( ees''4 aes'8) |
+    \tuplet 2/3 { ces''8\>( ees''8) } aes'4. |
     ces''4.( ees''4 aes'8\!) |
     \break ces''4.\<( ees''4 aes'8) |
     a''4.( c'''4 f''8\!) |
-    des''4.\>( fes''?4 bes'8) |
+    \tuplet 2/3 { des''8\>( fes''?8) } bes'4. |
     g''4.( bes''4 ees''8\!) |
     \break fes''4.\<( aes''4 des''8) |
     g''4.( bes''4 ees''8\!) |
-    aes''4.\>( ces'''4 fes''8) |
+    \tuplet 2/3 { aes''8\>( ces'''8) } fes''4. |
     d''4.( f''4 bes'8\!) |
     \break ces''4.\<( ees''4 aes'8) |
     g''4.( bes''4 ees''8\!) |
-    aes''4.\>( ces'''4 fes''8) |
+    \tuplet 2/3 { aes''8\>( ces'''8) } fes''4. |
     fes''4.( aes''4 des''8\!) |
     \break c''4.\<( ees''4 aes'8) |
     fes''4.( aes''4 des''8\!) |
-    g''4.\>( bes''4 ees''8) |
+    \tuplet 2/3 { g''8\>( bes''8) } ees''4. |
     ces''4.( ees''4 aes'8\!) \bar "|." |
           }
           \new Voice = "vPx2" {

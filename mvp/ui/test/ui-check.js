@@ -184,10 +184,12 @@ srv.listen(0, async () => {
         ok('dropzone: dropping a PDF converts it; title and file row report it', dres && dres.r && !dres.r.error && /dropped-hymn\.pdf converted/.test(dres.title || '') && dres.file === 'dropped-hymn.pdf' && dres.tick, dres && { title: dres.title, file: dres.file, tick: dres.tick, err: dres.err });
       }
       // second sample: the hymn (closed-score SATB with lyrics)
-      await page.evaluate(() => { window.__omrResult = null; });
-      await page.click('#sampleHymn');
       let hres = null;
-      try { await page.waitForFunction(() => window.__omrResult, null, { timeout: 120000 }); hres = await page.evaluate(() => ({ r: window.__omrResult, title: document.getElementById('dropTitle').textContent, verses: document.querySelectorAll('#lyrics .verse').length })); } catch (e) { hres = { err: e.message }; }
+      if (!(await page.$('#sampleHymn'))) hres = { err: 'no #sampleHymn button' };
+      else try {
+        await page.evaluate(() => { window.__omrResult = null; });
+        await page.click('#sampleHymn', { timeout: 5000 });
+        await page.waitForFunction(() => window.__omrResult, null, { timeout: 120000 }); hres = await page.evaluate(() => ({ r: window.__omrResult, title: document.getElementById('dropTitle').textContent, verses: document.querySelectorAll('#lyrics .verse').length })); } catch (e) { hres = { err: e.message }; }
       info.hymn = hres && hres.r && { parts: hres.r.parts, lyrics: hres.r.lyrics, ocrLangs: hres.r.ocrLangs, secs: hres.r.secs, verses: hres.verses };
       ok('sample: St. Anselm button gives four parts with lyrics', hres && hres.r && hres.r.file === 'sample-st-anselm.pdf' && hres.r.parts.length === 4 && hres.r.lyrics > 0 && hres.verses > 0 && /sample hymn converted/i.test(hres.title || ''), info.hymn || hres);
       ok('ocr: reads with the pipeline language set (eng+deu)', hres && hres.r && hres.r.ocrLangs === 'eng+deu', hres && hres.r && hres.r.ocrLangs);

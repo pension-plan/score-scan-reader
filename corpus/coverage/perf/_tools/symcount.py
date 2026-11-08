@@ -7,7 +7,7 @@ The same rules are used for meta.json "counts" of every coverage/perf item, so r
 the app's output gives directly comparable per-symbol numbers.  Counting rules:
 
   note-<type>      note heads (each chord tone) that are not grace / cue notes
-  chord            note events with >= 2 heads;  dot / double-dot  note events with 1 / 2 dots
+  chord            note events with >= 2 heads (grace chords included);  dot / double-dot  note events with 1 / 2 dots
   beam             beams (<beam number="1">begin</beam>);  flag  unbeamed note events eighth or shorter
   stem-up/-down    note events with <stem>up/down</stem>
   ledger-above/-below  note heads (incl. grace, chord tones) outside the staff that need ledger
@@ -18,7 +18,8 @@ the app's output gives directly comparable per-symbol numbers.  Counting rules:
   clef-*           <clef> declarations per staff (initial + changes);  clef-change  changes only
   key-*, time-*    distinct (measure, value) declarations over all parts;  key-change / time-change
                    declarations after the first measure;  time-common / time-cut  symbol= forms
-                   (then not counted as time-4-4 / time-2-2);  pickup  implicit first measure
+                   (then not counted as time-4-4 / time-2-2), other signatures as x-time-N-D;
+                   pickup  implicit first measure
   acc-*            <accidental> values (natural-sharp -> acc-sharp, natural-flat -> acc-flat);
                    acc-courtesy  accidentals with cautionary / parentheses / editorial
   ottava-8va/8vb/15ma  <octave-shift> starts (down 8 / up 8 / down 15)
@@ -70,9 +71,14 @@ def key_tag(fifths):
     return 'key-0' if f == 0 else (f'key-s{f}' if f > 0 else f'key-f{-f}')
 
 
+TIME_TAGS = {'time-2-4', 'time-3-4', 'time-4-4', 'time-2-2', 'time-3-2', 'time-6-8', 'time-9-8', 'time-12-8',
+             'time-5-4', 'time-5-8', 'time-7-8'}
+
+
 def count(path):
     root = ET.parse(path).getroot()
     c = Counter()
+    ev_state = {'counted': True}
     keys, times, bars, prints = set(), set(), set(), {}
     lyric_numbers = set()
     parts = root.findall('part')
@@ -182,7 +188,7 @@ def count(path):
                 elif el.tag == 'harmony':
                     c['chord-symbol'] += 1
                 elif el.tag == 'note':
-                    _note(el, c, clef, shift, open_ties, tuplet_open, voice_lyr, lyric_numbers, mi, prints)
+                    _note(el, c, clef, shift, open_ties, tuplet_open, voice_lyr, lyric_numbers, mi, prints, ev_state)
     for mi, fx in keys:
         c[key_tag(fx)] += 1
         if mi > 0:
@@ -193,7 +199,8 @@ def count(path):
         elif sym == 'cut':
             c['time-cut'] += 1
         else:
-            c[f'time-{beats}-{bt}'] += 1
+            tag = f'time-{beats}-{bt}'
+            c[tag if tag in TIME_TAGS else 'x-' + tag] += 1
         if mi > 0:
             c['time-change'] += 1
     for _mi, _loc, tag in bars:
@@ -208,8 +215,13 @@ def count(path):
     return {k: v for k, v in sorted(c.items()) if v}
 
 
-def _note(n, c, clef, shift, open_ties, tuplet_open, voice_lyr, lyric_numbers, mi, prints):
+def _note(n, c, clef, shift, open_ties, tuplet_open, voice_lyr, lyric_numbers, mi, prints, ev_state):
     is_chord = n.find('chord') is not None
+    if not is_chord:
+        ev_state['counted'] = False
+    elif not ev_state['counted']:
+        c['chord'] += 1                 # first extra head of a note event -> one chord
+        ev_state['counted'] = True
     grace = n.find('grace')
     cue = n.find('cue') is not None
     rest = n.find('rest')
@@ -250,7 +262,6 @@ def _note(n, c, clef, shift, open_ties, tuplet_open, voice_lyr, lyric_numbers, m
         elif grace is None and typ:
             c[TYPE_TAG.get(typ, 'x-note-' + typ)] += 1
         if not is_chord:
-            c['_events'] += 0
             if grace is not None:
                 c['grace'] += 1
                 if grace.get('slash') == 'yes':
@@ -268,11 +279,8 @@ def _note(n, c, clef, shift, open_ties, tuplet_open, voice_lyr, lyric_numbers, m
             if any(b.get('number', '1') == '1' and (b.text or '').strip() == 'begin' for b in beams):
                 c['beam'] += 1
             if typ in FLAGGED and not beams:
-                n.set('_flag_candidate', '1')
                 c['flag'] += 1
             _lyric_note(n, voice, voice_lyr, lyric_numbers, c)
-        else:
-            c['_chord_tones'] += 0
     acc = n.find('accidental')
     if acc is not None and (acc.text or '').strip():
         c[ACC_TAG.get(acc.text.strip(), 'x-acc-' + acc.text.strip())] += 1

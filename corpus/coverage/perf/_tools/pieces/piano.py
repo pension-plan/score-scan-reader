@@ -4,7 +4,8 @@ tempo + metronome marks, grace notes (plain + slashed), trill, mordent, turn, ar
 staccato / staccatissimo / accent / tenuto / marcato, fermatas, breath mark, tremolo, ottava 8va / 8vb,
 clef changes, sharps / flats / naturals / double sharp / double flat / courtesy accidentals,
 triplets / quintuplet / sextuplet, 16th / 32nd / 64th notes, double dots, ties across a system break,
-two voices on the right-hand staff, pedal, dynamics pp..ff + sfz, hairpins, a whole-bar rest)."""
+two voices on the right-hand staff, pedal, dynamics pp..ff + sfz, hairpins, a whole-bar rest,
+Fine + D.C. al Fine)."""
 from __future__ import annotations
 
 from cov.dsl import parse_voice
@@ -82,8 +83,10 @@ def make(paper='A4'):
     sc.measures[3].volta_start, sc.measures[3].volta_end, sc.measures[3].right_bar = '1', 'stop', 'repeat-end'
     sc.measures[4].volta_start, sc.measures[4].volta_end, sc.measures[4].right_bar = '2', 'discontinue', 'double'
     sc.measures[8].right_bar = 'double'
-    sc.measures[12].right_bar = 'double'
+    sc.measures[12].right_bar = 'final'
+    sc.measures[12].end_marks.append(dict(kind='words', text='Fine', style='bold', sound={'fine': 'yes'}))
     sc.measures[-1].right_bar = 'final'
+    sc.measures[-1].end_marks.append(dict(kind='words', text='D.C. al Fine', style='italic', sound={'dacapo': 'yes'}))
     finish_measures(sc)
     add_mark(sc, 0, 'tempo', text='Allegro', unit='quarter', bpm=132)
     add_mark(sc, 0, 'rehearsal', text='A')
@@ -122,7 +125,8 @@ def make(paper='A4'):
         expected_notes=('One Piano part on a grand staff (2 staves); bars 6-9 have two voices on the upper '
                         'staff (stems up / down) that stay in the Piano part. Sounding pitches under the '
                         '8va (bar 10) and 8vb (bar 14) brackets are an octave above / below the written '
-                        'note heads. Bars 1-4 are repeated (1st ending bar 4, 2nd ending bar 5).'),
+                        'note heads. Bars 1-4 are repeated (1st ending bar 4, 2nd ending bar 5); "Fine" ends bar 13 and '
+                        '"D.C. al Fine" ends bar 18 (encoded as words + <sound fine/dacapo>).'),
         truth_limitations=('Dynamics / hairpins / pedal marks are directions without placement attributes. '
                            'The truth has no <sound> playback for the repeat; voltas and repeat barlines are '
                            'encoded as printed.'),

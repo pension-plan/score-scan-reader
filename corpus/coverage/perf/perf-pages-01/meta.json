@@ -5,6 +5,7 @@
  "symbols": [
   "acc-sharp",
   "barline-final",
+  "chord",
   "clef-bass",
   "clef-treble",
   "dyn-mf",
@@ -36,6 +37,7 @@
  "counts": {
   "acc-sharp": 2,
   "barline-final": 1,
+  "chord": 56,
   "clef-bass": 1,
   "clef-treble": 1,
   "dyn-mf": 1,

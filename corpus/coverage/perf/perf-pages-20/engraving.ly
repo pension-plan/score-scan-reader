@@ -59,7 +59,7 @@
     c'''4( aes''8 f''8) aes''4-. f'''4-. |
     bes''4( g''8 ees''8) g''4-. ees'''4-. |
     aes'2 c''4-. r4 \bar "||" |
-    \pageBreak \mark \markup { \box \bold "3" } \tempo "Var. 3  Presto" 4 = 152 \time 2/4 \key fis \major fis''16->\mp ais''16 cis'''16 fis'''16 fis'''16 cis'''16 ais''16 fis''16 |
+    \pageBreak \mark \markup { \box \bold "3" } \segnoMark 1 \tempo "Var. 3  Presto" 4 = 152 \time 2/4 \key fis \major fis''16->\mp ais''16 cis'''16 fis'''16 fis'''16 cis'''16 ais''16 fis''16 |
     b'16-> dis''16 fis''16 b''16 b''16 fis''16 dis''16 b'16 |
     cis''16-> eis''16 gis''16 cis'''16 cis'''16 gis''16 eis''16 cis''16 |
     fis''16-> ais''16 cis'''16 fis'''16 fis'''16 cis'''16 ais''16 fis''16 |
@@ -70,12 +70,12 @@
     \break fis''16-> ais''16 cis'''16 fis'''16 fis'''16 cis'''16 ais''16 fis''16 |
     b'16-> dis''16 fis''16 b''16 b''16 fis''16 dis''16 b'16 |
     cis''16-> eis''16 gis''16 cis'''16 cis'''16 gis''16 eis''16 cis''16 |
-    fis''16-> ais''16 cis'''16 fis'''16 fis'''16 cis'''16 ais''16 fis''16 |
+    fis''16-> ais''16 cis'''16 fis'''16 fis'''16 cis'''16 ais''16 fis''16 \textEndMark \markup { \italic "To Coda" } |
     \break dis''16-> fis''16 ais''16 dis'''16 dis'''16 ais''16 fis''16 dis''16 |
     b'16-> dis''16 fis''16 b''16 b''16 fis''16 dis''16 b'16 |
     fis''16-> ais''16 cis'''16 fis'''16 fis'''16 cis'''16 ais''16 fis''16 |
-    cis''16-> eis''16 gis''16 cis'''16 cis'''16 gis''16 eis''16 cis''16 |
-    \break fis''16-> ais''16 cis'''16 fis'''16 fis'''16 cis'''16 ais''16 fis''16 |
+    cis''16-> eis''16 gis''16 cis'''16 cis'''16 gis''16 eis''16 cis''16 \textEndMark \markup { \italic "D.S. al Coda" } \bar "||" |
+    \break \codaMark 1 fis''16-> ais''16 cis'''16 fis'''16 fis'''16 cis'''16 ais''16 fis''16 |
     gis'16-> bis'16 dis''16 gis''16 gis''16 dis''16 bis'16 gis'16 |
     cis''16-> eis''16 gis''16 cis'''16 cis'''16 gis''16 eis''16 cis''16 |
     fis''16-> ais''16 cis'''16 fis'''16 fis'''16 cis'''16 ais''16 fis''16 \bar "||" |
@@ -101,23 +101,23 @@
     fis''2.\trill \bar "||" |
     \pageBreak \mark \markup { \box \bold "5" } \tempo "Var. 5  Andante" 4. = 54 \time 6/8 \key aes \minor des''4.\ff\<( fes''4 bes'8) |
     g''4.( bes''4 ees''8\!) |
-    ces''4.\>( ees''4 aes'8) |
+    \tuplet 2/3 { ces''8\>( ees''8) } aes'4. |
     ces''4.( ees''4 aes'8\!) |
     \break ces''4.\<( ees''4 aes'8) |
     a''4.( c'''4 f''8\!) |
-    des''4.\>( fes''?4 bes'8) |
+    \tuplet 2/3 { des''8\>( fes''?8) } bes'4. |
     g''4.( bes''4 ees''8\!) |
     \break fes''4.\<( aes''4 des''8) |
     g''4.( bes''4 ees''8\!) |
-    aes''4.\>( ces'''4 fes''8) |
+    \tuplet 2/3 { aes''8\>( ces'''8) } fes''4. |
     d''4.( f''4 bes'8\!) |
     \break ces''4.\<( ees''4 aes'8) |
     g''4.( bes''4 ees''8\!) |
-    aes''4.\>( ces'''4 fes''8) |
+    \tuplet 2/3 { aes''8\>( ces'''8) } fes''4. |
     fes''4.( aes''4 des''8\!) |
     \break c''4.\<( ees''4 aes'8) |
     fes''4.( aes''4 des''8\!) |
-    g''4.\>( bes''4 ees''8) |
+    \tuplet 2/3 { g''8\>( bes''8) } ees''4. |
     ces''4.( ees''4 aes'8\!) \bar "||" |
     \pageBreak \mark \markup { \box \bold "6" } \tempo "Var. 6  Moderato" 4 = 88 \numericTimeSignature \time 4/4 \key a \major \tuplet 3/2 { a'8\p\< cis''8 e''8 } \tuplet 3/2 { a''8 cis'''8 e'''8 } \tuplet 3/2 { e'''8 cis'''8 a''8 } \tuplet 3/2 { e''8 cis''8 a'8 } |
     \tuplet 3/2 { e'8 gis'8 b'8 } \tuplet 3/2 { e''8 gis''8 b''8 } \tuplet 3/2 { b''8 gis''8 e''8 } \tuplet 3/2 { b'8 gis'8 e'8\! } |
@@ -199,26 +199,26 @@
     ces''2.\turn ees''4 aes'2 |
     d''2.\mordent f''4 bes'2 |
     ees''1.\fermata \bar "||" |
-    \pageBreak \mark \markup { \box \bold "10" } \tempo "Var. 10  Allegro" 4 = 116 \numericTimeSignature \time 4/4 \key d \major d''32\pp e''32 fis''32 g''32 a''32 b''32 cis'''32 d'''32 d'''4-. a'4-. d''4 |
-    b'32 cis''32 d''32 e''32 fis''32 g''32 a''32 b''32 b''4-. fis''4-. b''4 |
-    e''32 fis''32 g''32 a''32 b''32 cis'''32 d'''32 e'''32 e'''4-. b'4-. e''4 |
-    a'32 b'32 cis''32 d''32 e''32 fis''32 g''32 a''32 a''4-. e''4-. a''4 |
-    \break d''32 e''32 fis''32 g''32 a''32 b''32 cis'''32 d'''32 d'''4-. a'4-. d''4 |
-    g'32 a'32 b'32 cis''32 d''32 e''32 fis''32 g''32 g''4-. d''4-. g''4 |
-    a'32 b'32 cis''32 d''32 e''32 fis''32 g''32 a''32 a''4-. e''4-. a''4 |
-    d''32 e''32 fis''32 g''32 a''32 b''32 cis'''32 d'''32 d'''4-. a'4-. d''4 |
-    \break b'32 cis''32 d''32 e''32 fis''32 g''32 a''32 b''32 b''4-. fis''4-. b''4 |
-    g'32 a'32 b'32 cis''32 d''32 e''32 fis''32 g''32 g''4-. d''4-. g''4 |
-    d''32 e''32 fis''32 g''32 a''32 b''32 cis'''32 d'''32 d'''4-. a'4-. d''4 |
-    a'32 b'32 cis''32 d''32 e''32 fis''32 g''32 a''32 a''4-. e''4-. a''4 |
-    \break d''32 e''32 fis''32 g''32 a''32 b''32 cis'''32 d'''32 d'''4-. a'4-. d''4 |
-    e''32 fis''32 g''32 a''32 b''32 cis'''32 d'''32 e'''32 e'''4-. b'4-. e''4 |
-    a'32 b'32 cis''32 d''32 e''32 fis''32 g''32 a''32 a''4-. e''4-. a''4 |
-    d''32 e''32 fis''32 g''32 a''32 b''32 cis'''32 d'''32 d'''4-. a'4-. d''4 |
-    \break d''32 e''32 fis''32 g''32 a''32 b''32 cis'''32 d'''32 d'''4-. a'4-. d''4 |
-    fis''32 g''32 a''32 b''32 cis'''32 d'''32 e'''32 fis'''32 fis'''4-. cis''4-. fis''4 |
-    a'32 b'32 cis''32 d''32 e''32 fis''32 g''32 a''32 a''4-. e''4-. a''4 |
-    d''32 e''32 fis''32 g''32 a''32 b''32 cis'''32 d'''32 d'''4-. a'4-. d''4 \bar "||" |
+    \pageBreak \mark \markup { \box \bold "10" } \tempo "Var. 10  Allegro" 4 = 116 \numericTimeSignature \time 4/4 \key d \major r32 e''32\pp fis''32 g''32 a''32 b''32 cis'''32 d'''32 d'''4-. a'4-. d''4 |
+    r32 cis''32 d''32 e''32 fis''32 g''32 a''32 b''32 b''4-. fis''4-. b''4 |
+    r32 fis''32 g''32 a''32 b''32 cis'''32 d'''32 e'''32 e'''4-. b'4-. e''4 |
+    r32 b'32 cis''32 d''32 e''32 fis''32 g''32 a''32 r64 a''64 cis''32 e''16 a''8 e''4-. a''4 |
+    \break r32 e''32 fis''32 g''32 a''32 b''32 cis'''32 d'''32 d'''4-. a'4-. d''4 |
+    r32 a'32 b'32 cis''32 d''32 e''32 fis''32 g''32 g''4-. d''4-. g''4 |
+    r32 b'32 cis''32 d''32 e''32 fis''32 g''32 a''32 a''4-. e''4-. a''4 |
+    r32 e''32 fis''32 g''32 a''32 b''32 cis'''32 d'''32 r64 d''64 fis''32 a''16 d''8 a'4-. d''4 |
+    \break r32 cis''32 d''32 e''32 fis''32 g''32 a''32 b''32 b''4-. fis''4-. b''4 |
+    r32 a'32 b'32 cis''32 d''32 e''32 fis''32 g''32 g''4-. d''4-. g''4 |
+    r32 e''32 fis''32 g''32 a''32 b''32 cis'''32 d'''32 d'''4-. a'4-. d''4 |
+    r32 b'32 cis''32 d''32 e''32 fis''32 g''32 a''32 r64 a''64 cis''32 e''16 a''8 e''4-. a''4 |
+    \break r32 e''32 fis''32 g''32 a''32 b''32 cis'''32 d'''32 d'''4-. a'4-. d''4 |
+    r32 fis''32 g''32 a''32 b''32 cis'''32 d'''32 e'''32 e'''4-. b'4-. e''4 |
+    r32 b'32 cis''32 d''32 e''32 fis''32 g''32 a''32 a''4-. e''4-. a''4 |
+    r32 e''32 fis''32 g''32 a''32 b''32 cis'''32 d'''32 r64 d''64 fis''32 a''16 d''8 a'4-. d''4 |
+    \break r32 e''32 fis''32 g''32 a''32 b''32 cis'''32 d'''32 d'''4-. a'4-. d''4 |
+    r32 g''32 a''32 b''32 cis'''32 d'''32 e'''32 fis'''32 fis'''4-. cis''4-. fis''4 |
+    r32 b'32 cis''32 d''32 e''32 fis''32 g''32 a''32 a''4-. e''4-. a''4 |
+    r32 e''32 fis''32 g''32 a''32 b''32 cis'''32 d'''32 r64 d''64 fis''32 a''16 d''8 a'4-. d''4 \bar "||" |
     \pageBreak \mark \markup { \box \bold "11" } \tempo "Var. 11  Pastorale" 4. = 60 \time 12/8 \key bes \major d''4\ff bes'8 f''8( d''8 bes'8) d''4 bes'8 bes'4. |
     e''4 c''8 g''8( e''8 c''8) e''4 c''8 c''4. |
     a''4 f''8 c'''8( a''8 f''8) a''4 f''8 f''4. |
@@ -363,18 +363,18 @@
     \tuplet 6/4 { cis'16 eis'16 gis'16 cis''16 eis''16 gis''16 } gis''4 \tuplet 6/4 { gis''16 eis''16 cis''16 gis'16 eis'16 cis'16 } cis'4 |
     \tuplet 6/4 { dis'16 fis'16 ais'16 dis''16 fis''16 ais''16 } ais''4 \tuplet 6/4 { ais''16 fis''16 dis''16 ais'16 fis'16 dis'16 } dis'4 |
     \tuplet 6/4 { eis'16 gisis'16 bis'16 eis''16 gisis''16 bis''16 } bis''4 \tuplet 6/4 { bis''16 gisis''16 eis''16 bis'16 gisis'16 eis'16 } eis'4 |
-    \break \tuplet 6/4 { bis16 dis'16 fis'16 bis'16 dis''16 fis''16 } fis''4 \tuplet 6/4 { fis''16 dis''16 bis'16 fis'16 dis'16 bis16 } bis4 |
-    \tuplet 6/4 { eis'16 gisis'16 bis'16 eis''16 gisis''16 bis''16 } bis''4 \tuplet 6/4 { bis''16 gisis''16 eis''16 bis'16 gisis'16 eis'16 } eis'4 |
-    \tuplet 6/4 { ais'16 cis''16 eis''16 ais''16 cis'''16 eis'''16 } eis'''4 \tuplet 6/4 { eis'''16 cis'''16 ais''16 eis''16 cis''16 ais'16 } ais'4 |
-    \tuplet 6/4 { ais'16 cis''16 eis''16 ais''16 cis'''16 eis'''16 } eis'''4 \tuplet 6/4 { eis'''16 cis'''16 ais''16 eis''16 cis''16 ais'16 } ais'4 |
+    \break \tuplet 7/4 { bis16 dis'16 fis'16 bis'16 dis''16 fis''16 bis''16 } bis''4 \tuplet 7/4 { bis''16 fis''16 dis''16 bis'16 fis'16 dis'16 bis16 } bis4 |
+    \tuplet 7/4 { eis'16 gisis'16 bis'16 eis''16 gisis''16 bis''16 eis'''16 } eis'''4 \tuplet 7/4 { eis'''16 bis''16 gisis''16 eis''16 bis'16 gisis'16 eis'16 } eis'4 |
+    \tuplet 7/4 { ais'16 cis''16 eis''16 ais''16 cis'''16 eis'''16 ais'''16 } ais'''4 \tuplet 7/4 { ais'''16 eis'''16 cis'''16 ais''16 eis''16 cis''16 ais'16 } ais'4 |
+    \tuplet 7/4 { ais'16 cis''16 eis''16 ais''16 cis'''16 eis'''16 ais'''16 } ais'''4 \tuplet 7/4 { ais'''16 eis'''16 cis'''16 ais''16 eis''16 cis''16 ais'16 } ais'4 |
     \break \tuplet 6/4 { ais'16 cis''16 eis''16 ais''16 cis'''16 eis'''16 } eis'''4 \tuplet 6/4 { eis'''16 cis'''16 ais''16 eis''16 cis''16 ais'16 } ais'4 |
     \tuplet 6/4 { fisis'16 aisis'16 cisis''16 fisis''16 aisis''16 cisis'''16 } cisis'''4 \tuplet 6/4 { cisis'''16 aisis''16 fisis''16 cisis''16 aisis'16 fisis'16 } fisis'4 |
     \tuplet 6/4 { bis16 dis'16 fis'?16 bis'16 dis''16 fis''?16 } fis''4 \tuplet 6/4 { fis''16 dis''16 bis'16 fis'16 dis'16 bis16 } bis4 |
     \tuplet 6/4 { eis'16 gisis'16 bis'16 eis''16 gisis''16 bis''16 } bis''4 \tuplet 6/4 { bis''16 gisis''16 eis''16 bis'16 gisis'16 eis'16 } eis'4 |
-    \break \tuplet 6/4 { dis'16 fis'16 ais'16 dis''16 fis''16 ais''16 } ais''4 \tuplet 6/4 { ais''16 fis''16 dis''16 ais'16 fis'16 dis'16 } dis'4 |
-    \tuplet 6/4 { eis'16 gisis'16 bis'16 eis''16 gisis''16 bis''16 } bis''4 \tuplet 6/4 { bis''16 gisis''16 eis''16 bis'16 gisis'16 eis'16 } eis'4 |
-    \tuplet 6/4 { fis'16 ais'16 cis''16 fis''16 ais''16 cis'''16 } cis'''4 \tuplet 6/4 { cis'''16 ais''16 fis''16 cis''16 ais'16 fis'16 } fis'4 |
-    \tuplet 6/4 { bis16 disis'16 fisis'16 bis'16 disis''16 fisis''16 } fisis''4 \tuplet 6/4 { fisis''16 disis''16 bis'16 fisis'16 disis'16 bis16 } bis4 |
+    \break \tuplet 7/4 { dis'16 fis'16 ais'16 dis''16 fis''16 ais''16 dis'''16 } dis'''4 \tuplet 7/4 { dis'''16 ais''16 fis''16 dis''16 ais'16 fis'16 dis'16 } dis'4 |
+    \tuplet 7/4 { eis'16 gisis'16 bis'16 eis''16 gisis''16 bis''16 eis'''16 } eis'''4 \tuplet 7/4 { eis'''16 bis''16 gisis''16 eis''16 bis'16 gisis'16 eis'16 } eis'4 |
+    \tuplet 7/4 { fis'16 ais'16 cis''16 fis''16 ais''16 cis'''16 fis'''16 } fis'''4 \tuplet 7/4 { fis'''16 cis'''16 ais''16 fis''16 cis''16 ais'16 fis'16 } fis'4 |
+    \tuplet 7/4 { bis16 disis'16 fisis'16 bis'16 disis''16 fisis''16 bis''16 } bis''4 \tuplet 7/4 { bis''16 fisis''16 disis''16 bis'16 fisis'16 disis'16 bis16 } bis4 |
     \break \tuplet 6/4 { ais'16 cis''16 eis''16 ais''16 cis'''16 eis'''16 } eis'''4 \tuplet 6/4 { eis'''16 cis'''16 ais''16 eis''16 cis''16 ais'16 } ais'4 |
     \tuplet 6/4 { eis'16 gisis'16 bis'16 eis''16 gisis''16 bis''16 } bis''4 \tuplet 6/4 { bis''16 gisis''16 eis''16 bis'16 gisis'16 eis'16 } eis'4 |
     \tuplet 6/4 { eis'16 gisis'16 bis'16 eis''16 gisis''16 bis''16 } bis''4 \tuplet 6/4 { bis''16 gisis''16 eis''16 bis'16 gisis'16 eis'16 } eis'4 |
@@ -965,7 +965,7 @@
     dis,4 ais,4 fis,4 ais,4 |
     gis,4 dis4 bis,4 dis4 |
     cis4 gis4 eis,4 gis4 |
-    cis4 gis4 eis,4 gis4 |
+    r1 |
     cis4 gis4 eis,4 gis4 |
     ais,4 eis4 cisis4 eis4 |
     dis,4 ais,4 fis,4 ais,4 |
@@ -973,7 +973,7 @@
     fis,4 cis4 ais,4 cis4 |
     gis,4 dis4 bis,4 dis4 |
     ais,4 eis4 cis4 eis4 |
-    dis,4 ais,4 fisis,4 ais,4 |
+    r1 |
     cis4 gis4 eis,4 gis4 |
     gis,4 dis4 bis,4 dis4 |
     gis,4 dis4 bis,4 dis4 |

@@ -12,10 +12,13 @@
   "barline-double",
   "barline-final",
   "beam",
+  "chord",
   "clef-bass",
   "clef-change",
   "clef-treble",
+  "coda",
   "dot",
+  "ds",
   "dyn-f",
   "dyn-ff",
   "dyn-mf",
@@ -50,6 +53,7 @@
   "multi-page",
   "note-16th",
   "note-32nd",
+  "note-64th",
   "note-8th",
   "note-half",
   "note-quarter",
@@ -59,8 +63,12 @@
   "page-break",
   "pedal",
   "rehearsal-mark",
+  "rest-32nd",
+  "rest-64th",
   "rest-half",
   "rest-quarter",
+  "rest-whole",
+  "segno",
   "slur",
   "staccato",
   "stem-down",
@@ -68,6 +76,7 @@
   "system-break",
   "tempo-mark",
   "tenuto",
+  "text-expression",
   "time-12-8",
   "time-2-4",
   "time-3-2",
@@ -82,9 +91,11 @@
   "time-cut",
   "tremolo",
   "trill",
+  "tuplet-2",
   "tuplet-3",
   "tuplet-5",
   "tuplet-6",
+  "tuplet-7",
   "turn"
  ],
  "layout": "piano",
@@ -100,18 +111,21 @@
  },
  "counts": {
   "acc-courtesy": 4,
-  "acc-double-sharp": 36,
+  "acc-double-sharp": 35,
   "acc-flat": 1,
   "acc-natural": 69,
   "acc-sharp": 90,
   "accent": 45,
-  "barline-double": 19,
+  "barline-double": 20,
   "barline-final": 1,
-  "beam": 710,
+  "beam": 720,
+  "chord": 886,
   "clef-bass": 6,
   "clef-change": 10,
   "clef-treble": 6,
+  "coda": 1,
   "dot": 325,
+  "ds": 1,
   "dyn-f": 4,
   "dyn-ff": 3,
   "dyn-mf": 4,
@@ -119,7 +133,7 @@
   "dyn-p": 3,
   "dyn-pp": 3,
   "fermata": 18,
-  "flag": 90,
+  "flag": 85,
   "grace": 70,
   "grace-slash": 30,
   "hairpin-cresc": 10,
@@ -138,32 +152,38 @@
   "key-s4": 1,
   "key-s6": 1,
   "key-s7": 2,
-  "ledger-above": 1139,
-  "ledger-below": 161,
+  "ledger-above": 1159,
+  "ledger-below": 159,
   "marcato": 20,
   "metronome": 20,
   "mordent": 10,
   "multi-page": 1,
-  "note-16th": 535,
-  "note-32nd": 160,
-  "note-8th": 1945,
+  "note-16th": 556,
+  "note-32nd": 145,
+  "note-64th": 5,
+  "note-8th": 1955,
   "note-half": 722,
-  "note-quarter": 1807,
+  "note-quarter": 1789,
   "note-whole": 45,
   "ottava-8va": 3,
   "ottava-8vb": 2,
   "page-break": 19,
   "pedal": 40,
   "rehearsal-mark": 20,
+  "rest-32nd": 20,
+  "rest-64th": 5,
   "rest-half": 5,
   "rest-quarter": 5,
+  "rest-whole": 2,
+  "segno": 1,
   "slur": 105,
-  "staccato": 265,
-  "stem-down": 3111,
-  "stem-up": 914,
+  "staccato": 260,
+  "stem-down": 3144,
+  "stem-up": 884,
   "system-break": 79,
   "tempo-mark": 20,
   "tenuto": 27,
+  "text-expression": 1,
   "time-12-8": 1,
   "time-2-4": 2,
   "time-3-2": 1,
@@ -178,9 +198,11 @@
   "time-cut": 1,
   "tremolo": 40,
   "trill": 5,
+  "tuplet-2": 5,
   "tuplet-3": 80,
   "tuplet-5": 20,
-  "tuplet-6": 40,
+  "tuplet-6": 24,
+  "tuplet-7": 16,
   "turn": 5
  },
  "degradations": {
@@ -196,7 +218,7 @@
     2481,
     3508
    ],
-   "bytes": 2788684
+   "bytes": 2807961
   },
   "scan.pdf": {
    "seed": 53001,
@@ -258,7 +280,7 @@
     "dpi": 300
    },
    "summary": "typical sheet-fed scan of every page: grey, 0.2-1.0 deg skew that differs per page, light blur + noise, JPEG q80",
-   "bytes": 17137670,
+   "bytes": 17155607,
    "pdf_pages": [
     {
      "page": 1,
@@ -984,7 +1006,7 @@
     "dpi": 300
    },
    "summary": "worn photocopies scanned in grey: 1.5-3.5 deg skew per page, bleed-through of the next page, strong lighting gradient, blur, noise, toner speckles, JPEG q35",
-   "bytes": 11327921,
+   "bytes": 11334085,
    "pdf_pages": [
     {
      "page": 1,
@@ -1886,14 +1908,14 @@
   "group": "pages",
   "engraving": "var-20",
   "file_bytes": {
-   "clean.pdf": 2788684,
-   "scan.pdf": 17137670,
-   "scan-severe.pdf": 11327921
+   "clean.pdf": 2807961,
+   "scan.pdf": 17155607,
+   "scan-severe.pdf": 11334085
   },
   "measures": 396,
   "systems": 99,
-  "notes_in_truth": 5214,
-  "rests_in_truth": 10,
+  "notes_in_truth": 5217,
+  "rests_in_truth": 37,
   "staff_size_pt": 18,
   "paper_mm": [
    210.0,
@@ -1910,16 +1932,16 @@
  "source": "own procedural composition for the coverage corpus (pieces/variations.py)",
  "validation": {
   "xsd_valid": true,
-  "music21_parse": "2 4048 10",
+  "music21_parse": "2 4051 37",
   "engraving_matches_model": {
    "ok": true,
-   "checked": 5294,
+   "checked": 5324,
    "n_problems": 0,
    "problems": []
   },
   "midi_vs_truth": {
-   "truth_attacks": 5214,
-   "midi_attacks": 5284,
+   "truth_attacks": 5217,
+   "midi_attacks": 5287,
    "grace_extras": 70,
    "missing": 0,
    "extra": 0,
@@ -1932,8 +1954,8 @@
    "lyr_missing_sample": []
   },
   "accidentals_cross_check": {
-   "printed": 196,
-   "simulated_per_part": 196,
+   "printed": 195,
+   "simulated_per_part": 195,
    "differences": []
   },
   "symbol_cross_check": {
@@ -1953,18 +1975,18 @@
     "ok": true
    },
    "beam": {
-    "truth": 710,
-    "engraved": 710,
+    "truth": 720,
+    "engraved": 720,
     "ok": true
    },
    "flag": {
-    "truth": 90,
-    "engraved": 90,
+    "truth": 85,
+    "engraved": 85,
     "ok": true
    },
    "staccato": {
-    "truth": 265,
-    "engraved": 265,
+    "truth": 260,
+    "engraved": 260,
     "ok": true
    },
    "staccatissimo": {
@@ -2043,8 +2065,8 @@
     "ok": true
    },
    "accidentals(all)": {
-    "truth": 196,
-    "engraved": 196,
+    "truth": 195,
+    "engraved": 195,
     "ok": true
    },
    "acc-courtesy": {
@@ -2068,13 +2090,13 @@
     "ok": true
    },
    "ledger-above": {
-    "truth": 1139,
-    "engraved": 1139,
+    "truth": 1159,
+    "engraved": 1159,
     "ok": true
    },
    "ledger-below": {
-    "truth": 161,
-    "engraved": 161,
+    "truth": 159,
+    "engraved": 159,
     "ok": true
    },
    "lyrics": {
@@ -2142,6 +2164,11 @@
     "engraved": 0,
     "ok": true
    },
+   "tuplet-2": {
+    "truth": 5,
+    "engraved": 5,
+    "ok": true
+   },
    "tuplet-3": {
     "truth": 80,
     "engraved": 80,
@@ -2153,8 +2180,13 @@
     "ok": true
    },
    "tuplet-6": {
-    "truth": 40,
-    "engraved": 40,
+    "truth": 24,
+    "engraved": 24,
+    "ok": true
+   },
+   "tuplet-7": {
+    "truth": 16,
+    "engraved": 16,
     "ok": true
    }
   },

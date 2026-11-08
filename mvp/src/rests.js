@@ -105,7 +105,15 @@ function readDigit(R, c) {
   const hs = holes(R, c);
   if (hs.length >= 2) return 8;
   // a 1 is a full-height stem (with a flag and a foot in bold type)
-  if (!hs.length) {
+  // (its middle rows start left of centre; a 3's start right of it)
+  const lefts = [];
+  for (let y = c.y0 + Math.floor(0.3 * h); y <= c.y0 + Math.floor(0.7 * h); y++) {
+    let x = c.x0;
+    while (x <= c.x1 && !R.data[y * R.width + x]) x++;
+    lefts.push((x - c.x0) / w);
+  }
+  lefts.sort((a, b) => a - b);
+  if (!hs.length && lefts[lefts.length >> 1] < 0.45) {
     for (let x = c.x0 + Math.floor(0.25 * w); x <= c.x0 + Math.ceil(0.75 * w); x++) {
       let n = 0;
       for (let y = c.y0; y <= c.y1; y++) n += R.data[y * R.width + x] ? 1 : 0;
@@ -196,15 +204,19 @@ function detectRests({ R, comps, s, xa, xb, debug }) {
   for (const c of near) {
     if (c.x0 < xMin || c.x1 > xb - 0.2 * sp || c.area < 0.1 * sp * sp) continue;
     const f = features(R, c, st, sp);
-    if (f.h < 0.3 || f.w < 0.3 || f.w > 14 || f.h > 5.6) continue;
-    // must sit on the staff
-    if (Math.min(f.bot, 4) - Math.max(f.top, 0) < 0.3) continue;
+    if (f.h < 0.3 || f.w < 0.3 || f.w > 40 || f.h > 5.6) continue;
+    // must sit on the staff; a whole or half rest of a second voice may
+    // stand outside it (on a ledger line)
+    const block = f.fill >= 0.65 && f.h >= 0.3 && f.h <= 1.0 && f.w >= 0.8 && f.w <= 2.0;
+    if (Math.min(f.bot, 4) - Math.max(f.top, 0) < 0.3 && !(block && f.top >= -2.2 && f.bot <= 6.2)) continue;
     // part of a note (head, stem, flag); but a heavy eighth rest's blob is
     // easily read as a notehead: one head at the top of a short glyph whose
     // thin tail slants down to the left (a stem is straight, and longer)
     const on = heads.filter(hd => hd.x + 0.6 * sp >= c.x0 && hd.x - 0.6 * sp <= c.x1 && hd.y + 0.5 * sp >= c.y0 && hd.y - 0.5 * sp <= c.y1);
     let onHead = null;
-    if (on.length) {
+    // (a whole / half rest is a solid rectangle; a notehead an oval)
+    if (on.length && block && on.length === 1 && f.fill >= 0.92 && f.h <= 0.85) onHead = on[0];
+    else if (on.length) {
       if (on.length > 1 || f.h < 1.4 || f.h > 2.6 || f.w > 1.5 || on[0].y > c.y0 + 0.9 * sp) continue;
       const sh = strokeShape(rowProfile(R, c), sp);
       if (!(sh.tail >= 0.6 && sh.slant >= 0.05 && sh.rise < 0.25)) continue;
@@ -212,7 +224,7 @@ function detectRests({ R, comps, s, xa, xb, debug }) {
     }
     let kind = null, q = 0, bars = 0, multi = 0;
     const fr = f.cy - Math.floor(f.cy);
-    if (f.fill >= 0.65 && f.h >= 0.3 && f.h <= 1.0 && f.w >= 0.8 && f.w <= 2.0 && f.top >= -0.2 && f.bot <= 4.2) {
+    if (block) {
       // block hanging from a line (whole) or sitting on one (half)
       if (fr > 0.05 && fr < 0.5) { kind = 'whole'; q = 4; bars = 1; } else { kind = 'half'; q = 2; }
     } else if (f.fill >= 0.8 && f.h >= 0.85 && f.h <= 1.25 && f.w >= 0.35 && f.w <= 0.75 && Math.abs(f.cy - 1.5) < 0.25) { kind = 'breve'; q = 8; bars = 2; }
@@ -227,7 +239,7 @@ function detectRests({ R, comps, s, xa, xb, debug }) {
       const pos = (c.y0 + mid - st.yAt(0, f.xc)) / sp;
       if (best >= 0.3 * sp && best <= 1.1 * sp && Math.abs(pos - 2) < 0.6) {
         kind = 'multi'; q = 4; bars = 1;
-        multi = readNumber(R, comps, st, sp, c.x0 - 0.5 * sp, c.x1 + 0.5 * sp) || 0;
+        multi = readNumber(R, comps, st, sp, f.xc - 3 * sp, f.xc + 3 * sp) || 0;
       }
     } else if (f.h >= 1.3 && f.h <= 5.4 && f.w >= 0.6 && f.w <= 1.9 && f.fill >= 0.15 && f.fill <= 0.65) {
       const rows = rowProfile(R, c);
@@ -249,10 +261,10 @@ function detectRests({ R, comps, s, xa, xb, debug }) {
     // a beam fragment does not); dots aside
     if (bars || q === 2) {
       const pad = (kind === 'breve' || kind === 'long' ? 1.2 : 0.9) * sp;
-      if (heads.some(hd => hd.x > c.x0 - 2 * sp && hd.x < c.x1 + 2 * sp && kind !== 'multi')) continue;
+      if (heads.some(hd => hd !== onHead && hd.x > c.x0 - 2 * sp && hd.x < c.x1 + 2 * sp && hd.y > c.y0 - sp && hd.y < c.y1 + sp && kind !== 'multi')) continue;
       // (a barline beside it is fine: a thin stroke at least a staff tall)
       if (near.some(o => o !== c && o.area >= 0.1 * sp * sp && (o.x1 - o.x0 > 0.75 * sp || o.y1 - o.y0 > 0.75 * sp) &&
-        !(o.x1 - o.x0 + 1 <= 0.4 * sp && o.y1 - o.y0 + 1 >= 3.5 * sp) &&
+        !(o.x1 - o.x0 + 1 <= 0.4 * sp && o.y1 - o.y0 + 1 >= 2.5 * sp) &&
         o.x1 > c.x0 - pad && o.x0 < c.x1 + pad && o.y1 > c.y0 - sp && o.y0 < c.y1 + sp)) continue;
     }
     // a glyph directly left of a notehead at its height is an accidental
@@ -273,7 +285,7 @@ function detectRests({ R, comps, s, xa, xb, debug }) {
       dots++; dx = d.x1;
     }
     if (dots) q *= dots === 1 ? 1.5 : 1.75;
-    if (onHead && !/^flag/.test(kind)) continue;
+    if (onHead && !/^flag/.test(kind) && kind !== 'whole' && kind !== 'half') continue;
     out.push({ x: f.xc, pos: f.cy, q, dots, kind, box: c, bars, multi, onHead });
   }
   return out.sort((a, b) => a.x - b.x);
@@ -290,8 +302,18 @@ module.exports = { detectRests, readNumber, _features: features, _rowProfile: ro
 function mergeRests(evs, rests, voice, sp) {
   if (!rests.length) return evs;
   let rs = rests;
-  // a note read on a rest glyph goes
-  for (const r of rs) if (r.onHead) evs = evs.filter(e => !(e.heads && e.heads.length === 1 && e.heads[0] === r.onHead));
+  // a notehead read on a rest glyph goes
+  for (const r of rs) {
+    if (!r.onHead || !evs.some(e => e.heads && e.heads.includes(r.onHead))) continue;
+    evs = evs.flatMap(e => {
+      if (!e.heads || !e.heads.includes(r.onHead)) return [e];
+      const heads = e.heads.filter(h => h !== r.onHead);
+      if (!heads.length) return [];
+      // a chord's value is its shortest head's
+      const h0 = heads.reduce((a, h) => (h.dur.q < a.dur.q ? h : a));
+      return [{ ...e, heads, q: h0.dur.q, dots: h0.dur.dots }];
+    });
+  }
   if (voice === 1) rs = rs.filter(r => r.pos <= 2.4);
   else if (voice === 2) rs = rs.filter(r => r.pos >= 1.6);
   rs = rs.filter(r => !evs.some(e => !e.rest && e.x != null && Math.abs(e.x - r.x) < 0.8 * sp));

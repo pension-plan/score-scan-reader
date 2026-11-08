@@ -3454,9 +3454,11 @@
    "barline-final",
    "beam",
    "breath",
+   "chord",
    "clef-bass",
    "clef-change",
    "clef-treble",
+   "dc",
    "dot",
    "double-dot",
    "dyn-f",
@@ -3467,6 +3469,7 @@
    "dyn-pp",
    "dyn-sfz",
    "fermata",
+   "fine",
    "fingering",
    "flag",
    "grace",
@@ -3536,7 +3539,7 @@
     "Piano"
    ],
    "must_not_split": true,
-   "notes": "One Piano part on a grand staff (2 staves); bars 6-9 have two voices on the upper staff (stems up / down) that stay in the Piano part. Sounding pitches under the 8va (bar 10) and 8vb (bar 14) brackets are an octave above / below the written note heads. Bars 1-4 are repeated (1st ending bar 4, 2nd ending bar 5)."
+   "notes": "One Piano part on a grand staff (2 staves); bars 6-9 have two voices on the upper staff (stems up / down) that stay in the Piano part. Sounding pitches under the 8va (bar 10) and 8vb (bar 14) brackets are an octave above / below the written note heads. Bars 1-4 are repeated (1st ending bar 4, 2nd ending bar 5); \"Fine\" ends bar 13 and \"D.C. al Fine\" ends bar 18 (encoded as words + <sound fine/dacapo>)."
   },
   "counts": {
    "acc-courtesy": 2,
@@ -3547,13 +3550,15 @@
    "acc-sharp": 2,
    "accent": 1,
    "arpeggio": 1,
-   "barline-double": 3,
-   "barline-final": 1,
+   "barline-double": 2,
+   "barline-final": 2,
    "beam": 28,
    "breath": 1,
+   "chord": 25,
    "clef-bass": 2,
    "clef-change": 2,
    "clef-treble": 2,
+   "dc": 1,
    "dot": 16,
    "double-dot": 1,
    "dyn-f": 1,
@@ -3564,6 +3569,7 @@
    "dyn-pp": 1,
    "dyn-sfz": 1,
    "fermata": 5,
+   "fine": 1,
    "fingering": 5,
    "flag": 4,
    "grace": 3,
@@ -3637,7 +3643,7 @@
      827,
      1170
     ],
-    "bytes": 57861
+    "bytes": 58902
    },
    "scan.pdf": {
     "seed": 52001,
@@ -3659,7 +3665,7 @@
      "dpi": 100
     },
     "summary": "typical flatbed scan: grey, -0.8 deg skew, slight lighting gradient, light blur + sensor noise, JPEG q80",
-    "bytes": 156376,
+    "bytes": 157441,
     "pdf_pages": [
      {
       "page": 1,
@@ -3718,7 +3724,7 @@
      "dpi": 100
     },
     "summary": "binarised (1-bit) photocopy: -3 deg skew, faded strokes, blur before thresholding, salt & pepper, toner speckles",
-    "bytes": 28100,
+    "bytes": 28310,
     "pdf_pages": [
      {
       "page": 1,
@@ -3781,9 +3787,9 @@
    "group": "piano",
    "engraving": "piano-A4",
    "file_bytes": {
-    "clean.pdf": 57861,
-    "scan.pdf": 156376,
-    "scan-severe.pdf": 28100
+    "clean.pdf": 58902,
+    "scan.pdf": 157441,
+    "scan-severe.pdf": 28310
    },
    "measures": 18,
    "systems": 5,
@@ -4093,9 +4099,11 @@
    "barline-final",
    "beam",
    "breath",
+   "chord",
    "clef-bass",
    "clef-change",
    "clef-treble",
+   "dc",
    "dot",
    "double-dot",
    "dyn-f",
@@ -4106,6 +4114,7 @@
    "dyn-pp",
    "dyn-sfz",
    "fermata",
+   "fine",
    "fingering",
    "flag",
    "grace",
@@ -4175,7 +4184,7 @@
     "Piano"
    ],
    "must_not_split": true,
-   "notes": "One Piano part on a grand staff (2 staves); bars 6-9 have two voices on the upper staff (stems up / down) that stay in the Piano part. Sounding pitches under the 8va (bar 10) and 8vb (bar 14) brackets are an octave above / below the written note heads. Bars 1-4 are repeated (1st ending bar 4, 2nd ending bar 5)."
+   "notes": "One Piano part on a grand staff (2 staves); bars 6-9 have two voices on the upper staff (stems up / down) that stay in the Piano part. Sounding pitches under the 8va (bar 10) and 8vb (bar 14) brackets are an octave above / below the written note heads. Bars 1-4 are repeated (1st ending bar 4, 2nd ending bar 5); \"Fine\" ends bar 13 and \"D.C. al Fine\" ends bar 18 (encoded as words + <sound fine/dacapo>)."
   },
   "counts": {
    "acc-courtesy": 2,
@@ -4186,13 +4195,15 @@
    "acc-sharp": 2,
    "accent": 1,
    "arpeggio": 1,
-   "barline-double": 3,
-   "barline-final": 1,
+   "barline-double": 2,
+   "barline-final": 2,
    "beam": 28,
    "breath": 1,
+   "chord": 25,
    "clef-bass": 2,
    "clef-change": 2,
    "clef-treble": 2,
+   "dc": 1,
    "dot": 16,
    "double-dot": 1,
    "dyn-f": 1,
@@ -4203,6 +4214,7 @@
    "dyn-pp": 1,
    "dyn-sfz": 1,
    "fermata": 5,
+   "fine": 1,
    "fingering": 5,
    "flag": 4,
    "grace": 3,
@@ -4276,7 +4288,7 @@
      1241,
      1754
     ],
-    "bytes": 89820
+    "bytes": 91620
    },
    "scan.pdf": {
     "seed": 52001,
@@ -4298,7 +4310,7 @@
      "dpi": 150
     },
     "summary": "typical flatbed scan: grey, -0.8 deg skew, slight lighting gradient, light blur + sensor noise, JPEG q80",
-    "bytes": 301440,
+    "bytes": 303104,
     "pdf_pages": [
      {
       "page": 1,
@@ -4357,7 +4369,7 @@
      "dpi": 150
     },
     "summary": "binarised (1-bit) photocopy: -3 deg skew, faded strokes, blur before thresholding, salt & pepper, toner speckles",
-    "bytes": 49129,
+    "bytes": 49409,
     "pdf_pages": [
      {
       "page": 1,
@@ -4420,9 +4432,9 @@
    "group": "piano",
    "engraving": "piano-A4",
    "file_bytes": {
-    "clean.pdf": 89820,
-    "scan.pdf": 301440,
-    "scan-severe.pdf": 49129
+    "clean.pdf": 91620,
+    "scan.pdf": 303104,
+    "scan-severe.pdf": 49409
    },
    "measures": 18,
    "systems": 5,
@@ -4732,9 +4744,11 @@
    "barline-final",
    "beam",
    "breath",
+   "chord",
    "clef-bass",
    "clef-change",
    "clef-treble",
+   "dc",
    "dot",
    "double-dot",
    "dyn-f",
@@ -4745,6 +4759,7 @@
    "dyn-pp",
    "dyn-sfz",
    "fermata",
+   "fine",
    "fingering",
    "flag",
    "grace",
@@ -4814,7 +4829,7 @@
     "Piano"
    ],
    "must_not_split": true,
-   "notes": "One Piano part on a grand staff (2 staves); bars 6-9 have two voices on the upper staff (stems up / down) that stay in the Piano part. Sounding pitches under the 8va (bar 10) and 8vb (bar 14) brackets are an octave above / below the written note heads. Bars 1-4 are repeated (1st ending bar 4, 2nd ending bar 5)."
+   "notes": "One Piano part on a grand staff (2 staves); bars 6-9 have two voices on the upper staff (stems up / down) that stay in the Piano part. Sounding pitches under the 8va (bar 10) and 8vb (bar 14) brackets are an octave above / below the written note heads. Bars 1-4 are repeated (1st ending bar 4, 2nd ending bar 5); \"Fine\" ends bar 13 and \"D.C. al Fine\" ends bar 18 (encoded as words + <sound fine/dacapo>)."
   },
   "counts": {
    "acc-courtesy": 2,
@@ -4825,13 +4840,15 @@
    "acc-sharp": 2,
    "accent": 1,
    "arpeggio": 1,
-   "barline-double": 3,
-   "barline-final": 1,
+   "barline-double": 2,
+   "barline-final": 2,
    "beam": 28,
    "breath": 1,
+   "chord": 25,
    "clef-bass": 2,
    "clef-change": 2,
    "clef-treble": 2,
+   "dc": 1,
    "dot": 16,
    "double-dot": 1,
    "dyn-f": 1,
@@ -4842,6 +4859,7 @@
    "dyn-pp": 1,
    "dyn-sfz": 1,
    "fermata": 5,
+   "fine": 1,
    "fingering": 5,
    "flag": 4,
    "grace": 3,
@@ -4915,7 +4933,7 @@
      1654,
      2339
     ],
-    "bytes": 127982
+    "bytes": 130299
    },
    "scan.pdf": {
     "seed": 52001,
@@ -4937,7 +4955,7 @@
      "dpi": 200
     },
     "summary": "typical flatbed scan: grey, -0.8 deg skew, slight lighting gradient, light blur + sensor noise, JPEG q80",
-    "bytes": 475327,
+    "bytes": 478186,
     "pdf_pages": [
      {
       "page": 1,
@@ -4996,7 +5014,7 @@
      "dpi": 200
     },
     "summary": "binarised (1-bit) photocopy: -3 deg skew, faded strokes, blur before thresholding, salt & pepper, toner speckles",
-    "bytes": 74616,
+    "bytes": 75010,
     "pdf_pages": [
      {
       "page": 1,
@@ -5059,9 +5077,9 @@
    "group": "piano",
    "engraving": "piano-A4",
    "file_bytes": {
-    "clean.pdf": 127982,
-    "scan.pdf": 475327,
-    "scan-severe.pdf": 74616
+    "clean.pdf": 130299,
+    "scan.pdf": 478186,
+    "scan-severe.pdf": 75010
    },
    "measures": 18,
    "systems": 5,
@@ -5371,9 +5389,11 @@
    "barline-final",
    "beam",
    "breath",
+   "chord",
    "clef-bass",
    "clef-change",
    "clef-treble",
+   "dc",
    "dot",
    "double-dot",
    "dyn-f",
@@ -5384,6 +5404,7 @@
    "dyn-pp",
    "dyn-sfz",
    "fermata",
+   "fine",
    "fingering",
    "flag",
    "grace",
@@ -5453,7 +5474,7 @@
     "Piano"
    ],
    "must_not_split": true,
-   "notes": "One Piano part on a grand staff (2 staves); bars 6-9 have two voices on the upper staff (stems up / down) that stay in the Piano part. Sounding pitches under the 8va (bar 10) and 8vb (bar 14) brackets are an octave above / below the written note heads. Bars 1-4 are repeated (1st ending bar 4, 2nd ending bar 5)."
+   "notes": "One Piano part on a grand staff (2 staves); bars 6-9 have two voices on the upper staff (stems up / down) that stay in the Piano part. Sounding pitches under the 8va (bar 10) and 8vb (bar 14) brackets are an octave above / below the written note heads. Bars 1-4 are repeated (1st ending bar 4, 2nd ending bar 5); \"Fine\" ends bar 13 and \"D.C. al Fine\" ends bar 18 (encoded as words + <sound fine/dacapo>)."
   },
   "counts": {
    "acc-courtesy": 2,
@@ -5464,13 +5485,15 @@
    "acc-sharp": 2,
    "accent": 1,
    "arpeggio": 1,
-   "barline-double": 3,
-   "barline-final": 1,
+   "barline-double": 2,
+   "barline-final": 2,
    "beam": 28,
    "breath": 1,
+   "chord": 25,
    "clef-bass": 2,
    "clef-change": 2,
    "clef-treble": 2,
+   "dc": 1,
    "dot": 16,
    "double-dot": 1,
    "dyn-f": 1,
@@ -5481,6 +5504,7 @@
    "dyn-pp": 1,
    "dyn-sfz": 1,
    "fermata": 5,
+   "fine": 1,
    "fingering": 5,
    "flag": 4,
    "grace": 3,
@@ -5554,7 +5578,7 @@
      2481,
      3508
     ],
-    "bytes": 209364
+    "bytes": 213713
    },
    "scan.pdf": {
     "seed": 52001,
@@ -5576,7 +5600,7 @@
      "dpi": 300
     },
     "summary": "typical flatbed scan: grey, -0.8 deg skew, slight lighting gradient, light blur + sensor noise, JPEG q80",
-    "bytes": 908256,
+    "bytes": 911622,
     "pdf_pages": [
      {
       "page": 1,
@@ -5635,7 +5659,7 @@
      "dpi": 300
     },
     "summary": "binarised (1-bit) photocopy: -3 deg skew, faded strokes, blur before thresholding, salt & pepper, toner speckles",
-    "bytes": 141738,
+    "bytes": 142542,
     "pdf_pages": [
      {
       "page": 1,
@@ -5698,9 +5722,9 @@
    "group": "piano",
    "engraving": "piano-A4",
    "file_bytes": {
-    "clean.pdf": 209364,
-    "scan.pdf": 908256,
-    "scan-severe.pdf": 141738
+    "clean.pdf": 213713,
+    "scan.pdf": 911622,
+    "scan-severe.pdf": 142542
    },
    "measures": 18,
    "systems": 5,
@@ -6010,9 +6034,11 @@
    "barline-final",
    "beam",
    "breath",
+   "chord",
    "clef-bass",
    "clef-change",
    "clef-treble",
+   "dc",
    "dot",
    "double-dot",
    "dyn-f",
@@ -6023,6 +6049,7 @@
    "dyn-pp",
    "dyn-sfz",
    "fermata",
+   "fine",
    "fingering",
    "flag",
    "grace",
@@ -6092,7 +6119,7 @@
     "Piano"
    ],
    "must_not_split": true,
-   "notes": "One Piano part on a grand staff (2 staves); bars 6-9 have two voices on the upper staff (stems up / down) that stay in the Piano part. Sounding pitches under the 8va (bar 10) and 8vb (bar 14) brackets are an octave above / below the written note heads. Bars 1-4 are repeated (1st ending bar 4, 2nd ending bar 5)."
+   "notes": "One Piano part on a grand staff (2 staves); bars 6-9 have two voices on the upper staff (stems up / down) that stay in the Piano part. Sounding pitches under the 8va (bar 10) and 8vb (bar 14) brackets are an octave above / below the written note heads. Bars 1-4 are repeated (1st ending bar 4, 2nd ending bar 5); \"Fine\" ends bar 13 and \"D.C. al Fine\" ends bar 18 (encoded as words + <sound fine/dacapo>)."
   },
   "counts": {
    "acc-courtesy": 2,
@@ -6103,13 +6130,15 @@
    "acc-sharp": 2,
    "accent": 1,
    "arpeggio": 1,
-   "barline-double": 3,
-   "barline-final": 1,
+   "barline-double": 2,
+   "barline-final": 2,
    "beam": 28,
    "breath": 1,
+   "chord": 25,
    "clef-bass": 2,
    "clef-change": 2,
    "clef-treble": 2,
+   "dc": 1,
    "dot": 16,
    "double-dot": 1,
    "dyn-f": 1,
@@ -6120,6 +6149,7 @@
    "dyn-pp": 1,
    "dyn-sfz": 1,
    "fermata": 5,
+   "fine": 1,
    "fingering": 5,
    "flag": 4,
    "grace": 3,
@@ -6193,7 +6223,7 @@
      3308,
      4678
     ],
-    "bytes": 298016
+    "bytes": 304722
    },
    "scan.pdf": {
     "seed": 52001,
@@ -6215,7 +6245,7 @@
      "dpi": 400
     },
     "summary": "typical flatbed scan: grey, -0.8 deg skew, slight lighting gradient, light blur + sensor noise, JPEG q80",
-    "bytes": 1449477,
+    "bytes": 1454343,
     "pdf_pages": [
      {
       "page": 1,
@@ -6274,7 +6304,7 @@
      "dpi": 400
     },
     "summary": "binarised (1-bit) photocopy: -3 deg skew, faded strokes, blur before thresholding, salt & pepper, toner speckles",
-    "bytes": 228902,
+    "bytes": 230321,
     "pdf_pages": [
      {
       "page": 1,
@@ -6337,9 +6367,9 @@
    "group": "piano",
    "engraving": "piano-A4",
    "file_bytes": {
-    "clean.pdf": 298016,
-    "scan.pdf": 1449477,
-    "scan-severe.pdf": 228902
+    "clean.pdf": 304722,
+    "scan.pdf": 1454343,
+    "scan-severe.pdf": 230321
    },
    "measures": 18,
    "systems": 5,
@@ -6649,9 +6679,11 @@
    "barline-final",
    "beam",
    "breath",
+   "chord",
    "clef-bass",
    "clef-change",
    "clef-treble",
+   "dc",
    "dot",
    "double-dot",
    "dyn-f",
@@ -6662,6 +6694,7 @@
    "dyn-pp",
    "dyn-sfz",
    "fermata",
+   "fine",
    "fingering",
    "flag",
    "grace",
@@ -6731,7 +6764,7 @@
     "Piano"
    ],
    "must_not_split": true,
-   "notes": "One Piano part on a grand staff (2 staves); bars 6-9 have two voices on the upper staff (stems up / down) that stay in the Piano part. Sounding pitches under the 8va (bar 10) and 8vb (bar 14) brackets are an octave above / below the written note heads. Bars 1-4 are repeated (1st ending bar 4, 2nd ending bar 5)."
+   "notes": "One Piano part on a grand staff (2 staves); bars 6-9 have two voices on the upper staff (stems up / down) that stay in the Piano part. Sounding pitches under the 8va (bar 10) and 8vb (bar 14) brackets are an octave above / below the written note heads. Bars 1-4 are repeated (1st ending bar 4, 2nd ending bar 5); \"Fine\" ends bar 13 and \"D.C. al Fine\" ends bar 18 (encoded as words + <sound fine/dacapo>)."
   },
   "counts": {
    "acc-courtesy": 2,
@@ -6742,13 +6775,15 @@
    "acc-sharp": 2,
    "accent": 1,
    "arpeggio": 1,
-   "barline-double": 3,
-   "barline-final": 1,
+   "barline-double": 2,
+   "barline-final": 2,
    "beam": 28,
    "breath": 1,
+   "chord": 25,
    "clef-bass": 2,
    "clef-change": 2,
    "clef-treble": 2,
+   "dc": 1,
    "dot": 16,
    "double-dot": 1,
    "dyn-f": 1,
@@ -6759,6 +6794,7 @@
    "dyn-pp": 1,
    "dyn-sfz": 1,
    "fermata": 5,
+   "fine": 1,
    "fingering": 5,
    "flag": 4,
    "grace": 3,
@@ -6832,7 +6868,7 @@
      4961,
      7016
     ],
-    "bytes": 477649
+    "bytes": 487482
    },
    "scan.pdf": {
     "seed": 52001,
@@ -6854,7 +6890,7 @@
      "dpi": 600
     },
     "summary": "typical flatbed scan: grey, -0.8 deg skew, slight lighting gradient, light blur + sensor noise, JPEG q80",
-    "bytes": 2802852,
+    "bytes": 2810154,
     "pdf_pages": [
      {
       "page": 1,
@@ -6913,7 +6949,7 @@
      "dpi": 600
     },
     "summary": "binarised (1-bit) photocopy: -3 deg skew, faded strokes, blur before thresholding, salt & pepper, toner speckles",
-    "bytes": 460006,
+    "bytes": 462413,
     "pdf_pages": [
      {
       "page": 1,
@@ -6976,9 +7012,9 @@
    "group": "piano",
    "engraving": "piano-A4",
    "file_bytes": {
-    "clean.pdf": 477649,
-    "scan.pdf": 2802852,
-    "scan-severe.pdf": 460006
+    "clean.pdf": 487482,
+    "scan.pdf": 2810154,
+    "scan-severe.pdf": 462413
    },
    "measures": 18,
    "systems": 5,
@@ -8434,9 +8470,11 @@
    "barline-final",
    "beam",
    "breath",
+   "chord",
    "clef-bass",
    "clef-change",
    "clef-treble",
+   "dc",
    "dot",
    "double-dot",
    "dyn-f",
@@ -8447,6 +8485,7 @@
    "dyn-pp",
    "dyn-sfz",
    "fermata",
+   "fine",
    "fingering",
    "flag",
    "grace",
@@ -8516,7 +8555,7 @@
     "Piano"
    ],
    "must_not_split": true,
-   "notes": "One Piano part on a grand staff (2 staves); bars 6-9 have two voices on the upper staff (stems up / down) that stay in the Piano part. Sounding pitches under the 8va (bar 10) and 8vb (bar 14) brackets are an octave above / below the written note heads. Bars 1-4 are repeated (1st ending bar 4, 2nd ending bar 5)."
+   "notes": "One Piano part on a grand staff (2 staves); bars 6-9 have two voices on the upper staff (stems up / down) that stay in the Piano part. Sounding pitches under the 8va (bar 10) and 8vb (bar 14) brackets are an octave above / below the written note heads. Bars 1-4 are repeated (1st ending bar 4, 2nd ending bar 5); \"Fine\" ends bar 13 and \"D.C. al Fine\" ends bar 18 (encoded as words + <sound fine/dacapo>)."
   },
   "counts": {
    "acc-courtesy": 2,
@@ -8527,13 +8566,15 @@
    "acc-sharp": 2,
    "accent": 1,
    "arpeggio": 1,
-   "barline-double": 3,
-   "barline-final": 1,
+   "barline-double": 2,
+   "barline-final": 2,
    "beam": 28,
    "breath": 1,
+   "chord": 25,
    "clef-bass": 2,
    "clef-change": 2,
    "clef-treble": 2,
+   "dc": 1,
    "dot": 16,
    "double-dot": 1,
    "dyn-f": 1,
@@ -8544,6 +8585,7 @@
    "dyn-pp": 1,
    "dyn-sfz": 1,
    "fermata": 5,
+   "fine": 1,
    "fingering": 5,
    "flag": 4,
    "grace": 3,
@@ -8617,7 +8659,7 @@
      2550,
      3300
     ],
-    "bytes": 208257
+    "bytes": 212497
    },
    "scan.pdf": {
     "seed": 52001,
@@ -8639,7 +8681,7 @@
      "dpi": 300
     },
     "summary": "typical flatbed scan: grey, -0.8 deg skew, slight lighting gradient, light blur + sensor noise, JPEG q80",
-    "bytes": 897456,
+    "bytes": 901291,
     "pdf_pages": [
      {
       "page": 1,
@@ -8698,7 +8740,7 @@
      "dpi": 300
     },
     "summary": "binarised (1-bit) photocopy: -3 deg skew, faded strokes, blur before thresholding, salt & pepper, toner speckles",
-    "bytes": 140540,
+    "bytes": 141232,
     "pdf_pages": [
      {
       "page": 1,
@@ -8761,9 +8803,9 @@
    "group": "piano",
    "engraving": "piano-Letter",
    "file_bytes": {
-    "clean.pdf": 208257,
-    "scan.pdf": 897456,
-    "scan-severe.pdf": 140540
+    "clean.pdf": 212497,
+    "scan.pdf": 901291,
+    "scan-severe.pdf": 141232
    },
    "measures": 18,
    "systems": 5,
@@ -9073,9 +9115,11 @@
    "barline-final",
    "beam",
    "breath",
+   "chord",
    "clef-bass",
    "clef-change",
    "clef-treble",
+   "dc",
    "dot",
    "double-dot",
    "dyn-f",
@@ -9086,6 +9130,7 @@
    "dyn-pp",
    "dyn-sfz",
    "fermata",
+   "fine",
    "fingering",
    "flag",
    "grace",
@@ -9155,7 +9200,7 @@
     "Piano"
    ],
    "must_not_split": true,
-   "notes": "One Piano part on a grand staff (2 staves); bars 6-9 have two voices on the upper staff (stems up / down) that stay in the Piano part. Sounding pitches under the 8va (bar 10) and 8vb (bar 14) brackets are an octave above / below the written note heads. Bars 1-4 are repeated (1st ending bar 4, 2nd ending bar 5)."
+   "notes": "One Piano part on a grand staff (2 staves); bars 6-9 have two voices on the upper staff (stems up / down) that stay in the Piano part. Sounding pitches under the 8va (bar 10) and 8vb (bar 14) brackets are an octave above / below the written note heads. Bars 1-4 are repeated (1st ending bar 4, 2nd ending bar 5); \"Fine\" ends bar 13 and \"D.C. al Fine\" ends bar 18 (encoded as words + <sound fine/dacapo>)."
   },
   "counts": {
    "acc-courtesy": 2,
@@ -9166,13 +9211,15 @@
    "acc-sharp": 2,
    "accent": 1,
    "arpeggio": 1,
-   "barline-double": 3,
-   "barline-final": 1,
+   "barline-double": 2,
+   "barline-final": 2,
    "beam": 28,
    "breath": 1,
+   "chord": 25,
    "clef-bass": 2,
    "clef-change": 2,
    "clef-treble": 2,
+   "dc": 1,
    "dot": 16,
    "double-dot": 1,
    "dyn-f": 1,
@@ -9183,6 +9230,7 @@
    "dyn-pp": 1,
    "dyn-sfz": 1,
    "fermata": 5,
+   "fine": 1,
    "fingering": 5,
    "flag": 4,
    "grace": 3,
@@ -9256,7 +9304,7 @@
      3508,
      4961
     ],
-    "bytes": 320042
+    "bytes": 325745
    },
    "scan.pdf": {
     "seed": 52001,
@@ -9278,7 +9326,7 @@
      "dpi": 300
     },
     "summary": "typical flatbed scan: grey, -0.8 deg skew, slight lighting gradient, light blur + sensor noise, JPEG q80",
-    "bytes": 1617985,
+    "bytes": 1623704,
     "pdf_pages": [
      {
       "page": 1,
@@ -9337,7 +9385,7 @@
      "dpi": 300
     },
     "summary": "binarised (1-bit) photocopy: -3 deg skew, faded strokes, blur before thresholding, salt & pepper, toner speckles",
-    "bytes": 229634,
+    "bytes": 230943,
     "pdf_pages": [
      {
       "page": 1,
@@ -9400,9 +9448,9 @@
    "group": "piano",
    "engraving": "piano-A3",
    "file_bytes": {
-    "clean.pdf": 320042,
-    "scan.pdf": 1617985,
-    "scan-severe.pdf": 229634
+    "clean.pdf": 325745,
+    "scan.pdf": 1623704,
+    "scan-severe.pdf": 230943
    },
    "measures": 18,
    "systems": 5,
@@ -9702,6 +9750,7 @@
   "symbols": [
    "acc-sharp",
    "barline-final",
+   "chord",
    "clef-bass",
    "clef-treble",
    "dyn-mf",
@@ -9733,6 +9782,7 @@
   "counts": {
    "acc-sharp": 2,
    "barline-final": 1,
+   "chord": 56,
    "clef-bass": 1,
    "clef-treble": 1,
    "dyn-mf": 1,
@@ -10234,9 +10284,12 @@
    "barline-double",
    "barline-final",
    "beam",
+   "chord",
    "clef-bass",
    "clef-treble",
+   "coda",
    "dot",
+   "ds",
    "dyn-f",
    "dyn-ff",
    "dyn-mf",
@@ -10267,6 +10320,7 @@
    "pedal",
    "rehearsal-mark",
    "rest-quarter",
+   "segno",
    "slur",
    "staccato",
    "stem-down",
@@ -10274,13 +10328,15 @@
    "system-break",
    "tempo-mark",
    "tenuto",
+   "text-expression",
    "time-2-4",
    "time-3-4",
    "time-4-4",
    "time-6-8",
    "time-change",
    "time-common",
-   "trill"
+   "trill",
+   "tuplet-2"
   ],
   "layout": "piano",
   "layout_also": [],
@@ -10298,19 +10354,22 @@
    "acc-natural": 27,
    "acc-sharp": 18,
    "accent": 20,
-   "barline-double": 4,
+   "barline-double": 5,
    "barline-final": 1,
-   "beam": 175,
+   "beam": 180,
+   "chord": 176,
    "clef-bass": 1,
    "clef-treble": 1,
+   "coda": 1,
    "dot": 25,
+   "ds": 1,
    "dyn-f": 1,
    "dyn-ff": 1,
    "dyn-mf": 1,
    "dyn-mp": 1,
    "dyn-pp": 1,
    "fermata": 8,
-   "flag": 30,
+   "flag": 25,
    "grace": 10,
    "grace-slash": 10,
    "hairpin-cresc": 5,
@@ -10326,14 +10385,15 @@
    "metronome": 5,
    "multi-page": 1,
    "note-16th": 160,
-   "note-8th": 490,
+   "note-8th": 495,
    "note-half": 97,
-   "note-quarter": 277,
+   "note-quarter": 272,
    "note-whole": 20,
    "page-break": 4,
    "pedal": 40,
    "rehearsal-mark": 5,
    "rest-quarter": 5,
+   "segno": 1,
    "slur": 35,
    "staccato": 155,
    "stem-down": 739,
@@ -10341,13 +10401,15 @@
    "system-break": 19,
    "tempo-mark": 5,
    "tenuto": 12,
+   "text-expression": 1,
    "time-2-4": 1,
    "time-3-4": 1,
    "time-4-4": 1,
    "time-6-8": 1,
    "time-change": 4,
    "time-common": 1,
-   "trill": 5
+   "trill": 5,
+   "tuplet-2": 5
   },
   "degradations": {
    "clean.pdf": {
@@ -10362,7 +10424,7 @@
      2481,
      3508
     ],
-    "bytes": 712746
+    "bytes": 720880
    },
    "scan.pdf": {
     "seed": 53001,
@@ -10394,7 +10456,7 @@
      "dpi": 300
     },
     "summary": "typical sheet-fed scan of every page: grey, 0.2-1.0 deg skew that differs per page, light blur + noise, JPEG q80",
-    "bytes": 4241991,
+    "bytes": 4248169,
     "pdf_pages": [
      {
       "page": 1,
@@ -10595,7 +10657,7 @@
      "dpi": 300
     },
     "summary": "worn photocopies scanned in grey: 1.5-3.5 deg skew per page, bleed-through of the next page, strong lighting gradient, blur, noise, toner speckles, JPEG q35",
-    "bytes": 2802436,
+    "bytes": 2804852,
     "pdf_pages": [
      {
       "page": 1,
@@ -10837,9 +10899,9 @@
    "group": "pages",
    "engraving": "var-5",
    "file_bytes": {
-    "clean.pdf": 712746,
-    "scan.pdf": 4241991,
-    "scan-severe.pdf": 2802436
+    "clean.pdf": 720880,
+    "scan.pdf": 4248169,
+    "scan-severe.pdf": 2804852
    },
    "measures": 96,
    "systems": 24,
@@ -10904,13 +10966,13 @@
      "ok": true
     },
     "beam": {
-     "truth": 175,
-     "engraved": 175,
+     "truth": 180,
+     "engraved": 180,
      "ok": true
     },
     "flag": {
-     "truth": 30,
-     "engraved": 30,
+     "truth": 25,
+     "engraved": 25,
      "ok": true
     },
     "staccato": {
@@ -11092,6 +11154,11 @@
      "truth": 0,
      "engraved": 0,
      "ok": true
+    },
+    "tuplet-2": {
+     "truth": 5,
+     "engraved": 5,
+     "ok": true
     }
    },
    "twin_identical": true,
@@ -11243,9 +11310,12 @@
    "barline-double",
    "barline-final",
    "beam",
+   "chord",
    "clef-bass",
    "clef-treble",
+   "coda",
    "dot",
+   "ds",
    "dyn-f",
    "dyn-ff",
    "dyn-mf",
@@ -11276,6 +11346,7 @@
    "multi-page",
    "note-16th",
    "note-32nd",
+   "note-64th",
    "note-8th",
    "note-half",
    "note-quarter",
@@ -11285,7 +11356,11 @@
    "page-break",
    "pedal",
    "rehearsal-mark",
+   "rest-32nd",
+   "rest-64th",
    "rest-quarter",
+   "rest-whole",
+   "segno",
    "slur",
    "staccato",
    "stem-down",
@@ -11293,6 +11368,7 @@
    "system-break",
    "tempo-mark",
    "tenuto",
+   "text-expression",
    "time-2-4",
    "time-3-2",
    "time-3-4",
@@ -11301,6 +11377,7 @@
    "time-change",
    "time-common",
    "trill",
+   "tuplet-2",
    "tuplet-3",
    "turn"
   ],
@@ -11317,17 +11394,20 @@
   },
   "counts": {
    "acc-courtesy": 1,
-   "acc-double-sharp": 5,
+   "acc-double-sharp": 4,
    "acc-flat": 1,
    "acc-natural": 40,
    "acc-sharp": 35,
    "accent": 40,
-   "barline-double": 9,
+   "barline-double": 10,
    "barline-final": 1,
-   "beam": 355,
+   "beam": 365,
+   "chord": 546,
    "clef-bass": 1,
    "clef-treble": 1,
+   "coda": 1,
    "dot": 50,
+   "ds": 1,
    "dyn-f": 2,
    "dyn-ff": 1,
    "dyn-mf": 2,
@@ -11335,7 +11415,7 @@
    "dyn-p": 1,
    "dyn-pp": 2,
    "fermata": 18,
-   "flag": 30,
+   "flag": 25,
    "grace": 10,
    "grace-slash": 10,
    "hairpin-cresc": 10,
@@ -11350,31 +11430,37 @@
    "key-s3": 2,
    "key-s6": 1,
    "key-s7": 1,
-   "ledger-above": 618,
-   "ledger-below": 95,
+   "ledger-above": 620,
+   "ledger-below": 93,
    "marcato": 20,
    "metronome": 10,
    "mordent": 10,
    "multi-page": 1,
-   "note-16th": 160,
-   "note-32nd": 160,
-   "note-8th": 1210,
+   "note-16th": 165,
+   "note-32nd": 145,
+   "note-64th": 5,
+   "note-8th": 1220,
    "note-half": 317,
-   "note-quarter": 862,
+   "note-quarter": 844,
    "note-whole": 45,
    "ottava-8va": 3,
    "ottava-8vb": 2,
    "page-break": 9,
    "pedal": 40,
    "rehearsal-mark": 10,
+   "rest-32nd": 20,
+   "rest-64th": 5,
    "rest-quarter": 5,
+   "rest-whole": 2,
+   "segno": 1,
    "slur": 50,
-   "staccato": 195,
-   "stem-down": 1633,
-   "stem-up": 392,
+   "staccato": 190,
+   "stem-down": 1626,
+   "stem-up": 386,
    "system-break": 39,
    "tempo-mark": 10,
    "tenuto": 12,
+   "text-expression": 1,
    "time-2-4": 1,
    "time-3-2": 1,
    "time-3-4": 1,
@@ -11383,6 +11469,7 @@
    "time-change": 7,
    "time-common": 1,
    "trill": 5,
+   "tuplet-2": 5,
    "tuplet-3": 80,
    "turn": 5
   },
@@ -11399,7 +11486,7 @@
      2481,
      3508
     ],
-    "bytes": 1422011
+    "bytes": 1439868
    },
    "scan.pdf": {
     "seed": 53001,
@@ -11441,7 +11528,7 @@
      "dpi": 300
     },
     "summary": "typical sheet-fed scan of every page: grey, 0.2-1.0 deg skew that differs per page, light blur + noise, JPEG q80",
-    "bytes": 8682519,
+    "bytes": 8693079,
     "pdf_pages": [
      {
       "page": 1,
@@ -11817,7 +11904,7 @@
      "dpi": 300
     },
     "summary": "worn photocopies scanned in grey: 1.5-3.5 deg skew per page, bleed-through of the next page, strong lighting gradient, blur, noise, toner speckles, JPEG q35",
-    "bytes": 5702259,
+    "bytes": 5705275,
     "pdf_pages": [
      {
       "page": 1,
@@ -12279,14 +12366,14 @@
    "group": "pages",
    "engraving": "var-10",
    "file_bytes": {
-    "clean.pdf": 1422011,
-    "scan.pdf": 8682519,
-    "scan-severe.pdf": 5702259
+    "clean.pdf": 1439868,
+    "scan.pdf": 8693079,
+    "scan-severe.pdf": 5705275
    },
    "measures": 196,
    "systems": 49,
-   "notes_in_truth": 2754,
-   "rests_in_truth": 5,
+   "notes_in_truth": 2741,
+   "rests_in_truth": 32,
    "staff_size_pt": 18,
    "paper_mm": [
     210.0,
@@ -12303,16 +12390,16 @@
   "source": "own procedural composition for the coverage corpus (pieces/variations.py)",
   "validation": {
    "xsd_valid": true,
-   "music21_parse": "2 2048 5",
+   "music21_parse": "2 2035 32",
    "engraving_matches_model": {
     "ok": true,
-    "checked": 2769,
+    "checked": 2783,
     "n_problems": 0,
     "problems": []
    },
    "midi_vs_truth": {
-    "truth_attacks": 2754,
-    "midi_attacks": 2764,
+    "truth_attacks": 2741,
+    "midi_attacks": 2751,
     "grace_extras": 10,
     "missing": 0,
     "extra": 0,
@@ -12325,8 +12412,8 @@
     "lyr_missing_sample": []
    },
    "accidentals_cross_check": {
-    "printed": 81,
-    "simulated_per_part": 81,
+    "printed": 80,
+    "simulated_per_part": 80,
     "differences": []
    },
    "symbol_cross_check": {
@@ -12346,18 +12433,18 @@
      "ok": true
     },
     "beam": {
-     "truth": 355,
-     "engraved": 355,
+     "truth": 365,
+     "engraved": 365,
      "ok": true
     },
     "flag": {
-     "truth": 30,
-     "engraved": 30,
+     "truth": 25,
+     "engraved": 25,
      "ok": true
     },
     "staccato": {
-     "truth": 195,
-     "engraved": 195,
+     "truth": 190,
+     "engraved": 190,
      "ok": true
     },
     "staccatissimo": {
@@ -12436,8 +12523,8 @@
      "ok": true
     },
     "accidentals(all)": {
-     "truth": 81,
-     "engraved": 81,
+     "truth": 80,
+     "engraved": 80,
      "ok": true
     },
     "acc-courtesy": {
@@ -12461,13 +12548,13 @@
      "ok": true
     },
     "ledger-above": {
-     "truth": 618,
-     "engraved": 618,
+     "truth": 620,
+     "engraved": 620,
      "ok": true
     },
     "ledger-below": {
-     "truth": 95,
-     "engraved": 95,
+     "truth": 93,
+     "engraved": 93,
      "ok": true
     },
     "lyrics": {
@@ -12533,6 +12620,11 @@
     "dyn-sfz": {
      "truth": 0,
      "engraved": 0,
+     "ok": true
+    },
+    "tuplet-2": {
+     "truth": 5,
+     "engraved": 5,
      "ok": true
     },
     "tuplet-3": {
@@ -12800,10 +12892,13 @@
    "barline-double",
    "barline-final",
    "beam",
+   "chord",
    "clef-bass",
    "clef-change",
    "clef-treble",
+   "coda",
    "dot",
+   "ds",
    "dyn-f",
    "dyn-ff",
    "dyn-mf",
@@ -12838,6 +12933,7 @@
    "multi-page",
    "note-16th",
    "note-32nd",
+   "note-64th",
    "note-8th",
    "note-half",
    "note-quarter",
@@ -12847,8 +12943,12 @@
    "page-break",
    "pedal",
    "rehearsal-mark",
+   "rest-32nd",
+   "rest-64th",
    "rest-half",
    "rest-quarter",
+   "rest-whole",
+   "segno",
    "slur",
    "staccato",
    "stem-down",
@@ -12856,6 +12956,7 @@
    "system-break",
    "tempo-mark",
    "tenuto",
+   "text-expression",
    "time-12-8",
    "time-2-4",
    "time-3-2",
@@ -12870,9 +12971,11 @@
    "time-cut",
    "tremolo",
    "trill",
+   "tuplet-2",
    "tuplet-3",
    "tuplet-5",
    "tuplet-6",
+   "tuplet-7",
    "turn"
   ],
   "layout": "piano",
@@ -12888,18 +12991,21 @@
   },
   "counts": {
    "acc-courtesy": 4,
-   "acc-double-sharp": 36,
+   "acc-double-sharp": 35,
    "acc-flat": 1,
    "acc-natural": 69,
    "acc-sharp": 90,
    "accent": 45,
-   "barline-double": 19,
+   "barline-double": 20,
    "barline-final": 1,
-   "beam": 710,
+   "beam": 720,
+   "chord": 886,
    "clef-bass": 6,
    "clef-change": 10,
    "clef-treble": 6,
+   "coda": 1,
    "dot": 325,
+   "ds": 1,
    "dyn-f": 4,
    "dyn-ff": 3,
    "dyn-mf": 4,
@@ -12907,7 +13013,7 @@
    "dyn-p": 3,
    "dyn-pp": 3,
    "fermata": 18,
-   "flag": 90,
+   "flag": 85,
    "grace": 70,
    "grace-slash": 30,
    "hairpin-cresc": 10,
@@ -12926,32 +13032,38 @@
    "key-s4": 1,
    "key-s6": 1,
    "key-s7": 2,
-   "ledger-above": 1139,
-   "ledger-below": 161,
+   "ledger-above": 1159,
+   "ledger-below": 159,
    "marcato": 20,
    "metronome": 20,
    "mordent": 10,
    "multi-page": 1,
-   "note-16th": 535,
-   "note-32nd": 160,
-   "note-8th": 1945,
+   "note-16th": 556,
+   "note-32nd": 145,
+   "note-64th": 5,
+   "note-8th": 1955,
    "note-half": 722,
-   "note-quarter": 1807,
+   "note-quarter": 1789,
    "note-whole": 45,
    "ottava-8va": 3,
    "ottava-8vb": 2,
    "page-break": 19,
    "pedal": 40,
    "rehearsal-mark": 20,
+   "rest-32nd": 20,
+   "rest-64th": 5,
    "rest-half": 5,
    "rest-quarter": 5,
+   "rest-whole": 2,
+   "segno": 1,
    "slur": 105,
-   "staccato": 265,
-   "stem-down": 3111,
-   "stem-up": 914,
+   "staccato": 260,
+   "stem-down": 3144,
+   "stem-up": 884,
    "system-break": 79,
    "tempo-mark": 20,
    "tenuto": 27,
+   "text-expression": 1,
    "time-12-8": 1,
    "time-2-4": 2,
    "time-3-2": 1,
@@ -12966,9 +13078,11 @@
    "time-cut": 1,
    "tremolo": 40,
    "trill": 5,
+   "tuplet-2": 5,
    "tuplet-3": 80,
    "tuplet-5": 20,
-   "tuplet-6": 40,
+   "tuplet-6": 24,
+   "tuplet-7": 16,
    "turn": 5
   },
   "degradations": {
@@ -12984,7 +13098,7 @@
      2481,
      3508
     ],
-    "bytes": 2788684
+    "bytes": 2807961
    },
    "scan.pdf": {
     "seed": 53001,
@@ -13046,7 +13160,7 @@
      "dpi": 300
     },
     "summary": "typical sheet-fed scan of every page: grey, 0.2-1.0 deg skew that differs per page, light blur + noise, JPEG q80",
-    "bytes": 17137670,
+    "bytes": 17155607,
     "pdf_pages": [
      {
       "page": 1,
@@ -13772,7 +13886,7 @@
      "dpi": 300
     },
     "summary": "worn photocopies scanned in grey: 1.5-3.5 deg skew per page, bleed-through of the next page, strong lighting gradient, blur, noise, toner speckles, JPEG q35",
-    "bytes": 11327921,
+    "bytes": 11334085,
     "pdf_pages": [
      {
       "page": 1,
@@ -14674,14 +14788,14 @@
    "group": "pages",
    "engraving": "var-20",
    "file_bytes": {
-    "clean.pdf": 2788684,
-    "scan.pdf": 17137670,
-    "scan-severe.pdf": 11327921
+    "clean.pdf": 2807961,
+    "scan.pdf": 17155607,
+    "scan-severe.pdf": 11334085
    },
    "measures": 396,
    "systems": 99,
-   "notes_in_truth": 5214,
-   "rests_in_truth": 10,
+   "notes_in_truth": 5217,
+   "rests_in_truth": 37,
    "staff_size_pt": 18,
    "paper_mm": [
     210.0,
@@ -14698,16 +14812,16 @@
   "source": "own procedural composition for the coverage corpus (pieces/variations.py)",
   "validation": {
    "xsd_valid": true,
-   "music21_parse": "2 4048 10",
+   "music21_parse": "2 4051 37",
    "engraving_matches_model": {
     "ok": true,
-    "checked": 5294,
+    "checked": 5324,
     "n_problems": 0,
     "problems": []
    },
    "midi_vs_truth": {
-    "truth_attacks": 5214,
-    "midi_attacks": 5284,
+    "truth_attacks": 5217,
+    "midi_attacks": 5287,
     "grace_extras": 70,
     "missing": 0,
     "extra": 0,
@@ -14720,8 +14834,8 @@
     "lyr_missing_sample": []
    },
    "accidentals_cross_check": {
-    "printed": 196,
-    "simulated_per_part": 196,
+    "printed": 195,
+    "simulated_per_part": 195,
     "differences": []
    },
    "symbol_cross_check": {
@@ -14741,18 +14855,18 @@
      "ok": true
     },
     "beam": {
-     "truth": 710,
-     "engraved": 710,
+     "truth": 720,
+     "engraved": 720,
      "ok": true
     },
     "flag": {
-     "truth": 90,
-     "engraved": 90,
+     "truth": 85,
+     "engraved": 85,
      "ok": true
     },
     "staccato": {
-     "truth": 265,
-     "engraved": 265,
+     "truth": 260,
+     "engraved": 260,
      "ok": true
     },
     "staccatissimo": {
@@ -14831,8 +14945,8 @@
      "ok": true
     },
     "accidentals(all)": {
-     "truth": 196,
-     "engraved": 196,
+     "truth": 195,
+     "engraved": 195,
      "ok": true
     },
     "acc-courtesy": {
@@ -14856,13 +14970,13 @@
      "ok": true
     },
     "ledger-above": {
-     "truth": 1139,
-     "engraved": 1139,
+     "truth": 1159,
+     "engraved": 1159,
      "ok": true
     },
     "ledger-below": {
-     "truth": 161,
-     "engraved": 161,
+     "truth": 159,
+     "engraved": 159,
      "ok": true
     },
     "lyrics": {
@@ -14930,6 +15044,11 @@
      "engraved": 0,
      "ok": true
     },
+    "tuplet-2": {
+     "truth": 5,
+     "engraved": 5,
+     "ok": true
+    },
     "tuplet-3": {
      "truth": 80,
      "engraved": 80,
@@ -14941,8 +15060,13 @@
      "ok": true
     },
     "tuplet-6": {
-     "truth": 40,
-     "engraved": 40,
+     "truth": 24,
+     "engraved": 24,
+     "ok": true
+    },
+    "tuplet-7": {
+     "truth": 16,
+     "engraved": 16,
      "ok": true
     }
    },
@@ -15427,10 +15551,17 @@
    "barline-final",
    "beam",
    "breath",
+   "chord",
+   "clef-alto",
    "clef-bass",
    "clef-change",
+   "clef-soprano",
+   "clef-tenor",
    "clef-treble",
+   "clef-treble-8va",
+   "coda",
    "dot",
+   "ds",
    "dyn-f",
    "dyn-ff",
    "dyn-mf",
@@ -15468,17 +15599,25 @@
    "multi-page",
    "note-16th",
    "note-32nd",
+   "note-64th",
    "note-8th",
+   "note-breve",
    "note-half",
    "note-quarter",
    "note-whole",
+   "ottava-15ma",
    "ottava-8va",
    "ottava-8vb",
    "page-break",
    "pedal",
    "rehearsal-mark",
+   "rest-32nd",
+   "rest-64th",
+   "rest-breve",
    "rest-half",
    "rest-quarter",
+   "rest-whole",
+   "segno",
    "slur",
    "staccato",
    "stem-down",
@@ -15486,12 +15625,15 @@
    "system-break",
    "tempo-mark",
    "tenuto",
+   "text-expression",
    "time-12-8",
+   "time-2-2",
    "time-2-4",
    "time-3-2",
    "time-3-4",
    "time-4-4",
    "time-5-4",
+   "time-5-8",
    "time-6-8",
    "time-7-8",
    "time-9-8",
@@ -15500,10 +15642,13 @@
    "time-cut",
    "tremolo",
    "trill",
+   "tuplet-2",
    "tuplet-3",
    "tuplet-5",
    "tuplet-6",
-   "turn"
+   "tuplet-7",
+   "turn",
+   "x-time-4-2"
   ],
   "layout": "piano",
   "layout_also": [
@@ -15517,30 +15662,37 @@
    "notes": "One Piano part (grand staff) over 40 page(s); every page is one variation with its own key, metre, tempo + metronome mark and rehearsal number (1, 2, ...). Pages are separated by double barlines + page breaks; systems hold 4 bars."
   },
   "counts": {
-   "acc-courtesy": 7,
-   "acc-double-sharp": 68,
-   "acc-flat": 3,
-   "acc-natural": 153,
-   "acc-sharp": 187,
+   "acc-courtesy": 8,
+   "acc-double-sharp": 69,
+   "acc-flat": 4,
+   "acc-natural": 143,
+   "acc-sharp": 172,
    "accent": 90,
    "arpeggio": 60,
-   "barline-double": 39,
+   "barline-double": 40,
    "barline-final": 1,
-   "beam": 1280,
+   "beam": 1260,
    "breath": 10,
+   "chord": 1861,
+   "clef-alto": 5,
    "clef-bass": 11,
-   "clef-change": 20,
+   "clef-change": 40,
+   "clef-soprano": 5,
+   "clef-tenor": 5,
    "clef-treble": 11,
+   "clef-treble-8va": 5,
+   "coda": 1,
    "dot": 650,
+   "ds": 1,
    "dyn-f": 7,
    "dyn-ff": 6,
    "dyn-mf": 7,
    "dyn-mp": 7,
    "dyn-p": 6,
    "dyn-pp": 7,
-   "fermata": 38,
+   "fermata": 48,
    "fingering": 140,
-   "flag": 160,
+   "flag": 150,
    "grace": 80,
    "grace-slash": 40,
    "hairpin-cresc": 20,
@@ -15561,50 +15713,64 @@
    "key-s5": 2,
    "key-s6": 3,
    "key-s7": 3,
-   "ledger-above": 2280,
-   "ledger-below": 344,
+   "ledger-above": 2191,
+   "ledger-below": 352,
    "marcato": 40,
    "metronome": 40,
    "mordent": 20,
    "multi-page": 1,
-   "note-16th": 970,
-   "note-32nd": 320,
-   "note-8th": 3690,
-   "note-half": 1722,
-   "note-quarter": 3552,
-   "note-whole": 95,
-   "ottava-8va": 6,
+   "note-16th": 756,
+   "note-32nd": 290,
+   "note-64th": 10,
+   "note-8th": 3650,
+   "note-breve": 25,
+   "note-half": 1642,
+   "note-quarter": 3476,
+   "note-whole": 195,
+   "ottava-15ma": 3,
+   "ottava-8va": 3,
    "ottava-8vb": 4,
    "page-break": 39,
    "pedal": 80,
    "rehearsal-mark": 40,
+   "rest-32nd": 40,
+   "rest-64th": 10,
+   "rest-breve": 5,
    "rest-half": 10,
    "rest-quarter": 10,
+   "rest-whole": 4,
+   "segno": 1,
    "slur": 210,
-   "staccato": 530,
-   "stem-down": 6123,
-   "stem-up": 1662,
+   "staccato": 520,
+   "stem-down": 5774,
+   "stem-up": 1581,
    "system-break": 159,
    "tempo-mark": 40,
    "tenuto": 57,
+   "text-expression": 1,
    "time-12-8": 2,
+   "time-2-2": 1,
    "time-2-4": 3,
    "time-3-2": 2,
    "time-3-4": 3,
    "time-4-4": 9,
-   "time-5-4": 2,
+   "time-5-4": 1,
+   "time-5-8": 1,
    "time-6-8": 2,
    "time-7-8": 2,
    "time-9-8": 2,
-   "time-change": 30,
+   "time-change": 31,
    "time-common": 2,
-   "time-cut": 2,
+   "time-cut": 1,
    "tremolo": 80,
    "trill": 10,
+   "tuplet-2": 10,
    "tuplet-3": 160,
    "tuplet-5": 20,
-   "tuplet-6": 80,
-   "turn": 10
+   "tuplet-6": 24,
+   "tuplet-7": 16,
+   "turn": 10,
+   "x-time-4-2": 1
   },
   "degradations": {
    "clean.pdf": {
@@ -15619,7 +15785,7 @@
      2481,
      3508
     ],
-    "bytes": 5617652
+    "bytes": 5608468
    },
    "scan.pdf": {
     "seed": 53001,
@@ -15721,7 +15887,7 @@
      "dpi": 300
     },
     "summary": "typical sheet-fed scan of every page: grey, 0.2-1.0 deg skew that differs per page, light blur + noise, JPEG q80",
-    "bytes": 34256621,
+    "bytes": 34131625,
     "pdf_pages": [
      {
       "page": 1,
@@ -17147,7 +17313,7 @@
      "dpi": 300
     },
     "summary": "worn photocopies scanned in grey: 1.5-3.5 deg skew per page, bleed-through of the next page, strong lighting gradient, blur, noise, toner speckles, JPEG q35",
-    "bytes": 22614135,
+    "bytes": 22552867,
     "pdf_pages": [
      {
       "page": 1,
@@ -18929,14 +19095,14 @@
    "group": "pages",
    "engraving": "var-40",
    "file_bytes": {
-    "clean.pdf": 5617652,
-    "scan.pdf": 34256621,
-    "scan-severe.pdf": 22614135
+    "clean.pdf": 5608468,
+    "scan.pdf": 34131625,
+    "scan-severe.pdf": 22552867
    },
    "measures": 796,
    "systems": 199,
-   "notes_in_truth": 10349,
-   "rests_in_truth": 20,
+   "notes_in_truth": 10044,
+   "rests_in_truth": 79,
    "staff_size_pt": 18,
    "paper_mm": [
     210.0,
@@ -18953,16 +19119,16 @@
   "source": "own procedural composition for the coverage corpus (pieces/variations.py)",
   "validation": {
    "xsd_valid": true,
-   "music21_parse": "2 7833 20",
+   "music21_parse": "2 7458 79",
    "engraving_matches_model": {
     "ok": true,
-    "checked": 10449,
+    "checked": 10203,
     "n_problems": 0,
     "problems": []
    },
    "midi_vs_truth": {
-    "truth_attacks": 10349,
-    "midi_attacks": 10429,
+    "truth_attacks": 10044,
+    "midi_attacks": 10124,
     "grace_extras": 80,
     "missing": 0,
     "extra": 0,
@@ -18975,8 +19141,8 @@
     "lyr_missing_sample": []
    },
    "accidentals_cross_check": {
-    "printed": 411,
-    "simulated_per_part": 411,
+    "printed": 388,
+    "simulated_per_part": 388,
     "differences": []
    },
    "symbol_cross_check": {
@@ -18996,18 +19162,18 @@
      "ok": true
     },
     "beam": {
-     "truth": 1280,
-     "engraved": 1280,
+     "truth": 1260,
+     "engraved": 1260,
      "ok": true
     },
     "flag": {
-     "truth": 160,
-     "engraved": 160,
+     "truth": 150,
+     "engraved": 150,
      "ok": true
     },
     "staccato": {
-     "truth": 530,
-     "engraved": 530,
+     "truth": 520,
+     "engraved": 520,
      "ok": true
     },
     "staccatissimo": {
@@ -19031,8 +19197,8 @@
      "ok": true
     },
     "fermata": {
-     "truth": 38,
-     "engraved": 38,
+     "truth": 48,
+     "engraved": 48,
      "ok": true
     },
     "trill": {
@@ -19086,18 +19252,18 @@
      "ok": true
     },
     "accidentals(all)": {
-     "truth": 411,
-     "engraved": 411,
+     "truth": 388,
+     "engraved": 388,
      "ok": true
     },
     "acc-courtesy": {
-     "truth": 7,
-     "engraved": 7,
+     "truth": 8,
+     "engraved": 8,
      "ok": true
     },
     "ottava-8va": {
-     "truth": 6,
-     "engraved": 6,
+     "truth": 3,
+     "engraved": 3,
      "ok": true
     },
     "ottava-8vb": {
@@ -19106,18 +19272,18 @@
      "ok": true
     },
     "ottava-15ma": {
-     "truth": 0,
-     "engraved": 0,
+     "truth": 3,
+     "engraved": 3,
      "ok": true
     },
     "ledger-above": {
-     "truth": 2280,
-     "engraved": 2280,
+     "truth": 2191,
+     "engraved": 2191,
      "ok": true
     },
     "ledger-below": {
-     "truth": 344,
-     "engraved": 344,
+     "truth": 352,
+     "engraved": 352,
      "ok": true
     },
     "lyrics": {
@@ -19146,8 +19312,8 @@
      "ok": true
     },
     "clef-change": {
-     "truth": 20,
-     "engraved": 20,
+     "truth": 40,
+     "engraved": 40,
      "ok": true
     },
     "dyn-pp": {
@@ -19185,6 +19351,11 @@
      "engraved": 0,
      "ok": true
     },
+    "tuplet-2": {
+     "truth": 10,
+     "engraved": 10,
+     "ok": true
+    },
     "tuplet-3": {
      "truth": 160,
      "engraved": 160,
@@ -19196,8 +19367,13 @@
      "ok": true
     },
     "tuplet-6": {
-     "truth": 80,
-     "engraved": 80,
+     "truth": 24,
+     "engraved": 24,
+     "ok": true
+    },
+    "tuplet-7": {
+     "truth": 16,
+     "engraved": 16,
      "ok": true
     }
    },
@@ -19705,14 +19881,36 @@
    },
    {
     "variation": 23,
-    "texture": "Chorale",
+    "texture": "Antico",
+    "time": [
+     4,
+     2
+    ],
+    "symbol": null,
+    "key": [
+     -1,
+     "major"
+    ],
+    "tempo": [
+     "Stile antico",
+     "half",
+     72,
+     0
+    ],
+    "bars": 20,
+    "systems": 5,
+    "first_bar": 437
+   },
+   {
+    "variation": 24,
+    "texture": "Chorale II",
     "time": [
      4,
      4
     ],
     "symbol": "common",
     "key": [
-     -1,
+     5,
      "major"
     ],
     "tempo": [
@@ -19723,18 +19921,18 @@
     ],
     "bars": 20,
     "systems": 5,
-    "first_bar": 437
+    "first_bar": 457
    },
    {
-    "variation": 24,
-    "texture": "Alberti",
+    "variation": 25,
+    "texture": "Alberti II",
     "time": [
      4,
      4
     ],
     "symbol": null,
     "key": [
-     5,
+     -6,
      "major"
     ],
     "tempo": [
@@ -19745,19 +19943,19 @@
     ],
     "bars": 20,
     "systems": 5,
-    "first_bar": 457
+    "first_bar": 477
    },
    {
-    "variation": 25,
-    "texture": "Toccata",
+    "variation": 26,
+    "texture": "Toccata II",
     "time": [
      2,
      4
     ],
     "symbol": null,
     "key": [
-     -6,
-     "major"
+     5,
+     "minor"
     ],
     "tempo": [
      "Presto",
@@ -19767,18 +19965,18 @@
     ],
     "bars": 20,
     "systems": 5,
-    "first_bar": 477
+    "first_bar": 497
    },
    {
-    "variation": 26,
-    "texture": "Valse",
+    "variation": 27,
+    "texture": "Valse II",
     "time": [
      3,
      4
     ],
     "symbol": null,
     "key": [
-     5,
+     -3,
      "minor"
     ],
     "tempo": [
@@ -19789,18 +19987,18 @@
     ],
     "bars": 20,
     "systems": 5,
-    "first_bar": 497
+    "first_bar": 517
    },
    {
-    "variation": 27,
-    "texture": "Barcarolle",
+    "variation": 28,
+    "texture": "Barcarolle II",
     "time": [
      6,
      8
     ],
     "symbol": null,
     "key": [
-     -3,
+     0,
      "minor"
     ],
     "tempo": [
@@ -19811,33 +20009,11 @@
     ],
     "bars": 20,
     "systems": 5,
-    "first_bar": 517
-   },
-   {
-    "variation": 28,
-    "texture": "Triplets",
-    "time": [
-     4,
-     4
-    ],
-    "symbol": null,
-    "key": [
-     0,
-     "minor"
-    ],
-    "tempo": [
-     "Moderato",
-     "quarter",
-     88,
-     0
-    ],
-    "bars": 20,
-    "systems": 5,
     "first_bar": 537
    },
    {
     "variation": 29,
-    "texture": "Octaves",
+    "texture": "Triplets II",
     "time": [
      4,
      4
@@ -19848,9 +20024,9 @@
      "major"
     ],
     "tempo": [
-     "Con fuoco",
+     "Moderato",
      "quarter",
-     120,
+     88,
      0
     ],
     "bars": 20,
@@ -19859,7 +20035,7 @@
    },
    {
     "variation": 30,
-    "texture": "Duet",
+    "texture": "Octaves II",
     "time": [
      4,
      4
@@ -19870,9 +20046,9 @@
      "minor"
     ],
     "tempo": [
-     "Cantabile",
+     "Con fuoco",
      "quarter",
-     72,
+     120,
      0
     ],
     "bars": 20,
@@ -19881,14 +20057,36 @@
    },
    {
     "variation": 31,
-    "texture": "Sarabande",
+    "texture": "Duet II",
+    "time": [
+     4,
+     4
+    ],
+    "symbol": null,
+    "key": [
+     0,
+     "major"
+    ],
+    "tempo": [
+     "Cantabile",
+     "quarter",
+     72,
+     0
+    ],
+    "bars": 20,
+    "systems": 5,
+    "first_bar": 597
+   },
+   {
+    "variation": 32,
+    "texture": "Sarabande II",
     "time": [
      3,
      2
     ],
     "symbol": null,
     "key": [
-     0,
+     -4,
      "major"
     ],
     "tempo": [
@@ -19899,18 +20097,18 @@
     ],
     "bars": 20,
     "systems": 5,
-    "first_bar": 597
+    "first_bar": 617
    },
    {
-    "variation": 32,
-    "texture": "Etude",
+    "variation": 33,
+    "texture": "Etude II",
     "time": [
      4,
      4
     ],
     "symbol": null,
     "key": [
-     -4,
+     6,
      "major"
     ],
     "tempo": [
@@ -19921,19 +20119,19 @@
     ],
     "bars": 20,
     "systems": 5,
-    "first_bar": 617
+    "first_bar": 637
    },
    {
-    "variation": 33,
-    "texture": "Pastorale",
+    "variation": 34,
+    "texture": "Pastorale II",
     "time": [
      12,
      8
     ],
     "symbol": null,
     "key": [
-     6,
-     "major"
+     3,
+     "minor"
     ],
     "tempo": [
      "Pastorale",
@@ -19943,18 +20141,18 @@
     ],
     "bars": 20,
     "systems": 5,
-    "first_bar": 637
+    "first_bar": 657
    },
    {
-    "variation": 34,
-    "texture": "March",
+    "variation": 35,
+    "texture": "March II",
     "time": [
      2,
      2
     ],
-    "symbol": "cut",
+    "symbol": null,
     "key": [
-     3,
+     -7,
      "minor"
     ],
     "tempo": [
@@ -19965,19 +20163,19 @@
     ],
     "bars": 20,
     "systems": 5,
-    "first_bar": 657
+    "first_bar": 677
    },
    {
-    "variation": 35,
-    "texture": "Siciliano",
+    "variation": 36,
+    "texture": "Siciliano II",
     "time": [
      9,
      8
     ],
     "symbol": null,
     "key": [
-     -7,
-     "minor"
+     3,
+     "major"
     ],
     "tempo": [
      "Siciliano",
@@ -19987,41 +20185,41 @@
     ],
     "bars": 20,
     "systems": 5,
-    "first_bar": 677
-   },
-   {
-    "variation": 36,
-    "texture": "Five",
-    "time": [
-     5,
-     4
-    ],
-    "symbol": null,
-    "key": [
-     3,
-     "major"
-    ],
-    "tempo": [
-     "Inquieto",
-     "quarter",
-     132,
-     0
-    ],
-    "bars": 20,
-    "systems": 5,
     "first_bar": 697
    },
    {
     "variation": 37,
-    "texture": "Seven",
+    "texture": "Five II",
     "time": [
-     7,
+     5,
      8
     ],
     "symbol": null,
     "key": [
      1,
      "minor"
+    ],
+    "tempo": [
+     "Inquieto",
+     "eighth",
+     240,
+     0
+    ],
+    "bars": 20,
+    "systems": 5,
+    "first_bar": 717
+   },
+   {
+    "variation": 38,
+    "texture": "Seven II",
+    "time": [
+     7,
+     8
+    ],
+    "symbol": null,
+    "key": [
+     7,
+     "major"
     ],
     "tempo": [
      "Danza",
@@ -20031,33 +20229,11 @@
     ],
     "bars": 20,
     "systems": 5,
-    "first_bar": 717
-   },
-   {
-    "variation": 38,
-    "texture": "Tremolo",
-    "time": [
-     4,
-     4
-    ],
-    "symbol": null,
-    "key": [
-     7,
-     "major"
-    ],
-    "tempo": [
-     "Misterioso",
-     "quarter",
-     60,
-     0
-    ],
-    "bars": 20,
-    "systems": 5,
     "first_bar": 737
    },
    {
     "variation": 39,
-    "texture": "Clefs",
+    "texture": "Tremolo II",
     "time": [
      4,
      4
@@ -20068,9 +20244,9 @@
      "minor"
     ],
     "tempo": [
-     "Comodo",
+     "Misterioso",
      "quarter",
-     96,
+     60,
      0
     ],
     "bars": 20,
@@ -20079,7 +20255,7 @@
    },
    {
     "variation": 40,
-    "texture": "Sextuplets",
+    "texture": "Clefs II",
     "time": [
      4,
      4
@@ -20090,9 +20266,9 @@
      "major"
     ],
     "tempo": [
-     "Fluido",
+     "Comodo",
      "quarter",
-     69,
+     96,
      0
     ],
     "bars": 20,

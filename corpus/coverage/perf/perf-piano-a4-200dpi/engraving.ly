@@ -34,12 +34,12 @@
     \tempo "Vivace" 4. = 116 \mark \markup { \box \bold "C" } \time 6/8 \key e \major \oneVoice \ottava #1 e'''8-.\ff fis'''8-. gis'''8-. a'''4.-^ \ottava #0 |
     gis''8( fisis''8 gis''8) b''4. |
     fis''?8 e''8 d''8 e''4 r8 |
-    e''4.\> r4.\! \bar "||" |
+    e''4.\> r4.\! \textEndMark \markup { \bold "Fine" } \bar "|." |
     \break \tempo "Tempo I" \mark \markup { \box \bold "D" } \defaultTimeSignature \time 2/2 \key aes \major \tuplet 6/4 { aes16-1\mp^\markup { \italic "leggiero" }( c'16 ees'16 aes'16 c''16 ees''16) } aes''4-! \tuplet 5/4 { g''16( f''16 ees''16 des''16 c''16) } bes'4 \breathe |
     c''8.\sfz beses'32 aes'32 g'4-- f'8( ees'16 des'16) c'4 |
     \break \tuplet 3/2 { bes'?4\<( c''4 des''4) } ees''2-^\! |
     c'''64( des'''64 c'''64 bes''64 aes''8.) r8 r16 ees''16 <c'' ees'' aes''>2\fermata\arpeggio\pp |
-    R1 \bar "|." |
+    R1 \textEndMark \markup { \italic "D.C. al Fine" } \bar "|." |
           }
           \new Voice = "vPx2" {
     \oneVoice s1 |

@@ -258,6 +258,12 @@ function refinePage(entry, dets, opts, stats) {
   const heads = fr.heads || [];
   const hm = matchHeads(heads, notes, fr.ss);
   stats.heads += heads.length; stats.notes += notes.length; stats.matched += hm.size;
+  // the two readings must mostly agree on where the heads are before either
+  // corrects the other: on a page where they do not (a heavy photocopy, a
+  // page the model cannot read) one of them is lost, and which one is unknown
+  const agree = hm.size / Math.max(1, Math.min(heads.length, notes.length));
+  if (heads.length >= 8 && agree < (opts.minAgree != null ? opts.minAgree : 0.6)) { stats.skipped = (stats.skipped || 0) + 1; return; }
+  const edit = agree >= (opts.minAgreeEdit != null ? opts.minAgreeEdit : 0.75);
   // vote per (chord, stem direction)
   const groups = new Map();
   heads.forEach((h, i) => {
@@ -310,8 +316,8 @@ function refinePage(entry, dets, opts, stats) {
   annotateAccidentals(heads, hm, dets, fr.ss, minConf);
   // rests, clefs and signatures stay on the page for other readers
   if (opts.keepDets !== false) fr.mlDets = (dets || []).filter(d => /^(rest_|mRest|multiRest|clef_|keySig_|meterSig_)/.test(d.cls) && d.conf >= minConf);
-  if (entry.asm && opts.remove !== false) removeFalseHeads(entry, dets, hm, opts, stats);
-  if (entry.asm && opts.add !== false) addMissedHeads(entry, notes, hm, opts, stats);
+  if (entry.asm && edit && opts.remove !== false) removeFalseHeads(entry, dets, hm, opts, stats);
+  if (entry.asm && edit && opts.add !== false) addMissedHeads(entry, notes, hm, opts, stats, heads);
 }
 
 // The accidental the detector prints left of each head it also saw, as
@@ -368,9 +374,10 @@ function removeFalseHeads(entry, dets, hm, opts, stats) {
 // at their x (taking its stem and value) or as a new chord whose stem is read
 // from the page.  Grace notes, heads in the clef / key area and heads outside
 // every measure are left out.
-function addMissedHeads(entry, notes, hm, opts, stats) {
+function addMissedHeads(entry, notes, hm, opts, stats, heads0) {
   const fr = entry.fr, asm = entry.asm;
   const used = new Set(hm.values());
+  const matched = new Set([...hm.keys()].map(i => heads0[i]));
   const minC = opts.addConf != null ? opts.addConf : 0.9;
   const L = fr.L || fr.R;
   for (let j = 0; j < notes.length; j++) {
@@ -394,7 +401,9 @@ function addMissedHeads(entry, notes, hm, opts, stats) {
       break;
     }
     if (!st) continue;
-    if (fr.heads.some(h => Math.abs(h.x - n.x) < 0.6 * sp && Math.abs(h.y - y) < 0.45 * sp)) continue;
+    // one of ours there already, or one of ours unmatched close by (the same
+    // head, read at another height by one of the two)
+    if (fr.heads.some(h => Math.abs(h.x - n.x) < 0.6 * sp && (Math.abs(h.y - y) < 0.45 * sp || (!matched.has(h) && Math.abs(h.y - y) < 1.2 * sp)))) continue;
     let sy = null, s = null;
     for (const a of asm.systems) for (const b of a.staves) if (b.si === st.index) { sy = a; s = b; }
     if (!s || n.x <= s.hdr.end + 0.3 * sp || !sy.measures.some(([a, b]) => n.x > a && n.x < b)) continue;

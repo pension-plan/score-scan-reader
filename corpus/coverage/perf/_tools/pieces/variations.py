@@ -40,6 +40,13 @@ PROGS = [[0, 5, 1, 4], [0, 3, 4, 0], [5, 3, 0, 4], [0, ('V/', 4), 4, 0], [0, 2, 
 
 # --------------------------------------------------------------------------- harmony helpers
 
+CTX = {'v': 1}
+
+
+def second_pass():
+    return CTX['v'] > len(TEXTURES)
+
+
 def spell(step, pc):
     alter = (pc - STEP_PC[step] + 6) % 12 - 6
     return (step, alter)
@@ -157,6 +164,8 @@ def t_barcarolle(k, ch, nx, pos, ph, rng):
     m = stack(ch[:3], 67, 3)
     hp = ['\\<', '', '\\>', ''][pos]
     end = '\\!' if pos in (1, 3) else ''
+    if pos == 2:      # duplet: two eighths in the time of three
+        return f"\\tup2/3 {L(m[1])}8{hp}( {L(m[2])}8) \\tupend {L(m[0])}4.", None, lh
     return f"{L(m[1])}4.{hp}( {L(m[2])}4 {L(m[0])}8{end})", None, lh
 
 
@@ -172,9 +181,11 @@ def t_triplets(k, ch, nx, pos, ph, rng):
 
 
 def t_octaves(k, ch, nx, pos, ph, rng):
-    m = stack(ch[:3], 79 if (pos <= 1 and ph % 2 == 0) else 67, 3)
+    hi = (pos <= 1 and ph % 2 == 0)
+    up2 = second_pass()
+    m = stack(ch[:3], (86 if up2 else 79) if hi else 67, 3)
     o = lambda p: f"<{L(p)} {L((p[0], p[1], p[2] + 1))}>"
-    ott_on = '\\ottava=1 ' if pos == 0 and ph % 2 == 0 else ''
+    ott_on = (f'\\ottava={2 if up2 else 1} ') if pos == 0 and ph % 2 == 0 else ''
     ott_off = ' \\ottava=0' if pos == 1 and ph % 2 == 0 else ''
     rh = f"{ott_on}{o(m[0])}4-> {o(m[1])}4 {o(m[2])}4-^ {o(m[1])}4{ott_off}"
     b = place(ch[0], 28 if (pos <= 1 and ph % 2 == 1) else 36)
@@ -189,6 +200,8 @@ def t_duet(k, ch, nx, pos, ph, rng):
     inner = stack(ch[:3], 62, 4)
     v2 = ' '.join(L(p) + '8' for p in inner + inner[::-1])
     v1 = f"{L(m[1])}2( {L(m[0])}4 {L(m[2])}4)" if pos != 3 else f"{L(m[0])}1"
+    if pos == 3 and ph % 2 == 1:
+        return v1, v2, "r1"
     return v1, v2, f"{L(place(ch[0], 38))}4 {L(place(ch[2], 45))}4 {L(place(ch[1], 41))}4 {L(place(ch[2], 45))}4"
 
 
@@ -210,7 +223,12 @@ def t_etude(k, ch, nx, pos, ph, rng):
         p = place(sc[(start + j) % 7], lo)
         run_.append(p)
         lo = midi(p) + 1
-    rh = ' '.join(L(p) + '32' for p in run_) + f" {L(run_[-1])}4-. {L(place(ch[2], 69))}4-. {L(place(ch[0], 72))}4"
+    head = 'r32 ' + ' '.join(L(p) + '32' for p in run_[1:])
+    if pos == 3:
+        a, b_, c_ = place(ch[0], 72), place(ch[1], 72), place(ch[2], 72)
+        rh = f"{head} r64 {L(a)}64 {L(b_)}32 {L(c_)}16 {L(a)}8 {L(place(ch[2], 69))}4-. {L(place(ch[0], 72))}4"
+    else:
+        rh = head + f" {L(run_[-1])}4-. {L(place(ch[2], 69))}4-. {L(place(ch[0], 72))}4"
     lc = stack(ch[:3], 48, 3)
     return rh, None, ' '.join([f"{C(lc)}4"] * 4)
 
@@ -248,6 +266,14 @@ def t_five(k, ch, nx, pos, ph, rng):
     return (f"{L(m[0])}4 {L(m[1])}4 {L(m[2])}4 {L(m[1])}2", None, f"{L(b)}2. {C(lc)}2")
 
 
+def t_five8(k, ch, nx, pos, ph, rng):
+    up = stack(ch[:3], 69, 3)
+    rh = f"{L(up[0])}8[ {L(up[1])}] {L(up[2])}8[ {L(up[1])} {L(up[0])}]"
+    b = place(ch[0], 38)
+    lc = stack(ch[1:3], 50, 2)
+    return rh, None, f"{L(b)}4 {C(lc)}4."
+
+
 def t_seven(k, ch, nx, pos, ph, rng):
     up = stack(ch[:3], 69, 4)
     rh = (f"{L(up[0])}8[ {L(up[1])}] {L(up[2])}8[ {L(up[1])}] {L(up[0])}8[ {L(up[2])} {L(up[3])}]")
@@ -263,6 +289,8 @@ def t_tremolo(k, ch, nx, pos, ph, rng):
 
 
 def t_clefs(k, ch, nx, pos, ph, rng):
+    if second_pass():
+        return t_clefs2(k, ch, nx, pos, ph, rng)
     m = stack(ch[:3], 69, 3)
     rh = f"{L(m[0])}4 {L(m[1])}4 {L(m[2])}2"
     if pos == 1:      # LH moves up into the treble clef for this bar
@@ -273,10 +301,27 @@ def t_clefs(k, ch, nx, pos, ph, rng):
     return rh, None, f"{pre}{L(lc[0])}8 {L(lc[1])} {L(lc[2])} {L(lc[1])} {C(lc)}2"
 
 
+def t_clefs2(k, ch, nx, pos, ph, rng):
+    """right hand: treble -> soprano -> treble^8 -> treble; left hand: bass -> tenor -> alto -> bass"""
+    rclef, rlo = [('treble', 69), ('soprano', 64), ('treble^8', 81), ('treble', 69)][pos]
+    lclef, llo = [('bass', 41), ('tenor', 50), ('alto', 55), ('bass', 41)][pos]
+    m = stack(ch[:3], rlo, 3)
+    lc = stack(ch[:3], llo, 3)
+    rpre = f'\\clef={rclef} ' if pos else ''
+    lpre = f'\\clef={lclef} ' if pos else ''
+    return (f"{rpre}{L(m[0])}4 {L(m[1])}4 {L(m[2])}2", None,
+            f"{lpre}{L(lc[0])}8 {L(lc[1])} {L(lc[2])} {L(lc[1])} {C(lc)}2")
+
+
 def t_sextuplets(k, ch, nx, pos, ph, rng):
     up = stack(ch[:3], 60, 6)
-    sx = lambda a: '\\tup6/4 ' + ' '.join(L(p) + '16' for p in a) + ' \\tupend'
-    rh = f"{sx(up)} {L(up[5])}4 {sx(up[::-1])} {L(up[0])}4"
+    if ph % 2 == 1:   # septuplets
+        up7 = stack(ch[:3], 60, 7)
+        sp = lambda a: '\\tup7/4 ' + ' '.join(L(p) + '16' for p in a) + ' \\tupend'
+        rh = f"{sp(up7)} {L(up7[6])}4 {sp(up7[::-1])} {L(up7[0])}4"
+    else:
+        sx = lambda a: '\\tup6/4 ' + ' '.join(L(p) + '16' for p in a) + ' \\tupend'
+        rh = f"{sx(up)} {L(up[5])}4 {sx(up[::-1])} {L(up[0])}4"
     lc = stack(ch[:3], 45, 2)
     return rh, None, ' '.join(L(p) + '8' for p in (lc * 4))
 
@@ -313,6 +358,15 @@ def t_breath(k, ch, nx, pos, ph, rng):
     return f"{L(m[1])}2 {L(m[0])}4{br}", None, f"{L(b)}4 {C(lc)}2"
 
 
+def t_antico(k, ch, nx, pos, ph, rng):
+    a, b_ = stack(ch[:3], 67, 3), stack(ch[:3], 69, 3)
+    bass = place(ch[0], 36)
+    if pos == 3:
+        return f"{C(a)}\\breve\\fermata", None, f"{L(bass)}\\breve\\fermata"
+    lh = 'r\\breve' if pos == 1 else (f"{L(bass)}\\breve" if pos == 0 else f"{L(bass)}1 {L(place(ch[2], 43))}1")
+    return f"{C(a)}1 {C(b_)}1", None, lh
+
+
 TEXTURES = [
     ('Chorale', (4, 4), 'common', 'Maestoso', 'quarter', 66, 0, t_chorale),
     ('Alberti', (4, 4), None, 'Allegretto', 'quarter', 108, 0, t_alberti),
@@ -336,8 +390,10 @@ TEXTURES = [
     ('Graces', (2, 4), None, 'Scherzando', 'quarter', 100, 0, t_graces),
     ('Arpeggios', (4, 4), None, 'Largo', 'quarter', 50, 0, t_arpeggios),
     ('Breath', (3, 4), None, 'Semplice', 'quarter', 80, 0, t_breath),
+    ('Antico', (4, 2), None, 'Stile antico', 'half', 72, 0, t_antico),
 ]
 DYNS = ['p', 'mf', 'f', 'mp', 'pp', 'ff']
+DS_PAGE = 3                 # variation with Segno / To Coda / D.S. al Coda / Coda
 PAGE_SYSTEMS = 5            # systems per page (page 1: one less, for the title)
 BARS_PER_SYSTEM = 4
 
@@ -354,6 +410,11 @@ def build_voices(n_pages, seed=4242):
     for v in range(1, n_pages + 1):
         ti, ki = variation_plan(v)
         name, time, sym, ttext, unit, bpm, dots, fn = TEXTURES[ti]
+        CTX['v'] = v
+        if v > len(TEXTURES) and name == 'March':
+            sym = None                                   # numeric 2/2 instead of alla breve
+        if v > len(TEXTURES) and name == 'Five':
+            time, fn, unit, bpm = (5, 8), t_five8, 'eighth', 240
         fifths, mode, ts, ta = KEYS[ki]
         key = Key(fifths, mode, ts, ta)
         n_sys = PAGE_SYSTEMS - (1 if v == 1 else 0)
@@ -373,7 +434,7 @@ def build_voices(n_pages, seed=4242):
             rh1.append(r1)
             rh2.append(r2)
             lh.append(l_)
-        pages.append(dict(variation=v, texture=name, time=time, symbol=sym, key=(fifths, mode),
+        pages.append(dict(variation=v, texture=name + (' II' if v > len(TEXTURES) else ''), time=time, symbol=sym, key=(fifths, mode),
                           tempo=(ttext, unit, bpm, dots), start=start, bars=n_bars, systems=n_sys))
     return rh1, rh2, lh, pages
 
@@ -420,6 +481,14 @@ def make(n_pages, paper='A4'):
             sc.measures[i + s * BARS_PER_SYSTEM].brk = 'system'
         ttext, unit, bpm, dots = pg['tempo']
         add_mark(sc, i, 'rehearsal', text=str(pg['variation']))
+        if pg['variation'] == DS_PAGE and pg['bars'] >= 20:
+            add_mark(sc, i, 'segno')
+            sc.measures[i + 11].end_marks.append(dict(kind='words', text='To Coda', style='italic',
+                                                       sound={'tocoda': 'coda'}))
+            sc.measures[i + 15].end_marks.append(dict(kind='words', text='D.S. al Coda', style='italic',
+                                                       sound={'dalsegno': 'segno'}))
+            sc.measures[i + 15].right_bar = 'double'
+            add_mark(sc, i + 16, 'coda')
         add_mark(sc, i, 'tempo', text=f'Var. {pg["variation"]}  {ttext}', unit=unit, bpm=bpm, dots=dots)
         prev = pg
     sc.measures[-1].right_bar = 'final'

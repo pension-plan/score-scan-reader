@@ -1422,7 +1422,8 @@
         <stem>up</stem>
         <staff>2</staff>
       </note>
-      <barline location="right"><bar-style>light-light</bar-style></barline>
+      <direction placement="above"><direction-type><words font-weight="bold">Fine</words></direction-type><staff>1</staff><sound fine="yes"/></direction>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
     <measure number="14">
       <print new-system="yes"/>
@@ -2030,6 +2031,7 @@
         <type>whole</type>
         <staff>2</staff>
       </note>
+      <direction placement="above"><direction-type><words font-style="italic">D.C. al Fine</words></direction-type><staff>1</staff><sound dacapo="yes"/></direction>
       <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>

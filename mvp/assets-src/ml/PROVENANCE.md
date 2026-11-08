@@ -1,3 +1,16 @@
+# Provenance of the ML detector assets
+
+## Shipped by the app (mvp/dist/assets, copied by `node assets-src/ml/sync.js`, checked against SHA256SUMS)
+
+`copista2m-dense.int8w.onnx`, `copista2m-rel.int8w.onnx`, `copista2m-classes.json` (copista-2m, KobiMusic,
+Apache-2.0, modified: ONNX export + int8 weight storage), `ort-wasm-simd-threaded.wasm` (onnxruntime-web 1.30.0,
+MIT, unmodified, from the npm tarball), and the licence / notice files `LICENSE.copista-Apache-2.0.txt`,
+`NOTICE.copista-2m`, `NOTICE.copisteria`, `LICENSE.onnxruntime-web-MIT.txt`, `NOTICE.ml.txt`.
+Code: `mvp/src/ml-worker.js` (detector pipeline + browser worker), `mvp/src/ml.js` (node / browser detector,
+refinement of the classical reading). Tests: `assets-src/ml/node-test.js`, `assets-src/ml/browser-test.js`.
+
+The sections below are the spike's record (paths relative to spike/ml/), kept as written.
+
 # Provenance of spike/ml/assets
 
 Everything here is derived from **kobimusic copista** weights, licensed **Apache-2.0** (weights and the
