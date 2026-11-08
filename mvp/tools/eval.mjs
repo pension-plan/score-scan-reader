@@ -4,11 +4,13 @@
 //   node tools/eval.mjs --out work/eval-r1-<key>.json [--only id,...] [--no-ocr] [--jobs N]
 //                       [--src dir] [--dpi 200|native|app] [--timeout sec]
 //                       [--set synthetic|real|challenge|coverage] [--ml] [--ocr-lang eng|app|<langs>]
+//                       [--ocr-workers N]
 //
 // --ml wraps each conversion with the optional copista-2m detector (src/ml.js wrapConverter,
 // onnxruntime-node; ORT_NODE overrides its path), as the app does when the detector is on.
 // --ocr-lang picks the Tesseract languages: eng (default), app (lyrics.js OCR_CONFIG, what the
-// page ships: eng+deu) or an explicit list such as eng+deu.
+// page ships: eng+deu) or an explicit list such as eng+deu. --ocr-workers (default 2, as the page)
+// is the number of Tesseract workers taking the reads a page starts together.
 //
 // Items: every corpus/{synthetic,real}/<id>/ holding scan.pdf + truth.musicxml (the default
 // benchmark). --set challenge instead scores corpus/challenge/<category>/<id>/: every scan*.pdf
@@ -60,7 +62,7 @@ const require = createRequire(import.meta.url);
 
 // ---------------------------------------------------------------- args
 function parseArgs(argv) {
-  const a = { out: null, only: null, ocr: true, jobs: 0, src: path.join(MVP, 'src'), dpi: 200, timeout: 0, set: null, child: null, quiet: false, ml: false, ocrLang: 'eng' };
+  const a = { out: null, only: null, ocr: true, jobs: 0, src: path.join(MVP, 'src'), dpi: 200, timeout: 0, set: null, child: null, quiet: false, ml: false, ocrLang: 'eng', ocrWorkers: 2 };
   for (let i = 0; i < argv.length; i++) {
     const k = argv[i];
     const v = () => argv[++i];
@@ -75,6 +77,7 @@ function parseArgs(argv) {
     else if (k === '--quiet') a.quiet = true;
     else if (k === '--ml') a.ml = true;
     else if (k === '--ocr-lang') a.ocrLang = v();
+    else if (k === '--ocr-workers') a.ocrWorkers = Math.max(1, +v() || 1);
     else if (k === '--child') a.child = v();
     else if (k === '-h' || k === '--help') { const L = fs.readFileSync(__filename, 'utf8').split('\n'); let e = 1; while (e < L.length && L[e].startsWith('//')) e++; console.log(L.slice(1, e).join('\n')); process.exit(0); }
     else throw new Error('unknown arg ' + k);
@@ -113,23 +116,34 @@ async function childMain(specPath) {
     }
     return c.finish();
   };
-  let ocr = null, worker = null, extraWorker = null;
+  let ocr = null, worker = null, extraWorker = null, more = [];
   if (spec.ocr) {
     const { createWorker } = require(path.join(ROOT, 'spike/ocr/node_modules/tesseract.js'));
-    const { PNG } = require('pngjs');
     const lang = spec.ocrLang || 'eng';
     const cfg = lang === 'app' ? req(path.join(spec.src, 'lyrics.js')).OCR_CONFIG : null;
     worker = await createWorker(cfg ? cfg.langs : lang, cfg && cfg.oem != null ? cfg.oem : 1, { langPath: path.join(MVP, 'dist/assets'), gzip: true, cacheMethod: 'none' });
     await worker.setParameters(cfg && cfg.params ? cfg.params : { tessedit_pageseg_mode: '7', user_defined_dpi: '300' });
+    // the image goes to Tesseract as a binary PGM: the same pixels as an RGBA PNG (identical words,
+    // confidences and boxes), without the PNG encode and decode. The comment line keeps pixel bytes
+    // out of the first 500 bytes, where tesseract.js looks for an EXIF orientation tag.
     const read = (wk) => async (img) => {
-      const png = new PNG({ width: img.width, height: img.height });
-      for (let i = 0; i < img.data.length; i++) { png.data[i * 4] = png.data[i * 4 + 1] = png.data[i * 4 + 2] = img.data[i]; png.data[i * 4 + 3] = 255; }
-      const { data } = await wk.recognize(PNG.sync.write(png), {}, { text: true, blocks: true });
+      const pgm = Buffer.concat([Buffer.from(`P5\n#${' '.repeat(500)}\n${img.width} ${img.height}\n255\n`), Buffer.from(img.data.buffer, img.data.byteOffset, img.data.byteLength)]);
+      const { data } = await wk.recognize(pgm, {}, { text: true, blocks: true });
       const words = [];
       for (const b of data.blocks || []) for (const p of b.paragraphs) for (const l of p.lines) for (const w of l.words) words.push({ text: w.text, conf: w.confidence, x0: w.bbox.x0, x1: w.bbox.x1 });
       return words;
     };
-    ocr = read(worker);
+    // more workers with the same languages (spec.ocrWorkers): a read waits for a free worker
+    for (let k = 1; k < (spec.ocrWorkers || 1); k++) {
+      const w = await createWorker(cfg ? cfg.langs : lang, cfg && cfg.oem != null ? cfg.oem : 1, { langPath: path.join(MVP, 'dist/assets'), gzip: true, cacheMethod: 'none' });
+      await w.setParameters(cfg && cfg.params ? cfg.params : { tessedit_pageseg_mode: '7', user_defined_dpi: '300' });
+      more.push(w);
+    }
+    const idle = [worker, ...more], queue = [];
+    const give = (w) => { const r = queue.shift(); if (r) r(w); else idle.push(w); };
+    const take = () => (idle.length ? Promise.resolve(idle.pop()) : new Promise((r) => queue.push(r)));
+    const pool = { async recognize(...a) { const w = await take(); try { return await w.recognize(...a); } finally { give(w); } } };
+    ocr = read(pool);
     // --ocr-lang app: the app's second pass (OCR_CONFIG.extraLangs), its worker made on first use
     if (cfg && cfg.extraLangs) {
       let w2 = null;
@@ -151,6 +165,7 @@ async function childMain(specPath) {
   const r = await convert(spec.pages, { ocr, onProgress });
   const ms = Date.now() - t0, p1 = performance.now();
   if (worker) await worker.terminate();
+  for (const w of more) await w.terminate();
   if (extraWorker) await extraWorker.terminate();
   const ends = pages.map((_, i) => { for (let k = i + 1; k < pages.length; k++) if (pageStart[k] != null) return pageStart[k]; return perf.assembleAt ?? p1; });
   const page_ms = pages.map((_, i) => Math.round((ends[i] - (pageStart[i] ?? (i ? ends[i - 1] : p0))) * 10) / 10);
@@ -599,7 +614,7 @@ async function main() {
       const metaOut = path.join(outDir, it.key + '.meta.json');
       const specPath = path.join(outDir, it.key + '.spec.json');
       for (const f of [xmlOut, metaOut]) fs.rmSync(f, { force: true });
-      fs.writeFileSync(specPath, JSON.stringify({ src: args.src, pages, ocr: args.ocr, ocrLang: args.ocrLang, ml: args.ml, xmlOut, metaOut }));
+      fs.writeFileSync(specPath, JSON.stringify({ src: args.src, pages, ocr: args.ocr, ocrLang: args.ocrLang, ocrWorkers: args.ocrWorkers, ml: args.ml, xmlOut, metaOut }));
       const tChild = Date.now();
       const r = await run(process.execPath, ['--max-old-space-size=8192', __filename, '--child', specPath], { timeoutMs: args.timeout * 1000, cwd: MVP, trackRss: true });
       res.child_ms = Date.now() - tChild;

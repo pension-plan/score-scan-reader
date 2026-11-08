@@ -309,9 +309,11 @@ function readRestGlyph(R, c, sp) {
   const g = glyphIn(R, { x0: c.x0, y0: c.y0, x1: c.x1, y1: c.y1, inner: (x0, y0, x1, y1) => x0 >= c.x0 && x1 <= c.x1 && y0 >= c.y0 && y1 <= c.y1 }, 1);
   if (!g) return null;
   const names = Object.keys(REST_T);
-  const sc = api.scores(g.img, sp, names.concat(REST_OTHERS));
-  const r = api.best(sc, names), o = api.best(sc, REST_OTHERS);
-  if (sc[r] < 0.62 || sc[r] - sc[o] < 0.08) return null;
+  // the other glyphs are scored only when a rest template matches well enough (most do not)
+  const sc = api.scores(g.img, sp, names), r = api.best(sc, names);
+  if (sc[r] < 0.62) return null;
+  const so = api.scores(g.img, sp, REST_OTHERS), o = api.best(so, REST_OTHERS);
+  if (sc[r] - so[o] < 0.08) return null;
   return { kind: REST_T[r][0], q: REST_T[r][1], score: sc[r] };
 }
 

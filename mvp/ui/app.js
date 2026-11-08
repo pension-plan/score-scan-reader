@@ -78,11 +78,23 @@
         try { w = await make(langs); } catch (e) { if (langs === 'eng') throw e; langs = 'eng'; w = await make(langs); }
         await w.setParameters(cfg.params);
         ocrLangs = langs;
-        return w;
+        // a second reader with the same languages, started in the background: the pipeline starts
+        // a page's lyric rows and text lines together, so two readers take them side by side
+        // (results do not depend on which reader or in what order; one that fails to start is
+        // simply not used)
+        return ocrPool(w, () => ocrMake(langs));
       })();
       ocrWorkerP.catch(() => {});
     }
     return ocrWorkerP;
+  }
+  // readers taking recognize() calls in turn: a call waits for a free reader
+  function ocrPool(first, more) {
+    const idle = [first], queue = [];
+    const give = (w) => { const r = queue.shift(); if (r) r(w); else idle.push(w); };
+    const take = () => (idle.length ? Promise.resolve(idle.pop()) : new Promise((r) => queue.push(r)));
+    more().then(give, () => {});
+    return { async recognize(...a) { const w = await take(); try { return await w.recognize(...a); } finally { give(w); } } };
   }
   function withTimeout(p, ms) {
     return Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('timed out')), ms))]);
@@ -1197,8 +1209,13 @@
       try {
         status('Loading the text reader');
         const w = await withTimeout(ocrP, 45000);
+        // the image goes to Tesseract as a binary PGM blob: the same pixels as the PNG a canvas
+        // would make (identical words and boxes), without a canvas or a PNG encode on this thread.
+        // The comment line keeps pixel bytes out of the first 500 bytes, where tesseract.js looks
+        // for an EXIF orientation tag.
         const readWith = (wk) => async (img) => {
-          const { data } = await wk.recognize(grayToCanvas(img), {}, { text: true, blocks: true });
+          const pgm = new Blob([`P5\n#${' '.repeat(500)}\n${img.width} ${img.height}\n255\n`, img.data], { type: 'image/x-portable-graymap' });
+          const { data } = await wk.recognize(pgm, {}, { text: true, blocks: true });
           const words = [];
           for (const b of data.blocks || []) for (const p of b.paragraphs) for (const l of p.lines) for (const wd of l.words)
             words.push({ text: wd.text, conf: wd.confidence, x0: wd.bbox.x0, x1: wd.bbox.x1 });

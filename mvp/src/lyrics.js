@@ -1243,11 +1243,13 @@ async function readLyrics(fr, ocr, onProgress, opts) {
   // once from the median stroke width / letter height of its text lines
   const swr = median(all.filter(l => l.sw && l.tall && !l.above).map(l => l.sw / l.tall));
   if (o.thinAt && swr > o.thinAt) for (const l of all) l.thin = 1;
-  for (const ln of all) {
-    const step = () => { done++; if (onProgress) onProgress(done, all.length); };
+  // each row's crop is cut first and all first-pass reads are started together (a pool of
+  // OCR workers reads them side by side; the results do not depend on the order of reads),
+  // then the rows are taken in order as before
+  const rowsIn = all.map((ln) => {
     // a row that is a title, credit or tempo line (o.skipBoxes: text.js
     // marks above the music) is not underlay
-    if (o.skipBoxes && o.skipBoxes.some(b => Math.min(b[3], ln.y1) - Math.max(b[1], ln.y0) > 0.5 * Math.min(b[3] - b[1], ln.y1 - ln.y0) && (ln.x0 == null || (b[0] < ln.x1 && b[2] > ln.x0)))) { step(); continue; }
+    if (o.skipBoxes && o.skipBoxes.some(b => Math.min(b[3], ln.y1) - Math.max(b[1], ln.y0) > 0.5 * Math.min(b[3] - b[1], ln.y1 - ln.y0) && (ln.x0 == null || (b[0] < ln.x1 && b[2] > ln.x0)))) return null;
     const pad = Math.round(0.3 * ln.sp);
     const row = ln.strip ? stripRow(ln) : analyseRow(fr.B, ln, pad);
     const ox = ln.strip ? ln.strip.x0 : 0;
@@ -1256,10 +1258,18 @@ async function readLyrics(fr, ocr, onProgress, opts) {
     if (dbg) o.debug.push(dbg);
     // text rows have many glyph clusters and a fair share of inked columns;
     // rows of stems, ties or fermatas have few, thin ones
-    if (o.geomCheck && (ln.strip ? row.clusters.length < 3 : (row.cov < 0.08 || row.clusters.length < 4))) { if (dbg) dbg.reject = 'geom'; step(); continue; }
-    const crop = buildCrop(ln.strip || fr.gray, row, ln, o), img = crop.img, toPage = (x) => crop.toPage(x) + ox;
-    let words = [];
-    try { words = await ocr(img); } catch (e) { words = []; }
+    if (o.geomCheck && (ln.strip ? row.clusters.length < 3 : (row.cov < 0.08 || row.clusters.length < 4))) { if (dbg) dbg.reject = 'geom'; return null; }
+    const crop = buildCrop(ln.strip || fr.gray, row, ln, o);
+    let read;
+    try { read = Promise.resolve(ocr(crop.img)).catch(() => []); } catch (e) { read = Promise.resolve([]); }
+    return { row, ox, dbg, crop, read };
+  });
+  for (let li = 0; li < all.length; li++) {
+    const ln = all[li], pre = rowsIn[li];
+    const step = () => { done++; if (onProgress) onProgress(done, all.length); };
+    if (!pre) { step(); continue; }
+    const { row, ox, dbg, crop } = pre, img = crop.img, toPage = (x) => crop.toPage(x) + ox;
+    let words = await pre.read;
     // second pass (ocr.extra: more languages, loaded on first use): a row with
     // accent marks over its letters is read again
     if (typeof ocr.extra === 'function' && o.secondPass !== false) {
