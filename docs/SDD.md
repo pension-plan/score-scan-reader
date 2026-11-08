@@ -1198,6 +1198,18 @@ severe), tempo-mark 40 to 48%; no item metric changed.
 stand by, as `<fermata type="upright">` (or `inverted` below the staff). Coverage recall 62 / 37 / 27%
 (clean / scan / severe; 0 before), no item metric changed.
 
+**Lyrics: credit rows, tall rows, elisions (L25).** Title, credit, tempo and header lines found by
+text.js are passed to `readLyrics` (`opts.skipBoxes`) and never read as underlay (a "Words: ... Melody:
+..." row above the first staff had become verse 1 and shifted every verse). A row taller than the page's
+rows is a caption only when it does not read as lower-case words (capitals with umlauts or accents make a
+lyric row taller). An elision slur (a small arc under the baseline inside a syllable's box) splits the
+syllable OCR read as one word ("ain" -> a‿in) into `<text>a</text><elision>‿</elision><syllabic>single
+</syllabic><text>in</text>`. Coverage (clean / scan / severe): lyrics-elision 0 to 63 / 50 / 63%,
+lyrics-multi-verse 85 to 91 / 90 / 75%, hyphen 82 to 87%, extender 79 to 84%; lyr02-non-ascii-four-languages
+lyrics 0.12 to 0.87; no item down. Non-ASCII letters stay at 0-5%: the eng+deu models drop most accents;
+adding fra+spa+ita+ces (6.7 MB more, 1.6x the OCR time) raises non-ASCII to 16-32% but lowers syllable
+and elision scores on the same items, so the language set is unchanged.
+
 **Overlay colours.** Text `--ov-text` #5e35b1, bar numbers `--ov-barno` #263238, dynamics and hairpins
 `--ov-dyn` #0277bd, slurs / ties / fermatas `--ov-slur` #f06292, braces and brackets `--ov-brace`
 #8d6e63, grace notes `--ov-grace` #e040fb; ledger lines are drawn with the staff (`--ov-staff`). Each is a stroke plus a 0.26 multiplied

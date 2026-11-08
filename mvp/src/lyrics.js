@@ -1184,6 +1184,9 @@ async function readLyrics(fr, ocr, onProgress, opts) {
   if (o.thinAt && swr > o.thinAt) for (const l of all) l.thin = 1;
   for (const ln of all) {
     const step = () => { done++; if (onProgress) onProgress(done, all.length); };
+    // a row that is a title, credit or tempo line (o.skipBoxes: text.js
+    // marks above the music) is not underlay
+    if (o.skipBoxes && o.skipBoxes.some(b => Math.min(b[3], ln.y1) - Math.max(b[1], ln.y0) > 0.5 * Math.min(b[3] - b[1], ln.y1 - ln.y0) && (ln.x0 == null || (b[0] < ln.x1 && b[2] > ln.x0)))) { step(); continue; }
     const pad = Math.round(0.3 * ln.sp);
     const row = ln.strip ? stripRow(ln) : analyseRow(fr.B, ln, pad);
     const ox = ln.strip ? ln.strip.x0 : 0;
@@ -1213,7 +1216,10 @@ async function readLyrics(fr, ocr, onProgress, opts) {
       const wordsL = mapped.map(w => w.text.replace(/[^\p{L}]/gu, '')).filter(t => t.length >= 2);
       const caps = wordsL.filter(t => /^\p{Lu}/u.test(t)).length;
       const txt = mapped.map(w => w.text).join(' ').trim();
-      const big = ln.tall && tallMed && ln.tall > 1.35 * tallMed;
+      // bigger type: a caption, unless the row reads as lower-case words (accents
+      // and umlauts on capitals make a lyric row taller, not a caption)
+      const lowerWords = wordsL.filter(t => /^\p{Ll}/u.test(t)).length;
+      const big = ln.tall && tallMed && ln.tall > 1.35 * tallMed && !(wordsL.length >= 4 && lowerWords >= 0.6 * wordsL.length);
       if ((wordsL.length >= 2 && caps >= 0.8 * wordsL.length && wordsL.length <= 8) || /^[(\[].*[)\]]$/.test(txt) || big) { if (dbg) dbg.reject = 'title'; step(); continue; }
     }
     // unsure short tokens without a vowel ("t", "T", "CL", "gs") are stems,

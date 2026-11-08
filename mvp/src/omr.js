@@ -104,7 +104,10 @@ function createConverter(opts = {}) {
     if (!opts.ocr) return;
     progress(`${label}: reading lyrics`, { stage: 'lyrics', page: i, pages: n });
     try {
-      const lyr = await readLyrics(entry.fr, opts.ocr, (d, m) => progress(`${label}: reading lyrics (${d}/${m} lines)`, { stage: 'lyrics', page: i, pages: n }));
+      // titles, credits and tempo lines above the music (text.js) are not lyrics
+      let skipBoxes = null;
+      try { const mk = pageMarks(entry.fr, entry.asm); skipBoxes = mk && mk.text.filter(t => ['title', 'subtitle', 'composer', 'lyricist', 'arranger', 'credit', 'header', 'footer', 'copyright'].includes(t.role) || t.metro).map(t => t.box); } catch (e) { skipBoxes = null; }
+      const lyr = await readLyrics(entry.fr, opts.ocr, (d, m) => progress(`${label}: reading lyrics (${d}/${m} lines)`, { stage: 'lyrics', page: i, pages: n }), skipBoxes && skipBoxes.length ? { skipBoxes } : undefined);
       for (const k in lyr) lyricsBySystem[entry.index + ':' + k] = lyr[k];
     } catch (e) { warnings.push(`Lyrics OCR failed: ${e.message}`); }
     // titles, credits, instrument names, tempo and expression text

@@ -239,8 +239,8 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
     const r = sel.map(sy => (sy.staves[k] ? sy.staves[k].st.space / Math.max(...sy.staves.map(s => s.st.space)) : 1)).sort((a, b) => a - b);
     return r.length > 0 && r[r.length >> 1] <= 0.85;
   });
-  // keyboard links between adjacent staves
-  const link = [];
+  // keyboard links between adjacent staves (evid: the evidence per pair, for debugging)
+  const link = [], evid = [];
   for (let k = 0; k + 1 < nSt; k++) {
     const c = pairConnectivity(sel, k);
     const underlay = lyr[k] >= 0.3;
@@ -278,6 +278,7 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
       const ev = braceEvidence(sel, k);
       if (ev.lines >= 2 && !ev.braces) { kb = false; notes.push(`Staves ${k + 1}+${k + 2}: joined by a system line but no brace on any system: read as two parts, not a keyboard grand staff.`); }
     }
+    evid.push({ pair: k, bars: c.n, joined: c.frac == null ? null : +c.frac.toFixed(2), lyr: [+lyr[k].toFixed(2), +lyr[k + 1].toFixed(2)], accomp, small: [small[k], small[k + 1]], brace: braceEvidence(sel, k), kb });
     link.push(kb);
   }
   // organ: a pedal staff (bass clef, no text, no name of its own) under a
@@ -355,7 +356,7 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
   parts.forEach(p => { if (p.nameRead) read.push(p.name); });
   if (read.length) notes.push(`Part names read from the page: ${read.join(', ')}.`);
   parts.forEach((p, i) => { p.id = 'P' + (i + 1); p.color = COLORS[i % COLORS.length]; });
-  return { parts, nSt, notes, clefs, stats, link };
+  return { parts, nSt, notes, clefs, stats, link, evid };
 }
 
 // Key signature: every staff carries the same key. A staff whose accidentals
@@ -963,7 +964,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     if (best.fit < L.minFit || !wordy(v.syllables)) { lyrNotes.add(`A text line under staff ${v.band + 1} does not follow the notes; not used as lyrics.`); continue; }
     const take = opts.copyLyrics || bandVoice[v.band] === 'all' ? cands.filter(c => c.fit >= L.minFit) : [best];
     if (opts.debug) opts.debug.push({ sys: L.sy.page + ':' + L.sy.index, band: v.band, n: v.number, nsyl: v.syllables.length, fits: cands.map(c => [c.p.name, +c.fit.toFixed(2), c.evs.length, +c.soft.toFixed(2)]), take: take.map(c => c.p.name) });
-    for (const c of take) alignSyllables(v, c.evs, sp);
+    for (const c of take) alignSyllables(v, c.evs, sp, L.sy && L.sy.comps);
     v.used = take.map(c => c.p.name).join(', ');
   }
   lyrNotes.forEach(n => warnings.push(n));
@@ -1197,7 +1198,26 @@ function wordy(syl) {
 // over the following notes of its voice gets an extender (<extend/> start on
 // its note, stop on the last note of the melisma); hyphenated syllables do not
 // (their hyphen spans the melisma).
-function alignSyllables(verse, evs, sp) {
+// An elision slur under a syllable ("a‿in": two syllables sung on one note):
+// a small thin arc in the lower part of the text row, inside the syllable's
+// box. OCR reads such a syllable as one word ("ain"); it is cut at the arc.
+// [left, right] or null
+function elisionOf(s, verse, comps, sp) {
+  if (!comps || s.x0 == null || s.x1 == null || verse.y == null || verse.y1 == null || !s.text || s.text.length < 2) return null;
+  const w = s.x1 - s.x0, rowH = verse.y1 - verse.y;
+  const arc = comps.find(c => {
+    const cw = c.x1 - c.x0 + 1, ch = c.y1 - c.y0 + 1, cx = (c.x0 + c.x1) / 2;
+    // under the baseline, wider than tall but not a flat hyphen
+    return cw >= 0.6 * sp && cw <= 3 * sp && ch <= 0.6 * sp && ch >= 0.2 * sp && cw >= 2.5 * ch && cx > s.x0 + 0.12 * w && cx < s.x1 - 0.12 * w &&
+      c.y0 >= verse.y + 0.75 * rowH && c.y1 <= verse.y1 + 1.0 * sp;
+  });
+  if (!arc) return null;
+  const t = s.text.replace(/[‿_]/g, ''), cx = (arc.x0 + arc.x1) / 2;
+  const k = Math.max(1, Math.min(t.length - 1, Math.round(t.length * (cx - s.x0) / Math.max(1, w))));
+  return [t.slice(0, k), t.slice(k)];
+}
+
+function alignSyllables(verse, evs, sp, comps) {
   const syl = verse.syllables, n = syl.length, m = evs.length;
   if (!n || !m) return;
   const SKIP_EV = 0.15, DROP_SYL = 2.2;
@@ -1229,6 +1249,8 @@ function alignSyllables(verse, evs, sp) {
     ev.lyrics ||= {};
     if (ev.lyrics[num]) continue;
     ev.lyrics[num] = { text: s.text, syllabic: s.syllabic };
+    const el = elisionOf(s, verse, comps, sp);
+    if (el) ev.lyrics[num].elision = el;
     placed.push([a, b]);
   }
   // melismas between placed syllables
@@ -1878,7 +1900,9 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
               const nums = new Set([...Object.keys(e.lyrics || {}), ...Object.keys(e.lyrExt || {})]);
               for (const n of [...nums].sort((a, b) => a - b)) {
                 const l = e.lyrics && e.lyrics[n];
-                if (l) lyr += `<lyric number="${n}"><syllabic>${l.syllabic}</syllabic><text>${esc(l.text)}</text>${l.extend ? '<extend type="start"/>' : ''}</lyric>`;
+                // an elision: the two syllables joined by ‿ on one note
+                const body = l && l.elision ? `<syllabic>${l.syllabic}</syllabic><text>${esc(l.elision[0])}</text><elision>‿</elision><syllabic>single</syllabic><text>${esc(l.elision[1])}</text>` : l ? `<syllabic>${l.syllabic}</syllabic><text>${esc(l.text)}</text>` : '';
+                if (l) lyr += `<lyric number="${n}">${body}${l.extend ? '<extend type="start"/>' : ''}</lyric>`;
                 else lyr += `<lyric number="${n}"><extend type="stop"/></lyric>`;
               }
             }
