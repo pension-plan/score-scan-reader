@@ -148,7 +148,8 @@ async function childMain(specPath) {
     if (cfg && cfg.extraLangs) {
       let w2 = null;
       ocr.extra = async (img) => {
-        if (!w2) { w2 = await createWorker(cfg.extraLangs, cfg.oem != null ? cfg.oem : 1, { langPath: path.join(MVP, 'dist/assets'), gzip: true, cacheMethod: 'none' }); await w2.setParameters(cfg.params); extraWorker = w2; }
+        // (no user-words file: the Italian model's config asks for one that is not shipped)
+        if (!w2) { w2 = await createWorker(cfg.extraLangs, cfg.oem != null ? cfg.oem : 1, { langPath: path.join(MVP, 'dist/assets'), gzip: true, cacheMethod: 'none' }, { user_words_suffix: '' }); await w2.setParameters(cfg.params); extraWorker = w2; }
         return read(w2)(img);
       };
     }

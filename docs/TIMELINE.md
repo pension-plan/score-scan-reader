@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 02:05 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 02:10 AEDT.
 
 ## Events
 
@@ -141,6 +141,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 02:02 | voices round (a25dd3b, e89e2eb, f64bd71): brace check on by default (L18 resolved), piano/spread fixes (L6), instrument names (L9), L7 rule kept by measurement, L4b small, L5b becomes an opt-in toggle. Challenge 0.8313 to 0.8384 incl. f64bd71; benchmark 0.951. Next: anthem/trio staff detection; trio labels to textsym. |
 | 02:03 | perf 6ee5e2e (in 0.28.1): OCR ~30% cheaper, byte-identical; 12-page book 97 to 64 s in the browser (L29 resolved). perf next: first-load size and time to first result. |
 | 02:05 | structure 69e30f1 (in 0.28.1): voltas over chord symbols and from a system's first bar; volta-2 7/10 to 10/10 clean/scan, severe 4 to 6/10; gate clean. Next: bar-contents meter check, bar numbering drift across pages, tenuto. D.S. OCR to textsym, severe multi-bar rests to opencv. |
+| 02:10 | textsym 15ec03e (release merged): pedal bracket lines, circled rehearsal numbers (92/88/66%), bar numbers read 298 to 308 of 332 on challenge scans, false elisions fixed; two new coverage items (mk10, mk11). Next: synthetic alphabet/chord items for shape templates, D.S., trio labels, concurrent text reads, merged lyric words. |
 
 ## Accuracy by round
 

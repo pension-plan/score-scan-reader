@@ -70,7 +70,9 @@
           corePath: coreURL + '#core.js',
           langPath: base.replace(/\/$/, ''),
           gzip: true, workerBlobURL: false, cacheMethod: 'none',
-        });
+          // the Italian model's config asks for an "ita.special-words" user-words file that is
+          // not shipped (and not needed): no user words, so no failed load in the console
+        }, { user_words_suffix: '' });
         // the pipeline's language set (eng+deu: umlauts and German words), or
         // English alone if a language file is missing
         ocrMake = async (l) => { const x = await make(l); await x.setParameters(cfg.params); return x; };
