@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.42.2](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.42.1...score-scan-reader-v0.42.2) (2026-11-08)
+
+
+### Bug Fixes
+
+* **assemble:** accidentals touching their notehead ([740f203](https://github.com/pension-plan/score-scan-reader/commit/740f203b3998872b4fc410906a63f346bf66f569))
+* **score,assemble:** tied notes keep their alteration over the barline; no sharps cut from a beamed chord ([adb78b4](https://github.com/pension-plan/score-scan-reader/commit/adb78b49974d50731f2d36a8cd1952f6c9b913ff))
+* **text:** no hairpin inside a staff's lines ([cd59d4d](https://github.com/pension-plan/score-scan-reader/commit/cd59d4d2ecd4496682c48f6223dc772d58d65e6d))
+
 ## [0.42.1](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.42.0...score-scan-reader-v0.42.1) (2026-11-08)
 
 
