@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.7.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.6.0...score-scan-reader-v0.7.0) (2026-11-08)
+
+
+### Features
+
+* **parts:** two voices inside piano parts, small instrument staves as separate parts, key changes across systems (round 3) ([7c6721c](https://github.com/pension-plan/score-scan-reader/commit/7c6721c3a41f103cb417c6c2709060ce9c7f2337))
+* **rests:** wide H-bar multi-rests with bar counts, rests outside the staff, rest blocks replace false noteheads ([2879ed9](https://github.com/pension-plan/score-scan-reader/commit/2879ed954510cfffc8feb267de3d56d739ca7058))
+
+
+### Bug Fixes
+
+* **score:** remove Node-only debug flags; keyboard two-voice split is the default (round 3) ([ae60855](https://github.com/pension-plan/score-scan-reader/commit/ae608555ca98957b697412ce52ac83f744178c91))
+
 ## [0.6.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.5.1...score-scan-reader-v0.6.0) (2026-11-08)
 
 
