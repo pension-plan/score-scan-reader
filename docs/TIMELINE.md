@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 18:02 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 18:05 AEDT.
 
 ## Events
 
@@ -71,6 +71,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 17:59 | Shared machine was at 99% CPU; the evaluation tool now caps parallel jobs at 16 (was 190) and waits while the host is over 90% busy. All agents told to keep heavy work low. |
 | 17:59 | Round 3 UI owner finished: 41 of 41 UI checks (v0.5.0 page: 35); St. Anselm added as a second sample beside Maple Leaf Rag; English + German lyric OCR shipped; each page notes whether it was rotated, smoothed or split as a 2-up spread; spread pages now colour 98.6% of noteheads by part (was 33%); benchmark 0.934 on the live tree. |
 | 18:02 | Release 0.6.0 (18:01 AEDT): rests precision fix (key-signature sharps/naturals were read as quarter rests) plus round 3 UI work. CI and Pages green. Score owner removed all Node-only debug flags; keyboard two-voice split is now the default. |
+| 18:05 | Coverage suite: all 8 families generated (structure 8 items, layouts 20, perf 21 incl. 100–600 dpi, A4/Letter/A3 and 1–40 pages) and the harness built (--set coverage, per-symbol support matrix, per-page time and peak memory). First pass on 76 items: 20 symbol tags supported, 40 partial, 90 unsupported; 16 of 19 layouts supported. Validation and the full baseline are running. |
 
 ## Accuracy by round
 
@@ -126,8 +127,8 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | Run 5 | Challenge test set (edge cases + scan damage) | done | 7 of 7 |  |
 | Run 3 | Max-parallel main workflow (research) | stopped | 7 of 10 | Stopped at 16:30 AEDT once all 7 research items returned, as planned; its 3 design-proposal agents had just started and were stopped with it. The full rebuild was replaced by fix-forward rounds on v1. |
 | Run 6 | Fix-forward round 2 (shipped 0.925 as v0.5.0) | done | 6 of 6 |  |
-| Run 7 | Coverage suite (every symbol and layout + speed) | running | 8 of 9 |  |
-| Run 8 | Fix-forward round 3 (6 owners incl. ML) | running | 0 of 6 |  |
+| Run 7 | Fix-forward round 3 (6 owners incl. ML) | running | 0 of 6 |  |
+| Run 8 | Coverage suite (every symbol and layout + speed) | running | 9 of 10 |  |
 | Side | Agents launched directly from the session | running | 3 of 4 |  |
 
 ## Agents
@@ -174,21 +175,22 @@ Every agent started for this build, including stopped runs. Outcomes are on the 
 | Run 6 | Fix | fix:r2:lyrics | done | 16:21 | 16:41 | 20 | 109 |
 | Run 6 | Fix | fix:r2:ui | done | 16:21 | 16:45 | 24 | 87 |
 | Run 6 | Integrate | integrate:r2 | done | 17:12 | 17:34 | 22 | 93 |
-| Run 7 | Harness | harness:coverage | done | 17:34 | 17:50 | 16 | 98 |
-| Run 7 | Generate | gen:notes | done | 17:34 | 17:44 | 10 | 76 |
-| Run 7 | Generate | gen:rests | done | 17:34 | 17:45 | 11 | 84 |
-| Run 7 | Generate | gen:pitch | done | 17:34 | 17:45 | 11 | 61 |
-| Run 7 | Generate | gen:time | done | 17:34 | 17:45 | 11 | 67 |
-| Run 7 | Generate | gen:marks | done | 17:34 | 17:46 | 12 | 78 |
-| Run 7 | Generate | gen:structure | done | 17:34 | 17:53 | 19 | 95 |
-| Run 7 | Generate | gen:layouts | done | 17:34 | 17:56 | 22 | 131 |
-| Run 7 | Generate | gen:perf | run | 17:34 |  | 28 | 87 |
-| Run 8 | Fix | fix:r3:heads | run | 17:36 |  | 23 | 130 |
-| Run 8 | Fix | fix:r3:symbols | run | 17:36 |  | 20 | 118 |
-| Run 8 | Fix | fix:r3:score | run | 17:36 |  | 25 | 126 |
-| Run 8 | Fix | fix:r3:lyrics | run | 17:36 |  | 26 | 122 |
-| Run 8 | Fix | fix:r3:ui | run | 17:36 |  | 23 | 91 |
-| Run 8 | Fix | fix:r3:ml | run | 17:36 |  | 26 | 178 |
+| Run 7 | Fix | fix:r3:heads | run | 17:36 |  | 29 | 131 |
+| Run 7 | Fix | fix:r3:symbols | run | 17:36 |  | 26 | 122 |
+| Run 7 | Fix | fix:r3:score | run | 17:36 |  | 28 | 131 |
+| Run 7 | Fix | fix:r3:lyrics | run | 17:36 |  | 26 | 122 |
+| Run 7 | Fix | fix:r3:ui | run | 17:36 |  | 23 | 91 |
+| Run 7 | Fix | fix:r3:ml | run | 17:36 |  | 29 | 185 |
+| Run 8 | Harness | harness:coverage | done | 17:34 | 17:50 | 16 | 98 |
+| Run 8 | Generate | gen:notes | done | 17:34 | 17:44 | 10 | 76 |
+| Run 8 | Generate | gen:rests | done | 17:34 | 17:45 | 11 | 84 |
+| Run 8 | Generate | gen:pitch | done | 17:34 | 17:45 | 11 | 61 |
+| Run 8 | Generate | gen:time | done | 17:34 | 17:45 | 11 | 67 |
+| Run 8 | Generate | gen:marks | done | 17:34 | 17:46 | 12 | 78 |
+| Run 8 | Generate | gen:structure | done | 17:34 | 17:53 | 19 | 95 |
+| Run 8 | Generate | gen:layouts | done | 17:34 | 17:56 | 22 | 131 |
+| Run 8 | Generate | gen:perf | done | 17:34 | 18:05 | 31 | 92 |
+| Run 8 | Baseline | validate+baseline | run | 18:05 |  | 0 | 7 |
 | Side | ML demo | copista-2m demo page for GitHub Pages | done | 16:38 | 16:41 | 3 | 21 |
 | Side | Fast track | First version build (mvp/) | done | 15:19 | 15:29 | 10 | 69 |
 | Side | Hotfix | Rests fix (L3a, user-reported) | run | 17:33 |  | 27 | 178 |

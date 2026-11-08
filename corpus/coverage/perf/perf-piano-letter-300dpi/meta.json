@@ -360,7 +360,8 @@
   "paper_mm": [
    215.9,
    279.4
-  ]
+  ],
+  "note": "US Letter (215.9 x 279.4 mm): same staff size and system breaks as the A4 item; margins / vertical spacing adapted to the shorter page."
  },
  "notes": [
   "counts follow the rules in _tools/symcount.py (run it on a converter output for comparable numbers); every count except stanza-text is computed from truth.musicxml and was cross-checked against the LilyPond grob log of the engraving (ties, slurs, beams, flags, articulations, ornaments, dynamics, hairpins, pedals, fingerings, accidentals, ottavas, tuplets, ledger lines, lyrics, rehearsal / tempo marks, voltas, whole-bar rests, clef changes).",

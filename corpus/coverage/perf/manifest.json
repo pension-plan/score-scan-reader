@@ -303,7 +303,8 @@
    "paper_mm": [
     210.0,
     297.0
-   ]
+   ],
+   "note": "Same A4 engraving and the same damage recipe/seed at 100, 150, 200, 300, 400 and 600 dpi (pixel-based damage parameters are scaled with dpi/300): only the resolution changes."
   },
   "notes": [
    "counts follow the rules in _tools/symcount.py (run it on a converter output for comparable numbers); every count except stanza-text is computed from truth.musicxml and was cross-checked against the LilyPond grob log of the engraving (ties, slurs, beams, flags, articulations, ornaments, dynamics, hairpins, pedals, fingerings, accidentals, ottavas, tuplets, ledger lines, lyrics, rehearsal / tempo marks, voltas, whole-bar rests, clef changes).",
@@ -876,7 +877,8 @@
    "paper_mm": [
     210.0,
     297.0
-   ]
+   ],
+   "note": "Same A4 engraving and the same damage recipe/seed at 100, 150, 200, 300, 400 and 600 dpi (pixel-based damage parameters are scaled with dpi/300): only the resolution changes."
   },
   "notes": [
    "counts follow the rules in _tools/symcount.py (run it on a converter output for comparable numbers); every count except stanza-text is computed from truth.musicxml and was cross-checked against the LilyPond grob log of the engraving (ties, slurs, beams, flags, articulations, ornaments, dynamics, hairpins, pedals, fingerings, accidentals, ottavas, tuplets, ledger lines, lyrics, rehearsal / tempo marks, voltas, whole-bar rests, clef changes).",
@@ -1449,7 +1451,8 @@
    "paper_mm": [
     210.0,
     297.0
-   ]
+   ],
+   "note": "Same A4 engraving and the same damage recipe/seed at 100, 150, 200, 300, 400 and 600 dpi (pixel-based damage parameters are scaled with dpi/300): only the resolution changes."
   },
   "notes": [
    "counts follow the rules in _tools/symcount.py (run it on a converter output for comparable numbers); every count except stanza-text is computed from truth.musicxml and was cross-checked against the LilyPond grob log of the engraving (ties, slurs, beams, flags, articulations, ornaments, dynamics, hairpins, pedals, fingerings, accidentals, ottavas, tuplets, ledger lines, lyrics, rehearsal / tempo marks, voltas, whole-bar rests, clef changes).",
@@ -2022,7 +2025,8 @@
    "paper_mm": [
     210.0,
     297.0
-   ]
+   ],
+   "note": "Same A4 engraving and the same damage recipe/seed at 100, 150, 200, 300, 400 and 600 dpi (pixel-based damage parameters are scaled with dpi/300): only the resolution changes."
   },
   "notes": [
    "counts follow the rules in _tools/symcount.py (run it on a converter output for comparable numbers); every count except stanza-text is computed from truth.musicxml and was cross-checked against the LilyPond grob log of the engraving (ties, slurs, beams, flags, articulations, ornaments, dynamics, hairpins, pedals, fingerings, accidentals, ottavas, tuplets, ledger lines, lyrics, rehearsal / tempo marks, voltas, whole-bar rests, clef changes).",
@@ -2595,7 +2599,8 @@
    "paper_mm": [
     210.0,
     297.0
-   ]
+   ],
+   "note": "Same A4 engraving and the same damage recipe/seed at 100, 150, 200, 300, 400 and 600 dpi (pixel-based damage parameters are scaled with dpi/300): only the resolution changes."
   },
   "notes": [
    "counts follow the rules in _tools/symcount.py (run it on a converter output for comparable numbers); every count except stanza-text is computed from truth.musicxml and was cross-checked against the LilyPond grob log of the engraving (ties, slurs, beams, flags, articulations, ornaments, dynamics, hairpins, pedals, fingerings, accidentals, ottavas, tuplets, ledger lines, lyrics, rehearsal / tempo marks, voltas, whole-bar rests, clef changes).",
@@ -3168,7 +3173,8 @@
    "paper_mm": [
     210.0,
     297.0
-   ]
+   ],
+   "note": "Same A4 engraving and the same damage recipe/seed at 100, 150, 200, 300, 400 and 600 dpi (pixel-based damage parameters are scaled with dpi/300): only the resolution changes."
   },
   "notes": [
    "counts follow the rules in _tools/symcount.py (run it on a converter output for comparable numbers); every count except stanza-text is computed from truth.musicxml and was cross-checked against the LilyPond grob log of the engraving (ties, slurs, beams, flags, articulations, ornaments, dynamics, hairpins, pedals, fingerings, accidentals, ottavas, tuplets, ledger lines, lyrics, rehearsal / tempo marks, voltas, whole-bar rests, clef changes).",
@@ -3799,7 +3805,8 @@
    "paper_mm": [
     210.0,
     297.0
-   ]
+   ],
+   "note": "Same A4 engraving and the same damage recipe/seed at 100, 150, 200, 300, 400 and 600 dpi (pixel-based damage parameters are scaled with dpi/300): only the resolution changes."
   },
   "notes": [
    "counts follow the rules in _tools/symcount.py (run it on a converter output for comparable numbers); every count except stanza-text is computed from truth.musicxml and was cross-checked against the LilyPond grob log of the engraving (ties, slurs, beams, flags, articulations, ornaments, dynamics, hairpins, pedals, fingerings, accidentals, ottavas, tuplets, ledger lines, lyrics, rehearsal / tempo marks, voltas, whole-bar rests, clef changes).",
@@ -4444,7 +4451,8 @@
    "paper_mm": [
     210.0,
     297.0
-   ]
+   ],
+   "note": "Same A4 engraving and the same damage recipe/seed at 100, 150, 200, 300, 400 and 600 dpi (pixel-based damage parameters are scaled with dpi/300): only the resolution changes."
   },
   "notes": [
    "counts follow the rules in _tools/symcount.py (run it on a converter output for comparable numbers); every count except stanza-text is computed from truth.musicxml and was cross-checked against the LilyPond grob log of the engraving (ties, slurs, beams, flags, articulations, ornaments, dynamics, hairpins, pedals, fingerings, accidentals, ottavas, tuplets, ledger lines, lyrics, rehearsal / tempo marks, voltas, whole-bar rests, clef changes).",
@@ -5089,7 +5097,8 @@
    "paper_mm": [
     210.0,
     297.0
-   ]
+   ],
+   "note": "Same A4 engraving and the same damage recipe/seed at 100, 150, 200, 300, 400 and 600 dpi (pixel-based damage parameters are scaled with dpi/300): only the resolution changes."
   },
   "notes": [
    "counts follow the rules in _tools/symcount.py (run it on a converter output for comparable numbers); every count except stanza-text is computed from truth.musicxml and was cross-checked against the LilyPond grob log of the engraving (ties, slurs, beams, flags, articulations, ornaments, dynamics, hairpins, pedals, fingerings, accidentals, ottavas, tuplets, ledger lines, lyrics, rehearsal / tempo marks, voltas, whole-bar rests, clef changes).",
@@ -5734,7 +5743,8 @@
    "paper_mm": [
     210.0,
     297.0
-   ]
+   ],
+   "note": "Same A4 engraving and the same damage recipe/seed at 100, 150, 200, 300, 400 and 600 dpi (pixel-based damage parameters are scaled with dpi/300): only the resolution changes."
   },
   "notes": [
    "counts follow the rules in _tools/symcount.py (run it on a converter output for comparable numbers); every count except stanza-text is computed from truth.musicxml and was cross-checked against the LilyPond grob log of the engraving (ties, slurs, beams, flags, articulations, ornaments, dynamics, hairpins, pedals, fingerings, accidentals, ottavas, tuplets, ledger lines, lyrics, rehearsal / tempo marks, voltas, whole-bar rests, clef changes).",
@@ -6379,7 +6389,8 @@
    "paper_mm": [
     210.0,
     297.0
-   ]
+   ],
+   "note": "Same A4 engraving and the same damage recipe/seed at 100, 150, 200, 300, 400 and 600 dpi (pixel-based damage parameters are scaled with dpi/300): only the resolution changes."
   },
   "notes": [
    "counts follow the rules in _tools/symcount.py (run it on a converter output for comparable numbers); every count except stanza-text is computed from truth.musicxml and was cross-checked against the LilyPond grob log of the engraving (ties, slurs, beams, flags, articulations, ornaments, dynamics, hairpins, pedals, fingerings, accidentals, ottavas, tuplets, ledger lines, lyrics, rehearsal / tempo marks, voltas, whole-bar rests, clef changes).",
@@ -7024,7 +7035,8 @@
    "paper_mm": [
     210.0,
     297.0
-   ]
+   ],
+   "note": "Same A4 engraving and the same damage recipe/seed at 100, 150, 200, 300, 400 and 600 dpi (pixel-based damage parameters are scaled with dpi/300): only the resolution changes."
   },
   "notes": [
    "counts follow the rules in _tools/symcount.py (run it on a converter output for comparable numbers); every count except stanza-text is computed from truth.musicxml and was cross-checked against the LilyPond grob log of the engraving (ties, slurs, beams, flags, articulations, ornaments, dynamics, hairpins, pedals, fingerings, accidentals, ottavas, tuplets, ledger lines, lyrics, rehearsal / tempo marks, voltas, whole-bar rests, clef changes).",
@@ -7611,7 +7623,8 @@
    "paper_mm": [
     215.9,
     279.4
-   ]
+   ],
+   "note": "US Letter (215.9 x 279.4 mm): same staff size and system breaks as the A4 item; margins / vertical spacing adapted to the shorter page."
   },
   "notes": [
    "counts follow the rules in _tools/symcount.py (run it on a converter output for comparable numbers); every count except stanza-text is computed from truth.musicxml and was cross-checked against the LilyPond grob log of the engraving (ties, slurs, beams, flags, articulations, ornaments, dynamics, hairpins, pedals, fingerings, accidentals, ottavas, tuplets, ledger lines, lyrics, rehearsal / tempo marks, voltas, whole-bar rests, clef changes).",
@@ -8184,7 +8197,8 @@
    "paper_mm": [
     297.0,
     420.0
-   ]
+   ],
+   "note": "A3 (297 x 420 mm): the A4 layout enlarged by sqrt(2) (staff size and margins x1.414) - same systems, about twice the pixels of A4 at the same dpi."
   },
   "notes": [
    "counts follow the rules in _tools/symcount.py (run it on a converter output for comparable numbers); every count except stanza-text is computed from truth.musicxml and was cross-checked against the LilyPond grob log of the engraving (ties, slurs, beams, flags, articulations, ornaments, dynamics, hairpins, pedals, fingerings, accidentals, ottavas, tuplets, ledger lines, lyrics, rehearsal / tempo marks, voltas, whole-bar rests, clef changes).",
@@ -8815,7 +8829,8 @@
    "paper_mm": [
     215.9,
     279.4
-   ]
+   ],
+   "note": "US Letter (215.9 x 279.4 mm): same staff size and system breaks as the A4 item; margins / vertical spacing adapted to the shorter page."
   },
   "notes": [
    "counts follow the rules in _tools/symcount.py (run it on a converter output for comparable numbers); every count except stanza-text is computed from truth.musicxml and was cross-checked against the LilyPond grob log of the engraving (ties, slurs, beams, flags, articulations, ornaments, dynamics, hairpins, pedals, fingerings, accidentals, ottavas, tuplets, ledger lines, lyrics, rehearsal / tempo marks, voltas, whole-bar rests, clef changes).",
@@ -9460,7 +9475,8 @@
    "paper_mm": [
     297.0,
     420.0
-   ]
+   ],
+   "note": "A3 (297 x 420 mm): the A4 layout enlarged by sqrt(2) (staff size and margins x1.414) - same systems, about twice the pixels of A4 at the same dpi."
   },
   "notes": [
    "counts follow the rules in _tools/symcount.py (run it on a converter output for comparable numbers); every count except stanza-text is computed from truth.musicxml and was cross-checked against the LilyPond grob log of the engraving (ties, slurs, beams, flags, articulations, ornaments, dynamics, hairpins, pedals, fingerings, accidentals, ottavas, tuplets, ledger lines, lyrics, rehearsal / tempo marks, voltas, whole-bar rests, clef changes).",
@@ -9978,7 +9994,8 @@
    "paper_mm": [
     210.0,
     297.0
-   ]
+   ],
+   "note": "Pages 1..N of the same 40-variation piano book (page k is identical in every document except the title subtitle on page 1 and the final barline); same per-page damage (seed*1000+k) in every document, so time / memory can be compared per page."
   },
   "notes": [
    "counts follow the rules in _tools/symcount.py (run it on a converter output for comparable numbers); every count except stanza-text is computed from truth.musicxml and was cross-checked against the LilyPond grob log of the engraving (ties, slurs, beams, flags, articulations, ornaments, dynamics, hairpins, pedals, fingerings, accidentals, ottavas, tuplets, ledger lines, lyrics, rehearsal / tempo marks, voltas, whole-bar rests, clef changes).",
@@ -10911,7 +10928,8 @@
    "paper_mm": [
     210.0,
     297.0
-   ]
+   ],
+   "note": "Pages 1..N of the same 40-variation piano book (page k is identical in every document except the title subtitle on page 1 and the final barline); same per-page damage (seed*1000+k) in every document, so time / memory can be compared per page."
   },
   "notes": [
    "counts follow the rules in _tools/symcount.py (run it on a converter output for comparable numbers); every count except stanza-text is computed from truth.musicxml and was cross-checked against the LilyPond grob log of the engraving (ties, slurs, beams, flags, articulations, ornaments, dynamics, hairpins, pedals, fingerings, accidentals, ottavas, tuplets, ledger lines, lyrics, rehearsal / tempo marks, voltas, whole-bar rests, clef changes).",
@@ -12378,7 +12396,8 @@
    "paper_mm": [
     210.0,
     297.0
-   ]
+   ],
+   "note": "Pages 1..N of the same 40-variation piano book (page k is identical in every document except the title subtitle on page 1 and the final barline); same per-page damage (seed*1000+k) in every document, so time / memory can be compared per page."
   },
   "notes": [
    "counts follow the rules in _tools/symcount.py (run it on a converter output for comparable numbers); every count except stanza-text is computed from truth.musicxml and was cross-checked against the LilyPond grob log of the engraving (ties, slurs, beams, flags, articulations, ornaments, dynamics, hairpins, pedals, fingerings, accidentals, ottavas, tuplets, ledger lines, lyrics, rehearsal / tempo marks, voltas, whole-bar rests, clef changes).",
@@ -14800,7 +14819,8 @@
    "paper_mm": [
     210.0,
     297.0
-   ]
+   ],
+   "note": "Pages 1..N of the same 40-variation piano book (page k is identical in every document except the title subtitle on page 1 and the final barline); same per-page damage (seed*1000+k) in every document, so time / memory can be compared per page."
   },
   "notes": [
    "counts follow the rules in _tools/symcount.py (run it on a converter output for comparable numbers); every count except stanza-text is computed from truth.musicxml and was cross-checked against the LilyPond grob log of the engraving (ties, slurs, beams, flags, articulations, ornaments, dynamics, hairpins, pedals, fingerings, accidentals, ottavas, tuplets, ledger lines, lyrics, rehearsal / tempo marks, voltas, whole-bar rests, clef changes).",
@@ -19111,7 +19131,8 @@
    "paper_mm": [
     210.0,
     297.0
-   ]
+   ],
+   "note": "Pages 1..N of the same 40-variation piano book (page k is identical in every document except the title subtitle on page 1 and the final barline); same per-page damage (seed*1000+k) in every document, so time / memory can be compared per page."
   },
   "notes": [
    "counts follow the rules in _tools/symcount.py (run it on a converter output for comparable numbers); every count except stanza-text is computed from truth.musicxml and was cross-checked against the LilyPond grob log of the engraving (ties, slurs, beams, flags, articulations, ornaments, dynamics, hairpins, pedals, fingerings, accidentals, ottavas, tuplets, ledger lines, lyrics, rehearsal / tempo marks, voltas, whole-bar rests, clef changes).",

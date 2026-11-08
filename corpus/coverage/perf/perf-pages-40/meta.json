@@ -3574,7 +3574,8 @@
   "paper_mm": [
    210.0,
    297.0
-  ]
+  ],
+  "note": "Pages 1..N of the same 40-variation piano book (page k is identical in every document except the title subtitle on page 1 and the final barline); same per-page damage (seed*1000+k) in every document, so time / memory can be compared per page."
  },
  "notes": [
   "counts follow the rules in _tools/symcount.py (run it on a converter output for comparable numbers); every count except stanza-text is computed from truth.musicxml and was cross-checked against the LilyPond grob log of the engraving (ties, slurs, beams, flags, articulations, ornaments, dynamics, hairpins, pedals, fingerings, accidentals, ottavas, tuplets, ledger lines, lyrics, rehearsal / tempo marks, voltas, whole-bar rests, clef changes).",
