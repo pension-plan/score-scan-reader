@@ -25,18 +25,25 @@ function mode(a) {
 
 // ------------------------------------------------------------ layout evidence
 function staffStats(systems, idx) {
-  let n = 0, n2 = 0, n3 = 0, mix = 0;
+  let n = 0, n2 = 0, n3 = 0, mix = 0, bars = 0, bars2 = 0;
   for (const sy of systems) {
     const s = sy.staves[idx]; if (!s) continue;
+    // bars with notes, and bars where two voices sound at once (two heads at
+    // one x, or a head with stems both ways): a staff split into two parts
+    // should show that in most of its bars, not only in a divisi passage
+    const inBar = (sy.measures || []).map(() => [0, 0]);
     for (const c of s.chords) {
       n++;
       const dirs = new Set(c.heads.map(h => h.stemDir));
       if (c.heads.length >= 3) n3++;
       else if (c.heads.length === 2 || dirs.has(2)) n2++;
       if (dirs.has(1) && dirs.has(-1)) { n2 += 0.5; mix++; }
+      const x = c.heads[0] && c.heads[0].x, bi = (sy.measures || []).findIndex(([xa, xb]) => x >= xa && x < xb);
+      if (bi >= 0) { inBar[bi][0]++; if (c.heads.length >= 2 || dirs.has(2)) inBar[bi][1]++; }
     }
+    for (const [a, b] of inBar) if (a) { bars++; if (b) bars2++; }
   }
-  return { n, f2: n ? n2 / n : 0, f3: n ? n3 / n : 0, mix: n ? mix / n : 0 };
+  return { n, f2: n ? n2 / n : 0, f3: n ? n3 / n : 0, mix: n ? mix / n : 0, bars2: bars ? bars2 / bars : 0 };
 }
 
 // Share of the barlines of staff k that run on into staff k+1. Engraving
@@ -340,11 +347,15 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
   // a piece on one staff splits only where stems up and down are seen
   // together (research-voices.md section 11): two heads on one stem there
   // are chords, double stops or blurred heads, not two singers
-  const vs = vocal.map(k => ({ staff: k, clef: clefs[k], small: small[k], split: clefs[k] !== 'perc' && !small[k] && stats[k].f2 > 0.35 && stats[k].f3 < 0.2 && (nSt > 1 || stats[k].mix >= 0.25) }));
+  // and only a staff with two voices in most of its bars (60 %): a passage
+  // in two voices (divisi), or one voice alone on a staff whose partner is
+  // split (SAB), is not two parts, whose unison bars would be written twice
+  const most = (k) => stats[k].bars2 >= 0.6;
+  const vs = vocal.map(k => ({ staff: k, clef: clefs[k], small: small[k], split: clefs[k] !== 'perc' && !small[k] && stats[k].f2 > 0.35 && stats[k].f3 < 0.2 && (nSt > 1 || stats[k].mix >= 0.25) && most(k) }));
   // a two-staff closed score decides once for both staves
   if (vs.length === 2 && nSt === 2 && !small[0] && !small[1]) {
     const both = (stats[0].f2 + stats[1].f2) / 2 > 0.3 && (stats[0].f3 + stats[1].f3) / 2 < 0.2;
-    vs.forEach(v => { v.split = both; });
+    vs.forEach(v => { v.split = both && most(v.staff); });
   }
   // printed names decide the voice count of a staff: two names (stacked
   // "Soprano / Alto", "S. A.", "Women") split it, one name centred on the

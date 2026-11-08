@@ -1351,6 +1351,16 @@ to 0.593, scan 0.646 to 0.720; nothing dropped. A bottom treble/bass pair of a t
 with full chords (three heads on a stem) and no text is an accompaniment even when its joined barlines were
 not seen (voice + piano on a faded copy).
 
+**A staff splits only where two voices run through it.** `staffStats` also counts the share of a staff's bars
+with notes in which two voices sound at once (two heads at one x, or a head with stems both ways). A staff is
+split into two parts only when that share is at least 60 % (in the two-staff closed-score rule too); printed
+names still split it. A divisi passage (Violin I "div." in four of eight bars, a Soprano divisi) or a single voice
+on the staff below a split one (SAB's Baritone) stays one part: split, its single-voice bars were written into
+both parts. Measured shares: split staves of the corpus 0.69-1.0, these staves 0.13-0.43. Coverage without OCR
+0.8552 to 0.8611 (divisi-choir-bright-new-day 0.40 to 0.80, divisi-strings-lament clean 0.65 to 0.99);
+sab-cross-staff-alto scan 0.632 to 0.765, mild 0.646 to 0.783; surplus notes on the challenge set 538 to 492
+(copies 151 to 105); coverage with OCR and the benchmark unchanged.
+
 **Staves on only some systems (L11).** A small staff (staff space at most 0.85 of its system's largest) that
 the fullest systems all carry and the other systems leave out keeps a part of its own: `score.js
 partialStaves()` gives every system without it an empty stand-in staff at its place (written as rests), and the
