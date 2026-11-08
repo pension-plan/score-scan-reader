@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.41.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.40.0...score-scan-reader-v0.41.0) (2026-11-08)
+
+
+### Features
+
+* **cue:** cue notes written as &lt;cue/&gt; in their own voice over rests; graces preferred before full notes; descant bars doubling a part are cue (L11) ([a822b10](https://github.com/pension-plan/score-scan-reader/commit/a822b100ede7069bef8e11bd514db70597ae99c8))
+* **ml:** ML assist option in the app; copista-2m corrections filtered for cue, grace and percussion heads ([b4551ca](https://github.com/pension-plan/score-scan-reader/commit/b4551ca99e46c1cd90105c880be066bea659b27e))
+
+
+### Bug Fixes
+
+* **assemble:** a chord's natural cut by cutAccidental's window is not a sharp for the head below ([719003f](https://github.com/pension-plan/score-scan-reader/commit/719003f747e5ac85ad854710a8fc7e655278941e))
+* **heads:** dotted stems bridged on thin photocopies ([9ba5604](https://github.com/pension-plan/score-scan-reader/commit/9ba56049658593f18737ec460fd35a5d40969482))
+* **structure:** bar counts over church rests and H-bars are not segnos ([39d2b03](https://github.com/pension-plan/score-scan-reader/commit/39d2b032f367aa70335aab2fbfd6737b6fc8c3c9))
+
 ## [0.40.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.39.0...score-scan-reader-v0.40.0) (2026-11-08)
 
 
