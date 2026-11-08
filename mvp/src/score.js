@@ -502,10 +502,18 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
       segs.forEach((sg, si) => { if (sg.sy === sy) for (const e of segEv[si][pi][0]) evs.push(e); });
       return evs;
     };
+    // verses stack under the same staff: once one line of a band clearly
+    // follows the notes, its sibling lines (same band, same system) are
+    // underlay too and need only a looser fit (unhyphenated multi-note words
+    // and OCR-merged words pull a line's syllables off the onsets)
+    const fitOf = (v) => parts.map((p, pi) => ({ p, pi })).filter(({ p }) => p.kind !== 'keyboard' && p.src[0].staff === v.band)
+      .map(c => { const evs = evOf(c.pi); return { ...c, evs, fit: lyricFit(v.syllables, evs, sp) }; });
+    const fits = new Map(lyr.map(v => [v, fitOf(v)]));
+    const bandOK = new Set(lyr.filter(v => wordy(v.syllables) && fits.get(v).some(c => c.fit >= 0.5)).map(v => v.band));
     for (const v of lyr) {
-      const cand = parts.map((p, pi) => ({ p, pi })).filter(({ p }) => p.kind !== 'keyboard' && p.src[0].staff === v.band);
-      if (!cand.length) continue;
-      const scored = cand.map(c => { const evs = evOf(c.pi); return { ...c, evs, fit: lyricFit(v.syllables, evs, sp) }; });
+      const scored = fits.get(v);
+      if (!scored.length) continue;
+      const minFit = bandOK.has(v.band) ? 0.3 : 0.5;
       // a line between staves serves the upper voice of the staff above it
       // (the melody) unless another voice follows it clearly better; a further
       // line under the lowest staff of a split vocal group is sung by both
@@ -513,8 +521,8 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
       const lowest = scored.length === 2 && v.band === lowestSplit && v.band !== topVocal;
       let best = scored[0];
       for (const c of scored) if (c.fit >= best.fit + 0.15) best = c;
-      if (best.fit < 0.5 || !wordy(v.syllables)) { lyrNotes.add(`A text line under staff ${v.band + 1} does not follow the notes; not used as lyrics.`); continue; }
-      const take = opts.copyLyrics || lowest ? scored.filter(c => c.fit >= 0.5) : [best];
+      if (best.fit < minFit || !wordy(v.syllables)) { lyrNotes.add(`A text line under staff ${v.band + 1} does not follow the notes; not used as lyrics.`); continue; }
+      const take = opts.copyLyrics || lowest ? scored.filter(c => c.fit >= minFit) : [best];
       for (const c of take) alignSyllables(v, c.evs, sp);
       v.used = take.map(c => c.p.name).join(', ');
     }
