@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 17:00 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 17:04 AEDT.
 
 ## Events
 
@@ -52,6 +52,8 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 16:42 | Round 2 lyrics owner finished: words spanning several notes split into syllables, the trial’s line detector ported, part-name labels and stanza text now read. Lyrics 0.82 → 0.86 on its own; live tree with other owners’ work so far: aggregate 0.914, real scans 0.893. |
 | 16:45 | Round 2 UI owner finished: L5a resolved. Reads up to 40 pages (was 8), one page at a time with progress, a page strip and a Stop button; recognition moved to a Web Worker (main-thread freeze on an 8-page PDF 23.2 s → 2.2 s, memory 310 MB → 50 MB). 35 of 35 UI checks pass. |
 | 17:00 | Round 2 voices owner finished: lyric lines assigned to the right voice for the whole piece, melisma extenders written, printed part names read and applied (they also steer splitting), stanza text kept as MusicXML lyrics credits. Live tree: aggregate 0.918, real scans 0.900; challenge set 0.878 → 0.903. L3e, L4a, L4b resolved. |
+| 17:04 | Release 0.3.0 published at 17:02 AEDT (round 2 so far), shipped first and then regression-tested against 0.2.0. Benchmark with OCR 0.897 → 0.918, real scans 0.870 → 0.900, no item worse. Challenge set 0.689 → 0.784 (93 items better), but 4 items dropped by more than 0.05: tracked as L19 for round 3. |
+| 17:04 | Policy from now on: ship first, then test for regressions. CI runs tools/regress.mjs against the last release on every push; /app/ now shows a changelog panel and which engine it runs. |
 
 ## Accuracy by round
 
@@ -63,6 +65,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | Round 1 (shipped) | 0.884 | 0.863 | 0.822 | 0.817 | 0.987 | 1.000 | 0.865 |
 | Challenge set baseline (round 1 code, OCR) | 0.747 | – | – | – | – | – | – |
 | Round 2 (interim) | 0.918 | – | – | 0.911 | – | 1.000 | 0.900 |
+| v0.3.0 released (benchmark, OCR) | 0.918 | 0.891 | 0.851 | 0.911 | 0.992 | 1.000 | 0.900 |
 
 ## Known limits
 
@@ -92,6 +95,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | L16 | Key and time-signature changes mid-piece not written; C clefs (alto/tenor) | Symbols + voices | Queued for round 3 | Challenge: later keys 31%, time changes 35%, C clefs 29%. (Overlaps L3d.) |
 | L17 | Two voices inside one part (piano right hand, divisi) merged into chords | Voices + MusicXML | Queued for round 3 | Challenge: always merged in 9 pieces. |
 | L18 | A bracketed instrument pair (violin + cello) read as a piano grand staff; organ pedal staff becomes a separate part | Voices (layout) | Queued for round 3 | Challenge: trio and clef-carousel read as Piano; organ comes out Piano + Voice. |
+| L19 | Regressions found after shipping 0.3.0: 4 challenge items dropped > 0.05 vs 0.2.0 (wind-melody thick-photocopy severe −0.067, satb-closed-lyrics-both-staves-de severe −0.061, lyr08 Scandinavian −0.056, hymn-descant mild −0.050) | Round 3 owners (heads, lyrics, score) | Queued for round 3 | docs/regressions/v0.3.0-vs-v0.2.0.md |
 
 ## Runs
 
@@ -133,8 +137,8 @@ Every agent started for this build, including stopped runs. Outcomes are on the 
 | Run 5 | Generate | gen:layout | done | 15:55 | 16:18 | 23 | 120 |
 | Run 5 | Generate | gen:degradation | done | 15:55 | 16:12 | 17 | 87 |
 | Run 5 | Validate | validate+baseline | done | 16:18 | 16:28 | 10 | 70 |
-| Run 6 | Fix | fix:r2:heads | run | 16:21 |  | 39 | 229 |
-| Run 6 | Fix | fix:r2:symbols | run | 16:21 |  | 39 | 177 |
+| Run 6 | Fix | fix:r2:heads | run | 16:21 |  | 43 | 241 |
+| Run 6 | Fix | fix:r2:symbols | run | 16:21 |  | 43 | 202 |
 | Run 6 | Fix | fix:r2:score | done | 16:21 | 17:00 | 39 | 170 |
 | Run 6 | Fix | fix:r2:lyrics | done | 16:21 | 16:41 | 20 | 109 |
 | Run 6 | Fix | fix:r2:ui | done | 16:21 | 16:45 | 24 | 87 |
