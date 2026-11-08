@@ -1442,6 +1442,20 @@ keyboard are a piano trio's Violin and Violoncello. Desk and divisi numbers read
 the roman style of printed scores ("Violin 1" becomes "Violin I"). The names also choose the playback
 instrument (`playback.js gmFor`).
 
+**Hairpins across barlines (L4 hairpin recall).** A long hairpin between the staves of a grand staff runs into
+the barlines it crosses and becomes part of one large component with them, so the leftovers never held it.
+`text.js classifyMarks` now also looks at the page's large components (wider than 4 spaces, taller than 2.4): their
+vertical runs of 1.2 spaces or more (barlines, stems) are cut away and the remaining pieces are tested. A piece with
+two straight thin strokes whose opening changes monotonically is a hairpin part (`wedgeProfile`); two single thin
+straight strokes over the same columns a little apart are a hairpin's open end (`strokeOf`; two parallel strokes
+one staff space apart are staff-line remnants and are skipped). Parts on either side of a barline whose opening
+carries on across the cut are joined into one wedge, start in the first bar and stop in the last. A run needs a
+converging part (parallel pairs only extend one), a single cut piece must have straight strokes and be three
+spaces long, and a wedge inside a staff's lines is refused. Coverage with OCR, wedges against truth (start bar
+and type): written 195 to 439, matched 151 to 298 (recall 0.26 to 0.51); within one bar 179 to 379 (precision
+0.92 to 0.86, recall 0.30 to 0.65); most exact-bar misses are bar-number drift in the 10- to 40-page documents.
+Challenge with OCR: 9 to 12 written, 2 to 4 matched. Aggregates unchanged (wedges are not scored).
+
 **Slurs, ties and grace notes in MusicXML.** A thin bowed curve is classified even where its box
 touches the heads it joins. Its two ends are matched to note heads (left end within about 1.8 staff
 spaces right of a head, right end left of one, 1.6 spaces vertically): two heads of one pitch on one staff

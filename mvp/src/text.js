@@ -13,6 +13,7 @@
 //  - braces and system brackets, ledger lines, slurs and ties.
 // Boxes are [x0, y0, x1, y1] in the page's deskewed frame.
 const { _glyphImage: glyphImage } = require('./assemble');
+const { labelComponents } = require('./cc');
 const { makeGray } = require('./image');
 
 // ---------------------------------------------------------------- dynamics glyphs
@@ -235,6 +236,38 @@ function columnRuns(img) {
 
 // hairpin: two thin lines meeting at one end (the point) and apart at the
 // other, the gap growing steadily. 'crescendo' opens to the right.
+// The opening of a hairpin piece (an image of thin strokes): the gap between
+// its top and bottom stroke at its two ends (g0, g1, px) and its direction
+// when it changes monotonically, else null
+function wedgeProfile(img, sp) {
+  const cols = columnRuns(img), w = img.width;
+  const gap = (x) => { const r = cols[x]; if (!r || !r.length) return null; return r.length >= 2 ? r[r.length - 1][0] - r[0][1] : 0; };
+  const thin = (x) => cols[x].every(([a, b]) => b - a + 1 <= 0.45 * sp);
+  const xs = [0.1, 0.3, 0.5, 0.7, 0.9].map(f => Math.round(f * (w - 1)));
+  const gs = xs.map(gap);
+  if (gs.some(g => g == null) || !xs.every(thin)) return null;
+  const inc = gs.every((g, i) => i === 0 || g >= gs[i - 1] - 1), dec = gs.every((g, i) => i === 0 || g <= gs[i - 1] + 1);
+  if (!inc && !dec) return null;
+  // two strokes somewhere (a single line is not a hairpin piece)
+  if (Math.max(gs[0], gs[4]) < 0.2 * sp || cols[xs[gs[4] > gs[0] ? 4 : 0]].length < 2) return null;
+  // both strokes straight (hairpins are drawn with a ruler; slurs, beams
+  // and staff-line remnants bend or step)
+  const line = (pick) => { const P = xs.map(x => pick(cols[x])); const a = P[0], b = P[4]; return P.every((y, i) => Math.abs(y - (a + (b - a) * (xs[i] - xs[0]) / Math.max(1, xs[4] - xs[0]))) <= 0.15 * sp + 1); };
+  const straight = line(r => (r[0][0] + r[0][1]) / 2) && line(r => (r[r.length - 1][0] + r[r.length - 1][1]) / 2);
+  return { g0: gs[0], g1: gs[4], straight, dir: Math.abs(gs[4] - gs[0]) < 0.12 * sp ? null : gs[4] > gs[0] ? 'crescendo' : 'diminuendo' };
+}
+
+// A single thin straight stroke (one ink run per column): its centre line
+// at its two ends {x0, x1, ya, yb}, or null
+function strokeOf(img, sp, ox, oy) {
+  const cols = columnRuns(img), w = img.width;
+  const ys = [];
+  for (let x = 0; x < w; x++) { const r = cols[x]; if (r.length !== 1 || r[0][1] - r[0][0] + 1 > 0.35 * sp) return null; ys.push((r[0][0] + r[0][1]) / 2); }
+  const ya = ys[0], yb = ys[w - 1];
+  for (let x = 0; x < w; x++) if (Math.abs(ys[x] - (ya + (yb - ya) * x / Math.max(1, w - 1))) > 0.15 * sp + 1) return null;
+  return { x0: ox, x1: ox + w - 1, ya: oy + ya, yb: oy + yb };
+}
+
 function hairpin(R, c, sp) {
   const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1;
   if (w < 2.2 * sp || h < 0.35 * sp || h > 2.4 * sp || w < 2 * h) return null;
@@ -599,6 +632,91 @@ function classifyMarks(fr, asm, left) {
   // unread letters: the marks run A, B, C ... down the page
   // (circled marks are numbers: 1, 2, 3 ...; LilyPond's letters skip I)
   out.rehearsals.sort((a, b) => a.sys - b.sys || a.x - b.x).forEach((r, i) => { if (!r.text) { r.text = r.enclosure === 'circle' ? String(i + 1) : 'ABCDEFGHJKLMNOPQRSTUVWXYZ'[i % 25]; r.guessed = true; } });
+  // hairpins joined to barlines and stems (a long hairpin between the staves
+  // of a grand staff runs into the barlines it crosses): in a large component,
+  // vertical runs of 1.2 spaces or more are cut away and what is left is
+  // tested piece by piece; pieces of one hairpin on either side of a barline
+  // are joined (L4 hairpin recall)
+  const wedgeComps = new Set();
+  {
+    const pieces = [], strokes = [];
+    // (all of the page's components: one joined to barlines and stems is
+    // explained as those and is not among the leftovers)
+    for (const c of (asm && asm.comps) || left) {
+      const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1, n = nearest((c.x0 + c.x1) / 2, (c.y0 + c.y1) / 2), sp = n ? n.s.sp : ss;
+      // a hairpin's part on its own (the near-parallel open end on one side of
+      // a barline): kept only if it joins another part
+      if (h <= 2.4 * sp && w >= 2 * sp && w >= 3 * h) {
+        const g = glyphImage(R, c), pf = wedgeProfile(g, sp);
+        if (pf) pieces.push({ x0: c.x0, x1: c.x1, y0: c.y0, y1: c.y1, ...pf, solo: true, comp: c });
+        else { const st = strokeOf(g, sp, c.x0, c.y0); if (st) strokes.push({ ...st, comp: c }); }
+        continue;
+      }
+      if (w < 4 * sp || h <= 2.4 * sp) continue;
+      const img = glyphImage(R, c), W = img.width, H = img.height, d = new Uint8Array(img.data);
+      for (let x = 0; x < W; x++) {
+        let s0 = -1;
+        for (let y = 0; y <= H; y++) {
+          const on = y < H && d[y * W + x];
+          if (on && s0 < 0) s0 = y;
+          else if (!on && s0 >= 0) { if (y - s0 >= 1.2 * sp) for (let t = s0; t < y; t++) d[t * W + x] = 0; s0 = -1; }
+        }
+      }
+      const { labels, comps } = labelComponents({ width: W, height: H, data: d });
+      for (const q of comps) {
+        const qw = q.x1 - q.x0 + 1, qh = q.y1 - q.y0 + 1;
+        if (qw < 1.2 * sp || qh > 2.4 * sp || qw < 2 * qh) continue;
+        const sub = { width: qw, height: qh, data: new Uint8Array(qw * qh) };
+        for (let y = 0; y < qh; y++) for (let x = 0; x < qw; x++) if (labels[(q.y0 + y) * W + q.x0 + x] === q.id) sub.data[y * qw + x] = 1;
+        const pf = wedgeProfile(sub, sp);
+        if (pf) pieces.push({ x0: c.x0 + q.x0, x1: c.x0 + q.x1, y0: c.y0 + q.y0, y1: c.y0 + q.y1, ...pf });
+        else if (qw >= 2 * sp) { const st = strokeOf(sub, sp, c.x0 + q.x0, c.y0 + q.y0); if (st) strokes.push({ ...st, cut: true }); }
+      }
+    }
+    // the open end of a hairpin cut off by barlines: two thin strokes over
+    // the same columns, one above the other, a little apart
+    strokes.sort((a, b) => a.x0 - b.x0);
+    const paired = new Set();
+    for (const a of strokes) for (const b of strokes) {
+      if (a === b || paired.has(a) || paired.has(b)) continue;
+      const ov = Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0), len = Math.max(a.x1 - a.x0, b.x1 - b.x0);
+      if (ov < 0.85 * len) continue;
+      const ga = b.ya - a.ya, gb = b.yb - a.yb;
+      if (ga <= 0 || gb <= 0 || Math.max(ga, gb) > 1.6 * ss || Math.min(ga, gb) < 0.15 * ss) continue;
+      // two lines a staff space apart and parallel: remnants of staff lines
+      if (Math.abs(ga - gb) < 0.1 * ss && Math.abs((ga + gb) / 2 - ss) < 0.2 * ss) continue;
+      paired.add(a); paired.add(b);
+      pieces.push({ x0: Math.min(a.x0, b.x0), x1: Math.max(a.x1, b.x1), y0: Math.min(a.ya, a.yb), y1: Math.max(b.ya, b.yb), g0: ga, g1: gb,
+        dir: Math.abs(gb - ga) < 0.12 * ss ? null : gb > ga ? 'crescendo' : 'diminuendo', solo: !a.cut && !b.cut, comps: [a.comp, b.comp].filter(Boolean) });
+    }
+    pieces.sort((a, b) => a.x0 - b.x0);
+    const used = new Set();
+    for (let i = 0; i < pieces.length; i++) {
+      if (used.has(i)) continue;
+      let run = [pieces[i]];
+      for (let j = i + 1; j < pieces.length; j++) {
+        const a = run[run.length - 1], b = pieces[j];
+        if (used.has(j) || b.x0 - a.x1 > 2 * ss || b.x0 - a.x1 < -0.5 * ss || Math.min(a.y1, b.y1) - Math.max(a.y0, b.y0) < -0.5 * ss) continue;
+        // the gap carries on across the cut: one hairpin
+        if (Math.abs(b.g0 - a.g1) > 0.35 * ss) continue;
+        run.push(b); used.add(j);
+      }
+      const a = run[0], b = run[run.length - 1], x0 = a.x0, x1 = b.x1, y0 = Math.min(...run.map(p => p.y0)), y1 = Math.max(...run.map(p => p.y1));
+      if (run.length === 1 && a.solo) continue;
+      // one piece cut from a larger component: straight strokes, three spaces long
+      if (run.length === 1 && (!a.straight || a.x1 - a.x0 + 1 < 3 * ss)) continue;
+      // a hairpin has its point (or a converging part) somewhere: runs made
+      // only of parallel stroke pairs are staff-line remnants
+      if (!run.some(p => p.dir && !p.comps)) continue;
+      if (x1 - x0 + 1 < 2.2 * ss || Math.abs(b.g1 - a.g0) < 0.25 * ss) continue;
+      const type = b.g1 > a.g0 ? 'crescendo' : 'diminuendo';
+      if (run.some(p => p.dir && p.dir !== type)) continue;
+      const m = nearest((x0 + x1) / 2, (y0 + y1) / 2, 1.6);
+      if (!m || (y0 >= m.s.top((x0 + x1) / 2) - 0.3 * ss && y1 <= m.s.bot((x0 + x1) / 2) + 0.3 * ss)) continue;
+      out.wedges.push({ box: [x0, y0, x1, y1], type, sys: m.sys, k: m.k, si: m.s.si, joined: run.length });
+      run.forEach(p => { if (p.comp) wedgeComps.add(p.comp); (p.comps || []).forEach(c => wedgeComps.add(c)); });
+    }
+  }
   for (const c of left) {
     if (inBox.has(c)) continue;
     const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1, cx = (c.x0 + c.x1) / 2, cy = (c.y0 + c.y1) / 2;
@@ -675,6 +793,7 @@ function classifyMarks(fr, asm, left) {
     // a hairpin stands off the staff: one whose box lies between a staff's
     // top and bottom lines is staff-line remnants and accidentals, not a wedge
     const inStaff = n && c.y0 >= n.s.top(cx) - 0.3 * sp && c.y1 <= n.s.bot(cx) + 0.3 * sp;
+    if (wedgeComps.has(c)) continue;
     const hp = !inStaff && hairpin(R, c, sp);
     // dynamics and hairpins stand below their staff unless clearly nearer the one below
     if (hp) { const m = nearest(cx, cy, 1.6); out.wedges.push({ box: [c.x0, c.y0, c.x1, c.y1], type: hp, sys: m.sys, k: m.k, si: m.s.si }); continue; }

@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 09:45 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 09:58 AEDT.
 
 ## Events
 
@@ -193,6 +193,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 09:35 | structure adb78b4: ties over barlines keep their tied alteration; cutAccidental refuses notehead squares (false sharps challenge 240 to 231, variations-12 10 to 1; clara recovered). Remaining ~45 not carry logic; St Anselm m20 truth to be checked against the scan. |
 | 09:36 | structure 740f203: accidentals touching their heads cut apart and read (St Anselm truth verified correct by eye; real-scan 0.818 to 0.822; accidentals toward truth on all sets). rh05 'grace sharp' is a generator defect (two clefs, key over time digits): fix the test data, not the app. |
 | 09:45 | Estate Status updated (SSR-4: CC BY-SA 4.0 word lists). textsym 1fc03e2: lyric spelling correction (benchmark lyrics 0.9338 level, coverage 0.9768 to 0.9770; haupt verse 1 fixed). structure 107049a: rh05 test page regenerated (queue done). Release 0.43.0 waits for green CI on 1fc03e2. |
+| 09:58 | perf 6c466f1 (in 0.43.0): ML detector reads alongside each page; browser St Anselm ML cost 1.3 s to 0.1 s, Maple 4.4 s to 3.3 s; real download 5.6 MB compressed (not 16 MB); output byte-identical with ML on and off. SSR-3 text updated. perf's queue done. |
 
 ## Accuracy by round
 
