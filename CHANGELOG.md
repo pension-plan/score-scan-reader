@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.37.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.36.2...score-scan-reader-v0.37.0) (2026-11-08)
+
+
+### Features
+
+* **clefs:** C clefs inside a staff, soprano/mezzo C clefs, 8va/8vb on treble and bass clefs ([957da24](https://github.com/pension-plan/score-scan-reader/commit/957da242a5113ed8acf3d3d8fe63f9987587c56e))
+
+
+### Bug Fixes
+
+* **lyrics:** extender lines read from the page binary along the baseline (L4b) ([3107bf9](https://github.com/pension-plan/score-scan-reader/commit/3107bf9a5490f971e076c6d35baa915dae6f5f52))
+
+
+### Performance Improvements
+
+* **ocr:** German first-pass model is tessdata_fast (0.48 MB less), English stays best_int ([94364c0](https://github.com/pension-plan/score-scan-reader/commit/94364c0c9fcf551473135af53b84a218220de587))
+
 ## [0.36.2](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.36.1...score-scan-reader-v0.36.2) (2026-11-08)
 
 
