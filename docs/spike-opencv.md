@@ -4,30 +4,30 @@ Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be add
 
 ## Update: hollow heads on ledger lines of scans (L1)
 
-\`nt06-ledger-lines\` lost 19 of its 37 half and whole notes on the plain scan. A hollow head on a ledger line is
+`nt06-ledger-lines` lost 19 of its 37 half and whole notes on the plain scan. A hollow head on a ledger line is
 judged by its ink with the ledger rows left out, relative to the page: hollow when under 0.66 and 0.15 under the
 lightest "filled-looking" head (≥ 0.66). On the scan the hollow heads read 0.61–0.68 and the filled ones 0.79–0.94,
 so the 0.67 hollow ones set the reference and the cut-off fell to 0.52. Now only clearly filled heads (≥ 0.75) set
 the reference, and the cut-off is 0.1 under the lightest of them, at most 0.7. Severe pages whose values run together
-still keep their heads filled. Coverage (OCR, clean / scan / severe): \`note-half\` 1426 / 1311 / 650 → 1432 / 1351 /
-716 of 1510, \`note-whole\` severe 85 → 95 of 199. A/B (no OCR): coverage +0.0010 per item (\`nt06\` scan 0.953 →
-1.000, \`nt03-chords\` severe +0.048), worst −0.005; challenge +0.0003, worst −0.015 (\`pitch-satb-ledger-extremes\`
+still keep their heads filled. Coverage (OCR, clean / scan / severe): `note-half` 1426 / 1311 / 650 → 1432 / 1351 /
+716 of 1510, `note-whole` severe 85 → 95 of 199. A/B (no OCR): coverage +0.0010 per item (`nt06` scan 0.953 →
+1.000, `nt03-chords` severe +0.048), worst −0.005; challenge +0.0003, worst −0.015 (`pitch-satb-ledger-extremes`
 severe); benchmark +0.0002.
 
 Tried and not shipped: (1) the same test for heads on staff lines, where a blurred scan leaves the line in R through
-the head (\`organ-three-staves\` scan reads 6 of 20 such half notes as quarters). Coverage −0.0013: filled heads on
+the head (`organ-three-staves` scan reads 6 of 20 such half notes as quarters). Coverage −0.0013: filled heads on
 lines read lighter than the page's ledger heads, so grace and cue notes and dotted notes turned hollow. (2) Cutting
 an arpeggio's wavy line off a hollow chord it fuses with, and letting stacks taller than four heads give their top
-head. That fixes chords on \`perf-pages-40\` page 21 but measured 0.0000 overall, with \`voice-piano-night-song\` severe
+head. That fixes chords on `perf-pages-40` page 21 but measured 0.0000 overall, with `voice-piano-night-song` severe
 −0.017.
 
 ## Update: key signatures read slot by slot (L24 severe scans, L2 old engraving)
 
-The component parse in \`assemble.js\` misses key signature signs that touch something: a flat fused with the treble
-clef (\`golden1923-auld-lang-syne\` system 1 read no key), four flats run together on a bass staff (the same page,
+The component parse in `assemble.js` misses key signature signs that touch something: a flat fused with the treble
+clef (`golden1923-auld-lang-syne` system 1 read no key), four flats run together on a bass staff (the same page,
 system 5, read 0 for A-flat major), sharps cut by a shadow on a curled severe scan (4 read as 1), flats filled solid
-on heavy severe prints, and the narrow flats of old engravings. \`cv.js\` \`readKeySig\` (called from \`readHeaders\`,
-\`assemble.js\` untouched) reads the signature slot by slot. Signs stand at fixed positions for each clef (sharps
+on heavy severe prints, and the narrow flats of old engravings. `cv.js` `readKeySig` (called from `readHeaders`,
+`assemble.js` untouched) reads the signature slot by slot. Signs stand at fixed positions for each clef (sharps
 F C G D A E B, flats B E A D G C F; treble, bass and alto clefs), so for each next sign it takes the best match of
 the Bravura sharp (or flat) template in a window at that slot's height, 0.6–1.7 spaces right of the previous one
 (the first may overlap the clef's end). A slot counts at score ≥ 0.42 when it beats noteheads by 0.05 and digits
@@ -38,10 +38,10 @@ Then the header end moves past the last sign, and heads read on the signs are dr
 On the five real scans of L2 it agrees with every key the parse already had right, and fixes both auld-lang-syne
 misses. golden1923-america, methodist1905 st-anselm and tappan-dennis, and haupt1867 were already right at every
 system start, so L2 there is down to mid-piece key changes. A/B on the same source (no OCR): coverage +0.0012 per
-item, no item down (\`perf-piano-a4-300dpi\` severe +0.058, \`keys-minor-sharps\` severe +0.057); challenge +0.0005, no
-item down (\`pitch-ttbb-enharmonic-keys\` severe 0.473 → 0.622); benchmark unchanged. Coverage per tag (OCR, severe):
-\`key-s1\` 13 → 14 of 16, \`key-f7\` 0 → 1 of 2, \`key-change\` 15 → 16 of 34. \`key-0\` 35 → 34: the upside-down
-\`keys-minor-sharps\` severe page, which is read wrongly either way (front.js does not turn it; raised with the
+item, no item down (`perf-piano-a4-300dpi` severe +0.058, `keys-minor-sharps` severe +0.057); challenge +0.0005, no
+item down (`pitch-ttbb-enharmonic-keys` severe 0.473 → 0.622); benchmark unchanged. Coverage per tag (OCR, severe):
+`key-s1` 13 → 14 of 16, `key-f7` 0 → 1 of 2, `key-change` 15 → 16 of 34. `key-0` 35 → 34: the upside-down
+`keys-minor-sharps` severe page, which is read wrongly either way (front.js does not turn it; raised with the
 structure agent).
 
 ## Update: heads beside accidentals, courtesy accidentals (L24)
