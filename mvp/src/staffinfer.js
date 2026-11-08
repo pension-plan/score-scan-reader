@@ -62,6 +62,36 @@ function trebleClefs(B, comps, ss) {
   return clefs;
 }
 
+// Staves cut short where their lines fade (severe scans): extended along their own slope to the
+// page's usual left / right margin when the lines show on at least 40 % of the columns on the way
+// (three of the five lines inked; an indented first system has no lines there and stays)
+function extendToMargins(B, staves) {
+  const { width: w, height: h, data } = B;
+  if (staves.length < 3) return 0;
+  // (nor are the staves of a photographed page running off its edges: its margins tell nothing)
+  if (staves.some(s => s.left <= 0.01 * w || s.right >= 0.99 * w)) return 0;
+  // (a two-up spread's half-width staves are not short)
+  if (staves.some(s => s.left > 0.5 * w) && staves.some(s => s.right < 0.5 * w)) return 0;
+  const med = (a) => { const s = a.slice().sort((p, q) => p - q); return s[s.length >> 1]; };
+  const L = med(staves.map(s => s.left)), Rm = med(staves.map(s => s.right));
+  let n = 0;
+  const share = (st, a, b) => {
+    let hit = 0, tot = 0;
+    for (let x = Math.max(0, Math.round(a)); x < Math.min(w, Math.round(b)); x += 2) {
+      let k2 = 0;
+      for (let k = 0; k < 5; k++) { const y = Math.round(st.yAt(k, x)); if (y > 0 && y < h - 1 && (data[y * w + x] || data[(y - 1) * w + x] || data[(y + 1) * w + x])) k2++; }
+      tot++; if (k2 >= 3) hit++;
+    }
+    return tot ? hit / tot : 0;
+  };
+  for (const st of staves) {
+    const sp = st.space;
+    if (st.left > L + 2 * sp && share(st, L, st.left) >= 0.4) { st.left = L; n++; }
+    if (st.right < Rm - 2 * sp && share(st, st.right, Rm) >= 0.4) { st.right = Rm; n++; }
+  }
+  return n;
+}
+
 function inferStaves(B, staves, opts = {}) {
   const { width: w } = B;
   const out = staves.slice();
@@ -198,4 +228,4 @@ function oneLineStaves(B, staves, opts = {}) {
   return out;
 }
 
-module.exports = { inferStaves, oneLineStaves };
+module.exports = { inferStaves, oneLineStaves, extendToMargins };

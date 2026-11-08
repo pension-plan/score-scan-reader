@@ -13,7 +13,7 @@ const { detectBarlines } = require('./barlines');
 const { rotateGray, makeGray } = require('./image');
 const { precleanPage, clefScore } = require('./cv');
 const { percClefOnPage, findXHeads } = require('./percussion');
-const { inferStaves, oneLineStaves } = require('./staffinfer');
+const { inferStaves, oneLineStaves, extendToMargins } = require('./staffinfer');
 
 function resample(g, f) {
   const w = Math.max(1, Math.round(g.width * f)), h = Math.max(1, Math.round(g.height * f));
@@ -362,6 +362,8 @@ function* frontSteps(gray0, opts = {}) {
       ctx.staves.forEach((s, i) => { s.index = i; });
     }
   }
+  // staves cut short where their lines fade, extended to the page's margins (staffinfer.js)
+  if (opts.infer !== false && ctx.staves.length) extendToMargins(ctx.B, ctx.staves);
   let { gray, B, L0, sp, ltL, scale, skew, staves } = ctx;
   if (!staves.length) {
     warnings.push('No staves found on this page.');

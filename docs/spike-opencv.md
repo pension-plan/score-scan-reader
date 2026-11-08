@@ -2,6 +2,21 @@
 
 Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
 
+## Update: missing heads, 3: staves cut short where their lines fade
+
+On `variations-piano-12-pages` severe the first heads of many systems were missing although they are clearly printed:
+their staff started 8–30 spaces late (x = 311 or 595 against the page's 187–192) where its lines faded, and heads
+before a staff's start are not read. `staffinfer.js` `extendToMargins` now runs on every page with three staves or
+more: a staff starting after the page's median left edge (or ending before its median right edge) by over two spaces
+is extended there when three of its five lines show on at least 40 % of the columns on the way. An indented first
+system has no lines there and keeps its start; two-up spreads and photographed pages whose staves run off the edges
+(`wind-melody-phone` severe fell to 0.18 without that check) are left alone. Challenge (wp.py): missing 2,571 →
+2,497, wrong pitches 1,517 → 1,508. A/B (no OCR): challenge +0.0000 mean (variations severe +0.011, worst
+`wind-melody-photocopy-thin` severe −0.008), coverage +0.0001, benchmark unchanged.
+
+Tried and dropped: keeping a stemless filled head when a beam spans its column (neutral: the beams of faded groups
+are mostly not found either).
+
 ## Update: missing heads, 2: dotted stems on thin photocopies
 
 On thin photocopies read in the bridge mode (staff lines are rows of dots), the stems break up as well: dashes with
