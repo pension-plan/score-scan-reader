@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 16:38 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 16:42 AEDT.
 
 ## Events
 
@@ -48,6 +48,8 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 16:30 | ML model trial finished: copista-2m (Apache-2.0, 2 MB ONNX) scores notehead F1 0.996 and voice-slot 0.991 on the trial scans and runs in the browser under artifact rules at about 4–5 s per page. All 7 research items are now done; the old main workflow was stopped as planned. Round 3 will add the model as a second detector and ship it only if it scores better. |
 | 16:38 | Release 0.2.0 published on GitHub (round 1 code) with downloads: web app zip, source zip, design document. Release PRs will be merged after each round ships. |
 | 16:38 | copista-2m ML demo page started, for GitHub Pages at /ml-demo/. |
+| 16:42 | copista-2m ML demo published on GitHub Pages: https://pension-plan.github.io/score-scan-reader/ml-demo/ — runs the model in your browser on a sample hymn (124 noteheads split exactly S/A and T/B on the sample) or your own scan. Live check passed: 203 symbols in 7.0 s, no errors. On a real 1905 scan the model’s voice slots fail (208 of 213 in one slot), so the app keeps its own voice logic. |
+| 16:42 | Round 2 lyrics owner finished: words spanning several notes split into syllables, the trial’s line detector ported, part-name labels and stanza text now read. Lyrics 0.82 → 0.86 on its own; live tree with other owners’ work so far: aggregate 0.914, real scans 0.893. |
 
 ## Accuracy by round
 
@@ -58,6 +60,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | v1 baseline | 0.589 | 0.493 | 0.542 | 0.439 | 0.727 | 1.000 | 0.618 |
 | Round 1 (shipped) | 0.884 | 0.863 | 0.822 | 0.817 | 0.987 | 1.000 | 0.865 |
 | Challenge set baseline (round 1 code, OCR) | 0.747 | – | – | – | – | – | – |
+| Round 2 (interim, lyrics owner) | 0.914 | – | – | 0.905 | – | – | 0.893 |
 
 ## Known limits
 
@@ -69,11 +72,11 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | L3b | Ties and slurs not detected; a stray slur can create a false 16th | Symbols | In progress (round 1) |  |
 | L3c | Triplets and other tuplets not detected | Symbols | Queued for round 2 |  |
 | L3d | Mid-piece clef and key changes not detected | Symbols | Partial (round 1) | Treble-8vb clef detected; broken clefs re-joined; two treble clefs in a piano system kept as read. Per-system clef changes are read but not yet applied by score.js (round 2). |
-| L3e | Part names not read from the labels at the start of each system | Lyrics (OCR) + voices (apply) | Queued for round 2 |  |
+| L3e | Part names not read from the labels at the start of each system | Lyrics (OCR) + voices (apply) | Partial (round 2) | Part-name labels at system starts are now read by OCR (fr.partLabels); voices owner must apply them. |
 | L4a | Lyric alignment drifts when the note count is off | Voices + lyrics | Partial (round 1) | Syllables now matched to notes by left-to-right alignment instead of nearest note; a lyric line goes to the staff above it. |
-| L4b | No melisma or extender handling | Lyrics + voices | Partial (round 1) | Hyphens carried across system breaks; extender underscores handled. Splitting unhyphenated words over several notes still open. |
+| L4b | No melisma or extender handling | Lyrics + voices | Partial (round 2) | Words spanning several notes are now split into one syllable per note (vowel groups, en/de/la rules); extenders and their end positions are reported. Lindenbaum lyrics 0.45 → 0.65. |
 | L5a | At most 8 PDF pages processed | UI | Queued for round 2 |  |
-| L5b | Stanza text printed below the last system dropped for SATB | Lyrics + voices | Partial (round 1) | Stanza blocks below the music are now detected and kept out of the underlay (no more poem text as lyrics). Attaching them as extra verses still open. |
+| L5b | Stanza text printed below the last system dropped for SATB | Lyrics + voices | Partial (round 2) | Stanza text blocks below the music are now read (fr.stanzas); attaching them as verses is up to the voices owner. |
 | L6 | Piano wrongly split: grand staves become S/A/T/B, voice+piano gets 4 parts instead of 2 (breaks the never-split-piano rule) | Voices (score.js) | Resolved (round 1) | All 20 benchmark items now get the right part count (was 13 of 20). Piano grand staves are recognised by barlines running through both staves and are never split; Bach bwv67, Clara Schumann, Lindenbaum, Dichterliebe, Beach and Aloha fixed. |
 | L7 | Lyrics attached to every part in closed score (3–4× too many syllables) | Voices + lyrics | Resolved (round 1) | Lyrics between staves go to the upper voice only; lines under the lowest split staff go to both its voices; copying to every voice is opt-in. Lyrics 0.60 → 0.82. |
 | L8 | Lyric text or other glyphs read as noteheads on single-melody pages | Noteheads and staves | Resolved (round 1) | A notehead outside the staff must sit on or next to ledger lines, which removes lyric letters, tuplet numbers and dynamics. Jeanie 0.48 → 0.88, Silent Night 0.56 → 0.96. |
@@ -96,9 +99,9 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | Run 2 | Scanned-PDF design | stopped | 0 of 4 | Stopped at 14:58 AEDT to restart with more agents in parallel. |
 | Run 4 | Fix-forward round 1 (shipped 0.884) | done | 7 of 7 |  |
 | Run 5 | Challenge test set (edge cases + scan damage) | running | 7 of 7 |  |
-| Run 6 | Fix-forward round 2 | running | 0 of 5 |  |
+| Run 6 | Fix-forward round 2 | running | 1 of 5 |  |
 | Run 3 | Max-parallel main workflow (research) | stopped | 7 of 10 | Stopped at 16:30 AEDT once all 7 research items returned, as planned; its 3 design-proposal agents had just started and were stopped with it. The full rebuild was replaced by fix-forward rounds on v1. |
-| Side | Agents launched directly from the session | running | 2 of 3 |  |
+| Side | Agents launched directly from the session | running | 3 of 3 |  |
 
 ## Agents
 
@@ -128,11 +131,11 @@ Every agent started for this build, including stopped runs. Outcomes are on the 
 | Run 5 | Generate | gen:layout | done | 15:55 | 16:18 | 23 | 120 |
 | Run 5 | Generate | gen:degradation | done | 15:55 | 16:12 | 17 | 87 |
 | Run 5 | Validate | validate+baseline | done | 16:18 | 16:28 | 10 | 70 |
-| Run 6 | Fix | fix:r2:heads | run | 16:21 |  | 17 | 150 |
-| Run 6 | Fix | fix:r2:symbols | run | 16:21 |  | 17 | 124 |
-| Run 6 | Fix | fix:r2:score | run | 16:21 |  | 12 | 90 |
-| Run 6 | Fix | fix:r2:lyrics | run | 16:21 |  | 17 | 98 |
-| Run 6 | Fix | fix:r2:ui | run | 16:21 |  | 15 | 74 |
+| Run 6 | Fix | fix:r2:heads | run | 16:21 |  | 20 | 161 |
+| Run 6 | Fix | fix:r2:symbols | run | 16:21 |  | 20 | 142 |
+| Run 6 | Fix | fix:r2:score | run | 16:21 |  | 21 | 105 |
+| Run 6 | Fix | fix:r2:lyrics | done | 16:21 | 16:41 | 20 | 109 |
+| Run 6 | Fix | fix:r2:ui | run | 16:21 |  | 21 | 82 |
 | Run 3 | Research | web:omr | done | 14:58 | 15:11 | 13 | 77 |
 | Run 3 | Research | web:voices | done | 14:58 | 15:15 | 17 | 120 |
 | Run 3 | Research | spike:ml | done | 14:58 | 16:30 | 92 | 193 |
@@ -143,6 +146,6 @@ Every agent started for this build, including stopped runs. Outcomes are on the 
 | Run 3 | Design | design:proposal-1 | stopped | 16:30 | 16:30 | 0 | 2 |
 | Run 3 | Design | design:proposal-2 | stopped | 16:30 | 16:30 | 0 | 1 |
 | Run 3 | Design | design:proposal-3 | stopped | 16:30 | 16:30 | 0 | 1 |
-| Side | ML demo | copista-2m demo page for GitHub Pages | run | 16:38 |  | 0 | 5 |
+| Side | ML demo | copista-2m demo page for GitHub Pages | done | 16:38 | 16:41 | 3 | 21 |
 | Side | Fast track | First version build (mvp/) | done | 15:19 | 15:29 | 10 | 69 |
 | Side | Fast track | Software design document | done | 15:20 | 15:22 | 2 | 16 |
