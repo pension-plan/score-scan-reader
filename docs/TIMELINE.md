@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 07:02 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 08:12 AEDT.
 
 ## Events
 
@@ -185,6 +185,8 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 06:21 | voices a822b10: cue notes (coverage 0.9279 to 0.9281, graces 249 to 325 on challenge). push.sh no longer leaves conflict markers. voices next: part copies. |
 | 07:02 | textsym b4551ca: ML assist shipped (off by default): benchmark 0.951 to 0.963, real scans 0.936 to 0.955, challenge 0.784 to 0.796, coverage 0.855 to 0.868, no item down >0.05; cost 16 MB once and ~2.2 s/page. Release 0.41.0 merged; all CI green. Estate Status: SSR-3 added (ML assist on by default?). |
 | 07:02 | Shipped (in 0.41.0 or after): structure 39d2b03 false segnos over church rests removed (coverage 33 to 21), 719003f false chord sharps from its own cutAccidental removed; voices 46a361a part copies; perf fbbe0ca one-line staves moved to staffinfer.js, fdffc73 user guide on Pages + README/SDD with measured accuracy (benchmark 0.959, real 0.937, challenge 0.949 with OCR, coverage 0.930). textsym lexicon corrector in progress (L36). Next: structure key context, voices instrument names, perf faster ML. |
+| 08:11 | Release with ff375e0 (instrument names from title/subtitle; lead sheets Melody), f59ce5f and 3b65d04 (key changes after double barlines, signs run together), 4273614 (solid key signatures on heavy photocopies), eb287a1 (cue staves) merged. Agents continue: opencv missing heads, structure key context, voices names, perf faster ML, textsym lyric lexicon. |
+| 08:12 | CI red on 4273614: challenge wedges 14 to 12 (written-elements gate); 0.42.0 was released before the check finished (my merge loop didn't stop on failure). structure investigating which commit/item and fixing forward. |
 
 ## Accuracy by round
 

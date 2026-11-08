@@ -431,11 +431,27 @@ function* frontSteps(gray0, opts = {}) {
     const c = other(h);
     if (c && !heads.some(o => o.staff === c.staff && o.p === c.p && Math.abs(o.x - c.x) < 0.6 * c.sp)) hs.push(c);
   }
+  // (cue-size heads clear of the full heads that passed the ledger test, out of the staff too)
+  hs = hs.filter(h => !h.small || !hs.some(o => !o.small && o.staff === h.staff && Math.abs(o.p - h.p) <= 8 && Math.abs(o.x - h.x) < 1.2 * h.sp));
   const chords = chordStems(L, hs, { minLen: 1.5, sides: true, stemGap: ctx.mode === 'bridge' ? 0.9 : 0.4 });
   // (on a staff inferred from washed-out music the stems faded with the lines: filled heads stay)
   hs = hs.filter(h => (h.stemDir !== 0 || h.kind === 'hollow' || staves[h.staff].inferred) && !(h.chord && h.chord.accidental));
   // cue-size heads (heads.js h.small) only with a stem of their own: a dot, a letter or a stray blob has none
-  hs = hs.filter(h => !h.small || Math.max(h.stem ? h.stem.up : 0, h.stem ? h.stem.down : 0) >= 1.8);
+  // (or 1.5 spaces when it ends in a beam: beamed cue stems are short; a rest's hook has no beam)
+  const beamAtTip = (h) => {
+    const c = h.chord; if (!c) return false;
+    const sx = c.up ? c.upX : c.downX, tip = c.up ? c.upEnd : c.downEnd, sp = h.sp;
+    if (sx == null || tip == null || sx < 0) return false;
+    for (let y = Math.round(tip - 0.4 * sp); y <= Math.round(tip + 0.4 * sp); y++) {
+      if (y < 0 || y >= L.height || !L.data[y * L.width + sx]) continue;
+      let a = sx, b = sx;
+      while (a > 0 && L.data[y * L.width + a - 1]) a--;
+      while (b < L.width - 1 && L.data[y * L.width + b + 1]) b++;
+      if (b - a + 1 >= sp) return true;
+    }
+    return false;
+  };
+  hs = hs.filter(h => { if (!h.small) return true; const len = Math.max(h.stem ? h.stem.up : 0, h.stem ? h.stem.down : 0); return len >= 1.8 || (len >= 1.5 && beamAtTip(h)); });
   // (an x head of a drum kit sits at a snare's stem end by design)
   hs = hs.filter(h => h.xHead || !atStemTip(h, hs, L, ltL));
   hs = hs.filter(h => !accidentalBefore(h, chords, L, R));

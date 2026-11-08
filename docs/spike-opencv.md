@@ -2,6 +2,19 @@
 
 Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
 
+## Update: beamed cue heads (with voices' cue writer)
+
+`nt08-cue-notes` clean found 8 of its 24 cue heads. Beamed cue stems reach their beam after 1.6–1.7 spaces, under
+the 1.8 floor for small heads, and "heads" read off the cue's instrument name (Ob., above the staff) blocked the
+real small head below them. Now a small head may have a 1.5-space stem when the stem ends in a beam (a run of ink a
+space long at its tip; a quarter rest's hook has none: `rst02` severe lost 0.011 without that check). Small heads
+are cleared against full heads inside the staff in `heads.js`, and against full heads outside it in `front.js` only
+after the ledger test (doing it in `heads.js` with a smaller radius let ledger notes' fragments into chords: `nt06`
+severe −0.026). With voices' eb287a1 (cues allowed while small heads are under 75 % of a staff), nt08 writes 10 /
+11 / 4 `<cue/>` notes (clean / scan / severe), up from 6 / 7 / 2. The scorer leaves cue notes out, so the A/B
+shows only the cost elsewhere: coverage +0.0000 (`nt08` scan +0.021, worst `orchestral-festive-march` severe −0.017),
+challenge and benchmark unchanged.
+
 ## Update: key signatures filled in solid (heavy photocopies)
 
 Structure's cases: on `andantino-piano-photocopy-thick` severe (and `sab-cross-staff-alto` severe) the two sharps of

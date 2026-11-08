@@ -402,11 +402,12 @@ function detectHeads(B, R, staves, ss, lt, opts = {}) {
     if (!out.some(o => o.staff === h.staff && o.p === h.p && Math.abs(o.x - h.x) < 0.6 * h.sp)) out.push(h);
   }
   // cue-size heads after the full-size ones, clear of them (a small blob beside a head is a piece of
-  // an accidental, a dot or a flag)
+  // an accidental, a dot or a flag; heads outside the staff are checked in front.js, once the ledger
+  // test has thrown out the ones read off a cue's instrument name)
   // only on pages whose full heads are clearly wider (modern engravings, about 1.2
   // spaces and up): on narrow-headed old prints a worn full head reads as small
   if (headW >= 1.12) for (const h of heads) {
-    if (h.small && !out.some(o => o.staff === h.staff && Math.abs(o.p - h.p) <= 8 && Math.abs(o.x - h.x) < 1.2 * h.sp)) out.push(h);
+    if (h.small && !out.some(o => o.staff === h.staff && Math.abs(o.p) <= 5 && Math.abs(o.p - h.p) <= 8 && Math.abs(o.x - h.x) < 1.2 * h.sp)) out.push(h);
   }
   out.sort((a, b) => a.x - b.x);
   return { heads: out, beams, opened: O, headW, stacked };
