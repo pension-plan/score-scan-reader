@@ -2,6 +2,16 @@
 
 Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
 
+## Update: missing heads, 1: ledger heads on scans
+
+Structure's wrong-pitch table (`scratchpad/stools/wp.py`, a global alignment of app and truth notes) puts missing notes
+first: 2,836 on the challenge set. The largest single block, `variations-piano-12-pages` scan (223 missing of
+2,455), is ledger heads: every head on a ledger line above or below a staff failed `ledgerOK`. The scan's staff
+lines measure 2 px but its ledgers 4, and where a ledger runs into a head it reads 5 rows deep, past the 4-row
+thin-stroke limit (1.6 × line thickness + 1). The limit is now at least 0.28 space. That item's missing notes fall
+223 → 34; challenge missing 2,836 → 2,618, wrong pitches 1,641 → 1,580, extras 1,673 → 1,653. A/B (no OCR):
+challenge +0.0005, coverage +0.0005 (worst −0.016, `mk03` clean), benchmark +0.0004.
+
 ## Update: staves where the lines are washed out (L38)
 
 Three severe pages lose their staff lines: `rst08-tuplet-beam-rests` (none left: the row profile over a staff is flat, 241

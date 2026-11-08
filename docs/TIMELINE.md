@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 05:08 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 05:17 AEDT.
 
 ## Events
 
@@ -174,6 +174,8 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 04:44 | perf 9865bed: CI gates widened (benchmark with app OCR + models from refs, and the challenge set), failing on any regression; CI 2.5 to 9.3 min. perf next: extra (false) notes, the second-largest error. |
 | 04:55 | voices 3107bf9: extender-line detector (challenge per-item extender error 422 to 275). Release merged. voices next: cue voice over a whole-bar rest + opencv's cue patch. |
 | 05:08 | structure 957da24: clefs (octave marks, C clefs, mid-staff changes); release merged. Key misses to opencv (readKeySig); fermata recall moved to structure; cue pairing with voices. |
+| 05:10 | perf extra-notes analysis: mostly wrong pitches; surplus from severe scans, voice-split copies (voices), percussion (perf: unpitched + GM drums). |
+| 05:17 | opencv 92cf0ac: washed-out staff finder (L38 resolved). Release merged. structure can now test the H-bar barline split; opencv next: missing heads. |
 
 ## Accuracy by round
 
@@ -237,8 +239,8 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | L34 | On a slow phone the first result takes ~49 s, bound by the ~7 MB the first conversion needs (OCR models ~4 MB) | Performance (load) | Partial (34dad95) | 34dad95: conversion starts while OCR loads, split Tesseract core, lazy OSMD; page 1 renders at 15.8 s instead of 48.9 s; result 54.5 to 48.8 s. Next: progressive result (notes before OCR). 031a2cf/f04634e: progressive result (deferText): notes shown at ~19 s instead of 45.6 s on the phone profile; complete result ~48.5 s (OCR download-bound); output identical. Next: smaller OCR models if identical. 94364c0: German OCR model now tessdata_fast (1.33 to 0.85 MB, ~3 s less on Fast 3G); bench lyrics 0.9314 to 0.9331, challenge lyrics 0.9473 to 0.9472, one item -0.073 (being checked). English fast rejected (4 items down >0.05). |
 | L35 | Whole-file copies from private worktrees based on an older main reverted newer work on main three times (411aade, f091328, d176663 sweep) | Integration (push tooling) | Resolved (9e5c95a) | push.sh requires PUSH_BASE for code paths and three-way merges (base->copy, base->HEAD), refusing on conflict; tested with a 15-commit-stale score.js: merge = HEAD + the new line. Extended to docs/*.md and README.md after 06fc092 replaced SDD.md from an older base (restored f401938). |
 | L36 | Lyric OCR on old print garbles words (haupt1867: I ler-zens Ci-ran-de for Herzens Grunde, T ob for Lob; demdithiglich for demuthiglich) | Lyrics (OCR) | Queued | Lexicon-based, hyphen-aware post-correction with OCR-confusion costs, queued for textsym after the ML task. |
-| L37 | Wrong-pitch notes are the largest error source: over 85% of unmatched notes are stemmed heads in the staff at the wrong pitch (coverage 4.2% of truth notes, challenge 5.8%); text and marks now cause under 1% | Pitch (clef/key/accidental/ledger) | Open | structure fhs.js (LCS alignment per item) measured it; next: classify wrong pitches by cause and fix the top one. structure wp.py cause table (challenge / coverage): missing notes 2853/1456, extra 1677/967, 1-2 step position 484/184, octave 146/95 (clef 8va/8vb 0%), clef runs 20/127, key 90/27, accidental 57/57. Routed: clef octave + tenor/alto + keys to structure; missing heads + position to opencv; fermata recall (447 of 752) to textsym. |
-| L38 | Pages whose staff lines are washed out or partly missing yield no or partial staves, so nothing on them is read (rst08 severe, voice-piano-night-song severe, rst05 severe) | Staves | Open | opencv: infer staves from notes, stems, clefs, barlines and fragments when the line finders fail. |
+| L37 | Wrong-pitch notes are the largest error source: over 85% of unmatched notes are stemmed heads in the staff at the wrong pitch (coverage 4.2% of truth notes, challenge 5.8%); text and marks now cause under 1% | Pitch (clef/key/accidental/ledger) | Open | structure fhs.js (LCS alignment per item) measured it; next: classify wrong pitches by cause and fix the top one. structure wp.py cause table (challenge / coverage): missing notes 2853/1456, extra 1677/967, 1-2 step position 484/184, octave 146/95 (clef 8va/8vb 0%), clef runs 20/127, key 90/27, accidental 57/57. Routed: clef octave + tenor/alto + keys to structure; missing heads + position to opencv; fermata recall (447 of 752) to textsym. perf: of 3,555 unmatched app notes on challenge, 2,903 are wrong pitches, only 652 net surplus; net surplus (1,434 incl. coverage): severe scans 63%, part copies from voice splitting 24% (to voices), percussion written pitched vs unpitched truth 11% (perf). |
+| L38 | Pages whose staff lines are washed out or partly missing yield no or partial staves, so nothing on them is read (rst08 severe, voice-piano-night-song severe, rst05 severe) | Staves | Resolved (92cf0ac) | opencv: infer staves from notes, stems, clefs, barlines and fragments when the line finders fail. 92cf0ac: staffinfer.js (clef-anchored, gated) extends partial staves and adds missing ones; rst05 severe 0.626 to 0.739, rst08 severe 0.367 to 0.538, no item down. voice-piano-night-song severe has all staves; its loss is heads/pitch. |
 
 ## Runs
 

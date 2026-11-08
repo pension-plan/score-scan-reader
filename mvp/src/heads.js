@@ -405,7 +405,9 @@ function ledgerOK(bin, staves, hd, lt) {
   const sp = hd.sp, sgn = hd.p > 0 ? 1 : -1;
   const st = staves[hd.staff];
   const xm = Math.round(hd.x);
-  const maxThick = Math.max(2, Math.round(1.6 * lt + 1));
+  // (a scan's ledgers come out thicker than its staff lines measure, and thicker still where
+  // they run into the head: up to about a quarter space)
+  const maxThick = Math.max(2, Math.round(1.6 * lt + 1), Math.round(0.28 * sp));
   const band = Math.max(1, Math.round(lt / 2 + 1));
   const ymid = st.yAt(2, xm);
   const thinAt = (x, yq) => {
