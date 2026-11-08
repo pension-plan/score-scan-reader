@@ -302,13 +302,19 @@ def t_clefs(k, ch, nx, pos, ph, rng):
 
 
 def t_clefs2(k, ch, nx, pos, ph, rng):
-    """right hand: treble -> soprano -> treble^8 -> treble; left hand: bass -> tenor -> alto -> bass"""
-    rclef, rlo = [('treble', 69), ('soprano', 64), ('treble^8', 81), ('treble', 69)][pos]
-    lclef, llo = [('bass', 41), ('tenor', 50), ('alto', 55), ('bass', 41)][pos]
+    """right hand: treble -> soprano -> treble^8 -> treble_8 ; left hand: bass -> tenor -> alto -> bass_8
+    (the octave clefs of bar 4 return to treble / bass at the start of the next system; not in the last phrase)"""
+    last = ph == CTX['last_ph']
+    rseq = [('treble', 69), ('soprano', 64), ('treble^8', 81), ('treble' if last else 'treble_8', 69 if last else 57)]
+    lseq = [('bass', 41), ('tenor', 50), ('alto', 55), ('bass' if last else 'bass_8', 41 if last else 29)]
+    rclef, rlo = rseq[pos]
+    lclef, llo = lseq[pos]
     m = stack(ch[:3], rlo, 3)
     lc = stack(ch[:3], llo, 3)
-    rpre = f'\\clef={rclef} ' if pos else ''
-    lpre = f'\\clef={lclef} ' if pos else ''
+    prev_r = rseq[pos - 1][0] if pos else ('treble_8' if ph > 0 else 'treble')
+    prev_l = lseq[pos - 1][0] if pos else ('bass_8' if ph > 0 else 'bass')
+    rpre = f'\\clef={rclef} ' if rclef != prev_r else ''
+    lpre = f'\\clef={lclef} ' if lclef != prev_l else ''
     return (f"{rpre}{L(m[0])}4 {L(m[1])}4 {L(m[2])}2", None,
             f"{lpre}{L(lc[0])}8 {L(lc[1])} {L(lc[2])} {L(lc[1])} {C(lc)}2")
 
@@ -419,6 +425,7 @@ def build_voices(n_pages, seed=4242):
         key = Key(fifths, mode, ts, ta)
         n_sys = PAGE_SYSTEMS - (1 if v == 1 else 0)
         n_bars = n_sys * BARS_PER_SYSTEM
+        CTX['last_ph'] = n_sys - 1
         start = len(rh1)
         for b in range(n_bars):
             ph, pos = divmod(b, 4)
