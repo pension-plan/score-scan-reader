@@ -472,6 +472,35 @@ function partialStaves(systems) {
   return out;
 }
 
+// Melody instruments named in a title or subtitle, in order of mention,
+// with the printed desk numbers ("flutes 1.2"); plurals named once each
+const INSTR = [
+  [/^(flutes?|flauti|flöten?|flûtes?)$/, 'Flute'], [/^(piccolos?)$/, 'Piccolo'], [/^(oboes?|oboi|hautbois)$/, 'Oboe'],
+  [/^(clarinets?|clarinetti|klarinetten?|clarinettes?)$/, 'Clarinet'], [/^(bassoons?|fagotti?|fagott)$/, 'Bassoon'],
+  [/^(saxophones?|sax)$/, 'Saxophone'], [/^(recorders?|blockflöten?)$/, 'Recorder'],
+  [/^(horns?|corni?|hörner)$/, 'Horn'], [/^(trumpets?|trombe|trompeten?|trompettes?)$/, 'Trumpet'], [/^(trombones?|tromboni|posaunen?)$/, 'Trombone'], [/^(tubas?)$/, 'Tuba'],
+  [/^(violins?|violini|violinen?|violons?|violine|fiddles?)$/, 'Violin'], [/^(violas?|viole|bratschen?|altos?)$/, 'Viola'],
+  [/^(violoncellos?|violoncelli|cellos?|celli|violoncelles?)$/, 'Violoncello'], [/^(double[\s-]?bass|contrabass|kontrabass)$/, 'Contrabass'],
+  [/^(guitars?|guitarre|gitarren?|guitare)$/, 'Guitar'], [/^(harps?|harfen?|harpe)$/, 'Harp'],
+];
+function instrumentsIn(text) {
+  const out = [];
+  const words = String(text || '').toLowerCase().replace(/[()\[\],;:!?"“”]/g, ' ').split(/\s+/).filter(Boolean);
+  for (let i = 0; i < words.length; i++) {
+    const w = words[i];
+    const hit = INSTR.find(([re]) => re.test(w));
+    // "alto" is a voice unless it is in a list of instruments (rare): skipped
+    if (!hit || w === 'alto' || w === 'altos') continue;
+    const num = words[i + 1] && /^([1-4](\.[1-4])*|i{1,3}|iv)$/.test(words[i + 1]) ? ' ' + words[i + 1].toUpperCase() : '';
+    const name = (num ? (/s$/.test(w) ? hit[1] + 's' : hit[1]) : hit[1]) + num;
+    // the same instrument named twice (a title and a subtitle) counts once; the numbered form wins
+    const j = out.findIndex(n => n.startsWith(hit[1]));
+    if (j >= 0) { if (num && !/\d|I$/.test(out[j])) out[j] = name; continue; }
+    out.push(name);
+  }
+  return out;
+}
+
 // Key signature: every staff carries the same key. A staff whose accidentals
 // were missed reads as 0 (or as fewer accidentals than printed), while extra
 // accidentals are rare, so the largest key that several staves agree on wins.
@@ -1451,6 +1480,25 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   // and credits, part abbreviations, dynamics, hairpins, tempo and expression text
   let read = { dirs: parts.map(() => units.map(() => [])), head: {}, nDyn: 0, nWedge: 0, nWords: 0 };
   try { read = readMarks(pages, segs, units, parts, partMeasures, slotOf); } catch (e) { warnings.push(`Text and dynamics not placed (${e.message}).`); }
+  // instrument names from the title and subtitle (L9): "for violin and
+  // piano", "duet for flute and tuba", "Hocket for Two Flutes (flutes 1.2)",
+  // "for violoncello solo". Parts whose name was not read on the page and
+  // that carry no lyrics take them in order, when the text names exactly as
+  // many melody instruments as there are such parts (keyboards keep their
+  // part). A lead sheet's single staff is its Melody
+  {
+    const text = [read.head.title, read.head.subtitle].filter(Boolean).join(' / ');
+    const sung = (pi) => partMeasures[pi].some(m => m && m.some(st => st && st.events.some(e => e.lyrics && Object.keys(e.lyrics).length)));
+    const open = parts.map((p, pi) => ({ p, pi })).filter(({ p }) => !p.nameRead && p.kind !== 'keyboard');
+    const found = instrumentsIn(text);
+    const cands = open.filter(({ pi }) => !sung(pi));
+    if (found.length && found.length === cands.length) {
+      cands.forEach(({ p }, i) => { p.name = found[i]; p.nameFrom = 'title'; });
+      warnings.push(`Part name${found.length > 1 ? 's' : ''} taken from the title: ${found.join(', ')}.`);
+    } else if (/\blead[\s-]*sheet\b/i.test(text) && open.length === 1 && parts.length === 1) {
+      open[0].p.name = 'Melody'; open[0].p.nameFrom = 'title';
+    }
+  }
   if (read.nDyn || read.nWedge || read.nWords || read.nTie || read.nSlur || read.nGrace || read.nFermata || read.nPedal || read.nFinger || read.nRehearsal || read.nChord) warnings.push(`Read from the page: ${[read.nDyn && `${read.nDyn} dynamic${read.nDyn > 1 ? 's' : ''}`, read.nWedge && `${read.nWedge} hairpin${read.nWedge > 1 ? 's' : ''}`, read.nWords && `${read.nWords} tempo / expression text${read.nWords > 1 ? 's' : ''}`, read.nTie && `${read.nTie} tie${read.nTie > 1 ? 's' : ''}`, read.nSlur && `${read.nSlur} slur${read.nSlur > 1 ? 's' : ''}`, read.nGrace && `${read.nGrace} grace note${read.nGrace > 1 ? 's' : ''}`, read.nFermata && `${read.nFermata} fermata${read.nFermata > 1 ? 's' : ''}`, read.nPedal && `${read.nPedal} pedal mark${read.nPedal > 1 ? 's' : ''}`, read.nFinger && `${read.nFinger} fingering${read.nFinger > 1 ? 's' : ''}`, read.nRehearsal && `${read.nRehearsal} rehearsal mark${read.nRehearsal > 1 ? 's' : ''}`, read.nChord && `${read.nChord} chord symbol${read.nChord > 1 ? 's' : ''}`].filter(Boolean).join(', ')}.`);
   const unitTime = units.map(u => u.time), unitMulti = units.map(u => u.multi || 0);
   // barlines, repeats and voltas read on the page (structure.js: sy.bars, sy.voltas) at the ends of

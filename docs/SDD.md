@@ -1384,6 +1384,17 @@ both parts. Measured shares: split staves of the corpus 0.69-1.0, these staves 0
 sab-cross-staff-alto scan 0.632 to 0.765, mild 0.646 to 0.783; surplus notes on the challenge set 538 to 492
 (copies 151 to 105); coverage with OCR and the benchmark unchanged.
 
+**Instrument names from the title (L9).** After the page text is read, the title and subtitle are searched for
+melody instruments (a small multilingual list: flute, oboe, clarinet, bassoon, horn, trumpet, trombone, tuba,
+violin/fiddle, viola, violoncello/cello, guitar, harp...; a following desk number kept: "flutes 1.2" gives
+"Flutes 1.2"). When they name exactly as many instruments as there are parts whose name was not read and that
+carry no lyrics, those parts take the names in order ("duet for flute and tuba", "for violoncello solo", "for violin
+and piano": keyboards keep their part). A lead sheet's single staff is named Melody. Names from clef and range alone
+were not added: the corpus's unlabelled treble staves are violin, flute, oboe, fiddle and melody in about equal
+numbers, so a guess would be wrong more often than right. Coverage with OCR 0.9300 to 0.9315 (rst06, lead sheets,
+cello elegy severe: parts 0.67 to 1.00); challenge with OCR 0.9488 to 0.9491 (keysig-odyssey severe, rh05 severe).
+Playback follows the names (`playback.js gmFor`: Flutes 1.2 to flute, Violoncello to cello, Tuba to tuba).
+
 **Staves on only some systems (L11).** A small staff (staff space at most 0.85 of its system's largest) that
 the fullest systems all carry and the other systems leave out keeps a part of its own: `score.js
 partialStaves()` gives every system without it an empty stand-in staff at its place (written as rests), and the
