@@ -447,6 +447,11 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 }
 /* before the first result there is nothing to filter or step through */
 .plate:not([data-ready]) .presets,.plate:not([data-ready]) .unknav{display:none}
+
+/* L5b: stanzas below the music as verses (a checkbox under the lyrics) */
+.stanza-opt{display:flex;align-items:flex-start;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--rule);font-size:13px;cursor:pointer}
+.stanza-opt input{margin:2px 0 0;width:16px;height:16px;flex:none;accent-color:var(--accent)}
+@media (max-width:640px){.stanza-opt{min-height:44px;align-items:center}}
 /* playback (ui/player.js): transport bar, parts mixer, follow-along marks */
 :root{--pb-hl:#e65100;--pb-hl-fill:rgba(255,145,0,.30)}
 .pb{border:1px solid var(--rule);background:var(--panel-2);border-radius:6px;padding:10px 12px;margin:0 6px 12px;display:grid;gap:8px}
@@ -665,6 +670,7 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
       <section class="panel" aria-labelledby="lyrH">
         <div class="panel-head"><h2 id="lyrH">Lyrics</h2></div>
         <div id="lyrics" class="lyrics"><p class="muted">None yet</p></div>
+        <label class="stanza-opt" id="stanzaOpt" hidden><input type="checkbox" id="stanzaVerses"><span id="stanzaOptLabel">Set the stanzas printed below the music as verses</span></label>
       </section>
       <section class="panel" aria-labelledby="warnH">
         <details class="fold" id="warnFold">
@@ -6222,7 +6228,8 @@ function labelLines(fr, sysIdx) {
   const { labels, comps } = labelComponents(band);
   const cs = comps.filter(c => {
     const h = c.y1 - c.y0 + 1, w = c.x1 - c.x0 + 1;
-    return h >= 0.35 * sp && h <= 2.5 * sp && w <= 4 * sp && c.area >= 4 && c.x1 < bw - 1 && c.y0 > 0 && c.y1 < bh - 1;
+    // (a whole word can be one component: letters touch in bold type and on scans)
+    return h >= 0.35 * sp && h <= 2.5 * sp && w <= 16 * sp && w <= 8 * h && c.area >= 4 && c.x1 < bw - 1 && c.y0 > 0 && c.y1 < bh - 1;
   }).sort((a, b) => (a.y0 + a.y1) - (b.y0 + b.y1));
   // single-linkage grouping: same text row (vertical overlap) and close (word gaps)
   const par = cs.map((_, i) => i);
@@ -6716,7 +6723,7 @@ const OCR_CONFIG = {
   params: { tessedit_pageseg_mode: '7', user_defined_dpi: '300' },
 };
 
-module.exports = { _accentMarks: accentMarks, OCR_CONFIG, readLyrics, readPartLabels, readStanzas, syllabify, findTextLines, findTextLinesCC, toSyllables, splitSyllable, vowelGroups, detectLang, cropGray, DEFAULTS, _analyseRow: analyseRow };
+module.exports = { _labelLines: labelLines, _accentMarks: accentMarks, OCR_CONFIG, readLyrics, readPartLabels, readStanzas, syllabify, findTextLines, findTextLinesCC, toSyllables, splitSyllable, vowelGroups, detectLang, cropGray, DEFAULTS, _analyseRow: analyseRow };
 
 };
 defs["meter"]=function(require,module,exports){
@@ -7952,6 +7959,7 @@ function createConverter(opts = {}) {
   const pages = [];
   const lyricsBySystem = {};
   const warnings = [];
+  let allLyrics = null;
 
   async function readPageLyrics(entry, label, i, n) {
     if (!opts.ocr) return;
@@ -8013,18 +8021,22 @@ function createConverter(opts = {}) {
       fr.L = null;
       keepPacked(fr, 'R');
     },
-    finish() {
+    // fo: options for this build (stanzasAsVerses); finish() may be called
+    // again with other options and rebuilds the score from the same pages
+    finish(fo = {}) {
       progress('Building parts', { stage: 'parts' });
+      if (allLyrics) { for (const k in lyricsBySystem) delete lyricsBySystem[k]; Object.assign(lyricsBySystem, allLyrics); }
+      else allLyrics = Object.fromEntries(Object.entries(lyricsBySystem).map(([k, v]) => [k, v.slice()]));
       let score;
-      try { score = buildScore(pages, lyricsBySystem, { ocr: !!opts.ocr, copyLyrics: !!opts.copyLyrics, debug: opts.debug }); }
+      try { score = buildScore(pages, lyricsBySystem, { ocr: !!opts.ocr, copyLyrics: !!opts.copyLyrics, debug: opts.debug, stanzasAsVerses: !!(fo.stanzasAsVerses ?? opts.stanzasAsVerses) }); }
       catch (e) { score = { parts: [], warnings: ['Assembly failed: ' + e.message], xml: '' }; }
       // show only the text lines that were attached to notes (stanza text printed
       // below the music, titles and dynamics are not underlay)
       if (score.layout && Object.values(lyricsBySystem).some(l => l.some(v => v.used))) {
         for (const k in lyricsBySystem) lyricsBySystem[k] = lyricsBySystem[k].filter(v => v.used);
       }
-      if (!pages.length) warnings.push('No staves were detected. Try a cleaner or higher-resolution scan.');
-      return { pages, score, lyricsBySystem, warnings: warnings.concat(score.warnings || []) };
+      const none = pages.length ? [] : ['No staves were detected. Try a cleaner or higher-resolution scan.'];
+      return { pages, score, lyricsBySystem, warnings: warnings.concat(none, score.warnings || []) };
     },
   };
 }
@@ -9250,6 +9262,7 @@ const { readArticulations, readDoubleDots } = require('./artic');
 const { readOttavas } = require('./ottava');
 const { pageMarks } = require('./symbols');
 const { instrumentXML, soundDynamics, tempoFromWords } = require('./playback');
+const { syllabify, detectLang } = require('./lyrics');
 
 const COLORS = ['#d1495b', '#edae49', '#00798c', '#30638e', '#7b5ea7', '#3a7d44'];
 
@@ -10296,6 +10309,8 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     if (tie) bandVoice[band] = 'all';
     if (pis.length > 1) lyrNotes.add(`Lyrics under staff ${+band + 1} attached to ${tie ? pis.map(pi => parts[pi].name).join(' and ') + ' (same rhythm, text sung by both)' : parts[best].name + (best === prior ? ' (upper voice)' : ' (its rhythm fits the syllables best)')}.`);
   }
+  // a score may be built again from the same pages (another option): start clean
+  for (const L of lines) { L.v.used = null; L.v.melismas = null; }
   for (const L of lines) {
     const { v, cands, sp } = L;
     let best = cands.find(c => c.pi === bandVoice[v.band]) || cands[0];
@@ -10439,8 +10454,39 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     seenFr.add(pg.fr);
     for (const st of pg.fr.stanzas || []) {
       const lines = (st.lines || []).map(l => String(l).trim()).filter(Boolean);
-      if (lines.length) credits.push({ page: Math.floor(pg.index || 0) + 1, label: st.label || (st.number ? st.number + '.' : ''), text: lines.join('\n') });
+      if (lines.length) credits.push({ page: Math.floor(pg.index || 0) + 1, label: st.label || (st.number ? st.number + '.' : ''), text: lines.join('\n'), number: st.number });
     }
+  }
+  // opts.stanzasAsVerses (L5b, off by default): each such stanza that fits the
+  // tune is set under the notes as one more verse of the voice carrying the
+  // underlay, syllable by syllable on the notes the printed verses use (their
+  // melismas kept); a stanza whose syllable count is off by more than 15 % of
+  // those notes stays a credit
+  const stanzas = { printed: credits.length, set: 0 };
+  if (opts.stanzasAsVerses && credits.length) {
+    let pi = -1, best = 0;
+    partMeasures.forEach((pm, i) => { let n = 0; pm.forEach(m => m && m[0] && m[0].events.forEach(e => { if (!e.rest && e.lyrics && Object.keys(e.lyrics).length) n++; })); if (n > best) { best = n; pi = i; } });
+    const slots = [];
+    if (pi >= 0) partMeasures[pi].forEach(m => m && m[0] && m[0].events.forEach(e => { if (!e.rest && e.lyrics && Object.keys(e.lyrics).length) slots.push(e); }));
+    const used = new Set(slots.flatMap(e => Object.keys(e.lyrics).map(Number)));
+    let set = 0;
+    for (const c of credits.slice()) {
+      const words = c.text.split(/\s+/).filter(w => /\p{L}/u.test(w));
+      const lang = detectLang([c.text]);
+      const syl = [];
+      for (const w of words) {
+        const parts_ = syllabify(w, lang);
+        parts_.forEach((t, k) => syl.push({ text: t, syllabic: parts_.length === 1 ? 'single' : k === 0 ? 'begin' : k === parts_.length - 1 ? 'end' : 'middle' }));
+      }
+      if (!slots.length || Math.abs(syl.length - slots.length) > 0.15 * slots.length) continue;
+      let num = c.number && !used.has(c.number) ? c.number : Math.max(0, ...used) + 1;
+      used.add(num);
+      syl.slice(0, slots.length).forEach((sy, k) => { slots[k].lyrics[num] = { text: sy.text, syllabic: sy.syllabic }; });
+      credits.splice(credits.indexOf(c), 1);
+      set++;
+    }
+    stanzas.set = set;
+    if (set) warnings.push(`${set} stanza${set > 1 ? 's' : ''} printed below the music set under the notes of ${parts[pi].name} as verse${set > 1 ? 's' : ''}.`);
   }
   if (credits.length) warnings.push(`${credits.length} stanza${credits.length > 1 ? 's' : ''} printed below the music kept as text in the file (not set under notes).`);
   const unitSys = units.map(u => u.m.sy);
@@ -10563,7 +10609,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   }
   if (barCheck) barCheck.notes.forEach(n => warnings.push(n));
   // UI compares clefs with 'F'; 'G8' stays a treble clef there
-  return { parts, layout, fifths, time, timeRead, clefs, ranges, measures: units.length, nNotes, credits, title: read.head.title || null, composer: read.head.composer || null, warnings: warnings.concat(layout.notes), xml, measureMap, barCheck, rhythm: { repaired, mismatch } };
+  return { parts, layout, fifths, time, timeRead, clefs, ranges, measures: units.length, nNotes, credits, stanzas, title: read.head.title || null, composer: read.head.composer || null, warnings: warnings.concat(layout.notes), xml, measureMap, barCheck, rhythm: { repaired, mismatch } };
 }
 
 // Horizontal extent of a syllable: lyrics.js may report x0/x1; otherwise it is
@@ -13547,6 +13593,11 @@ async function readPageText(fr, marks, ocr, opts = {}) {
   const seenAbbr = new Set();
   // chord symbols are many short words: their own budget
   let n = 0, nc = 0;
+  // the reads are planned in order (the line budget counts reads, not their results), started
+  // together (a pool of OCR workers reads them side by side; results do not depend on the order
+  // of reads) and applied in order
+  const jobs = [];
+  const read = (img) => { let p; try { p = img ? Promise.resolve(ocr(img)).catch(() => []) : Promise.resolve([]); } catch (e) { p = Promise.resolve([]); } return p; };
   for (const t of todo) {
     if (t.chordCand ? nc >= (opts.maxChords || 48) : n >= maxLines) continue;
     if (t.chordCand) nc++;
@@ -13555,21 +13606,21 @@ async function readPageText(fr, marks, ocr, opts = {}) {
     // and the number when its shapes did not read
     if (t.metro) {
       if (t.ocrBox) {
-        const wi = lineCrop(fr, t.ocrBox, t.h);
-        let ws = [];
-        try { ws = wi ? await ocr(wi) : []; } catch (e) { ws = []; }
+        const ws = read(lineCrop(fr, t.ocrBox, t.h));
         n++;
-        const ok = ws.filter(w => w.conf >= 30 && /\p{L}/u.test(w.text));
-        t.text = ok.map(w => w.text).join(' ').replace(/^[^\p{L}]+|[^\p{L}.]+$/gu, '').replace(/\s+/g, ' ').trim();
-        t.conf = ok.length ? Math.round(ok.reduce((a, w) => a + w.conf, 0) / ok.length) : 0;
+        jobs.push(async () => {
+          const ok = (await ws).filter(w => w.conf >= 30 && /\p{L}/u.test(w.text));
+          t.text = ok.map(w => w.text).join(' ').replace(/^[^\p{L}]+|[^\p{L}.]+$/gu, '').replace(/\s+/g, ' ').trim();
+          t.conf = ok.length ? Math.round(ok.reduce((a, w) => a + w.conf, 0) / ok.length) : 0;
+        });
       }
       if (!t.metro.bpm && t.metro.numBox) {
-        const ni = lineCrop(fr, t.metro.numBox, t.metro.numBox[3] - t.metro.numBox[1]);
-        let ws = [];
-        try { ws = ni ? await ocr(ni) : []; } catch (e) { ws = []; }
+        const ws = read(lineCrop(fr, t.metro.numBox, t.metro.numBox[3] - t.metro.numBox[1]));
         n++;
-        const num = +(ws.map(w => w.text).join('').replace(/[^0-9]/g, '')) || 0;
-        if (num >= 20 && num <= 400) t.metro.bpm = num;
+        jobs.push(async () => {
+          const num = +((await ws).map(w => w.text).join('').replace(/[^0-9]/g, '')) || 0;
+          if (num >= 20 && num <= 400) t.metro.bpm = num;
+        });
       }
       continue;
     }
@@ -13582,13 +13633,24 @@ async function readPageText(fr, marks, ocr, opts = {}) {
     }
     const img = lineCrop(fr, t.box, t.h);
     if (!img) continue;
-    let words = [];
-    try { words = await ocr(img); } catch (e) { words = []; }
+    const words = read(img);
     n++;
-    const ok = words.filter(w => w.conf >= 30 && /[\p{L}\p{N}]/u.test(w.text));
-    t.text = ok.map(w => w.text).join(' ').replace(/\s+/g, ' ').trim();
-    t.conf = ok.length ? Math.round(ok.reduce((a, w) => a + w.conf, 0) / ok.length) : 0;
-    refineRole(t);
+    jobs.push(async () => {
+      const ok = (await words).filter(w => w.conf >= 30 && /[\p{L}\p{N}]/u.test(w.text));
+      t.text = ok.map(w => w.text).join(' ').replace(/\s+/g, ' ').trim();
+      t.conf = ok.length ? Math.round(ok.reduce((a, w) => a + w.conf, 0) / ok.length) : 0;
+      refineRole(t);
+    });
+  }
+  for (const job of jobs) await job();
+  // "D.S. al Coda" / "D.C. al Fine" whose D.S. / D.C. was taken for other ink (a segno, a
+  // letter-like sign) and left out of the line: read again with the room to its left
+  for (const t of marks.text) {
+    if (!/^al\s+(coda|fine)\b/i.test(t.text || '')) continue;
+    const ws = await read(lineCrop(fr, [t.box[0] - 5 * t.h, t.box[1], t.box[2], t.box[3]], t.h));
+    const txt = ws.filter(w => w.conf >= 30).map(w => w.text).join(' ').replace(/\s+/g, ' ').trim();
+    const m = txt.match(/\b(d\.?\s*[sc]\.?)\s*al\s+(coda|fine)\b/i);
+    if (m) { t.text = `D.${/s/i.test(m[1].replace(/^d/i, '')) ? 'S' : 'C'}. al ${m[2].charAt(0).toUpperCase() + m[2].slice(1).toLowerCase()}`; t.role = 'expression'; }
   }
   // a dynamic whose letters did not all match the shapes (one fused with a
   // stem, a worn letter) but reads as one: a dynamic after all
@@ -13686,10 +13748,10 @@ function __omrSessionModule() {
       },
       // this copy's finish() needs only fr.R and asm.comps (see release)
       releasePage: release,
-      finish() {
+      finish(fo) {
         progress('Building parts', { stage: 'parts' });
         let score;
-        try { score = buildScore(pages, lyricsBySystem, { ocr: !!opts.ocr, copyLyrics: !!opts.copyLyrics, debug: opts.debug }); }
+        try { score = buildScore(pages, lyricsBySystem, { ocr: !!opts.ocr, copyLyrics: !!opts.copyLyrics, debug: opts.debug, stanzasAsVerses: !!(fo && fo.stanzasAsVerses) }); }
         catch (e) { score = { parts: [], warnings: ['Assembly failed: ' + e.message], xml: '' }; }
         if (score.layout && Object.values(lyricsBySystem).some((l) => l.some((v) => v.used))) {
           for (const k in lyricsBySystem) lyricsBySystem[k] = lyricsBySystem[k].filter((v) => v.used);
@@ -13914,7 +13976,7 @@ function __omrSessionModule() {
   }
 
   // ------------------------------------------------------------ worker side
-  // Messages in: init {ocr, ocrExtra}, page {i, n, gray}, finish. Out: ready, progress,
+  // Messages in: init {ocr, ocrExtra}, page {i, n, gray}, finish {opts}. Out: ready, progress,
   // ocr {id, img, extra} (answered by ocr-res), page-done, done, error.
   function workerMain(scope, req) {
     let session = null;
@@ -13959,7 +14021,8 @@ function __omrSessionModule() {
         if (session.releasePage) { session.releasePage(entry); (entry.spread || []).forEach((h) => session.releasePage(h)); }
         post({ t: 'page-done', i: m.i, ms: Date.now() - t0, view, thumb }, [thumb.data.buffer]);
       } else if (m.t === 'finish') {
-        const res = session.finish();
+        // m.opts: build options (stanzasAsVerses); a later finish rebuilds the score
+        const res = session.finish(m.opts || {});
         post({ t: 'done', result: resultSummary(res) });
       }
     }
@@ -15109,7 +15172,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
           resolveEngine(Object.assign(eng, {
             init(useOcr) { const p = wait('ready', 60000); w.postMessage({ t: 'init', ocr: !!useOcr, ocrExtra: !!(useOcr && ocrFn && ocrFn.extra) }); return p; },
             addPage(gray, i, n) { const p = wait('page-done', 300000); if (!eng.dead) w.postMessage({ t: 'page', i, n, gray, maxW: THUMB_W }, [gray.data.buffer]); return p; },
-            finish() { const p = wait('done', 300000); if (!eng.dead) w.postMessage({ t: 'finish' }); return p.then((m2) => m2.result); },
+            finish(o) { const p = wait('done', 300000); if (!eng.dead) w.postMessage({ t: 'finish', opts: o || {} }); return p.then((m2) => m2.result); },
             dispose() { eng.dead = true; w.terminate(); settle(false, new Error('stopped')); },
           }));
         } else if (m.t === 'progress') onProgress(m.msg, m.info);
@@ -15144,7 +15207,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
         if (session.releasePage) session.releasePage(entry);
         return { view, thumb, ms: performance.now() - t0 };
       },
-      async finish() { await nextPaint(); return Sess.resultSummary(session.finish()); },
+      async finish(o) { await nextPaint(); return Sess.resultSummary(session.finish(o || {})); },
       dispose() { session = null; },
     };
   }
@@ -15887,6 +15950,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
     setBusy(true);
     setStale(true);
     stopAsked = false;
+    dropRebuild();
     const t0 = performance.now();
     $('alert').hidden = true;
     stepper.reset();
@@ -16028,36 +16092,24 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
       $('stop').hidden = true;
       $('fileEta').hidden = true;
       mark('finish');
-      const res = await engine.finish();
+      const res = await engine.finish({ stanzasAsVerses: $('stanzaVerses').checked });
       mark('results');
-      engine.dispose();
+      // warnings about the reading itself, kept for a rebuild of the score
+      const pre = [...extraWarn];
+      if (total > n) pre.push(`Only the first ${n} of ${total} pages were read (the page reads at most ${MAX_PAGES}).`);
+      if (stopAsked && read < n) pre.push(`Stopped at your request after page ${read} of ${n}; the MusicXML covers ${read === 1 ? 'page 1' : `pages 1 to ${read}`}.`);
+      if (ocrError) pre.push('Lyrics were not read: the text reader is unavailable (' + ocrError + ').');
+      // stanzas printed below the music: keep the engine so the score can be rebuilt with them as verses
+      if (res.score && res.score.stanzas && res.score.stanzas.printed > 0) rebuild = { engine, pre, ocrError, read };
+      else engine.dispose();
       engine = null;
-      res.ocrError = ocrError;
-      res.pagesRead = read;
-      if (ocrError) res.warnings.unshift('Lyrics were not read: the text reader is unavailable (' + ocrError + ').');
-      if (stopAsked && read < n) res.warnings.unshift(`Stopped at your request after page ${read} of ${n}; the MusicXML covers ${read === 1 ? 'page 1' : `pages 1 to ${read}`}.`);
-      if (total > n) res.warnings.unshift(`Only the first ${n} of ${total} pages were read (the page reads at most ${MAX_PAGES}).`);
-      res.warnings.unshift(...extraWarn);
       stepper.go('xml');
       meter.set(0.97);
       status('Writing MusicXML');
-      lastRes = res;
-      $('margin').hidden = $('previewPanel').hidden = false; // results panels appear with the first result
-      document.querySelector('.plate').dataset.ready = '';
-      setStale(false);
-      legend((res.score && res.score.parts) || []);
-      book.applyResult(res);
-      renderParts(res);
-      renderLyrics(res);
-      corr = corrected();
-      renderCorrNote(corr);
-      renderWarnings((res.warnings || []).concat(corrWarnings(corr)));
       mark('code');
-      renderCode(corr.xml);
+      await showResult(res, pre, ocrError, read);
       mark('facts');
       stepFacts(res, ocrUsed);
-      await nextPaint();
-      await renderNotation(corr.xml, res.score.measures || 0, false);
       stepper.finish();
       fileFinished(true);
       const partial = stopAsked && read < n;
@@ -16066,6 +16118,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
       window.__omrResult = {
         parts: res.score.parts.map((p) => p.name), nNotes: res.score.nNotes, measures: res.score.measures,
         lyrics: Object.values(res.lyricsBySystem).flat().length, warnings: res.warnings, xmlLength: (res.score.xml || '').length,
+        stanzas: res.score.stanzas || null,
         corrections: corr && corr.corrections ? corr.corrections.applied.length : 0,
         steps: stepper.snapshot(), engine: engineKind, pages: { total, n, read, states: book.pages.map((p) => p.state) },
         ocrLangs: ocrUsed ? ocrLangs : null, file: file.name,
@@ -16087,6 +16140,62 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
       if (engine) engine.dispose();
       if (doc && doc.close) { try { doc.close(); } catch (e) { /* already closed */ } }
       $('stop').hidden = true;
+      setBusy(false);
+    }
+  }
+
+  // Everything drawn from a result: parts, lyrics, warnings, MusicXML and the preview.
+  async function showResult(res, pre, ocrError, read) {
+    res.ocrError = ocrError;
+    res.pagesRead = read;
+    res.warnings = pre.concat(res.warnings || []);
+    lastRes = res;
+    $('margin').hidden = $('previewPanel').hidden = false; // results panels appear with the first result
+    document.querySelector('.plate').dataset.ready = '';
+    setStale(false);
+    legend((res.score && res.score.parts) || []);
+    book.applyResult(res);
+    renderParts(res);
+    renderLyrics(res);
+    renderStanzaOpt(res);
+    corr = corrected();
+    renderCorrNote(corr);
+    renderWarnings((res.warnings || []).concat(corrWarnings(corr)));
+    renderCode(corr.xml);
+    await nextPaint();
+    await renderNotation(corr.xml, res.score.measures || 0, false);
+  }
+
+  // L5b: stanzas printed below the music, set as verses on request. The engine
+  // of the last scan stays alive while it has such stanzas, so a toggle rebuilds
+  // only the score (score assembly), not the page reading.
+  let rebuild = null;
+  function dropRebuild() {
+    if (rebuild) { rebuild.engine.dispose(); rebuild = null; }
+    $('stanzaOpt').hidden = true;
+  }
+  function renderStanzaOpt(res) {
+    const st = res.score && res.score.stanzas;
+    $('stanzaOpt').hidden = !(st && st.printed > 0 && rebuild);
+    if (st && st.printed > 0) $('stanzaOptLabel').textContent = `Set the ${st.printed === 1 ? 'stanza' : st.printed + ' stanzas'} printed below the music as verses`;
+  }
+  async function rebuildScore() {
+    if (!rebuild || busy) return;
+    const box = $('stanzaVerses'), r = rebuild;
+    setBusy(true);
+    box.disabled = true;
+    status('Rebuilding the score');
+    try {
+      const res = await r.engine.finish({ stanzasAsVerses: box.checked });
+      await showResult(res, r.pre, r.ocrError, r.read);
+      const set = (res.score.stanzas && res.score.stanzas.set) || 0;
+      status(!box.checked ? 'Stanzas below the music left as text' : set ? `${plural(set, 'stanza')} set as verses` : 'No stanza fits the tune: left as text');
+      if (window.__omrResult) Object.assign(window.__omrResult, { lyrics: Object.values(res.lyricsBySystem).flat().length, xmlLength: (res.score.xml || '').length, stanzas: res.score.stanzas });
+    } catch (e) {
+      dropRebuild();
+      status('Could not rebuild the score: ' + ((e && e.message) || e));
+    } finally {
+      box.disabled = false;
       setBusy(false);
     }
   }
@@ -16154,6 +16263,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
   });
   $('copy').addEventListener('click', copyXML);
   $('saveXml').addEventListener('click', saveXML);
+  $('stanzaVerses').addEventListener('change', rebuildScore);
   $('copy').disabled = true;
   $('stop').addEventListener('click', () => {
     stopAsked = true;

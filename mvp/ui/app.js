@@ -399,7 +399,7 @@
           resolveEngine(Object.assign(eng, {
             init(useOcr) { const p = wait('ready', 60000); w.postMessage({ t: 'init', ocr: !!useOcr, ocrExtra: !!(useOcr && ocrFn && ocrFn.extra) }); return p; },
             addPage(gray, i, n) { const p = wait('page-done', 300000); if (!eng.dead) w.postMessage({ t: 'page', i, n, gray, maxW: THUMB_W }, [gray.data.buffer]); return p; },
-            finish() { const p = wait('done', 300000); if (!eng.dead) w.postMessage({ t: 'finish' }); return p.then((m2) => m2.result); },
+            finish(o) { const p = wait('done', 300000); if (!eng.dead) w.postMessage({ t: 'finish', opts: o || {} }); return p.then((m2) => m2.result); },
             dispose() { eng.dead = true; w.terminate(); settle(false, new Error('stopped')); },
           }));
         } else if (m.t === 'progress') onProgress(m.msg, m.info);
@@ -434,7 +434,7 @@
         if (session.releasePage) session.releasePage(entry);
         return { view, thumb, ms: performance.now() - t0 };
       },
-      async finish() { await nextPaint(); return Sess.resultSummary(session.finish()); },
+      async finish(o) { await nextPaint(); return Sess.resultSummary(session.finish(o || {})); },
       dispose() { session = null; },
     };
   }
@@ -1177,6 +1177,7 @@
     setBusy(true);
     setStale(true);
     stopAsked = false;
+    dropRebuild();
     const t0 = performance.now();
     $('alert').hidden = true;
     stepper.reset();
@@ -1318,36 +1319,24 @@
       $('stop').hidden = true;
       $('fileEta').hidden = true;
       mark('finish');
-      const res = await engine.finish();
+      const res = await engine.finish({ stanzasAsVerses: $('stanzaVerses').checked });
       mark('results');
-      engine.dispose();
+      // warnings about the reading itself, kept for a rebuild of the score
+      const pre = [...extraWarn];
+      if (total > n) pre.push(`Only the first ${n} of ${total} pages were read (the page reads at most ${MAX_PAGES}).`);
+      if (stopAsked && read < n) pre.push(`Stopped at your request after page ${read} of ${n}; the MusicXML covers ${read === 1 ? 'page 1' : `pages 1 to ${read}`}.`);
+      if (ocrError) pre.push('Lyrics were not read: the text reader is unavailable (' + ocrError + ').');
+      // stanzas printed below the music: keep the engine so the score can be rebuilt with them as verses
+      if (res.score && res.score.stanzas && res.score.stanzas.printed > 0) rebuild = { engine, pre, ocrError, read };
+      else engine.dispose();
       engine = null;
-      res.ocrError = ocrError;
-      res.pagesRead = read;
-      if (ocrError) res.warnings.unshift('Lyrics were not read: the text reader is unavailable (' + ocrError + ').');
-      if (stopAsked && read < n) res.warnings.unshift(`Stopped at your request after page ${read} of ${n}; the MusicXML covers ${read === 1 ? 'page 1' : `pages 1 to ${read}`}.`);
-      if (total > n) res.warnings.unshift(`Only the first ${n} of ${total} pages were read (the page reads at most ${MAX_PAGES}).`);
-      res.warnings.unshift(...extraWarn);
       stepper.go('xml');
       meter.set(0.97);
       status('Writing MusicXML');
-      lastRes = res;
-      $('margin').hidden = $('previewPanel').hidden = false; // results panels appear with the first result
-      document.querySelector('.plate').dataset.ready = '';
-      setStale(false);
-      legend((res.score && res.score.parts) || []);
-      book.applyResult(res);
-      renderParts(res);
-      renderLyrics(res);
-      corr = corrected();
-      renderCorrNote(corr);
-      renderWarnings((res.warnings || []).concat(corrWarnings(corr)));
       mark('code');
-      renderCode(corr.xml);
+      await showResult(res, pre, ocrError, read);
       mark('facts');
       stepFacts(res, ocrUsed);
-      await nextPaint();
-      await renderNotation(corr.xml, res.score.measures || 0, false);
       stepper.finish();
       fileFinished(true);
       const partial = stopAsked && read < n;
@@ -1356,6 +1345,7 @@
       window.__omrResult = {
         parts: res.score.parts.map((p) => p.name), nNotes: res.score.nNotes, measures: res.score.measures,
         lyrics: Object.values(res.lyricsBySystem).flat().length, warnings: res.warnings, xmlLength: (res.score.xml || '').length,
+        stanzas: res.score.stanzas || null,
         corrections: corr && corr.corrections ? corr.corrections.applied.length : 0,
         steps: stepper.snapshot(), engine: engineKind, pages: { total, n, read, states: book.pages.map((p) => p.state) },
         ocrLangs: ocrUsed ? ocrLangs : null, file: file.name,
@@ -1377,6 +1367,62 @@
       if (engine) engine.dispose();
       if (doc && doc.close) { try { doc.close(); } catch (e) { /* already closed */ } }
       $('stop').hidden = true;
+      setBusy(false);
+    }
+  }
+
+  // Everything drawn from a result: parts, lyrics, warnings, MusicXML and the preview.
+  async function showResult(res, pre, ocrError, read) {
+    res.ocrError = ocrError;
+    res.pagesRead = read;
+    res.warnings = pre.concat(res.warnings || []);
+    lastRes = res;
+    $('margin').hidden = $('previewPanel').hidden = false; // results panels appear with the first result
+    document.querySelector('.plate').dataset.ready = '';
+    setStale(false);
+    legend((res.score && res.score.parts) || []);
+    book.applyResult(res);
+    renderParts(res);
+    renderLyrics(res);
+    renderStanzaOpt(res);
+    corr = corrected();
+    renderCorrNote(corr);
+    renderWarnings((res.warnings || []).concat(corrWarnings(corr)));
+    renderCode(corr.xml);
+    await nextPaint();
+    await renderNotation(corr.xml, res.score.measures || 0, false);
+  }
+
+  // L5b: stanzas printed below the music, set as verses on request. The engine
+  // of the last scan stays alive while it has such stanzas, so a toggle rebuilds
+  // only the score (score assembly), not the page reading.
+  let rebuild = null;
+  function dropRebuild() {
+    if (rebuild) { rebuild.engine.dispose(); rebuild = null; }
+    $('stanzaOpt').hidden = true;
+  }
+  function renderStanzaOpt(res) {
+    const st = res.score && res.score.stanzas;
+    $('stanzaOpt').hidden = !(st && st.printed > 0 && rebuild);
+    if (st && st.printed > 0) $('stanzaOptLabel').textContent = `Set the ${st.printed === 1 ? 'stanza' : st.printed + ' stanzas'} printed below the music as verses`;
+  }
+  async function rebuildScore() {
+    if (!rebuild || busy) return;
+    const box = $('stanzaVerses'), r = rebuild;
+    setBusy(true);
+    box.disabled = true;
+    status('Rebuilding the score');
+    try {
+      const res = await r.engine.finish({ stanzasAsVerses: box.checked });
+      await showResult(res, r.pre, r.ocrError, r.read);
+      const set = (res.score.stanzas && res.score.stanzas.set) || 0;
+      status(!box.checked ? 'Stanzas below the music left as text' : set ? `${plural(set, 'stanza')} set as verses` : 'No stanza fits the tune: left as text');
+      if (window.__omrResult) Object.assign(window.__omrResult, { lyrics: Object.values(res.lyricsBySystem).flat().length, xmlLength: (res.score.xml || '').length, stanzas: res.score.stanzas });
+    } catch (e) {
+      dropRebuild();
+      status('Could not rebuild the score: ' + ((e && e.message) || e));
+    } finally {
+      box.disabled = false;
       setBusy(false);
     }
   }
@@ -1444,6 +1490,7 @@
   });
   $('copy').addEventListener('click', copyXML);
   $('saveXml').addEventListener('click', saveXML);
+  $('stanzaVerses').addEventListener('change', rebuildScore);
   $('copy').disabled = true;
   $('stop').addEventListener('click', () => {
     stopAsked = true;
