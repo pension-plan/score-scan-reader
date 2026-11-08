@@ -1140,12 +1140,15 @@ in `score.barCheck` ({systems: [{page, sys, printed, read}], printed, agree, not
 disagrees on one system only (its neighbours agree with each other) and is ignored; a missed or extra
 barline shifts every later system, and each such change becomes a warning ("Bar numbers say system 3
 starts at bar 11; the reading has it start at bar 9 (2 barlines missed before it)."). Printed numbers
-were read on 13 of 20 benchmark items (27 systems; 15 agree) and 276 of 365 challenge items (842 systems;
-691 agree). Feeding them back (`opts.barFix`: a second pass with the bar count of the system before each
-change fixed, over-full merges allowed at a high price, groups whose contents fill k bars cut into k, the
-first bar made a pickup when the numbers say so) raises agreement to 21/27 and 711/842, but rhythm repair
-then does worse (benchmark duration 0.918 to 0.914, pitch 0.945 to 0.943; challenge aggregate 0.8228 to
-0.8226, 8 items down), so it is off by default.
+were read on 13 of 20 benchmark items (27 systems; 15 agree), 276 of 365 challenge items (842 systems;
+691 agree) and 210 of 288 coverage PDFs (520 systems; 327 agree). Feeding them back (`opts.barFix`) is a
+second pass that fixes the bar count of the system before each change of one barline, only where a clean
+fix exists (no over-full merge; a group is cut into k bars only when its contents fill exactly k; the
+first bar becomes a pickup when the numbers say so), kept only when it agrees with more printed numbers
+and leaves no more voice-measures needing rhythm repair. It raises agreement to 19/27 (benchmark) and
+340/520 (coverage); aloha-oe-full-score gains 0.011, but per-item metrics move both ways (challenge
+wind-melody: pitch +0.038, duration -0.042 on 31 variants; clara-schumann pitch -0.014), so it is off by
+default.
 
 **Braces and the part layout.** `score.js` `braceEvidence()` counts, per staff pair, the systems whose
 left edge shows a brace and those showing only a system line. A rule "a pair read as a keyboard grand
