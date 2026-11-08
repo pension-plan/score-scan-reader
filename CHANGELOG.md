@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.33.1](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.33.0...score-scan-reader-v0.33.1) (2026-11-08)
+
+
+### Bug Fixes
+
+* **front:** upside-down pages whose staves end in keys are turned ([4ad0d58](https://github.com/pension-plan/score-scan-reader/commit/4ad0d583121a29effbedc905158be61a4e4df0fc))
+* **score:** inner notes of a tied chord tied too ([b978cf1](https://github.com/pension-plan/score-scan-reader/commit/b978cf1bd853120d30be6ee69fd209dcaa1133d4))
+* **score:** restore the ties-across-a-system-break block (L20) dropped by f091328 ([8be60f8](https://github.com/pension-plan/score-scan-reader/commit/8be60f877e4643f3079be3765d28791b007f5d72))
+* **systems:** trio page 2 regrouped by position-wise gaps; small staves voted per system ([f091328](https://github.com/pension-plan/score-scan-reader/commit/f091328bcb2b0baca91028d9500979eb9fa9ee0d))
+
+
+### Performance Improvements
+
+* page text read after the page step (deferText), notes-only preview, settle ([031a2cf](https://github.com/pension-plan/score-scan-reader/commit/031a2cf504db849eb9c5a27846ab29cc042beff8))
+
 ## [0.33.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.32.2...score-scan-reader-v0.33.0) (2026-11-08)
 
 
