@@ -179,6 +179,23 @@ text is read. Phone profile, default sample: notes shown at 18.9 s instead of 45
 image buffers until then. The two models (eng, deu) load together; neither can be read without the other,
 so fetching eng first would not show text sooner.
 
+**OCR model size.** The first-pass models are most of what the complete first result waits for. Measured
+(eng+deu as the page reads, with the second pass; benchmark 20 items, challenge 365):
+
+| eng / deu | bytes (gzip) | benchmark lyrics | challenge aggregate | challenge lyrics | challenge items down > 0.05 (lyrics) |
+|---|---|---|---|---|---|
+| best_int / best_int (was) | 2.95 + 1.33 MB | 0.9314 | 0.9448 | 0.9473 | - |
+| fast / fast | 1.98 + 0.85 MB | 0.9311 | 0.9440 | 0.9463 | 4 (worst -0.16) |
+| fast / best_int | 1.98 + 1.33 MB | 0.9316 | 0.9444 | 0.9458 | 4 (worst -0.15) |
+| **best_int / fast (now)** | 2.95 + 0.85 MB | 0.9331 | 0.9447 | 0.9472 | 1 (worst -0.07) |
+
+So deu is the `tessdata_fast` model (0.48 MB less, about 3 s on Fast 3G) and eng stays `best_int`: the
+fast English model loses lyrics on several challenge items. Recompressing does not help within gzip
+(gzip -9 gives the same size); brotli or xz would save another 0.46-0.50 MB with identical output, but Pages
+serves `.br`/`.xz` files without decoding them and tesseract.js only unpacks gzip, so the page would need
+its own decoder and to hand the model data to the worker (tesseract.js's `{code, data}` language objects
+are mishandled in its initialise step): not done.
+
 **Size budget.** Each supporting file ≤ 15 MB, the total ≤ 64 MB [WF]. Planned: phase 1 about 13–20 MB, phase
 2 with ONNX about 30–40 MB [OMR §9.3]. The build fails if a limit is exceeded (§9).
 

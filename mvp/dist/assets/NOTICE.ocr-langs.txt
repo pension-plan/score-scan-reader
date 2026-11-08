@@ -5,3 +5,11 @@ Tesseract 4 LSTM "best_int" models from @tesseract.js-data/{fra,spa,ita,ces}/4.0
 (the integer conversion of tesseract-ocr/tessdata_best), Copyright Google and the Tesseract
 contributors, licensed under the Apache License 2.0 (https://www.apache.org/licenses/LICENSE-2.0).
 They are loaded only when a lyric row shows accents the first pass (eng+deu) did not read.
+
+First-pass OCR languages (English, German)
+
+eng.traineddata.gz is the Tesseract 4 LSTM "best_int" model from @tesseract.js-data/eng/4.0.0_best_int.
+deu.traineddata.gz is the Tesseract 4 LSTM "fast" model from tesseract-ocr/tessdata_fast (deu.traineddata,
+gzip -9): 0.85 MB instead of 1.33 MB for best_int, with the same lyric and text accuracy on the benchmark
+and challenge sets (docs/SDD.md, First load). Copyright Google and the Tesseract contributors, licensed
+under the Apache License 2.0 (https://www.apache.org/licenses/LICENSE-2.0).
