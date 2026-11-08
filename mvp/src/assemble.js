@@ -1431,8 +1431,33 @@ function cutAccidental(R, comps, hd, minX = -Infinity, reach = 1.9) {
   return null;
 }
 
+// An accidental touching its own notehead (one component with it): cut at the thinnest column
+// between the sign's place and the head, and the pieces left of the cut read as a sign
+function joinedAccidental(R, comps, hd, minX = -Infinity, reach = 1.9) {
+  const sp = hd.sp;
+  const J = comps.find(c => c.x0 <= hd.x && c.x1 >= hd.x && c.y0 <= hd.y && c.y1 >= hd.y && c.x0 < hd.x - 1.2 * sp && c.x0 > minX);
+  if (!J) return null;
+  const ya = Math.max(0, Math.round(hd.y - 2.6 * sp)), yb = Math.min(R.height - 1, Math.round(hd.y + 1.6 * sp));
+  let cx = -1, best = Infinity;
+  for (let x = Math.round(hd.x - 0.5 * sp); x >= Math.round(hd.x - 1.0 * sp); x--) {
+    let n = 0;
+    for (let y = ya; y <= yb; y++) n += R.data[y * R.width + x] ? 1 : 0;
+    if (n < best) { best = n; cx = x; }
+  }
+  if (best > 0.6 * sp) return null;
+  const x0 = Math.max(0, Math.round(Math.max(minX, hd.x - (reach + 1.2) * sp))), x1 = cx - 1;
+  if (x1 - x0 < 0.5 * sp) return null;
+  const w = x1 - x0 + 1, h = yb - ya + 1, img = { width: w, height: h, data: new Uint8Array(w * h) };
+  for (let y = 0; y < h; y++) img.data.set(R.data.subarray((y + ya) * R.width + x0, (y + ya) * R.width + x0 + w), y * w);
+  // (pieces of the head's own component, whole but for the cut on the right)
+  const cs = labelComponents(img).comps.filter(c => c.area >= 4 && c.x0 > 0 && c.y0 > 0 && c.y1 < h - 1 && c.x1 >= w - 2)
+    .map(c => ({ ...c, x0: c.x0 + x0, x1: c.x1 + x0, y0: c.y0 + ya, y1: c.y1 + ya }));
+  return cs.length ? accidentalGlyph(R, cs, { ...hd, x: Math.max(hd.x, x1 + 0.5 * sp) }, minX, reach) : null;
+}
+
 function headAccidental(R, comps, hd, minX = -Infinity, reach = 1.9) {
-  const g = accidentalGlyph(R, comps, hd, minX, reach) || fallbackAccidental(R, comps, hd, minX, reach) || cutAccidental(R, comps, hd, minX, reach);
+  const g = accidentalGlyph(R, comps, hd, minX, reach) || fallbackAccidental(R, comps, hd, minX, reach) || cutAccidental(R, comps, hd, minX, reach) ||
+    joinedAccidental(R, comps, hd, minX, reach);
   if (g && parenthesised(comps, g, hd)) hd.accParen = true;
   return g ? g.kind : null;
 }
