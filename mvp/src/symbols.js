@@ -182,15 +182,12 @@ function pageSymbols(fr, asm) {
     const label = t.role === 'measure' ? (t.text ? `Bar ${t.text}` : 'Bar ? (number not read)') : body ? `${name}: ${body}` : name;
     return [...b4(t.box), t.role, label];
   });
-  out.dyns = marks.dyns.map(d => [...b4(d.box), d.value]).concat((marks.pedals || []).map(p => [...b4(p.box), p.type === 'start' ? 'Ped.' : p.type === 'change' ? 'Ped. change' : '✽ (pedal up)']));
-  out.slurs = (out.slurs || []);
+  out.dyns = marks.dyns.map(d => [...b4(d.box), d.value]).concat((marks.pedals || []).map(p => [...b4(p.box), p.type === 'start' ? 'Ped.' : '✽ (pedal up)']));
   out.text = out.text.concat((marks.rehearsals || []).map(r => [...b4(r.box), 'rehearsal', `Rehearsal ${r.text}${r.guessed ? ' (letter by order)' : ''}`]));
   // fingering digits show with the text, labelled by their digit
   out.text = out.text.concat((marks.fingerings || []).map(f => [...b4(f.box), 'fingering', `Finger ${f.digit}`]));
   out.wedges = marks.wedges.map(w => [...b4(w.box), w.type === 'crescendo' ? 'cresc.' : 'dim.']);
   out.slurs = marks.slurs.map(s => b4(s.box));
-  // pedal bracket lines are drawn with the dynamics
-  out.dyns = (out.dyns || []).concat((marks.pedalLines || []).map(p => [...b4(p.box), 'pedal line']));
   out.fermatas = marks.fermatas.map(s => b4(s.box));
   out.braces = marks.braces.map(s => [...b4(s.box), s.kind]);
   out.ledgers = marks.ledgers.map(s => b4(s.box));

@@ -162,8 +162,7 @@ function parseLabel(text) {
         continue;
       }
       if (MOD.test(w)) {
-        // desk and divisi numbers in the roman style of printed scores: "Violin 1" -> "Violin I"
-        if (cur) cur.name += ' ' + w0.replace(/[.,]+$/, '').replace(/^(i{1,3}|iv)$/i, m => m.toUpperCase()).replace(/^([1-4])(st|nd|rd|th|mo|do)?$/i, (m, d) => ['I', 'II', 'III', 'IV'][d - 1]);
+        if (cur) cur.name += ' ' + w0.replace(/[.,]+$/, '').replace(/^i{1,3}$/i, m => m.toUpperCase());
         else out.push(cur = { name: w0, kind: 'modifier', pending: true });
         continue;
       }
@@ -206,20 +205,16 @@ function readLabels(systems, nSt) {
 // Braces and system lines (text.js marks) joining staves k and k+1 of the
 // systems: {braces, lines} counted over systems
 function braceEvidence(sel, k) {
-  let braces = 0, lines = 0, pair = 0, wide = 0, read = 0;
+  let braces = 0, lines = 0;
   for (const sy of sel) {
     const m = sy.fr && sy.fr._marks && sy.fr._marks.marks;
     if (!m || !sy.staves[k + 1]) continue;
     const a = sy.staves[k].si, b = sy.staves[k + 1].si;
-    if (m.braces.some(x => x.span && (x.span.includes(a) || x.span.includes(b)))) read++;
     const on = m.braces.filter(x => x.span && x.span.includes(a) && x.span.includes(b));
     if (on.some(x => x.kind === 'brace')) braces++;
     else if (on.length) lines++;
-    // a curly brace over exactly this pair; a mark over more staves than the pair
-    if (on.some(x => x.kind === 'brace' && x.span.length === 2)) pair++;
-    if (on.some(x => x.span.length > 2)) wide++;
   }
-  return { braces, lines, pair, wide, read };
+  return { braces, lines };
 }
 
 // Decide the part layout for the whole piece (never per measure):
@@ -264,10 +259,6 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
       // no barline evidence: two chordal staves with no text at all read as piano
       const chordal = (stats[k].f3 + stats[k + 1].f3) / 2 >= 0.2 || (stats[k].f2 + stats[k + 1].f2) / 2 <= 0.3;
       kb = nSt === 2 && !underlay && (chordal || (ocr && !anyLyrics));
-      // the bottom pair of a taller score, treble over bass with full chords
-      // (three heads on a stem) and no text: an accompaniment whose joined
-      // barlines were lost (L6: voice and piano on a faded copy)
-      if (!kb && nSt > 2 && k + 1 === nSt - 1 && clefs[k] === 'G' && clefs[k + 1] === 'F' && !underlay && lyr[k + 1] < 0.15 && Math.max(stats[k].f3, stats[k + 1].f3) >= 0.2) kb = true;
     }
     if (small[k] || small[k + 1]) kb = false;
     // a lone one-letter voice name ("a": OCR of a brace, a clef fragment or a
@@ -280,42 +271,19 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
     const noise = kb && texture && !anyLyrics && own.length === 1 && own[0].letter;
     // printed names overrule: one keyboard name across the pair joins it; a
     // staff with its own voice or instrument name is not half of a grand staff
-    const named = labels[k].some(l => l.span && l.span.includes(k + 1) && l.names.some(n => n.kind === 'keyboard'));
-    if (named) kb = true;
+    if (labels[k].some(l => l.span && l.span.includes(k + 1) && l.names.some(n => n.kind === 'keyboard'))) kb = true;
     else if (own.length && !noise) kb = false;
-    // a grand staff is braced (L18). text.js tells a curly brace from a
-    // straight system line or bracket by its tip, so a brace over exactly this
-    // pair on any system confirms a keyboard; without one, a pair is two
-    // instruments when a mark over more staves than the pair joins it (the
-    // bracket or system line of an ensemble), when a C clef is on it (never
-    // a keyboard clef), when three or more systems agree on a system line and
-    // neither staff has chords, or when both staves carry the same clef and
-    // no chords. Degraded pianos whose brace is lost keep their link: their
-    // texture (chords) and unbracketed pairs leave all of these silent.
-    const ev = braceEvidence(sel, k);
-    const mono = stats[k].f2 + stats[k].f3 < 0.1 && stats[k + 1].f2 + stats[k + 1].f3 < 0.1;
-    const cClef = /^C/.test(clefs[k]) || /^C/.test(clefs[k + 1]);
-    let why = null;
-    if (kb && !named) {
-      if (cClef) why = 'a C clef (never a keyboard clef)';
-      else if (!ev.pair && ev.wide) why = 'a bracket or system line over more staves than the pair and no brace';
-      else if (!ev.pair && mono && ev.lines >= 3 && ev.lines >= 0.75 * ev.read) why = `a system line and no brace on ${ev.lines} systems, single-line staves`;
-      else if (!ev.pair && mono && clefs[k] === clefs[k + 1]) why = 'the same clef on both staves, single lines and no brace';
+    // a grand staff is braced: where the systems' left edges were read (a
+    // system line joins the pair) and no system shows a brace over the pair,
+    // the two staves are two instruments (L18). Off unless opts.braceCheck: on
+    // the challenge set it fixed the two-instrument items but split pianos
+    // whose brace was not found (degraded copies)
+    if (kb && opts.braceCheck) {
+      const ev = braceEvidence(sel, k);
+      if (ev.lines >= 2 && !ev.braces) { kb = false; notes.push(`Staves ${k + 1}+${k + 2}: joined by a system line but no brace on any system: read as two parts, not a keyboard grand staff.`); }
     }
-    if (why) { kb = false; notes.push(`Staves ${k + 1}+${k + 2}: ${why}: read as two parts, not a keyboard grand staff.`); }
-    evid.push({ pair: k, nsys: sel.length, clefs: [clefs[k], clefs[k + 1]], tex: [+(stats[k].f2 + stats[k].f3).toFixed(2), +(stats[k + 1].f2 + stats[k + 1].f3).toFixed(2)], bars: c.n, joined: c.frac == null ? null : +c.frac.toFixed(2), lyr: [+lyr[k].toFixed(2), +lyr[k + 1].toFixed(2)], accomp, small: [small[k], small[k + 1]], brace: ev, kb });
+    evid.push({ pair: k, bars: c.n, joined: c.frac == null ? null : +c.frac.toFixed(2), lyr: [+lyr[k].toFixed(2), +lyr[k + 1].toFixed(2)], accomp, small: [small[k], small[k + 1]], brace: braceEvidence(sel, k), kb });
     link.push(kb);
-  }
-  // three or more staves joined in a run with no brace over any pair of them
-  // are an ensemble's bracketed group (strings, winds), not keyboards (L18)
-  for (let i = 0; i < link.length;) {
-    let j = i;
-    while (j < link.length && link[j]) j++;
-    if (j - i >= 2 && !evid.slice(i, j).some(e => e.brace.pair) && !labels.slice(i, j + 1).some(ls => ls.some(l => l.names.some(n => n.kind === 'keyboard')))) {
-      for (let t = i; t < j; t++) { link[t] = false; evid[t].kb = false; }
-      notes.push(`Staves ${i + 1}\u2013${j + 1}: joined by barlines with no brace: read as separate instruments, not keyboards.`);
-    }
-    i = Math.max(j, i + 1);
   }
   // organ: a pedal staff (bass clef, no text, no name of its own) under a
   // keyboard pair belongs to it; its barlines are often not drawn through
@@ -361,33 +329,6 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
     let q = 0;
     vv.forEach(v => { const n = v.split ? 2 : 1; v.inf = vn.slice(q, q + n); q += n; });
     sm.forEach((v, i) => { v.inf = [sm.length > 1 ? `Instrument ${i + 1}` : 'Instrument']; });
-    // two small staves, treble over bass, over a keyboard: a piano trio
-    if (sm.length === 2 && sm[0].clef === 'G' && sm[1].clef === 'F' && groups.some(g => g.keyboard)) { sm[0].inf = ['Violin']; sm[1].inf = ['Violoncello']; }
-  }
-  // instrumental ensembles (L9): no voice name read, no underlay, and an
-  // instrument name read or a C clef on some staff: the unnamed staves are
-  // not singers. A string quartet's clefs (G G C3 F) name its four staves, an
-  // alto-clef staff is a viola, and two neighbouring staves of one instrument
-  // in one clef are its two desks (Violin I over Violin II)
-  {
-    const got = vs.flatMap(v => (v.names || []).filter(Boolean));
-    const solo = vs.filter(v => !v.small && !v.split);
-    if (!anyLyrics && !got.some(n => n.kind === 'vocal') && (got.some(n => n.kind === 'instrument') || solo.some(v => /^C/.test(v.clef)))) {
-      const quartet = ['Violin I', 'Violin II', 'Viola', 'Violoncello'];
-      if (nSt === 4 && solo.length === 4 && solo.map(v => v.clef).join() === 'G,G,C3,F') solo.forEach((v, i) => { v.inf = [quartet[i]]; });
-      else solo.forEach(v => { if (v.clef === 'C3') v.inf = ['Viola']; });
-      const nameOf = (v) => v.names && v.names[0] && v.names[0].kind === 'instrument' ? v.names[0] : null;
-      for (let i = 0; i + 1 < solo.length; i++) {
-        const a = solo[i], b = solo[i + 1];
-        if (b.staff !== a.staff + 1 || a.clef !== b.clef) continue;
-        const na = nameOf(a), nb = nameOf(b), base = (na || nb) && (na || nb).name;
-        if (!base || / (I{1,3}|IV)$/.test(base) || (na && nb && na.name !== nb.name) || (!na && a.names && a.names[0]) || (!nb && b.names && b.names[0])) continue;
-        a.inf = [base + ' I']; b.inf = [base + ' II'];
-        if (na) a.names = [{ ...na, name: base + ' I' }];
-        if (nb) b.names = [{ ...nb, name: base + ' II' }];
-        i++;
-      }
-    }
   }
   const read = [];
   const parts = [];
@@ -1047,10 +988,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     for (const pi of pis) if (e[pi] > (lowest ? e[best] + 0.6 : 1.25 * e[best] + 2)) best = pi;
     bandVoice[band] = best;
     // under the lowest split staff with nothing to tell the voices apart (the
-    // same onsets throughout): the text serves both voices of that staff.
-    // Transcriptions give such text to either voice (tenor in aloha-oe and the
-    // anthem, bass in bwv3-6 and the amen item), so one voice would be wrong
-    // as often as right; both is right in every case where both sing it (L7)
+    // same onsets throughout): the text serves both voices of that staff
     const tie = lowest && best === prior && pis.every(pi => Math.abs(e[pi] - e[prior]) < 0.6);
     if (tie) bandVoice[band] = 'all';
     if (pis.length > 1) lyrNotes.add(`Lyrics under staff ${+band + 1} attached to ${tie ? pis.map(pi => parts[pi].name).join(' and ') + ' (same rhythm, text sung by both)' : parts[best].name + (best === prior ? ' (upper voice)' : ' (its rhythm fits the syllables best)')}.`);
@@ -1071,24 +1009,6 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     if (opts.debug) opts.debug.push({ sys: L.sy.page + ':' + L.sy.index, band: v.band, n: v.number, nsyl: v.syllables.length, fits: cands.map(c => [c.p.name, +c.fit.toFixed(2), c.evs.length, +c.soft.toFixed(2)]), take: take.map(c => c.p.name) });
     for (const c of take) alignSyllables(v, c.evs, sp, L.sy && L.sy.comps);
     v.used = take.map(c => c.p.name).join(', ');
-  }
-  // a melisma inferred from notes left without a syllable (no extender line
-  // read) where letters are printed in the verse's own text row under one of
-  // those notes is a syllable OCR missed, not a melisma: no extender (L4b)
-  for (const L of lines) for (const ml of L.v.melismas || []) {
-    const v = L.v, comps = L.sy.comps;
-    if (ml.printed || !comps || v.y == null || v.y1 == null) continue;
-    const { evs, b, last, num } = ml, sp = L.sp, rowH = v.y1 - v.y;
-    const own = (c, q) => q && q.x0 != null && c.x1 >= q.x0 - 0.2 * sp && c.x0 <= q.x1 + 0.2 * sp;
-    let letters = false;
-    for (let t = b + 1; t <= last && !letters; t++) {
-      const x = evs[t].x;
-      letters = comps.some(c => c.x1 >= x - 0.6 * sp && c.x0 <= x + 0.6 * sp && c.y0 >= v.y - 0.25 * rowH && c.y1 <= v.y1 + 0.25 * rowH &&
-        c.y1 - c.y0 + 1 >= 0.35 * rowH && c.x1 - c.x0 + 1 <= 3 * sp && !own(c, ml.s) && !own(c, ml.next));
-    }
-    if (!letters) continue;
-    if (evs[b].lyrics && evs[b].lyrics[num]) delete evs[b].lyrics[num].extend;
-    if (evs[last].lyrExt) delete evs[last].lyrExt[num];
   }
   lyrNotes.forEach(n => warnings.push(n));
 
@@ -1454,7 +1374,6 @@ function alignSyllables(verse, evs, sp, comps) {
     for (let t = b + 1; t <= last; t++) if (evs[t].lyrics && evs[t].lyrics[num]) return;
     evs[b].lyrics[num].extend = true;
     (evs[last].lyrExt ||= {})[num] = true;
-    (verse.melismas ||= []).push({ evs, b, last, num, printed: !!ext, s, next: k + 1 < placed.length ? syl[placed[k + 1][0]] : null });
   });
 }
 
@@ -1650,12 +1569,11 @@ function readMarks(pages, segs, units, parts, partMeasures) {
       if (place(d, d.x, (pl) => `<direction placement="${pl}"><direction-type><dynamics>${tag}</dynamics></direction-type>`, sd != null ? `<sound dynamics="${sd}"/>` : '')) nDyn++;
     }
     for (const r of marks.rehearsals || []) {
-      if (place(r, r.box[0] + 0.5 * (r.box[2] - r.box[0]), () => `<direction placement="above"><direction-type><rehearsal enclosure="${r.enclosure || 'square'}">${esc(r.text)}</rehearsal></direction-type>`)) nRehearsal++;
+      if (place(r, r.box[0] + 0.5 * (r.box[2] - r.box[0]), () => `<direction placement="above"><direction-type><rehearsal enclosure="square">${esc(r.text)}</rehearsal></direction-type>`)) nRehearsal++;
     }
     // piano pedal: "Ped." press, star release (a star then "Ped." is a change: release, press)
     for (const pd of marks.pedals || []) {
-      const style = pd.line ? 'line="yes" sign="no"' : 'line="no" sign="yes"';
-      if (place(pd, pd.line ? pd.x : pd.box[0], (pl) => `<direction placement="below"><direction-type><pedal type="${pd.type}" ${style}/></direction-type>`) && pd.type === 'start') nPedal++;
+      if (place(pd, pd.box[0], (pl) => `<direction placement="below"><direction-type><pedal type="${pd.type}" line="no" sign="yes"/></direction-type>`) && pd.type === 'start') nPedal++;
     }
     for (const w of marks.wedges) {
       const ok = place(w, w.box[0] + 0.1 * (w.box[2] - w.box[0]), (pl) => `<direction placement="${pl}"><direction-type><wedge type="${w.type}" number="1"/></direction-type>`);

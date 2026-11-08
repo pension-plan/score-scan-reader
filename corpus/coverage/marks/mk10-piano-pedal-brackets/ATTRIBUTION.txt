@@ -1,7 +1,0 @@
-Nocturne in Brackets (pedal lines)
-coverage/marks item mk10-piano-pedal-brackets
-
-Music composed for the OMR synthetic coverage corpus (2026) and dedicated to the public domain
-under CC0 1.0 Universal (https://creativecommons.org/publicdomain/zero/1.0/).  Engraving
-(LilyPond 2.24), truth.musicxml and all scan images are generated from the same source and are
-likewise CC0.  No third-party material is included.
