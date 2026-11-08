@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.22.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.21.1...score-scan-reader-v0.22.0) (2026-11-08)
+
+
+### Features
+
+* metronome marks read and written as tempo (words, metronome, sound tempo) ([3ae56fa](https://github.com/pension-plan/score-scan-reader/commit/3ae56fa4c849bbe436035bfefa4428686655138b))
+
 ## [0.21.1](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.21.0...score-scan-reader-v0.21.1) (2026-11-08)
 
 
