@@ -31,11 +31,13 @@ const srv = http.createServer((req, res) => {
       await page.evaluate(() => { try { localStorage.removeItem('ssr.layers'); localStorage.removeItem('ssr.zoom'); } catch (e) {} });
       await page.waitForFunction(() => window.__omrResult, null, { timeout: 240000 });
       await page.waitForTimeout(300);
+      // every layer: the "Everything" preset, then "Custom" for the layer toggles
+      await page.click('.preset[data-mode="all"]');
       const info = () => page.evaluate(() => {
         const q = (s) => document.querySelectorAll('#pages ' + s).length;
         return {
           rests: q('.ov-rests rect'), clefs: q('.ov-clefs path, .ov-clefs rect'), keys: q('.ov-keys rect'), times: q('.ov-times rect'),
-          marks: q('.ov-marks > *'), unknown: q('.ov-unknown rect'), labels: q('.ov-labels text'), stems: q('.ov-stem'),
+          marks: q('.ov-marks > *'), unknown: q('.unk-layer .unk'), labels: q('.ov-labels text'), stems: q('.ov-stem'),
           labelsShown: !document.getElementById('pages').classList.contains('lbl-small'),
           layers: [...document.querySelectorAll('#layers .layer')].map(b => b.textContent.trim()),
           hscroll: document.documentElement.scrollWidth > window.innerWidth, dbg: (() => { const im = document.querySelector('#pages .pageframe img'); return im ? [im.clientWidth, im.width, im.naturalWidth, document.querySelector('#pages svg.ov').viewBox.baseVal.width] : null; })(),
@@ -70,8 +72,9 @@ const srv = http.createServer((req, res) => {
       await shot(`zoom-mid-${tag}.png`, 0.45, 0.3);
       out.runs[tag].wide = await page.evaluate(() => [...document.querySelectorAll('body *')].filter(e => e.getBoundingClientRect().right > window.innerWidth + 1 && !e.closest('#pages')).slice(0, 5).map(e => e.tagName + '#' + e.id + '.' + e.className));
       // layer toggle: switch off unrecognised and labels, check they hide and persist
+      await page.click('.preset[data-mode="custom"]');
       await page.click('#layers button[data-layer="unknown"]');
-      const hid = await page.evaluate(() => getComputedStyle(document.querySelector('#pages .ov-unknown')).display === 'none' && localStorage.getItem('ssr.layers'));
+      const hid = await page.evaluate(() => getComputedStyle(document.querySelector('#pages .unk-layer')).display === 'none' && /unknown/.test(localStorage.getItem('ssr.view.v2')));
       if (!hid) out.failures.push(tag + ': unrecognised layer toggle did not hide / persist');
       await page.click('#layers button[data-layer="unknown"]');
     } catch (e) { out.failures.push(tag + ': ' + e.message.split('\n')[0]); }

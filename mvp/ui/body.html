@@ -1,24 +1,24 @@
 <div class="wrap">
   <header class="masthead">
     <h1>Score Scan Reader</h1>
-    <p class="lede">Turns a scanned hymn, part-song or piano piece into MusicXML 4.0. Lyrics are kept, closed-score SATB is split into four parts, and piano grand staves stay together. Your file never leaves this browser.</p>
+    <p class="lede">Scanned sheet music in, MusicXML out. Your file stays in this browser.</p>
   </header>
 
   <section class="drop" id="drop" aria-labelledby="dropTitle" data-state="idle">
     <div class="drop-main">
       <h2 class="drop-title" id="dropTitle">Drop a scanned PDF or image</h2>
-      <p class="drop-hint" id="dropHint">A PDF, or one or more PNG or JPG pages.</p>
+      <p class="drop-hint" id="dropHint">PDF, PNG or JPG</p>
       <div class="drop-actions">
-        <button class="btn primary" id="choose" type="button">Choose PDF or image</button>
-        <div class="samples" role="group" aria-labelledby="samplesLabel">
-          <span class="samples-label" id="samplesLabel">Samples</span>
-          <button class="btn" id="sample" type="button" title="Piano rag, two staves kept together (converted when the page opens)">Maple Leaf Rag</button>
-          <button class="btn" id="sampleHymn" type="button" title="Real 1905 hymnal scan: closed-score SATB split into four parts, with lyrics">St. Anselm hymn</button>
-          <label class="sr-only" for="sampleAll">All example scans</label>
-          <select class="btn sample-all" id="sampleAll" title="Every example scan from the test set: real hymnal and songbook scans, and synthetic scans with known answers">
-            <option value="">All examples…</option>
-          </select>
-        </div>
+        <button class="btn primary" id="choose" type="button">Choose file</button>
+        <span class="or" aria-hidden="true">or</span>
+        <label class="sr-only" for="sampleAll">Try an example scan</label>
+        <select class="btn sample-all" id="sampleAll">
+          <option value="">Try an example</option>
+          <optgroup label="Start here">
+            <option value="rag">Maple Leaf Rag (piano)</option>
+            <option value="hymn">St. Anselm (hymn, 4 parts, lyrics)</option>
+          </optgroup>
+        </select>
       </div>
       <input id="file" class="sr-only" type="file" accept="application/pdf,image/png,image/jpeg" multiple tabindex="-1" aria-hidden="true">
       <p class="sr-only" id="dropLive" aria-live="polite"></p>
@@ -39,31 +39,57 @@
   <nav class="stepper" aria-label="Conversion progress">
     <ol id="steps"></ol>
   </nav>
-  <p class="status" id="status" role="status" aria-live="polite">Loading the sample: Maple Leaf Rag</p>
+  <div class="result" id="resultBar">
+    <p class="status" id="status" role="status" aria-live="polite">Loading the Maple Leaf Rag example</p>
+    <div class="result-actions" id="resultActions" hidden>
+      <button class="btn primary copy" id="copy" type="button" aria-describedby="copied">
+        <svg class="i-copy" viewBox="0 0 20 20" aria-hidden="true"><rect x="6.5" y="6.5" width="10" height="11" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M13.5 4V3.5a1.5 1.5 0 0 0-1.5-1.5H5A1.5 1.5 0 0 0 3.5 3.5V13A1.5 1.5 0 0 0 5 14.5h.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+        <svg class="i-check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10.5l4 4 8-9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span id="copyLabel">Copy MusicXML</span>
+      </button>
+      <button class="btn" id="saveXml" type="button">Save .musicxml</button>
+      <p class="copied" id="copied" aria-live="polite"></p>
+    </div>
+  </div>
   <div class="alert" id="alert" role="alert" hidden></div>
 
   <div class="grid">
     <section class="panel plate" aria-labelledby="detH">
-      <div class="panel-head">
-        <h2 id="detH">Detection</h2>
+      <div class="panel-head det-head">
+        <h2 id="detH">Scan</h2>
+        <div class="presets" role="group" aria-label="What the overlay shows">
+          <button type="button" class="preset" data-mode="unknown" aria-pressed="true">Unrecognised only</button>
+          <button type="button" class="preset" data-mode="all" aria-pressed="false">Everything</button>
+          <button type="button" class="preset" data-mode="custom" aria-pressed="false">Custom</button>
+        </div>
+        <div class="zoom" role="group" aria-label="Page zoom">
+          <button class="btn icon" id="zoomOut" type="button" aria-label="Zoom out" aria-controls="pages"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8h9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+          <output class="zoom-label" id="zoomLabel" aria-live="polite">Fit</output>
+          <button class="btn icon" id="zoomIn" type="button" aria-label="Zoom in" aria-controls="pages"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8h9M8 3.5v9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+        </div>
         <div class="head-tools">
-          <button class="toggle" id="repairToggle" type="button" aria-pressed="false" aria-controls="pages repairBar" disabled>
-            <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
-            <span>Mark for repair</span>
-          </button>
           <button class="toggle" id="overlayToggle" type="button" aria-pressed="true" aria-controls="pages">
             <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
             <span>Overlay</span>
           </button>
+          <button class="toggle" id="repairToggle" type="button" aria-pressed="false" aria-controls="pages repairBar" disabled>
+            <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+            <span>Mark for repair</span>
+          </button>
         </div>
+      </div>
+      <div class="unknav" id="unkNav" role="group" aria-label="Marks the reading did not recognise">
+        <p class="unk-count"><span class="unk-swatch" aria-hidden="true"></span><span id="unkCount">Not recognised: none yet</span></p>
+        <div class="unk-btns">
+          <button class="btn small" id="unkPrev" type="button" aria-keyshortcuts="P" disabled>Previous</button>
+          <button class="btn small" id="unkNext" type="button" aria-keyshortcuts="N" disabled>Next unrecognised</button>
+        </div>
+        <p class="unk-count done-count" id="identCount" hidden></p>
+        <button class="btn small" id="identCopy" type="button" hidden>Copy labelled examples (JSON)</button>
+        <p class="unk-msg" id="unkMsg" role="status" aria-live="polite"></p>
       </div>
       <ul class="legend" id="legend" aria-label="Overlay key"></ul>
       <ul class="layers" id="layers" aria-label="Overlay layers: switch each kind of mark on or off"></ul>
-      <div class="zoom" role="group" aria-label="Page zoom">
-        <button class="btn icon" id="zoomOut" type="button" aria-label="Zoom out" aria-controls="pages"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8h9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
-        <output class="zoom-label" id="zoomLabel" aria-live="polite">Fit</output>
-        <button class="btn icon" id="zoomIn" type="button" aria-label="Zoom in" aria-controls="pages"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8h9M8 3.5v9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
-      </div>
       <div class="pagenav" id="pageNav" hidden>
         <div class="pagenav-row">
           <button class="btn icon" id="pgPrev" type="button" aria-label="Previous page" aria-controls="pages"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -93,38 +119,67 @@
         <textarea class="repair-out" id="rpOut" readonly hidden aria-label="Repair notes as JSON"></textarea>
       </div>
       <div id="pages" class="pages"></div>
+      <div class="idpop" id="idPop" role="dialog" aria-labelledby="idPopH" hidden>
+        <h3 id="idPopH">What is this mark?</h3>
+        <p class="idpop-where" id="idWhere"></p>
+        <canvas class="idpop-crop" id="idCrop" width="160" height="96" aria-hidden="true"></canvas>
+        <label class="idpop-field"><span>It is</span>
+          <select id="idType">
+            <option value="">Choose a type</option>
+            <optgroup label="Note head"><option value="head:filled">Filled note head</option><option value="head:half">Half-note head</option><option value="head:whole">Whole-note head</option></optgroup>
+            <optgroup label="Rest"><option value="rest:whole">Whole rest</option><option value="rest:half">Half rest</option><option value="rest:quarter">Quarter rest</option><option value="rest:eighth">Eighth rest</option><option value="rest:16th">16th rest</option><option value="rest:32nd">32nd rest</option></optgroup>
+            <optgroup label="Accidental"><option value="acc:sharp">Sharp ♯</option><option value="acc:flat">Flat ♭</option><option value="acc:natural">Natural ♮</option><option value="acc:double-sharp">Double sharp 𝄪</option><option value="acc:flat-flat">Double flat 𝄫</option></optgroup>
+            <optgroup label="Dot"><option value="dot">Augmentation dot</option></optgroup>
+            <optgroup label="Clef"><option value="clef:G">G clef</option><option value="clef:F">F clef</option><option value="clef:C">C clef</option></optgroup>
+            <optgroup label="Signature"><option value="time">Time signature</option><option value="key">Key signature</option></optgroup>
+            <optgroup label="Dynamic"><option value="dyn:ppp">ppp</option><option value="dyn:pp">pp</option><option value="dyn:p">p</option><option value="dyn:mp">mp</option><option value="dyn:mf">mf</option><option value="dyn:f">f</option><option value="dyn:ff">ff</option><option value="dyn:fff">fff</option><option value="dyn:sfz">sfz</option></optgroup>
+            <optgroup label="Other marks"><option value="artic">Articulation or ornament</option><option value="slur:slur">Slur</option><option value="slur:tie">Tie</option><option value="text">Text</option><option value="barno">Bar number</option></optgroup>
+            <optgroup label="Not music"><option value="noise">Noise: ignore it</option><option value="other">Something else</option></optgroup>
+          </select>
+        </label>
+        <label class="idpop-field" id="idDetailRow" hidden><span id="idDetailLabel">Details</span><input type="text" id="idDetail" maxlength="80" autocomplete="off"></label>
+        <p class="idpop-effect" id="idEffect"></p>
+        <div class="idpop-btns">
+          <button class="btn small primary" id="idSave" type="button">Save</button>
+          <button class="btn small" id="idRemove" type="button" hidden>Remove label</button>
+          <button class="btn small" id="idCancel" type="button">Cancel</button>
+        </div>
+      </div>
     </section>
 
-    <div class="margin" id="margin">
-      <p class="stale-note" id="staleNote" hidden>The previous result stays here until this one is ready.</p>
+    <section class="panel preview-panel" id="previewPanel" aria-labelledby="prevH" hidden>
+      <div class="panel-head"><h2 id="prevH">Preview</h2></div>
+      <div class="sheet"><div id="osmd"></div></div>
+      <p class="muted" id="osmdNote"></p>
+      <button class="btn small" id="osmdAll" type="button" hidden>Draw every measure</button>
+    </section>
+    <div class="margin" id="margin" hidden>
+      <p class="stale-note" id="staleNote" hidden>Previous result, until this one is ready</p>
       <section class="panel" aria-labelledby="partsH">
         <div class="panel-head"><h2 id="partsH">Parts</h2></div>
-        <p class="summary" id="partsSummary">Waiting for the first conversion.</p>
+        <p class="summary" id="partsSummary">None yet</p>
+        <p class="corr-note" id="corrNote" role="status" hidden></p>
         <ol class="partlist" id="parts"></ol>
       </section>
       <section class="panel" aria-labelledby="lyrH">
         <div class="panel-head"><h2 id="lyrH">Lyrics</h2></div>
-        <div id="lyrics" class="lyrics"><p class="muted">Lyrics appear here once the text is read.</p></div>
+        <div id="lyrics" class="lyrics"><p class="muted">None yet</p></div>
       </section>
       <section class="panel" aria-labelledby="warnH">
-        <div class="panel-head"><h2 id="warnH">Warnings</h2><span class="count" id="warnCount"></span></div>
-        <ul class="warnings" id="warnings"></ul>
+        <details class="fold" id="warnFold">
+          <summary class="panel-head"><h2 id="warnH">Warnings</h2><span class="count" id="warnCount"></span></summary>
+          <ul class="warnings" id="warnings"></ul>
+        </details>
       </section>
       <section class="panel code-panel" aria-labelledby="xmlH">
-        <div class="codeblock">
-          <div class="code-head">
+        <details class="codeblock fold" id="xmlFold">
+          <summary class="code-head">
             <div class="code-label">
-              <h2 id="xmlH">MusicXML 4.0</h2>
+              <h2 id="xmlH">MusicXML source</h2>
               <span class="code-file" id="xmlFile">score.musicxml</span>
               <span class="code-meta" id="xmlMeta"></span>
             </div>
-            <button class="btn copy" id="copy" type="button" aria-describedby="copied">
-              <svg class="i-copy" viewBox="0 0 20 20" aria-hidden="true"><rect x="6.5" y="6.5" width="10" height="11" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M13.5 4V3.5a1.5 1.5 0 0 0-1.5-1.5H5A1.5 1.5 0 0 0 3.5 3.5V13A1.5 1.5 0 0 0 5 14.5h.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
-              <svg class="i-check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10.5l4 4 8-9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <span id="copyLabel">Copy</span>
-            </button>
-          </div>
-          <p class="copied" id="copied" aria-live="polite"></p>
+          </summary>
           <div class="code-body" id="codeBody" tabindex="0" role="region" aria-label="MusicXML source">
             <pre class="gutter" id="gutter" aria-hidden="true"></pre>
             <pre class="code"><code id="code"></code></pre>
@@ -132,20 +187,12 @@
           <p class="code-note" id="codeNote" hidden></p>
           <label class="sr-only" for="xml">Full MusicXML text</label>
           <textarea id="xml" class="xml-raw" spellcheck="false" readonly hidden></textarea>
-        </div>
+        </details>
       </section>
     </div>
-
-
-    <section class="panel preview-panel" id="previewPanel" aria-labelledby="prevH">
-      <div class="panel-head"><h2 id="prevH">Notation preview</h2></div>
-      <div class="sheet"><div id="osmd"></div></div>
-      <p class="muted" id="osmdNote"></p>
-      <button class="btn small" id="osmdAll" type="button" hidden>Draw every measure</button>
-    </section>
   </div>
 
   <footer class="colophon">
-    <p>Recognition runs in this page with a classical OMR pipeline; lyrics are read with Tesseract. Check the result against the scan before you rely on it.</p>
+    <p>Check the result against the scan before you rely on it.</p>
   </footer>
 </div>

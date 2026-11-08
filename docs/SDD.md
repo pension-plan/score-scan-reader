@@ -985,8 +985,11 @@ staves and barlines (double bars and repeats), accidentals, augmentation dots, t
 syllables the score used. Text labels give each note's pitch and written value (upper voice above the
 staff, lower voice below) and name each rest, clef, key and time signature; they are drawn only while a
 staff space is at least 11 screen pixels (page zoom times pinch zoom). Ink left after staff-line removal
-that touches no recognised symbol is highlighted as "Not recognised". Each layer has a toggle in the legend
-(remembered in `localStorage` as `ssr.layers`); the page zoom (Fit to 6x) is `ssr.zoom`. The data comes
+that touches no recognised symbol is highlighted as "Not recognised". Three views sit above the legend:
+"Unrecognised only" (just the highlights over the plain scan; the default), "Everything", and "Custom" (a
+toggle per layer). The choice and the custom set are kept in `localStorage` as `ssr.view.v2`
+(`{mode, off}`); a visitor without that key (new, or from before views) starts once on "Unrecognised only",
+and an older per-layer choice (`ssr.layers`) becomes the custom set. The page zoom (Fit to 6x) is `ssr.zoom`. The data comes
 from `src/symbols.js` `pageSymbols(fr, asm)` via `ui/session.js` `pageView(entry, i, req).sym`, per-head
 `notes` in the result's `pages`, and `score.measureMap`.
 
@@ -1038,6 +1041,52 @@ JSON is the input for a later repair / re-recognition pass (shape; `[]` and `x0 
 (0 for a pickup) whose segment, from `score.measureMap`, meets the mark's box; it is `null` on a two-up
 spread, whose halves are measured in their own frames. `found` is `null` for a page not read in this
 session.
+
+**Unrecognised marks and the reader's labels.** Each unrecognised mark is an HTML button over the page
+(positioned in % of the page, so it follows the zoom), centred on the ink, padded 0.6 staff space and at
+least 1.6 staff spaces (and 18 screen pixels) square, with a yellow highlighter fill and a 3-pixel dark
+amber ring. Its accessible name is "Unrecognised mark 2 of 3, bar 15". "Not recognised: N" with Previous /
+Next (keys P / N when not typing) steps through the marks in reading order across pages, zooming until a
+staff space is at least 16 screen pixels and scrolling the mark to the middle; the selected mark pulses
+(not with reduced motion). Clicking, tapping or pressing Enter on a mark opens "What is this mark?": a crop
+of the mark, a type (note head filled / half / whole; rest whole to 32nd; accidental sharp, flat, natural,
+double sharp, double flat; augmentation dot; clef G / F / C; time or key signature; dynamic ppp to fff,
+sfz; articulation or ornament; slur; tie; text; bar number; noise; something else), optional details
+(required for "something else") and a line saying what saving will do. Labels are kept per document in
+`localStorage` as `ssr.ident:<file name>:<size>` (`{v: 1, items: {<page index>: [{id, page, box, type,
+sub, detail, at}]}}`, `box` the mark's ink box in the overlay frame), drawn as a green "identified by you"
+box with its name, editable and removable, and counted ("Identified by you: N"). A label stays with its
+ink box: when a later reading reports the same box it replaces that highlight; otherwise it is drawn where
+it was given.
+
+**User corrections.** `src/corrections.js` applies labels to the MusicXML after `buildScore`, as two pure
+functions, so every re-run applies them again and they are unit-tested (`mvp/ui/test/corrections.js`):
+`resolveCorrections(idents, pages, measureMap)` ties each label to the notes around it, and
+`applyCorrections(xml, corrections)` edits the MusicXML text at the lines those notes were written on
+(`correctScore(score, idents, pages)` runs both). `pages[i]` is `{ss, heads, notes}`: the overlay's heads
+and the result's per-head notes, whose eighth field is the MusicXML line of the head's first written note
+(`toMusicXML` records it as `h.xmlLine`; a note whose step / octave no longer match is skipped). Applied:
+
+| Label | Change to the MusicXML |
+|---|---|
+| accidental | the nearest note to its right on its staff (within 4 staff spaces, 1.3 up / down) gets that `<alter>` (sharp 1, flat -1, natural 0, double +/-2) and an `<accidental>` |
+| rest | a `<note><rest/>` of that value in the same voice and staff, after the last note before it in its bar (or before the first after it); the next `<backup>` grows to match |
+| dot | the nearest note to its left (and its chord) gets one more `<dot/>` and the longer duration; the next `<backup>` grows to match |
+| dynamic | a `<direction>` with `<dynamics>` before the nearest note, above or below its staff as drawn |
+| noise | nothing: the mark is hidden |
+| other types | nothing: kept as a label for repair notes and training examples |
+
+A bar made longer than its time signature is not rebalanced; a warning says so. "N corrections of yours
+applied" shows under the parts summary, and the MusicXML panel, preview and copy carry the corrected
+MusicXML. With no labels the MusicXML is unchanged (benchmark byte-identical).
+
+**Exports.** The repair notes JSON (below) carries, per page, `identified`: `[{id, type, sub, detail,
+label, bbox, bar, nearestHeads: [{k, x, y, pitch, value}] (three nearest), correction: {kind: accidental |
+dot | rest | dynamic | hide | label | skip, why, head}, at}]`. "Copy labelled examples (JSON)" gives
+training data for a later classifier: `{format: "score-scan-reader/labelled-examples", version: 1, file,
+exported, examples: [{page, id, type, sub, detail, label, bbox, crop, staffSpace, staffSpacePx, png}]}`,
+each `png` a data URL of the mark with half a staff space around it from the page as shown (at most
+160 px across).
 
 ### 8.7 Text, dynamics and other marks
 

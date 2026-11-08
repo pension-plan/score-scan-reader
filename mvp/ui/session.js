@@ -268,11 +268,11 @@ function __omrSessionModule() {
       if (!by.has(k)) by.set(k, []);
       for (const h of p.fr.heads || []) by.get(k).push(h.parts ? h.parts.slice() : []);
       // what each drawn head was written as: [step, alter, octave, quarters,
-      // type, dots, tuplet number], or 0 when no part wrote it
+      // type, dots, tuplet number, MusicXML line of its note], or 0 when no part wrote it
       if (!notes.has(k)) notes.set(k, []);
       for (const h of p.fr.heads || []) {
         const pt = h.pitch, d = h.shown;
-        notes.get(k).push(pt && d ? [pt.step, pt.alter || 0, pt.octave, Math.round(d.q * 1000) / 1000, d.type || '', d.dots || 0, d.tuplet || 0] : 0);
+        notes.get(k).push(pt && d ? [pt.step, pt.alter || 0, pt.octave, Math.round(d.q * 1000) / 1000, d.type || '', d.dots || 0, d.tuplet || 0, h.xmlLine == null ? -1 : h.xmlLine] : 0);
       }
     }
     return [...by].map(([index, parts]) => ({ index, parts, notes: notes.get(index) || [] }));

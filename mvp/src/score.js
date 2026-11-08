@@ -1369,6 +1369,7 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
   })));
   accLine.forEach(a => a.sort((x, y) => x.t - y.t));
   const L = [];
+  const noteAt = [], noted = new Set(); // (user corrections: the XML line of each head's first written note)
   L.push('<?xml version="1.0" encoding="UTF-8" standalone="no"?>');
   L.push('<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">');
   L.push('<score-partwise version="4.0">');
@@ -1484,6 +1485,7 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
             h.pitch = pt;
             // (overlay only: the value written for this head, first part that writes it)
             h.shown ||= { q: e.q, type: tt ? tt.type : null, dots: tt ? tt.dots : 0, tuplet: tmod ? tu.actual : 0 };
+            if (!noted.has(h)) { noted.add(h); noteAt.push([h, L.length]); }
             const acc = h.acc && !e.tieStop ? `<accidental>${h.acc}</accidental>` : '';
             const tie = (e.tieStop ? '<tie type="stop"/>' : '') + (e.tieStart ? '<tie type="start"/>' : '');
             const tied = e.tieStop || e.tieStart ? `<notations>${e.tieStop ? '<tied type="stop"/>' : ''}${e.tieStart ? '<tied type="start"/>' : ''}</notations>` : '';
@@ -1515,6 +1517,12 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
     L.push('  </part>');
   });
   L.push('</score-partwise>');
+  // entries may hold line breaks: count them for the line numbers
+  if (noteAt.length) {
+    const off = new Array(L.length + 1).fill(0);
+    for (let i = 0; i < L.length; i++) off[i + 1] = off[i] + (L[i].split('\n').length - 1);
+    for (const [h, i] of noteAt) h.xmlLine = i + off[i];
+  }
   return L.join('\n') + '\n';
 }
 

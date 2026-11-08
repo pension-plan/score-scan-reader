@@ -12,8 +12,8 @@
   // Two bundled samples: the rag (piano grand staff, converted on load) and a
   // real 1905 hymnal scan (closed-score SATB with lyrics: the four-part split).
   const SAMPLES = {
-    rag: { url: 'assets/sample-maple-leaf-rag.pdf', name: 'sample-maple-leaf-rag.pdf', title: 'the sample rag', label: 'Maple Leaf Rag (Scott Joplin, 1899), engraved and aged like a scan' },
-    hymn: { url: 'assets/sample-st-anselm.pdf', name: 'sample-st-anselm.pdf', title: 'the sample hymn', label: 'St. Anselm (Methodist Hymnal, 1905), a real scan' },
+    rag: { url: 'assets/sample-maple-leaf-rag.pdf', name: 'sample-maple-leaf-rag.pdf', title: 'the sample rag', label: 'Maple Leaf Rag (Joplin)' },
+    hymn: { url: 'assets/sample-st-anselm.pdf', name: 'sample-st-anselm.pdf', title: 'the sample hymn', label: 'St. Anselm (1905 hymnal scan)' },
   };
   // Every redistributable benchmark scan (assets/samples.json, written by
   // tools/sync-samples.mjs), offered in the "All examples" picker.
@@ -228,12 +228,12 @@
         error: `Could not convert ${n}`,
       };
       const hints = {
-        idle: `A PDF, or one or more PNG or JPG pages. Up to ${MAX_PAGES} pages are read, one at a time.`,
-        over: 'Release to convert. The file stays in this browser.',
-        busy: this.nPages > 1 ? `Reading ${this.nPages} pages one at a time. Each page appears below when it is done; you can stop early and keep them.` : 'Reading the scan. This takes a few seconds per page.',
-        done: 'Drop another scan here, or choose a file.',
-        stopped: 'Stopped early: the result covers the pages read so far.',
-        error: 'Try a sharper scan (200 dpi or more), or a PDF, PNG or JPG file.',
+        idle: `PDF, PNG or JPG · up to ${MAX_PAGES} pages`,
+        over: 'Release to convert',
+        busy: this.nPages > 1 ? `${this.nPages} pages · each appears below when read` : 'A few seconds per page',
+        done: 'Drop another scan to replace it',
+        stopped: 'Stopped early: covers the pages read',
+        error: 'Try a sharper scan (200 dpi or more)',
       };
       const t = titles[state] || titles.idle;
       // a file name is shown exactly as given; only a prose title is capitalised
@@ -542,6 +542,7 @@
       }
       host.appendChild(this.frame(p));
       renderLayers(p.view);
+      updateUnkNav();
       fitLabels();
       repair.attach(host.querySelector('.pageframe'), p);
       $('repairToggle').disabled = false;
@@ -566,6 +567,7 @@
       img.alt = `Page ${p.i + 1} of the scan, straightened: ${plural(v.nStaves, 'staff', 'staves')}, ${plural(v.heads.length, 'note head')} found.`;
       fig.appendChild(img);
       fig.insertAdjacentHTML('beforeend', this.overlay(p));
+      fig.insertAdjacentHTML('beforeend', unkLayerHTML(p));
       return fig;
     },
     overlay(p) {
@@ -628,15 +630,19 @@
       const lyr = this.lyricBoxes(p);
       s += g('lyrics', lyr.map(([x0, y0, x1, y1]) => `<path d="M${f1(x0)},${f1(y1 - ss * 0.3)}V${f1(y1 + ss * 0.15)}H${f1(x1)}V${f1(y1 - ss * 0.3)}"/>`).join(''), ` fill="none" stroke-width="${f1(sw)}"`);
       // ink nothing explains: swiped with a yellow highlighter
-      const unk = (sy.unknown || []).filter((b) => !lyr.some((l) => b[0] < l[2] && b[2] > l[0] && b[1] < l[3] && b[3] > l[1]));
-      // text read off the page (titles, credits, instrument names, bar
-      // numbers, tempo and expression), dynamics and hairpins, and the curves
-      // and lines around the notes: a box each, text and dynamics labelled
+      // text read off the page (titles, credits, instrument names, tempo and
+      // expression), bar numbers, dynamics and hairpins, slurs / ties /
+      // fermatas, braces and brackets: a tinted box each, text labelled above
       const named = (b, label) => `<g><title>${esc(label)}</title>${rect(b, ss * 0.12)}<text x="${f1(b[0])}" y="${f1(b[1] - ss * 0.3)}" font-size="${f1(ss * 0.75)}">${esc(label)}</text></g>`;
-      s += g('text', (sy.text || []).filter((t) => t[4] !== 'lyrics').map((t) => named(t, t[5])).join(''), ` stroke-width="${f1(sw)}"`);
+      const txt = sy.text || [];
+      s += g('text', txt.filter((t) => t[4] !== 'lyrics' && t[4] !== 'measure').map((t) => named(t, t[5])).join(''), ` stroke-width="${f1(sw)}"`);
+      s += g('barno', txt.filter((t) => t[4] === 'measure').map((t) => named(t, t[5])).join(''), ` stroke-width="${f1(sw)}"`);
       s += g('dyns', (sy.dyns || []).concat(sy.wedges || []).map((d) => named(d, d[4])).join(''), ` stroke-width="${f1(sw)}"`);
-      s += g('curves', [].concat(sy.slurs || [], sy.fermatas || [], sy.braces || [], sy.ledgers || []).map((b) => rect(b, ss * 0.08)).join(''), ` stroke-width="${f1(sw * 0.8)}" stroke-dasharray="${f1(sw * 2)} ${f1(sw)}"`);
-      s += g('unknown', unk.map((b) => rect(b, ss * 0.18, ` rx="${f1(ss * 0.25)}"`)).join(''));
+      s += g('slurs', [].concat(sy.slurs || [], sy.fermatas || []).map((b) => rect(b, ss * 0.08)).join(''), ` stroke-width="${f1(sw)}"`);
+      s += g('braces', (sy.braces || []).map((b) => rect(b, ss * 0.08)).join(''), ` stroke-width="${f1(sw)}"`);
+      // ledger lines belong with the staff lines
+      if (sy.ledgers && sy.ledgers.length) s += g('bars', `<g class="ov-ledger">${sy.ledgers.map((b) => rect(b, ss * 0.05)).join('')}</g>`, ` stroke-width="${f1(sw)}"`);
+      // (unrecognised ink is drawn as focusable highlights over the page: unkLayerHTML)
       s += g('labels', this.labels(p));
       return s + '</svg>';
     },
@@ -748,7 +754,7 @@
   const LAYERS = [
     ['notes', 'Notes, stems, beams'], ['rests', 'Rests'], ['clefs', 'Clefs'], ['keys', 'Key signatures'], ['times', 'Time signatures'],
     ['bars', 'Staves, barlines'], ['marks', 'Accidentals, dots, tuplets'], ['lyrics', 'Lyric syllables'], ['labels', 'Pitch and value labels'],
-    ['text', 'Titles, names, text'], ['dyns', 'Dynamics, hairpins'], ['curves', 'Slurs, ties, fermatas, braces, ledger lines'], ['unknown', 'Not recognised'],
+    ['text', 'Titles, names, text'], ['barno', 'Bar numbers'], ['dyns', 'Dynamics, hairpins'], ['slurs', 'Slurs, ties, fermatas'], ['braces', 'Braces, brackets'], ['unknown', 'Not recognised'],
   ];
   const LAYER_ICON = {
     notes: '<path d="M9 2v8" stroke-width="1.4" class="ovk-stem"/><circle cx="6.5" cy="10" r="2.6" stroke-width="1.6"/>',
@@ -762,18 +768,34 @@
     labels: '<text x="7" y="10.5" font-size="9" text-anchor="middle" stroke="none" fill="currentColor">C5</text>',
     text: '<text x="7" y="10.5" font-size="9.5" text-anchor="middle" stroke="none" fill="currentColor" font-family="serif">Aa</text>',
     dyns: '<text x="5.5" y="10.5" font-size="9" text-anchor="middle" stroke="none" fill="currentColor" font-style="italic" font-weight="700" font-family="serif">f</text><path d="M8.5 7l4.5-2.5M8.5 7l4.5 2.5" stroke-width="1"/>',
-    curves: '<path d="M2 9c2-4 8-4 10 0" stroke-width="1.6"/>',
+    barno: '<rect x="3" y="2.5" width="8" height="9" stroke-width="1.4"/><text x="7" y="10.3" font-size="8" text-anchor="middle" stroke="none" fill="currentColor">5</text>',
+    slurs: '<path d="M2 9c2-4 8-4 10 0" stroke-width="1.6"/>',
+    braces: '<path d="M9 1.5c-3 0-1 5.5-4 5.5c3 0 1 5.5 4 5.5" stroke-width="1.5"/>',
     unknown: '<rect x="1.5" y="3.5" width="11" height="7" rx="1.6" stroke-width=".8"/>',
   };
-  const layerOff = new Set((() => { try { return JSON.parse(store.get('ssr.layers') || '[]'); } catch (e) { return []; } })());
+  // What the overlay shows: a preset (unrecognised marks only, everything) or
+  // the reader's own set of layers. Stored as ssr.view.v2; a visitor without
+  // it (new, or from before presets) starts once on "Unrecognised only", and
+  // an older custom set (ssr.layers) becomes the custom choice.
+  const VIEW_KEY = 'ssr.view.v2';
+  const viewPref = (() => {
+    try { const j = JSON.parse(store.get(VIEW_KEY) || 'null'); if (j && /^(unknown|all|custom)$/.test(j.mode)) return { mode: j.mode, off: j.off || [] }; } catch (e) { /* fall through */ }
+    let off = [];
+    try { off = JSON.parse(store.get('ssr.layers') || '[]') || []; } catch (e) { off = []; }
+    const v = { mode: 'unknown', off };
+    store.set(VIEW_KEY, JSON.stringify(v));
+    return v;
+  })();
+  const layerOff = new Set(viewPref.off);
+  const saveView = () => store.set(VIEW_KEY, JSON.stringify({ mode: viewPref.mode, off: [...layerOff] }));
   function layerCounts(v) {
     const sy = (v && v.sym) || {};
     return {
       notes: v ? v.heads.length : 0, rests: (sy.rests || []).length, clefs: (sy.clefs || []).length, keys: (sy.keys || []).length, times: (sy.times || []).length,
       bars: v ? (sy.bars || v.barlines).length : 0, marks: (sy.accs || []).length + (sy.dots || []).length + (sy.tuplets || []).length,
       lyrics: null, labels: null, unknown: (sy.unknown || []).length,
-      text: (sy.text || []).filter((t) => t[4] !== 'lyrics').length, dyns: (sy.dyns || []).length + (sy.wedges || []).length,
-      curves: (sy.slurs || []).length + (sy.fermatas || []).length + (sy.braces || []).length + (sy.ledgers || []).length,
+      text: (sy.text || []).filter((t) => t[4] !== 'lyrics' && t[4] !== 'measure').length, barno: (sy.text || []).filter((t) => t[4] === 'measure').length,
+      dyns: (sy.dyns || []).length + (sy.wedges || []).length, slurs: (sy.slurs || []).length + (sy.fermatas || []).length, braces: (sy.braces || []).length,
     };
   }
   function renderLayers(v) {
@@ -785,8 +807,13 @@
     }).join('');
   }
   function applyLayers() {
-    const host = $('pages');
-    LAYERS.forEach(([k]) => host.classList.toggle('hide-' + k, layerOff.has(k)));
+    const host = $('pages'), mode = viewPref.mode;
+    const hidden = (k) => (mode === 'unknown' ? k !== 'unknown' : mode === 'all' ? false : layerOff.has(k));
+    LAYERS.forEach(([k]) => host.classList.toggle('hide-' + k, hidden(k)));
+    host.classList.toggle('only-unknown', mode === 'unknown');
+    $('layers').classList.toggle('preset-hidden', mode !== 'custom');
+    $('legend').classList.toggle('preset-hidden', mode === 'unknown');
+    document.querySelectorAll('.preset').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)));
   }
   function legend(parts) {
     const aux = '';
@@ -911,7 +938,7 @@
     if (!verses.size) {
       const p = document.createElement('p');
       p.className = 'muted';
-      p.textContent = res.ocrError ? `The text reader is unavailable (${res.ocrError}), so only notes were read.` : 'No lyric lines were found under the staves.';
+      p.textContent = res.ocrError ? `Not read: the text reader is unavailable (${res.ocrError})` : 'None found';
       host.appendChild(p);
       return;
     }
@@ -947,8 +974,8 @@
       li.innerHTML = (info ? ICON_INFO : ICON_WARN) + `<span><span class="sr-only">${info ? 'Note' : 'Warning'}: </span>${esc(w)}</span>`;
       ul.appendChild(li);
     }
-    if (!list.length) ul.innerHTML = '<li class="none">Nothing to report.</li>';
-    $('warnCount').textContent = list.length ? `${nWarn} to check · ${list.length - nWarn} notes` : '';
+    if (!list.length) ul.innerHTML = '<li class="none">None</li>';
+    $('warnCount').textContent = nWarn ? `${nWarn} to check` : (list.length ? plural(list.length, 'note') : 'none');
   }
 
   // Facts for each completed stage, read from the pages and the result.
@@ -1006,6 +1033,7 @@
     note.hidden = lines.length <= MAX_CODE_LINES;
     note.textContent = note.hidden ? '' : `Showing the first ${MAX_CODE_LINES.toLocaleString('en')} of ${lines.length.toLocaleString('en')} lines. Copy takes the whole file.`;
     $('copy').disabled = !lastXML;
+    $('resultActions').hidden = !lastXML;
   }
   let copyTimer = 0;
   function copyXML() {
@@ -1015,23 +1043,43 @@
       clearTimeout(copyTimer);
       btn.classList.add('is-copied');
       $('copyLabel').textContent = 'Copied';
-      msg.textContent = `Copied ${lastXML.split('\n').length.toLocaleString('en')} lines of MusicXML.`;
-      copyTimer = setTimeout(() => { btn.classList.remove('is-copied'); $('copyLabel').textContent = 'Copy'; msg.textContent = ''; }, 1200);
+      msg.textContent = '';
+      copyTimer = setTimeout(() => { btn.classList.remove('is-copied'); $('copyLabel').textContent = 'Copy MusicXML'; msg.textContent = ''; }, 1200);
     };
     const fallback = () => {
       // clipboard refused: show the full text selected so the keyboard can copy it
       const ta = $('xml');
+      $('xmlFold').open = true;
       ta.hidden = false;
       $('codeBody').hidden = true;
       $('codeNote').hidden = true;
       ta.focus();
       ta.select();
-      msg.textContent = 'This page cannot reach the clipboard. The full text is selected: press Ctrl+C (Cmd+C on a Mac).';
+      msg.textContent = 'No clipboard here: the text is selected below, press Ctrl+C (Cmd+C on a Mac).';
     };
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(lastXML).then(ok, fallback);
       else fallback();
     } catch (e) { fallback(); }
+  }
+  // Save without a download link (tools/build.js forbids them): the browser's
+  // save dialog where it has one, else the file opens in a new tab to save.
+  async function saveXML() {
+    if (!lastXML) return;
+    const name = ($('fileName').textContent || 'score').replace(/\.[^.]+$/, '').replace(/^sample-|^example-/, '') + '.musicxml', msg = $('copied');
+    msg.textContent = '';
+    if (window.showSaveFilePicker) {
+      try {
+        const h = await window.showSaveFilePicker({ suggestedName: name, types: [{ description: 'MusicXML', accept: { 'application/vnd.recordare.musicxml+xml': ['.musicxml'] } }] });
+        const w = await h.createWritable(); await w.write(lastXML); await w.close();
+        msg.textContent = 'Saved ' + h.name; return;
+      } catch (e) { if (e && e.name === 'AbortError') return; }
+    }
+    const url = URL.createObjectURL(new Blob([lastXML], { type: 'application/xml' }));
+    let w = null;
+    try { w = window.open(url, '_blank'); if (w) w.opener = null; } catch (e) { w = null; }
+    setTimeout(() => URL.revokeObjectURL(url), 120000);
+    msg.textContent = w ? 'Opened in a new tab: save it from there.' : 'New tabs are blocked here: use Copy MusicXML.';
   }
 
   // ------------------------------------------------------------ preview ---
@@ -1071,8 +1119,6 @@
   // ---------------------------------------------------------------- run ---
   function setBusy(b) {
     busy = b;
-    $('sample').disabled = b;
-    $('sampleHymn').disabled = b;
     $('sampleAll').disabled = b;
     $('choose').disabled = b;
   }
@@ -1095,6 +1141,8 @@
     drop.set('busy', file.title || file.name, !!file.title);
     showFile(file.name, file.size);
     repair.open(file.name, file.size);
+    ident.open();
+    corr = null;
     legend(null);
     let ocrUsed = false;
     let engine = null;
@@ -1230,28 +1278,33 @@
       res.warnings.unshift(...extraWarn);
       stepper.go('xml');
       meter.set(0.97);
-      status('Writing MusicXML and drawing the preview');
+      status('Writing MusicXML');
       lastRes = res;
+      $('margin').hidden = $('previewPanel').hidden = false; // results panels appear with the first result
+      document.querySelector('.plate').dataset.ready = '';
       setStale(false);
       legend((res.score && res.score.parts) || []);
       book.applyResult(res);
       renderParts(res);
       renderLyrics(res);
-      renderWarnings(res.warnings || []);
+      corr = corrected();
+      renderCorrNote(corr);
+      renderWarnings((res.warnings || []).concat(corrWarnings(corr)));
       mark('code');
-      renderCode(res.score.xml);
+      renderCode(corr.xml);
       mark('facts');
       stepFacts(res, ocrUsed);
       await nextPaint();
-      await renderNotation(res.score.xml, res.score.measures || 0, false);
+      await renderNotation(corr.xml, res.score.measures || 0, false);
       stepper.finish();
       fileFinished(true);
       const partial = stopAsked && read < n;
       drop.set(partial ? 'stopped' : 'done');
-      status(`Done in ${((performance.now() - t0) / 1000).toFixed(1)} s: ${file.label || file.name}` + (n > 1 ? ` (${plural(read, 'page')})` : ''));
+      status(`${file.label || file.name}` + (n > 1 ? ` · ${plural(read, 'page')}` : '') + ` · ${((performance.now() - t0) / 1000).toFixed(1)} s`);
       window.__omrResult = {
         parts: res.score.parts.map((p) => p.name), nNotes: res.score.nNotes, measures: res.score.measures,
         lyrics: Object.values(res.lyricsBySystem).flat().length, warnings: res.warnings, xmlLength: (res.score.xml || '').length,
+        corrections: corr && corr.corrections ? corr.corrections.applied.length : 0,
         steps: stepper.snapshot(), engine: engineKind, pages: { total, n, read, states: book.pages.map((p) => p.state) },
         ocrLangs: ocrUsed ? ocrLangs : null, file: file.name,
         pageNotes: book.pages.map((p) => Sess.pageNotes(p.view)),
@@ -1262,10 +1315,10 @@
       stepper.fail('stopped');
       fileFinished(false);
       drop.set('error');
-      status('Could not convert: ' + msg);
+      status(''); // the alert below says it
       const al = $('alert');
       al.hidden = false;
-      al.textContent = `Could not convert ${file.name}: ${msg}. ` + (lastRes ? 'The previous result is still shown below.' : '');
+      al.textContent = `Could not convert ${file.name}: ${msg.replace(/\.$/, '')}.` + (lastRes ? ' The previous result is still below.' : '');
       window.__omrResult = { error: msg, steps: stepper.snapshot() };
     } finally {
       setStale(false);
@@ -1284,7 +1337,7 @@
     const bad = files.filter((f) => !(isPDF(f) || isImg(f)));
     if (!ok.length) {
       drop.set('error', files[0].name, false);
-      status(`${files[0].name} is not a PDF, PNG or JPG file.`);
+      status(`${files[0].name} is not a PDF, PNG or JPG`);
       return;
     }
     const size = ok.reduce((a, f) => a + f.size, 0);
@@ -1293,15 +1346,14 @@
       const parts = [];
       for (const f of ok) parts.push(isPDF(f) ? await pdfSource(new Uint8Array(await f.arrayBuffer()), f.name) : imageSource(f));
       const pages = parts.flatMap((p) => p.pages);
-      if (bad.length) status(`Skipped ${bad.map((f) => f.name).join(', ')}: not a PDF, PNG or JPG file.`);
+      if (bad.length) status(`Skipped ${bad.map((f) => f.name).join(', ')}: not PDF, PNG or JPG`);
       return { pages, size, close: () => parts.forEach((p) => p.close()) };
     }, { name, size, title: ok.length > 1 ? `${ok.length} files` : null });
   }
 
   function loadSample(kind) {
     const S = typeof kind === 'object' ? kind : SAMPLES[kind] || SAMPLES.rag;
-    const pick = catalogue.findIndex((c) => 'assets/' + c.file === S.url);
-    $('sampleAll').value = pick >= 0 ? String(pick) : '';
+    $('sampleAll').value = ''; // the menu always reads "Try an example"; the file row names what is loaded
     run(async () => {
       const r = await fetch(S.url);
       if (!r.ok) throw new Error('the sample file was not found (' + r.status + ')');
@@ -1309,19 +1361,20 @@
       const size = buf.length; // read before pdf.js transfers (detaches) the buffer
       const src = await pdfSource(buf, S.name);
       return { pages: src.pages, size, close: src.close };
-    }, { name: S.name, title: S.title, label: 'sample: ' + S.label, size: null });
+    }, { name: S.name, title: S.title, label: S.label, size: null });
   }
 
   // ---------------------------------------------------------------- wire ---
   stepper.build();
   $('choose').addEventListener('click', () => $('file').click());
   $('file').addEventListener('change', (e) => { const fs = Array.prototype.slice.call(e.target.files || []); e.target.value = ''; handleFiles(fs); });
-  $('sample').addEventListener('click', () => loadSample('rag'));
   fetch('assets/samples.json').then((r) => (r.ok ? r.json() : [])).then((list) => {
     catalogue = Array.isArray(list) ? list : [];
     const sel = $('sampleAll');
     const groups = new Map();
+    const featured = new Set(Object.values(SAMPLES).map((x) => x.name)); // already under "Start here"
     catalogue.forEach((c, i) => {
+      if (featured.has(c.file)) return;
       if (!groups.has(c.group)) { const g = document.createElement('optgroup'); g.label = c.group; groups.set(c.group, g); sel.appendChild(g); }
       const o = document.createElement('option');
       o.value = String(i);
@@ -1329,16 +1382,16 @@
       o.title = c.license;
       groups.get(c.group).appendChild(o);
     });
-    const cur = catalogue.findIndex((c) => c.file === 'sample-maple-leaf-rag.pdf');
-    if (cur >= 0 && !sel.value) sel.value = String(cur);
   }).catch(() => { $('sampleAll').hidden = true; });
   $('sampleAll').addEventListener('change', (e) => {
-    const c = catalogue[+e.target.value];
-    if (!c || e.target.value === '') return;
+    const v = e.target.value;
+    if (SAMPLES[v]) { loadSample(v); return; }
+    const c = catalogue[+v];
+    if (!c || v === '') return;
     loadSample({ url: 'assets/' + c.file, name: c.file, title: c.title, label: c.title + ' (' + c.group.toLowerCase().replace(/s$/, '') + ')' });
   });
-  $('sampleHymn').addEventListener('click', () => loadSample('hymn'));
   $('copy').addEventListener('click', copyXML);
+  $('saveXml').addEventListener('click', saveXML);
   $('copy').disabled = true;
   $('stop').addEventListener('click', () => {
     stopAsked = true;
@@ -1359,7 +1412,7 @@
     book.show(i);
     if (book.pages[i].el) book.pages[i].el.focus();
   });
-  $('osmdAll').addEventListener('click', () => { if (lastRes) renderNotation(lastRes.score.xml, lastRes.score.measures || 0, true); });
+  $('osmdAll').addEventListener('click', () => { if (lastRes) renderNotation(correctedXML(), lastRes.score.measures || 0, true); });
   const ovSaved = store.get('ssr.overlay');
   if (ovSaved === 'off') $('overlayToggle').setAttribute('aria-pressed', 'false');
   $('overlayToggle').addEventListener('click', () => {
@@ -1375,8 +1428,35 @@
     const k = b.dataset.layer;
     if (layerOff.has(k)) layerOff.delete(k); else layerOff.add(k);
     b.setAttribute('aria-pressed', String(!layerOff.has(k)));
-    store.set('ssr.layers', JSON.stringify([...layerOff]));
+    saveView();
     applyLayers();
+  });
+  document.querySelectorAll('.preset').forEach((b) => b.addEventListener('click', () => { viewPref.mode = b.dataset.mode; saveView(); applyLayers(); }));
+  $('unkNext').addEventListener('click', () => stepUnk(1));
+  $('unkPrev').addEventListener('click', () => stepUnk(-1));
+  $('identCopy').addEventListener('click', copyExamples);
+  $('pages').addEventListener('click', (e) => {
+    const b = e.target.closest('.unk');
+    if (b && !repair.on) openPop(b);
+  });
+  $('idType').addEventListener('change', describeEffect);
+  $('idDetail').addEventListener('input', describeEffect);
+  $('idSave').addEventListener('click', saveIdent);
+  $('idRemove').addEventListener('click', removeIdent);
+  $('idCancel').addEventListener('click', () => closePop(true));
+  $('idDetail').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); saveIdent(); } });
+  document.addEventListener('keydown', (e) => {
+    if (!$('idPop').hidden) {
+      if (e.key === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); closePop(true); }
+      return;
+    }
+    if (e.ctrlKey || e.metaKey || e.altKey || repair.on) return;
+    const t = e.target;
+    if (t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable)) return;
+    if (e.key === 'n' || e.key === 'N') { e.preventDefault(); stepUnk(1); } else if (e.key === 'p' || e.key === 'P') { e.preventDefault(); stepUnk(-1); }
+  }, true);
+  document.addEventListener('pointerdown', (e) => {
+    if (!$('idPop').hidden && !e.target.closest('#idPop') && !e.target.closest('.unk')) closePop(false);
   });
   renderLayers(null);
   applyLayers();
@@ -1391,6 +1471,337 @@
   applyZoom();
   window.addEventListener('resize', fitLabels);
   if (window.visualViewport) window.visualViewport.addEventListener('resize', fitLabels);
+
+  // ------------------------------------------------- unrecognised marks ---
+  // Ink the reading did not explain is a focusable highlight over the page.
+  // The reader can say what each one is; the labels are kept per document
+  // (like repair marks), shown as "identified by you", applied to the
+  // MusicXML where that is simple (src/corrections.js) and exported for
+  // repair and as training examples.
+  const ident = {
+    items: {}, seq: 0, sel: null,
+    key() { return repair.doc ? 'ssr.ident:' + repair.doc : null; },
+    open() {
+      this.items = {}; this.sel = null;
+      try { const j = JSON.parse(store.get(this.key()) || 'null'); if (j && j.items) this.items = j.items; } catch (e) { this.items = {}; }
+      this.seq = Math.max(0, ...this.all().map((m) => m.id || 0));
+    },
+    save() {
+      const k = this.key();
+      if (!k) return;
+      if (this.all().length) store.set(k, JSON.stringify({ v: 1, items: this.items })); else store.del(k);
+    },
+    list(i) { return this.items[i] || []; },
+    all() { return Object.values(this.items).flat(); },
+  };
+  const sameBox = (a, b) => !!a && !!b && a.every((v, k) => Math.abs(v - b[k]) <= 2);
+  const typeKey = (m) => m.type + (m.sub ? ':' + m.sub : '');
+  function identName(m) {
+    const o = $('idType').querySelector(`option[value="${typeKey(m)}"]`);
+    const t = o ? o.textContent : m.type;
+    return m.detail ? `${t}: ${m.detail}` : t;
+  }
+  function barOf(p, b) {
+    const mm = lastRes && lastRes.score && lastRes.score.measureMap, v = p.view;
+    if (!mm || !v || v.spread) return null;
+    const cx = (b[0] + b[2]) / 2, cy = (b[1] + b[3]) / 2, ss = v.ss;
+    const m = mm.find((q) => q.page === p.i && cx >= q.xa && cx <= q.xb && cy >= q.y0 - 3 * ss && cy <= q.y1 + 3 * ss);
+    return m ? m.n : null;
+  }
+  // the page's unrecognised marks in reading order (rows of systems, then
+  // left to right), each with the reader's label when it has one; labels
+  // whose mark a later reading no longer reports stay where they were drawn
+  function unkItems(p) {
+    const v = p.view;
+    if (!v || !v.sym) return [];
+    const ss = v.ss, lyr = book.lyricBoxes(p);
+    const boxes = (v.sym.unknown || []).filter((b) => !lyr.some((l) => b[0] < l[2] && b[2] > l[0] && b[1] < l[3] && b[3] > l[1]));
+    const ids = ident.list(p.i).slice();
+    const out = boxes.map((b) => {
+      const k = ids.findIndex((m) => sameBox(m.box, b));
+      return { box: b, ident: k >= 0 ? ids.splice(k, 1)[0] : null };
+    }).concat(ids.map((m) => ({ box: m.box, ident: m })));
+    // reading order: by bar where the bar is known, else by row, then left to right
+    const row = (b) => Math.round((b[1] + b[3]) / 2 / (8 * ss)), bar = (b) => { const n = barOf(p, b); return n == null ? 1e9 : n; };
+    out.sort((a, b) => bar(a.box) - bar(b.box) || row(a.box) - row(b.box) || a.box[0] - b.box[0]);
+    out.forEach((it) => { it.key = it.box.map((x) => Math.round(x)).join('_'); });
+    return out;
+  }
+  // every mark still unrecognised, page by page
+  function unkList() {
+    return book.pages.filter((p) => p.view).flatMap((p) => unkItems(p).filter((it) => !it.ident).map((it) => ({ page: p.i, key: it.key, box: it.box })));
+  }
+  function unkLayerHTML(p) {
+    const v = p.view, W = v.width, H = v.height, ss = v.ss;
+    const all = unkList();
+    const pc = (n, d) => `${((n / d) * 100).toFixed(3)}%`;
+    const html = unkItems(p).map((it) => {
+      const b = it.box, pad = 0.6 * ss;
+      const w = Math.max(b[2] - b[0] + 2 * pad, 1.6 * ss), h = Math.max(b[3] - b[1] + 2 * pad, 1.6 * ss);
+      const cx = (b[0] + b[2]) / 2, cy = (b[1] + b[3]) / 2;
+      const bar = barOf(p, b), barTxt = bar != null ? `, bar ${bar}` : '';
+      const sel = ident.sel && ident.sel.page === p.i && ident.sel.key === it.key ? ' sel' : '';
+      let cls = 'unk' + sel, label, tag = '';
+      if (it.ident) {
+        cls += ' done' + (it.ident.type === 'noise' ? ' noise' : '');
+        label = `Identified by you: ${identName(it.ident)}${barTxt}. Change it`;
+        tag = `<span class="unk-tag" aria-hidden="true">${esc(it.ident.type === 'noise' ? 'ignored' : identName(it.ident))}</span>`;
+      } else {
+        const n = all.findIndex((q) => q.page === p.i && q.key === it.key) + 1;
+        label = `Unrecognised mark ${n} of ${all.length}${barTxt}${book.n > 1 ? `, page ${p.i + 1}` : ''}. Say what it is`;
+      }
+      // centred on the ink; never under 18 screen px across (CSS max())
+      return `<button type="button" class="${cls}" data-key="${it.key}" style="left:${pc(cx, W)};top:${pc(cy, H)};width:max(18px, ${pc(w, W)});height:max(18px, ${pc(h, H)})" aria-label="${esc(label)}">${tag}</button>`;
+    }).join('');
+    return `<div class="unk-layer">${html}</div>`;
+  }
+  function refreshUnk() {
+    const p = book.pages[book.sel], fig = $('pages').querySelector('.pageframe:not(.placeholder)');
+    if (!p || !p.view || !fig) { updateUnkNav(); return; }
+    const old = fig.querySelector('.unk-layer');
+    if (old) old.remove();
+    const rp = fig.querySelector('svg.rp');
+    if (rp) rp.insertAdjacentHTML('beforebegin', unkLayerHTML(p)); else fig.insertAdjacentHTML('beforeend', unkLayerHTML(p));
+    updateUnkNav();
+  }
+  function updateUnkNav() {
+    const n = unkList().length, m = ident.all().length, read = book.pages.some((p) => p.view);
+    $('unkCount').textContent = !read ? 'Not recognised: none yet' : `Not recognised: ${n}`;
+    $('unkPrev').disabled = !n; $('unkNext').disabled = !n;
+    $('identCount').hidden = !m;
+    $('identCount').textContent = `Identified by you: ${m}`;
+    $('identCopy').hidden = !m;
+  }
+  const unkMsg = (t) => { $('unkMsg').textContent = t; };
+  // the zoom at which a staff space is at least 16 screen pixels
+  function zoomFor(p) {
+    const img = $('pages').querySelector('.pageframe img');
+    if (!img || !p.view) return zoom;
+    const fit = img.clientWidth / zoom / p.view.width;
+    const need = 16 / (p.view.ss * fit);
+    return ZOOMS.find((z) => z >= need) || ZOOMS[ZOOMS.length - 1];
+  }
+  function focusUnk(it, announce) {
+    ident.sel = { page: it.page, key: it.key };
+    if (book.sel !== it.page) { book.follow = false; book.show(it.page); } else refreshUnk();
+    const p = book.pages[it.page];
+    const z = zoomFor(p);
+    if (z > zoom) { zoom = z; store.set('ssr.zoom', String(zoom)); applyZoom(); }
+    requestAnimationFrame(() => {
+      const btn = $('pages').querySelector(`.unk[data-key="${it.key}"]`);
+      if (!btn) return;
+      const host = $('pages'), r = btn.getBoundingClientRect(), hr = host.getBoundingClientRect();
+      host.scrollLeft += r.left + r.width / 2 - (hr.left + hr.width / 2);
+      const r2 = btn.getBoundingClientRect();
+      window.scrollBy(0, r2.top + r2.height / 2 - window.innerHeight / 2);
+      btn.focus({ preventScroll: true });
+      if (announce) unkMsg(btn.getAttribute('aria-label').replace(/\. Say what it is$/, '.'));
+    });
+  }
+  function stepUnk(dir) {
+    const list = unkList();
+    if (!list.length) { unkMsg('Every mark on the read pages is recognised or identified.'); return; }
+    let i = ident.sel ? list.findIndex((q) => q.page === ident.sel.page && q.key === ident.sel.key) : -1;
+    if (i < 0 && ident.sel) {
+      // the selected mark was just identified: go on from where it stood
+      const s = ident.sel, after = list.findIndex((q) => q.page > s.page || (q.page === s.page && q.key > s.key));
+      i = dir > 0 ? (after < 0 ? list.length : after) - 1 : (after < 0 ? list.length : after);
+    }
+    i = dir > 0 ? (i + 1) % list.length : (i - 1 + list.length) % list.length;
+    focusUnk(list[i], true);
+  }
+
+  // ------------------------------------------------- user corrections ---
+  function pagesMeta() {
+    const o = {};
+    book.pages.forEach((p) => { if (p.view) o[p.i] = { ss: p.view.ss, heads: p.view.heads, notes: (book.headNotes && book.headNotes.get(p.i)) || [] }; });
+    return o;
+  }
+  const corrMod = () => { try { return omrRequire('./corrections'); } catch (e) { return null; } };
+  let corr = null;
+  function corrected() {
+    if (!lastRes) return null;
+    const C = corrMod(), ids = ident.all();
+    if (!C || !ids.length) return { xml: lastRes.score.xml, corrections: null };
+    try { return C.correctScore(lastRes.score, ids, pagesMeta()); } catch (e) {
+      return { xml: lastRes.score.xml, corrections: { applied: [], skipped: [], hidden: 0, labels: 0, warnings: [`Your corrections could not be applied (${e.message}).`] } };
+    }
+  }
+  const correctedXML = () => (corr ? corr.xml : lastRes ? lastRes.score.xml : '');
+  function renderCorrNote(c) {
+    const el = $('corrNote'), cs = c && c.corrections;
+    const n = cs ? cs.applied.length : 0;
+    el.hidden = !cs || (!n && !cs.skipped.length);
+    if (el.hidden) return;
+    el.textContent = `${plural(n, 'correction')} of yours applied to the MusicXML` + (n ? `: ${cs.applied.map((a) => `${a.text} (bar ${a.measure})`).join(', ')}` : '') +
+      (cs.skipped.length ? `. ${plural(cs.skipped.length, 'label')} could not be applied.` : '.');
+  }
+  const corrWarnings = (c) => ((c && c.corrections) ? c.corrections.warnings.concat(c.corrections.skipped.map((s) => `A mark you identified (${s.kind}) was not applied: ${s.why}.`)) : []);
+  async function applyCorrectionsNow() {
+    if (!lastRes) return;
+    corr = corrected();
+    renderCode(corr.xml);
+    renderCorrNote(corr);
+    renderWarnings((lastRes.warnings || []).concat(corrWarnings(corr)));
+    await renderNotation(corr.xml, lastRes.score.measures || 0, false);
+  }
+
+  // ------------------------------------------------------- the popover ---
+  const pop = { page: null, key: null, box: null };
+  const DETAIL = {
+    time: ['Time signature', 'e.g. 3/4', false], key: ['Key signature', 'e.g. 3 flats or 2 sharps', false], text: ['The text', 'e.g. dolce', false],
+    barno: ['The number', 'e.g. 17', false], artic: ['Which one', 'e.g. staccato, accent, trill', false], other: ['What it is', 'required', true],
+  };
+  function candidate() {
+    const v = $('idType').value;
+    if (!v) return null;
+    const [type, sub] = v.split(':');
+    return { id: 0, page: pop.page, box: pop.box, type, sub: sub || null, detail: $('idDetail').value.trim() };
+  }
+  function describeEffect() {
+    const c = candidate(), C = corrMod();
+    const row = DETAIL[c ? c.type : ''];
+    $('idDetailRow').hidden = !row;
+    if (row) { $('idDetailLabel').textContent = row[0] + (row[2] ? '' : ' (optional)'); $('idDetail').placeholder = row[1]; }
+    if (!c || !C) { $('idEffect').textContent = ''; return; }
+    const r = C.resolveCorrections([c], pagesMeta(), lastRes && lastRes.score && lastRes.score.measureMap)[0];
+    const notes = (book.headNotes && book.headNotes.get(pop.page)) || [];
+    const at = (k) => (notes[k] ? pitchText(notes[k]) : 'the note');
+    const t = {
+      accidental: () => `Makes ${at(r.head)}, the nearest note to its right, ${r.name.replace('-', ' ')} in the MusicXML.`,
+      dot: () => `Adds a dot to ${at(r.head)}, the nearest note to its left.`,
+      rest: () => `Inserts ${/^[aeiou]/.test(r.value) ? 'an' : 'a'} ${r.value} rest in bar ${r.measure} of the MusicXML.`,
+      dynamic: () => `Adds ${r.value} ${r.placement} ${at(r.head)} in the MusicXML.`,
+      hide: () => 'Hides the mark; nothing changes in the MusicXML.',
+      label: () => 'Kept as a label (repair notes and training examples); the MusicXML does not change.',
+      skip: () => `Kept as a label only: ${r.why}.`,
+    }[r.kind];
+    $('idEffect').textContent = t ? t() : '';
+  }
+  function drawCrop(p, b) {
+    const cv = $('idCrop'), img = $('pages').querySelector('.pageframe img');
+    const g = cv.getContext('2d');
+    if (!img || !img.naturalWidth) { cv.hidden = true; return; }
+    cv.hidden = false;
+    const v = p.view, k = img.naturalWidth / v.width, pad = 1.5 * v.ss;
+    const x0 = Math.max(0, b[0] - pad), y0 = Math.max(0, b[1] - pad), x1 = Math.min(v.width, b[2] + pad), y1 = Math.min(v.height, b[3] + pad);
+    const w = 200, h = Math.max(48, Math.min(140, Math.round((w * (y1 - y0)) / Math.max(1, x1 - x0))));
+    cv.width = w; cv.height = h;
+    g.fillStyle = '#fff'; g.fillRect(0, 0, w, h);
+    const sc = Math.min(w / (x1 - x0), h / (y1 - y0)), dw = (x1 - x0) * sc, dh = (y1 - y0) * sc;
+    g.drawImage(img, x0 * k, y0 * k, (x1 - x0) * k, (y1 - y0) * k, (w - dw) / 2, (h - dh) / 2, dw, dh);
+    g.strokeStyle = '#b25e00'; g.lineWidth = 2;
+    g.strokeRect((w - dw) / 2 + (b[0] - x0) * sc - 2, (h - dh) / 2 + (b[1] - y0) * sc - 2, (b[2] - b[0]) * sc + 4, (b[3] - b[1]) * sc + 4);
+  }
+  function openPop(btn) {
+    const p = book.pages[book.sel];
+    if (!p || !p.view) return;
+    const it = unkItems(p).find((q) => q.key === btn.dataset.key);
+    if (!it) return;
+    Object.assign(pop, { page: p.i, key: it.key, box: it.box });
+    ident.sel = { page: p.i, key: it.key };
+    $('pages').querySelectorAll('.unk.sel').forEach((b) => b.classList.remove('sel'));
+    btn.classList.add('sel');
+    const bar = barOf(p, it.box);
+    $('idPopH').textContent = it.ident ? 'Change what this mark is' : 'What is this mark?';
+    $('idWhere').textContent = `Page ${p.i + 1}${bar != null ? `, bar ${bar}` : ''}. It is shown below, ringed.`;
+    $('idType').value = it.ident ? typeKey(it.ident) : '';
+    $('idDetail').value = (it.ident && it.ident.detail) || '';
+    $('idRemove').hidden = !it.ident;
+    drawCrop(p, it.box);
+    describeEffect();
+    const el = $('idPop');
+    el.hidden = false;
+    if (window.innerWidth > 640) {
+      const r = btn.getBoundingClientRect(), pw = el.offsetWidth, ph = el.offsetHeight;
+      let top = r.bottom + 8;
+      if (top + ph > window.innerHeight - 12) top = Math.max(12, r.top - ph - 8);
+      el.style.left = `${Math.max(12, Math.min(window.innerWidth - pw - 12, r.left))}px`;
+      el.style.top = `${top}px`;
+    } else { el.style.left = ''; el.style.top = ''; }
+    $('idType').focus();
+  }
+  function closePop(refocus) {
+    if ($('idPop').hidden) return;
+    $('idPop').hidden = true;
+    if (refocus) { const b = $('pages').querySelector(`.unk[data-key="${pop.key}"]`); if (b) b.focus({ preventScroll: true }); }
+  }
+  async function saveIdent() {
+    const c = candidate();
+    if (!c) { $('idEffect').textContent = 'Choose what the mark is first.'; $('idType').focus(); return; }
+    if (DETAIL[c.type] && DETAIL[c.type][2] && !c.detail) { $('idEffect').textContent = 'Say in a few words what it is.'; $('idDetail').focus(); return; }
+    const list = ident.list(pop.page).filter((m) => !sameBox(m.box, pop.box));
+    const old = ident.list(pop.page).find((m) => sameBox(m.box, pop.box));
+    list.push({ ...c, id: old ? old.id : ++ident.seq, at: new Date().toISOString() });
+    ident.items[pop.page] = list;
+    ident.save();
+    closePop(false);
+    refreshUnk();
+    await applyCorrectionsNow();
+    const b = $('pages').querySelector(`.unk[data-key="${pop.key}"]`);
+    if (b) b.focus({ preventScroll: true });
+    const n = corr && corr.corrections ? corr.corrections.applied.length : 0;
+    unkMsg(`Saved: ${identName(c)}. ${plural(unkList().length, 'mark')} still not recognised; ${plural(n, 'correction')} applied. Press N for the next one.`);
+  }
+  async function removeIdent() {
+    ident.items[pop.page] = ident.list(pop.page).filter((m) => !sameBox(m.box, pop.box));
+    ident.save();
+    closePop(false);
+    refreshUnk();
+    await applyCorrectionsNow();
+    const b = $('pages').querySelector(`.unk[data-key="${pop.key}"]`);
+    if (b) b.focus({ preventScroll: true });
+    unkMsg('Label removed.');
+  }
+  // labelled crops for a classifier: PNG data URLs with the reader's type
+  async function labelledExamples() {
+    const out = [];
+    for (const p of book.pages) {
+      const ids = ident.list(p.i);
+      if (!ids.length || !p.view || !p.url) continue;
+      const img = await new Promise((res) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = p.url; });
+      if (!img) continue;
+      const v = p.view, k = img.naturalWidth / v.width, ss = v.ss;
+      for (const m of ids) {
+        const pad = 0.5 * ss, b = m.box;
+        const x0 = Math.max(0, b[0] - pad), y0 = Math.max(0, b[1] - pad), x1 = Math.min(v.width, b[2] + pad), y1 = Math.min(v.height, b[3] + pad);
+        const sc = Math.min(1, 160 / Math.max((x1 - x0) * k, (y1 - y0) * k));
+        const c = document.createElement('canvas');
+        c.width = Math.max(1, Math.round((x1 - x0) * k * sc)); c.height = Math.max(1, Math.round((y1 - y0) * k * sc));
+        c.getContext('2d').drawImage(img, x0 * k, y0 * k, (x1 - x0) * k, (y1 - y0) * k, 0, 0, c.width, c.height);
+        out.push({ page: p.i + 1, id: m.id, type: m.type, sub: m.sub, detail: m.detail || '', label: identName(m), bbox: b, crop: [x0, y0, x1, y1].map((x) => Math.round(x)),
+          staffSpace: v.ss, staffSpacePx: +(ss * k * sc).toFixed(2), png: c.toDataURL('image/png') });
+        c.width = c.height = 0;
+      }
+    }
+    return { format: 'score-scan-reader/labelled-examples', version: 1, file: repair.file, exported: new Date().toISOString(), examples: out };
+  }
+  async function copyExamples() {
+    const j = await labelledExamples();
+    const txt = JSON.stringify(j);
+    const ok = () => unkMsg(`Copied ${plural(j.examples.length, 'labelled example')} as JSON.`);
+    const fallback = () => {
+      const url = URL.createObjectURL(new Blob([txt], { type: 'application/json' }));
+      let w = null;
+      try { w = window.open(url, '_blank'); if (w) w.opener = null; } catch (e) { w = null; }
+      setTimeout(() => URL.revokeObjectURL(url), 120000);
+      unkMsg(w ? 'The clipboard is not available: the examples opened in a new tab.' : 'Neither the clipboard nor a new tab is available here.');
+    };
+    try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, fallback); else fallback(); } catch (e) { fallback(); }
+  }
+  function identNotes(p) {
+    const v = p.view, C = corrMod();
+    const res = C ? C.resolveCorrections(ident.list(p.i), pagesMeta(), lastRes && lastRes.score && lastRes.score.measureMap) : [];
+    const notes = (book.headNotes && book.headNotes.get(p.i)) || [];
+    return ident.list(p.i).map((m, j) => {
+      const b = m.box, cx = (b[0] + b[2]) / 2, cy = (b[1] + b[3]) / 2;
+      const near = v ? v.heads.map((h, k) => ({ k, d: Math.hypot(h[0] - cx, h[1] - cy), h })).sort((a, c) => a.d - c.d).slice(0, 3)
+        .map(({ k, h }) => ({ k, x: h[0], y: h[1], pitch: notes[k] ? pitchText(notes[k]) : null, value: notes[k] ? durText(notes[k][3], notes[k][4], notes[k][5], notes[k][6]) : null })) : [];
+      const r = res[j] || {};
+      return { id: m.id, type: m.type, sub: m.sub, detail: m.detail || '', label: identName(m), bbox: b.map((x) => Math.round(x)), bar: barOf(p, b), nearestHeads: near,
+        correction: r.kind ? { kind: r.kind, why: r.why || null, head: r.head != null ? r.head : null } : null, at: m.at };
+    });
+  }
 
   // ------------------------------------------------------ repair marks ---
   // The reader draws over a page to mark what the reading got wrong. Marks are
@@ -1577,12 +1988,13 @@
   function repairNotes() {
     const pages = [];
     book.pages.forEach((p) => {
-      const ms = repair.list(p.i);
-      if (!ms.length) return;
+      const ms = repair.list(p.i), ids = ident.list(p.i);
+      if (!ms.length && !ids.length) return;
       const v = p.view;
       pages.push({
         page: p.i + 1, width: v ? v.width : null, height: v ? v.height : null, staffSpace: v ? v.ss : null, spread: v ? v.spread || 0 : 0,
         marks: ms.map((m, k) => { const b = bboxOf(m.pts).map((x) => Math.round(x)); return { n: k + 1, id: m.id, tool: m.tool, note: m.note || '', points: m.pts, bbox: b, drawn: m.at, found: repairInside(p, b) }; }),
+        identified: identNotes(p),
       });
     });
     const sc = (lastRes && lastRes.score) || {};
@@ -1604,7 +2016,7 @@
     setTimeout(() => URL.revokeObjectURL(url), 120000);
     msgRP(w ? `${what} opened in a new tab: save it from there.` : `${what} could not open here (new tabs are blocked); use Copy repair notes.`);
   }
-  function countMarks() { return Object.values(repair.marks).reduce((a, m) => a + m.length, 0); }
+  function countMarks() { return Object.values(repair.marks).reduce((a, m) => a + m.length, 0) + ident.all().length; }
   function copyRepair() {
     const n = countMarks();
     if (!n) { msgRP('There are no repair marks to copy yet.'); return; }

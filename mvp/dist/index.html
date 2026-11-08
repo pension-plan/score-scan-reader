@@ -33,7 +33,7 @@
   --ov-note:#d32f2f; --ov-stem:#757575; --ov-beam:#6d4c41; --ov-rest:#00897b; --ov-clef:#8e24aa; --ov-key:#ef6c00;
   --ov-time:#2e7d32; --ov-bar:#283593; --ov-staff:#546e7a; --ov-acc:#c2185b; --ov-dot:#1e88e5; --ov-tup:#827717;
   --ov-lyric:#00838f; --ov-unknown:rgba(255,222,0,.58); --ov-unknown-edge:#d4b000; --ov-label:#15171b; --ov-label-dur:#4f5761;
-  --ov-mark:var(--ov-acc); --ov-text:#4527a0; --ov-dyn:#ad1457; --ov-curve:#607d8b;
+  --ov-mark:var(--ov-acc); --ov-text:#5e35b1; --ov-barno:#263238; --ov-dyn:#0277bd; --ov-slur:#f06292; --ov-brace:#8d6e63;
   /* repair marks (the reader's own): a lime highlighter under a black dashed
      core, unlike every detection colour and the yellow of unrecognised ink */
   --rp-halo:rgba(118,255,3,.55); --rp-ink:#0b0c0e; --rp-badge-ink:#b2ff59;
@@ -63,8 +63,8 @@ button,input,textarea{font:inherit;color:inherit}
 .wrap{margin:0 auto;padding-block:24px 48px;
   padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
 
-/* reading text keeps a measure; the results grid (and the sheet view in it) uses the full page width */
-.wrap > :not(.grid){max-width:1200px;margin-left:auto;margin-right:auto}
+/* one column edge for everything; reading text keeps its own measure (.lede) */
+.wrap > *{max-width:1440px;margin-left:auto;margin-right:auto}
 
 /* ---- masthead with a five-line staff rule ending in a final barline ---- */
 .masthead{position:relative;padding-bottom:30px;margin-bottom:18px}
@@ -98,17 +98,15 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 .drop-hint{margin:0 0 12px;color:var(--muted);font-size:14px}
 .drop-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px}
 /* sample pair: a bracket like the one joining staves in a system */
-.samples{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding-left:10px;border-left:3px solid var(--rule-strong);position:relative}
-.samples::before,.samples::after{content:"";position:absolute;left:-3px;width:8px;height:3px;background:var(--rule-strong)}
-.samples::before{top:0}
-.samples::after{bottom:0}
-.samples-label{font:italic 600 14px/1 var(--display);color:var(--muted);margin-right:2px}
-.sample-all{max-width:16rem;min-width:0;font:inherit;cursor:pointer;text-overflow:ellipsis}
+.or{font:italic 600 14px/1 var(--display);color:var(--muted)}
+.sample-all{max-width:18rem;min-width:0;font:inherit;font-weight:600;cursor:pointer;text-overflow:ellipsis;
+  appearance:none;-webkit-appearance:none;padding-right:30px;
+  background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);
+  background-position:calc(100% - 15px) 52%,calc(100% - 10px) 52%;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
 @media (max-width:480px){
-  .samples{flex:1 1 100%}
-  .samples-label{flex-basis:100%;padding-top:2px}
-  .samples .btn{flex:1 1 0;justify-content:center;padding:7px 8px;white-space:nowrap}
-  .samples .sample-all{flex:1 1 100%;max-width:none;width:100%}
+  .drop-actions{display:grid;grid-template-columns:1fr;gap:8px}
+  .drop-actions .btn{justify-content:center;max-width:none;width:100%}
+  .drop-actions .or{display:none}
 }
 .filerow{flex:1 1 300px;min-width:0;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;
   gap:6px 12px;padding:10px 12px;border:1px solid var(--rule);background:var(--panel-2);border-radius:2px}
@@ -117,14 +115,17 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 .filerow-name{font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .filerow-size{font:12px var(--mono);font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
 .filerow-done{width:20px;height:20px;color:var(--ok);grid-row:span 2}
-.meter{grid-column:2;height:3px;background:var(--rule);overflow:hidden}
+/* the stepper is the one visible progress indicator; the meter stays for assistive tech */
+.meter{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .meter span{display:block;height:100%;width:0;background:var(--accent);transition:width .25s}
 .filerow[data-done] .meter span{background:var(--ok)}
 .filerow-eta{grid-column:2;margin:0;font:12px var(--mono);font-variant-numeric:tabular-nums;color:var(--muted)}
 .filerow .stop{grid-column:2;justify-self:start;margin-top:2px}
 
 /* ---- stepper: seven noteheads on one staff line ---- */
-.stepper{margin:20px 0 4px}
+.stepper{margin:20px auto 4px}
+/* the stepper shows only while a scan is read, or where it failed */
+.drop:not([data-state="busy"]):not([data-state="error"]) ~ .stepper{display:none}
 .stepper ol{list-style:none;margin:0;padding:0;display:flex}
 .step{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:6px}
 .step:last-child{flex:0 0 auto}
@@ -161,13 +162,19 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
   .sep{margin:0 3px}
 }
 
-.status{margin:10px 0 0;font-size:14px;color:var(--muted);min-height:1.5em;overflow-wrap:anywhere}
+/* result bar: what was read, and the MusicXML actions where the eye lands */
+.result{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 18px;margin-top:14px}
+.status{margin:0;font-size:14px;color:var(--muted);min-height:1.5em;overflow-wrap:anywhere;flex:1 1 260px;min-width:0}
+.drop[data-state="busy"] ~ .result .status{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.result-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.result-actions .copied{flex-basis:100%;padding:0}
+@media (max-width:480px){.result-actions{flex:1 1 100%}.result-actions .btn{flex:1 1 0;justify-content:center}}
 .alert{margin-top:10px;padding:10px 12px;border:1px solid var(--warn-mark);background:var(--warn-bg);color:var(--warn-ink);border-radius:2px;font-size:14px}
 
 /* ---- results grid ---- */
 .grid{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;margin-top:18px;align-items:start}
 /* the panels beside the music sit below it, side by side where there is room */
-.margin{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:18px;min-width:0;align-items:start}
+.margin{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,max(340px,(100% - 36px) / 3)),1fr));gap:18px;min-width:0;align-items:start}
 .margin > .code-panel{grid-column:1 / -1}
 .panel{background:var(--panel);border:1px solid var(--rule);border-radius:3px;padding:14px 16px 16px;min-width:0;box-shadow:var(--shadow)}
 .panel-head{display:flex;align-items:center;gap:10px;justify-content:space-between;border-bottom:1px solid var(--rule);
@@ -175,6 +182,17 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 .panel h2{font-family:var(--display);font-weight:600;font-size:17px;letter-spacing:.06em;font-variant:small-caps;
   text-transform:lowercase;margin:0;line-height:1.2}
 .count{font:12px var(--mono);color:var(--muted)}
+/* disclosure panels: the summary is the panel head, with a chevron */
+.fold > summary{cursor:pointer;list-style:none}
+.fold > summary::-webkit-details-marker{display:none}
+.fold > summary::after{content:"";flex:none;width:8px;height:8px;margin:0 4px 0 8px;border:solid var(--muted);border-width:0 2px 2px 0;
+  transform:rotate(45deg) translateY(-3px);transition:transform .15s}
+.fold[open] > summary::after{transform:rotate(-135deg) translate(-2px,-1px)}
+.fold > summary.panel-head{justify-content:flex-start}
+.fold > summary.panel-head .count,.fold > summary.code-head .code-label{margin-right:auto}
+.fold > summary.panel-head .count{margin-left:auto;margin-right:0}
+.fold:not([open]) > summary.panel-head{border-bottom:0;margin-bottom:0;padding-bottom:0}
+.fold > summary:focus-visible{outline-offset:4px}
 
 /* detection plate */
 .toggle{appearance:none;border:0;background:none;padding:4px 2px;display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;cursor:pointer}
@@ -204,14 +222,15 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 .ov-labels text{font-family:var(--sans);font-weight:600;fill:var(--ov-label);stroke:var(--paper);stroke-linejoin:round;paint-order:stroke}
 .ov-labels .ld{font-weight:500;font-style:italic;fill:var(--ov-label-dur)}
 .ov-labels .lr{fill:var(--ov-rest)} .ov-labels .lb{fill:var(--ov-bar)}
-/* text, dynamics and curves read off the page: tinted boxes, text and dynamics labelled above */
-.ov-text{stroke:var(--ov-text);fill:var(--ov-text)} .ov-dyns{stroke:var(--ov-dyn);fill:var(--ov-dyn)} .ov-curves{stroke:var(--ov-curve);fill:none}
-.ov-text rect,.ov-dyns rect{fill-opacity:.12;mix-blend-mode:multiply}
-.ov-text text,.ov-dyns text{font-family:var(--sans);font-weight:600;stroke:var(--paper);stroke-width:3px;stroke-linejoin:round;paint-order:stroke}
+/* text, bar numbers, dynamics, slurs and braces read off the page: tinted boxes like every symbol, text labelled above */
+.ov-text{stroke:var(--ov-text);fill:var(--ov-text)} .ov-barno{stroke:var(--ov-barno);fill:var(--ov-barno)} .ov-dyns{stroke:var(--ov-dyn);fill:var(--ov-dyn)}
+.ov-slurs{stroke:var(--ov-slur);fill:var(--ov-slur)} .ov-braces{stroke:var(--ov-brace);fill:var(--ov-brace)} .ov-ledger{stroke:var(--ov-staff);fill:var(--ov-staff)}
+.ov-text rect,.ov-barno rect,.ov-dyns rect,.ov-slurs rect,.ov-braces rect,.ov-ledger rect{fill-opacity:.26;mix-blend-mode:multiply}
+.ov-text text,.ov-barno text,.ov-dyns text{font-family:var(--sans);font-weight:600;stroke:var(--paper);stroke-width:3px;stroke-linejoin:round;paint-order:stroke}
 .ov-dyns text{font-style:italic}
 .pages.hide-notes .ov-notes,.pages.hide-rests .ov-rests,.pages.hide-clefs .ov-clefs,.pages.hide-keys .ov-keys,.pages.hide-times .ov-times,
 .pages.hide-bars .ov-bars,.pages.hide-marks .ov-marks,.pages.hide-lyrics .ov-lyrics,.pages.hide-labels .ov-labels,.pages.hide-unknown .ov-unknown,
-.pages.hide-text .ov-text,.pages.hide-dyns .ov-dyns,.pages.hide-curves .ov-curves,
+.pages.hide-text .ov-text,.pages.hide-barno .ov-barno,.pages.hide-dyns .ov-dyns,.pages.hide-slurs .ov-slurs,.pages.hide-braces .ov-braces,
 .pages.lbl-small .ov-labels{display:none}
 .pages{overflow-x:auto}
 .pages>.pageframe{flex:none;width:calc(100% * var(--zoom, 1))}
@@ -231,7 +250,8 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 .ovk-lyrics{stroke:var(--ov-lyric)} .ovk-labels{color:var(--ov-label)}
 .ovk-notes,.ovk-rests,.ovk-clefs,.ovk-keys,.ovk-times,.ovk-acc,.ovk-dot,.ovk-tup{fill-opacity:.3}
 .ovk-unknown{stroke:var(--ov-unknown-edge);fill:var(--ov-unknown)}
-.ovk-text{color:var(--ov-text)} .ovk-dyns{color:var(--ov-dyn);stroke:var(--ov-dyn)} .ovk-curves{stroke:var(--ov-curve)}
+.ovk-text{color:var(--ov-text)} .ovk-barno{color:var(--ov-barno);stroke:var(--ov-barno);fill:var(--ov-barno)} .ovk-barno rect{fill-opacity:.26} .ovk-dyns{color:var(--ov-dyn);stroke:var(--ov-dyn)}
+.ovk-slurs{stroke:var(--ov-slur)} .ovk-braces{stroke:var(--ov-brace)}
 /* repair markup: the layer takes the pointer (and stops touch scrolling) only while drawing */
 .head-tools{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:4px 14px}
 .toggle:disabled{opacity:.45;cursor:not-allowed}
@@ -254,6 +274,48 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 .rp-num{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--rp-ink);color:var(--rp-badge-ink);font-weight:700;font-size:11px;box-shadow:0 0 0 3px var(--rp-halo)}
 .repair-list input{min-width:0;width:100%;padding:3px 6px;border:1px solid var(--rule-strong);border-radius:3px;background:var(--panel);font-size:12.5px}
 .repair-out{width:100%;min-height:120px;font:11px var(--mono);background:var(--panel);border:1px solid var(--rule-strong)}
+/* unrecognised marks: focusable highlights over the page (HTML, sized in % of
+   the page, so they follow every zoom); the ring stays 3 screen px thick */
+:root{--unk-fill:rgba(255,212,0,.62); --unk-ring:#b25e00; --unk-ring-sel:#7a3b00; --ident-fill:rgba(46,160,67,.16); --ident-ring:#1b7a35; --ident-ink:#ffffff}
+.unk-layer{position:absolute;inset:0;pointer-events:none}
+.unk{position:absolute;pointer-events:auto;padding:0;margin:0;border:3px solid var(--unk-ring);border-radius:6px;background:var(--unk-fill);
+  transform:translate(-50%,-50%);mix-blend-mode:multiply;cursor:pointer;box-shadow:0 0 0 1px rgba(255,255,255,.7)}
+.unk:hover{border-color:var(--unk-ring-sel)}
+.unk:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.unk.sel{border-color:var(--unk-ring-sel);border-width:4px;animation:unk-pulse 1.4s ease-in-out 3}
+@keyframes unk-pulse{0%,100%{box-shadow:0 0 0 1px rgba(255,255,255,.7),0 0 0 0 rgba(178,94,0,.55)}50%{box-shadow:0 0 0 1px rgba(255,255,255,.7),0 0 0 9px rgba(178,94,0,0)}}
+@media (prefers-reduced-motion: reduce){.unk.sel{animation:none}}
+.unk.done{background:var(--ident-fill);border-color:var(--ident-ring);border-style:solid;mix-blend-mode:normal}
+.unk.done.noise{border-style:dashed;opacity:.75}
+.unk-tag{position:absolute;left:-3px;bottom:100%;margin-bottom:2px;white-space:nowrap;font:600 11px/1.3 var(--sans);color:var(--ident-ink);
+  background:var(--ident-ring);padding:1px 5px 1px 3px;border-radius:3px;pointer-events:none}
+.unk-tag::before{content:"\2713\00a0"}
+.pages.ov-off .unk-layer,.pages.hide-unknown .unk-layer{display:none}
+.pages.drawing .unk-layer .unk{pointer-events:none}
+.presets{display:inline-flex;flex-wrap:wrap;margin:0 0 10px;border:1px solid var(--rule-strong);border-radius:16px;overflow:hidden}
+.preset{appearance:none;border:0;background:transparent;color:var(--ink);font-size:12.5px;padding:6px 12px;min-height:32px;cursor:pointer}
+.preset+.preset{border-left:1px solid var(--rule-strong)}
+.preset[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:600}
+.unknav{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin:0 0 10px}
+.unk-count{margin:0;display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:15px}
+.unk-swatch{width:18px;height:14px;border:3px solid var(--unk-ring);border-radius:4px;background:var(--unk-fill)}
+.done-count{font-size:13px;font-weight:600;color:var(--ok)}
+.done-count::before{content:"\2713";display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--ident-ring);color:#fff;font-size:11px}
+.unk-btns{display:inline-flex;gap:6px}
+.unk-msg{margin:0;font-size:12.5px;color:var(--muted);flex-basis:100%}
+.unk-msg:empty{display:none}
+.layers.preset-hidden,.legend.preset-hidden{display:none}
+.idpop{position:fixed;z-index:50;width:min(340px,calc(100vw - 24px));background:var(--panel);color:var(--ink);border:1px solid var(--rule-strong);
+  border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.25);padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.idpop h3{margin:0;font-size:15px}
+.idpop-where,.idpop-effect{margin:0;font-size:12.5px;color:var(--muted)}
+.idpop-effect:empty{display:none}
+.idpop-crop{align-self:flex-start;max-width:100%;background:var(--paper);border:1px solid var(--rule);border-radius:4px;image-rendering:auto}
+.idpop-field{display:flex;flex-direction:column;gap:3px;font-size:12.5px}
+.idpop-field select,.idpop-field input{font-size:14px;padding:6px 8px;border:1px solid var(--rule-strong);border-radius:4px;background:var(--panel);min-height:36px}
+.idpop-btns{display:flex;flex-wrap:wrap;gap:6px}
+@media (max-width:640px){.idpop{left:0!important;right:0;bottom:0;top:auto!important;width:auto;border-radius:12px 12px 0 0;padding-bottom:max(14px,env(safe-area-inset-bottom))}}
+.corr-note{margin:6px 0 0;font-size:13px;color:var(--ok);font-weight:600}
 .zoom{display:inline-flex;align-items:center;gap:6px;margin:0 0 10px}
 .zoom-label{min-width:3.2em;text-align:center;font:12px var(--mono);color:var(--muted)}
 .pageframe.placeholder{aspect-ratio:1 / 1.29;display:grid;place-items:center;line-height:1.5;
@@ -321,18 +383,19 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 /* code block */
 .code-panel,.preview-panel{min-width:0}
 .code-panel{padding:0;overflow:hidden}
-.codeblock{display:flex;flex-direction:column;min-width:0}
-.code-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;padding:10px 12px 10px 16px;
+.codeblock{display:block;min-width:0}
+.code-head{display:flex;flex-wrap:nowrap;align-items:center;gap:8px 12px;padding:12px 16px;min-height:44px;
   background:var(--panel-2);border-bottom:1px solid var(--rule)}
+.codeblock:not([open]) > .code-head{border-bottom:0}
 .code-label{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;min-width:0}
 .code-file{font:13px var(--mono)}
 .code-meta{font:12px var(--mono);font-variant-numeric:tabular-nums;color:var(--muted)}
-.copy{padding:6px 12px;background:var(--panel)}
+.copy:not(.primary){background:var(--panel)}
 .copy .i-check{display:none}
 .copy.is-copied{border-color:var(--ok);color:var(--ok)}
 .copy.is-copied .i-copy{display:none}
 .copy.is-copied .i-check{display:block}
-.copied{margin:0;font-size:13px;color:var(--muted);padding:0 16px}
+.copied{margin:0;font-size:13px;color:var(--muted)}
 .copied:empty{display:none}
 .copied:not(:empty){padding-top:6px}
 .code-body{max-height:440px;overflow:auto;display:grid;grid-template-columns:auto max-content;font:12px/1.6 var(--mono);
@@ -357,13 +420,32 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 #osmdNote:not(:empty){margin-top:10px}
 #osmdAll{margin-top:8px}
 
-.colophon{margin-top:28px;padding-top:12px;border-top:1px solid var(--rule);color:var(--muted);font-size:13px}
+.colophon{margin-top:24px;padding-top:12px;border-top:1px solid var(--rule);color:var(--muted);font-size:13px}
 .colophon p{margin:0;max-width:72ch}
 
 .preview-panel{grid-column:1 / -1}
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}
 }
+
+/* phone: every control is at least a 44px target */
+@media (max-width:640px){
+  .btn,.btn.small,.preset,.toggle,.layer{min-height:44px}
+  .btn.icon{width:44px;height:44px}
+}
+
+/* scan toolbar: view presets, zoom, overlay and repair in one row that wraps */
+.det-head{flex-wrap:wrap;justify-content:flex-start;gap:8px 16px}
+.det-head h2{margin-right:4px}
+.det-head .presets,.det-head .zoom{margin:0}
+.det-head .head-tools{margin-left:auto}
+@media (max-width:640px){
+  .det-head h2{flex-basis:100%}
+  .det-head .head-tools{margin-left:0;flex-basis:100%;justify-content:flex-start}
+  .preset{padding-inline:14px}
+}
+/* before the first result there is nothing to filter or step through */
+.plate:not([data-ready]) .presets,.plate:not([data-ready]) .unknav{display:none}
 /* playback (ui/player.js): transport bar, parts mixer, follow-along marks */
 :root{--pb-hl:#e65100;--pb-hl-fill:rgba(255,145,0,.30)}
 .pb{border:1px solid var(--rule);background:var(--panel-2);border-radius:6px;padding:10px 12px;margin:0 6px 12px;display:grid;gap:8px}
@@ -415,24 +497,24 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 <div class="wrap">
   <header class="masthead">
     <h1>Score Scan Reader</h1>
-    <p class="lede">Turns a scanned hymn, part-song or piano piece into MusicXML 4.0. Lyrics are kept, closed-score SATB is split into four parts, and piano grand staves stay together. Your file never leaves this browser.</p>
+    <p class="lede">Scanned sheet music in, MusicXML out. Your file stays in this browser.</p>
   </header>
 
   <section class="drop" id="drop" aria-labelledby="dropTitle" data-state="idle">
     <div class="drop-main">
       <h2 class="drop-title" id="dropTitle">Drop a scanned PDF or image</h2>
-      <p class="drop-hint" id="dropHint">A PDF, or one or more PNG or JPG pages.</p>
+      <p class="drop-hint" id="dropHint">PDF, PNG or JPG</p>
       <div class="drop-actions">
-        <button class="btn primary" id="choose" type="button">Choose PDF or image</button>
-        <div class="samples" role="group" aria-labelledby="samplesLabel">
-          <span class="samples-label" id="samplesLabel">Samples</span>
-          <button class="btn" id="sample" type="button" title="Piano rag, two staves kept together (converted when the page opens)">Maple Leaf Rag</button>
-          <button class="btn" id="sampleHymn" type="button" title="Real 1905 hymnal scan: closed-score SATB split into four parts, with lyrics">St. Anselm hymn</button>
-          <label class="sr-only" for="sampleAll">All example scans</label>
-          <select class="btn sample-all" id="sampleAll" title="Every example scan from the test set: real hymnal and songbook scans, and synthetic scans with known answers">
-            <option value="">All examples…</option>
-          </select>
-        </div>
+        <button class="btn primary" id="choose" type="button">Choose file</button>
+        <span class="or" aria-hidden="true">or</span>
+        <label class="sr-only" for="sampleAll">Try an example scan</label>
+        <select class="btn sample-all" id="sampleAll">
+          <option value="">Try an example</option>
+          <optgroup label="Start here">
+            <option value="rag">Maple Leaf Rag (piano)</option>
+            <option value="hymn">St. Anselm (hymn, 4 parts, lyrics)</option>
+          </optgroup>
+        </select>
       </div>
       <input id="file" class="sr-only" type="file" accept="application/pdf,image/png,image/jpeg" multiple tabindex="-1" aria-hidden="true">
       <p class="sr-only" id="dropLive" aria-live="polite"></p>
@@ -453,31 +535,57 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
   <nav class="stepper" aria-label="Conversion progress">
     <ol id="steps"></ol>
   </nav>
-  <p class="status" id="status" role="status" aria-live="polite">Loading the sample: Maple Leaf Rag</p>
+  <div class="result" id="resultBar">
+    <p class="status" id="status" role="status" aria-live="polite">Loading the Maple Leaf Rag example</p>
+    <div class="result-actions" id="resultActions" hidden>
+      <button class="btn primary copy" id="copy" type="button" aria-describedby="copied">
+        <svg class="i-copy" viewBox="0 0 20 20" aria-hidden="true"><rect x="6.5" y="6.5" width="10" height="11" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M13.5 4V3.5a1.5 1.5 0 0 0-1.5-1.5H5A1.5 1.5 0 0 0 3.5 3.5V13A1.5 1.5 0 0 0 5 14.5h.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+        <svg class="i-check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10.5l4 4 8-9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span id="copyLabel">Copy MusicXML</span>
+      </button>
+      <button class="btn" id="saveXml" type="button">Save .musicxml</button>
+      <p class="copied" id="copied" aria-live="polite"></p>
+    </div>
+  </div>
   <div class="alert" id="alert" role="alert" hidden></div>
 
   <div class="grid">
     <section class="panel plate" aria-labelledby="detH">
-      <div class="panel-head">
-        <h2 id="detH">Detection</h2>
+      <div class="panel-head det-head">
+        <h2 id="detH">Scan</h2>
+        <div class="presets" role="group" aria-label="What the overlay shows">
+          <button type="button" class="preset" data-mode="unknown" aria-pressed="true">Unrecognised only</button>
+          <button type="button" class="preset" data-mode="all" aria-pressed="false">Everything</button>
+          <button type="button" class="preset" data-mode="custom" aria-pressed="false">Custom</button>
+        </div>
+        <div class="zoom" role="group" aria-label="Page zoom">
+          <button class="btn icon" id="zoomOut" type="button" aria-label="Zoom out" aria-controls="pages"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8h9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+          <output class="zoom-label" id="zoomLabel" aria-live="polite">Fit</output>
+          <button class="btn icon" id="zoomIn" type="button" aria-label="Zoom in" aria-controls="pages"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8h9M8 3.5v9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+        </div>
         <div class="head-tools">
-          <button class="toggle" id="repairToggle" type="button" aria-pressed="false" aria-controls="pages repairBar" disabled>
-            <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
-            <span>Mark for repair</span>
-          </button>
           <button class="toggle" id="overlayToggle" type="button" aria-pressed="true" aria-controls="pages">
             <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
             <span>Overlay</span>
           </button>
+          <button class="toggle" id="repairToggle" type="button" aria-pressed="false" aria-controls="pages repairBar" disabled>
+            <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+            <span>Mark for repair</span>
+          </button>
         </div>
+      </div>
+      <div class="unknav" id="unkNav" role="group" aria-label="Marks the reading did not recognise">
+        <p class="unk-count"><span class="unk-swatch" aria-hidden="true"></span><span id="unkCount">Not recognised: none yet</span></p>
+        <div class="unk-btns">
+          <button class="btn small" id="unkPrev" type="button" aria-keyshortcuts="P" disabled>Previous</button>
+          <button class="btn small" id="unkNext" type="button" aria-keyshortcuts="N" disabled>Next unrecognised</button>
+        </div>
+        <p class="unk-count done-count" id="identCount" hidden></p>
+        <button class="btn small" id="identCopy" type="button" hidden>Copy labelled examples (JSON)</button>
+        <p class="unk-msg" id="unkMsg" role="status" aria-live="polite"></p>
       </div>
       <ul class="legend" id="legend" aria-label="Overlay key"></ul>
       <ul class="layers" id="layers" aria-label="Overlay layers: switch each kind of mark on or off"></ul>
-      <div class="zoom" role="group" aria-label="Page zoom">
-        <button class="btn icon" id="zoomOut" type="button" aria-label="Zoom out" aria-controls="pages"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8h9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
-        <output class="zoom-label" id="zoomLabel" aria-live="polite">Fit</output>
-        <button class="btn icon" id="zoomIn" type="button" aria-label="Zoom in" aria-controls="pages"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8h9M8 3.5v9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
-      </div>
       <div class="pagenav" id="pageNav" hidden>
         <div class="pagenav-row">
           <button class="btn icon" id="pgPrev" type="button" aria-label="Previous page" aria-controls="pages"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -507,38 +615,67 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
         <textarea class="repair-out" id="rpOut" readonly hidden aria-label="Repair notes as JSON"></textarea>
       </div>
       <div id="pages" class="pages"></div>
+      <div class="idpop" id="idPop" role="dialog" aria-labelledby="idPopH" hidden>
+        <h3 id="idPopH">What is this mark?</h3>
+        <p class="idpop-where" id="idWhere"></p>
+        <canvas class="idpop-crop" id="idCrop" width="160" height="96" aria-hidden="true"></canvas>
+        <label class="idpop-field"><span>It is</span>
+          <select id="idType">
+            <option value="">Choose a type</option>
+            <optgroup label="Note head"><option value="head:filled">Filled note head</option><option value="head:half">Half-note head</option><option value="head:whole">Whole-note head</option></optgroup>
+            <optgroup label="Rest"><option value="rest:whole">Whole rest</option><option value="rest:half">Half rest</option><option value="rest:quarter">Quarter rest</option><option value="rest:eighth">Eighth rest</option><option value="rest:16th">16th rest</option><option value="rest:32nd">32nd rest</option></optgroup>
+            <optgroup label="Accidental"><option value="acc:sharp">Sharp ♯</option><option value="acc:flat">Flat ♭</option><option value="acc:natural">Natural ♮</option><option value="acc:double-sharp">Double sharp 𝄪</option><option value="acc:flat-flat">Double flat 𝄫</option></optgroup>
+            <optgroup label="Dot"><option value="dot">Augmentation dot</option></optgroup>
+            <optgroup label="Clef"><option value="clef:G">G clef</option><option value="clef:F">F clef</option><option value="clef:C">C clef</option></optgroup>
+            <optgroup label="Signature"><option value="time">Time signature</option><option value="key">Key signature</option></optgroup>
+            <optgroup label="Dynamic"><option value="dyn:ppp">ppp</option><option value="dyn:pp">pp</option><option value="dyn:p">p</option><option value="dyn:mp">mp</option><option value="dyn:mf">mf</option><option value="dyn:f">f</option><option value="dyn:ff">ff</option><option value="dyn:fff">fff</option><option value="dyn:sfz">sfz</option></optgroup>
+            <optgroup label="Other marks"><option value="artic">Articulation or ornament</option><option value="slur:slur">Slur</option><option value="slur:tie">Tie</option><option value="text">Text</option><option value="barno">Bar number</option></optgroup>
+            <optgroup label="Not music"><option value="noise">Noise: ignore it</option><option value="other">Something else</option></optgroup>
+          </select>
+        </label>
+        <label class="idpop-field" id="idDetailRow" hidden><span id="idDetailLabel">Details</span><input type="text" id="idDetail" maxlength="80" autocomplete="off"></label>
+        <p class="idpop-effect" id="idEffect"></p>
+        <div class="idpop-btns">
+          <button class="btn small primary" id="idSave" type="button">Save</button>
+          <button class="btn small" id="idRemove" type="button" hidden>Remove label</button>
+          <button class="btn small" id="idCancel" type="button">Cancel</button>
+        </div>
+      </div>
     </section>
 
-    <div class="margin" id="margin">
-      <p class="stale-note" id="staleNote" hidden>The previous result stays here until this one is ready.</p>
+    <section class="panel preview-panel" id="previewPanel" aria-labelledby="prevH" hidden>
+      <div class="panel-head"><h2 id="prevH">Preview</h2></div>
+      <div class="sheet"><div id="osmd"></div></div>
+      <p class="muted" id="osmdNote"></p>
+      <button class="btn small" id="osmdAll" type="button" hidden>Draw every measure</button>
+    </section>
+    <div class="margin" id="margin" hidden>
+      <p class="stale-note" id="staleNote" hidden>Previous result, until this one is ready</p>
       <section class="panel" aria-labelledby="partsH">
         <div class="panel-head"><h2 id="partsH">Parts</h2></div>
-        <p class="summary" id="partsSummary">Waiting for the first conversion.</p>
+        <p class="summary" id="partsSummary">None yet</p>
+        <p class="corr-note" id="corrNote" role="status" hidden></p>
         <ol class="partlist" id="parts"></ol>
       </section>
       <section class="panel" aria-labelledby="lyrH">
         <div class="panel-head"><h2 id="lyrH">Lyrics</h2></div>
-        <div id="lyrics" class="lyrics"><p class="muted">Lyrics appear here once the text is read.</p></div>
+        <div id="lyrics" class="lyrics"><p class="muted">None yet</p></div>
       </section>
       <section class="panel" aria-labelledby="warnH">
-        <div class="panel-head"><h2 id="warnH">Warnings</h2><span class="count" id="warnCount"></span></div>
-        <ul class="warnings" id="warnings"></ul>
+        <details class="fold" id="warnFold">
+          <summary class="panel-head"><h2 id="warnH">Warnings</h2><span class="count" id="warnCount"></span></summary>
+          <ul class="warnings" id="warnings"></ul>
+        </details>
       </section>
       <section class="panel code-panel" aria-labelledby="xmlH">
-        <div class="codeblock">
-          <div class="code-head">
+        <details class="codeblock fold" id="xmlFold">
+          <summary class="code-head">
             <div class="code-label">
-              <h2 id="xmlH">MusicXML 4.0</h2>
+              <h2 id="xmlH">MusicXML source</h2>
               <span class="code-file" id="xmlFile">score.musicxml</span>
               <span class="code-meta" id="xmlMeta"></span>
             </div>
-            <button class="btn copy" id="copy" type="button" aria-describedby="copied">
-              <svg class="i-copy" viewBox="0 0 20 20" aria-hidden="true"><rect x="6.5" y="6.5" width="10" height="11" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M13.5 4V3.5a1.5 1.5 0 0 0-1.5-1.5H5A1.5 1.5 0 0 0 3.5 3.5V13A1.5 1.5 0 0 0 5 14.5h.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
-              <svg class="i-check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10.5l4 4 8-9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <span id="copyLabel">Copy</span>
-            </button>
-          </div>
-          <p class="copied" id="copied" aria-live="polite"></p>
+          </summary>
           <div class="code-body" id="codeBody" tabindex="0" role="region" aria-label="MusicXML source">
             <pre class="gutter" id="gutter" aria-hidden="true"></pre>
             <pre class="code"><code id="code"></code></pre>
@@ -546,21 +683,13 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
           <p class="code-note" id="codeNote" hidden></p>
           <label class="sr-only" for="xml">Full MusicXML text</label>
           <textarea id="xml" class="xml-raw" spellcheck="false" readonly hidden></textarea>
-        </div>
+        </details>
       </section>
     </div>
-
-
-    <section class="panel preview-panel" id="previewPanel" aria-labelledby="prevH">
-      <div class="panel-head"><h2 id="prevH">Notation preview</h2></div>
-      <div class="sheet"><div id="osmd"></div></div>
-      <p class="muted" id="osmdNote"></p>
-      <button class="btn small" id="osmdAll" type="button" hidden>Draw every measure</button>
-    </section>
   </div>
 
   <footer class="colophon">
-    <p>Recognition runs in this page with a classical OMR pipeline; lyrics are read with Tesseract. Check the result against the scan before you rely on it.</p>
+    <p>Check the result against the scan before you rely on it.</p>
   </footer>
 </div>
 
@@ -2483,6 +2612,207 @@ function integral(bin) {
 }
 
 module.exports = { labelComponents, integral };
+
+};
+defs["corrections"]=function(require,module,exports){
+'use strict';
+// User corrections: what the reader said an unrecognised mark is, applied to
+// the MusicXML after buildScore. Two pure steps, so a re-run of the
+// conversion simply applies them again:
+//   resolveCorrections(idents, pages, measureMap) -> corrections
+//     ties each identified mark to the notes around it (page geometry: the
+//     overlay's pageView heads and the result's per-head notes)
+//   applyCorrections(xml, corrections) -> { xml, applied, skipped, warnings }
+//     edits the MusicXML text at the lines those notes were written on
+// correctScore(score, idents, pages) runs both on a score.
+//
+// An ident is { id, page, box: [x0, y0, x1, y1], type, sub, detail } in the
+// page's overlay frame. pages[page] = { ss, heads: [[x, y, r, stem, top, bot]],
+// notes: [[step, alter, octave, q, type, dots, tuplet, line] | 0] }.
+// Applied: an accidental (to the nearest note to its right on its staff), a
+// rest (at its place in the bar, by the notes around it), an augmentation dot
+// (to the nearest note to its left) and a dynamic (before the nearest note).
+// 'noise' only hides the mark; every other type is kept as a label only.
+
+const ACC_ALTER = { sharp: 1, flat: -1, natural: 0, 'double-sharp': 2, 'flat-flat': -2 };
+const REST_Q = { whole: 4, half: 2, quarter: 1, eighth: 0.5, '16th': 0.25, '32nd': 0.125 };
+const DYNAMICS = ['pppp', 'ppp', 'pp', 'p', 'mp', 'mf', 'f', 'ff', 'fff', 'ffff', 'sf', 'sfz', 'sffz', 'fp', 'rfz'];
+
+// heads of a page with what was written for them, and the staff band of each
+function pageHeads(pg) {
+  const out = [];
+  (pg.heads || []).forEach((h, k) => {
+    const n = (pg.notes || [])[k];
+    out.push({ k, x: h[0], y: h[1], r: h[2], top: h[4] != null ? h[4] : h[1], bot: h[5] != null ? h[5] : h[1], note: n || null, line: n && n[7] >= 0 ? n[7] : -1 });
+  });
+  return out;
+}
+// heads on the staff a mark at height cy belongs to: the staff (by its
+// heads' staff edges) whose band, 3 spaces either side, holds cy most centrally
+function staffHeads(hs, cy, ss) {
+  let best = null, bd = Infinity;
+  for (const h of hs) {
+    if (cy < h.top - 3 * ss || cy > h.bot + 3 * ss) continue;
+    const d = Math.abs(cy - (h.top + h.bot) / 2);
+    if (d < bd) { bd = d; best = h; }
+  }
+  if (!best) return [];
+  return hs.filter(h => Math.abs(h.top - best.top) < 1.5 * ss);
+}
+
+function resolveCorrections(idents, pages, measureMap) {
+  const out = [];
+  for (const id of idents || []) {
+    const pg = pages && pages[id.page];
+    const base = { id: id.id, page: id.page, type: id.type, sub: id.sub || null };
+    if (id.type === 'noise') { out.push({ ...base, kind: 'hide' }); continue; }
+    if (!pg || !pg.heads) { out.push({ ...base, kind: 'skip', why: 'page not read in this session' }); continue; }
+    const ss = pg.ss || 16, [x0, y0, x1, y1] = id.box, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+    const hs = pageHeads(pg).filter(h => h.line >= 0);
+    const onStaff = staffHeads(hs, cy, ss);
+    if (id.type === 'acc') {
+      const alter = ACC_ALTER[id.sub];
+      if (alter === undefined) { out.push({ ...base, kind: 'skip', why: 'unknown accidental' }); continue; }
+      let best = null, bd = Infinity;
+      for (const h of onStaff) {
+        const dx = h.x - x1, dy = Math.abs(h.y - cy);
+        if (dx < -0.3 * ss || dx > 4 * ss || dy > 1.3 * ss) continue;
+        const d = dx + 2 * dy;
+        if (d < bd) { bd = d; best = h; }
+      }
+      if (!best) { out.push({ ...base, kind: 'skip', why: 'no note just right of it on its staff' }); continue; }
+      out.push({ ...base, kind: 'accidental', line: best.line, step: best.note[0], octave: best.note[2], alter, name: id.sub, head: best.k });
+    } else if (id.type === 'dot') {
+      let best = null, bd = Infinity;
+      for (const h of onStaff) {
+        const dx = x0 - h.x, dy = Math.abs(h.y - cy);
+        if (dx < 0 || dx > 3 * ss || dy > 1.3 * ss) continue;
+        const d = dx + 2 * dy;
+        if (d < bd) { bd = d; best = h; }
+      }
+      if (!best) { out.push({ ...base, kind: 'skip', why: 'no note just left of it on its staff' }); continue; }
+      out.push({ ...base, kind: 'dot', line: best.line, step: best.note[0], octave: best.note[2], head: best.k });
+    } else if (id.type === 'rest') {
+      const q = REST_Q[id.sub];
+      if (!q) { out.push({ ...base, kind: 'skip', why: 'unknown rest value' }); continue; }
+      const m = (measureMap || []).find(mm => mm.page === id.page && cx >= mm.xa && cx <= mm.xb && cy >= mm.y0 - 3 * ss && cy <= mm.y1 + 3 * ss);
+      const inBar = onStaff.filter(h => !m || (h.x >= m.xa && h.x <= m.xb));
+      const before = inBar.filter(h => h.x < cx).sort((a, b) => b.x - a.x)[0];
+      const after = inBar.filter(h => h.x >= cx).sort((a, b) => a.x - b.x)[0];
+      if (!m || (!before && !after)) { out.push({ ...base, kind: 'skip', why: m ? 'no note on its staff in that bar to place it by' : 'not inside a bar that was read' }); continue; }
+      out.push({ ...base, kind: 'rest', q, value: id.sub, measure: m.n, ...(before ? { afterLine: before.line, head: before.k } : { beforeLine: after.line, head: after.k }) });
+    } else if (id.type === 'dyn') {
+      if (!DYNAMICS.includes(id.sub)) { out.push({ ...base, kind: 'skip', why: 'unknown dynamic' }); continue; }
+      const pool = onStaff.length ? onStaff : hs;
+      let best = null, bd = Infinity;
+      for (const h of pool) {
+        const d = Math.abs(h.x - cx) + (h.x < x0 - ss ? 2 * ss : 0) + 0.3 * Math.abs(h.y - cy);
+        if (d < bd) { bd = d; best = h; }
+      }
+      if (!best) { out.push({ ...base, kind: 'skip', why: 'no note near it' }); continue; }
+      out.push({ ...base, kind: 'dynamic', value: id.sub, beforeLine: best.line, placement: cy < best.top ? 'above' : 'below', head: best.k });
+    } else out.push({ ...base, kind: 'label' });
+  }
+  return out;
+}
+
+// ------------------------------------------------------------- the XML ---
+const isNote = (l) => /^\s*<note>/.test(l || '');
+const isChordMate = (l) => /^\s*<note><chord\/>/.test(l || '');
+function chordStart(L, i) { while (i > 0 && isChordMate(L[i])) i--; return i; }
+function chordEnd(L, i) { while (isChordMate(L[i + 1])) i++; return i; }
+// the next <backup> of this measure after line i (its voice ran longer)
+function bumpBackup(L, i, d) {
+  for (let j = i + 1; j < L.length && !/<\/measure>/.test(L[j]); j++) {
+    const m = L[j].match(/<backup><duration>(\d+)<\/duration><\/backup>/);
+    if (m) { L[j] = L[j].replace(m[0], `<backup><duration>${+m[1] + d}</duration></backup>`); return; }
+  }
+}
+const measureOf = (L, i) => { for (let j = i; j >= 0; j--) { const m = L[j].match(/<measure number="([^"]+)"/); if (m) return m[1]; } return '?'; };
+const tag = (l, t) => { const m = l.match(new RegExp(`<${t}>([^<]*)</${t}>`)); return m ? m[1] : null; };
+const TYPE_OF = [[4, 'whole'], [2, 'half'], [1, 'quarter'], [0.5, 'eighth'], [0.25, '16th'], [0.125, '32nd']];
+
+function applyCorrections(xml, corrections) {
+  const applied = [], skipped = [], warnings = [];
+  if (!xml || !corrections || !corrections.length) return { xml, applied, skipped, warnings };
+  const L = xml.split('\n');
+  const div = +((xml.match(/<divisions>(\d+)<\/divisions>/) || [])[1] || 0);
+  const check = (c, i) => {
+    const l = L[i];
+    if (!isNote(l) || !/<pitch>/.test(l)) return 'its note is not in this MusicXML';
+    if (c.step && (tag(l, 'step') !== c.step || +tag(l, 'octave') !== c.octave)) return 'its note changed since it was identified';
+    return null;
+  };
+  const longer = new Set();
+  // edits in place first (line numbers stay), then insertions from the bottom up
+  const edits = corrections.filter(c => c.kind === 'accidental' || c.kind === 'dot');
+  const inserts = corrections.filter(c => c.kind === 'rest' || c.kind === 'dynamic');
+  for (const c of edits) {
+    const why = check(c, c.line);
+    if (why) { skipped.push({ id: c.id, kind: c.kind, why }); continue; }
+    if (c.kind === 'accidental') {
+      let l = L[c.line];
+      l = l.replace(/<pitch><step>([A-G])<\/step>(?:<alter>[^<]*<\/alter>)?<octave>/, (_, s) => `<pitch><step>${s}</step>${c.alter ? `<alter>${c.alter}</alter>` : ''}<octave>`);
+      l = l.replace(/<accidental>[^<]*<\/accidental>/, '');
+      const acc = `<accidental>${c.name}</accidental>`;
+      if (/<dot\/>/.test(l)) l = l.replace(/((?:<dot\/>)+)/, `$1${acc}`);
+      else if (/<\/type>/.test(l)) l = l.replace('</type>', `</type>${acc}`);
+      else l = l.replace('</voice>', `</voice>${acc}`);
+      L[c.line] = l;
+      applied.push({ id: c.id, kind: c.kind, measure: measureOf(L, c.line), text: `${c.name} on ${c.step}${c.octave}` });
+    } else {
+      const a = chordStart(L, c.line), b = chordEnd(L, c.line);
+      const dots = (L[a].match(/<dot\/>/g) || []).length;
+      const d0 = +tag(L[a], 'duration');
+      const base = d0 / (2 - Math.pow(2, -dots)), d1 = Math.round(base * (2 - Math.pow(2, -(dots + 1))));
+      if (!(d1 > d0)) { skipped.push({ id: c.id, kind: c.kind, why: 'the note value cannot take another dot' }); continue; }
+      for (let i = a; i <= b; i++) {
+        let l = L[i].replace(`<duration>${d0}</duration>`, `<duration>${d1}</duration>`);
+        if (/<dot\/>/.test(l)) l = l.replace(/((?:<dot\/>)+)/, '$1<dot/>');
+        else if (/<\/type>/.test(l)) l = l.replace('</type>', '</type><dot/>');
+        L[i] = l;
+      }
+      bumpBackup(L, b, d1 - d0);
+      longer.add(measureOf(L, a));
+      applied.push({ id: c.id, kind: c.kind, measure: measureOf(L, a), text: `dot on ${c.step}${c.octave}` });
+    }
+  }
+  const at = (c) => (c.kind === 'rest' ? (c.afterLine != null ? c.afterLine + 0.5 : c.beforeLine - 0.5) : c.beforeLine - 0.5);
+  for (const c of inserts.slice().sort((p, q) => at(q) - at(p))) {
+    const ref = c.afterLine != null ? c.afterLine : c.beforeLine;
+    if (!isNote(L[ref])) { skipped.push({ id: c.id, kind: c.kind, why: 'its neighbouring note is not in this MusicXML' }); continue; }
+    const voice = tag(L[ref], 'voice'), staff = tag(L[ref], 'staff');
+    const staffXML = staff ? `<staff>${staff}</staff>` : '';
+    if (c.kind === 'rest') {
+      if (!div) { skipped.push({ id: c.id, kind: c.kind, why: 'no divisions in the MusicXML' }); continue; }
+      const d = Math.max(1, Math.round(c.q * div)), type = (TYPE_OF.find(t => Math.abs(t[0] - c.q) < 1e-6) || [0, c.value])[1];
+      const line = `      <note><rest/><duration>${d}</duration><voice>${voice}</voice><type>${type}</type>${staffXML}</note>`;
+      const i = c.afterLine != null ? chordEnd(L, c.afterLine) + 1 : chordStart(L, c.beforeLine);
+      L.splice(i, 0, line);
+      bumpBackup(L, i, d);
+      longer.add(measureOf(L, i));
+      applied.push({ id: c.id, kind: c.kind, measure: measureOf(L, i), text: `${type} rest` });
+    } else {
+      const i = chordStart(L, c.beforeLine);
+      L.splice(i, 0, `      <direction placement="${c.placement}"><direction-type><dynamics><${c.value}/></dynamics></direction-type>${staffXML}</direction>`);
+      applied.push({ id: c.id, kind: c.kind, measure: measureOf(L, i), text: c.value });
+    }
+  }
+  for (const m of longer) warnings.push(`Bar ${m}: your correction makes it longer than its time signature (not rebalanced).`);
+  return { xml: L.join('\n'), applied, skipped, warnings };
+}
+
+function correctScore(score, idents, pages) {
+  const cs = resolveCorrections(idents, pages, score && score.measureMap);
+  const r = applyCorrections(score && score.xml, cs.filter(c => c.kind !== 'hide' && c.kind !== 'skip' && c.kind !== 'label'));
+  return {
+    ...score, xml: r.xml,
+    corrections: { applied: r.applied, skipped: r.skipped.concat(cs.filter(c => c.kind === 'skip').map(c => ({ id: c.id, kind: c.type, why: c.why }))),
+      hidden: cs.filter(c => c.kind === 'hide').length, labels: cs.filter(c => c.kind === 'label').length, warnings: r.warnings },
+  };
+}
+
+module.exports = { resolveCorrections, applyCorrections, correctScore, ACC_ALTER, REST_Q, DYNAMICS };
 
 };
 defs["cv"]=function(require,module,exports){
@@ -8915,6 +9245,7 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
   })));
   accLine.forEach(a => a.sort((x, y) => x.t - y.t));
   const L = [];
+  const noteAt = [], noted = new Set(); // (user corrections: the XML line of each head's first written note)
   L.push('<?xml version="1.0" encoding="UTF-8" standalone="no"?>');
   L.push('<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">');
   L.push('<score-partwise version="4.0">');
@@ -9030,6 +9361,7 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
             h.pitch = pt;
             // (overlay only: the value written for this head, first part that writes it)
             h.shown ||= { q: e.q, type: tt ? tt.type : null, dots: tt ? tt.dots : 0, tuplet: tmod ? tu.actual : 0 };
+            if (!noted.has(h)) { noted.add(h); noteAt.push([h, L.length]); }
             const acc = h.acc && !e.tieStop ? `<accidental>${h.acc}</accidental>` : '';
             const tie = (e.tieStop ? '<tie type="stop"/>' : '') + (e.tieStart ? '<tie type="start"/>' : '');
             const tied = e.tieStop || e.tieStart ? `<notations>${e.tieStop ? '<tied type="stop"/>' : ''}${e.tieStart ? '<tied type="start"/>' : ''}</notations>` : '';
@@ -9061,6 +9393,12 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
     L.push('  </part>');
   });
   L.push('</score-partwise>');
+  // entries may hold line breaks: count them for the line numbers
+  if (noteAt.length) {
+    const off = new Array(L.length + 1).fill(0);
+    for (let i = 0; i < L.length; i++) off[i + 1] = off[i] + (L[i].split('\n').length - 1);
+    for (const [h, i] of noteAt) h.xmlLine = i + off[i];
+  }
   return L.join('\n') + '\n';
 }
 
@@ -10707,11 +11045,11 @@ function __omrSessionModule() {
       if (!by.has(k)) by.set(k, []);
       for (const h of p.fr.heads || []) by.get(k).push(h.parts ? h.parts.slice() : []);
       // what each drawn head was written as: [step, alter, octave, quarters,
-      // type, dots, tuplet number], or 0 when no part wrote it
+      // type, dots, tuplet number, MusicXML line of its note], or 0 when no part wrote it
       if (!notes.has(k)) notes.set(k, []);
       for (const h of p.fr.heads || []) {
         const pt = h.pitch, d = h.shown;
-        notes.get(k).push(pt && d ? [pt.step, pt.alter || 0, pt.octave, Math.round(d.q * 1000) / 1000, d.type || '', d.dots || 0, d.tuplet || 0] : 0);
+        notes.get(k).push(pt && d ? [pt.step, pt.alter || 0, pt.octave, Math.round(d.q * 1000) / 1000, d.type || '', d.dots || 0, d.tuplet || 0, h.xmlLine == null ? -1 : h.xmlLine] : 0);
       }
     }
     return [...by].map(([index, parts]) => ({ index, parts, notes: notes.get(index) || [] }));
@@ -11501,8 +11839,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
   // Two bundled samples: the rag (piano grand staff, converted on load) and a
   // real 1905 hymnal scan (closed-score SATB with lyrics: the four-part split).
   const SAMPLES = {
-    rag: { url: 'assets/sample-maple-leaf-rag.pdf', name: 'sample-maple-leaf-rag.pdf', title: 'the sample rag', label: 'Maple Leaf Rag (Scott Joplin, 1899), engraved and aged like a scan' },
-    hymn: { url: 'assets/sample-st-anselm.pdf', name: 'sample-st-anselm.pdf', title: 'the sample hymn', label: 'St. Anselm (Methodist Hymnal, 1905), a real scan' },
+    rag: { url: 'assets/sample-maple-leaf-rag.pdf', name: 'sample-maple-leaf-rag.pdf', title: 'the sample rag', label: 'Maple Leaf Rag (Joplin)' },
+    hymn: { url: 'assets/sample-st-anselm.pdf', name: 'sample-st-anselm.pdf', title: 'the sample hymn', label: 'St. Anselm (1905 hymnal scan)' },
   };
   // Every redistributable benchmark scan (assets/samples.json, written by
   // tools/sync-samples.mjs), offered in the "All examples" picker.
@@ -11717,12 +12055,12 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
         error: `Could not convert ${n}`,
       };
       const hints = {
-        idle: `A PDF, or one or more PNG or JPG pages. Up to ${MAX_PAGES} pages are read, one at a time.`,
-        over: 'Release to convert. The file stays in this browser.',
-        busy: this.nPages > 1 ? `Reading ${this.nPages} pages one at a time. Each page appears below when it is done; you can stop early and keep them.` : 'Reading the scan. This takes a few seconds per page.',
-        done: 'Drop another scan here, or choose a file.',
-        stopped: 'Stopped early: the result covers the pages read so far.',
-        error: 'Try a sharper scan (200 dpi or more), or a PDF, PNG or JPG file.',
+        idle: `PDF, PNG or JPG · up to ${MAX_PAGES} pages`,
+        over: 'Release to convert',
+        busy: this.nPages > 1 ? `${this.nPages} pages · each appears below when read` : 'A few seconds per page',
+        done: 'Drop another scan to replace it',
+        stopped: 'Stopped early: covers the pages read',
+        error: 'Try a sharper scan (200 dpi or more)',
       };
       const t = titles[state] || titles.idle;
       // a file name is shown exactly as given; only a prose title is capitalised
@@ -12031,6 +12369,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
       }
       host.appendChild(this.frame(p));
       renderLayers(p.view);
+      updateUnkNav();
       fitLabels();
       repair.attach(host.querySelector('.pageframe'), p);
       $('repairToggle').disabled = false;
@@ -12055,6 +12394,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
       img.alt = `Page ${p.i + 1} of the scan, straightened: ${plural(v.nStaves, 'staff', 'staves')}, ${plural(v.heads.length, 'note head')} found.`;
       fig.appendChild(img);
       fig.insertAdjacentHTML('beforeend', this.overlay(p));
+      fig.insertAdjacentHTML('beforeend', unkLayerHTML(p));
       return fig;
     },
     overlay(p) {
@@ -12117,15 +12457,19 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
       const lyr = this.lyricBoxes(p);
       s += g('lyrics', lyr.map(([x0, y0, x1, y1]) => `<path d="M${f1(x0)},${f1(y1 - ss * 0.3)}V${f1(y1 + ss * 0.15)}H${f1(x1)}V${f1(y1 - ss * 0.3)}"/>`).join(''), ` fill="none" stroke-width="${f1(sw)}"`);
       // ink nothing explains: swiped with a yellow highlighter
-      const unk = (sy.unknown || []).filter((b) => !lyr.some((l) => b[0] < l[2] && b[2] > l[0] && b[1] < l[3] && b[3] > l[1]));
-      // text read off the page (titles, credits, instrument names, bar
-      // numbers, tempo and expression), dynamics and hairpins, and the curves
-      // and lines around the notes: a box each, text and dynamics labelled
+      // text read off the page (titles, credits, instrument names, tempo and
+      // expression), bar numbers, dynamics and hairpins, slurs / ties /
+      // fermatas, braces and brackets: a tinted box each, text labelled above
       const named = (b, label) => `<g><title>${esc(label)}</title>${rect(b, ss * 0.12)}<text x="${f1(b[0])}" y="${f1(b[1] - ss * 0.3)}" font-size="${f1(ss * 0.75)}">${esc(label)}</text></g>`;
-      s += g('text', (sy.text || []).filter((t) => t[4] !== 'lyrics').map((t) => named(t, t[5])).join(''), ` stroke-width="${f1(sw)}"`);
+      const txt = sy.text || [];
+      s += g('text', txt.filter((t) => t[4] !== 'lyrics' && t[4] !== 'measure').map((t) => named(t, t[5])).join(''), ` stroke-width="${f1(sw)}"`);
+      s += g('barno', txt.filter((t) => t[4] === 'measure').map((t) => named(t, t[5])).join(''), ` stroke-width="${f1(sw)}"`);
       s += g('dyns', (sy.dyns || []).concat(sy.wedges || []).map((d) => named(d, d[4])).join(''), ` stroke-width="${f1(sw)}"`);
-      s += g('curves', [].concat(sy.slurs || [], sy.fermatas || [], sy.braces || [], sy.ledgers || []).map((b) => rect(b, ss * 0.08)).join(''), ` stroke-width="${f1(sw * 0.8)}" stroke-dasharray="${f1(sw * 2)} ${f1(sw)}"`);
-      s += g('unknown', unk.map((b) => rect(b, ss * 0.18, ` rx="${f1(ss * 0.25)}"`)).join(''));
+      s += g('slurs', [].concat(sy.slurs || [], sy.fermatas || []).map((b) => rect(b, ss * 0.08)).join(''), ` stroke-width="${f1(sw)}"`);
+      s += g('braces', (sy.braces || []).map((b) => rect(b, ss * 0.08)).join(''), ` stroke-width="${f1(sw)}"`);
+      // ledger lines belong with the staff lines
+      if (sy.ledgers && sy.ledgers.length) s += g('bars', `<g class="ov-ledger">${sy.ledgers.map((b) => rect(b, ss * 0.05)).join('')}</g>`, ` stroke-width="${f1(sw)}"`);
+      // (unrecognised ink is drawn as focusable highlights over the page: unkLayerHTML)
       s += g('labels', this.labels(p));
       return s + '</svg>';
     },
@@ -12237,7 +12581,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
   const LAYERS = [
     ['notes', 'Notes, stems, beams'], ['rests', 'Rests'], ['clefs', 'Clefs'], ['keys', 'Key signatures'], ['times', 'Time signatures'],
     ['bars', 'Staves, barlines'], ['marks', 'Accidentals, dots, tuplets'], ['lyrics', 'Lyric syllables'], ['labels', 'Pitch and value labels'],
-    ['text', 'Titles, names, text'], ['dyns', 'Dynamics, hairpins'], ['curves', 'Slurs, ties, fermatas, braces, ledger lines'], ['unknown', 'Not recognised'],
+    ['text', 'Titles, names, text'], ['barno', 'Bar numbers'], ['dyns', 'Dynamics, hairpins'], ['slurs', 'Slurs, ties, fermatas'], ['braces', 'Braces, brackets'], ['unknown', 'Not recognised'],
   ];
   const LAYER_ICON = {
     notes: '<path d="M9 2v8" stroke-width="1.4" class="ovk-stem"/><circle cx="6.5" cy="10" r="2.6" stroke-width="1.6"/>',
@@ -12251,18 +12595,34 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
     labels: '<text x="7" y="10.5" font-size="9" text-anchor="middle" stroke="none" fill="currentColor">C5</text>',
     text: '<text x="7" y="10.5" font-size="9.5" text-anchor="middle" stroke="none" fill="currentColor" font-family="serif">Aa</text>',
     dyns: '<text x="5.5" y="10.5" font-size="9" text-anchor="middle" stroke="none" fill="currentColor" font-style="italic" font-weight="700" font-family="serif">f</text><path d="M8.5 7l4.5-2.5M8.5 7l4.5 2.5" stroke-width="1"/>',
-    curves: '<path d="M2 9c2-4 8-4 10 0" stroke-width="1.6"/>',
+    barno: '<rect x="3" y="2.5" width="8" height="9" stroke-width="1.4"/><text x="7" y="10.3" font-size="8" text-anchor="middle" stroke="none" fill="currentColor">5</text>',
+    slurs: '<path d="M2 9c2-4 8-4 10 0" stroke-width="1.6"/>',
+    braces: '<path d="M9 1.5c-3 0-1 5.5-4 5.5c3 0 1 5.5 4 5.5" stroke-width="1.5"/>',
     unknown: '<rect x="1.5" y="3.5" width="11" height="7" rx="1.6" stroke-width=".8"/>',
   };
-  const layerOff = new Set((() => { try { return JSON.parse(store.get('ssr.layers') || '[]'); } catch (e) { return []; } })());
+  // What the overlay shows: a preset (unrecognised marks only, everything) or
+  // the reader's own set of layers. Stored as ssr.view.v2; a visitor without
+  // it (new, or from before presets) starts once on "Unrecognised only", and
+  // an older custom set (ssr.layers) becomes the custom choice.
+  const VIEW_KEY = 'ssr.view.v2';
+  const viewPref = (() => {
+    try { const j = JSON.parse(store.get(VIEW_KEY) || 'null'); if (j && /^(unknown|all|custom)$/.test(j.mode)) return { mode: j.mode, off: j.off || [] }; } catch (e) { /* fall through */ }
+    let off = [];
+    try { off = JSON.parse(store.get('ssr.layers') || '[]') || []; } catch (e) { off = []; }
+    const v = { mode: 'unknown', off };
+    store.set(VIEW_KEY, JSON.stringify(v));
+    return v;
+  })();
+  const layerOff = new Set(viewPref.off);
+  const saveView = () => store.set(VIEW_KEY, JSON.stringify({ mode: viewPref.mode, off: [...layerOff] }));
   function layerCounts(v) {
     const sy = (v && v.sym) || {};
     return {
       notes: v ? v.heads.length : 0, rests: (sy.rests || []).length, clefs: (sy.clefs || []).length, keys: (sy.keys || []).length, times: (sy.times || []).length,
       bars: v ? (sy.bars || v.barlines).length : 0, marks: (sy.accs || []).length + (sy.dots || []).length + (sy.tuplets || []).length,
       lyrics: null, labels: null, unknown: (sy.unknown || []).length,
-      text: (sy.text || []).filter((t) => t[4] !== 'lyrics').length, dyns: (sy.dyns || []).length + (sy.wedges || []).length,
-      curves: (sy.slurs || []).length + (sy.fermatas || []).length + (sy.braces || []).length + (sy.ledgers || []).length,
+      text: (sy.text || []).filter((t) => t[4] !== 'lyrics' && t[4] !== 'measure').length, barno: (sy.text || []).filter((t) => t[4] === 'measure').length,
+      dyns: (sy.dyns || []).length + (sy.wedges || []).length, slurs: (sy.slurs || []).length + (sy.fermatas || []).length, braces: (sy.braces || []).length,
     };
   }
   function renderLayers(v) {
@@ -12274,8 +12634,13 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
     }).join('');
   }
   function applyLayers() {
-    const host = $('pages');
-    LAYERS.forEach(([k]) => host.classList.toggle('hide-' + k, layerOff.has(k)));
+    const host = $('pages'), mode = viewPref.mode;
+    const hidden = (k) => (mode === 'unknown' ? k !== 'unknown' : mode === 'all' ? false : layerOff.has(k));
+    LAYERS.forEach(([k]) => host.classList.toggle('hide-' + k, hidden(k)));
+    host.classList.toggle('only-unknown', mode === 'unknown');
+    $('layers').classList.toggle('preset-hidden', mode !== 'custom');
+    $('legend').classList.toggle('preset-hidden', mode === 'unknown');
+    document.querySelectorAll('.preset').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)));
   }
   function legend(parts) {
     const aux = '';
@@ -12400,7 +12765,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
     if (!verses.size) {
       const p = document.createElement('p');
       p.className = 'muted';
-      p.textContent = res.ocrError ? `The text reader is unavailable (${res.ocrError}), so only notes were read.` : 'No lyric lines were found under the staves.';
+      p.textContent = res.ocrError ? `Not read: the text reader is unavailable (${res.ocrError})` : 'None found';
       host.appendChild(p);
       return;
     }
@@ -12436,8 +12801,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
       li.innerHTML = (info ? ICON_INFO : ICON_WARN) + `<span><span class="sr-only">${info ? 'Note' : 'Warning'}: </span>${esc(w)}</span>`;
       ul.appendChild(li);
     }
-    if (!list.length) ul.innerHTML = '<li class="none">Nothing to report.</li>';
-    $('warnCount').textContent = list.length ? `${nWarn} to check · ${list.length - nWarn} notes` : '';
+    if (!list.length) ul.innerHTML = '<li class="none">None</li>';
+    $('warnCount').textContent = nWarn ? `${nWarn} to check` : (list.length ? plural(list.length, 'note') : 'none');
   }
 
   // Facts for each completed stage, read from the pages and the result.
@@ -12495,6 +12860,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
     note.hidden = lines.length <= MAX_CODE_LINES;
     note.textContent = note.hidden ? '' : `Showing the first ${MAX_CODE_LINES.toLocaleString('en')} of ${lines.length.toLocaleString('en')} lines. Copy takes the whole file.`;
     $('copy').disabled = !lastXML;
+    $('resultActions').hidden = !lastXML;
   }
   let copyTimer = 0;
   function copyXML() {
@@ -12504,23 +12870,43 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
       clearTimeout(copyTimer);
       btn.classList.add('is-copied');
       $('copyLabel').textContent = 'Copied';
-      msg.textContent = `Copied ${lastXML.split('\n').length.toLocaleString('en')} lines of MusicXML.`;
-      copyTimer = setTimeout(() => { btn.classList.remove('is-copied'); $('copyLabel').textContent = 'Copy'; msg.textContent = ''; }, 1200);
+      msg.textContent = '';
+      copyTimer = setTimeout(() => { btn.classList.remove('is-copied'); $('copyLabel').textContent = 'Copy MusicXML'; msg.textContent = ''; }, 1200);
     };
     const fallback = () => {
       // clipboard refused: show the full text selected so the keyboard can copy it
       const ta = $('xml');
+      $('xmlFold').open = true;
       ta.hidden = false;
       $('codeBody').hidden = true;
       $('codeNote').hidden = true;
       ta.focus();
       ta.select();
-      msg.textContent = 'This page cannot reach the clipboard. The full text is selected: press Ctrl+C (Cmd+C on a Mac).';
+      msg.textContent = 'No clipboard here: the text is selected below, press Ctrl+C (Cmd+C on a Mac).';
     };
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(lastXML).then(ok, fallback);
       else fallback();
     } catch (e) { fallback(); }
+  }
+  // Save without a download link (tools/build.js forbids them): the browser's
+  // save dialog where it has one, else the file opens in a new tab to save.
+  async function saveXML() {
+    if (!lastXML) return;
+    const name = ($('fileName').textContent || 'score').replace(/\.[^.]+$/, '').replace(/^sample-|^example-/, '') + '.musicxml', msg = $('copied');
+    msg.textContent = '';
+    if (window.showSaveFilePicker) {
+      try {
+        const h = await window.showSaveFilePicker({ suggestedName: name, types: [{ description: 'MusicXML', accept: { 'application/vnd.recordare.musicxml+xml': ['.musicxml'] } }] });
+        const w = await h.createWritable(); await w.write(lastXML); await w.close();
+        msg.textContent = 'Saved ' + h.name; return;
+      } catch (e) { if (e && e.name === 'AbortError') return; }
+    }
+    const url = URL.createObjectURL(new Blob([lastXML], { type: 'application/xml' }));
+    let w = null;
+    try { w = window.open(url, '_blank'); if (w) w.opener = null; } catch (e) { w = null; }
+    setTimeout(() => URL.revokeObjectURL(url), 120000);
+    msg.textContent = w ? 'Opened in a new tab: save it from there.' : 'New tabs are blocked here: use Copy MusicXML.';
   }
 
   // ------------------------------------------------------------ preview ---
@@ -12560,8 +12946,6 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
   // ---------------------------------------------------------------- run ---
   function setBusy(b) {
     busy = b;
-    $('sample').disabled = b;
-    $('sampleHymn').disabled = b;
     $('sampleAll').disabled = b;
     $('choose').disabled = b;
   }
@@ -12584,6 +12968,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
     drop.set('busy', file.title || file.name, !!file.title);
     showFile(file.name, file.size);
     repair.open(file.name, file.size);
+    ident.open();
+    corr = null;
     legend(null);
     let ocrUsed = false;
     let engine = null;
@@ -12719,28 +13105,33 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
       res.warnings.unshift(...extraWarn);
       stepper.go('xml');
       meter.set(0.97);
-      status('Writing MusicXML and drawing the preview');
+      status('Writing MusicXML');
       lastRes = res;
+      $('margin').hidden = $('previewPanel').hidden = false; // results panels appear with the first result
+      document.querySelector('.plate').dataset.ready = '';
       setStale(false);
       legend((res.score && res.score.parts) || []);
       book.applyResult(res);
       renderParts(res);
       renderLyrics(res);
-      renderWarnings(res.warnings || []);
+      corr = corrected();
+      renderCorrNote(corr);
+      renderWarnings((res.warnings || []).concat(corrWarnings(corr)));
       mark('code');
-      renderCode(res.score.xml);
+      renderCode(corr.xml);
       mark('facts');
       stepFacts(res, ocrUsed);
       await nextPaint();
-      await renderNotation(res.score.xml, res.score.measures || 0, false);
+      await renderNotation(corr.xml, res.score.measures || 0, false);
       stepper.finish();
       fileFinished(true);
       const partial = stopAsked && read < n;
       drop.set(partial ? 'stopped' : 'done');
-      status(`Done in ${((performance.now() - t0) / 1000).toFixed(1)} s: ${file.label || file.name}` + (n > 1 ? ` (${plural(read, 'page')})` : ''));
+      status(`${file.label || file.name}` + (n > 1 ? ` · ${plural(read, 'page')}` : '') + ` · ${((performance.now() - t0) / 1000).toFixed(1)} s`);
       window.__omrResult = {
         parts: res.score.parts.map((p) => p.name), nNotes: res.score.nNotes, measures: res.score.measures,
         lyrics: Object.values(res.lyricsBySystem).flat().length, warnings: res.warnings, xmlLength: (res.score.xml || '').length,
+        corrections: corr && corr.corrections ? corr.corrections.applied.length : 0,
         steps: stepper.snapshot(), engine: engineKind, pages: { total, n, read, states: book.pages.map((p) => p.state) },
         ocrLangs: ocrUsed ? ocrLangs : null, file: file.name,
         pageNotes: book.pages.map((p) => Sess.pageNotes(p.view)),
@@ -12751,10 +13142,10 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
       stepper.fail('stopped');
       fileFinished(false);
       drop.set('error');
-      status('Could not convert: ' + msg);
+      status(''); // the alert below says it
       const al = $('alert');
       al.hidden = false;
-      al.textContent = `Could not convert ${file.name}: ${msg}. ` + (lastRes ? 'The previous result is still shown below.' : '');
+      al.textContent = `Could not convert ${file.name}: ${msg.replace(/\.$/, '')}.` + (lastRes ? ' The previous result is still below.' : '');
       window.__omrResult = { error: msg, steps: stepper.snapshot() };
     } finally {
       setStale(false);
@@ -12773,7 +13164,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
     const bad = files.filter((f) => !(isPDF(f) || isImg(f)));
     if (!ok.length) {
       drop.set('error', files[0].name, false);
-      status(`${files[0].name} is not a PDF, PNG or JPG file.`);
+      status(`${files[0].name} is not a PDF, PNG or JPG`);
       return;
     }
     const size = ok.reduce((a, f) => a + f.size, 0);
@@ -12782,15 +13173,14 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
       const parts = [];
       for (const f of ok) parts.push(isPDF(f) ? await pdfSource(new Uint8Array(await f.arrayBuffer()), f.name) : imageSource(f));
       const pages = parts.flatMap((p) => p.pages);
-      if (bad.length) status(`Skipped ${bad.map((f) => f.name).join(', ')}: not a PDF, PNG or JPG file.`);
+      if (bad.length) status(`Skipped ${bad.map((f) => f.name).join(', ')}: not PDF, PNG or JPG`);
       return { pages, size, close: () => parts.forEach((p) => p.close()) };
     }, { name, size, title: ok.length > 1 ? `${ok.length} files` : null });
   }
 
   function loadSample(kind) {
     const S = typeof kind === 'object' ? kind : SAMPLES[kind] || SAMPLES.rag;
-    const pick = catalogue.findIndex((c) => 'assets/' + c.file === S.url);
-    $('sampleAll').value = pick >= 0 ? String(pick) : '';
+    $('sampleAll').value = ''; // the menu always reads "Try an example"; the file row names what is loaded
     run(async () => {
       const r = await fetch(S.url);
       if (!r.ok) throw new Error('the sample file was not found (' + r.status + ')');
@@ -12798,19 +13188,20 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
       const size = buf.length; // read before pdf.js transfers (detaches) the buffer
       const src = await pdfSource(buf, S.name);
       return { pages: src.pages, size, close: src.close };
-    }, { name: S.name, title: S.title, label: 'sample: ' + S.label, size: null });
+    }, { name: S.name, title: S.title, label: S.label, size: null });
   }
 
   // ---------------------------------------------------------------- wire ---
   stepper.build();
   $('choose').addEventListener('click', () => $('file').click());
   $('file').addEventListener('change', (e) => { const fs = Array.prototype.slice.call(e.target.files || []); e.target.value = ''; handleFiles(fs); });
-  $('sample').addEventListener('click', () => loadSample('rag'));
   fetch('assets/samples.json').then((r) => (r.ok ? r.json() : [])).then((list) => {
     catalogue = Array.isArray(list) ? list : [];
     const sel = $('sampleAll');
     const groups = new Map();
+    const featured = new Set(Object.values(SAMPLES).map((x) => x.name)); // already under "Start here"
     catalogue.forEach((c, i) => {
+      if (featured.has(c.file)) return;
       if (!groups.has(c.group)) { const g = document.createElement('optgroup'); g.label = c.group; groups.set(c.group, g); sel.appendChild(g); }
       const o = document.createElement('option');
       o.value = String(i);
@@ -12818,16 +13209,16 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
       o.title = c.license;
       groups.get(c.group).appendChild(o);
     });
-    const cur = catalogue.findIndex((c) => c.file === 'sample-maple-leaf-rag.pdf');
-    if (cur >= 0 && !sel.value) sel.value = String(cur);
   }).catch(() => { $('sampleAll').hidden = true; });
   $('sampleAll').addEventListener('change', (e) => {
-    const c = catalogue[+e.target.value];
-    if (!c || e.target.value === '') return;
+    const v = e.target.value;
+    if (SAMPLES[v]) { loadSample(v); return; }
+    const c = catalogue[+v];
+    if (!c || v === '') return;
     loadSample({ url: 'assets/' + c.file, name: c.file, title: c.title, label: c.title + ' (' + c.group.toLowerCase().replace(/s$/, '') + ')' });
   });
-  $('sampleHymn').addEventListener('click', () => loadSample('hymn'));
   $('copy').addEventListener('click', copyXML);
+  $('saveXml').addEventListener('click', saveXML);
   $('copy').disabled = true;
   $('stop').addEventListener('click', () => {
     stopAsked = true;
@@ -12848,7 +13239,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
     book.show(i);
     if (book.pages[i].el) book.pages[i].el.focus();
   });
-  $('osmdAll').addEventListener('click', () => { if (lastRes) renderNotation(lastRes.score.xml, lastRes.score.measures || 0, true); });
+  $('osmdAll').addEventListener('click', () => { if (lastRes) renderNotation(correctedXML(), lastRes.score.measures || 0, true); });
   const ovSaved = store.get('ssr.overlay');
   if (ovSaved === 'off') $('overlayToggle').setAttribute('aria-pressed', 'false');
   $('overlayToggle').addEventListener('click', () => {
@@ -12864,8 +13255,35 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
     const k = b.dataset.layer;
     if (layerOff.has(k)) layerOff.delete(k); else layerOff.add(k);
     b.setAttribute('aria-pressed', String(!layerOff.has(k)));
-    store.set('ssr.layers', JSON.stringify([...layerOff]));
+    saveView();
     applyLayers();
+  });
+  document.querySelectorAll('.preset').forEach((b) => b.addEventListener('click', () => { viewPref.mode = b.dataset.mode; saveView(); applyLayers(); }));
+  $('unkNext').addEventListener('click', () => stepUnk(1));
+  $('unkPrev').addEventListener('click', () => stepUnk(-1));
+  $('identCopy').addEventListener('click', copyExamples);
+  $('pages').addEventListener('click', (e) => {
+    const b = e.target.closest('.unk');
+    if (b && !repair.on) openPop(b);
+  });
+  $('idType').addEventListener('change', describeEffect);
+  $('idDetail').addEventListener('input', describeEffect);
+  $('idSave').addEventListener('click', saveIdent);
+  $('idRemove').addEventListener('click', removeIdent);
+  $('idCancel').addEventListener('click', () => closePop(true));
+  $('idDetail').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); saveIdent(); } });
+  document.addEventListener('keydown', (e) => {
+    if (!$('idPop').hidden) {
+      if (e.key === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); closePop(true); }
+      return;
+    }
+    if (e.ctrlKey || e.metaKey || e.altKey || repair.on) return;
+    const t = e.target;
+    if (t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable)) return;
+    if (e.key === 'n' || e.key === 'N') { e.preventDefault(); stepUnk(1); } else if (e.key === 'p' || e.key === 'P') { e.preventDefault(); stepUnk(-1); }
+  }, true);
+  document.addEventListener('pointerdown', (e) => {
+    if (!$('idPop').hidden && !e.target.closest('#idPop') && !e.target.closest('.unk')) closePop(false);
   });
   renderLayers(null);
   applyLayers();
@@ -12880,6 +13298,337 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
   applyZoom();
   window.addEventListener('resize', fitLabels);
   if (window.visualViewport) window.visualViewport.addEventListener('resize', fitLabels);
+
+  // ------------------------------------------------- unrecognised marks ---
+  // Ink the reading did not explain is a focusable highlight over the page.
+  // The reader can say what each one is; the labels are kept per document
+  // (like repair marks), shown as "identified by you", applied to the
+  // MusicXML where that is simple (src/corrections.js) and exported for
+  // repair and as training examples.
+  const ident = {
+    items: {}, seq: 0, sel: null,
+    key() { return repair.doc ? 'ssr.ident:' + repair.doc : null; },
+    open() {
+      this.items = {}; this.sel = null;
+      try { const j = JSON.parse(store.get(this.key()) || 'null'); if (j && j.items) this.items = j.items; } catch (e) { this.items = {}; }
+      this.seq = Math.max(0, ...this.all().map((m) => m.id || 0));
+    },
+    save() {
+      const k = this.key();
+      if (!k) return;
+      if (this.all().length) store.set(k, JSON.stringify({ v: 1, items: this.items })); else store.del(k);
+    },
+    list(i) { return this.items[i] || []; },
+    all() { return Object.values(this.items).flat(); },
+  };
+  const sameBox = (a, b) => !!a && !!b && a.every((v, k) => Math.abs(v - b[k]) <= 2);
+  const typeKey = (m) => m.type + (m.sub ? ':' + m.sub : '');
+  function identName(m) {
+    const o = $('idType').querySelector(`option[value="${typeKey(m)}"]`);
+    const t = o ? o.textContent : m.type;
+    return m.detail ? `${t}: ${m.detail}` : t;
+  }
+  function barOf(p, b) {
+    const mm = lastRes && lastRes.score && lastRes.score.measureMap, v = p.view;
+    if (!mm || !v || v.spread) return null;
+    const cx = (b[0] + b[2]) / 2, cy = (b[1] + b[3]) / 2, ss = v.ss;
+    const m = mm.find((q) => q.page === p.i && cx >= q.xa && cx <= q.xb && cy >= q.y0 - 3 * ss && cy <= q.y1 + 3 * ss);
+    return m ? m.n : null;
+  }
+  // the page's unrecognised marks in reading order (rows of systems, then
+  // left to right), each with the reader's label when it has one; labels
+  // whose mark a later reading no longer reports stay where they were drawn
+  function unkItems(p) {
+    const v = p.view;
+    if (!v || !v.sym) return [];
+    const ss = v.ss, lyr = book.lyricBoxes(p);
+    const boxes = (v.sym.unknown || []).filter((b) => !lyr.some((l) => b[0] < l[2] && b[2] > l[0] && b[1] < l[3] && b[3] > l[1]));
+    const ids = ident.list(p.i).slice();
+    const out = boxes.map((b) => {
+      const k = ids.findIndex((m) => sameBox(m.box, b));
+      return { box: b, ident: k >= 0 ? ids.splice(k, 1)[0] : null };
+    }).concat(ids.map((m) => ({ box: m.box, ident: m })));
+    // reading order: by bar where the bar is known, else by row, then left to right
+    const row = (b) => Math.round((b[1] + b[3]) / 2 / (8 * ss)), bar = (b) => { const n = barOf(p, b); return n == null ? 1e9 : n; };
+    out.sort((a, b) => bar(a.box) - bar(b.box) || row(a.box) - row(b.box) || a.box[0] - b.box[0]);
+    out.forEach((it) => { it.key = it.box.map((x) => Math.round(x)).join('_'); });
+    return out;
+  }
+  // every mark still unrecognised, page by page
+  function unkList() {
+    return book.pages.filter((p) => p.view).flatMap((p) => unkItems(p).filter((it) => !it.ident).map((it) => ({ page: p.i, key: it.key, box: it.box })));
+  }
+  function unkLayerHTML(p) {
+    const v = p.view, W = v.width, H = v.height, ss = v.ss;
+    const all = unkList();
+    const pc = (n, d) => `${((n / d) * 100).toFixed(3)}%`;
+    const html = unkItems(p).map((it) => {
+      const b = it.box, pad = 0.6 * ss;
+      const w = Math.max(b[2] - b[0] + 2 * pad, 1.6 * ss), h = Math.max(b[3] - b[1] + 2 * pad, 1.6 * ss);
+      const cx = (b[0] + b[2]) / 2, cy = (b[1] + b[3]) / 2;
+      const bar = barOf(p, b), barTxt = bar != null ? `, bar ${bar}` : '';
+      const sel = ident.sel && ident.sel.page === p.i && ident.sel.key === it.key ? ' sel' : '';
+      let cls = 'unk' + sel, label, tag = '';
+      if (it.ident) {
+        cls += ' done' + (it.ident.type === 'noise' ? ' noise' : '');
+        label = `Identified by you: ${identName(it.ident)}${barTxt}. Change it`;
+        tag = `<span class="unk-tag" aria-hidden="true">${esc(it.ident.type === 'noise' ? 'ignored' : identName(it.ident))}</span>`;
+      } else {
+        const n = all.findIndex((q) => q.page === p.i && q.key === it.key) + 1;
+        label = `Unrecognised mark ${n} of ${all.length}${barTxt}${book.n > 1 ? `, page ${p.i + 1}` : ''}. Say what it is`;
+      }
+      // centred on the ink; never under 18 screen px across (CSS max())
+      return `<button type="button" class="${cls}" data-key="${it.key}" style="left:${pc(cx, W)};top:${pc(cy, H)};width:max(18px, ${pc(w, W)});height:max(18px, ${pc(h, H)})" aria-label="${esc(label)}">${tag}</button>`;
+    }).join('');
+    return `<div class="unk-layer">${html}</div>`;
+  }
+  function refreshUnk() {
+    const p = book.pages[book.sel], fig = $('pages').querySelector('.pageframe:not(.placeholder)');
+    if (!p || !p.view || !fig) { updateUnkNav(); return; }
+    const old = fig.querySelector('.unk-layer');
+    if (old) old.remove();
+    const rp = fig.querySelector('svg.rp');
+    if (rp) rp.insertAdjacentHTML('beforebegin', unkLayerHTML(p)); else fig.insertAdjacentHTML('beforeend', unkLayerHTML(p));
+    updateUnkNav();
+  }
+  function updateUnkNav() {
+    const n = unkList().length, m = ident.all().length, read = book.pages.some((p) => p.view);
+    $('unkCount').textContent = !read ? 'Not recognised: none yet' : `Not recognised: ${n}`;
+    $('unkPrev').disabled = !n; $('unkNext').disabled = !n;
+    $('identCount').hidden = !m;
+    $('identCount').textContent = `Identified by you: ${m}`;
+    $('identCopy').hidden = !m;
+  }
+  const unkMsg = (t) => { $('unkMsg').textContent = t; };
+  // the zoom at which a staff space is at least 16 screen pixels
+  function zoomFor(p) {
+    const img = $('pages').querySelector('.pageframe img');
+    if (!img || !p.view) return zoom;
+    const fit = img.clientWidth / zoom / p.view.width;
+    const need = 16 / (p.view.ss * fit);
+    return ZOOMS.find((z) => z >= need) || ZOOMS[ZOOMS.length - 1];
+  }
+  function focusUnk(it, announce) {
+    ident.sel = { page: it.page, key: it.key };
+    if (book.sel !== it.page) { book.follow = false; book.show(it.page); } else refreshUnk();
+    const p = book.pages[it.page];
+    const z = zoomFor(p);
+    if (z > zoom) { zoom = z; store.set('ssr.zoom', String(zoom)); applyZoom(); }
+    requestAnimationFrame(() => {
+      const btn = $('pages').querySelector(`.unk[data-key="${it.key}"]`);
+      if (!btn) return;
+      const host = $('pages'), r = btn.getBoundingClientRect(), hr = host.getBoundingClientRect();
+      host.scrollLeft += r.left + r.width / 2 - (hr.left + hr.width / 2);
+      const r2 = btn.getBoundingClientRect();
+      window.scrollBy(0, r2.top + r2.height / 2 - window.innerHeight / 2);
+      btn.focus({ preventScroll: true });
+      if (announce) unkMsg(btn.getAttribute('aria-label').replace(/\. Say what it is$/, '.'));
+    });
+  }
+  function stepUnk(dir) {
+    const list = unkList();
+    if (!list.length) { unkMsg('Every mark on the read pages is recognised or identified.'); return; }
+    let i = ident.sel ? list.findIndex((q) => q.page === ident.sel.page && q.key === ident.sel.key) : -1;
+    if (i < 0 && ident.sel) {
+      // the selected mark was just identified: go on from where it stood
+      const s = ident.sel, after = list.findIndex((q) => q.page > s.page || (q.page === s.page && q.key > s.key));
+      i = dir > 0 ? (after < 0 ? list.length : after) - 1 : (after < 0 ? list.length : after);
+    }
+    i = dir > 0 ? (i + 1) % list.length : (i - 1 + list.length) % list.length;
+    focusUnk(list[i], true);
+  }
+
+  // ------------------------------------------------- user corrections ---
+  function pagesMeta() {
+    const o = {};
+    book.pages.forEach((p) => { if (p.view) o[p.i] = { ss: p.view.ss, heads: p.view.heads, notes: (book.headNotes && book.headNotes.get(p.i)) || [] }; });
+    return o;
+  }
+  const corrMod = () => { try { return omrRequire('./corrections'); } catch (e) { return null; } };
+  let corr = null;
+  function corrected() {
+    if (!lastRes) return null;
+    const C = corrMod(), ids = ident.all();
+    if (!C || !ids.length) return { xml: lastRes.score.xml, corrections: null };
+    try { return C.correctScore(lastRes.score, ids, pagesMeta()); } catch (e) {
+      return { xml: lastRes.score.xml, corrections: { applied: [], skipped: [], hidden: 0, labels: 0, warnings: [`Your corrections could not be applied (${e.message}).`] } };
+    }
+  }
+  const correctedXML = () => (corr ? corr.xml : lastRes ? lastRes.score.xml : '');
+  function renderCorrNote(c) {
+    const el = $('corrNote'), cs = c && c.corrections;
+    const n = cs ? cs.applied.length : 0;
+    el.hidden = !cs || (!n && !cs.skipped.length);
+    if (el.hidden) return;
+    el.textContent = `${plural(n, 'correction')} of yours applied to the MusicXML` + (n ? `: ${cs.applied.map((a) => `${a.text} (bar ${a.measure})`).join(', ')}` : '') +
+      (cs.skipped.length ? `. ${plural(cs.skipped.length, 'label')} could not be applied.` : '.');
+  }
+  const corrWarnings = (c) => ((c && c.corrections) ? c.corrections.warnings.concat(c.corrections.skipped.map((s) => `A mark you identified (${s.kind}) was not applied: ${s.why}.`)) : []);
+  async function applyCorrectionsNow() {
+    if (!lastRes) return;
+    corr = corrected();
+    renderCode(corr.xml);
+    renderCorrNote(corr);
+    renderWarnings((lastRes.warnings || []).concat(corrWarnings(corr)));
+    await renderNotation(corr.xml, lastRes.score.measures || 0, false);
+  }
+
+  // ------------------------------------------------------- the popover ---
+  const pop = { page: null, key: null, box: null };
+  const DETAIL = {
+    time: ['Time signature', 'e.g. 3/4', false], key: ['Key signature', 'e.g. 3 flats or 2 sharps', false], text: ['The text', 'e.g. dolce', false],
+    barno: ['The number', 'e.g. 17', false], artic: ['Which one', 'e.g. staccato, accent, trill', false], other: ['What it is', 'required', true],
+  };
+  function candidate() {
+    const v = $('idType').value;
+    if (!v) return null;
+    const [type, sub] = v.split(':');
+    return { id: 0, page: pop.page, box: pop.box, type, sub: sub || null, detail: $('idDetail').value.trim() };
+  }
+  function describeEffect() {
+    const c = candidate(), C = corrMod();
+    const row = DETAIL[c ? c.type : ''];
+    $('idDetailRow').hidden = !row;
+    if (row) { $('idDetailLabel').textContent = row[0] + (row[2] ? '' : ' (optional)'); $('idDetail').placeholder = row[1]; }
+    if (!c || !C) { $('idEffect').textContent = ''; return; }
+    const r = C.resolveCorrections([c], pagesMeta(), lastRes && lastRes.score && lastRes.score.measureMap)[0];
+    const notes = (book.headNotes && book.headNotes.get(pop.page)) || [];
+    const at = (k) => (notes[k] ? pitchText(notes[k]) : 'the note');
+    const t = {
+      accidental: () => `Makes ${at(r.head)}, the nearest note to its right, ${r.name.replace('-', ' ')} in the MusicXML.`,
+      dot: () => `Adds a dot to ${at(r.head)}, the nearest note to its left.`,
+      rest: () => `Inserts ${/^[aeiou]/.test(r.value) ? 'an' : 'a'} ${r.value} rest in bar ${r.measure} of the MusicXML.`,
+      dynamic: () => `Adds ${r.value} ${r.placement} ${at(r.head)} in the MusicXML.`,
+      hide: () => 'Hides the mark; nothing changes in the MusicXML.',
+      label: () => 'Kept as a label (repair notes and training examples); the MusicXML does not change.',
+      skip: () => `Kept as a label only: ${r.why}.`,
+    }[r.kind];
+    $('idEffect').textContent = t ? t() : '';
+  }
+  function drawCrop(p, b) {
+    const cv = $('idCrop'), img = $('pages').querySelector('.pageframe img');
+    const g = cv.getContext('2d');
+    if (!img || !img.naturalWidth) { cv.hidden = true; return; }
+    cv.hidden = false;
+    const v = p.view, k = img.naturalWidth / v.width, pad = 1.5 * v.ss;
+    const x0 = Math.max(0, b[0] - pad), y0 = Math.max(0, b[1] - pad), x1 = Math.min(v.width, b[2] + pad), y1 = Math.min(v.height, b[3] + pad);
+    const w = 200, h = Math.max(48, Math.min(140, Math.round((w * (y1 - y0)) / Math.max(1, x1 - x0))));
+    cv.width = w; cv.height = h;
+    g.fillStyle = '#fff'; g.fillRect(0, 0, w, h);
+    const sc = Math.min(w / (x1 - x0), h / (y1 - y0)), dw = (x1 - x0) * sc, dh = (y1 - y0) * sc;
+    g.drawImage(img, x0 * k, y0 * k, (x1 - x0) * k, (y1 - y0) * k, (w - dw) / 2, (h - dh) / 2, dw, dh);
+    g.strokeStyle = '#b25e00'; g.lineWidth = 2;
+    g.strokeRect((w - dw) / 2 + (b[0] - x0) * sc - 2, (h - dh) / 2 + (b[1] - y0) * sc - 2, (b[2] - b[0]) * sc + 4, (b[3] - b[1]) * sc + 4);
+  }
+  function openPop(btn) {
+    const p = book.pages[book.sel];
+    if (!p || !p.view) return;
+    const it = unkItems(p).find((q) => q.key === btn.dataset.key);
+    if (!it) return;
+    Object.assign(pop, { page: p.i, key: it.key, box: it.box });
+    ident.sel = { page: p.i, key: it.key };
+    $('pages').querySelectorAll('.unk.sel').forEach((b) => b.classList.remove('sel'));
+    btn.classList.add('sel');
+    const bar = barOf(p, it.box);
+    $('idPopH').textContent = it.ident ? 'Change what this mark is' : 'What is this mark?';
+    $('idWhere').textContent = `Page ${p.i + 1}${bar != null ? `, bar ${bar}` : ''}. It is shown below, ringed.`;
+    $('idType').value = it.ident ? typeKey(it.ident) : '';
+    $('idDetail').value = (it.ident && it.ident.detail) || '';
+    $('idRemove').hidden = !it.ident;
+    drawCrop(p, it.box);
+    describeEffect();
+    const el = $('idPop');
+    el.hidden = false;
+    if (window.innerWidth > 640) {
+      const r = btn.getBoundingClientRect(), pw = el.offsetWidth, ph = el.offsetHeight;
+      let top = r.bottom + 8;
+      if (top + ph > window.innerHeight - 12) top = Math.max(12, r.top - ph - 8);
+      el.style.left = `${Math.max(12, Math.min(window.innerWidth - pw - 12, r.left))}px`;
+      el.style.top = `${top}px`;
+    } else { el.style.left = ''; el.style.top = ''; }
+    $('idType').focus();
+  }
+  function closePop(refocus) {
+    if ($('idPop').hidden) return;
+    $('idPop').hidden = true;
+    if (refocus) { const b = $('pages').querySelector(`.unk[data-key="${pop.key}"]`); if (b) b.focus({ preventScroll: true }); }
+  }
+  async function saveIdent() {
+    const c = candidate();
+    if (!c) { $('idEffect').textContent = 'Choose what the mark is first.'; $('idType').focus(); return; }
+    if (DETAIL[c.type] && DETAIL[c.type][2] && !c.detail) { $('idEffect').textContent = 'Say in a few words what it is.'; $('idDetail').focus(); return; }
+    const list = ident.list(pop.page).filter((m) => !sameBox(m.box, pop.box));
+    const old = ident.list(pop.page).find((m) => sameBox(m.box, pop.box));
+    list.push({ ...c, id: old ? old.id : ++ident.seq, at: new Date().toISOString() });
+    ident.items[pop.page] = list;
+    ident.save();
+    closePop(false);
+    refreshUnk();
+    await applyCorrectionsNow();
+    const b = $('pages').querySelector(`.unk[data-key="${pop.key}"]`);
+    if (b) b.focus({ preventScroll: true });
+    const n = corr && corr.corrections ? corr.corrections.applied.length : 0;
+    unkMsg(`Saved: ${identName(c)}. ${plural(unkList().length, 'mark')} still not recognised; ${plural(n, 'correction')} applied. Press N for the next one.`);
+  }
+  async function removeIdent() {
+    ident.items[pop.page] = ident.list(pop.page).filter((m) => !sameBox(m.box, pop.box));
+    ident.save();
+    closePop(false);
+    refreshUnk();
+    await applyCorrectionsNow();
+    const b = $('pages').querySelector(`.unk[data-key="${pop.key}"]`);
+    if (b) b.focus({ preventScroll: true });
+    unkMsg('Label removed.');
+  }
+  // labelled crops for a classifier: PNG data URLs with the reader's type
+  async function labelledExamples() {
+    const out = [];
+    for (const p of book.pages) {
+      const ids = ident.list(p.i);
+      if (!ids.length || !p.view || !p.url) continue;
+      const img = await new Promise((res) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = p.url; });
+      if (!img) continue;
+      const v = p.view, k = img.naturalWidth / v.width, ss = v.ss;
+      for (const m of ids) {
+        const pad = 0.5 * ss, b = m.box;
+        const x0 = Math.max(0, b[0] - pad), y0 = Math.max(0, b[1] - pad), x1 = Math.min(v.width, b[2] + pad), y1 = Math.min(v.height, b[3] + pad);
+        const sc = Math.min(1, 160 / Math.max((x1 - x0) * k, (y1 - y0) * k));
+        const c = document.createElement('canvas');
+        c.width = Math.max(1, Math.round((x1 - x0) * k * sc)); c.height = Math.max(1, Math.round((y1 - y0) * k * sc));
+        c.getContext('2d').drawImage(img, x0 * k, y0 * k, (x1 - x0) * k, (y1 - y0) * k, 0, 0, c.width, c.height);
+        out.push({ page: p.i + 1, id: m.id, type: m.type, sub: m.sub, detail: m.detail || '', label: identName(m), bbox: b, crop: [x0, y0, x1, y1].map((x) => Math.round(x)),
+          staffSpace: v.ss, staffSpacePx: +(ss * k * sc).toFixed(2), png: c.toDataURL('image/png') });
+        c.width = c.height = 0;
+      }
+    }
+    return { format: 'score-scan-reader/labelled-examples', version: 1, file: repair.file, exported: new Date().toISOString(), examples: out };
+  }
+  async function copyExamples() {
+    const j = await labelledExamples();
+    const txt = JSON.stringify(j);
+    const ok = () => unkMsg(`Copied ${plural(j.examples.length, 'labelled example')} as JSON.`);
+    const fallback = () => {
+      const url = URL.createObjectURL(new Blob([txt], { type: 'application/json' }));
+      let w = null;
+      try { w = window.open(url, '_blank'); if (w) w.opener = null; } catch (e) { w = null; }
+      setTimeout(() => URL.revokeObjectURL(url), 120000);
+      unkMsg(w ? 'The clipboard is not available: the examples opened in a new tab.' : 'Neither the clipboard nor a new tab is available here.');
+    };
+    try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, fallback); else fallback(); } catch (e) { fallback(); }
+  }
+  function identNotes(p) {
+    const v = p.view, C = corrMod();
+    const res = C ? C.resolveCorrections(ident.list(p.i), pagesMeta(), lastRes && lastRes.score && lastRes.score.measureMap) : [];
+    const notes = (book.headNotes && book.headNotes.get(p.i)) || [];
+    return ident.list(p.i).map((m, j) => {
+      const b = m.box, cx = (b[0] + b[2]) / 2, cy = (b[1] + b[3]) / 2;
+      const near = v ? v.heads.map((h, k) => ({ k, d: Math.hypot(h[0] - cx, h[1] - cy), h })).sort((a, c) => a.d - c.d).slice(0, 3)
+        .map(({ k, h }) => ({ k, x: h[0], y: h[1], pitch: notes[k] ? pitchText(notes[k]) : null, value: notes[k] ? durText(notes[k][3], notes[k][4], notes[k][5], notes[k][6]) : null })) : [];
+      const r = res[j] || {};
+      return { id: m.id, type: m.type, sub: m.sub, detail: m.detail || '', label: identName(m), bbox: b.map((x) => Math.round(x)), bar: barOf(p, b), nearestHeads: near,
+        correction: r.kind ? { kind: r.kind, why: r.why || null, head: r.head != null ? r.head : null } : null, at: m.at };
+    });
+  }
 
   // ------------------------------------------------------ repair marks ---
   // The reader draws over a page to mark what the reading got wrong. Marks are
@@ -13066,12 +13815,13 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
   function repairNotes() {
     const pages = [];
     book.pages.forEach((p) => {
-      const ms = repair.list(p.i);
-      if (!ms.length) return;
+      const ms = repair.list(p.i), ids = ident.list(p.i);
+      if (!ms.length && !ids.length) return;
       const v = p.view;
       pages.push({
         page: p.i + 1, width: v ? v.width : null, height: v ? v.height : null, staffSpace: v ? v.ss : null, spread: v ? v.spread || 0 : 0,
         marks: ms.map((m, k) => { const b = bboxOf(m.pts).map((x) => Math.round(x)); return { n: k + 1, id: m.id, tool: m.tool, note: m.note || '', points: m.pts, bbox: b, drawn: m.at, found: repairInside(p, b) }; }),
+        identified: identNotes(p),
       });
     });
     const sc = (lastRes && lastRes.score) || {};
@@ -13093,7 +13843,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
     setTimeout(() => URL.revokeObjectURL(url), 120000);
     msgRP(w ? `${what} opened in a new tab: save it from there.` : `${what} could not open here (new tabs are blocked); use Copy repair notes.`);
   }
-  function countMarks() { return Object.values(repair.marks).reduce((a, m) => a + m.length, 0); }
+  function countMarks() { return Object.values(repair.marks).reduce((a, m) => a + m.length, 0) + ident.all().length; }
   function copyRepair() {
     const n = countMarks();
     if (!n) { msgRP('There are no repair marks to copy yet.'); return; }
