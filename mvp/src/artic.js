@@ -90,14 +90,14 @@ function readArticulations(fr, asm, stats = {}) {
             !(c.y0 <= bot + 0.4 * sp && c.y1 >= top - 0.4 * sp);
         }).sort((a, b) => (above ? b.y1 - a.y1 : a.y0 - b.y0));
         let last = above ? top : bot;
-        // a mark cut in pieces by staff-line removal: pieces within a fifth of a space joined
+        // a mark cut in pieces by staff-line removal: pieces within 0.3 space joined
         const used = new Set();
         const glyphs = [];
         for (const c of cand) {
           if (used.has(c)) continue;
           const g = { x0: c.x0, y0: c.y0, x1: c.x1, y1: c.y1, area: c.area };
           used.add(c);
-          for (const o of cand) if (!used.has(o) && o.x0 <= g.x1 + 0.2 * sp && o.x1 >= g.x0 - 0.2 * sp && o.y0 <= g.y1 + 0.2 * sp && o.y1 >= g.y0 - 0.2 * sp &&
+          for (const o of cand) if (!used.has(o) && o.x0 <= g.x1 + 0.3 * sp && o.x1 >= g.x0 - 0.3 * sp && o.y0 <= g.y1 + 0.3 * sp && o.y1 >= g.y0 - 0.3 * sp &&
             !markKind(R, c, sp, above) && !markKind(R, o, sp, above)) {
             used.add(o); g.x0 = Math.min(g.x0, o.x0); g.y0 = Math.min(g.y0, o.y0); g.x1 = Math.max(g.x1, o.x1); g.y1 = Math.max(g.y1, o.y1); g.area += o.area;
           }
