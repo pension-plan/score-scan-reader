@@ -34,7 +34,8 @@ the page shows you where it was unsure.
   when the text reader has downloaded; the page says *Lyrics, titles and text are still being read*
   meanwhile.
 - **ML assist** (off by default) rechecks note values and noteheads with the copista-2m detector, a
-  small neural network. It downloads about 16 MB once and adds a few seconds per page.
+  small neural network. It downloads about 6 MB once and reads alongside the rest of each page, so it
+  adds little time on most pages (a second or more on dense piano pages).
 
 Scans work best at 200–400 dpi, upright, one page per image. Sideways or upside-down pages are
 turned, a photographed or curled page is straightened, and a two-page book spread is read as its

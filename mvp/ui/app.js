@@ -410,7 +410,8 @@
     return workerSrcURL;
   }
   // ML assist (the copista-2m detector, src/ml.js): off unless the box is ticked; its models and
-  // runtime (about 16 MB) are fetched on the first page that needs them, then kept for the session
+  // runtime (about 6 MB over the wire, 16 MB unpacked) are fetched when a conversion with it starts,
+  // then kept for the session
   let mlDet = null;
   const mlDetector = () => (mlDet ||= omrRequire('./ml').createBrowserDetector());
   function workerEngine(ocrFn, onProgress) {
@@ -1342,6 +1343,9 @@
       engine.onPageView = (i, view) => { const p = book.pages[i]; if (!p || !p.view || !view) return; p.view = view; if (book.sel === i) book.show(i); };
       const engineKind = engine.kind;
       await engine.init(!!ocr, $('mlAssist').checked);
+      // the detector's models load while the first page is read (it starts on each page as soon as
+      // the page is straightened, src/ml.js)
+      if ($('mlAssist').checked) mlDetector().warm();
 
       // Render page i+1 here while the worker reads page i.
       const renderPage = (i) => {

@@ -479,6 +479,21 @@ components handed to `lyrics.js`.
    (single thread); in the browser the St. Anselm sample went from 11.9 to 16.4 s. That cost, and the 16 MB
    download, are why it stays off by default.
 
+   **Cheaper ML assist (2026-11-08).** The detector now starts on each page as soon as the front end has
+   settled the working image (front.js `opts.onGray`, omr.js `setGrayHook`, ml.js `wrapConverter`), so it
+   reads while the rest of the page step runs instead of after it; its result is used when the page's final
+   image is that same image, unchanged (a checksum), else the page is read again: same input, same
+   detections, byte-identical MusicXML. In the page it already ran in its own worker (now warmed when a
+   conversion starts); in Node it now runs in a worker thread (onnxruntime-node runs a model on the calling
+   thread). Measured: browser, ML cost on the St. Anselm sample 1.4 s -> 0.1 s (6.25 s without ML, 6.37 s
+   with), on the Maple Leaf Rag 4.4 s -> 3.3 s (the detector is slower than that page's classical step);
+   Node benchmark 2.31 -> 1.65 s per page more than without ML (4 jobs in parallel). The download is about
+   5.6 MB over the wire (the 14 MB runtime and 2 MB models are served compressed), not 16 MB, and later
+   visits revalidate them (HTTP 304) rather than download again. Not done: WebGPU / WebNN (their arithmetic
+   differs from the wasm CPU path, so detections and output would change, and the test browser has no GPU),
+   wasm threads (they need cross-origin isolation, which Pages cannot set; a service-worker shim would reload
+   the page and does not run inside the artifact frame), a smaller input scale (it changes detections).
+
 **Failure modes.** Heads touching each other (seconds, unisons offset sideways); stems broken by staff
 removal; beams merged with slurs; accidentals touching heads; lyric hyphens read as ledger lines or ties
 [VOI §2.7]; fermatas read as heads; verse numbers read as fingering. **Confidence.** Each symbol carries its

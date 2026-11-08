@@ -394,6 +394,9 @@ function* frontSteps(gray0, opts = {}) {
   if (quarter % 4) warnings.push(`Page was turned ${((quarter % 4) * 90)}\u00b0 to read it.`);
   const systems = groupSystems(B, staves, sp.ss, L0);
   eraseStartLines(R, staves, sp.ss);
+  // the working page is settled here (deskewed, scaled, turned): a caller may start reading it
+  // alongside the rest of this step (ml.js starts its detector on it)
+  if (opts.onGray) opts.onGray(gray);
   yield 'notes';
   // thin, faint prints: hollow-head outlines break open in B but stay closed
   // on the lenient binary (heavy prints close unrelated gaps there instead)

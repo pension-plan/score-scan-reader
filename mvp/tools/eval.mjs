@@ -100,10 +100,10 @@ async function childMain(specPath) {
   // the app's path: pages read one at a time (each page file loaded only when its turn
   // comes), each page's big buffers released after its step (converter releasePage, as
   // the page worker does), then finish; --ml wraps the converter with ml.wrapConverter
-  let wrap = (c) => c;
+  let wrap = (c) => c, det = null;
   if (spec.ml) {
     const ml = req(path.join(spec.src, 'ml.js'));
-    const det = await ml.createNodeDetector({ assets: path.join(MVP, 'assets-src/ml'), ortPath: process.env.ORT_NODE || path.join(ROOT, 'spike/ml/node_modules/onnxruntime-node') });
+    det = await ml.createNodeDetector({ assets: path.join(MVP, 'assets-src/ml'), ortPath: process.env.ORT_NODE || path.join(ROOT, 'spike/ml/node_modules/onnxruntime-node') });
     // ML_CACHE=<dir> keeps each page's detections (keyed by the page pixels), so runs that
     // only change how the corrections are applied skip the detector
     let detect = det.detect;
@@ -191,6 +191,8 @@ async function childMain(specPath) {
   const r = await convert(spec.pages, { ocr, onProgress });
   const ms = Date.now() - t0, p1 = performance.now();
   if (worker) await worker.terminate();
+  // the ML detector's worker thread
+  if (det && det.release) await det.release();
   for (const w of more) await w.terminate();
   if (extraWorker) await extraWorker.terminate();
   const ends = pages.map((_, i) => { for (let k = i + 1; k < pages.length; k++) if (pageStart[k] != null) return pageStart[k]; return perf.assembleAt ?? p1; });

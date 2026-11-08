@@ -183,13 +183,16 @@ function createConverter(opts = {}) {
     keepPacked(fr, 'R');
   };
 
+  // a caller's hook on each working page the front end settles (setGrayHook: ml.js)
+  let grayHook = null;
+
   return {
     // returns the page entry ({fr, asm, index}) to show, or null when the page has no staves
     async addPage(gray, i, n) {
       if (pending.length >= 2) await pending[pending.length - 2].catch(() => {});
       const label = `Page ${i + 1}${n ? '/' + n : ''}`;
       progress(`${label}: finding staves and notes`, { stage: 'cleanup', page: i, pages: n });
-      const frOpts = { onProgress: (m, info) => progress(`${label}: ${m}`, Object.assign({ page: i, pages: n }, info || {})) };
+      const frOpts = { onProgress: (m, info) => progress(`${label}: ${m}`, Object.assign({ page: i, pages: n }, info || {})), onGray: (g) => { if (grayHook) grayHook(g, i); } };
       let a;
       try { a = analyseOriented(gray, i, frOpts); } catch (e) { warnings.push(`Page ${i + 1}: image analysis failed (${e.message}).`); return null; }
       (a.fr.warnings || []).forEach(w => warnings.push(`Page ${i + 1}: ${w}`));
@@ -230,6 +233,7 @@ function createConverter(opts = {}) {
     },
     // all pages' text read (deferText)
     settle() { return textChain; },
+    setGrayHook(fn) { grayHook = typeof fn === 'function' ? fn : null; },
     // the page's text read (deferText; null when it was read in its step)
     textRead(entry) { return (entry && textOf.get(entry)) || null; },
     // the score from the notes alone, while the pages' text is still being read (deferText): no

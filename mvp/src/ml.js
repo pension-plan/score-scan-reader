@@ -41,7 +41,13 @@ function loadOrtNode(hint) {
   throw new Error('onnxruntime-node not found (' + (err && err.message) + ')');
 }
 
+// opts.thread (default on): the detector runs in a worker thread, so the page step goes on while
+// it reads (onnxruntime-node runs a model on the calling thread); the same model, the same input,
+// the same detections. opts.thread === false runs it here.
 async function createNodeDetector(opts = {}) {
+  if (opts.thread !== false && !opts.ort) {
+    try { return await createNodeThreadDetector(opts); } catch (e) { /* no worker threads: run it here */ }
+  }
   const fs = require('fs'), path = require('path');
   const ort = opts.ort || loadOrtNode(opts.ortPath);
   const dirs = [opts.assets, path.join(__dirname, '../assets-src/ml'), path.join(__dirname, '../dist/assets')].filter(Boolean);
@@ -57,6 +63,49 @@ async function createNodeDetector(opts = {}) {
     detect: (gray, o) => core.detect(ort, sessions, meta, gray, o),
     async release() { try { await sessions.dense.release(); await sessions.rel.release(); } catch (e) { /* ignore */ } },
   };
+}
+
+function createNodeThreadDetector(opts) {
+  const { Worker } = require('worker_threads');
+  const src = `
+    const { parentPort, workerData } = require('worker_threads');
+    const ml = require(workerData.ml);
+    ml.createNodeDetector(Object.assign({}, workerData.opts, { thread: false })).then((det) => {
+      parentPort.postMessage({ t: 'ready' });
+      parentPort.on('message', async (m) => {
+        if (m.t === 'release') { await det.release(); parentPort.postMessage({ t: 'released' }); return; }
+        try { const r = await det.detect(m.img, m.o); parentPort.postMessage({ t: 'dets', id: m.id, r }); }
+        catch (e) { parentPort.postMessage({ t: 'error', id: m.id, msg: (e && e.message) || String(e) }); }
+      });
+    }, (e) => parentPort.postMessage({ t: 'fail', msg: (e && e.message) || String(e) }));`;
+  const w = new Worker(src, { eval: true, workerData: { ml: __filename, opts: { assets: opts.assets, ortPath: opts.ortPath, threads: opts.threads } } });
+  w.unref();
+  const pending = new Map();
+  let seq = 0;
+  return new Promise((resolve, reject) => {
+    w.on('error', (e) => { reject(e); for (const p of pending.values()) p.reject(e); pending.clear(); });
+    w.on('message', (m) => {
+      if (m.t === 'ready') { resolve(api); return; }
+      if (m.t === 'fail') { w.terminate(); reject(new Error(m.msg)); return; }
+      if (m.t === 'released') { const p = pending.get('release'); if (p) { pending.delete('release'); p.resolve(); } return; }
+      const p = pending.get(m.id);
+      if (!p) return;
+      pending.delete(m.id);
+      if (m.t === 'dets') p.resolve(m.r); else p.reject(new Error(m.msg));
+    });
+    const api = {
+      detect(gray, o) {
+        const id = ++seq;
+        // a copy of the page (the caller keeps its buffer), handed over
+        const data = new Uint8ClampedArray(gray.data);
+        return new Promise((res, rej) => {
+          pending.set(id, { resolve: res, reject: rej });
+          w.postMessage({ t: 'detect', id, o, img: { width: gray.width, height: gray.height, data } }, [data.buffer]);
+        });
+      },
+      release() { return new Promise((res) => { pending.set('release', { resolve: () => { w.terminate(); res(); }, reject: res }); w.postMessage({ t: 'release' }); }); },
+    };
+  });
 }
 
 // --------------------------------------------------------------- browser
@@ -478,17 +527,40 @@ function wrapConverter(conv, detect, opts = {}) {
   const stats = { pages: 0, failed: 0, ms: 0, heads: 0, notes: 0, matched: 0, durations: 0 };
   const warnings = [];
   let off = false;
+  // The detector starts on each working page as soon as the front end has settled it
+  // (conv.setGrayHook), so it reads the page while the rest of the page step runs; its result is
+  // used when the page's final image is that same image, unchanged (a checksum), else the page is
+  // read again. Same input, same detections: only the timing changes.
+  const early = new Map();
+  const sumOf = (g) => { let h = 0; const d = g.data; for (let k = 0; k < d.length; k++) h = (Math.imul(h, 31) + d[k]) | 0; return h; };
+  if (typeof conv.setGrayHook === 'function') {
+    conv.setGrayHook((g) => {
+      if (off || early.size >= 4 || !g || !g.data) return;
+      // started here, not in a later microtask: the page step runs on synchronously and the
+      // detector (native threads in Node, its own worker in the page) reads meanwhile
+      let p;
+      try { p = Promise.resolve(detect(g)).then((r) => ({ r }), (error) => ({ error })); } catch (error) { p = Promise.resolve({ error }); }
+      early.set(g, { p, sum: sumOf(g) });
+    });
+  }
+  const detectFor = async (g) => {
+    const sp = early.get(g);
+    if (sp && sp.sum === sumOf(g)) { const o = await sp.p; if (o.error) throw o.error; return o.r; }
+    return detect(g);
+  };
   return Object.assign({}, conv, {
     async addPage(gray, i, n) {
-      const entry = await conv.addPage(gray, i, n);
-      if (!entry || off) return entry;
+      let entry;
+      try { entry = await conv.addPage(gray, i, n); } catch (e) { early.clear(); throw e; }
+      const done = () => early.clear();
+      if (!entry || off) { done(); return entry; }
       const parts = entry.spread && entry.spread.length ? entry.spread : [entry];
       for (const e of parts) {
         if (off || !e.fr || !e.fr.gray || !e.fr.gray.data || !e.asm) continue;
         progress(`Page ${i + 1}${n ? '/' + n : ''}: checking note values with the ML detector`, { stage: 'notes', page: i, pages: n });
         const t0 = Date.now();
         try {
-          const r = await detect(e.fr.gray);
+          const r = await detectFor(e.fr.gray);
           refinePage(e, (r && r.dets) || [], opts, stats);
           stats.pages++;
         } catch (err) {
@@ -499,6 +571,7 @@ function wrapConverter(conv, detect, opts = {}) {
         }
         stats.ms += Date.now() - t0;
       }
+      done();
       return entry;
     },
     finish(...a) {
