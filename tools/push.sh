@@ -45,11 +45,17 @@ if [ ${#PATHS[@]} -gt 0 ]; then
     if git cat-file -e "$PUSH_BASE:$f" 2>/dev/null && [ "$(git rev-parse "$PUSH_BASE")" != "$(git rev-parse HEAD)" ]; then
       tb=$(mktemp); th=$(mktemp)
       git show "$PUSH_BASE:$f" > "$tb"; git show "HEAD:$f" > "$th"
+      keep=$(mktemp); cp "$f" "$keep"
       if ! git merge-file -q "$f" "$tb" "$th"; then
-        rm -f "$tb" "$th"
-        echo "refusing: $f conflicts with changes made on main since $PUSH_BASE (conflict markers left in the file; resolve against HEAD and retry)" >&2
+        # never leave conflict markers in the shared tree: put the agent's copy back,
+        # and keep the conflicted merge beside the scratchpad for them to resolve
+        cf="$SCRATCH/push-conflict-$(echo "$f" | tr / _).$$"
+        cp "$f" "$cf"; cp "$keep" "$f"
+        rm -f "$tb" "$th" "$keep"
+        echo "refusing: $f conflicts with changes made on main since $PUSH_BASE; your copy is restored, the conflicted merge is at $cf (resolve against HEAD in your worktree and retry)" >&2
         exit 1
       fi
+      rm -f "$keep"
       rm -f "$tb" "$th"
     fi
   done
