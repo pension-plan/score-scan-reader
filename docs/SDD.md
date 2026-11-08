@@ -1086,6 +1086,80 @@ MusicXML (attaching them needs the head each curve starts and ends at), measure 
 used to check the measure count, rehearsal marks and chord symbols stay text or unknown. Pedal marks and
 fingering are not classified.
 
+### 8.8 Playback (General MIDI)
+
+The preview panel carries a transport bar and a parts mixer (`mvp/ui/player.js`, `mvp/ui/player.css`,
+inlined by `tools/build.js` before `app.js`; app.js only calls `ScorePlayer.attach({xml, osmd, book, res})`
+after each preview render). The timing model is a pure module shared with the Node tests,
+`mvp/src/playback.js`:
+
+- **Events.** The app's MusicXML (the same string the user exports) is parsed into timed note events per
+  part, staff and voice: MIDI pitch, onset and length in quarters along the played timeline and in seconds,
+  velocity, and the 0-based MusicXML line of the `<note>` (the overlay's head -> note link: each head's
+  `xmlLine` from `resultSummary().pages[].notes`). Chords, voices (`<backup>` / `<forward>`), dots and
+  tuplets (through `<duration>`), ties (merged, also across voices sharing a pitch), grace notes (1/8 quarter
+  or less, on the beat from the principal, or before it when slashed), rests, cue notes (silent) and
+  `<transpose>` are handled.
+- **Form.** Repeats with voltas (1st/2nd/3rd endings, `times`), D.C. / D.S. al Fine / al Coda from
+  `<sound dacapo|dalsegno|fine|tocoda|coda|segno>` or from the words (D.C. al Fine, To Coda, Fine). Repeats
+  are not taken again after a jump; the last volta is played. All seven corpus structure items with a stated
+  played form match it (`ui/test/playback.js`).
+- **Tempo.** `<sound tempo>` beats a metronome mark (beat unit and dots converted to quarters per minute)
+  beats tempo words (Allegro 132, Andante 80, Moderato 104, "Not fast" 80 for the rag, Tempo di marcia 112,
+  ...), else 100 qpm. rit./rall. step down to 82 %, a tempo / Tempo I restore. A fermata holds 1.5x (the
+  span plays at 2/3 speed in every part). The player scales all of it by 50-200 %.
+- **Dynamics.** ppp..fff -> velocity 26..120 (mf 80 by default), `<sound dynamics>`, sf/sfz/fz/fp as
+  accents, wedges and cresc./dim. words ramp to the next dynamic (or +-18), accents +12/+18, staccato
+  halves the length; other notes are slightly detached (legato for organ).
+- **Instruments.** A GM program per part from its name (Piano 0, Organ 19, Violin 40, Viola 41, Cello 42,
+  Flute 73, Clarinet 71, Trumpet 56, Tuba 58, Guitar 24, ...; Soprano/Alto/Tenor/Bass/Chorus 52 Choir Aahs,
+  a single or solo voice 53 Voice Oohs; drums on channel 10). The score writer now writes it into every
+  `<score-part>` as `<score-instrument>` + `<midi-instrument>` (channel, 1-based program, volume 80, pan
+  spread across ensembles), on the same line as the part name so head line numbers do not move. It is
+  XSD-valid and left the benchmark unchanged: default set with OCR 0.950 -> 0.950, challenge set
+  0.823 -> 0.823, 0 of 385 items changed (`OMR_NO_MIDI=1` leaves the elements out, for that comparison).
+
+**Synth.** Web Audio, nothing fetched from the network at run time. Eight sampled sets
+(`dist/assets/gm-{piano,organ,choir,oohs,strings,flute,clarinet,brass}.json`, 4.98 MB together: every 3rd
+semitone of the FluidR3_GM renders from gleitz/midi-js-soundfonts, CC BY 3.0, see
+`dist/assets/NOTICE.soundfont.txt`; rebuilt by `tools/soundfont.mjs`) load only when a part using them is
+played; the nearest sample is resampled by playbackRate (at most a semitone), sustained families loop the
+middle of the sample, each voice has an attack/release envelope. GM programs map to the nearest set by
+family; a set that fails to load, or a program with no set (synth, percussion, timpani), plays a
+two-oscillator synth with an ADSR. Per part gain -> stereo panner -> master -> compressor. A look-ahead
+scheduler (25 ms timer, 100 ms window on the AudioContext clock) creates voices only just before they sound.
+The AudioContext is created by the first Play click.
+
+**UI.** Play/Pause (aria-pressed; Space when focus is not in a field or on another control), Stop, a
+position scrubber with bar numbers (spaced to fit the width), tempo 50-200 % with the resulting quarter
+note rate, Click (metronome; compound meters beat in dotted quarters), Count-in (one bar), Loop bars A to B
+(first played bar A through the next bar B), and the parts mixer (GM instrument picker, volume, mute, solo).
+Follow-along: the OSMD cursor moves to the latest onset (its stops are listed once, then `next()` /
+`reset()`), and the scan overlay rings the note heads that are sounding (an SVG layer of its own in the
+page frame; the plate turns to the page that is playing). Clicking a note head on the scan, or a measure in
+the preview, plays from there. **Export:** "MIDI file (.mid)" writes a type 1 Standard MIDI File (480 PPQ;
+tempo map including the fermata holds, time signatures, one track per part with name, program change,
+volume and pan; mixer mutes and instrument choices applied). `tools/build.js` still forbids download links
+except in the guarded helper in player.js (between `<guarded-download>` markers, checked by the build): a
+real `<a download>` when the page is not framed (GitHub Pages, the primary home), a new tab inside the
+claude.ai artifact frame.
+
+**Tests.** `node mvp/ui/test/playback.js`: event model cases (chords, voices, ties, grace notes, tempo
+sources, fermata, dynamics and wedges, voltas, D.C. al Fine, D.S. al Coda, GM table, instrument XML), SMF
+round trip through `readSMF` (tempo map, programs, note on/off pitch, tick and velocity per note, volume,
+pan, mixer overrides), XSD validity, and a sweep over 249 truth files and 385 produced outputs (finite
+ordered timing, note counts with ties merged, played forms). `node mvp/tools/pw/player.js <dir>`: the rag and
+the St. Anselm hymn (four Choir Aahs parts) at 1280 and 400 px, light and dark: Play -> AudioContext
+running, position, OSMD cursor and scan rings advance, Space pauses, head and measure clicks play from
+there, an OfflineAudioContext render of 4 s is not silent, tempo/mute controls, and the downloaded .mid
+parses with one note-on per event.
+
+**Limits.** No swing, no pedal (sustain marks are not read), no ornaments realised (trills, turns), no
+articulation beyond accent/staccato/tenuto, no per-staff dynamics inside a part (a dynamic applies to the
+whole part), unpitched notes all sound as one drum, the OSMD cursor follows only the measures the preview
+has drawn (48 until "Draw every measure"), and after user corrections that insert lines the head -> note
+link can point one note off.
+
 ## 9. Deployment and artifact constraints
 
 ### 9.1 Packaging
@@ -1261,6 +1335,7 @@ tested on ground-truth symbols generated from the chorales, against the ≥ 99 %
 | Bravura / Leland | SIL OFL-1.1 | Templates rendered from glyphs | Notice; font not renamed or sold |
 | copista-2m weights (phase 2, if chosen) | Apache-2.0 | Optional detector | Keep the NOTICE file (Apache-2.0 §4(d)) [OMR §9.4] |
 | Sample hymn scan | Public domain | Default sample | Attribution file |
+| FluidR3_GM samples (8 instruments, via gleitz/midi-js-soundfonts) | CC BY 3.0 (renders: MIT) | Score playback | Attribution in `dist/assets/NOTICE.soundfont.txt` |
 
 ### 11.2 Used offline only (harness, never shipped)
 

@@ -1064,6 +1064,8 @@
     } catch (e) {
       note.textContent = 'The preview could not draw this MusicXML: ' + e.message;
     }
+    // playback (ui/player.js): the whole MusicXML, the drawn preview, the scan's heads
+    if (window.ScorePlayer) window.ScorePlayer.attach({ xml, osmd, book, res: lastRes });
   }
 
   // ---------------------------------------------------------------- run ---

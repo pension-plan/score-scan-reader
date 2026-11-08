@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 20:58 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 21:03 AEDT.
 
 ## Events
 
@@ -102,6 +102,9 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 20:53 | Shipped 9a124ee + 4aab1af: time-signature digits read by plain-JS templates (on by default; challenge 0.8212 to 0.8227, first time signature right 342 to 352/365); pre-clean ported to plain JS with identical scores, so OpenCV.js (10.4 MB) is no longer shipped (assets back to 39.8 MB). Verified in the app: Maple Leaf Rag shows Time signatures 2, Not recognised 3. |
 | 20:56 | User asked: default to the 'not recognised' view, larger and clearer highlights, and a way for users to say what an unrecognised item is. Overlay agent resumed: view presets (Unrecognised only by default), next/previous navigation, bigger highlights with a constant-width ring, click-to-label popover, user corrections applied to the MusicXML (accidentals, rests, dots, dynamics) as a pure post-pass, plus export of labelled crops as training data. |
 | 20:58 | User asked to play the transcribed score with MIDI instruments. Playback agent started (Opus xhigh): MusicXML to timed events (ties, voices, repeats, tempo, dynamics), General MIDI program per part written into the MusicXML, self-hosted sampled GM subset (8 MB budget, lazy) with an oscillator fallback, transport + mixer, follow-along cursor on the preview and the scan, MIDI file export. |
+| 21:01 | User couldn't see the examples menu (it looked like a third button). Fixed in the tree (chevron, reads 'All 19 examples'); ships with the overlay agent's next push. Changelog moved to the bottom of /app/, collapsed (e0c6c6b). |
+| 21:01 | User asked to improve the UI, cut verbiage and streamline usage: uiux agent started (Opus xhigh, design-uiux-canon), coordinating with overlay/playback/textsym on shared UI files. |
+| 21:03 | OpenCV agent confirmed the time-signature reader is in v0.14.0 (rag: both 2/4 read; coverage first time signature right 244 to 270/306). Next task for it: phone/book dewarp guided by staff lines, dashed-staff reconstruction (L11), and diagnosis of the German SATB severe scan (L19). |
 
 ## Accuracy by round
 

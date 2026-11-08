@@ -4,6 +4,7 @@
 const { staffMeasureEvents, pitchOf, keyAlters, DIV } = require('./assemble');
 const { detectRests, mergeRests, restBars } = require('./rests');
 const { pageMarks } = require('./symbols');
+const { instrumentXML } = require('./playback');
 
 const COLORS = ['#d1495b', '#edae49', '#00798c', '#30638e', '#7b5ea7', '#3a7d44'];
 
@@ -1389,7 +1390,9 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
     parts.some(p => p.kind === 'vocal' && (p.src[0].voice === 1 || p.src[0].voice === 2));
   parts.forEach((p, i) => {
     if (groupChoir && i === vocalIdx[0]) L.push('    <part-group type="start" number="1"><group-name>Choir</group-name><group-symbol>bracket</group-symbol><group-barline>no</group-barline></part-group>');
-    L.push(`    <score-part id="${p.id}"><part-name>${esc(p.name)}</part-name>${p.abbrev ? `<part-abbreviation>${esc(p.abbrev)}</part-abbreviation>` : ''}</score-part>`);
+    // General MIDI sound per part (playback.js), so exports and players carry it (OMR_NO_MIDI=1: left out)
+    const midi = process.env.OMR_NO_MIDI ? '' : instrumentXML(p, i, parts.length, { vocalParts: parts.filter(q => q.kind === 'vocal').length });
+    L.push(`    <score-part id="${p.id}"><part-name>${esc(p.name)}</part-name>${p.abbrev ? `<part-abbreviation>${esc(p.abbrev)}</part-abbreviation>` : ''}${midi}</score-part>`);
     if (groupChoir && i === vocalIdx[vocalIdx.length - 1]) L.push('    <part-group type="stop" number="1"/>');
   });
   L.push('  </part-list>');

@@ -3,7 +3,11 @@
 //   - no doctype/html/head/body tags; <title> of 2-4 words in the first 8 KB
 //   - external scripts only from cdnjs/jsdelivr/unpkg, pinned to an exact version;
 //     stylesheets only from Google Fonts
-//   - no alert/confirm/prompt/print calls and no download links in page code
+//   - no alert/confirm/prompt/print calls and no download links in page code, except
+//     the guarded helper in ui/player.js (between <guarded-download> markers): the app's
+//     primary home is GitHub Pages, where a .mid export should save as a file, so that
+//     helper makes a real <a download> only when the page is not framed and opens a new
+//     tab inside the claude.ai artifact frame (whose rules forbid download links)
 //   - every relative require() between src modules resolves inside the bundle
 //   - required assets present; each asset <= 15 MB, total <= 64 MB, page <= 16 MB
 // Usage: node tools/build.js [--quiet]
@@ -19,7 +23,9 @@ const MB = 1024 * 1024;
 // licence / notice files that must ship with them (copy with node assets-src/ml/sync.js).
 const ML_ASSETS = ['copista2m-dense.int8w.onnx', 'copista2m-rel.int8w.onnx', 'copista2m-classes.json', 'ort-wasm-simd-threaded.wasm',
   'LICENSE.copista-Apache-2.0.txt', 'NOTICE.copista-2m', 'NOTICE.copisteria', 'LICENSE.onnxruntime-web-MIT.txt', 'NOTICE.ml.txt'];
-const REQUIRED_ASSETS = ['tesseract-worker.min.js', 'tesseract-core-simd-lstm.wasm.js', 'eng.traineddata.gz', 'deu.traineddata.gz', 'sample-st-anselm.pdf', 'sample-maple-leaf-rag.pdf', 'samples.json', ...ML_ASSETS];
+// playback: the sampled General MIDI subset (tools/soundfont.mjs) and its licence notice
+const SOUND_ASSETS = ['gm-piano.json', 'gm-organ.json', 'gm-choir.json', 'gm-oohs.json', 'gm-strings.json', 'gm-flute.json', 'gm-clarinet.json', 'gm-brass.json', 'NOTICE.soundfont.txt'];
+const REQUIRED_ASSETS = [...SOUND_ASSETS, 'tesseract-worker.min.js', 'tesseract-core-simd-lstm.wasm.js', 'eng.traineddata.gz', 'deu.traineddata.gz', 'sample-st-anselm.pdf', 'sample-maple-leaf-rag.pdf', 'samples.json', ...ML_ASSETS];
 const SCRIPTS = [
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',
@@ -54,17 +60,20 @@ bundle += '(typeof self!=="undefined"?self:window).omrRequire=req;\n}\n__omrBund
 const css = fs.readFileSync(path.join(UI, 'style.css'), 'utf8');
 const body = fs.readFileSync(path.join(UI, 'body.html'), 'utf8');
 const app = fs.readFileSync(path.join(UI, 'app.js'), 'utf8');
+// playback module (optional files): its CSS after style.css, its script before app.js
+const playerCss = fs.existsSync(path.join(UI, 'player.css')) ? fs.readFileSync(path.join(UI, 'player.css'), 'utf8') : '';
+const player = fs.existsSync(path.join(UI, 'player.js')) ? fs.readFileSync(path.join(UI, 'player.js'), 'utf8') : '';
 const sessionPath = path.join(UI, 'session.js');
 const session = fs.existsSync(sessionPath) ? fs.readFileSync(sessionPath, 'utf8') : '';
 if (!session) fail('ui/session.js is missing (incremental per-page conversion)');
 else if (!/function __omrSessionModule\(/.test(session)) fail('ui/session.js does not define __omrSessionModule()');
-if (/<\/script/i.test(bundle + app + session)) fail('a script terminator (</script) appears inside the bundle or app');
-if (/<\/style/i.test(css)) fail('a </style> appears inside style.css');
+if (/<\/script/i.test(bundle + app + session + player)) fail('a script terminator (</script) appears inside the bundle or app');
+if (/<\/style/i.test(css + playerCss)) fail('a </style> appears inside style.css');
 
 const html = `<title>Score Scan Reader</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
-${css}</style>
+${css}${playerCss}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="${FONTS}">
@@ -74,7 +83,7 @@ ${SCRIPTS.map((s) => `<script src="${s}"></script>`).join('\n')}
 ${bundle}</script>
 <script>
 ${session}</script>
-<script>
+${player ? `<script>\n${player}</script>\n` : ''}<script>
 ${app}</script>
 `;
 
@@ -92,7 +101,11 @@ for (const m of shell.matchAll(/<script\b[^>]*\bsrc="([^"]+)"/g)) {
 for (const m of shell.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*>/g)) {
   if (!/href="https:\/\/fonts\.googleapis\.com\//.test(m[0])) fail(`stylesheet outside Google Fonts: ${m[0]}`);
 }
-const code = bundle + '\n' + session + '\n' + app;
+// the guarded download helper is the one place a download attribute may be set
+const GUARD = /\/\/ <guarded-download>[\s\S]*?\/\/ <\/guarded-download>/;
+const guarded = (player.match(GUARD) || [''])[0];
+if (guarded && !/function framed\(\)[\s\S]*window\.self !== window\.top[\s\S]*if \(!framed\(\)\)/.test(guarded)) fail('ui/player.js: the guarded download helper must check the frame (framed()) before setting a download attribute');
+const code = bundle + '\n' + session + '\n' + app + '\n' + player.replace(GUARD, '');
 const banned = code.match(/(^|[^.\w$])(alert|confirm|prompt|print)\s*\(|window\.(alert|confirm|prompt|print)\b/m);
 if (banned) fail(`banned dialog/print call in page code: "${banned[0].trim()}"`);
 if (/\sdownload(=|\s|>)/i.test(shell) || /\.download\s*=|setAttribute\(\s*['"]download/.test(code)) fail('download link in page');

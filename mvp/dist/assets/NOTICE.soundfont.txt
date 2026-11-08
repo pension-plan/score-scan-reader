@@ -1,0 +1,41 @@
+Score Scan Reader: playback samples (assets/gm-*.json)
+
+The instrument samples used by the score player are a sparse subset (every third
+semitone) of the MP3 renders of the Fluid (R3) General MIDI SoundFont published in
+gleitz/midi-js-soundfonts (https://github.com/gleitz/midi-js-soundfonts, folder
+FluidR3_GM), unmodified apart from the selection of notes and repackaging as JSON
+(base64 MP3, one file per instrument, written by mvp/tools/soundfont.mjs).
+
+  gm-piano.json     acoustic_grand_piano  (GM 1)
+  gm-organ.json     church_organ          (GM 20)
+  gm-choir.json     choir_aahs            (GM 53)
+  gm-oohs.json      voice_oohs            (GM 54)
+  gm-strings.json   string_ensemble_1     (GM 49)
+  gm-flute.json     flute                 (GM 74)
+  gm-clarinet.json  clarinet              (GM 72)
+  gm-brass.json     trumpet               (GM 57)
+
+Fluid (R3) SoundFont: Copyright (c) Frank Wen and contributors. Licensed under the
+Creative Commons Attribution 3.0 licence (as stated by the gleitz/midi-js-soundfonts
+README for FluidR3_GM): https://creativecommons.org/licenses/by/3.0/
+(The FluidR3_GM.sf2 distribution itself is also offered under the MIT licence.)
+
+gleitz/midi-js-soundfonts (the MP3 renders): Copyright (C) 2012 Benjamin Gleitzman,
+MIT licence:
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy of this
+  software and associated documentation files (the "Software"), to deal in the Software
+  without restriction, including without limitation the rights to use, copy, modify,
+  merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+  permit persons to whom the Software is furnished to do so, subject to the following
+  conditions:
+
+  The above copyright notice and this permission notice shall be included in all copies
+  or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+  INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+  PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+  CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+  OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
