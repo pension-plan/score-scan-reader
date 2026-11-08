@@ -6,6 +6,7 @@
 // Verses are numbered top-down per staff; a stack under the bottom staff that
 // starts with a printed "2." is stanza text set after the music and dropped.
 const { makeGray } = require('./image');
+const { labelComponents } = require('./cc');
 
 const DEFAULTS = {
   widen: true,        // stretch word gaps before OCR (stops "workswith" merges)
@@ -23,6 +24,13 @@ const DEFAULTS = {
   goodAbs: 6,         // ... or at least this many of them
   lastStaffSp: 14,    // how far below the last staff of a system verse rows may reach ...
   maxRowGapSp: 1.5,   // ... provided each row follows the previous one within this gap
+  ccLines: true,      // find lines by components + baselines and OCR masked strips (spike strips.js)
+  attachedLetters: true, // keep text-zone pixels of letters that touch stems / notes
+  ccLastStaffSp: 24,  // component lines: depth searched under a system's last staff (stacked verses stay contiguous)
+  maxGapFont: 0,      // close up word gaps wider than this share of the font size (0 = off; hurt here)
+  wordGapFont: 0,     // ... separate cap for gaps not next to a hyphen (0 = same)
+  titleCheck: true,   // reject captions: title-case or bracketed lines, oversized type
+  targetCap: 28,      // OCR scale: cap height in px (component lines)
   splitByNotes: true, // split tokens that span several note onsets (unprinted hyphens, merged words)
   lang: null,         // underlay language for syllable rules ('en' | 'de' | 'la'); null = detect
 };
@@ -88,6 +96,162 @@ function findTextLines(fr, sysIdx, nextTop, opts) {
   return out;
 }
 
+// ---- component-based lyric lines (port of spike/ocr/src/strips.js) -------
+// In each band under a staff, connected components that do not touch the band
+// edges (those hang off the staff: notes, stems, beams) and are letter sized
+// vote for baselines; each baseline with enough letters is a text line whose
+// members are the components between ascender and descender height. The OCR
+// strip keeps member pixels only (stems and noteheads poking into the text are
+// masked out). Flat members are hyphens (mid height) or extenders (baseline).
+const median = (a) => { if (!a.length) return 0; const s = [...a].sort((x, y) => x - y); return s[s.length >> 1]; };
+
+function findTextLinesCC(fr, sysIdx, nextTop, o) {
+  const { B, gray, staves } = fr;
+  const sys = fr.systems[sysIdx];
+  const W = B.width, H = B.height;
+  const out = [];
+  sys.forEach((si, k) => {
+    const st = staves[si], sp = st.space;
+    const xs = [st.left, (st.left + st.right) / 2, st.right];
+    const last = k === sys.length - 1;
+    const y0 = Math.round(Math.max(...xs.map(x => st.yAt(4, x))) + 0.4 * sp);
+    const y1 = Math.round(last ? Math.min(nextTop - 1.0 * sp, y0 + o.ccLastStaffSp * sp, H - 1)
+      : Math.min(...xs.map(x => staves[sys[k + 1]].yAt(0, x))) - 0.4 * sp);
+    if (y1 - y0 < 1.5 * sp) return;
+    const x0 = Math.max(0, Math.round(st.left - 2 * sp)), x1 = Math.min(W - 1, Math.round(st.right + 1 * sp));
+    const bw = x1 - x0 + 1, bh = y1 - y0 + 1;
+    const band = { width: bw, height: bh, data: new Uint8Array(bw * bh) };
+    for (let y = 0; y < bh; y++) band.data.set(B.data.subarray((y0 + y) * W + x0, (y0 + y) * W + x0 + bw), y * bw);
+    const { labels, comps } = labelComponents(band);
+    const cand = comps.filter(c => c.y0 > 0 && c.y1 < bh - 1 && c.area >= 3 && c.y1 - c.y0 + 1 <= 4 * sp && c.x1 - c.x0 + 1 <= 30 * sp);
+    const candSet = new Set(cand);
+    const letters = cand.filter(c => { const h = c.y1 - c.y0 + 1, w = c.x1 - c.x0 + 1; return h >= 0.45 * sp && h <= 3.2 * sp && w <= 4 * sp && w >= 0.12 * sp; });
+    if (letters.length < 4) return;
+    const hist = new Float64Array(bh + 1);
+    for (const c of letters) hist[c.y1]++;
+    const R = Math.max(1, Math.round(0.15 * sp)), sm = new Float64Array(bh + 1);
+    for (let y = 0; y <= bh; y++) { let s = 0; for (let d = -R; d <= R; d++) { const yy = y + d; if (yy >= 0 && yy <= bh) s += hist[yy]; } sm[y] = s; }
+    const peaks = [];
+    for (const y of [...sm.keys()].sort((a, b) => sm[b] - sm[a])) {
+      if (sm[y] < 4) break;
+      if (peaks.some(p => Math.abs(p - y) < 1.4 * sp)) continue;
+      peaks.push(y);
+    }
+    peaks.sort((a, b) => a - b);
+    const lines = [];
+    for (const bl of peaks) {
+      const core = letters.filter(c => Math.abs(c.y1 - bl) <= 0.25 * sp + 1);
+      if (core.length < 4) continue;
+      const hs = core.map(c => c.y1 - c.y0 + 1).sort((a, b) => a - b);
+      const xh = median(hs.slice(0, Math.max(1, hs.length >> 1))), tall = median(hs.slice(hs.length >> 1));
+      if (tall < 0.6 * sp || median(core.map(c => c.area)) < 0.15 * sp * sp) continue;   // rows of specks
+      lines.push({ bl, xh, tall, core, mem: [] });
+    }
+    if (!lines.length) return;
+    // members: each candidate goes to the line whose window holds it and whose baseline is nearest its bottom
+    for (const c of cand) {
+      let best = null, bd = Infinity;
+      for (const ln of lines) {
+        if (c.y0 < ln.bl - 1.9 * ln.tall || c.y1 > ln.bl + 0.6 * ln.tall || c.y1 - c.y0 + 1 > 2.2 * ln.tall) continue;
+        const d = Math.abs(c.y1 - ln.bl);
+        if (d < bd) { bd = d; best = ln; }
+      }
+      if (best) best.mem.push(c);
+    }
+    const stW = st.right - st.left;
+    let prevBl = null;
+    for (const ln of lines) {
+      const mem = ln.mem;
+      if (!mem.length) continue;
+      const lx0 = Math.min(...mem.map(c => c.x0)), lx1 = Math.max(...mem.map(c => c.x1));
+      if (lx1 - lx0 < 0.2 * stW && ln.core.length < 8) continue;
+      // under the last staff: the first line starts within 7 sp, later ones follow on
+      if (last && (prevBl == null ? ln.bl > 7 * sp + ln.tall : ln.bl - prevBl > 3.2 * sp)) break;
+      prevBl = ln.bl;
+      const hyphens = [], extenders = [];
+      for (const c of mem) {
+        const ch = c.y1 - c.y0 + 1, cw = c.x1 - c.x0 + 1, cy = (c.y0 + c.y1 + 1) / 2;
+        if (ch <= Math.max(2, 0.4 * ln.xh) && cw >= 1.6 * ch) {
+          if (cy < ln.bl - 0.15 * ln.xh && cy > ln.bl - 0.95 * ln.xh && cw <= 3.5 * ln.xh) { hyphens.push({ x0: x0 + c.x0, x1: x0 + c.x1 + 1 }); c.hy = true; }
+          else if (Math.abs(cy - ln.bl) <= 0.3 * ln.xh + 1 && cw >= 1.2 * ln.xh) { extenders.push({ x0: x0 + c.x0, x1: x0 + c.x1 + 1 }); c.ext = true; }
+        }
+      }
+      // masked strip: member pixels (dilated by 1 px for the soft glyph edges) from the gray page
+      const pad = Math.max(2, Math.round(0.4 * ln.xh));
+      const sx0 = Math.max(0, lx0 - pad), sx1 = Math.min(bw - 1, lx1 + pad);
+      const sy0 = Math.max(0, Math.min(Math.round(ln.bl - 1.6 * ln.tall), ...mem.map(c => c.y0)) - 2);
+      const sy1 = Math.min(bh - 1, Math.max(Math.round(ln.bl + 0.5 * ln.tall), ...mem.map(c => c.y1)) + 2);
+      const SW = sx1 - sx0 + 1, SH = sy1 - sy0 + 1;
+      const keep = new Set(mem.filter(c => !c.ext).map(c => c.id));
+      // letters touching a stem or note hang off the staff as one component:
+      // keep such components' pixels inside the text zone, minus thin
+      // vertical strokes crossing the whole zone (stems, barlines)
+      const zt = Math.round(ln.bl - 1.15 * ln.tall), zb = Math.round(ln.bl + 0.5 * ln.tall), zh = zb - zt + 1;
+      const part = new Map();   // label -> Set of erased columns (band x)
+      if (o.attachedLetters) for (const c of comps) {
+        if (candSet.has(c) || c.y1 < zt || c.y0 > zb || c.x1 < lx0 || c.x0 > lx1) continue;
+        const ya = Math.max(zt, c.y0), yb = Math.min(zb, c.y1);
+        const colFull = [];
+        for (let x = c.x0; x <= c.x1; x++) {
+          let run = 0, best = 0;
+          for (let y = ya; y <= yb; y++) { if (labels[y * bw + x] === c.id) { run++; if (run > best) best = run; } else run = 0; }
+          colFull.push(best >= 0.9 * zh);
+        }
+        const erase = new Set();
+        for (let i = 0; i < colFull.length;) {
+          if (!colFull[i]) { i++; continue; }
+          let j = i; while (j < colFull.length && colFull[j]) j++;
+          if (j - i <= Math.max(3, 0.35 * sp)) for (let q = i - 1; q <= j; q++) erase.add(c.x0 + q);
+          i = j;
+        }
+        part.set(c.id, erase);
+      }
+      const mask = new Uint8Array(SW * SH);
+      for (let y = 0; y < SH; y++) for (let x = 0; x < SW; x++) {
+        const lab = labels[(sy0 + y) * bw + sx0 + x];
+        if (!lab) continue;
+        if (keep.has(lab)) mask[y * SW + x] = 1;
+        else if (part.has(lab) && sy0 + y >= zt && sy0 + y <= zb && !part.get(lab).has(sx0 + x)) mask[y * SW + x] = 1;
+      }
+      const data = new Uint8ClampedArray(SW * SH).fill(255);
+      for (let y = 0; y < SH; y++) for (let x = 0; x < SW; x++) {
+        let m = mask[y * SW + x];
+        if (!m) {
+          const lab = labels[(sy0 + y) * bw + sx0 + x];
+          if (lab) continue;   // ink of another component
+          for (let dy = -1; dy <= 1 && !m; dy++) for (let dx = -1; dx <= 1 && !m; dx++) {
+            const yy = y + dy, xx = x + dx;
+            if (yy >= 0 && yy < SH && xx >= 0 && xx < SW && mask[yy * SW + xx]) m = 1;
+          }
+        }
+        if (m) data[y * SW + x] = gray.data[(y0 + sy0 + y) * W + x0 + sx0 + x];
+      }
+      out.push({
+        band: k, sys: sysIdx, last, sp, x0: st.left, x1: st.right, y0: y0 + sy0, y1: y0 + sy1,
+        baseline: y0 + ln.bl, xh: ln.xh, tall: ln.tall, hyphens, extenders,
+        strip: { width: SW, height: SH, data, x0: x0 + sx0, y0: y0 + sy0, mask },
+      });
+    }
+  });
+  return out;
+}
+
+// row analysis on a masked strip (same shape as analyseRow's result)
+function stripRow(ln) {
+  const { width: n, height: Hh, mask } = ln.strip;
+  const ink = new Int32Array(n), rule = new Uint8Array(n);
+  for (let x = 0; x < n; x++) { let c = 0; for (let y = 0; y < Hh; y++) c += mask[y * n + x]; ink[x] = c; }
+  const clusters = [];
+  for (let i = 0; i < n;) {
+    if (!ink[i]) { i++; continue; }
+    let j = i; while (j < n && ink[j]) j++;
+    clusters.push([i, j]); i = j;
+  }
+  const hy = clusters.map(([a, b]) => ln.hyphens.some(h => h.x0 - ln.strip.x0 >= a - 1 && h.x1 - ln.strip.x0 <= b + 1 && b - a <= h.x1 - h.x0 + 2));
+  let cov = 0; for (const [a, b] of clusters) cov += b - a;
+  return { xa: 0, ya: 0, yb: Hh - 1, n, ink, rule, clusters, hy, cov: cov / Math.max(1, n) };
+}
+
 // Column analysis of a text row on the binary page: vertical rules that cross
 // the whole (padded) row, blank runs between glyph clusters, and simple shape
 // statistics used to reject rows that are stems / ties / fermatas, not text.
@@ -142,25 +306,31 @@ function analyseRow(B, ln, pad) {
 function buildCrop(g, row, ln, o) {
   const gapMin = Math.max(3, o.gapSp * ln.sp);
   const add = o.widen ? Math.round(o.addSp * ln.sp) : 0;
+  // word gaps wider than ~half the font size are closed up (syllables spread
+  // under the notes break tesseract's word segmentation and LSTM context)
+  const cap = o.maxGapFont && ln.tall ? Math.max(gapMin + add, Math.round(o.maxGapFont * ln.tall / 0.7)) : Infinity;
   // segments of source columns, with inserted blank columns before each
   const segs = []; // {sx, len, before}
   const { clusters, n } = row;
-  if (!o.widen || !clusters.length) segs.push({ sx: 0, len: n, before: 0 });
+  if ((!o.widen && cap === Infinity) || !clusters.length) segs.push({ sx: 0, len: n, before: 0 });
   else {
-    let start = 0;
+    let start = 0, ins = 0;
     for (let c = 1; c < clusters.length; c++) {
-      const gap = clusters[c][0] - clusters[c - 1][1];
+      const a = clusters[c - 1][1], b = clusters[c][0], gap = b - a;
       if (gap >= gapMin || (o.hyGaps && (row.hy[c] || row.hy[c - 1]))) {
-        const cut = clusters[c - 1][1] + Math.floor(gap / 2);
-        segs.push({ sx: start, len: cut - start, before: segs.length ? add : 0 });
-        start = cut;
+        const hyAdj = row.hy[c] || row.hy[c - 1];
+        const cp = hyAdj ? cap : (o.wordGapFont && ln.tall ? Math.max(cap, Math.round(o.wordGapFont * ln.tall / 0.7)) : cap);
+        const keep = Math.min(gap, cp), l = Math.ceil(keep / 2);
+        segs.push({ sx: start, len: a + l - start, before: ins });
+        start = b - (keep - l);
+        ins = Math.max(0, Math.min(add, cp - keep));
       }
     }
-    segs.push({ sx: start, len: n - start, before: segs.length ? add : 0 });
+    segs.push({ sx: start, len: n - start, before: ins });
   }
   const srcW = segs.reduce((a, s) => a + s.len + s.before, 0);
   const srcH = row.yb - row.ya + 1;
-  const scale = Math.min(3, Math.max(0.5, o.targetH / srcH));
+  const scale = Math.min(3, Math.max(0.5, ln.tall && o.targetCap ? o.targetCap / ln.tall : o.targetH / srcH));
   // source column for each virtual column (-1 = inserted blank)
   const vcol = new Int32Array(srcW);
   let v = 0;
@@ -284,7 +454,7 @@ function toSyllables(words) {
   let number = null;
   for (let i = 0; i < Math.min(3, toks.length); i++) {
     if (toks[i].hy) continue;
-    const m = toks[i].text.match(/^([0-9]{1,2})[.,:]\s*(.*)$/) || toks[i].text.match(/^([0-9]{1,2})$/);
+    const m = toks[i].text.match(/^([1-9][0-9]?)[.,:]\s*(.*)$/) || toks[i].text.match(/^([1-9][0-9]?)$/);
     const roman = /^[IVX]{1,3}[.,]$/.test(toks[i].text);
     if (!m && !roman) continue;
     if (i > 0 && !(m && /[.,:]/.test(toks[i].text)) && !roman) continue; // bare digit later in the row: not a verse number
@@ -294,6 +464,10 @@ function toSyllables(words) {
     if (rest) toks.unshift(rest);
     break;
   }
+  // a language tag after the stanza number ("1. EN Fairest", multilingual hymnals)
+  if (number != null && toks[0] && !toks[0].hy && /^(EN|DE|DA|SV|NO|NL|FR|IT|LA|ES|FI|IS|CY|PL|CS|HU|PT)$/.test(toks[0].text)) toks.shift();
+  // a lone "1" / "0" inside a line is the word I / O (verse numbers are handled above)
+  for (const t of toks) if (!t.hy && /^[10][,.;:!?]?$/.test(t.text)) t.text = (t.text[0] === '1' ? 'I' : 'O') + t.text.slice(1);
   const syl = [];
   for (let i = 0; i < toks.length; i++) {
     const t = toks[i];
@@ -449,6 +623,29 @@ function cutAt(s, tgt, lang, ons) {
   return out.filter(p => /\p{L}/u.test(p.text));
 }
 
+// extender lines (geometry) -> the syllable just left of each is a melisma:
+// extend = true, extendTo = page x where the line ends (alignment hint)
+function markExtenders(syl, ext, sp) {
+  for (const e of ext || []) {
+    let best = null;
+    for (const s of syl) if (s.x1 != null && s.x0 < e.x0 && e.x0 - s.x1 < 2.5 * sp && (!best || s.x1 > best.x1)) best = s;
+    if (best && !(best.syllabic === 'begin' || best.syllabic === 'middle')) { best.extend = true; best.extendTo = Math.max(best.extendTo || 0, e.x1); }
+  }
+}
+
+// a printed hyphen between two syllables (geometry) links them even when
+// OCR read it as "." or missed it ("Fair . est" -> Fair- est)
+function linkHyphens(syl, hyphens) {
+  if (!hyphens || !hyphens.length) return;
+  for (let i = 0; i + 1 < syl.length; i++) {
+    const a = syl[i], b = syl[i + 1];
+    if (a.x1 == null || b.x0 == null || a.syllabic === 'begin' || a.syllabic === 'middle') continue;
+    if (!hyphens.some(x => x > a.x1 - 2 && x < b.x0 + 2)) continue;
+    a.syllabic = a.syllabic === 'end' ? 'middle' : 'begin';
+    b.syllabic = b.syllabic === 'begin' ? 'middle' : (b.syllabic === 'single' ? 'end' : b.syllabic);
+  }
+}
+
 // note onsets of one staff between x0 and x1: one list, or two (upper and
 // lower voice) when the staff carries two voices (opposed stems at one x)
 function staffVoices(fr, staff, x0, x1, sp) {
@@ -495,18 +692,22 @@ async function readLyrics(fr, ocr, onProgress, opts) {
   let done = 0;
   const all = [];
   const geo = new Map();
-  fr.systems.forEach((sys, si) => all.push(...findTextLines(fr, si, sysTops[si + 1] ?? fr.gray.height, o)));
+  const finder = o.ccLines ? findTextLinesCC : findTextLines;
+  fr.systems.forEach((sys, si) => all.push(...finder(fr, si, sysTops[si + 1] ?? fr.gray.height, o)));
+  const talls = all.filter(l => l.tall).map(l => l.tall).sort((a, b) => a - b);
+  const tallMed = talls.length >= 3 ? talls[talls.length >> 1] : 0;
   for (const ln of all) {
     const step = () => { done++; if (onProgress) onProgress(done, all.length); };
     const pad = Math.round(0.3 * ln.sp);
-    const row = analyseRow(fr.B, ln, pad);
+    const row = ln.strip ? stripRow(ln) : analyseRow(fr.B, ln, pad);
+    const ox = ln.strip ? ln.strip.x0 : 0;
     // opts.debug (an array) collects per-row decisions for tuning tools
     const dbg = o.debug ? { sys: ln.sys, band: ln.band, y: ln.y0, h: ln.y1 - ln.y0, sp: +ln.sp.toFixed(1), cov: +row.cov.toFixed(3), ncl: row.clusters.length } : null;
     if (dbg) o.debug.push(dbg);
     // text rows have many glyph clusters and a fair share of inked columns;
     // rows of stems, ties or fermatas have few, thin ones
-    if (o.geomCheck && (row.cov < 0.08 || row.clusters.length < 4)) { if (dbg) dbg.reject = 'geom'; step(); continue; }
-    const { img, toPage } = buildCrop(fr.gray, row, ln, o);
+    if (o.geomCheck && (ln.strip ? row.clusters.length < 3 : (row.cov < 0.08 || row.clusters.length < 4))) { if (dbg) dbg.reject = 'geom'; step(); continue; }
+    const crop = buildCrop(ln.strip || fr.gray, row, ln, o), img = crop.img, toPage = (x) => crop.toPage(x) + ox;
     let words = [];
     try { words = await ocr(img); } catch (e) { words = []; }
     const mapped = splitMerged(words.map(w => ({ ...w, x0: toPage(w.x0), x1: toPage(Math.max(w.x0, w.x1 - 1)) + 1 }))).map(w => ({ ...w, ok: plausible(w.text) }));
@@ -521,12 +722,24 @@ async function readLyrics(fr, ocr, onProgress, opts) {
     const nTok = mapped.filter(w => !/^[-‐‑‒–—―~_|.,;:'"]+$/.test(w.text)).length;
     if (dbg) dbg.good = nGood + '/' + nTok;
     if (!mapped.length || meanConf < o.minLineConf * 0.8 || nOk < 0.6 * mapped.length || nGood2 < 2 || (nGood < o.goodFrac * nTok && nGood < o.goodAbs)) { if (dbg) dbg.reject = 'ocr'; step(); continue; }
+    // captions under the music ("God Bless Our Native Land", "(Tune: America)"): title case, brackets, bigger type
+    if (o.titleCheck) {
+      const wordsL = mapped.map(w => w.text.replace(/[^\p{L}]/gu, '')).filter(t => t.length >= 2);
+      const caps = wordsL.filter(t => /^\p{Lu}/u.test(t)).length;
+      const txt = mapped.map(w => w.text).join(' ').trim();
+      const big = ln.tall && tallMed && ln.tall > 1.35 * tallMed;
+      if ((wordsL.length >= 2 && caps >= 0.8 * wordsL.length && wordsL.length <= 8) || /^[(\[].*[)\]]$/.test(txt) || big) { if (dbg) dbg.reject = 'title'; step(); continue; }
+    }
     const { number, syllables } = toSyllables(kept.filter(w => w.ok || w.conf >= 60));
     const entry = { band: ln.band, last: ln.last, y: ln.y0, printed: number, number, syllables, raw: mapped.map(w => w.text).join(' '), conf: meanConf };
     (out[ln.sys] ||= []).push(entry);
-    geo.set(entry, { sp: ln.sp, staff: fr.systems[ln.sys][ln.band], x0: ln.x0, x1: ln.x1, hyphens: row.clusters.filter((c, i) => row.hy[i]).map(([a, b]) => row.xa + (a + b) / 2) });
+    geo.set(entry, { sp: ln.sp, staff: fr.systems[ln.sys][ln.band], x0: ln.x0, x1: ln.x1, extenders: ln.extenders || [],
+      hyphens: ln.hyphens ? ln.hyphens.map(h => (h.x0 + h.x1) / 2) : row.clusters.filter((c, i) => row.hy[i]).map(([a, b]) => row.xa + (a + b) / 2) });
     step();
   }
+  for (const [v, g] of geo) linkHyphens(v.syllables, g.hyphens);
+  // melisma: an extender line after a syllable holds it over the following notes
+  for (const [v, g] of geo) markExtenders(v.syllables, g.extenders, g.sp);
   // unprinted hyphens / merged words: split tokens spanning several onsets
   if (o.splitByNotes) {
     const lang = o.lang || detectLang(Object.values(out).flat().map(v => v.syllables.map(s => s.text).join(' ')));

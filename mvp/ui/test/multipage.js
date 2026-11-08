@@ -7,6 +7,19 @@
 // API), JS heap, time, page navigation, and then Stop after two pages.
 const http = require('http'), fs = require('fs'), path = require('path');
 const { execFileSync } = require('child_process');
+// resident memory of the browser and all its children (renderer, workers, GPU)
+function treeRSS(pid) {
+  try {
+    const rows = String(execFileSync('ps', ['-eo', 'pid=,ppid=,rss='])).trim().split('\n').map((l) => l.trim().split(/\s+/).map(Number));
+    const kids = new Map();
+    rows.forEach(([p, pp]) => { if (!kids.has(pp)) kids.set(pp, []); kids.get(pp).push(p); });
+    const rss = new Map(rows.map(([p, , r]) => [p, r]));
+    let total = 0;
+    const stack = [pid];
+    while (stack.length) { const p = stack.pop(); total += rss.get(p) || 0; (kids.get(p) || []).forEach((k) => stack.push(k)); }
+    return Math.round(total / 1024);
+  } catch (e) { return 0; }
+}
 const MVP = path.join(__dirname, '../..');
 const CORPUS = path.join(MVP, '../corpus');
 const { chromium } = require(path.join(MVP, 'tools/pw/node_modules/playwright'));
@@ -90,11 +103,15 @@ srv.listen(0, async () => {
 
   // ---- the long document
   const samples = [];
+  let rssPeak = 0;
+  const rssBefore = treeRSS(process.pid) - Math.round(process.memoryUsage().rss / 1048576);
   await page.evaluate(dropBook);
   const t0 = Date.now();
   let shot = false;
   while (Date.now() - t0 < 1500000) {
     const s = await page.evaluate(() => ({ done: !!window.__omrResult, chips: [...document.querySelectorAll('#pageChips .chip')].map((c) => c.dataset.state).join(''), heap: performance.memory ? performance.memory.usedJSHeapSize : 0 }));
+    s.rss = treeRSS(process.pid) - Math.round(process.memoryUsage().rss / 1048576);
+    rssPeak = Math.max(rssPeak, s.rss);
     samples.push([Math.round((Date.now() - t0) / 1000), s.chips.replace(/done/g, 'D').replace(/queued/g, '.').replace(/work/g, 'W').replace(/render/g, 'R').replace(/empty/g, 'E').replace(/failed/g, 'F'), Math.round(s.heap / 1048576)]);
     if (SHOTS && !shot && /D.*D.*D/.test(samples[samples.length - 1][1]) && !s.done) {
       shot = true;
@@ -104,15 +121,24 @@ srv.listen(0, async () => {
     await page.waitForTimeout(2000);
   }
   const r = await page.evaluate(() => ({ res: window.__omrResult, secs: (performance.now() - window.__t0) / 1000, lt: window.__lt.slice(),
+    marks: performance.getEntriesByType('mark').filter((m) => m.startTime >= window.__t0).map((m) => [Math.round(m.startTime), m.name.replace(/^ssr:/, '')]),
     hscroll: document.documentElement.scrollWidth > window.innerWidth, osmd: document.querySelectorAll('#osmd svg').length, osmdNote: document.getElementById('osmdNote').textContent,
     heap: performance.memory ? performance.memory.usedJSHeapSize : 0 }));
   const lt = r.lt.map((x) => x[1]).sort((a, b) => b - a);
+  // attribute each long task to the last mark before it started
+  const by = {};
+  for (const [st, d] of r.lt) {
+    let name = 'before-first-mark';
+    for (const [t, n] of r.marks) if (t <= st + 1) name = n; else break;
+    by[name] = by[name] || { n: 0, ms: 0, max: 0 };
+    by[name].n++; by[name].ms += d; by[name].max = Math.max(by[name].max, d);
+  }
   out.book = {
     secs: +r.secs.toFixed(1), engine: r.res && r.res.engine, error: r.res && r.res.error,
     pagesInfo: r.res && r.res.pages, parts: r.res && r.res.parts, measures: r.res && r.res.measures,
     capWarning: !!(r.res && (r.res.warnings || []).some((w) => /Only the first/.test(w))),
-    longTasks: lt.length, longTaskMsTotal: lt.reduce((a, b) => a + b, 0), maxLongTaskMs: lt[0] || 0, top5: lt.slice(0, 5),
-    heapMB: Math.round(r.heap / 1048576), peakHeapMB: Math.max(0, ...samples.map((s) => s[2])),
+    longTasks: lt.length, longTaskMsTotal: lt.reduce((a, b) => a + b, 0), maxLongTaskMs: lt[0] || 0, top5: lt.slice(0, 5), longTasksBy: by,
+    heapMB: Math.round(r.heap / 1048576), peakHeapMB: Math.max(0, ...samples.map((s) => s[2])), rssBeforeMB: rssBefore, rssPeakMB: rssPeak,
     hscroll: r.hscroll, osmd: r.osmd + ' svg; ' + r.osmdNote, timeline: samples.filter((_, i) => i % 3 === 0).map((s) => s.join(' ')),
   };
   // navigation: chip 5, then previous
@@ -133,7 +159,8 @@ srv.listen(0, async () => {
   // ---- stop after two pages
   if (!process.argv.includes('--no-stop')) {
     await page.evaluate(dropBook);
-    await page.waitForFunction(() => [...document.querySelectorAll('#pageChips .chip')].filter((c) => c.dataset.state === 'done').length >= 2, null, { timeout: 300000 });
+    // the stop button shows once the new run has reset the page strip
+    await page.waitForFunction(() => !document.getElementById('stop').hidden && [...document.querySelectorAll('#pageChips .chip')].filter((c) => c.dataset.state === 'done').length >= 2, null, { timeout: 300000 });
     await page.click('#stop');
     await page.waitForFunction(() => window.__omrResult, null, { timeout: 300000 });
     out.stop = await page.evaluate(() => ({ read: window.__omrResult.pages && window.__omrResult.pages.read, states: window.__omrResult.pages && window.__omrResult.pages.states.join(','), warn: (window.__omrResult.warnings || []).find((w) => /Stopped/.test(w)) || null,

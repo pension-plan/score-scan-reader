@@ -176,15 +176,18 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
   color:var(--muted);font:600 14px/1 var(--display);font-variant-numeric:lining-nums tabular-nums;cursor:pointer;position:relative;
   transition:background-color .15s,border-color .15s,color .15s}
 .chip:hover{border-color:var(--ink)}
-.chip[data-state="render"],.chip[data-state="work"]{border:2px solid var(--accent);color:var(--accent);animation:breathe 1.6s ease-in-out infinite}
+.chip[data-state="render"]{border:1.5px dashed var(--accent);color:var(--accent)}
+.chip[data-state="work"]{border:2px solid var(--accent);color:var(--accent);animation:breathe 1.6s ease-in-out infinite}
 .chip[data-state="done"]{background:var(--ink);border-color:var(--ink);color:var(--panel)}
 .chip[data-state="empty"]{border-style:dashed;background:linear-gradient(to top right,transparent calc(50% - 1px),var(--rule-strong) calc(50% - 1px) calc(50% + 1px),transparent calc(50% + 1px)) var(--panel)}
 .chip[data-state="failed"]{border-color:var(--warn-mark);color:var(--warn-ink);background:var(--warn-bg)}
 .chip[data-state="skipped"]{border-style:dotted;opacity:.7}
 .chip[aria-current="page"]{outline:2px solid var(--accent);outline-offset:2px}
-.chip[aria-current="page"]::after{content:"";position:absolute;left:50%;bottom:-9px;width:0;height:0;margin-left:-4px;
-  border:4px solid transparent;border-top-color:var(--accent);border-bottom:0}
 .pagelabel{font:12px var(--mono);color:var(--muted);margin:0 0 -14px}
+
+/* while a new scan is read, the previous result is dimmed, not hidden */
+.stale-note{margin:0;padding:8px 12px;border:1px dashed var(--rule-strong);border-radius:2px;font-size:13px;color:var(--muted);background:var(--panel)}
+[data-stale] > .panel,.preview-panel[data-stale]{opacity:.5;transition:opacity .2s}
 
 /* parts */
 .summary{margin:0 0 10px;font-size:14px}
@@ -323,7 +326,8 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
       <div id="pages" class="pages"></div>
     </section>
 
-    <div class="margin">
+    <div class="margin" id="margin">
+      <p class="stale-note" id="staleNote" hidden>The previous result stays here until this one is ready.</p>
       <section class="panel" aria-labelledby="partsH">
         <div class="panel-head"><h2 id="partsH">Parts</h2></div>
         <p class="summary" id="partsSummary">Waiting for the first conversion.</p>
@@ -364,7 +368,7 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
     </div>
 
 
-    <section class="panel preview-panel" aria-labelledby="prevH">
+    <section class="panel preview-panel" id="previewPanel" aria-labelledby="prevH">
       <div class="panel-head"><h2 id="prevH">Notation preview</h2></div>
       <div class="sheet"><div id="osmd"></div></div>
       <p class="muted" id="osmdNote"></p>
@@ -391,7 +395,9 @@ defs["assemble"]=function(require,module,exports){
 // voices; then the part layout (closed-score split vs grand staff) for the page.
 const { labelComponents } = require('./cc');
 
-const DIV = 8; // divisions per quarter
+// divisions per quarter: 840 = 8 * 3 * 5 * 7 keeps 32nds and 3-, 5-, 6- and
+// 7-tuplets whole numbers
+const DIV = 840;
 const SHARP_ORDER = ['F', 'C', 'G', 'D', 'A', 'E', 'B'];
 const FLAT_ORDER = ['B', 'E', 'A', 'D', 'G', 'C', 'F'];
 
@@ -541,9 +547,28 @@ function groupGlyphs(cs, sp) {
   return out;
 }
 
+// diatonic index (7 * octave + step) of the middle line: D3 (bass), B3
+// (treble 8vb), B4 (treble); C clefs 'C1'..'C5' put C4 on line 1..5
+function clefBase(clef) {
+  if (clef === 'F') return 22;
+  if (clef === 'G8') return 27;
+  if (/^C[1-5]$/.test(clef || '')) return 28 - 2 * (+clef[1] - 3);
+  return 34;
+}
+
 // staff steps above the middle line where key-signature accidentals sit
 const KEY_POS = { G: { sharp: [4, 1, 5, 2, -1, 3, 0], flat: [0, 3, -1, 2, -2, 1, -3] } };
 KEY_POS.F = { sharp: KEY_POS.G.sharp.map(p => p - 2), flat: KEY_POS.G.flat.map(p => p - 2) };
+// C clefs: the treble pattern moved to the clef, each sign kept nearest its
+// treble place; tenor clef writes its first sharp low (F3)
+KEY_POS.C3 = { sharp: [3, 0, 4, 1, -2, 2, -1], flat: [-1, 2, -2, 1, -3, 0, -4] };
+KEY_POS.C4 = { sharp: [-2, 2, -1, 3, 0, 4, 1], flat: [1, 4, 0, 3, -1, 2, -2] };
+for (const k of ['C1', 'C2', 'C5']) {
+  const shift = 34 - clefBase(k);
+  const move = (t) => [t + shift - 14, t + shift - 7, t + shift, t + shift + 7].reduce((a, b) => (Math.abs(b - t) < Math.abs(a - t) ? b : a));
+  KEY_POS[k] = { sharp: KEY_POS.G.sharp.map(move), flat: KEY_POS.G.flat.map(move) };
+}
+const keyPosFor = (clef) => KEY_POS[clef] || KEY_POS[clef === 'F' ? 'F' : 'G'];
 
 // accidental's staff position: sharps/naturals are centred on it, a flat's
 // bowl sits at the bottom of the glyph
@@ -600,46 +625,129 @@ function commonTime(st, g, sp) {
 // from the staff start.  The parse stops at the first glyph that is none of
 // these, so noteheads never count; header.end marks where the music starts
 // (heads detected left of it are header glyphs misread as notes).
+// Clef at the start of a staff from the components near it.
+// Returns {clef, clefOct, clefEnd} (clef null when none is recognised).
+function readClef(R, near, left, lineY, sp, yTop, yBot) {
+  // tall glyphs at the staff start, centred on this staff (not the clef of
+  // the staff above / below reaching into the search band)
+  const tall = near.filter(c => c.x0 < left + 2.5 * sp && c.x0 >= left - 0.5 * sp && (c.y1 - c.y0) > 2.4 * sp && (c.x1 - c.x0) > 0.6 * sp && (c.y1 - c.y0) < 9 * sp &&
+    (c.y0 + c.y1) / 2 > lineY(0) - 1.5 * sp && (c.y0 + c.y1) / 2 < lineY(4) + 1.5 * sp).sort((a, b) => (b.y1 - b.y0) - (a.y1 - a.y0));
+  let first = null;
+  for (const c0 of tall) {
+    const r = clefFrom(R, near, c0, left, lineY, sp, yTop, yBot);
+    if (r.clef) return r;
+    if (!first) first = r;
+  }
+  return first || { clef: null, clefOct: 0, clefEnd: left };
+}
+
+function clefFrom(R, near, c0, left, lineY, sp, yTop, yBot) {
+  let clef = null, clefOct = 0, clefEnd = left;
+  // pieces of the clef cut apart by staff-line removal: overlapping it in x
+  // and touching it vertically (not text or slurs further away)
+  const parts = [c0];
+  let cb = boxOf(parts), grew = true;
+  while (grew) {
+    grew = false;
+    for (const c of near) {
+      if (parts.includes(c) || c.x0 > cb.x1 - 0.1 * sp || c.x1 < cb.x0 + 0.1 * sp || (c.x1 - c.x0) > 3.5 * sp) continue;
+      if (c.y0 < yTop || c.y1 > yBot) continue; // brace, system barline, text lines
+      if (c.y0 > cb.y1 + 0.6 * sp || c.y1 < cb.y0 - 0.6 * sp) continue;
+      parts.push(c); cb = boxOf(parts); grew = true;
+    }
+  }
+  const top = (cb.y0 - lineY(0)) / sp, bot = (cb.y1 - lineY(4)) / sp, hgt = (cb.y1 - cb.y0) / sp;
+  // G: from well above the staff to below it; F: from the top line down
+  // to about the fourth line (its dots follow); C: two full-height bars on
+  // the left, centred on the line it names
+  if (hgt > 5.2 && hgt < 9.5 && top < -0.6 && bot > 0.4) clef = 'G';
+  else if (hgt > 3.3 && hgt < 5.4 && top > -2.6 && top < 0.6 && bot > -2.6 && bot < 2.6 && cClefBars(R, cb, parts, sp)) {
+    const p = Math.round((lineY(2) - (cb.y0 + cb.y1) / 2) / sp); // lines from the middle
+    // an F clef's two dots to its right in the spaces around the fourth line
+    const dots = near.filter(c => c.x0 > cb.x1 - 0.2 * sp && c.x0 < cb.x1 + 0.8 * sp && (c.x1 - c.x0) < 0.7 * sp && (c.y1 - c.y0) < 0.7 * sp &&
+      c.y0 > lineY(0) - 0.3 * sp && c.y1 < lineY(2) + 0.3 * sp).length;
+    if (Math.abs(p) <= 2 && dots < 2) clef = 'C' + (3 + p);
+  }
+  else if (hgt > 2.4 && hgt < 4.6 && top > -0.8 && top < 1.3 && bot > -2.0 && bot < 1.1) clef = 'F';
+  clefEnd = cb.x1;
+  if (clef === 'G') {
+    // small "8" hanging under the clef: octave-transposing (tenor) treble clef
+    const eight = near.find(c => c.y0 > cb.y1 - 0.2 * sp && c.y0 < cb.y1 + 0.8 * sp && c.x0 >= cb.x0 - 0.2 * sp && c.x1 <= cb.x1 + 0.2 * sp &&
+      (c.y1 - c.y0) > 0.5 * sp && (c.y1 - c.y0) < 1.4 * sp && (c.x1 - c.x0) > 0.3 * sp && (c.x1 - c.x0) < 1.0 * sp);
+    if ((eight && c0.y1 < lineY(4) + 2.2 * sp) || cb.y1 > lineY(4) + 2.05 * sp) clefOct = -1;
+  }
+  if (clef === 'F') {
+    // the two dots right of the bass clef
+    for (const c of near) {
+      if (c.x0 > clefEnd - 0.2 * sp && c.x0 < clefEnd + 0.8 * sp && (c.x1 - c.x0) < 0.7 * sp && (c.y1 - c.y0) < 0.7 * sp &&
+          c.y0 > lineY(0) - 0.3 * sp && c.y1 < lineY(2) + 0.3 * sp) clefEnd = Math.max(clefEnd, c.x1);
+    }
+  }
+  return { clef, clefOct, clefEnd };
+}
+
+// C clef: its left part holds vertical bars running nearly its full height
+// (an F clef's curve and a G clef's spine do not reach that far down), and
+// it is symmetric about its centre line (an F clef is heavy at the top)
+function cClefBars(R, cb, parts, sp) {
+  const g = { ...cb, parts };
+  const img = glyphImage(R, g);
+  const w = img.width, h = img.height;
+  const st = strokes(img, { x0: 0, y0: 0, x1: Math.max(0, Math.round(w * 0.4)), y1: h - 1 }, 0.85 * h);
+  if (!st.length || st[0].x0 >= 0.3 * w) return false;
+  let top = 0, bot = 0;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (img.data[y * w + x]) { if (y < h / 2) top++; else bot++; }
+  return bot > 0 && top / bot > 0.75 && top / bot < 1.33;
+}
+
+// The page's components near a staff start with the system's barline (or a
+// bracket / brace touching the clef) cut away: a clef drawn against the
+// barline is one component with it otherwise.
+function detachedNear(R, st, left, lineY, sp, limitX) {
+  const x0 = Math.max(0, Math.round(left - 1.2 * sp)), x1 = Math.min(R.width - 1, Math.round(Math.min(limitX, left + 6 * sp)));
+  const y0 = Math.max(0, Math.round(lineY(0) - 3.5 * sp)), y1 = Math.min(R.height - 1, Math.round(lineY(4) + 3.5 * sp));
+  const w = x1 - x0 + 1, h = y1 - y0 + 1;
+  if (w < 4 || h < 4) return [];
+  const img = { width: w, height: h, data: new Uint8Array(w * h) };
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) img.data[y * w + x] = R.data[(y + y0) * R.width + x + x0];
+  // barline columns: ink through (nearly) the whole staff, near its start
+  // (staff-line removal may have nicked it)
+  const ya = Math.max(0, Math.round(lineY(0) - y0 - 0.3 * sp)), yb = Math.min(h - 1, Math.round(lineY(4) - y0 + 0.3 * sp));
+  const xe = Math.min(w - 1, Math.round(left + 0.6 * sp - x0));
+  let cut = 0;
+  for (let x = 0; x <= xe; x++) {
+    let n = 0;
+    for (let y = ya; y <= yb; y++) if (img.data[y * w + x]) n++;
+    if (n >= 0.85 * (yb - ya + 1)) {
+      for (let y = 0; y < h; y++) img.data[y * w + x] = 0;
+      if (x + 1 < w) for (let y = 0; y < h; y++) img.data[y * w + x + 1] = 0;
+      cut++;
+    }
+  }
+  if (!cut) return [];
+  const { comps } = labelComponents(img);
+  // pieces cut by the crop's own border are partial: flagged
+  return comps.filter(c => c.area >= 4).map(c => ({ ...c, x0: c.x0 + x0, x1: c.x1 + x0, y0: c.y0 + y0, y1: c.y1 + y0, edge: c.x1 === w - 1 || c.y0 === 0 || c.y1 === h - 1 }));
+}
+
+// Header of a staff: clef, key signature, time signature, read left to right
+// from the staff start.  The parse stops at the first glyph that is none of
+// these, so noteheads never count; header.end marks where the music starts
+// (heads detected left of it are header glyphs misread as notes).
 function analyseHeader(R, comps, st, limitX, trace) {
   const sp = st.spaceAt(st.left), left = st.left;
   const lineY = (k) => st.yAt(k, left + 4 * sp);
   const yTop = lineY(0) - 3 * sp, yBot = lineY(4) + 3 * sp;
-  const near = comps.filter(c => c.x1 >= left - 0.5 * sp && c.x0 < limitX && c.y1 > yTop && c.y0 < yBot);
-  let clef = null, clefOct = 0, clefEnd = left;
-  const tall = near.filter(c => c.x0 < left + 2.5 * sp && c.x0 >= left - 0.5 * sp && (c.y1 - c.y0) > 2.4 * sp && (c.x1 - c.x0) > 0.6 * sp && (c.y1 - c.y0) < 9 * sp);
-  if (tall.length) {
-    const c0 = tall.reduce((a, b) => ((b.y1 - b.y0) > (a.y1 - a.y0) ? b : a));
-    // pieces of the clef cut apart by staff-line removal: overlapping it in x
-    // and touching it vertically (not text or slurs further away)
-    const parts = [c0];
-    let cb = boxOf(parts), grew = true;
-    while (grew) {
-      grew = false;
-      for (const c of near) {
-        if (parts.includes(c) || c.x0 > cb.x1 - 0.1 * sp || c.x1 < cb.x0 + 0.1 * sp || (c.x1 - c.x0) > 3.5 * sp) continue;
-        if (c.y0 < yTop || c.y1 > yBot) continue; // brace, system barline, text lines
-        if (c.y0 > cb.y1 + 0.6 * sp || c.y1 < cb.y0 - 0.6 * sp) continue;
-        parts.push(c); cb = boxOf(parts); grew = true;
-      }
-    }
-    const top = (cb.y0 - lineY(0)) / sp, bot = (cb.y1 - lineY(4)) / sp, hgt = (cb.y1 - cb.y0) / sp;
-    // G: from well above the staff to below it; F: from the top line down
-    // to about the fourth line (its dots follow)
-    if (hgt > 5.2 && hgt < 9.5 && top < -0.6 && bot > 0.4) clef = 'G';
-    else if (hgt > 2.4 && hgt < 4.6 && top > -0.8 && top < 1.3 && bot > -2.0 && bot < 1.1) clef = 'F';
-    clefEnd = cb.x1;
-    if (clef === 'G') {
-      // small "8" hanging under the clef: octave-transposing (tenor) treble clef
-      const eight = near.find(c => c.y0 > cb.y1 - 0.2 * sp && c.y0 < cb.y1 + 0.8 * sp && c.x0 >= cb.x0 - 0.2 * sp && c.x1 <= cb.x1 + 0.2 * sp &&
-        (c.y1 - c.y0) > 0.5 * sp && (c.y1 - c.y0) < 1.4 * sp && (c.x1 - c.x0) > 0.3 * sp && (c.x1 - c.x0) < 1.0 * sp);
-      if ((eight && c0.y1 < lineY(4) + 2.2 * sp) || cb.y1 > lineY(4) + 2.05 * sp) clefOct = -1;
-    }
-    if (clef === 'F') {
-      // the two dots right of the bass clef
-      for (const c of near) {
-        if (c.x0 > clefEnd - 0.2 * sp && c.x0 < clefEnd + 0.8 * sp && (c.x1 - c.x0) < 0.7 * sp && (c.y1 - c.y0) < 0.7 * sp &&
-            c.y0 > lineY(0) - 0.3 * sp && c.y1 < lineY(2) + 0.3 * sp) clefEnd = Math.max(clefEnd, c.x1);
-      }
+  let near = comps.filter(c => c.x1 >= left - 0.5 * sp && c.x0 < limitX && c.y1 > yTop && c.y0 < yBot);
+  let { clef, clefOct, clefEnd } = readClef(R, near, left, lineY, sp, yTop, yBot);
+  if (!clef) {
+    // a clef touching the system barline / brace: read it with those cut away
+    // (pieces of that one component only: whole components are in near)
+    const same = (a, b) => a.x0 === b.x0 && a.y0 === b.y0 && a.x1 === b.x1 && a.y1 === b.y1;
+    const det = detachedNear(R, st, left, lineY, sp, limitX).filter(c => !c.edge && !near.some(o => same(o, c)));
+    if (det.length) {
+      const r = readClef(R, near.concat(det), left, lineY, sp, yTop, yBot);
+      if (r.clef) { ({ clef, clefOct, clefEnd } = r); near = near.concat(det); }
     }
   }
   // glyphs after the clef, ignoring text well above / below the staff
@@ -647,7 +755,7 @@ function analyseHeader(R, comps, st, limitX, trace) {
     (c.y0 + c.y1) / 2 > lineY(0) - 1.6 * sp && (c.y0 + c.y1) / 2 < lineY(4) + 1.6 * sp).sort((a, b) => a.x0 - b.x0);
   const glyphs = groupGlyphs(cand, sp);
   // expected accidental positions; both clefs stay possible when unread
-  let kcs = clef ? [KEY_POS[clef === 'F' ? 'F' : 'G']] : [KEY_POS.G, KEY_POS.F];
+  let kcs = clef ? [keyPosFor(clef)] : [KEY_POS.G, KEY_POS.F];
   let kind = null, n = 0, end = clefEnd, time = null;
   for (let gi = 0; gi < glyphs.length; gi++) {
     let g = glyphs[gi];
@@ -747,6 +855,227 @@ function headDuration(R, hd, chord) {
   return { q: dot ? q * 1.5 : q, dots: dot ? 1 : 0 };
 }
 
+// ---------------------------------------------------------------- tuplets ---
+// A tuplet is read from its number: a small isolated digit printed beyond the
+// beam of a beamed group, or in the gap of a bracket.  The notes it covers
+// (its bracket's span, else the part of the beam nearest to it) give the
+// ratio from their notated length in units of the shortest note:
+// 3 -> 3:2, 5 -> 5:4, 6 -> 6:4, 7 -> 7:4.
+const TUPLET = { 3: 2, 5: 4, 6: 4, 7: 4 };
+
+function digitLike(c, sp) {
+  const w = (c.x1 - c.x0 + 1) / sp, h = (c.y1 - c.y0 + 1) / sp;
+  if (h < 0.7 || h > 2.0 || w < 0.35 || w > 1.5 || h / w < 0.9) return false;
+  const fill = c.area / ((c.x1 - c.x0 + 1) * (c.y1 - c.y0 + 1));
+  return fill > 0.2 && fill < 0.92;
+}
+
+// thin horizontal piece: half of a tuplet bracket (with its end hook)
+function bracketLike(c, sp) {
+  const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1;
+  return w >= 0.7 * sp && w <= 10 * sp && h <= 1.3 * sp && h < 0.8 * w && c.area <= 0.55 * w * h;
+}
+
+// no glyph close beside it at its height: a lyric syllable or a word is a
+// row of letters, a tuplet number stands alone (bracket halves aside)
+function isolated(n, comps, sp) {
+  const h = n.y1 - n.y0 + 1;
+  return !comps.some(c => c !== n && c.area >= 0.04 * sp * sp && (c.x1 - c.x0) < 3 * sp && !bracketLike(c, sp) &&
+    c.y1 > n.y0 + 0.25 * h && c.y0 < n.y1 - 0.25 * h && c.x1 >= n.x0 - 0.45 * sp && c.x0 <= n.x1 + 0.45 * sp);
+}
+
+// the stem a head's duration was read from: 1 up, -1 down
+const durDir = (h) => (h.stemDir === -1 ? -1 : 1);
+
+// Stems hanging from a beam between xa and xb: columns whose ink runs on from
+// the beam well past the beams' own depth (dir 1: beam above the heads).
+function stemsUnder(R, beamY, dir, xa, xb, sp) {
+  const { width: w, height: h, data } = R;
+  const gapMax = Math.max(2, Math.round(0.3 * sp));
+  const reach = [];
+  for (let x = Math.max(0, Math.round(xa)); x <= Math.min(w - 1, Math.round(xb)); x++) {
+    const y0 = Math.round(beamY(x) - dir * 0.15 * sp);
+    let r = 0, gap = 0;
+    for (let k = 0; k < 6 * sp; k++) {
+      const yy = y0 + dir * k;
+      if (yy < 0 || yy >= h) break;
+      if (data[yy * w + x]) { r = k; gap = 0; } else if (++gap > gapMax) break;
+    }
+    reach.push([x, r]);
+  }
+  if (!reach.length) return 0;
+  const need = Math.max(2.2 * sp, median(reach.map(v => v[1])) + 1.0 * sp);
+  let n = 0, last = -1e9;
+  for (const [x, r] of reach) if (r >= need) { if (x - last > 0.4 * sp) n++; last = x; }
+  return n;
+}
+
+// Beamed groups of a staff: stems whose tips touch one component (the beam).
+// A stem inside a group's span that ends at its beam but read no beam (cut
+// stem, faint beam) is a beamed note too: its value is read again at the beam.
+function beamGroups(R, labels, s, sp) {
+  const W = R.width;
+  const items = [];
+  for (const c of s.chords) {
+    for (const dir of [1, -1]) {
+      const heads = c.heads.filter(h => h.dur && durDir(h) === dir && h.stemDir !== 0);
+      if (!heads.length) continue;
+      const x = dir === 1 ? c.upX : c.downX, tip = dir === 1 ? c.upEnd : c.downEnd;
+      if (!(x >= 0) || tip == null || !(dir === 1 ? c.up : c.down)) continue;
+      // the component at the stem tip (beam, flag or the stem itself)
+      let lab = 0;
+      for (let r = 0; r <= 3 && !lab; r++) for (let dy = -r; dy <= r && !lab; dy++) for (let dx = -r; dx <= r && !lab; dx++) {
+        const xx = Math.round(x + dx), yy = Math.round(tip + dy);
+        if (xx >= 0 && yy >= 0 && xx < W && yy < R.height && R.data[yy * W + xx]) lab = labels[yy * W + xx];
+      }
+      items.push({ dir, x, tipY: tip, q: heads[0].dur.q, heads, lab });
+    }
+  }
+  const byLab = new Map();
+  for (const it of items) if (it.lab && it.q <= 0.5 + 1e-6) {
+    const k = it.lab + ':' + it.dir;
+    if (!byLab.has(k)) byLab.set(k, []);
+    byLab.get(k).push(it);
+  }
+  const groups = [];
+  const inGroup = new Set();
+  for (const g of byLab.values()) {
+    if (g.length < 2) continue;
+    g.sort((a, b) => a.x - b.x);
+    g.forEach(it => inGroup.add(it));
+    groups.push(g);
+  }
+  for (const g of groups) {
+    // the beam's edge through the stem tips (extended along the end slopes)
+    g.beamY = (x) => {
+      for (let i = 1; i < g.length; i++) if (x <= g[i].x || i === g.length - 1) {
+        const t = (x - g[i - 1].x) / Math.max(1, g[i].x - g[i - 1].x);
+        return g[i - 1].tipY + t * (g[i].tipY - g[i - 1].tipY);
+      }
+      return g[0].tipY;
+    };
+    const dir = g[0].dir, gx0 = g[0].x, gx1 = g[g.length - 1].x;
+    for (const it of items) {
+      if (inGroup.has(it) || it.dir !== dir || it.x <= gx0 + 0.3 * sp || it.x >= gx1 - 0.3 * sp || it.q < 1 - 1e-6) continue;
+      if (it.heads.some(h => h.kind === 'hollow')) continue;
+      const by = g.beamY(it.x);
+      // the stem stops short of the beam or runs into it
+      if (Math.abs(it.tipY - by) > 2.5 * sp) continue;
+      const nb = countBeams(R, it.x, by, dir, sp);
+      if (!nb) continue;
+      const q = 1 / Math.pow(2, nb);
+      for (const h of it.heads) h.dur = { q: h.dur.dots ? q * 1.5 : q, dots: h.dur.dots };
+      it.q = it.heads[0].dur.q; it.tipY = by;
+      inGroup.add(it); g.push(it);
+    }
+    g.sort((a, b) => a.x - b.x);
+    // where the beam itself ends (a missed note at either end still has its
+    // stem under it)
+    const ink = (x) => {
+      const by = g.beamY(x);
+      for (let k = -0.2 * sp; k <= 0.6 * sp; k++) {
+        const yy = Math.round(by + dir * k);
+        if (x >= 0 && x < W && yy >= 0 && yy < R.height && R.data[yy * W + x]) return true;
+      }
+      return false;
+    };
+    const walk = (x, step) => {
+      let gap = 0, last = x;
+      for (let xx = Math.round(x); Math.abs(xx - x) < 12 * sp; xx += step) {
+        if (ink(xx)) { last = xx; gap = 0; } else if (++gap > 0.3 * sp) break;
+      }
+      return last;
+    };
+    g.x0 = walk(g[0].x, -1); g.x1 = walk(g[g.length - 1].x, 1);
+  }
+  return { items, groups };
+}
+
+// Mark tuplets on one staff: rescales the covered heads' dur and drops
+// stemless 'heads' found on a tuplet number.
+function markTuplets(R, comps, s, sp, items, groups) {
+  const st = s.st;
+  if (items.length < 2) return;
+  const allHeads = s.chords.flatMap(c => c.heads);
+  const xm = (st.left + st.right) / 2, y0 = st.yAt(0, xm), y4 = st.yAt(4, xm);
+  // candidate numbers near this staff, not on a real notehead (a stemless
+  // 'hollow head' found on a number is the number)
+  const nums = comps.filter(c => c.x0 > s.hdr.end && c.y1 > y0 - 7 * sp && c.y0 < y4 + 7 * sp && digitLike(c, sp) &&
+    !allHeads.some(h => h.stemDir !== 0 && Math.abs(h.x - (c.x0 + c.x1) / 2) < 0.6 * sp && Math.abs(h.y - (c.y0 + c.y1) / 2) < 0.6 * sp) &&
+    isolated(c, comps, sp));
+  if (!nums.length) return;
+  for (const n of nums) {
+    const cy = (n.y0 + n.y1) / 2;
+    const side = comps.filter(c => c !== n && bracketLike(c, sp) && c.y0 < cy + 0.3 * sp && c.y1 > cy - 0.9 * sp && c.y1 < n.y1 + 0.9 * sp && c.y0 > n.y0 - 0.9 * sp);
+    const L = side.find(c => c.x1 <= n.x0 + 0.3 * sp && c.x1 >= n.x0 - 1.2 * sp);
+    const Rt = side.find(c => c.x0 >= n.x1 - 0.3 * sp && c.x0 <= n.x1 + 1.2 * sp);
+    n.br = L && Rt ? { x0: L.x0, x1: Rt.x1 } : null;
+  }
+  const used = new Set(), claimed = new Set();
+  // its: the notes found under the number; total: notes counted there
+  // (stems under the beam: a missed notehead still has its stem)
+  const tryTuplet = (its, n, total) => {
+    its = its.filter(it => !claimed.has(it));
+    if (!its.length) return;
+    const minq = Math.min(...its.map(it => it.q));
+    const u = its.reduce((a, it) => a + it.q, 0) / minq;
+    if (Math.abs(u - Math.round(u)) > 0.01) return;
+    const U = Math.round(u) + Math.max(0, (total || 0) - its.length);
+    if (U < 2 || (U === 2 && its.length < 2)) return;
+    const equal = its.every(it => Math.abs(it.q - minq) < 1e-6);
+    const actual = U === 3 ? 3 : equal && TUPLET[U] ? U : 0;
+    if (!actual) return;
+    const normal = TUPLET[actual];
+    for (const it of its) {
+      claimed.add(it);
+      for (const h of it.heads) if (!h.dur.tuplet) h.dur = { q: h.dur.q * normal / actual, dots: h.dur.dots, tuplet: { actual, normal } };
+    }
+    used.add(n);
+  };
+  for (const g of groups) {
+    const dir = g[0].dir, gx0 = g[0].x, gx1 = g[g.length - 1].x;
+    const mine = nums.filter(n => {
+      if (used.has(n)) return false;
+      const cx = (n.x0 + n.x1) / 2;
+      if (cx < g.x0 - 0.6 * sp || cx > g.x1 + 0.6 * sp) return false;
+      const by = g.beamY(cx), reach = (n.br ? 3.6 : 2.8) * sp;
+      return dir === 1 ? n.y1 <= by + 0.3 * sp && n.y0 >= by - reach : n.y0 >= by - 0.3 * sp && n.y1 <= by + reach;
+    }).sort((a, b) => a.x0 - b.x0);
+    if (!mine.length) continue;
+    // notes under a bracket go to its number, the rest to the nearest number
+    const parts = mine.map(n => ({ n, its: [] }));
+    const free = parts.filter(p => !p.n.br);
+    for (const it of g) {
+      let p = parts.find(p => p.n.br && it.x >= p.n.br.x0 - 0.5 * sp && it.x <= p.n.br.x1 + 0.5 * sp);
+      if (!p && free.length) p = free.reduce((a, b) => (Math.abs((b.n.x0 + b.n.x1) / 2 - it.x) < Math.abs((a.n.x0 + a.n.x1) / 2 - it.x) ? b : a));
+      if (p) p.its.push(it);
+    }
+    for (const p of parts) {
+      if (!p.its.length) continue;
+      // the span to count stems in: the bracket, the whole beam for a lone
+      // number, else the notes assigned
+      const xa = p.n.br ? Math.max(g.x0, p.n.br.x0) : parts.length === 1 ? g.x0 : Math.min(...p.its.map(it => it.x));
+      const xb = p.n.br ? Math.min(g.x1, p.n.br.x1) : parts.length === 1 ? g.x1 : Math.max(...p.its.map(it => it.x));
+      // an unbracketed number is centred on its notes (a lyric letter under
+      // a beam is not)
+      if (!p.n.br && Math.abs((p.n.x0 + p.n.x1) / 2 - (xa + xb) / 2) > 0.25 * (xb - xa) + 0.4 * sp) continue;
+      tryTuplet(p.its, p.n, stemsUnder(R, g.beamY, dir, xa - 0.3 * sp, xb + 0.3 * sp, sp));
+    }
+  }
+  // bracketed numbers over unbeamed notes
+  for (const n of nums) {
+    if (used.has(n) || !n.br) continue;
+    const cy = (n.y0 + n.y1) / 2;
+    const its = items.filter(it => it.x >= n.br.x0 - 0.5 * sp && it.x <= n.br.x1 + 0.5 * sp && Math.min(...it.heads.map(h => Math.abs(h.y - cy))) < 8 * sp);
+    if (its.length >= 2 && new Set(its.map(it => it.dir)).size === 1) tryTuplet(its, n, 0);
+  }
+  // numbers read as stemless noteheads are not notes
+  if (used.size) {
+    const onNum = (h) => h.stemDir === 0 && [...used].some(n => h.x >= n.x0 - 0.2 * sp && h.x <= n.x1 + 0.2 * sp && h.y >= n.y0 - 0.2 * sp && h.y <= n.y1 + 0.2 * sp);
+    s.chords = s.chords.map(c => (c.heads.some(onNum) ? { ...c, heads: c.heads.filter(h => !onNum(h)) } : c)).filter(c => c.heads.length);
+  }
+}
+
 // ---------------------------------------------------------------- systems ---
 function systemBarlines(fr, sys) {
   const xs = fr.barlines.filter(b => sys.includes(b.staff)).map(b => b.x).sort((a, b) => a - b);
@@ -759,9 +1088,7 @@ function systemBarlines(fr, sys) {
 }
 
 function pitchOf(clef, p, keyAlter, measAcc) {
-  // diatonic index of the middle line: D3 (bass), B3 (treble 8vb), B4 (treble)
-  const base = clef === 'F' ? 22 : clef === 'G8' ? 27 : 34;
-  const d = base + p;
+  const d = clefBase(clef) + p;
   const step = 'CDEFGAB'[((d % 7) + 7) % 7];
   const octave = Math.floor(d / 7);
   const k = step + octave;
@@ -803,7 +1130,8 @@ function median(a) { const s = a.slice().sort((x, y) => x - y); return s.length 
 
 function assemblePage(fr, pageIndex = 0) {
   const R = fr.R;
-  const comps = compIndex(R);
+  const { labels, comps: allComps } = labelComponents(R);
+  const comps = allComps.filter(c => c.area >= 4);
   const warnings = [];
   const systems = [];
   for (const sys of fr.systems) {
@@ -815,7 +1143,15 @@ function assemblePage(fr, pageIndex = 0) {
       const hdr = analyseHeader(R, comps, st, st.left + 18 * st.space);
       // heads found on clef / key / time-signature glyphs are not notes
       const music = chords.filter(c => c.x > hdr.end);
-      return { st, si, chords: music, hdr };
+      const s = { st, si, chords: music, hdr };
+      // durations read once here: tuplets rescale whole groups
+      for (const c of music) for (const h of c.heads) if (!h.dur) h.dur = headDuration(R, h, c);
+      try {
+        const sp = st.space || fr.ss;
+        const { items, groups } = beamGroups(R, labels, s, sp);
+        markTuplets(R, comps, s, sp, items, groups);
+      } catch (e) { warnings.push(`Beam / tuplet reading failed on a staff (${e.message}).`); }
+      return s;
     });
     // bass over treble in a two-staff system is a misreading: guess both
     if (staves.length === 2 && staves[0].hdr.clef === 'F' && /^G/.test(staves[1].hdr.clef || '')) {
@@ -868,7 +1204,7 @@ function staffMeasureEvents(fr, R, comps, s, xa, xb) {
   return v;
 }
 
-module.exports = { assemblePage, staffMeasureEvents, pitchOf, keyAlters, DIV, median, headDuration, _analyseHeader: analyseHeader, _compIndex: compIndex, _strokes: strokes, _classifyAccidental: classifyAccidental, _crossBands: crossBands, _glyphImage: glyphImage, _splitSharps: splitSharps };
+module.exports = { assemblePage, staffMeasureEvents, pitchOf, keyAlters, DIV, median, headDuration, _analyseHeader: analyseHeader, _compIndex: compIndex, _strokes: strokes, _classifyAccidental: classifyAccidental, _crossBands: crossBands, _glyphImage: glyphImage, _splitSharps: splitSharps, _detachedNear: detachedNear, _readClef: readClef };
 
 };
 defs["barlines"]=function(require,module,exports){
@@ -1845,6 +2181,7 @@ defs["lyrics"]=function(require,module,exports){
 // Verses are numbered top-down per staff; a stack under the bottom staff that
 // starts with a printed "2." is stanza text set after the music and dropped.
 const { makeGray } = require('./image');
+const { labelComponents } = require('./cc');
 
 const DEFAULTS = {
   widen: true,        // stretch word gaps before OCR (stops "workswith" merges)
@@ -1862,6 +2199,15 @@ const DEFAULTS = {
   goodAbs: 6,         // ... or at least this many of them
   lastStaffSp: 14,    // how far below the last staff of a system verse rows may reach ...
   maxRowGapSp: 1.5,   // ... provided each row follows the previous one within this gap
+  ccLines: true,      // find lines by components + baselines and OCR masked strips (spike strips.js)
+  attachedLetters: true, // keep text-zone pixels of letters that touch stems / notes
+  ccLastStaffSp: 24,  // component lines: depth searched under a system's last staff (stacked verses stay contiguous)
+  maxGapFont: 0,      // close up word gaps wider than this share of the font size (0 = off; hurt here)
+  wordGapFont: 0,     // ... separate cap for gaps not next to a hyphen (0 = same)
+  titleCheck: true,   // reject captions: title-case or bracketed lines, oversized type
+  targetCap: 28,      // OCR scale: cap height in px (component lines)
+  splitByNotes: true, // split tokens that span several note onsets (unprinted hyphens, merged words)
+  lang: null,         // underlay language for syllable rules ('en' | 'de' | 'la'); null = detect
 };
 
 // Returns [{band, sys, y0, y1, x0, x1}] text-line boxes in deskewed page coords.
@@ -1925,6 +2271,162 @@ function findTextLines(fr, sysIdx, nextTop, opts) {
   return out;
 }
 
+// ---- component-based lyric lines (port of spike/ocr/src/strips.js) -------
+// In each band under a staff, connected components that do not touch the band
+// edges (those hang off the staff: notes, stems, beams) and are letter sized
+// vote for baselines; each baseline with enough letters is a text line whose
+// members are the components between ascender and descender height. The OCR
+// strip keeps member pixels only (stems and noteheads poking into the text are
+// masked out). Flat members are hyphens (mid height) or extenders (baseline).
+const median = (a) => { if (!a.length) return 0; const s = [...a].sort((x, y) => x - y); return s[s.length >> 1]; };
+
+function findTextLinesCC(fr, sysIdx, nextTop, o) {
+  const { B, gray, staves } = fr;
+  const sys = fr.systems[sysIdx];
+  const W = B.width, H = B.height;
+  const out = [];
+  sys.forEach((si, k) => {
+    const st = staves[si], sp = st.space;
+    const xs = [st.left, (st.left + st.right) / 2, st.right];
+    const last = k === sys.length - 1;
+    const y0 = Math.round(Math.max(...xs.map(x => st.yAt(4, x))) + 0.4 * sp);
+    const y1 = Math.round(last ? Math.min(nextTop - 1.0 * sp, y0 + o.ccLastStaffSp * sp, H - 1)
+      : Math.min(...xs.map(x => staves[sys[k + 1]].yAt(0, x))) - 0.4 * sp);
+    if (y1 - y0 < 1.5 * sp) return;
+    const x0 = Math.max(0, Math.round(st.left - 2 * sp)), x1 = Math.min(W - 1, Math.round(st.right + 1 * sp));
+    const bw = x1 - x0 + 1, bh = y1 - y0 + 1;
+    const band = { width: bw, height: bh, data: new Uint8Array(bw * bh) };
+    for (let y = 0; y < bh; y++) band.data.set(B.data.subarray((y0 + y) * W + x0, (y0 + y) * W + x0 + bw), y * bw);
+    const { labels, comps } = labelComponents(band);
+    const cand = comps.filter(c => c.y0 > 0 && c.y1 < bh - 1 && c.area >= 3 && c.y1 - c.y0 + 1 <= 4 * sp && c.x1 - c.x0 + 1 <= 30 * sp);
+    const candSet = new Set(cand);
+    const letters = cand.filter(c => { const h = c.y1 - c.y0 + 1, w = c.x1 - c.x0 + 1; return h >= 0.45 * sp && h <= 3.2 * sp && w <= 4 * sp && w >= 0.12 * sp; });
+    if (letters.length < 4) return;
+    const hist = new Float64Array(bh + 1);
+    for (const c of letters) hist[c.y1]++;
+    const R = Math.max(1, Math.round(0.15 * sp)), sm = new Float64Array(bh + 1);
+    for (let y = 0; y <= bh; y++) { let s = 0; for (let d = -R; d <= R; d++) { const yy = y + d; if (yy >= 0 && yy <= bh) s += hist[yy]; } sm[y] = s; }
+    const peaks = [];
+    for (const y of [...sm.keys()].sort((a, b) => sm[b] - sm[a])) {
+      if (sm[y] < 4) break;
+      if (peaks.some(p => Math.abs(p - y) < 1.4 * sp)) continue;
+      peaks.push(y);
+    }
+    peaks.sort((a, b) => a - b);
+    const lines = [];
+    for (const bl of peaks) {
+      const core = letters.filter(c => Math.abs(c.y1 - bl) <= 0.25 * sp + 1);
+      if (core.length < 4) continue;
+      const hs = core.map(c => c.y1 - c.y0 + 1).sort((a, b) => a - b);
+      const xh = median(hs.slice(0, Math.max(1, hs.length >> 1))), tall = median(hs.slice(hs.length >> 1));
+      if (tall < 0.6 * sp || median(core.map(c => c.area)) < 0.15 * sp * sp) continue;   // rows of specks
+      lines.push({ bl, xh, tall, core, mem: [] });
+    }
+    if (!lines.length) return;
+    // members: each candidate goes to the line whose window holds it and whose baseline is nearest its bottom
+    for (const c of cand) {
+      let best = null, bd = Infinity;
+      for (const ln of lines) {
+        if (c.y0 < ln.bl - 1.9 * ln.tall || c.y1 > ln.bl + 0.6 * ln.tall || c.y1 - c.y0 + 1 > 2.2 * ln.tall) continue;
+        const d = Math.abs(c.y1 - ln.bl);
+        if (d < bd) { bd = d; best = ln; }
+      }
+      if (best) best.mem.push(c);
+    }
+    const stW = st.right - st.left;
+    let prevBl = null;
+    for (const ln of lines) {
+      const mem = ln.mem;
+      if (!mem.length) continue;
+      const lx0 = Math.min(...mem.map(c => c.x0)), lx1 = Math.max(...mem.map(c => c.x1));
+      if (lx1 - lx0 < 0.2 * stW && ln.core.length < 8) continue;
+      // under the last staff: the first line starts within 7 sp, later ones follow on
+      if (last && (prevBl == null ? ln.bl > 7 * sp + ln.tall : ln.bl - prevBl > 3.2 * sp)) break;
+      prevBl = ln.bl;
+      const hyphens = [], extenders = [];
+      for (const c of mem) {
+        const ch = c.y1 - c.y0 + 1, cw = c.x1 - c.x0 + 1, cy = (c.y0 + c.y1 + 1) / 2;
+        if (ch <= Math.max(2, 0.4 * ln.xh) && cw >= 1.6 * ch) {
+          if (cy < ln.bl - 0.15 * ln.xh && cy > ln.bl - 0.95 * ln.xh && cw <= 3.5 * ln.xh) { hyphens.push({ x0: x0 + c.x0, x1: x0 + c.x1 + 1 }); c.hy = true; }
+          else if (Math.abs(cy - ln.bl) <= 0.3 * ln.xh + 1 && cw >= 1.2 * ln.xh) { extenders.push({ x0: x0 + c.x0, x1: x0 + c.x1 + 1 }); c.ext = true; }
+        }
+      }
+      // masked strip: member pixels (dilated by 1 px for the soft glyph edges) from the gray page
+      const pad = Math.max(2, Math.round(0.4 * ln.xh));
+      const sx0 = Math.max(0, lx0 - pad), sx1 = Math.min(bw - 1, lx1 + pad);
+      const sy0 = Math.max(0, Math.min(Math.round(ln.bl - 1.6 * ln.tall), ...mem.map(c => c.y0)) - 2);
+      const sy1 = Math.min(bh - 1, Math.max(Math.round(ln.bl + 0.5 * ln.tall), ...mem.map(c => c.y1)) + 2);
+      const SW = sx1 - sx0 + 1, SH = sy1 - sy0 + 1;
+      const keep = new Set(mem.filter(c => !c.ext).map(c => c.id));
+      // letters touching a stem or note hang off the staff as one component:
+      // keep such components' pixels inside the text zone, minus thin
+      // vertical strokes crossing the whole zone (stems, barlines)
+      const zt = Math.round(ln.bl - 1.15 * ln.tall), zb = Math.round(ln.bl + 0.5 * ln.tall), zh = zb - zt + 1;
+      const part = new Map();   // label -> Set of erased columns (band x)
+      if (o.attachedLetters) for (const c of comps) {
+        if (candSet.has(c) || c.y1 < zt || c.y0 > zb || c.x1 < lx0 || c.x0 > lx1) continue;
+        const ya = Math.max(zt, c.y0), yb = Math.min(zb, c.y1);
+        const colFull = [];
+        for (let x = c.x0; x <= c.x1; x++) {
+          let run = 0, best = 0;
+          for (let y = ya; y <= yb; y++) { if (labels[y * bw + x] === c.id) { run++; if (run > best) best = run; } else run = 0; }
+          colFull.push(best >= 0.9 * zh);
+        }
+        const erase = new Set();
+        for (let i = 0; i < colFull.length;) {
+          if (!colFull[i]) { i++; continue; }
+          let j = i; while (j < colFull.length && colFull[j]) j++;
+          if (j - i <= Math.max(3, 0.35 * sp)) for (let q = i - 1; q <= j; q++) erase.add(c.x0 + q);
+          i = j;
+        }
+        part.set(c.id, erase);
+      }
+      const mask = new Uint8Array(SW * SH);
+      for (let y = 0; y < SH; y++) for (let x = 0; x < SW; x++) {
+        const lab = labels[(sy0 + y) * bw + sx0 + x];
+        if (!lab) continue;
+        if (keep.has(lab)) mask[y * SW + x] = 1;
+        else if (part.has(lab) && sy0 + y >= zt && sy0 + y <= zb && !part.get(lab).has(sx0 + x)) mask[y * SW + x] = 1;
+      }
+      const data = new Uint8ClampedArray(SW * SH).fill(255);
+      for (let y = 0; y < SH; y++) for (let x = 0; x < SW; x++) {
+        let m = mask[y * SW + x];
+        if (!m) {
+          const lab = labels[(sy0 + y) * bw + sx0 + x];
+          if (lab) continue;   // ink of another component
+          for (let dy = -1; dy <= 1 && !m; dy++) for (let dx = -1; dx <= 1 && !m; dx++) {
+            const yy = y + dy, xx = x + dx;
+            if (yy >= 0 && yy < SH && xx >= 0 && xx < SW && mask[yy * SW + xx]) m = 1;
+          }
+        }
+        if (m) data[y * SW + x] = gray.data[(y0 + sy0 + y) * W + x0 + sx0 + x];
+      }
+      out.push({
+        band: k, sys: sysIdx, last, sp, x0: st.left, x1: st.right, y0: y0 + sy0, y1: y0 + sy1,
+        baseline: y0 + ln.bl, xh: ln.xh, tall: ln.tall, hyphens, extenders,
+        strip: { width: SW, height: SH, data, x0: x0 + sx0, y0: y0 + sy0, mask },
+      });
+    }
+  });
+  return out;
+}
+
+// row analysis on a masked strip (same shape as analyseRow's result)
+function stripRow(ln) {
+  const { width: n, height: Hh, mask } = ln.strip;
+  const ink = new Int32Array(n), rule = new Uint8Array(n);
+  for (let x = 0; x < n; x++) { let c = 0; for (let y = 0; y < Hh; y++) c += mask[y * n + x]; ink[x] = c; }
+  const clusters = [];
+  for (let i = 0; i < n;) {
+    if (!ink[i]) { i++; continue; }
+    let j = i; while (j < n && ink[j]) j++;
+    clusters.push([i, j]); i = j;
+  }
+  const hy = clusters.map(([a, b]) => ln.hyphens.some(h => h.x0 - ln.strip.x0 >= a - 1 && h.x1 - ln.strip.x0 <= b + 1 && b - a <= h.x1 - h.x0 + 2));
+  let cov = 0; for (const [a, b] of clusters) cov += b - a;
+  return { xa: 0, ya: 0, yb: Hh - 1, n, ink, rule, clusters, hy, cov: cov / Math.max(1, n) };
+}
+
 // Column analysis of a text row on the binary page: vertical rules that cross
 // the whole (padded) row, blank runs between glyph clusters, and simple shape
 // statistics used to reject rows that are stems / ties / fermatas, not text.
@@ -1979,25 +2481,31 @@ function analyseRow(B, ln, pad) {
 function buildCrop(g, row, ln, o) {
   const gapMin = Math.max(3, o.gapSp * ln.sp);
   const add = o.widen ? Math.round(o.addSp * ln.sp) : 0;
+  // word gaps wider than ~half the font size are closed up (syllables spread
+  // under the notes break tesseract's word segmentation and LSTM context)
+  const cap = o.maxGapFont && ln.tall ? Math.max(gapMin + add, Math.round(o.maxGapFont * ln.tall / 0.7)) : Infinity;
   // segments of source columns, with inserted blank columns before each
   const segs = []; // {sx, len, before}
   const { clusters, n } = row;
-  if (!o.widen || !clusters.length) segs.push({ sx: 0, len: n, before: 0 });
+  if ((!o.widen && cap === Infinity) || !clusters.length) segs.push({ sx: 0, len: n, before: 0 });
   else {
-    let start = 0;
+    let start = 0, ins = 0;
     for (let c = 1; c < clusters.length; c++) {
-      const gap = clusters[c][0] - clusters[c - 1][1];
+      const a = clusters[c - 1][1], b = clusters[c][0], gap = b - a;
       if (gap >= gapMin || (o.hyGaps && (row.hy[c] || row.hy[c - 1]))) {
-        const cut = clusters[c - 1][1] + Math.floor(gap / 2);
-        segs.push({ sx: start, len: cut - start, before: segs.length ? add : 0 });
-        start = cut;
+        const hyAdj = row.hy[c] || row.hy[c - 1];
+        const cp = hyAdj ? cap : (o.wordGapFont && ln.tall ? Math.max(cap, Math.round(o.wordGapFont * ln.tall / 0.7)) : cap);
+        const keep = Math.min(gap, cp), l = Math.ceil(keep / 2);
+        segs.push({ sx: start, len: a + l - start, before: ins });
+        start = b - (keep - l);
+        ins = Math.max(0, Math.min(add, cp - keep));
       }
     }
-    segs.push({ sx: start, len: n - start, before: segs.length ? add : 0 });
+    segs.push({ sx: start, len: n - start, before: ins });
   }
   const srcW = segs.reduce((a, s) => a + s.len + s.before, 0);
   const srcH = row.yb - row.ya + 1;
-  const scale = Math.min(3, Math.max(0.5, o.targetH / srcH));
+  const scale = Math.min(3, Math.max(0.5, ln.tall && o.targetCap ? o.targetCap / ln.tall : o.targetH / srcH));
   // source column for each virtual column (-1 = inserted blank)
   const vcol = new Int32Array(srcW);
   let v = 0;
@@ -2109,7 +2617,7 @@ function toSyllables(words) {
       for (const p of parts) {
         if (HY.test(p[0])) { toks.push({ hy: true }); continue; }
         const ww = sw * p.length / letters;
-        toks.push({ text: p, x: cx + ww / 2, conf: wd.conf });
+        toks.push({ text: p, x: cx + ww / 2, x0: cx, x1: cx + ww, conf: wd.conf });
         cx += ww;
       }
       wx += sw;
@@ -2121,7 +2629,7 @@ function toSyllables(words) {
   let number = null;
   for (let i = 0; i < Math.min(3, toks.length); i++) {
     if (toks[i].hy) continue;
-    const m = toks[i].text.match(/^([0-9]{1,2})[.,:]\s*(.*)$/) || toks[i].text.match(/^([0-9]{1,2})$/);
+    const m = toks[i].text.match(/^([1-9][0-9]?)[.,:]\s*(.*)$/) || toks[i].text.match(/^([1-9][0-9]?)$/);
     const roman = /^[IVX]{1,3}[.,]$/.test(toks[i].text);
     if (!m && !roman) continue;
     if (i > 0 && !(m && /[.,:]/.test(toks[i].text)) && !roman) continue; // bare digit later in the row: not a verse number
@@ -2131,6 +2639,10 @@ function toSyllables(words) {
     if (rest) toks.unshift(rest);
     break;
   }
+  // a language tag after the stanza number ("1. EN Fairest", multilingual hymnals)
+  if (number != null && toks[0] && !toks[0].hy && /^(EN|DE|DA|SV|NO|NL|FR|IT|LA|ES|FI|IS|CY|PL|CS|HU|PT)$/.test(toks[0].text)) toks.shift();
+  // a lone "1" / "0" inside a line is the word I / O (verse numbers are handled above)
+  for (const t of toks) if (!t.hy && /^[10][,.;:!?]?$/.test(t.text)) t.text = (t.text[0] === '1' ? 'I' : 'O') + t.text.slice(1);
   const syl = [];
   for (let i = 0; i < toks.length; i++) {
     const t = toks[i];
@@ -2139,9 +2651,212 @@ function toSyllables(words) {
     const hyBefore = i > 0 && toks[i - 1].hy && syl.length;
     const hyAfter = i + 1 < toks.length && toks[i + 1].hy;
     const syllabic = hyBefore ? (hyAfter ? 'middle' : 'end') : (hyAfter ? 'begin' : 'single');
-    syl.push({ text: t.text.replace(/^[^\p{L}'’]+|[^\p{L}'’!?,.;:]+$/gu, ''), x: t.x, syllabic, conf: t.conf });
+    syl.push({ text: t.text.replace(/^[^\p{L}'’]+|[^\p{L}'’!?,.;:]+$/gu, ''), x: t.x, x0: t.x0, x1: t.x1, syllabic, conf: t.conf });
   }
   return { number, syllables: syl.filter(s => s.text) };
+}
+
+// ---- unprinted hyphens and merged words --------------------------------
+// Engravers drop the hyphen when two syllables sit close ("Jeannie" over two
+// notes), and OCR glues tightly set words ("rapturethrills"). A token whose
+// letters span several note onsets of the staff above is split into one
+// syllable per onset, at the syllable break (vowel groups + consonant rules)
+// nearest to where the notes say it should be; a blank gap at the break marks
+// a word boundary instead of a syllable boundary.
+
+const VOWELS = 'aeiouyäöüàâæéèêëîïôœùûÿáíóúåøœ';
+const isV = (w, i) => {
+  const c = w[i];
+  if (c === 'y') return i > 0 && !VOWELS.includes(w[i + 1] || '#');
+  if (c === 'u' && i > 0 && (w[i - 1] === 'q')) return false;
+  return VOWELS.includes(c);
+};
+
+// language of the underlay (decides silent final e and Latin vowel hiatus)
+function detectLang(texts) {
+  const s = ' ' + texts.join(' ').toLowerCase().replace(/[^\p{L}' ]+/gu, ' ').replace(/\s+/g, ' ') + ' ';
+  const cnt = (re) => (s.match(re) || []).length;
+  const de = 2 * cnt(/[äöüß]/g) + cnt(/ (?:und|der|die|das|ich|ein|eine|einen|nicht|mit|dem|den|zu|ist|sich|auf|mich|mir|dich|dir|du|wie|im|von|wir|ihr|sein|seine|nun|herz|gott|es|er|sie|so|wo|noch|nach|aus)(?= )/g);
+  const la = cnt(/ (?:et|est|cum|dei|deo|deus|non|qui|quae|quod|tu|te|nos|nobis|ad|sancte|sanctus|domine|dominus|gloria|pacem|excelsis|ave|mater|filius|spiritus|amen|mea|meum|tibi|sicut|erat|sunt|pax|alleluia)(?= )/g)
+    + 0.3 * cnt(/\p{L}(?:us|um|ae|is|unt|orum|ibus) /gu);
+  const en = cnt(/ (?:the|and|of|to|my|thy|thee|with|is|that|for|our|all|thou|his|her|be|we|you|i|on|from|love|me|he|she|they|was|are|o'er|when|where)(?= )/g);
+  if (de > en && de >= la) return 'de';
+  if (la > en && la > de) return 'la';
+  return 'en';
+}
+
+// vowel groups of a lower-case letter string: [{a, b}] (letter index ranges)
+function vowelGroups(w, lang) {
+  const g = [];
+  for (let i = 0; i < w.length; i++) {
+    if (!isV(w, i)) continue;
+    const last = g[g.length - 1];
+    const pair = w[i - 1] + w[i];
+    const joins = lang !== 'la' || pair === 'ae' || pair === 'oe' || pair === 'au' || pair === 'eu';
+    if (last && last.b === i && joins) { last.b = i + 1; continue; }
+    g.push({ a: i, b: i + 1 });
+  }
+  if (lang === 'en' && g.length > 1) {
+    const n = w.length, L = g[g.length - 1];
+    // silent final e ("love", "smile"), but "-le" after a consonant is sung ("ta-ble")
+    if (L.a === n - 1 && L.b === n && w[n - 1] === 'e' && !(w[n - 2] === 'l' && n >= 3 && !isV(w, n - 3))) g.pop();
+    // silent "-gue(s)" / "-que(s)" ("tongues")
+    else if (/[gq]ues?$/.test(w) && L.b >= n - 1 && w[L.a - 1] && /[gq]/.test(w[L.a - 1])) g.pop();
+    // silent -es / -ed ("hopes", "named"), not after sibilants / t, d
+    else if (L.a === n - 2 && L.b === n - 1 && w[n - 2] === 'e' && ((w[n - 1] === 'd' && !/[td]/.test(w[n - 3])) || (w[n - 1] === 's' && !/[szxgch]/.test(w[n - 3])))) g.pop();
+  }
+  return g;
+}
+
+const UNITS = new Set(['ch', 'sh', 'th', 'ph', 'wh', 'sch', 'ck', 'qu', 'chr', 'thr', 'shr']);
+const ONSETS = new Set(['bl', 'br', 'cl', 'cr', 'dr', 'fl', 'fr', 'gl', 'gr', 'pl', 'pr', 'tr', 'ch', 'sh', 'th', 'ph', 'wh', 'qu', 'sp', 'st', 'sc', 'sk', 'sl', 'sm', 'sn', 'sw', 'tw', 'str', 'spr', 'scr', 'spl', 'thr', 'shr', 'chr', 'sch', 'squ']);
+// preferred break (letter index: break before it) in the consonants w[a..b)
+function preferredBreak(w, a, b, lang) {
+  const c = w.slice(a, b);
+  // English suffix "-ing": "wait-ing", "sigh-ing", but "sob-bing"
+  if (lang === 'en' && /^ings?$/.test(w.slice(b)) && c.length && !(c.length >= 2 && c[c.length - 1] === c[c.length - 2])) return b;
+  if (c === 'gh' || c.endsWith('gh')) return b;          // "sigh-ing", "night-ly"
+  if (c.length <= 1) return c === 'x' ? b : a;           // V-CV ("va-por"); "ex-alt"
+  if (UNITS.has(c)) return a;                           // "la-chen", "fa-thers"
+  if (c === 'ng' && lang === 'en') return b;            // "sing-ing"
+  for (let L = Math.min(3, c.length - 1); L >= 2; L--) if (ONSETS.has(c.slice(c.length - L)) && !(lang === 'de' && c.slice(c.length - L) === 'st')) return b - L;
+  return b - 1;                                         // VC-CV ("Brun-nen", "win-ning")
+}
+
+// s: syllable {text, x, x0, x1, syllabic}; voices: [[onset x...]] of the staff
+// above (one list, or upper / lower voice of a two-voice staff); r: where a
+// note sits within its syllable on this row (0.5 centred, ~0.2 left-aligned)
+function splitSyllable(s, voices, lang, r, hyphens) {
+  const text = s.text;
+  if (s.x0 == null || text.length < 2) return [s];
+  const cw = (s.x1 - s.x0) / text.length;
+  // a printed hyphen inside the token that OCR did not read ("mu-sic" -> "music")
+  const hy = (hyphens || []).filter(x => x > s.x0 + 0.8 * cw && x < s.x1 - 0.8 * cw);
+  if (hy.length) {
+    const pieces = cutAt(s, hy.map(x => ({ x })), lang, null);
+    if (pieces.length > 1) return pieces.flatMap(p => splitSyllable(p, voices, lang, r, null));
+  }
+  let inside = [];
+  for (const ons of voices) {
+    const ins = ons.filter(x => x > s.x0 + 0.5 * cw && x < s.x1 - 0.5 * cw);
+    if (ins.length > inside.length) inside = ins;
+  }
+  if (inside.length < 2) return [s];
+  // target for each boundary: the next syllable starts r of its width left of its note
+  const tgt = [];
+  const k = inside.length;
+  for (let m = 0; m + 1 < k; m++) tgt.push({ x: inside[m + 1] - r * (inside[m + 1] - inside[m]) });
+  return cutAt(s, tgt, lang, inside);
+}
+
+// cut a token at k-1 syllable breaks nearest the target x positions; pieces
+// take the onset x when given (ons), else their own centre
+function cutAt(s, tgt, lang, ons) {
+  const text = s.text;
+  const cw = (s.x1 - s.x0) / text.length;
+  const k = tgt.length + 1;
+  const idx = []; let low = '';
+  for (let i = 0; i < text.length; i++) if (/\p{L}/u.test(text[i])) { idx.push(i); low += text[i].toLowerCase(); }
+  const groups = vowelGroups(low, lang);
+  // more notes than syllables: a melisma or another voice's notes; leave it
+  if (groups.length < k) return [s];
+  const xOf = (ci) => s.x0 + ci * cw;
+  // candidate breaks per gap between vowel groups
+  const gaps = [];
+  for (let j = 0; j + 1 < groups.length; j++) {
+    const a = groups[j].b, b = groups[j + 1].a, pref = preferredBreak(low, a, b, lang);
+    const list = [];
+    for (let li = Math.max(1, a); li <= b; li++) list.push({ li, x: xOf(idx[li]), pen: li === pref ? 0 : 1.2 + 0.3 * Math.abs(li - pref) });
+    gaps.push(list);
+  }
+  // DP: boundary m placed in gap j (gaps strictly increasing)
+  const G = gaps.length;
+  const best = Array.from({ length: k - 1 }, () => new Array(G).fill(null));
+  for (let m = 0; m < k - 1; m++) for (let j = m; j < G; j++) {
+    let prev = m === 0 ? { cost: 0 } : null;
+    if (m > 0) for (let jj = m - 1; jj < j; jj++) if (best[m - 1][jj] && (!prev || best[m - 1][jj].cost < prev.cost)) prev = best[m - 1][jj];
+    if (!prev) continue;
+    let bc = null;
+    for (const c of gaps[j]) { const v = prev.cost + Math.abs(c.x - tgt[m].x) / cw + c.pen; if (!bc || v < bc.cost) bc = { cost: v, c, prev: m > 0 ? prev : null }; }
+    best[m][j] = bc;
+  }
+  let end = null;
+  for (let j = 0; j < G; j++) if (best[k - 2][j] && (!end || best[k - 2][j].cost < end.cost)) end = best[k - 2][j];
+  if (!end) return [s];
+  const cuts = [];
+  for (let b = end; b; b = b.prev) cuts.unshift(b.c);
+  const out = [];
+  const first = s.syllabic === 'middle' || s.syllabic === 'end', last = s.syllabic === 'begin' || s.syllabic === 'middle';
+  let from = 0;
+  cuts.concat([null]).forEach((c, m) => {
+    const to = c ? idx[c.li] : text.length;
+    const before = m > 0 || first, after = m < cuts.length || last;
+    out.push({ ...s, text: text.slice(from, to), x: ons ? ons[m] : (xOf(from) + xOf(to)) / 2, x0: xOf(from), x1: xOf(to), split: true,
+      syllabic: before ? (after ? 'middle' : 'end') : (after ? 'begin' : 'single') });
+    from = to;
+  });
+  return out.filter(p => /\p{L}/u.test(p.text));
+}
+
+// extender lines (geometry) -> the syllable just left of each is a melisma:
+// extend = true, extendTo = page x where the line ends (alignment hint)
+function markExtenders(syl, ext, sp) {
+  for (const e of ext || []) {
+    let best = null;
+    for (const s of syl) if (s.x1 != null && s.x0 < e.x0 && e.x0 - s.x1 < 2.5 * sp && (!best || s.x1 > best.x1)) best = s;
+    if (best && !(best.syllabic === 'begin' || best.syllabic === 'middle')) { best.extend = true; best.extendTo = Math.max(best.extendTo || 0, e.x1); }
+  }
+}
+
+// a printed hyphen between two syllables (geometry) links them even when
+// OCR read it as "." or missed it ("Fair . est" -> Fair- est)
+function linkHyphens(syl, hyphens) {
+  if (!hyphens || !hyphens.length) return;
+  for (let i = 0; i + 1 < syl.length; i++) {
+    const a = syl[i], b = syl[i + 1];
+    if (a.x1 == null || b.x0 == null || a.syllabic === 'begin' || a.syllabic === 'middle') continue;
+    if (!hyphens.some(x => x > a.x1 - 2 && x < b.x0 + 2)) continue;
+    a.syllabic = a.syllabic === 'end' ? 'middle' : 'begin';
+    b.syllabic = b.syllabic === 'begin' ? 'middle' : (b.syllabic === 'single' ? 'end' : b.syllabic);
+  }
+}
+
+// note onsets of one staff between x0 and x1: one list, or two (upper and
+// lower voice) when the staff carries two voices (opposed stems at one x)
+function staffVoices(fr, staff, x0, x1, sp) {
+  const hs = (fr.heads || []).filter(h => h.staff === staff && h.x >= x0 && h.x <= x1).sort((a, b) => a.x - b.x);
+  const cl = [];
+  for (const h of hs) {
+    const last = cl[cl.length - 1];
+    if (last && h.x - last.xr < 1.2 * sp) { last.xr = h.x; last.hs.push(h); } else cl.push({ xr: h.x, hs: [h] });
+  }
+  const mean = (a) => a.reduce((t, h) => t + h.x, 0) / a.length;
+  const all = cl.map(c => mean(c.hs));
+  const up = (h) => h.stemDir === 1 || h.stemDir === 2, dn = (h) => h.stemDir === -1;
+  const both = cl.filter(c => c.hs.some(up) && c.hs.some(dn)).length;
+  if (cl.length < 4 || both < 0.3 * cl.length) return [all];
+  const U = [], D = [];
+  for (const c of cl) {
+    const u = c.hs.filter(h => !dn(h)), d = c.hs.filter(h => !up(h));
+    if (u.length) U.push(mean(u));
+    if (d.length) D.push(mean(d));
+  }
+  return [U, D];
+}
+
+// where a note sits inside its (single-note) word on a row: 0.5 = centred
+// (modern engraving), ~0.2 = syllables left-aligned to their notes
+function noteOffset(syl, voices) {
+  const rs = [];
+  for (const s of syl) {
+    if (s.x0 == null || s.x1 - s.x0 < 1) continue;
+    const cw = (s.x1 - s.x0) / Math.max(1, s.text.length);
+    const ins = voices[0].filter(x => x > s.x0 - 0.2 * cw && x < s.x1);
+    if (ins.length === 1) rs.push((ins[0] - s.x0) / (s.x1 - s.x0));
+  }
+  if (rs.length < 3) return 0.5;
+  rs.sort((a, b) => a - b);
+  return Math.max(0.15, Math.min(0.5, rs[rs.length >> 1]));
 }
 
 // ocr(grayImage) -> Promise<[{text, conf, x0, x1}]> in the given image's pixels
@@ -2151,18 +2866,23 @@ async function readLyrics(fr, ocr, onProgress, opts) {
   const sysTops = fr.systems.map(sys => fr.staves[sys[0]].yAt(0, fr.staves[sys[0]].left));
   let done = 0;
   const all = [];
-  fr.systems.forEach((sys, si) => all.push(...findTextLines(fr, si, sysTops[si + 1] ?? fr.gray.height, o)));
+  const geo = new Map();
+  const finder = o.ccLines ? findTextLinesCC : findTextLines;
+  fr.systems.forEach((sys, si) => all.push(...finder(fr, si, sysTops[si + 1] ?? fr.gray.height, o)));
+  const talls = all.filter(l => l.tall).map(l => l.tall).sort((a, b) => a - b);
+  const tallMed = talls.length >= 3 ? talls[talls.length >> 1] : 0;
   for (const ln of all) {
     const step = () => { done++; if (onProgress) onProgress(done, all.length); };
     const pad = Math.round(0.3 * ln.sp);
-    const row = analyseRow(fr.B, ln, pad);
+    const row = ln.strip ? stripRow(ln) : analyseRow(fr.B, ln, pad);
+    const ox = ln.strip ? ln.strip.x0 : 0;
     // opts.debug (an array) collects per-row decisions for tuning tools
     const dbg = o.debug ? { sys: ln.sys, band: ln.band, y: ln.y0, h: ln.y1 - ln.y0, sp: +ln.sp.toFixed(1), cov: +row.cov.toFixed(3), ncl: row.clusters.length } : null;
     if (dbg) o.debug.push(dbg);
     // text rows have many glyph clusters and a fair share of inked columns;
     // rows of stems, ties or fermatas have few, thin ones
-    if (o.geomCheck && (row.cov < 0.08 || row.clusters.length < 4)) { if (dbg) dbg.reject = 'geom'; step(); continue; }
-    const { img, toPage } = buildCrop(fr.gray, row, ln, o);
+    if (o.geomCheck && (ln.strip ? row.clusters.length < 3 : (row.cov < 0.08 || row.clusters.length < 4))) { if (dbg) dbg.reject = 'geom'; step(); continue; }
+    const crop = buildCrop(ln.strip || fr.gray, row, ln, o), img = crop.img, toPage = (x) => crop.toPage(x) + ox;
     let words = [];
     try { words = await ocr(img); } catch (e) { words = []; }
     const mapped = splitMerged(words.map(w => ({ ...w, x0: toPage(w.x0), x1: toPage(Math.max(w.x0, w.x1 - 1)) + 1 }))).map(w => ({ ...w, ok: plausible(w.text) }));
@@ -2177,9 +2897,33 @@ async function readLyrics(fr, ocr, onProgress, opts) {
     const nTok = mapped.filter(w => !/^[-‐‑‒–—―~_|.,;:'"]+$/.test(w.text)).length;
     if (dbg) dbg.good = nGood + '/' + nTok;
     if (!mapped.length || meanConf < o.minLineConf * 0.8 || nOk < 0.6 * mapped.length || nGood2 < 2 || (nGood < o.goodFrac * nTok && nGood < o.goodAbs)) { if (dbg) dbg.reject = 'ocr'; step(); continue; }
+    // captions under the music ("God Bless Our Native Land", "(Tune: America)"): title case, brackets, bigger type
+    if (o.titleCheck) {
+      const wordsL = mapped.map(w => w.text.replace(/[^\p{L}]/gu, '')).filter(t => t.length >= 2);
+      const caps = wordsL.filter(t => /^\p{Lu}/u.test(t)).length;
+      const txt = mapped.map(w => w.text).join(' ').trim();
+      const big = ln.tall && tallMed && ln.tall > 1.35 * tallMed;
+      if ((wordsL.length >= 2 && caps >= 0.8 * wordsL.length && wordsL.length <= 8) || /^[(\[].*[)\]]$/.test(txt) || big) { if (dbg) dbg.reject = 'title'; step(); continue; }
+    }
     const { number, syllables } = toSyllables(kept.filter(w => w.ok || w.conf >= 60));
-    (out[ln.sys] ||= []).push({ band: ln.band, last: ln.last, y: ln.y0, printed: number, number, syllables, raw: mapped.map(w => w.text).join(' '), conf: meanConf });
+    const entry = { band: ln.band, last: ln.last, y: ln.y0, printed: number, number, syllables, raw: mapped.map(w => w.text).join(' '), conf: meanConf };
+    (out[ln.sys] ||= []).push(entry);
+    geo.set(entry, { sp: ln.sp, staff: fr.systems[ln.sys][ln.band], x0: ln.x0, x1: ln.x1, extenders: ln.extenders || [],
+      hyphens: ln.hyphens ? ln.hyphens.map(h => (h.x0 + h.x1) / 2) : row.clusters.filter((c, i) => row.hy[i]).map(([a, b]) => row.xa + (a + b) / 2) });
     step();
+  }
+  for (const [v, g] of geo) linkHyphens(v.syllables, g.hyphens);
+  // melisma: an extender line after a syllable holds it over the following notes
+  for (const [v, g] of geo) markExtenders(v.syllables, g.extenders, g.sp);
+  // unprinted hyphens / merged words: split tokens spanning several onsets
+  if (o.splitByNotes) {
+    const lang = o.lang || detectLang(Object.values(out).flat().map(v => v.syllables.map(s => s.text).join(' ')));
+    for (const [v, g] of geo) {
+      const voices = staffVoices(fr, g.staff, g.x0, g.x1, g.sp);
+      const r = noteOffset(v.syllables, voices);
+      v.syllables = v.syllables.flatMap(s => splitSyllable(s, voices, lang, r, g.hyphens));
+    }
+    Object.defineProperty(out, 'lang', { value: lang, enumerable: false });
   }
   // verse numbers: per system and band, rows top-down are verses 1..n
   for (const k in out) {
@@ -2796,8 +3540,29 @@ function repairStream(evs, target, anchors, sp) {
   const gapCost = 2.6 + 2 * base;
   if (best && best.cost < gapCost) return { events: apply(best.edits), ok: true };
   if (diff > EPS) return { events: evs.concat([{ forward: true, q: diff }]), ok: false };
-  // still over-full: keep what fits and cut the note that crosses the barline
-  // so the measure stays importable (notation programs reject over-full bars)
+  // still over-full: shorten the longest values (drop a dot, else halve) until
+  // the voice fits, so every note read is kept; pad any small gap left over
+  {
+    const tr = evs.map(e => ({ ...e }));
+    let sum = qsum(tr);
+    while (sum > target + EPS) {
+      let k = -1;
+      tr.forEach((e, i) => { if (e.q > 0.25 + EPS && (k < 0 || e.q > tr[k].q + EPS || (e.rest && !tr[k].rest && Math.abs(e.q - tr[k].q) < EPS))) k = i; });
+      if (k < 0) break;
+      const e = tr[k], nq = e.dots ? e.q / 1.5 : e.q / 2;
+      if (!qToType(nq)) break;
+      sum -= e.q - nq; e.q = nq; e.dots = qToType(nq).dots;
+    }
+    if (sum <= target + EPS) {
+      evs.forEach((e, i) => { e.q = tr[i].q; e.dots = tr[i].dots; });
+      const out = evs.slice();
+      if (target - sum > EPS) out.push({ forward: true, q: target - sum });
+      return { events: out, ok: false };
+    }
+  }
+  // cannot be shortened enough: keep what fits and cut the note that crosses
+  // the barline so the measure stays importable (notation programs reject
+  // over-full bars)
   const out = [];
   let t = 0;
   for (const e of evs) {
@@ -2945,12 +3710,60 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   else { mq = 4; warnings.push('Could not infer a time signature; using 4/4.'); }
   const mLen = (time.beats * 4) / time.type;
   warnings.push(`Time signature inferred from measure contents: ${time.beats}/${time.type}.`);
-  // merge consecutive short segments that together make one measure
-  const measures = []; // [{segIdx:[...]}]
-  for (let i = 0; i < segs.length; i++) {
-    if (i > 0 && segSum[i] < mLen - 1e-6 && i + 1 < segs.length && segSum[i] + segSum[i + 1] <= mLen + 1e-6 &&
-        Math.abs(segSum[i] + segSum[i + 1] - mLen) < 1e-6) { measures.push({ segs: [i, i + 1] }); i++; }
-    else measures.push({ segs: [i] });
+  // Barline reconciliation. Barline detection both misses barlines and finds
+  // false ones (stems, brackets, text). Within each system the raw segments
+  // are grouped into measures by a small dynamic programme: a group costs how
+  // far its content is from a full bar plus a charge for every barline it
+  // drops (cheap when one side is a sliver no wider than a few staff spaces,
+  // which is how a stem misread as a barline shows up). An opening pickup and
+  // a closing short bar cost nothing. Over-full groups are cut later.
+  const nStreams = segEv.length ? segEv[0].reduce((a, ps) => a + ps.length, 0) : 0;
+  const segStreamSums = segEv.map(e => e.flatMap(ps => ps.map(evs => qsum(evs))));
+  const groupDev = (a, b, edge) => {
+    // dropping a barline must never make a bar over-full (its notes would be cut)
+    const sums = [];
+    for (let k = 0; k < nStreams; k++) {
+      let s = 0;
+      for (let i = a; i <= b; i++) s += segStreamSums[i][k] || 0;
+      if (s > 1e-6) sums.push(Math.round(s * 4) / 4);
+    }
+    if (!sums.length) return 0; // nothing but rests: a bar of rests
+    const S = mode(sums);
+    if (b > a && Math.max(...sums) > mLen + 1e-6) return Infinity;
+    if (Math.abs(S - mLen) < 1e-6 || (edge && S < mLen)) return 0;
+    return 0.1 + Math.min(1, Math.abs(S - mLen) / mLen);
+  };
+  const measures = []; // [{segs:[...]}]
+  for (let i0 = 0; i0 < segs.length;) {
+    let i1 = i0;
+    while (i1 + 1 < segs.length && segs[i1 + 1].sy === segs[i0].sy) i1++;
+    const n = i1 - i0 + 1, best = new Array(n + 1).fill(Infinity), from = new Array(n + 1).fill(-1);
+    best[0] = 0;
+    for (let j = 1; j <= n; j++) {
+      for (let i = Math.max(0, j - 5); i < j; i++) {
+        if (best[i] === Infinity) continue;
+        const a = i0 + i, b = i0 + j - 1;
+        const edge = a === 0 || b === segs.length - 1;
+        let c = 2 * groupDev(a, b, edge);
+        for (let t = a; t < b; t++) {
+          const sp = (segs[t].sy.staves[0] && segs[t].sy.staves[0].st.space) || 16;
+          const w = Math.min(segs[t].xb - segs[t].xa, segs[t + 1].xb - segs[t + 1].xa) / sp;
+          c += w < 4 ? 0.15 : 0.45;
+        }
+        if (best[i] + c < best[j] - 1e-9) { best[j] = best[i] + c; from[j] = i; }
+      }
+    }
+    const groups = [];
+    for (let j = n; j > 0; j = from[j]) groups.unshift(Array.from({ length: j - from[j] }, (_, t) => i0 + from[j] + t));
+    groups.forEach(g => measures.push({ segs: g }));
+    i0 = i1 + 1;
+  }
+  // a bar split across a system break: two short halves that make one bar
+  for (let k = 1; k + 1 < measures.length; k++) {
+    const a = measures[k], b = measures[k + 1];
+    if (segs[a.segs[0]].sy === segs[b.segs[0]].sy || a.segs.length > 1 || b.segs.length > 1) continue;
+    const sa = segSum[a.segs[0]], sb = segSum[b.segs[0]];
+    if (sa < mLen - 1e-6 && sb > 1e-6 && Math.abs(sa + sb - mLen) < 1e-6) { a.segs.push(...b.segs); measures.splice(k + 1, 1); }
   }
   if (opts.debug) segs.forEach((sg, i) => opts.debug.push(`seg ${i} sys ${sg.sy.page}:${sg.sy.index} x ${Math.round(sg.xa)}-${Math.round(sg.xb)} sum ${segSum[i]} streams ${segEv[i].map(ps => ps.map(evs => evs.map(e => (e.rest ? 'r' : '') + e.q).join(',')).join('/')).join(' | ')}`));
   const perPart = parts.map((p, pi) => measures.map(m => p.src.map((src, k) => ({
@@ -3008,9 +3821,11 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     const lowest = +band === lowestSplit && +band !== topVocal;
     const prior = lowest ? pis[pis.length - 1] : pis[0];
     // a syllable under an onset that only one voice has adds about 1 to that
-    // voice's total; voices that share every onset tie
+    // voice's total; voices that share every onset tie. A voice whose onsets
+    // include the other's (eighths against quarters) can only gain, so a line
+    // between staves leaves the melody (upper voice) only on strong evidence.
     let best = prior;
-    for (const pi of pis) if (e[pi] > e[best] + 0.6) best = pi;
+    for (const pi of pis) if (e[pi] > (lowest ? e[best] + 0.6 : 1.25 * e[best] + 2)) best = pi;
     bandVoice[band] = best;
     if (pis.length > 1) lyrNotes.add(`Lyrics under staff ${+band + 1} attached to ${parts[best].name} (${best === prior ? (lowest ? 'nearest voice' : 'upper voice') : 'its rhythm fits the syllables best'}).`);
   }
@@ -3018,7 +3833,13 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     const { v, cands, sp } = L;
     let best = cands.find(c => c.pi === bandVoice[v.band]) || cands[0];
     // a clearly better local fit wins (a passage where the other voice sings the text)
-    for (const c of cands) if (c.soft >= best.soft + Math.max(1.5, 0.15 * v.syllables.length) && c.fit >= best.fit + 0.1) best = c;
+    // (each voice with its own words and rhythm: the line sits under nearly
+    // every onset of one voice and misses several of the other's)
+    const nSyl = v.syllables.length, margin = Math.max(1.5, 0.15 * nSyl);
+    for (const c of cands) {
+      if (c === best || c.soft < best.soft + margin) continue;
+      if ((best.fit < 0.6 && c.fit >= 0.8) || (c.soft >= 0.88 * nSyl && best.soft < 0.8 * nSyl)) best = c;
+    }
     if (best.fit < L.minFit || !wordy(v.syllables)) { lyrNotes.add(`A text line under staff ${v.band + 1} does not follow the notes; not used as lyrics.`); continue; }
     const take = opts.copyLyrics ? cands.filter(c => c.fit >= L.minFit) : [best];
     if (opts.debug) opts.debug.push({ sys: L.sy.page + ':' + L.sy.index, band: v.band, n: v.number, nsyl: v.syllables.length, fits: cands.map(c => [c.p.name, +c.fit.toFixed(2), c.evs.length, +c.soft.toFixed(2)]), take: take.map(c => c.p.name) });
@@ -3035,7 +3856,10 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   let mismatch = 0, repaired = 0, restsFound = 0, splitBars = 0;
   // a missed barline leaves two (or more) bars in one segment: when the voices
   // agree on about k bar lengths, cut every voice at the bar boundaries (notes
-  // crossing a boundary are split and tied)
+  // crossing a boundary are split and tied). A segment clearly longer than a
+  // bar whose length is not a whole number of bars (a misread value inside)
+  // is cut by position instead: at the onsets of a reference voice that fall
+  // on whole bars, every voice cut at the same x.
   const units = [];
   measures.forEach((m, mi) => {
     const byPart = perPart.map(pm => pm[mi]);
@@ -3066,7 +3890,36 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
         }
       }));
       chunks.forEach(ch => units.push({ m, streams: ch, split: true }));
-    } else units.push({ m, streams: byPart, split: false });
+      return;
+    }
+    if (S >= 1.75 * mLen - 1e-6 && sums.filter(x => x >= 1.5 * mLen).length >= Math.max(1, 0.5 * sums.length)) {
+      // reference: the voice with the most onsets on whole bars
+      let ref = null;
+      byPart.forEach(sts => sts.forEach(st => {
+        let t = 0;
+        const cuts = [];
+        st.events.forEach((e, i) => {
+          if (i > 0 && t > 1e-6 && e.x != null && st.events[i - 1].x != null && Math.abs(t / mLen - Math.round(t / mLen)) < 1e-6) cuts.push((st.events[i - 1].x + e.x) / 2);
+          t += e.q;
+        });
+        if (cuts.length && (!ref || cuts.length > ref.length)) ref = cuts;
+      }));
+      if (ref) {
+        const xs = ref.sort((a, b) => a - b);
+        const chunks = Array.from({ length: xs.length + 1 }, () => byPart.map(sts => sts.map(st => ({ staff: st.staff, events: [] }))));
+        byPart.forEach((sts, pi) => sts.forEach((st, si) => {
+          let c = 0;
+          for (const e of st.events) {
+            if (e.x != null) while (c < xs.length && e.x > xs[c]) c++;
+            chunks[c][pi][si].events.push(e);
+          }
+        }));
+        splitBars += xs.length;
+        chunks.forEach(ch => units.push({ m, streams: ch, split: true }));
+        return;
+      }
+    }
+    units.push({ m, streams: byPart, split: false });
   });
   const partMeasures = parts.map(() => []);
   units.forEach((u, mi) => {
@@ -3084,9 +3937,9 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     // rests printed in the voices of a measure (looked up only when needed)
     const restCache = new Map();
     const restsOf = (st) => {
-      if (m.segs.length !== 1 || u.split) return [];
+      if (u.split || m.segs.some(si => segs[si].sy !== segs[m.segs[0]].sy)) return [];
       if (!restCache.has(st)) {
-        const seg = segs[m.segs[0]], sv = seg.sy.staves[st.staff];
+        const s0 = segs[m.segs[0]], seg = { ...s0, xb: segs[m.segs[m.segs.length - 1]].xb }, sv = seg.sy.staves[st.staff];
         restCache.set(st, sv ? findRests(seg, sv, parts[st.pi].src[st.k].voice) : []);
       }
       return restCache.get(st);
@@ -3153,9 +4006,13 @@ function sylBox(s, sp) {
 // centred under its note, except one that starts a melisma (a word held over
 // several notes, drawn with an extender line), which is left-aligned with the
 // notehead; so a long syllable may also sit with its left edge at the head.
+// Long tokens (7+ letters) are more often two syllables OCR read as one word
+// ("cherchons") and keep the centred reading only.
 function sylDist(s, x, sp) {
+  const c = Math.abs(x - s.x);
+  if (String(s.text || '').replace(/[^\p{L}]/gu, '').length > 6) return c;
   const x0 = sylBox(s, sp)[0];
-  return Math.min(Math.abs(x - s.x), Math.abs(x - (x0 + 0.55 * sp)) + 0.15 * sp);
+  return Math.min(c, Math.abs(x - (x0 + 0.55 * sp)) + 0.15 * sp);
 }
 
 // share of syllables that sit under an onset of the stream
@@ -4056,10 +4913,12 @@ function __omrSessionModule() {
         }
         return entry;
       },
+      // this copy's finish() needs only fr.R and asm.comps (see release)
+      releasePage: release,
       finish() {
         progress('Building parts', { stage: 'parts' });
         let score;
-        try { score = buildScore(pages, lyricsBySystem, { ocr: !!opts.ocr, copyLyrics: !!opts.copyLyrics }); }
+        try { score = buildScore(pages, lyricsBySystem, { ocr: !!opts.ocr, copyLyrics: !!opts.copyLyrics, debug: opts.debug }); }
         catch (e) { score = { parts: [], warnings: ['Assembly failed: ' + e.message], xml: '' }; }
         if (score.layout && Object.values(lyricsBySystem).some((l) => l.some((v) => v.used))) {
           for (const k in lyricsBySystem) lyricsBySystem[k] = lyricsBySystem[k].filter((v) => v.used);
@@ -4204,7 +5063,8 @@ function __omrSessionModule() {
         if (!entry) { post({ t: 'page-done', i: m.i, ms: Date.now() - t0, view: null }); return; }
         const view = pageView(entry, m.i);
         const thumb = shrink(entry.fr.gray, m.maxW || 1400);
-        release(entry);
+        // only a session that says what it can spare frees page buffers
+        if (session.releasePage) session.releasePage(entry);
         post({ t: 'page-done', i: m.i, ms: Date.now() - t0, view, thumb }, [thumb.data.buffer]);
       } else if (m.t === 'finish') {
         const res = session.finish();
@@ -4245,6 +5105,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
   const fmtBytes = (n) => n < 1024 ? n + ' B' : n < 1048576 ? (n / 1024).toFixed(n < 10240 ? 1 : 0) + ' KB' : (n / 1048576).toFixed(1) + ' MB';
   const plural = (n, one, many) => `${n.toLocaleString('en')} ${n === 1 ? one : (many || one + 's')}`;
   const nextPaint = () => new Promise((r) => { let done = false; const go = () => { if (!done) { done = true; setTimeout(r, 0); } }; requestAnimationFrame(go); setTimeout(go, 60); });
+  const mark = (n) => { try { performance.mark('ssr:' + n); } catch (e) { /* marks unsupported */ } };
   const fmtSecs = (s) => s < 60 ? `${Math.max(1, Math.round(s))} s` : `${Math.floor(s / 60)} min ${String(Math.round(s % 60)).padStart(2, '0')} s`;
 
   // ---------------------------------------------------------------- OCR ---
@@ -4463,14 +5324,42 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
     for (let i = 0, j = 0; i < g.length; i++, j += 4) g[i] = (d[j] * 299 + d[j + 1] * 587 + d[j + 2] * 114) / 1000;
     return { width: c.width, height: c.height, data: g };
   }
+  // pdf.js decodes page images in its worker. Its worker script is on the page
+  // as a plain script (which makes pdf.js decode on the main thread); give it
+  // a real worker instead: a blob: worker that importScripts the same pinned
+  // URL. If that worker does not answer, pdf.js keeps its main-thread fallback.
+  let pdfWorkerP = null;
+  function pdfWorkerReady() {
+    if (!pdfWorkerP) {
+      pdfWorkerP = (async () => {
+        const tag = document.querySelector('script[src*="pdf.worker"]');
+        if (typeof pdfjsLib === 'undefined' || !pdfjsLib.GlobalWorkerOptions || !tag || typeof Worker === 'undefined') return false;
+        const src = `try{importScripts(${JSON.stringify(tag.src)});self.postMessage({ssrPdfWorker:1})}catch(e){self.postMessage({ssrPdfWorker:0,msg:String(e&&e.message||e)})}`;
+        let w;
+        try { w = new Worker(URL.createObjectURL(new Blob([src], { type: 'text/javascript' }))); } catch (e) { return false; }
+        const ok = await new Promise((resolve) => {
+          const t = setTimeout(() => resolve(false), 6000);
+          const on = (ev) => { if (ev.data && 'ssrPdfWorker' in ev.data) { clearTimeout(t); w.removeEventListener('message', on); resolve(!!ev.data.ssrPdfWorker); } };
+          w.addEventListener('message', on);
+          w.addEventListener('error', (e) => { e.preventDefault(); clearTimeout(t); resolve(false); }, { once: true });
+        });
+        if (!ok) { w.terminate(); return false; }
+        pdfjsLib.GlobalWorkerOptions.workerPort = w;
+        return true;
+      })();
+    }
+    return pdfWorkerP;
+  }
   async function pdfSource(buf, name) {
     if (typeof pdfjsLib === 'undefined') throw new Error('the PDF reader did not load; try a PNG or JPG instead');
+    await pdfWorkerReady();
     const pdf = await pdfjsLib.getDocument({ data: buf, isEvalSupported: false }).promise;
     const pages = [];
     for (let k = 1; k <= pdf.numPages; k++) {
       pages.push({
         label: pdf.numPages > 1 ? `${name}, page ${k}` : name,
         async render() {
+          mark('render');
           const page = await pdf.getPage(k);
           const v1 = page.getViewport({ scale: 1 });
           const scale = Math.max(1.5, Math.min(5, 2300 / v1.width));
@@ -4480,6 +5369,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
           const ctx = c.getContext('2d');
           ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
           await page.render({ canvasContext: ctx, viewport: vp }).promise;
+          mark('gray');
           const g = canvasToGray(c);
           c.width = c.height = 0; // free the canvas backing store now
           page.cleanup();
@@ -4532,20 +5422,23 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
       try { w = new Worker(workerURL()); } catch (e) { rejectEngine(e); return; }
       let alive = false;
       let waiter = null;
-      const settle = (ok, v) => { const x = waiter; waiter = null; if (x) (ok ? x.resolve : x.reject)(v); };
-      const wait = (type) => new Promise((resolve, reject) => { waiter = { type, resolve, reject }; });
+      const eng = { kind: 'worker', dead: false };
+      const settle = (ok, v) => { const x = waiter; waiter = null; if (x) { clearTimeout(x.timer); (ok ? x.resolve : x.reject)(v); } };
+      // a page that never answers (worker out of memory, say) ends the run instead of hanging it
+      const wait = (type, ms) => eng.dead ? Promise.reject(new Error('the recognition worker stopped')) : new Promise((resolve, reject) => {
+        waiter = { type, resolve, reject, timer: setTimeout(() => { eng.dead = true; w.terminate(); settle(false, new Error(`the recognition worker did not answer within ${ms / 1000} s`)); }, ms) };
+      });
       const timer = setTimeout(() => { if (!alive) { w.terminate(); rejectEngine(new Error('the recognition worker did not start')); } }, 5000);
       w.onmessage = (ev) => {
         const m = ev.data || {};
         if (m.t === 'alive') {
           alive = true; clearTimeout(timer);
-          resolveEngine({
-            kind: 'worker',
-            init(useOcr) { const p = wait('ready'); w.postMessage({ t: 'init', ocr: !!useOcr }); return p; },
-            addPage(gray, i, n) { const p = wait('page-done'); w.postMessage({ t: 'page', i, n, gray, maxW: THUMB_W }, [gray.data.buffer]); return p; },
-            finish() { const p = wait('done'); w.postMessage({ t: 'finish' }); return p.then((m2) => m2.result); },
-            dispose() { w.terminate(); settle(false, new Error('stopped')); },
-          });
+          resolveEngine(Object.assign(eng, {
+            init(useOcr) { const p = wait('ready', 60000); w.postMessage({ t: 'init', ocr: !!useOcr }); return p; },
+            addPage(gray, i, n) { const p = wait('page-done', 300000); if (!eng.dead) w.postMessage({ t: 'page', i, n, gray, maxW: THUMB_W }, [gray.data.buffer]); return p; },
+            finish() { const p = wait('done', 300000); if (!eng.dead) w.postMessage({ t: 'finish' }); return p.then((m2) => m2.result); },
+            dispose() { eng.dead = true; w.terminate(); settle(false, new Error('stopped')); },
+          }));
         } else if (m.t === 'progress') onProgress(m.msg, m.info);
         else if (m.t === 'ocr') {
           Promise.resolve().then(() => ocrFn(m.img)).then(
@@ -4557,14 +5450,14 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
       w.onerror = (e) => {
         if (e && e.preventDefault) e.preventDefault();
         const err = new Error((e && e.message) || 'the recognition worker stopped');
-        if (!alive) { clearTimeout(timer); w.terminate(); rejectEngine(err); } else settle(false, err);
+        if (!alive) { clearTimeout(timer); w.terminate(); rejectEngine(err); } else { eng.dead = true; w.terminate(); settle(false, err); }
       };
     });
   }
   function mainEngine(ocrFn, onProgress) {
     let session = null;
     return {
-      kind: 'main',
+      kind: 'main', dead: false,
       async init(useOcr) { session = Sess.createSession(omrRequire, { ocr: useOcr ? ocrFn : null, onProgress }); },
       async addPage(gray, i, n) {
         // the page analysis runs without a break here; paint its stage first
@@ -4575,7 +5468,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
         if (!entry) return { view: null, ms: performance.now() - t0 };
         const view = Sess.pageView(entry, i);
         const thumb = Sess.shrink(entry.fr.gray, THUMB_W);
-        Sess.release(entry);
+        if (session.releasePage) session.releasePage(entry);
         return { view, thumb, ms: performance.now() - t0 };
       },
       async finish() { await nextPaint(); return Sess.resultSummary(session.finish()); },
@@ -4771,6 +5664,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
   const clefName = (c) => CLEF[String(c).charAt(0)] || (c ? c + ' clef' : 'clef unknown');
   // Where each part's notes came from, in the user's terms.
   function provenance(p, sc) {
+    // a label from the pipeline (score.js) wins when it provides one
+    if (p.layoutLabel) return esc(p.layoutLabel);
     const src = p.src || [];
     const clefs = sc.clefs || [];
     const nSt = (sc.layout && sc.layout.nSt) || clefs.length || 1;
@@ -4959,6 +5854,11 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
   }
 
   // ------------------------------------------------------------ preview ---
+  // The first measures of a long score as their own MusicXML, so the preview
+  // parses and draws only what it shows.
+  function previewXML(xml, upTo) {
+    return xml.replace(/<measure\b[^>]*\bnumber="(\d+)"[\s\S]*?<\/measure>\s*/g, (m, n) => (+n > upTo ? '' : m));
+  }
   let osmd = null;
   async function renderNotation(xml, measures, all) {
     const host = $('osmd');
@@ -4971,9 +5871,11 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
     try {
       host.textContent = '';
       osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay(host, { autoResize: true, drawTitle: false, backend: 'svg', drawPartNames: true });
-      if (capped) osmd.setOptions({ drawUpToMeasureNumber: PREVIEW_MEASURES });
-      await osmd.load(xml);
+      mark('osmd-load');
+      await osmd.load(capped ? previewXML(xml, PREVIEW_MEASURES) : xml);
+      mark('osmd-render');
       osmd.render();
+      mark('osmd-end');
       if (capped) {
         note.textContent = `The preview shows the first ${PREVIEW_MEASURES} of ${measures} measures; the MusicXML has them all.`;
         $('osmdAll').hidden = false;
@@ -4989,10 +5891,17 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
     $('sample').disabled = b;
     $('choose').disabled = b;
   }
+  // the previous result stays visible but dimmed while a new scan is read
+  function setStale(on) {
+    const had = !!lastRes;
+    $('staleNote').hidden = !(on && had);
+    ['margin', 'previewPanel'].forEach((id) => { if (on && had) $(id).dataset.stale = ''; else delete $(id).dataset.stale; });
+  }
   // doc: async () => ({ pages: [{label, render}], total, size, close }); file: {name, size, title, label}
   async function run(openDoc, file) {
     if (busy) { status('Wait for the current conversion to finish.'); return; }
     setBusy(true);
+    setStale(true);
     stopAsked = false;
     const t0 = performance.now();
     $('alert').hidden = true;
@@ -5042,7 +5951,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
       const eta = () => {
         if (n <= 1 || !pageDur.length) return '';
         const mean = pageDur.reduce((a, b) => a + b, 0) / pageDur.length;
-        const left = (n - curPage - 0.5) * mean / 1000;
+        const left = (n - curPage - 1) * mean / 1000;
         return left > 2 ? `about ${fmtSecs(left)} left` : '';
       };
       const onProgress = (msg, info) => {
@@ -5058,7 +5967,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
           } else if (id === 'parts') meter.set(0.94);
         }
         // the status line (announced politely) changes per page and stage, not per lyric line
-        const key = (id || '') + ':' + curPage;
+        const key = n > 1 ? String(curPage) : (id || '') + ':' + curPage;
         if (key !== lastStatusKey) { lastStatusKey = key; status(m.replace(/\s*\(\d+\/\d+ lines?\)/, '')); }
       };
       engine = await startEngine(ocr, onProgress);
@@ -5083,6 +5992,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
         meter.set((i / n) * 0.92);
         let gray;
         try { gray = await nextGray; } catch (e) {
+          if (n === 1) throw e;
           extraWarn.push(`Page ${i + 1} could not be rendered (${(e && e.message) || e}).`);
           book.setState(i, 'failed');
           nextGray = i + 1 < n ? renderPage(i + 1) : null;
@@ -5093,10 +6003,20 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
         gray = null;
         nextGray = null;
         if (engine.kind === 'worker' && i + 1 < n && !stopAsked) nextGray = renderPage(i + 1);
-        const r = await done;
+        let r;
+        try { r = await done; } catch (e) {
+          // one bad page does not end a long document; a stopped worker does
+          if (engine.dead || n === 1) throw e;
+          extraWarn.push(`Page ${i + 1} could not be read (${(e && e.message) || e}).`);
+          book.setState(i, 'failed');
+          if (!nextGray && i + 1 < n && !stopAsked) nextGray = renderPage(i + 1);
+          continue;
+        }
         if (!nextGray && i + 1 < n && !stopAsked) nextGray = renderPage(i + 1);
+        mark('page-done');
         if (r.view && r.thumb) {
           const url = await thumbURL(r.thumb);
+          mark('show');
           if (/^blob:/.test(url)) book.urls.push(url);
           book.setState(i, 'done', { view: r.view, url, ms: r.ms });
         } else book.setState(i, 'empty');
@@ -5111,25 +6031,30 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
       }
       $('stop').hidden = true;
       $('fileEta').hidden = true;
+      mark('finish');
       const res = await engine.finish();
+      mark('results');
       engine.dispose();
       engine = null;
       res.ocrError = ocrError;
       res.pagesRead = read;
       if (ocrError) res.warnings.unshift('Lyrics were not read: the text reader is unavailable (' + ocrError + ').');
-      if (stopAsked && read < n) res.warnings.unshift(`Stopped at your request after page ${read} of ${n}; the MusicXML covers pages 1 to ${read}.`);
+      if (stopAsked && read < n) res.warnings.unshift(`Stopped at your request after page ${read} of ${n}; the MusicXML covers ${read === 1 ? 'page 1' : `pages 1 to ${read}`}.`);
       if (total > n) res.warnings.unshift(`Only the first ${n} of ${total} pages were read (the page reads at most ${MAX_PAGES}).`);
       res.warnings.unshift(...extraWarn);
       stepper.go('xml');
       meter.set(0.97);
       status('Writing MusicXML and drawing the preview');
       lastRes = res;
+      setStale(false);
       legend((res.score && res.score.parts) || []);
       book.applyResult(res);
       renderParts(res);
       renderLyrics(res);
       renderWarnings(res.warnings || []);
+      mark('code');
       renderCode(res.score.xml);
+      mark('facts');
       stepFacts(res, ocrUsed);
       await nextPaint();
       await renderNotation(res.score.xml, res.score.measures || 0, false);
@@ -5155,6 +6080,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
       al.textContent = `Could not convert ${file.name}: ${msg}. ` + (lastRes ? 'The previous result is still shown below.' : '');
       window.__omrResult = { error: msg, steps: stepper.snapshot() };
     } finally {
+      setStale(false);
       if (engine) engine.dispose();
       if (doc && doc.close) { try { doc.close(); } catch (e) { /* already closed */ } }
       $('stop').hidden = true;

@@ -24,6 +24,7 @@
   const fmtBytes = (n) => n < 1024 ? n + ' B' : n < 1048576 ? (n / 1024).toFixed(n < 10240 ? 1 : 0) + ' KB' : (n / 1048576).toFixed(1) + ' MB';
   const plural = (n, one, many) => `${n.toLocaleString('en')} ${n === 1 ? one : (many || one + 's')}`;
   const nextPaint = () => new Promise((r) => { let done = false; const go = () => { if (!done) { done = true; setTimeout(r, 0); } }; requestAnimationFrame(go); setTimeout(go, 60); });
+  const mark = (n) => { try { performance.mark('ssr:' + n); } catch (e) { /* marks unsupported */ } };
   const fmtSecs = (s) => s < 60 ? `${Math.max(1, Math.round(s))} s` : `${Math.floor(s / 60)} min ${String(Math.round(s % 60)).padStart(2, '0')} s`;
 
   // ---------------------------------------------------------------- OCR ---
@@ -242,14 +243,42 @@
     for (let i = 0, j = 0; i < g.length; i++, j += 4) g[i] = (d[j] * 299 + d[j + 1] * 587 + d[j + 2] * 114) / 1000;
     return { width: c.width, height: c.height, data: g };
   }
+  // pdf.js decodes page images in its worker. Its worker script is on the page
+  // as a plain script (which makes pdf.js decode on the main thread); give it
+  // a real worker instead: a blob: worker that importScripts the same pinned
+  // URL. If that worker does not answer, pdf.js keeps its main-thread fallback.
+  let pdfWorkerP = null;
+  function pdfWorkerReady() {
+    if (!pdfWorkerP) {
+      pdfWorkerP = (async () => {
+        const tag = document.querySelector('script[src*="pdf.worker"]');
+        if (typeof pdfjsLib === 'undefined' || !pdfjsLib.GlobalWorkerOptions || !tag || typeof Worker === 'undefined') return false;
+        const src = `try{importScripts(${JSON.stringify(tag.src)});self.postMessage({ssrPdfWorker:1})}catch(e){self.postMessage({ssrPdfWorker:0,msg:String(e&&e.message||e)})}`;
+        let w;
+        try { w = new Worker(URL.createObjectURL(new Blob([src], { type: 'text/javascript' }))); } catch (e) { return false; }
+        const ok = await new Promise((resolve) => {
+          const t = setTimeout(() => resolve(false), 6000);
+          const on = (ev) => { if (ev.data && 'ssrPdfWorker' in ev.data) { clearTimeout(t); w.removeEventListener('message', on); resolve(!!ev.data.ssrPdfWorker); } };
+          w.addEventListener('message', on);
+          w.addEventListener('error', (e) => { e.preventDefault(); clearTimeout(t); resolve(false); }, { once: true });
+        });
+        if (!ok) { w.terminate(); return false; }
+        pdfjsLib.GlobalWorkerOptions.workerPort = w;
+        return true;
+      })();
+    }
+    return pdfWorkerP;
+  }
   async function pdfSource(buf, name) {
     if (typeof pdfjsLib === 'undefined') throw new Error('the PDF reader did not load; try a PNG or JPG instead');
+    await pdfWorkerReady();
     const pdf = await pdfjsLib.getDocument({ data: buf, isEvalSupported: false }).promise;
     const pages = [];
     for (let k = 1; k <= pdf.numPages; k++) {
       pages.push({
         label: pdf.numPages > 1 ? `${name}, page ${k}` : name,
         async render() {
+          mark('render');
           const page = await pdf.getPage(k);
           const v1 = page.getViewport({ scale: 1 });
           const scale = Math.max(1.5, Math.min(5, 2300 / v1.width));
@@ -259,6 +288,7 @@
           const ctx = c.getContext('2d');
           ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
           await page.render({ canvasContext: ctx, viewport: vp }).promise;
+          mark('gray');
           const g = canvasToGray(c);
           c.width = c.height = 0; // free the canvas backing store now
           page.cleanup();
@@ -311,20 +341,23 @@
       try { w = new Worker(workerURL()); } catch (e) { rejectEngine(e); return; }
       let alive = false;
       let waiter = null;
-      const settle = (ok, v) => { const x = waiter; waiter = null; if (x) (ok ? x.resolve : x.reject)(v); };
-      const wait = (type) => new Promise((resolve, reject) => { waiter = { type, resolve, reject }; });
+      const eng = { kind: 'worker', dead: false };
+      const settle = (ok, v) => { const x = waiter; waiter = null; if (x) { clearTimeout(x.timer); (ok ? x.resolve : x.reject)(v); } };
+      // a page that never answers (worker out of memory, say) ends the run instead of hanging it
+      const wait = (type, ms) => eng.dead ? Promise.reject(new Error('the recognition worker stopped')) : new Promise((resolve, reject) => {
+        waiter = { type, resolve, reject, timer: setTimeout(() => { eng.dead = true; w.terminate(); settle(false, new Error(`the recognition worker did not answer within ${ms / 1000} s`)); }, ms) };
+      });
       const timer = setTimeout(() => { if (!alive) { w.terminate(); rejectEngine(new Error('the recognition worker did not start')); } }, 5000);
       w.onmessage = (ev) => {
         const m = ev.data || {};
         if (m.t === 'alive') {
           alive = true; clearTimeout(timer);
-          resolveEngine({
-            kind: 'worker',
-            init(useOcr) { const p = wait('ready'); w.postMessage({ t: 'init', ocr: !!useOcr }); return p; },
-            addPage(gray, i, n) { const p = wait('page-done'); w.postMessage({ t: 'page', i, n, gray, maxW: THUMB_W }, [gray.data.buffer]); return p; },
-            finish() { const p = wait('done'); w.postMessage({ t: 'finish' }); return p.then((m2) => m2.result); },
-            dispose() { w.terminate(); settle(false, new Error('stopped')); },
-          });
+          resolveEngine(Object.assign(eng, {
+            init(useOcr) { const p = wait('ready', 60000); w.postMessage({ t: 'init', ocr: !!useOcr }); return p; },
+            addPage(gray, i, n) { const p = wait('page-done', 300000); if (!eng.dead) w.postMessage({ t: 'page', i, n, gray, maxW: THUMB_W }, [gray.data.buffer]); return p; },
+            finish() { const p = wait('done', 300000); if (!eng.dead) w.postMessage({ t: 'finish' }); return p.then((m2) => m2.result); },
+            dispose() { eng.dead = true; w.terminate(); settle(false, new Error('stopped')); },
+          }));
         } else if (m.t === 'progress') onProgress(m.msg, m.info);
         else if (m.t === 'ocr') {
           Promise.resolve().then(() => ocrFn(m.img)).then(
@@ -336,14 +369,14 @@
       w.onerror = (e) => {
         if (e && e.preventDefault) e.preventDefault();
         const err = new Error((e && e.message) || 'the recognition worker stopped');
-        if (!alive) { clearTimeout(timer); w.terminate(); rejectEngine(err); } else settle(false, err);
+        if (!alive) { clearTimeout(timer); w.terminate(); rejectEngine(err); } else { eng.dead = true; w.terminate(); settle(false, err); }
       };
     });
   }
   function mainEngine(ocrFn, onProgress) {
     let session = null;
     return {
-      kind: 'main',
+      kind: 'main', dead: false,
       async init(useOcr) { session = Sess.createSession(omrRequire, { ocr: useOcr ? ocrFn : null, onProgress }); },
       async addPage(gray, i, n) {
         // the page analysis runs without a break here; paint its stage first
@@ -354,7 +387,7 @@
         if (!entry) return { view: null, ms: performance.now() - t0 };
         const view = Sess.pageView(entry, i);
         const thumb = Sess.shrink(entry.fr.gray, THUMB_W);
-        Sess.release(entry);
+        if (session.releasePage) session.releasePage(entry);
         return { view, thumb, ms: performance.now() - t0 };
       },
       async finish() { await nextPaint(); return Sess.resultSummary(session.finish()); },
@@ -550,6 +583,8 @@
   const clefName = (c) => CLEF[String(c).charAt(0)] || (c ? c + ' clef' : 'clef unknown');
   // Where each part's notes came from, in the user's terms.
   function provenance(p, sc) {
+    // a label from the pipeline (score.js) wins when it provides one
+    if (p.layoutLabel) return esc(p.layoutLabel);
     const src = p.src || [];
     const clefs = sc.clefs || [];
     const nSt = (sc.layout && sc.layout.nSt) || clefs.length || 1;
@@ -738,6 +773,11 @@
   }
 
   // ------------------------------------------------------------ preview ---
+  // The first measures of a long score as their own MusicXML, so the preview
+  // parses and draws only what it shows.
+  function previewXML(xml, upTo) {
+    return xml.replace(/<measure\b[^>]*\bnumber="(\d+)"[\s\S]*?<\/measure>\s*/g, (m, n) => (+n > upTo ? '' : m));
+  }
   let osmd = null;
   async function renderNotation(xml, measures, all) {
     const host = $('osmd');
@@ -750,9 +790,11 @@
     try {
       host.textContent = '';
       osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay(host, { autoResize: true, drawTitle: false, backend: 'svg', drawPartNames: true });
-      if (capped) osmd.setOptions({ drawUpToMeasureNumber: PREVIEW_MEASURES });
-      await osmd.load(xml);
+      mark('osmd-load');
+      await osmd.load(capped ? previewXML(xml, PREVIEW_MEASURES) : xml);
+      mark('osmd-render');
       osmd.render();
+      mark('osmd-end');
       if (capped) {
         note.textContent = `The preview shows the first ${PREVIEW_MEASURES} of ${measures} measures; the MusicXML has them all.`;
         $('osmdAll').hidden = false;
@@ -768,10 +810,17 @@
     $('sample').disabled = b;
     $('choose').disabled = b;
   }
+  // the previous result stays visible but dimmed while a new scan is read
+  function setStale(on) {
+    const had = !!lastRes;
+    $('staleNote').hidden = !(on && had);
+    ['margin', 'previewPanel'].forEach((id) => { if (on && had) $(id).dataset.stale = ''; else delete $(id).dataset.stale; });
+  }
   // doc: async () => ({ pages: [{label, render}], total, size, close }); file: {name, size, title, label}
   async function run(openDoc, file) {
     if (busy) { status('Wait for the current conversion to finish.'); return; }
     setBusy(true);
+    setStale(true);
     stopAsked = false;
     const t0 = performance.now();
     $('alert').hidden = true;
@@ -821,7 +870,7 @@
       const eta = () => {
         if (n <= 1 || !pageDur.length) return '';
         const mean = pageDur.reduce((a, b) => a + b, 0) / pageDur.length;
-        const left = (n - curPage - 0.5) * mean / 1000;
+        const left = (n - curPage - 1) * mean / 1000;
         return left > 2 ? `about ${fmtSecs(left)} left` : '';
       };
       const onProgress = (msg, info) => {
@@ -837,7 +886,7 @@
           } else if (id === 'parts') meter.set(0.94);
         }
         // the status line (announced politely) changes per page and stage, not per lyric line
-        const key = (id || '') + ':' + curPage;
+        const key = n > 1 ? String(curPage) : (id || '') + ':' + curPage;
         if (key !== lastStatusKey) { lastStatusKey = key; status(m.replace(/\s*\(\d+\/\d+ lines?\)/, '')); }
       };
       engine = await startEngine(ocr, onProgress);
@@ -862,6 +911,7 @@
         meter.set((i / n) * 0.92);
         let gray;
         try { gray = await nextGray; } catch (e) {
+          if (n === 1) throw e;
           extraWarn.push(`Page ${i + 1} could not be rendered (${(e && e.message) || e}).`);
           book.setState(i, 'failed');
           nextGray = i + 1 < n ? renderPage(i + 1) : null;
@@ -872,10 +922,20 @@
         gray = null;
         nextGray = null;
         if (engine.kind === 'worker' && i + 1 < n && !stopAsked) nextGray = renderPage(i + 1);
-        const r = await done;
+        let r;
+        try { r = await done; } catch (e) {
+          // one bad page does not end a long document; a stopped worker does
+          if (engine.dead || n === 1) throw e;
+          extraWarn.push(`Page ${i + 1} could not be read (${(e && e.message) || e}).`);
+          book.setState(i, 'failed');
+          if (!nextGray && i + 1 < n && !stopAsked) nextGray = renderPage(i + 1);
+          continue;
+        }
         if (!nextGray && i + 1 < n && !stopAsked) nextGray = renderPage(i + 1);
+        mark('page-done');
         if (r.view && r.thumb) {
           const url = await thumbURL(r.thumb);
+          mark('show');
           if (/^blob:/.test(url)) book.urls.push(url);
           book.setState(i, 'done', { view: r.view, url, ms: r.ms });
         } else book.setState(i, 'empty');
@@ -890,25 +950,30 @@
       }
       $('stop').hidden = true;
       $('fileEta').hidden = true;
+      mark('finish');
       const res = await engine.finish();
+      mark('results');
       engine.dispose();
       engine = null;
       res.ocrError = ocrError;
       res.pagesRead = read;
       if (ocrError) res.warnings.unshift('Lyrics were not read: the text reader is unavailable (' + ocrError + ').');
-      if (stopAsked && read < n) res.warnings.unshift(`Stopped at your request after page ${read} of ${n}; the MusicXML covers pages 1 to ${read}.`);
+      if (stopAsked && read < n) res.warnings.unshift(`Stopped at your request after page ${read} of ${n}; the MusicXML covers ${read === 1 ? 'page 1' : `pages 1 to ${read}`}.`);
       if (total > n) res.warnings.unshift(`Only the first ${n} of ${total} pages were read (the page reads at most ${MAX_PAGES}).`);
       res.warnings.unshift(...extraWarn);
       stepper.go('xml');
       meter.set(0.97);
       status('Writing MusicXML and drawing the preview');
       lastRes = res;
+      setStale(false);
       legend((res.score && res.score.parts) || []);
       book.applyResult(res);
       renderParts(res);
       renderLyrics(res);
       renderWarnings(res.warnings || []);
+      mark('code');
       renderCode(res.score.xml);
+      mark('facts');
       stepFacts(res, ocrUsed);
       await nextPaint();
       await renderNotation(res.score.xml, res.score.measures || 0, false);
@@ -934,6 +999,7 @@
       al.textContent = `Could not convert ${file.name}: ${msg}. ` + (lastRes ? 'The previous result is still shown below.' : '');
       window.__omrResult = { error: msg, steps: stepper.snapshot() };
     } finally {
+      setStale(false);
       if (engine) engine.dispose();
       if (doc && doc.close) { try { doc.close(); } catch (e) { /* already closed */ } }
       $('stop').hidden = true;

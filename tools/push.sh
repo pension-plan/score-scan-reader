@@ -23,5 +23,9 @@ if git diff --cached -U0 | grep -E '^\+' | grep -q -E 'gh[pousr]_[A-Za-z0-9]{30,
 if git diff --cached --quiet; then echo "nothing to commit"; else
   git commit -q -m "$SUBJECT" -m "$BODY" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 fi
-git -c credential.helper= -c credential.helper='!f(){ echo username=x-access-token; echo "password=$(tr -d " \n\r" < ~/github-amiga-exposed.txt)"; }; f' push -q origin HEAD:main
+CRED=(-c credential.helper= -c credential.helper='!f(){ echo username=x-access-token; echo "password=$(tr -d " \n\r" < ~/github-amiga-exposed.txt)"; }; f')
+# release-please merges land on origin/main: rebase onto them before pushing
+git "${CRED[@]}" fetch -q origin main
+git -c rebase.autoStash=true rebase -q origin/main
+git "${CRED[@]}" push -q origin HEAD:main
 git log --oneline -1

@@ -320,8 +320,29 @@ function repairStream(evs, target, anchors, sp) {
   const gapCost = 2.6 + 2 * base;
   if (best && best.cost < gapCost) return { events: apply(best.edits), ok: true };
   if (diff > EPS) return { events: evs.concat([{ forward: true, q: diff }]), ok: false };
-  // still over-full: keep what fits and cut the note that crosses the barline
-  // so the measure stays importable (notation programs reject over-full bars)
+  // still over-full: shorten the longest values (drop a dot, else halve) until
+  // the voice fits, so every note read is kept; pad any small gap left over
+  {
+    const tr = evs.map(e => ({ ...e }));
+    let sum = qsum(tr);
+    while (sum > target + EPS) {
+      let k = -1;
+      tr.forEach((e, i) => { if (e.q > 0.25 + EPS && (k < 0 || e.q > tr[k].q + EPS || (e.rest && !tr[k].rest && Math.abs(e.q - tr[k].q) < EPS))) k = i; });
+      if (k < 0) break;
+      const e = tr[k], nq = e.dots ? e.q / 1.5 : e.q / 2;
+      if (!qToType(nq)) break;
+      sum -= e.q - nq; e.q = nq; e.dots = qToType(nq).dots;
+    }
+    if (sum <= target + EPS) {
+      evs.forEach((e, i) => { e.q = tr[i].q; e.dots = tr[i].dots; });
+      const out = evs.slice();
+      if (target - sum > EPS) out.push({ forward: true, q: target - sum });
+      return { events: out, ok: false };
+    }
+  }
+  // cannot be shortened enough: keep what fits and cut the note that crosses
+  // the barline so the measure stays importable (notation programs reject
+  // over-full bars)
   const out = [];
   let t = 0;
   for (const e of evs) {
@@ -469,12 +490,60 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   else { mq = 4; warnings.push('Could not infer a time signature; using 4/4.'); }
   const mLen = (time.beats * 4) / time.type;
   warnings.push(`Time signature inferred from measure contents: ${time.beats}/${time.type}.`);
-  // merge consecutive short segments that together make one measure
-  const measures = []; // [{segIdx:[...]}]
-  for (let i = 0; i < segs.length; i++) {
-    if (i > 0 && segSum[i] < mLen - 1e-6 && i + 1 < segs.length && segSum[i] + segSum[i + 1] <= mLen + 1e-6 &&
-        Math.abs(segSum[i] + segSum[i + 1] - mLen) < 1e-6) { measures.push({ segs: [i, i + 1] }); i++; }
-    else measures.push({ segs: [i] });
+  // Barline reconciliation. Barline detection both misses barlines and finds
+  // false ones (stems, brackets, text). Within each system the raw segments
+  // are grouped into measures by a small dynamic programme: a group costs how
+  // far its content is from a full bar plus a charge for every barline it
+  // drops (cheap when one side is a sliver no wider than a few staff spaces,
+  // which is how a stem misread as a barline shows up). An opening pickup and
+  // a closing short bar cost nothing. Over-full groups are cut later.
+  const nStreams = segEv.length ? segEv[0].reduce((a, ps) => a + ps.length, 0) : 0;
+  const segStreamSums = segEv.map(e => e.flatMap(ps => ps.map(evs => qsum(evs))));
+  const groupDev = (a, b, edge) => {
+    // dropping a barline must never make a bar over-full (its notes would be cut)
+    const sums = [];
+    for (let k = 0; k < nStreams; k++) {
+      let s = 0;
+      for (let i = a; i <= b; i++) s += segStreamSums[i][k] || 0;
+      if (s > 1e-6) sums.push(Math.round(s * 4) / 4);
+    }
+    if (!sums.length) return 0; // nothing but rests: a bar of rests
+    const S = mode(sums);
+    if (b > a && Math.max(...sums) > mLen + 1e-6) return Infinity;
+    if (Math.abs(S - mLen) < 1e-6 || (edge && S < mLen)) return 0;
+    return 0.1 + Math.min(1, Math.abs(S - mLen) / mLen);
+  };
+  const measures = []; // [{segs:[...]}]
+  for (let i0 = 0; i0 < segs.length;) {
+    let i1 = i0;
+    while (i1 + 1 < segs.length && segs[i1 + 1].sy === segs[i0].sy) i1++;
+    const n = i1 - i0 + 1, best = new Array(n + 1).fill(Infinity), from = new Array(n + 1).fill(-1);
+    best[0] = 0;
+    for (let j = 1; j <= n; j++) {
+      for (let i = Math.max(0, j - 5); i < j; i++) {
+        if (best[i] === Infinity) continue;
+        const a = i0 + i, b = i0 + j - 1;
+        const edge = a === 0 || b === segs.length - 1;
+        let c = 2 * groupDev(a, b, edge);
+        for (let t = a; t < b; t++) {
+          const sp = (segs[t].sy.staves[0] && segs[t].sy.staves[0].st.space) || 16;
+          const w = Math.min(segs[t].xb - segs[t].xa, segs[t + 1].xb - segs[t + 1].xa) / sp;
+          c += w < 4 ? 0.15 : 0.45;
+        }
+        if (best[i] + c < best[j] - 1e-9) { best[j] = best[i] + c; from[j] = i; }
+      }
+    }
+    const groups = [];
+    for (let j = n; j > 0; j = from[j]) groups.unshift(Array.from({ length: j - from[j] }, (_, t) => i0 + from[j] + t));
+    groups.forEach(g => measures.push({ segs: g }));
+    i0 = i1 + 1;
+  }
+  // a bar split across a system break: two short halves that make one bar
+  for (let k = 1; k + 1 < measures.length; k++) {
+    const a = measures[k], b = measures[k + 1];
+    if (segs[a.segs[0]].sy === segs[b.segs[0]].sy || a.segs.length > 1 || b.segs.length > 1) continue;
+    const sa = segSum[a.segs[0]], sb = segSum[b.segs[0]];
+    if (sa < mLen - 1e-6 && sb > 1e-6 && Math.abs(sa + sb - mLen) < 1e-6) { a.segs.push(...b.segs); measures.splice(k + 1, 1); }
   }
   if (opts.debug) segs.forEach((sg, i) => opts.debug.push(`seg ${i} sys ${sg.sy.page}:${sg.sy.index} x ${Math.round(sg.xa)}-${Math.round(sg.xb)} sum ${segSum[i]} streams ${segEv[i].map(ps => ps.map(evs => evs.map(e => (e.rest ? 'r' : '') + e.q).join(',')).join('/')).join(' | ')}`));
   const perPart = parts.map((p, pi) => measures.map(m => p.src.map((src, k) => ({
@@ -567,7 +636,10 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   let mismatch = 0, repaired = 0, restsFound = 0, splitBars = 0;
   // a missed barline leaves two (or more) bars in one segment: when the voices
   // agree on about k bar lengths, cut every voice at the bar boundaries (notes
-  // crossing a boundary are split and tied)
+  // crossing a boundary are split and tied). A segment clearly longer than a
+  // bar whose length is not a whole number of bars (a misread value inside)
+  // is cut by position instead: at the onsets of a reference voice that fall
+  // on whole bars, every voice cut at the same x.
   const units = [];
   measures.forEach((m, mi) => {
     const byPart = perPart.map(pm => pm[mi]);
@@ -598,7 +670,36 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
         }
       }));
       chunks.forEach(ch => units.push({ m, streams: ch, split: true }));
-    } else units.push({ m, streams: byPart, split: false });
+      return;
+    }
+    if (S >= 1.75 * mLen - 1e-6 && sums.filter(x => x >= 1.5 * mLen).length >= Math.max(1, 0.5 * sums.length)) {
+      // reference: the voice with the most onsets on whole bars
+      let ref = null;
+      byPart.forEach(sts => sts.forEach(st => {
+        let t = 0;
+        const cuts = [];
+        st.events.forEach((e, i) => {
+          if (i > 0 && t > 1e-6 && e.x != null && st.events[i - 1].x != null && Math.abs(t / mLen - Math.round(t / mLen)) < 1e-6) cuts.push((st.events[i - 1].x + e.x) / 2);
+          t += e.q;
+        });
+        if (cuts.length && (!ref || cuts.length > ref.length)) ref = cuts;
+      }));
+      if (ref) {
+        const xs = ref.sort((a, b) => a - b);
+        const chunks = Array.from({ length: xs.length + 1 }, () => byPart.map(sts => sts.map(st => ({ staff: st.staff, events: [] }))));
+        byPart.forEach((sts, pi) => sts.forEach((st, si) => {
+          let c = 0;
+          for (const e of st.events) {
+            if (e.x != null) while (c < xs.length && e.x > xs[c]) c++;
+            chunks[c][pi][si].events.push(e);
+          }
+        }));
+        splitBars += xs.length;
+        chunks.forEach(ch => units.push({ m, streams: ch, split: true }));
+        return;
+      }
+    }
+    units.push({ m, streams: byPart, split: false });
   });
   const partMeasures = parts.map(() => []);
   units.forEach((u, mi) => {
@@ -616,9 +717,9 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     // rests printed in the voices of a measure (looked up only when needed)
     const restCache = new Map();
     const restsOf = (st) => {
-      if (m.segs.length !== 1 || u.split) return [];
+      if (u.split || m.segs.some(si => segs[si].sy !== segs[m.segs[0]].sy)) return [];
       if (!restCache.has(st)) {
-        const seg = segs[m.segs[0]], sv = seg.sy.staves[st.staff];
+        const s0 = segs[m.segs[0]], seg = { ...s0, xb: segs[m.segs[m.segs.length - 1]].xb }, sv = seg.sy.staves[st.staff];
         restCache.set(st, sv ? findRests(seg, sv, parts[st.pi].src[st.k].voice) : []);
       }
       return restCache.get(st);

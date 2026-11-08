@@ -49,10 +49,12 @@ function __omrSessionModule() {
         }
         return entry;
       },
+      // this copy's finish() needs only fr.R and asm.comps (see release)
+      releasePage: release,
       finish() {
         progress('Building parts', { stage: 'parts' });
         let score;
-        try { score = buildScore(pages, lyricsBySystem, { ocr: !!opts.ocr, copyLyrics: !!opts.copyLyrics }); }
+        try { score = buildScore(pages, lyricsBySystem, { ocr: !!opts.ocr, copyLyrics: !!opts.copyLyrics, debug: opts.debug }); }
         catch (e) { score = { parts: [], warnings: ['Assembly failed: ' + e.message], xml: '' }; }
         if (score.layout && Object.values(lyricsBySystem).some((l) => l.some((v) => v.used))) {
           for (const k in lyricsBySystem) lyricsBySystem[k] = lyricsBySystem[k].filter((v) => v.used);
@@ -197,7 +199,8 @@ function __omrSessionModule() {
         if (!entry) { post({ t: 'page-done', i: m.i, ms: Date.now() - t0, view: null }); return; }
         const view = pageView(entry, m.i);
         const thumb = shrink(entry.fr.gray, m.maxW || 1400);
-        release(entry);
+        // only a session that says what it can spare frees page buffers
+        if (session.releasePage) session.releasePage(entry);
         post({ t: 'page-done', i: m.i, ms: Date.now() - t0, view, thumb }, [thumb.data.buffer]);
       } else if (m.t === 'finish') {
         const res = session.finish();

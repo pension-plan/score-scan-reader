@@ -56,7 +56,8 @@
       <div id="pages" class="pages"></div>
     </section>
 
-    <div class="margin">
+    <div class="margin" id="margin">
+      <p class="stale-note" id="staleNote" hidden>The previous result stays here until this one is ready.</p>
       <section class="panel" aria-labelledby="partsH">
         <div class="panel-head"><h2 id="partsH">Parts</h2></div>
         <p class="summary" id="partsSummary">Waiting for the first conversion.</p>
@@ -97,7 +98,7 @@
     </div>
 
 
-    <section class="panel preview-panel" aria-labelledby="prevH">
+    <section class="panel preview-panel" id="previewPanel" aria-labelledby="prevH">
       <div class="panel-head"><h2 id="prevH">Notation preview</h2></div>
       <div class="sheet"><div id="osmd"></div></div>
       <p class="muted" id="osmdNote"></p>

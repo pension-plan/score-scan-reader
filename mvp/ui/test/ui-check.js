@@ -74,6 +74,10 @@ srv.listen(0, async () => {
     if (SHOTS) await page.screenshot({ path: `${SHOTS}-${tag}.png`, fullPage: width === 1280 && scheme === 'light' });
 
     if (tag === '1280') {
+      // recognition off the main thread, and the page strip only for several pages
+      const eng = await page.evaluate(() => ({ engine: window.__omrResult && window.__omrResult.engine, pages: window.__omrResult && window.__omrResult.pages, nav: document.getElementById('pageNav') ? document.getElementById('pageNav').hidden : null }));
+      ok('engine: recognition runs in a Web Worker', eng.engine === 'worker', eng.engine);
+      ok('pages: one-page scan reports its page and hides the page strip', eng.pages && eng.pages.read === 1 && eng.nav === true, eng);
       // stepper structure and states
       const st = await page.evaluate(() => {
         const nav = document.querySelector('nav[aria-label="Conversion progress"]');

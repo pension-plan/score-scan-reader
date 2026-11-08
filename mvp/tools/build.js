@@ -11,7 +11,8 @@ const fs = require('fs'), path = require('path');
 const ROOT = path.join(__dirname, '..');
 const SRC = path.join(ROOT, 'src');
 const DIST = path.join(ROOT, 'dist');
-const UI = fs.existsSync(path.join(ROOT, 'ui/body.html')) ? path.join(ROOT, 'ui') : path.join(SRC, 'ui');
+// the page lives in mvp/ui/ only (the old src/ui copy is gone; no fallback)
+const UI = path.join(ROOT, 'ui');
 const quiet = process.argv.includes('--quiet');
 const MB = 1024 * 1024;
 const REQUIRED_ASSETS = ['tesseract-worker.min.js', 'tesseract-core-simd-lstm.wasm.js', 'eng.traineddata.gz', 'sample-st-anselm.pdf'];
@@ -25,6 +26,8 @@ const FONTS = 'https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wg
 
 const errors = [];
 const fail = (m) => errors.push(m);
+for (const f of ['body.html', 'style.css', 'app.js']) if (!fs.existsSync(path.join(UI, f))) { console.error(`BUILD FAILED: ui/${f} is missing`); process.exit(1); }
+if (fs.existsSync(path.join(SRC, 'ui'))) fail('src/ui/ exists again; the page is built from mvp/ui/ only, so edit there and remove src/ui/');
 
 // ---- bundle: every src/*.js module (definitions are lazy, so unused ones cost bytes only)
 const mods = fs.readdirSync(SRC).filter((f) => f.endsWith('.js')).map((f) => f.slice(0, -3)).sort();

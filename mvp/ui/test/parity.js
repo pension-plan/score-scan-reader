@@ -55,7 +55,7 @@ async function makeOCR() {
     for (let i = 0; i < pages.length; i++) {
       const e = await s.addPage(pages[i], i, pages.length);
       pages[i] = null;
-      if (e) { views.push(Sess.pageView(e, i)); Sess.shrink(e.fr.gray, 1400); Sess.release(e); }
+      if (e) { views.push(Sess.pageView(e, i)); Sess.shrink(e.fr.gray, 1400); if (s.releasePage) s.releasePage(e); }
     }
     const got = s.finish();
     const tGot = Date.now() - t;
