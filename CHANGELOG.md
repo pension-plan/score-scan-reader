@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.28.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.27.1...score-scan-reader-v0.28.0) (2026-11-08)
+
+
+### Features
+
+* **layout:** brace tip detector; brackets, C clefs and ensembles never read as a piano; instrument names (L18/L6/L9/L4b) ([a25dd3b](https://github.com/pension-plan/score-scan-reader/commit/a25dd3b7fe7c27378b8b1035e81a904116a2e3b8))
+
+
+### Bug Fixes
+
+* **lyrics:** record inferred melismas so the missed-syllable check runs (L4b); note why tied bass-staff text goes to both voices (L7) ([e89e2eb](https://github.com/pension-plan/score-scan-reader/commit/e89e2eb94cf7c39404dcf43e6fbc8145273cd15e))
+* **score:** articulations on every note of a chord ([d176663](https://github.com/pension-plan/score-scan-reader/commit/d176663fab2a8233777a74f31bbac8ae0b0a36fd))
+
+
+### Reverts
+
+* files swept into d176663 by mistake (other agents' work in progress) ([f7861d5](https://github.com/pension-plan/score-scan-reader/commit/f7861d5ad322bc5f46a9c6394a86510744d5f837))
+
 ## [0.27.1](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.27.0...score-scan-reader-v0.27.1) (2026-11-08)
 
 
