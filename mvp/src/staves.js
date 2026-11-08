@@ -512,6 +512,14 @@ function detectDashedStaves(bin, lt, opts = {}) {
     }));
     // equal spacing per strip (least squares through the five)
     for (let j = 0; j < t.length; j++) { let my = 0; for (let k = 0; k < 5; k++) my += ys[k][j]; my /= 5; let num = 0; for (let k = 0; k < 5; k++) num += (k - 2) * (ys[k][j] - my); const g = num / 10; for (let k = 0; k < 5; k++) ys[k][j] = my + (k - 2) * g; }
+    // re-anchor: four of five lines also match a pattern one line off (an empty line where there
+    // is none, the real outer line left out); keep the five consecutive positions with the most ink
+    {
+      const cover = (sh) => { let n = 0; for (let j = 0; j < t.length; j++) { const { p } = prof[t[j].s]; const g = (ys[4][j] - ys[0][j]) / 4; n += Math.min(...[0, 1, 2, 3, 4].map(k => pk(p, ys[k][j] + sh * g))); } return n; };
+      let bestSh = 0, bestC = cover(0);
+      for (const sh of [-1, 1]) { const cv = cover(sh); if (cv > bestC * 1.2) { bestC = cv; bestSh = sh; } }
+      if (bestSh) for (let j = 0; j < t.length; j++) { const g = (ys[4][j] - ys[0][j]) / 4; for (let k = 0; k < 5; k++) ys[k][j] += bestSh * g; }
+    }
     const dense = [0, 1, 2, 3, 4].map(k => densify(xs, ys[k], w));
     const staff = { xs, ys, dense, yAt(k, x) { const xi = Math.max(0, Math.min(w - 1, Math.round(x))); return this.dense[k][xi]; }, spaceAt(x) { return (this.yAt(4, x) - this.yAt(0, x)) / 4; } };
     // extents: from the first to the last tracked strip, trimmed to where a window of one space

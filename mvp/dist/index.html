@@ -8966,7 +8966,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
       let S = 0;
       for (let t = i0 + i; t < i0 + j; t++) S += segSum[t];
       const k = Math.round(S / mLen);
-      return k >= 2 && Math.abs(S - k * mLen) <= 0.25 * mLen ? k : 1;
+      return k >= 2 && Math.abs(S - k * mLen) < 1e-6 ? k : 1;
     };
     const groups = [], gBars = [];
     if (T) {
@@ -8974,8 +8974,10 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
       const best = Array.from({ length: n + 1 }, () => new Array(T + 1).fill(Infinity)), from = Array.from({ length: n + 1 }, () => new Array(T + 1).fill(-1));
       best[0][0] = 0;
       for (let j = 1; j <= n; j++) for (let i = Math.max(0, j - 5); i < j; i++) {
-        // an over-full merge is allowed here at a high price: the printed numbers say a barline is false
-        const k = barsIn(i, j), c = Math.min(20, cost(i, j));
+        // only clean fixes: no over-full merge, and a group counts k bars only
+        // when its contents fill exactly k
+        const k = barsIn(i, j), c = cost(i, j);
+        if (c === Infinity) continue;
         for (let g = k; g <= T; g++) {
           if (best[i][g - k] === Infinity) continue;
           if (best[i][g - k] + c < best[j][g] - 1e-9) { best[j][g] = best[i][g - k] + c; from[j][g] = i; }
@@ -9257,7 +9259,9 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     if (hint) {
       let again = null;
       try { again = buildScore(pages, lyricsBySystem, { ...opts, barTargets: hint.targets, pickup: hint.pickup }); } catch (e) { again = null; }
-      if (again && again.barCheck && again.barCheck.agree > barCheck.agree) {
+      // and the bars it makes fill as well as before (no more voice-measures
+      // that needed repair or still do not add up)
+      if (again && again.barCheck && again.barCheck.agree > barCheck.agree && again.rhythm.repaired + again.rhythm.mismatch <= repaired + mismatch) {
         again.warnings.unshift(`Bar count corrected from the printed bar numbers (${barCheck.agree} of ${barCheck.printed} agreed, now ${again.barCheck.agree}).`);
         return again;
       }
@@ -9265,7 +9269,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   }
   if (barCheck) barCheck.notes.forEach(n => warnings.push(n));
   // UI compares clefs with 'F'; 'G8' stays a treble clef there
-  return { parts, layout, fifths, time, timeRead, clefs, ranges, measures: units.length, nNotes, credits, title: read.head.title || null, composer: read.head.composer || null, warnings: warnings.concat(layout.notes), xml, measureMap, barCheck };
+  return { parts, layout, fifths, time, timeRead, clefs, ranges, measures: units.length, nNotes, credits, title: read.head.title || null, composer: read.head.composer || null, warnings: warnings.concat(layout.notes), xml, measureMap, barCheck, rhythm: { repaired, mismatch } };
 }
 
 // Horizontal extent of a syllable: lyrics.js may report x0/x1; otherwise it is
@@ -9465,8 +9469,8 @@ function barHints(pages, measureMap, bc, partMeasures) {
       // the first numbered system: the bars before it are the first system's
       const firstImplicit = partMeasures[0] && partMeasures[0][0] && partMeasures[0][0].every(st => st.implicit);
       if (d === -1 && !firstImplicit) { pickup = true; any = true; }
-      else if (pos(s) === 1) { targets[order[0]] = count(order[0]) + d; if (targets[order[0]] >= 1) any = true; else delete targets[order[0]]; }
-    } else if (pos(s) - pos(a) === 1) {
+      else if (pos(s) === 1 && Math.abs(d) === 1) { targets[order[0]] = count(order[0]) + d; if (targets[order[0]] >= 1) any = true; else delete targets[order[0]]; }
+    } else if (pos(s) - pos(a) === 1 && Math.abs(d - prev) === 1) {
       const key = order[pos(a)];
       targets[key] = count(key) + (d - prev);
       if (targets[key] >= 1) any = true; else delete targets[key];
@@ -10529,6 +10533,14 @@ function detectDashedStaves(bin, lt, opts = {}) {
     }));
     // equal spacing per strip (least squares through the five)
     for (let j = 0; j < t.length; j++) { let my = 0; for (let k = 0; k < 5; k++) my += ys[k][j]; my /= 5; let num = 0; for (let k = 0; k < 5; k++) num += (k - 2) * (ys[k][j] - my); const g = num / 10; for (let k = 0; k < 5; k++) ys[k][j] = my + (k - 2) * g; }
+    // re-anchor: four of five lines also match a pattern one line off (an empty line where there
+    // is none, the real outer line left out); keep the five consecutive positions with the most ink
+    {
+      const cover = (sh) => { let n = 0; for (let j = 0; j < t.length; j++) { const { p } = prof[t[j].s]; const g = (ys[4][j] - ys[0][j]) / 4; n += Math.min(...[0, 1, 2, 3, 4].map(k => pk(p, ys[k][j] + sh * g))); } return n; };
+      let bestSh = 0, bestC = cover(0);
+      for (const sh of [-1, 1]) { const cv = cover(sh); if (cv > bestC * 1.2) { bestC = cv; bestSh = sh; } }
+      if (bestSh) for (let j = 0; j < t.length; j++) { const g = (ys[4][j] - ys[0][j]) / 4; for (let k = 0; k < 5; k++) ys[k][j] += bestSh * g; }
+    }
     const dense = [0, 1, 2, 3, 4].map(k => densify(xs, ys[k], w));
     const staff = { xs, ys, dense, yAt(k, x) { const xi = Math.max(0, Math.min(w - 1, Math.round(x))); return this.dense[k][xi]; }, spaceAt(x) { return (this.yAt(4, x) - this.yAt(0, x)) / 4; } };
     // extents: from the first to the last tracked strip, trimmed to where a window of one space

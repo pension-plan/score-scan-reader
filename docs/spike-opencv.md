@@ -2,6 +2,28 @@
 
 Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
 
+## Update: dashed staves re-anchored; local threshold tried (not shipped)
+
+**Re-anchor** (`staves.js` `detectDashedStaves`): with four of five lines allowed, the comb also matched a staff one
+line off (an empty position above, the real bottom line left out; L11 page 1 staff 2: fitted at 565 / 578 / 591 /
+603 / 616 px, the dashes at 578 … 628). Each fallback staff is now shifted by one line when the five positions one
+line up or down carry clearly more ink (weakest line × 1.2). L11 `hymn-descant-cue-notes-amen-small` severe **0.228 →
+0.550** (pitch 0.12 → 0.64, duration 0.08 → 0.43, parts 0.38 → 0.86): heads on the staff lines are no longer removed
+with them, clefs read (G / F), 4 + 3 and 4 + 5 measures found. Challenge 0.8268 → 0.8277, 2 items changed, both up
+(also `wind-melody-phone` severe +0.020); coverage unchanged. Still missing on L11: barlines in some measures, about a
+third of the heads on the descant staff, the 75 % descant staff's own system and the Amen staff on page 2.
+
+**Local (Sauvola) threshold**, window three staff spaces, tried on rereads of pages whose reading looks broken:
+- L19 `satb-closed-lyrics-both-staves-de` severe gains (k = 0.1: barlines 7 → 20, measures 2 + 4 → 5 + 5;
+  aggregate 0.635 → 0.680), but
+- gated on a broken first reading, the reading-coherence check is fooled by the extra barlines Sauvola invents on
+  noisy pages: challenge −0.004 (`andantino-piano-combo` scan −0.63, `wind-melody-phone` scan −0.57,
+  `lyr04` severe −0.25);
+- gated on the severe-phone quality rule instead: L19 +0.045, but `andantino-piano-phone` severe −0.385,
+  `twinkle-piano2p-phone` severe −0.100, `agrace-satb-phone` severe −0.094.
+No gate separated L19 from the pages it hurts without fitting to that one item, so it is not shipped
+(`binarize.js` already has `sauvola()`; front.js would only need a mode to use it).
+
 ## Update: dashed-staff fallback finder (L11)
 
 `staves.js` `detectDashedStaves`, called from `front.js` only when the normal finder (all binarisation modes) found
