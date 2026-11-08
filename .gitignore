@@ -22,6 +22,9 @@ spike/ml/ortweb/
 spike/ml/scans/
 spike/*/vendor/
 spike/opencv/node_modules/
+# built by mvp/tools/build.js in CI, Pages and releases; agents with different working trees
+# kept conflicting on it, so it is not tracked (mvp/dist/assets still is)
+mvp/dist/index.html
 corpus/**/_work/
 corpus/**/_logs/
 probe/
