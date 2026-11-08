@@ -1,0 +1,13 @@
+n 365 aggregate 0.8265 -> 0.8268 (+0.0003) | pitch 0.9056 -> 0.9061 (+0.0005) | duration 0.8726 -> 0.8727 (+0.0001) | rests 0.7827 -> 0.7827 (+0.0000) | parts 0.9383 -> 0.9391 (+0.0008) | lyrics 0.463 -> 0.463 (+0.0000) | xml_valid 1 -> 1 (+0.0000) | crashes 0 -> 0 (+0.0000) | runtime_ms_mean 2445 -> 2384 (-61)
+  by_variant scan           n=123 agg 0.8471 -> 0.8471 (+0.0000)  dur 0.9115->0.9115 pitch 0.9378->0.9378 rests 0.8361->0.8361
+  by_variant scan-mild      n=123 agg 0.8574 -> 0.8574 (+0.0000)  dur 0.9387->0.9387 pitch 0.9511->0.9511 rests 0.8864->0.8864
+  by_variant scan-severe    n=119 agg 0.7731 -> 0.7742 (+0.0011)  dur 0.7642->0.7645 pitch 0.8253->0.8269 rests 0.6203->0.6203
+  by_category degradation    n=251 agg 0.8697 -> 0.8697 (+0.0000)  dur 0.9251->0.925 pitch 0.9509->0.9512 rests 0.8667->0.8667
+  by_category layout         n=21 agg 0.7376 -> 0.743 (+0.0054)  dur 0.6947->0.6985 pitch 0.73->0.7357 rests 0.3668->0.3668
+  by_category lyrics         n=24 agg 0.7227 -> 0.7227 (+0.0000)  dur 0.8443->0.8443 pitch 0.904->0.904 rests 0.7017->0.7017
+  by_category pitch          n=24 agg 0.7017 -> 0.7017 (+0.0000)  dur 0.7474->0.7474 pitch 0.7192->0.7192 rests 0.5697->0.5697
+  by_category rhythm         n=24 agg 0.8141 -> 0.8141 (+0.0000)  dur 0.6965->0.6965 pitch 0.8488->0.8488 rests 0.7403->0.7403
+  by_category voices         n=21 agg 0.6741 -> 0.6741 (+0.0000)  dur 0.7999->0.7999 pitch 0.8192->0.8192 rests 0.5786->0.5786
+items changed: 2/365; first time signature right: off 354/365, on 354/365
+  +0.0133 degradation/wind-melody-phone/scan-severe  agg 0.7266666666666667->0.74 dur 0.8->0.76 time 4/4->6/4 (truth 3/4)
+  +0.1145 layout/hymn-descant-cue-notes-amen-small/scan-severe  agg 0.11333333333333334->0.22782529670348609 dur 0->0.07920792079207921 time null->3/8 (truth 4/4)

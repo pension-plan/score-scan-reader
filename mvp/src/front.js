@@ -4,7 +4,7 @@
 const { binarize, boxBlur, despeckle, clearEdgeBands } = require('./binarize');
 const { estimateSkew } = require('./skew');
 const { estimateStaffSpace } = require('./staffspace');
-const { detectStaves, groupSystems, mergeStaffSets, lineCoverage, bridgeRows } = require('./staves');
+const { detectStaves, detectDashedStaves, groupSystems, mergeStaffSets, lineCoverage, bridgeRows } = require('./staves');
 const { removeStaffLines } = require('./staffremoval');
 const { detectHeads, chordStems, ledgerOK } = require('./heads');
 const { threshold } = require('./binarize');
@@ -252,6 +252,12 @@ function* frontSteps(gray0, opts = {}) {
       // upright readings first; a turned page only when none of them works
       if (ctx.staves.length && (q !== 0 || !tries[i + 1] || tries[i + 1][0] !== 0)) break;
     }
+  }
+  // staff lines broken into dashes (thin copies of halftoned or low-resolution pages): the
+  // fallback finder (staves.js detectDashedStaves), only when no staff was found at all
+  if (!ctx.staves.length && opts.dashed !== false) {
+    const d = detectDashedStaves(ctx.B, ctx.sp.lt);
+    if (d.staves.length >= 2) { ctx.staves = d.staves; ctx.sp = Object.assign({}, ctx.sp, { ss: d.ss }); }
   }
   let { gray, B, L0, sp, ltL, scale, skew, staves } = ctx;
   if (!staves.length) {

@@ -1,0 +1,15 @@
+n 306 aggregate 0.7818 -> 0.7818 (+0.0000) | pitch 0.7668 -> 0.7668 (+0.0000) | duration 0.6971 -> 0.6971 (+0.0000) | rests 0.6452 -> 0.6452 (+0.0000) | parts 0.787 -> 0.787 (+0.0000) | lyrics 0.7745 -> 0.7745 (+0.0000) | xml_valid 1 -> 1 (+0.0000) | crashes 0 -> 0 (+0.0000) | runtime_ms_mean 3610 -> 3558 (-52)
+  by_family layouts        n=60 agg 0.7211 -> 0.7211 (+0.0000)  dur 0.7788->0.7788 pitch 0.7431->0.7431 rests 0.6412->0.6412
+  by_family lyrics         n=6 agg 0.7842 -> 0.7842 (+0.0000)  dur 0.9414->0.9414 pitch 0.9862->0.9862 rests 0.8333->0.8333
+  by_family marks          n=27 agg 0.8476 -> 0.8476 (+0.0000)  dur 0.743->0.743 pitch 0.8664->0.8664 rests 0.7811->0.7811
+  by_family notes          n=30 agg 0.8186 -> 0.8186 (+0.0000)  dur 0.5734->0.5734 pitch 0.813->0.813 rests 0.7081->0.7081
+  by_family percussion     n=3 agg 0.6139 -> 0.6139 (+0.0000)  dur 0.2278->0.2278 pitch 0.5242->0.5242 rests 0.0243->0.0243
+  by_family perf           n=63 agg 0.8288 -> 0.8288 (+0.0000)  dur 0.7743->0.7743 pitch 0.8362->0.8362 rests 0.6388->0.6388
+  by_family pitch          n=36 agg 0.7846 -> 0.7846 (+0.0000)  dur 0.7136->0.7136 pitch 0.6374->0.6374 rests 0.7222->0.7222
+  by_family rests          n=27 agg 0.7283 -> 0.7283 (+0.0000)  dur 0.504->0.504 pitch 0.6603->0.6603 rests 0.4718->0.4718
+  by_family structure      n=24 agg 0.7936 -> 0.7936 (+0.0000)  dur 0.7487->0.7487 pitch 0.752->0.752 rests 0.7421->0.7421
+  by_family time           n=30 agg 0.7599 -> 0.7599 (+0.0000)  dur 0.5651->0.5651 pitch 0.7762->0.7762 rests 0.4924->0.4924
+  by_variant clean          n=102 agg 0.8111 -> 0.8111 (+0.0000)  dur 0.7571->0.7571 pitch 0.816->0.816 rests 0.7098->0.7098
+  by_variant scan           n=102 agg 0.8028 -> 0.8028 (+0.0000)  dur 0.7384->0.7384 pitch 0.8006->0.8006 rests 0.6853->0.6853
+  by_variant scan-severe    n=102 agg 0.7314 -> 0.7314 (+0.0000)  dur 0.5958->0.5958 pitch 0.6838->0.6838 rests 0.5406->0.5406
+items changed: 0/306; first time signature right: off 269/306, on 269/306

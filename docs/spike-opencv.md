@@ -2,6 +2,27 @@
 
 Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
 
+## Update: dashed-staff fallback finder (L11)
+
+`staves.js` `detectDashedStaves`, called from `front.js` only when the normal finder (all binarisation modes) found
+no staff at all. Staff lines that survive only as dashes never give a strip five clean projection peaks, and the
+staff-space estimate is wrong (L11 severe: estimated 24 px, true 12.4 px). The fallback:
+- staff space from the autocorrelation of the thin-line row profile over 10 wide strips (lag 5–40 px, the lag
+  whose double also matches; sub-pixel by a parabola): 12.53 / 12.31 px on the two L11 pages;
+- per strip, rows where four of five lines at that spacing carry line ink and the rows between them are
+  lighter (a text block or beam is dense throughout); local maxima tracked across strips; lines fitted equally
+  spaced; extents trimmed / extended along the staff's slope while one-space windows show dashes on three lines,
+  and extended to the page's shared margins when a third of the way still shows dashes.
+
+Result (`spike/opencv/results/r6-*.txt`): L11 `hymn-descant-cue-notes-amen-small` severe **0.113 → 0.228** (4 + 4
+staves found where there were none; pitch 0 → 0.12, parts 0.07 → 0.38). Challenge 0.8265 → 0.8268, 2 items changed,
+both up (also `wind-melody-phone` severe +0.013); coverage unchanged (its two pages without staves,
+`pitch-cov-clef-changes-piano` and `rst08-tuplet-beam-rests` severe, have their staff lines erased altogether, not
+dashed: nothing to fit). What breaks next on L11: on the found staves only 8–18 heads per staff are detected
+(about a third), barlines are not found (one measure per system), and on page 2 the 75 % descant staff and the
+14-pt Amen staff are missed or merged; the cue-size notes are not reached yet. The head and barline detectors
+would need the same dashed-line tolerance.
+
 ## Update: dewarp of photographed / curled pages, flatten for severe phone shots (plain JS)
 
 **Dewarp** (`cv.js` `dewarpPage`, `dewarpReading`; hook in `omr.js` `analyse`). After the global deskew a phone
