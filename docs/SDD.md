@@ -1024,6 +1024,14 @@ repeat), each line under its own note row; golden1923-america 1 of 2 (the other 
 against truth-underlaid.musicxml: lyrics 0.667 → 0.979 (scan), 0.664 → 0.931 (scan-mild); severe reads no
 stanzas. `score.stanzas = { printed, set }` tells the page whether to offer the option.
 
+Extender lines (L4b, `lyrics.js scanExtenders`): besides the flat components the row reader classes as
+extenders, each word-final syllable is checked in the page binary from the middle of its box to a little past
+its end for columns whose only ink near the baseline is a thin stroke (at most 0.35 x-height thick, nothing in
+the letters' body above it), at least 0.8 x-height long and reaching the word's end. This finds lines joined to a
+descender or inside the word's OCR box ("zing_"). Such a line marks a melisma but not its end (it often stops at
+the box), so it sets no extendTo. Challenge with OCR: extenders 1550 to 1721 against 1816 in truth (sum of
+per-item differences 422 to 275); benchmark 157 to 162 against 126 (53 to 54); lyric scores unchanged.
+
 Melismas (L4b). Slurs and ties read on the page (text.js curves, assigned to the staff nearest their ends)
 mark the notes under a curve after its first note as continuing a syllable: alignment charges 0.8 for setting a
 new syllable there. A syllable followed by notes without one gets an extender when the page marks the melisma:

@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 04:25 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 04:44 AEDT.
 
 ## Events
 
@@ -170,6 +170,8 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 04:23 | perf 94364c0: German OCR model fast (-0.48 MB). regress --ocr now uses the app's OCR languages (abf02ac); asset swaps still not A/B-gated — perf to extract traineddata from refs too. |
 | 04:25 | perf: the 0.073 drop is English lyrics noise on a severe photocopy (not German); regress.mjs now takes traineddata from the base/head refs (c3b20e8), so model swaps are gated; CI runs ~2.5 min. Next: widen the CI gate to the challenge set and app-OCR benchmark. |
 | 04:25 | structure wrong-pitch cause table (L37); fermata re-attach tried, not shipped (detection is the real gap). Routed: structure clef octave/tenor-alto/keys; opencv missing heads and step errors after the staff finder; textsym fermata recall. |
+| 04:36 | opencv cue-notes v2 (detection + <cue/> writer) not shipped (-0.0006): blocked on a cue voice over a whole-bar rest being dropped in voice assignment; patch handed to voices. structure's cue item dropped. opencv back to the staff finder (L38) then missing heads. |
+| 04:44 | perf 9865bed: CI gates widened (benchmark with app OCR + models from refs, and the challenge set), failing on any regression; CI 2.5 to 9.3 min. perf next: extra (false) notes, the second-largest error. |
 
 ## Accuracy by round
 

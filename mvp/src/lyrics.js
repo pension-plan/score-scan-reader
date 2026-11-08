@@ -899,6 +899,46 @@ function markExtenders(syl, ext, sp) {
   }
 }
 
+// Extender lines read straight from the page binary: right after a word's
+// last syllable, columns whose only ink near the baseline is a thin stroke
+// (at most 0.35 x-height thick, nothing in the letters' body above it) over
+// at least 0.8 x-height, reaching the word's right end. Joined to the
+// syllable's descender ("zing_") or too faint to make a component of its own,
+// the row reader did not report them. Such a line is often short (it stops
+// at the word's box), so it says only that a melisma follows, not where it
+// ends (no extendTo).
+function scanExtenders(B, syl, g) {
+  if (!B || !B.data || g.bl == null || !g.xh) return;
+  const { width: W, height: H, data } = B, xh = g.xh, sp = g.sp || 2 * xh;
+  const y0 = Math.max(0, Math.round(g.bl - 0.25 * xh)), y1 = Math.min(H - 1, Math.round(g.bl + 0.45 * xh));
+  const b0 = Math.max(0, Math.round(g.bl - 0.75 * xh)), b1 = Math.max(0, Math.round(g.bl - 0.35 * xh));
+  const thick = Math.max(2, 0.35 * xh);
+  const lineCol = (x) => {
+    if (x < 0 || x >= W) return false;
+    let n = 0;
+    for (let y = y0; y <= y1; y++) if (data[y * W + x]) n++;
+    if (!n || n > thick) return false;
+    for (let y = b0; y <= b1; y++) if (data[y * W + x]) return false;
+    return true;
+  };
+  for (const s of syl) {
+    if (s.extend || s.x1 == null || s.syllabic === 'begin' || s.syllabic === 'middle') continue;
+    // the line may sit inside the word's box (OCR boxes "zing_" whole) or
+    // start just after it: the last run of line columns from the word's
+    // middle to a little past its end
+    const xa = Math.round(s.x0 != null ? (s.x0 + s.x1) / 2 : s.x1 - xh), xb = Math.round(s.x1 + Math.min(1.2 * sp, 3 * xh));
+    let best = null;
+    for (let x = xa; x <= xb; x++) {
+      if (!lineCol(x)) continue;
+      let e = x, gap = 0;
+      for (let t = x + 1; t < W && gap <= 2; t++) { if (lineCol(t)) { e = t; gap = 0; } else gap++; }
+      if (!best || e - x > best.e - best.x) best = { x, e };
+      x = e;
+    }
+    if (best && best.e - best.x + 1 >= 0.8 * xh && best.e >= s.x1 - 0.3 * xh) { s.extend = true; s.extendScanned = true; }
+  }
+}
+
 // a printed hyphen between two syllables (geometry) links them even when
 // OCR read it as "." or missed it ("Fair . est" -> Fair- est)
 function linkHyphens(syl, hyphens) {
@@ -1421,13 +1461,16 @@ async function readLyrics(fr, ocr, onProgress, opts) {
     if (ln.above) entry.above = true;
     Object.defineProperty(entry, 'geo', { value: { bl: ln.baseline ?? ln.y1, numberConf, sp: ln.sp }, enumerable: false });
     (out[ln.sys] ||= []).push(entry);
-    geo.set(entry, { sp: ln.sp, staff: fr.systems[ln.sys][ln.band], x0: ln.x0, x1: ln.x1, extenders: ln.extenders || [],
+    geo.set(entry, { sp: ln.sp, staff: fr.systems[ln.sys][ln.band], x0: ln.x0, x1: ln.x1, extenders: ln.extenders || [], bl: ln.baseline, xh: ln.xh,
       hyphens: ln.hyphens ? ln.hyphens.map(h => (h.x0 + h.x1) / 2) : row.clusters.filter((c, i) => row.hy[i]).map(([a, b]) => row.xa + (a + b) / 2) });
     step();
   }
   for (const [v, g] of geo) linkHyphens(v.syllables, g.hyphens);
   // melisma: an extender line after a syllable holds it over the following notes
   for (const [v, g] of geo) markExtenders(v.syllables, g.extenders, g.sp);
+  // extender lines the row's components missed (joined to a descender, or
+  // too faint to be a component): read along the baseline in the binary
+  for (const [v, g] of geo) scanExtenders(fr.B, v.syllables, g);
   // text above a staff belongs to that staff only when it follows its notes;
   // the lower rows between two staves may belong to the staff below
   if (o.aboveLines) placeRows(fr, out, geo);
