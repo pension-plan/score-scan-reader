@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.4.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.3.0...score-scan-reader-v0.4.0) (2026-11-08)
+
+
+### Features
+
+* **heads:** ledger checks on both binaries, narrow-font heads, fewer false hollow heads, front-end fallbacks (round 2) ([2166f93](https://github.com/pension-plan/score-scan-reader/commit/2166f93405fc7b5fc7486f000264d0cd9edc2737))
+* **site:** changelog panel and engine label on /app/; ci: regression check against the last release on every push ([03214a3](https://github.com/pension-plan/score-scan-reader/commit/03214a346afa4fa0a4e989104503b2018af25761))
+* **symbols:** tuplet detection with 840 divisions, robust key/clef reading on old prints, clef/key change detection (round 2) ([bae11b0](https://github.com/pension-plan/score-scan-reader/commit/bae11b09277df56154849862d502fd7f9c6ebd09))
+
 ## [0.3.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.2.0...score-scan-reader-v0.3.0) (2026-11-08)
 
 
