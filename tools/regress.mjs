@@ -69,7 +69,34 @@ if (worse.length) {
   L.push('|---|---|---|---|');
   for (const r of worse.slice(0, 25)) L.push(`| ${r.id} | ${f(r.a)} | ${f(r.b)} | ${d(r.a, r.b)} |`);
 }
+// Notation the scorer does not grade (dynamics, words, ties...) can vanish without moving any
+// metric, as when a broken import dropped every dynamic in 0.21.0. Count each element across
+// all produced MusicXML files and treat a drop of more than 10% (from at least 10) as a regression.
+const MARKS = ['dynamics', 'wedge', 'words', 'metronome', 'credit', 'tie', 'slur', 'fermata', 'grace', 'time', 'key', 'lyric'];
+const outDir = (label) => path.join(ROOT, `mvp/work/regress-${label}-${set}${ocr ? '-ocr' : ''}.out`);
+const countMarks = (dir) => {
+  const n = Object.fromEntries(MARKS.map((m) => [m, 0]));
+  if (!fs.existsSync(dir)) return null;
+  for (const f of fs.readdirSync(dir)) {
+    if (!f.endsWith('.musicxml')) continue;
+    const x = fs.readFileSync(path.join(dir, f), 'utf8');
+    for (const m of MARKS) n[m] += (x.match(new RegExp(`<${m}[\\s/>]`, 'g')) || []).length;
+  }
+  return n;
+};
+const mA = countMarks(outDir(base)), mB = countMarks(outDir('head'));
+const markDrops = [];
+if (mA && mB) {
+  L.push('');
+  L.push('| Elements written | ' + base + ' | ' + head + ' |');
+  L.push('|---|---|---|');
+  for (const m of MARKS) {
+    L.push(`| ${m} | ${mA[m]} | ${mB[m]} |`);
+    if (mA[m] >= 10 && mB[m] < mA[m] * 0.9) markDrops.push(`${m} ${mA[m]} → ${mB[m]}`);
+  }
+}
 const fails = [];
+if (markDrops.length) fails.push(`fewer elements written: ${markDrops.join(', ')}`);
 if (sB.all.aggregate < sA.all.aggregate - 0.005) fails.push(`aggregate dropped ${d(sA.all.aggregate, sB.all.aggregate)}`);
 if (sA.real && sB.real && sB.real.aggregate < sA.real.aggregate - 0.01) fails.push(`real-scan aggregate dropped ${d(sA.real.aggregate, sB.real.aggregate)}`);
 if ((sB.all.crashes || 0) > (sA.all.crashes || 0)) fails.push(`crashes rose ${sA.all.crashes} → ${sB.all.crashes}`);
