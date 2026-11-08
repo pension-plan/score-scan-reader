@@ -2,7 +2,11 @@
 // Regression check: score the current pipeline and a released version on the same
 // corpus with the same options, and report what got worse.
 //
-//   node tools/regress.mjs [--base <tag>] [--set default|challenge] [--ocr] [--jobs N] [--out file.md]
+//   node tools/regress.mjs [--base <tag>] [--head <ref>] [--set default|challenge] [--ocr] [--jobs N] [--out file.md]
+//
+// --head scores a committed ref (git archive, like the base) instead of the working tree's
+// mvp/src. Several agents share this working tree, so without --head the head side also
+// includes everyone's uncommitted changes; a warning is printed when mvp/src is dirty.
 //
 // --base defaults to the latest score-scan-reader-v* tag. The base's mvp/src is
 // extracted with `git archive` into mvp/work/regress/<tag>/src and scored with
@@ -45,8 +49,20 @@ const run = (label, src) => {
   return JSON.parse(fs.readFileSync(out, 'utf8'));
 };
 
-const A = run(base, baseSrc), B = run('head', null);
-const head = git('rev-parse', '--short', 'HEAD');
+const headRef = opt('--head', null);
+let headSrc = null;
+if (headRef) {
+  const hw = path.join(ROOT, 'mvp/work/regress', 'head-' + headRef.replace(/[^\w.-]/g, '_'));
+  headSrc = path.join(hw, 'src');
+  fs.rmSync(hw, { recursive: true, force: true });
+  fs.mkdirSync(hw, { recursive: true });
+  const tar = execFileSync('git', ['archive', headRef, 'mvp/src'], { cwd: ROOT, maxBuffer: 1 << 28 });
+  spawnSync('tar', ['-x', '-C', hw, '--strip-components=1'], { input: tar });
+} else if (git('status', '--porcelain', '--', 'mvp/src')) {
+  console.error('warning: mvp/src has uncommitted changes (possibly other agents\' work); they are scored as head. Use --head <ref> to score a commit.');
+}
+const A = run(base, baseSrc), B = run('head', headSrc);
+const head = headRef ? git('rev-parse', '--short', headRef) : git('rev-parse', '--short', 'HEAD') + (git('status', '--porcelain', '--', 'mvp/src') ? '+wip' : '');
 const sA = A.summary, sB = B.summary;
 const f = (v) => (typeof v === 'number' ? v.toFixed(3) : '–');
 const d = (a, b) => (typeof a === 'number' && typeof b === 'number' ? (b - a >= 0 ? '+' : '') + (b - a).toFixed(3) : '');
