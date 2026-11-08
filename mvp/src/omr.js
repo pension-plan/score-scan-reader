@@ -102,6 +102,7 @@ function createConverter(opts = {}) {
   const pages = [];
   const lyricsBySystem = {};
   const warnings = [];
+  let allLyrics = null;
 
   async function readPageLyrics(entry, label, i, n) {
     if (!opts.ocr) return;
@@ -163,18 +164,22 @@ function createConverter(opts = {}) {
       fr.L = null;
       keepPacked(fr, 'R');
     },
-    finish() {
+    // fo: options for this build (stanzasAsVerses); finish() may be called
+    // again with other options and rebuilds the score from the same pages
+    finish(fo = {}) {
       progress('Building parts', { stage: 'parts' });
+      if (allLyrics) { for (const k in lyricsBySystem) delete lyricsBySystem[k]; Object.assign(lyricsBySystem, allLyrics); }
+      else allLyrics = Object.fromEntries(Object.entries(lyricsBySystem).map(([k, v]) => [k, v.slice()]));
       let score;
-      try { score = buildScore(pages, lyricsBySystem, { ocr: !!opts.ocr, copyLyrics: !!opts.copyLyrics, debug: opts.debug }); }
+      try { score = buildScore(pages, lyricsBySystem, { ocr: !!opts.ocr, copyLyrics: !!opts.copyLyrics, debug: opts.debug, stanzasAsVerses: !!(fo.stanzasAsVerses ?? opts.stanzasAsVerses) }); }
       catch (e) { score = { parts: [], warnings: ['Assembly failed: ' + e.message], xml: '' }; }
       // show only the text lines that were attached to notes (stanza text printed
       // below the music, titles and dynamics are not underlay)
       if (score.layout && Object.values(lyricsBySystem).some(l => l.some(v => v.used))) {
         for (const k in lyricsBySystem) lyricsBySystem[k] = lyricsBySystem[k].filter(v => v.used);
       }
-      if (!pages.length) warnings.push('No staves were detected. Try a cleaner or higher-resolution scan.');
-      return { pages, score, lyricsBySystem, warnings: warnings.concat(score.warnings || []) };
+      const none = pages.length ? [] : ['No staves were detected. Try a cleaner or higher-resolution scan.'];
+      return { pages, score, lyricsBySystem, warnings: warnings.concat(none, score.warnings || []) };
     },
   };
 }

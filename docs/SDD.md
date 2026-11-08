@@ -959,6 +959,16 @@ while both scores about 0.67 on every item. Setting it once under the lower voic
 by +0.03 on the amen item and -0.05 to -0.06 on the anthem, and the benchmark the same way (bwv3-6 up, aloha
 down).
 
+Stanzas printed as a text block below the music (`lyrics.js readStanzas` → `fr.stanzas`) are written as
+`<credit type="lyrics">` by default, as the corpus truth carries them. With `opts.stanzasAsVerses` (L5b, off by
+default; `createConverter().finish({ stanzasAsVerses })` rebuilds the score from the same pages, and the worker's
+`finish` message takes `opts`) each stanza is split into words and syllables (`syllabify`, language from
+`detectLang`) and set, one syllable per note, on the notes of the part that carries the underlay where any printed
+verse has a syllable (so the printed verses' melismas are kept), as verse number = the stanza's printed number.
+A stanza whose syllable count differs from those notes by more than 15 % stays a credit. lyr06-amazing-grace
+against truth-underlaid.musicxml: lyrics 0.667 → 0.979 (scan), 0.664 → 0.931 (scan-mild); severe reads no
+stanzas. `score.stanzas = { printed, set }` tells the page whether to offer the option.
+
 A melisma inferred from notes left without a syllable (no extender line seen in print) is dropped when letters
 are printed in the verse's own text row under one of those notes (outside the syllable's own box and the next
 one's): the gap is a syllable OCR missed, not a melisma (L4b). Measured on the benchmark with OCR: extenders 166

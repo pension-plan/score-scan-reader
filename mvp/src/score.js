@@ -9,6 +9,7 @@ const { readArticulations, readDoubleDots } = require('./artic');
 const { readOttavas } = require('./ottava');
 const { pageMarks } = require('./symbols');
 const { instrumentXML, soundDynamics, tempoFromWords } = require('./playback');
+const { syllabify, detectLang } = require('./lyrics');
 
 const COLORS = ['#d1495b', '#edae49', '#00798c', '#30638e', '#7b5ea7', '#3a7d44'];
 
@@ -1055,6 +1056,8 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     if (tie) bandVoice[band] = 'all';
     if (pis.length > 1) lyrNotes.add(`Lyrics under staff ${+band + 1} attached to ${tie ? pis.map(pi => parts[pi].name).join(' and ') + ' (same rhythm, text sung by both)' : parts[best].name + (best === prior ? ' (upper voice)' : ' (its rhythm fits the syllables best)')}.`);
   }
+  // a score may be built again from the same pages (another option): start clean
+  for (const L of lines) { L.v.used = null; L.v.melismas = null; }
   for (const L of lines) {
     const { v, cands, sp } = L;
     let best = cands.find(c => c.pi === bandVoice[v.band]) || cands[0];
@@ -1198,8 +1201,39 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     seenFr.add(pg.fr);
     for (const st of pg.fr.stanzas || []) {
       const lines = (st.lines || []).map(l => String(l).trim()).filter(Boolean);
-      if (lines.length) credits.push({ page: Math.floor(pg.index || 0) + 1, label: st.label || (st.number ? st.number + '.' : ''), text: lines.join('\n') });
+      if (lines.length) credits.push({ page: Math.floor(pg.index || 0) + 1, label: st.label || (st.number ? st.number + '.' : ''), text: lines.join('\n'), number: st.number });
     }
+  }
+  // opts.stanzasAsVerses (L5b, off by default): each such stanza that fits the
+  // tune is set under the notes as one more verse of the voice carrying the
+  // underlay, syllable by syllable on the notes the printed verses use (their
+  // melismas kept); a stanza whose syllable count is off by more than 15 % of
+  // those notes stays a credit
+  const stanzas = { printed: credits.length, set: 0 };
+  if (opts.stanzasAsVerses && credits.length) {
+    let pi = -1, best = 0;
+    partMeasures.forEach((pm, i) => { let n = 0; pm.forEach(m => m && m[0] && m[0].events.forEach(e => { if (!e.rest && e.lyrics && Object.keys(e.lyrics).length) n++; })); if (n > best) { best = n; pi = i; } });
+    const slots = [];
+    if (pi >= 0) partMeasures[pi].forEach(m => m && m[0] && m[0].events.forEach(e => { if (!e.rest && e.lyrics && Object.keys(e.lyrics).length) slots.push(e); }));
+    const used = new Set(slots.flatMap(e => Object.keys(e.lyrics).map(Number)));
+    let set = 0;
+    for (const c of credits.slice()) {
+      const words = c.text.split(/\s+/).filter(w => /\p{L}/u.test(w));
+      const lang = detectLang([c.text]);
+      const syl = [];
+      for (const w of words) {
+        const parts_ = syllabify(w, lang);
+        parts_.forEach((t, k) => syl.push({ text: t, syllabic: parts_.length === 1 ? 'single' : k === 0 ? 'begin' : k === parts_.length - 1 ? 'end' : 'middle' }));
+      }
+      if (!slots.length || Math.abs(syl.length - slots.length) > 0.15 * slots.length) continue;
+      let num = c.number && !used.has(c.number) ? c.number : Math.max(0, ...used) + 1;
+      used.add(num);
+      syl.slice(0, slots.length).forEach((sy, k) => { slots[k].lyrics[num] = { text: sy.text, syllabic: sy.syllabic }; });
+      credits.splice(credits.indexOf(c), 1);
+      set++;
+    }
+    stanzas.set = set;
+    if (set) warnings.push(`${set} stanza${set > 1 ? 's' : ''} printed below the music set under the notes of ${parts[pi].name} as verse${set > 1 ? 's' : ''}.`);
   }
   if (credits.length) warnings.push(`${credits.length} stanza${credits.length > 1 ? 's' : ''} printed below the music kept as text in the file (not set under notes).`);
   const unitSys = units.map(u => u.m.sy);
@@ -1322,7 +1356,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   }
   if (barCheck) barCheck.notes.forEach(n => warnings.push(n));
   // UI compares clefs with 'F'; 'G8' stays a treble clef there
-  return { parts, layout, fifths, time, timeRead, clefs, ranges, measures: units.length, nNotes, credits, title: read.head.title || null, composer: read.head.composer || null, warnings: warnings.concat(layout.notes), xml, measureMap, barCheck, rhythm: { repaired, mismatch } };
+  return { parts, layout, fifths, time, timeRead, clefs, ranges, measures: units.length, nNotes, credits, stanzas, title: read.head.title || null, composer: read.head.composer || null, warnings: warnings.concat(layout.notes), xml, measureMap, barCheck, rhythm: { repaired, mismatch } };
 }
 
 // Horizontal extent of a syllable: lyrics.js may report x0/x1; otherwise it is

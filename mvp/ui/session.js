@@ -51,10 +51,10 @@ function __omrSessionModule() {
       },
       // this copy's finish() needs only fr.R and asm.comps (see release)
       releasePage: release,
-      finish() {
+      finish(fo) {
         progress('Building parts', { stage: 'parts' });
         let score;
-        try { score = buildScore(pages, lyricsBySystem, { ocr: !!opts.ocr, copyLyrics: !!opts.copyLyrics, debug: opts.debug }); }
+        try { score = buildScore(pages, lyricsBySystem, { ocr: !!opts.ocr, copyLyrics: !!opts.copyLyrics, debug: opts.debug, stanzasAsVerses: !!(fo && fo.stanzasAsVerses) }); }
         catch (e) { score = { parts: [], warnings: ['Assembly failed: ' + e.message], xml: '' }; }
         if (score.layout && Object.values(lyricsBySystem).some((l) => l.some((v) => v.used))) {
           for (const k in lyricsBySystem) lyricsBySystem[k] = lyricsBySystem[k].filter((v) => v.used);
@@ -279,7 +279,7 @@ function __omrSessionModule() {
   }
 
   // ------------------------------------------------------------ worker side
-  // Messages in: init {ocr, ocrExtra}, page {i, n, gray}, finish. Out: ready, progress,
+  // Messages in: init {ocr, ocrExtra}, page {i, n, gray}, finish {opts}. Out: ready, progress,
   // ocr {id, img, extra} (answered by ocr-res), page-done, done, error.
   function workerMain(scope, req) {
     let session = null;
@@ -324,7 +324,8 @@ function __omrSessionModule() {
         if (session.releasePage) { session.releasePage(entry); (entry.spread || []).forEach((h) => session.releasePage(h)); }
         post({ t: 'page-done', i: m.i, ms: Date.now() - t0, view, thumb }, [thumb.data.buffer]);
       } else if (m.t === 'finish') {
-        const res = session.finish();
+        // m.opts: build options (stanzasAsVerses); a later finish rebuilds the score
+        const res = session.finish(m.opts || {});
         post({ t: 'done', result: resultSummary(res) });
       }
     }
