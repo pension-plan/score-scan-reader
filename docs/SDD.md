@@ -1172,13 +1172,17 @@ staff, its pitch from its staff position. Coverage recall (clean / scan / severe
 notes on scans are mostly missed: the head detector takes their heads as normal notes (they are then
 explained ink), which this does not undo.
 
+**Fermatas** (an arc with a dot inside its bow) go on the note or rest nearest by x on the staff they
+stand by, as `<fermata type="upright">` (or `inverted` below the staff). Coverage recall 62 / 37 / 27%
+(clean / scan / severe; 0 before), no item metric changed.
+
 **Overlay colours.** Text `--ov-text` #5e35b1, bar numbers `--ov-barno` #263238, dynamics and hairpins
 `--ov-dyn` #0277bd, slurs / ties / fermatas `--ov-slur` #f06292, braces and brackets `--ov-brace`
 #8d6e63, grace notes `--ov-grace` #e040fb; ledger lines are drawn with the staff (`--ov-staff`). Each is a stroke plus a 0.26 multiplied
 fill, like every other symbol layer.
 
 **Accuracy** (coverage suite, recall on clean / scan / scan-severe; all were 0 before): see the dynamics,
-hairpin, tempo and text rows of `docs/COVERAGE.md`. Not done: fermatas are drawn on the overlay but not written to MusicXML, measure numbers are labelled but not
+hairpin, tempo and text rows of `docs/COVERAGE.md`. Not done: measure numbers are labelled but not
 used to change the bar count by default (see above), rehearsal marks and chord symbols stay text or unknown. Pedal marks and
 fingering are not classified.
 
@@ -1204,9 +1208,17 @@ after each preview render). The timing model is a pure module shared with the No
   beats tempo words (Allegro 132, Andante 80, Moderato 104, "Not fast" 80 for the rag, Tempo di marcia 112,
   ...), else 100 qpm. rit./rall. step down to 82 %, a tempo / Tempo I restore. A fermata holds 1.5x (the
   span plays at 2/3 speed in every part). The player scales all of it by 50-200 %.
-- **Dynamics.** ppp..fff -> velocity 26..120 (mf 80 by default), `<sound dynamics>`, sf/sfz/fz/fp as
-  accents, wedges and cresc./dim. words ramp to the next dynamic (or +-18), accents +12/+18, staccato
-  halves the length; other notes are slightly detached (legato for organ).
+- **Dynamics.** ppp..fff -> velocity 26..120 (p 52, mp 66, mf 80, f 96), `<sound dynamics>` (velocity =
+  value x 90 / 100), sf/sfz/fz/fp as accents, wedges and cresc./dim. words ramp to the next dynamic (or
+  +-18), accents +12/+18, staccato halves the length; other notes are slightly detached (legato for organ).
+  Before the first marking notes play at 72 (between mp and mf), so a first mf is heard as a change from
+  its onset. Staff scope in a multi-staff part: a mark with no `<staff>`, or marks on one staff only, apply
+  to the whole part (an mf printed under the left hand means both hands); when two or more staves carry
+  their own marks, each staff follows its own (a mark with no `<staff>` still reaches all). The transport
+  shows the marking in force ("mf", or "RH f · LH p" / per part when they differ). The score writer adds
+  `<sound dynamics>` after each written dynamic (% of the default forte, MuseScore's convention: ppp 28.89,
+  pp 42.22, p 57.78, mp 73.33, mf 88.89, f 106.67, ff 122.22, fff 133.33; accent-type marks such as sfz get
+  none), so MuseScore, Finale and other players hear the same loudness; wedges are unchanged.
 - **Instruments.** A GM program per part from its name (Piano 0, Organ 19, Violin 40, Viola 41, Cello 42,
   Flute 73, Clarinet 71, Trumpet 56, Tuba 58, Guitar 24, ...; Soprano/Alto/Tenor/Bass/Chorus 52 Choir Aahs,
   a single or solo voice 53 Voice Oohs; drums on channel 10). The score writer now writes it into every

@@ -336,7 +336,7 @@ function classifyMarks(fr, asm, left) {
       // a short arc with a dot inside its bow: a fermata
       const dot = w <= 3 * sp && left.find(d => d !== c && d.x1 - d.x0 <= 0.7 * sp && d.y1 - d.y0 <= 0.7 * sp && (d.x0 + d.x1) / 2 > c.x0 + 0.3 * w && (d.x0 + d.x1) / 2 < c.x1 - 0.3 * w &&
         Math.abs((d.y0 + d.y1) / 2 - cy) <= 1.2 * sp);
-      if (dot) { out.fermatas.push({ box: [Math.min(c.x0, dot.x0), Math.min(c.y0, dot.y0), Math.max(c.x1, dot.x1), Math.max(c.y1, dot.y1)] }); fermataDots.add(dot); continue; }
+      if (dot) { out.fermatas.push({ box: [Math.min(c.x0, dot.x0), Math.min(c.y0, dot.y0), Math.max(c.x1, dot.x1), Math.max(c.y1, dot.y1)], sys: n ? n.sys : -1, k: n ? n.k : -1 }); fermataDots.add(dot); continue; }
       const sl = slurLike(R, c, sp);
       out.slurs.push({ box: [c.x0, c.y0, c.x1, c.y1], ends: sl.ends, up: sl.up });
       continue;

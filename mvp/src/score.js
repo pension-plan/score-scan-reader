@@ -4,7 +4,7 @@
 const { staffMeasureEvents, pitchOf, keyAlters, DIV } = require('./assemble');
 const { detectRests, mergeRests, restBars } = require('./rests');
 const { pageMarks } = require('./symbols');
-const { instrumentXML } = require('./playback');
+const { instrumentXML, soundDynamics } = require('./playback');
 
 const COLORS = ['#d1495b', '#edae49', '#00798c', '#30638e', '#7b5ea7', '#3a7d44'];
 
@@ -1043,7 +1043,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   // and credits, part abbreviations, dynamics, hairpins, tempo and expression text
   let read = { dirs: parts.map(() => units.map(() => [])), head: {}, nDyn: 0, nWedge: 0, nWords: 0 };
   try { read = readMarks(pages, segs, units, parts, partMeasures); } catch (e) { warnings.push(`Text and dynamics not placed (${e.message}).`); }
-  if (read.nDyn || read.nWedge || read.nWords || read.nTie || read.nSlur || read.nGrace) warnings.push(`Read from the page: ${[read.nDyn && `${read.nDyn} dynamic${read.nDyn > 1 ? 's' : ''}`, read.nWedge && `${read.nWedge} hairpin${read.nWedge > 1 ? 's' : ''}`, read.nWords && `${read.nWords} tempo / expression text${read.nWords > 1 ? 's' : ''}`, read.nTie && `${read.nTie} tie${read.nTie > 1 ? 's' : ''}`, read.nSlur && `${read.nSlur} slur${read.nSlur > 1 ? 's' : ''}`, read.nGrace && `${read.nGrace} grace note${read.nGrace > 1 ? 's' : ''}`].filter(Boolean).join(', ')}.`);
+  if (read.nDyn || read.nWedge || read.nWords || read.nTie || read.nSlur || read.nGrace || read.nFermata) warnings.push(`Read from the page: ${[read.nDyn && `${read.nDyn} dynamic${read.nDyn > 1 ? 's' : ''}`, read.nWedge && `${read.nWedge} hairpin${read.nWedge > 1 ? 's' : ''}`, read.nWords && `${read.nWords} tempo / expression text${read.nWords > 1 ? 's' : ''}`, read.nTie && `${read.nTie} tie${read.nTie > 1 ? 's' : ''}`, read.nSlur && `${read.nSlur} slur${read.nSlur > 1 ? 's' : ''}`, read.nGrace && `${read.nGrace} grace note${read.nGrace > 1 ? 's' : ''}`, read.nFermata && `${read.nFermata} fermata${read.nFermata > 1 ? 's' : ''}`].filter(Boolean).join(', ')}.`);
   const xml = toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, measures, credits, unitSys, title: read.head.title, head: read.head, dirs: read.dirs });
   const nNotes = partMeasures.map(pm => pm.reduce((a, m) => a + m.reduce((b, s) => b + s.events.filter(e => !e.rest && !e.forward).length, 0), 0));
   const ranges = partMeasures.map(pm => {
@@ -1373,7 +1373,7 @@ function readMarks(pages, segs, units, parts, partMeasures) {
     const marks = pageMarks(fr, pg.asm);
     if (!marks) continue;
     const sysIdx = (k) => (pg.asm.systems[k] ? pg.asm.systems[k].index : -1);
-    const place = (m, x, entry) => {
+    const place = (m, x, entry, tail) => {
       if (m.sys < 0 || m.k < 0) return;
       const st = pg.asm.systems[m.sys] && pg.asm.systems[m.sys].staves[m.k];
       const placement = st && (m.box[1] + m.box[3]) / 2 < st.st.yAt(0, x) ? 'above' : 'below';
@@ -1383,13 +1383,15 @@ function readMarks(pages, segs, units, parts, partMeasures) {
         const list = dirs[pi][at.mi];
         const xml = entry(placement);
         if (list.some(d => d.xml === xml && Math.abs(d.t - at.t) < 1e-6)) continue;
-        list.push({ t: at.t, staffNo: multi ? staffNo : 0, xml });
+        list.push({ t: at.t, staffNo: multi ? staffNo : 0, xml, tail: tail || '' });
       }
       return true;
     };
     for (const d of marks.dyns) {
       const tag = DYN_XML.has(d.value) ? `<${d.value}/>` : `<other-dynamics>${esc(d.value)}</other-dynamics>`;
-      if (place(d, d.x, (pl) => `<direction placement="${pl}"><direction-type><dynamics>${tag}</dynamics></direction-type>`)) nDyn++;
+      // explicit loudness for other players: <sound dynamics> (% of forte, MuseScore's convention, velocity x 100 / 90; OMR_NO_MIDI=1: left out)
+      const sd = process.env.OMR_NO_MIDI ? null : soundDynamics(d.value);
+      if (place(d, d.x, (pl) => `<direction placement="${pl}"><direction-type><dynamics>${tag}</dynamics></direction-type>`, sd != null ? `<sound dynamics="${sd}"/>` : '')) nDyn++;
     }
     for (const w of marks.wedges) {
       const ok = place(w, w.box[0] + 0.1 * (w.box[2] - w.box[0]), (pl) => `<direction placement="${pl}"><direction-type><wedge type="${w.type}" number="1"/></direction-type>`);
@@ -1486,6 +1488,35 @@ function readMarks(pages, segs, units, parts, partMeasures) {
       }
     }
   }
+  // fermatas (text.js): on the note or rest under (or, inverted, over) them,
+  // nearest by x on the staff they stand by (e.fermata)
+  let nFermata = 0;
+  {
+    const seen = new Set();
+    for (const pg of pages) {
+      const fr = pg.fr, m = fr && fr._marks && fr._marks.marks;
+      if (!m || seen.has(fr) || !m.fermatas) continue;
+      seen.add(fr);
+      for (const f of m.fermatas) {
+        if (f.sys == null || f.sys < 0) continue;
+        const sy = pg.asm.systems[f.sys], s = sy && sy.staves[f.k];
+        if (!s) continue;
+        const cx = (f.box[0] + f.box[2]) / 2, sp = s.st.space || fr.ss;
+        const inverted = (f.box[1] + f.box[3]) / 2 > s.st.yAt(4, cx);
+        for (const { pi } of partsOn(f.k)) {
+          const at = locate(fr, sy.index, f.k, cx, pi);
+          if (!at) continue;
+          let target = null, bd = Infinity;
+          for (const sm of partMeasures[pi][at.mi] || []) if (sm && sm.staff === f.k) for (const e of sm.events) {
+            if (e.forward || e.x == null) continue;
+            const d = Math.abs(e.x - cx);
+            if (d < bd && d <= 1.5 * sp) { bd = d; target = e; }
+          }
+          if (target && !target.fermata) { target.fermata = inverted ? 'inverted' : 'upright'; nFermata++; }
+        }
+      }
+    }
+  }
   // a keyboard part's name is printed between its staves: the abbreviation
   // stands on the staff nearest to it, which may be the lower one
   for (const p of parts) if (!p.abbrev && p.src.length > 1) {
@@ -1496,7 +1527,7 @@ function readMarks(pages, segs, units, parts, partMeasures) {
     }
   }
   for (const pm of dirs) for (const l of pm) l.sort((a, b) => a.t - b.t);
-  return { dirs, head, nDyn, nWedge, nWords, nTie, nSlur, nGrace };
+  return { dirs, head, nDyn, nWedge, nWords, nTie, nSlur, nGrace, nFermata };
 }
 
 function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, credits, unitSys, head, dirs }) {
@@ -1672,7 +1703,7 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
       // directions (dynamics, hairpins, words) go with the first voice written,
       // before the note they stand at (an offset when they fall inside it)
       const pend = ((dirs && dirs[pi] && dirs[pi][mi]) || []).slice();
-      const dirXML = (d, off) => `      ${d.xml}${off ? `<offset>${off}</offset>` : ''}${d.staffNo ? `<staff>${d.staffNo}</staff>` : ''}</direction>`;
+      const dirXML = (d, off) => `      ${d.xml}${off ? `<offset>${off}</offset>` : ''}${d.staffNo ? `<staff>${d.staffNo}</staff>` : ''}${d.tail || ''}</direction>`;
       order.forEach((k, oi) => {
         const s = streams[k], si = ps[k].staffNo - 1;
         if (pos > 0) L.push(`      <backup><duration>${pos}</duration></backup>`);
@@ -1705,8 +1736,9 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
             continue;
           }
           if (e.rest) {
-            if (e.whole) L.push(`      <note><rest measure="yes"/><duration>${dur}</duration><voice>${voice}</voice>${staffTag}</note>`);
-            else L.push(`      <note><rest/><duration>${dur}</duration><voice>${voice}</voice>${typeXML}${staffTag}</note>`);
+            const rf = e.fermata ? `<notations><fermata type="${e.fermata}"/></notations>` : '';
+            if (e.whole) L.push(`      <note><rest measure="yes"/><duration>${dur}</duration><voice>${voice}</voice>${staffTag}${rf}</note>`);
+            else L.push(`      <note><rest/><duration>${dur}</duration><voice>${voice}</voice>${typeXML}${staffTag}${rf}</note>`);
             continue;
           }
           const hc = e.heads[0].clef || clef;
@@ -1733,7 +1765,8 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
             const tStop = e.tieStop || h.tieOff, tStart = e.tieStart || h.tieOn;
             const tie = (tStop ? '<tie type="stop"/>' : '') + (tStart ? '<tie type="start"/>' : '');
             const slurs = hi === 0 ? (e.heads.some(x => x.slurOff) ? '<slur type="stop" number="1"/>' : '') + (e.heads.some(x => x.slurOn) ? '<slur type="start" number="1"/>' : '') : '';
-            const tied = tStop || tStart || slurs ? `<notations>${tStop ? '<tied type="stop"/>' : ''}${tStart ? '<tied type="start"/>' : ''}${slurs}</notations>` : '';
+            const ferm = hi === 0 && e.fermata ? `<fermata type="${e.fermata}"/>` : '';
+            const tied = tStop || tStart || slurs || ferm ? `<notations>${tStop ? '<tied type="stop"/>' : ''}${tStart ? '<tied type="start"/>' : ''}${slurs}${ferm}</notations>` : '';
             // a head with both stems: up in the upper voice, down in the lower
             const sd = h.stemDir === 2 ? (e.low ? -1 : 1) : h.stemDir;
             const stem = sd === 1 ? '<stem>up</stem>' : sd === -1 ? '<stem>down</stem>' : '';

@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 22:27 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 22:38 AEDT.
 
 ## Events
 
@@ -113,6 +113,8 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 21:58 | Shipped e97dbde (opencv): dashed-staff fallback in staves.js (runs only when no staff is found): L11 0.113 to 0.228, challenge 0.8265 to 0.8268, nothing down. Next: gated local threshold (L19) and broken-line tolerance for heads/barlines (L11). |
 | 22:17 | Shipped ec2a68e (release merged): dashed-staff line-offset fix; L11 0.228 to 0.550; challenge 0.8268 to 0.8277, none down. Sauvola rejected (collateral damage). opencv next: L24 keys with 4+ accidentals and courtesy accidentals, L23 half/whole notes, dots, 32nd/64th. |
 | 22:27 | Shipped 2b560bc (textsym, release merged): ties, slurs and grace notes written to MusicXML; nothing else changed on any set; regressions clean. textsym next: tie recall and grace heads on scans, then L25 lyrics. |
+| 22:33 | User asked whether 'mf' is understood. Checked: MusicXML has <dynamics><mf/> (bar 7, LH) and <f/> (bar 9); playback maps mf to velocity 80 and f to 96, but the default is also 80 (so the first mf is inaudible), marks apply to the whole part not per staff, and no <sound dynamics> is written. Playback agent resumed to fix all three and show the current dynamic in the transport. |
+| 22:38 | Shipped d4757fc (opencv, release merged): double sharps/flats via templates; coverage 0.7818 to 0.7821 (35 up), challenge 0.8277 to 0.8278, benchmark unchanged; COVERAGE.md regenerated. opencv next: L23 (stacked whole notes, half-note hollow/filled, 32nd/64th flags, dots). |
 
 ## Accuracy by round
 
@@ -154,7 +156,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | L12 | Two-page spreads read as one wide system (8–13 parts) | Noteheads and staves (page split) | Resolved (round 3) | No spread item is in the wrong-part-count list (v0.3.0 had twinkle-spread at 4 and 6 parts). Spread edge-case group 0.879 to 0.890. Spread overlay colouring is 98.7%. |
 | L13 | Tuplets cannot be represented: 8 divisions per quarter | Symbols + voices + MusicXML | Resolved (round 3) | divisions=840. Clara writes 32 time-modification elements. Tuplet edge-case group 0.909. |
 | L14 | Double dots, multi-bar rests and whole-bar rests | Symbols + voices | Partial (round 3) | Whole-bar rests are written in 70 challenge outputs and H-bar multi-rests are detected (rests agent). No multiple-rest element is written. Double dots are not modelled. Edge-case group 0.820 to 0.857. |
-| L15 | Double sharps/flats and 8va/8vb brackets | Symbols | Open | None of the 365 challenge outputs contains a double-sharp, a double-flat or an octave-shift. pitch-ledger-ottava scores 0.58 to 0.88. |
+| L15 | Double sharps/flats and 8va/8vb brackets | Symbols | Partial (d4757fc) | None of the 365 challenge outputs contains a double-sharp, a double-flat or an octave-shift. pitch-ledger-ottava scores 0.58 to 0.88. d4757fc: double sharps/flats read by template (coverage double-sharp 65/55/11 of 124 clean/scan/severe, double-flat 9/11/9 of 13); 8va/8vb still not written. |
 | L16 | Key and time-signature changes mid-piece not written; C clefs (alto/tenor) | Symbols + voices | Partial (round 3) | Key changes are written (odyssey 8/8). C clefs are read (3 C clefs in every clef-carousel output; scan 0.899 to 0.920). Mid-piece time-signature changes are not written (rh03: 1 time element against 12 in the truth). |
 | L17 | Two voices inside one part (piano right hand, divisi) merged into chords | Voices + MusicXML | Resolved (round 3) | Score r3: Beach piano 0.881 to 0.955 (pitch 0.86 to 0.96), about 40 twinkle-piano variants +0.015 each. Benchmark beach-prayer 0.878 to 0.967. Multi-voice edge-case group 0.908 to 0.929. |
 | L18 | A bracketed instrument pair (violin + cello) read as a piano grand staff; organ pedal staff becomes a separate part | Voices (layout) | Partial (round 3) | trio-minuet scan 0.480 to 0.819 (small staves become separate instruments). A bracketed pair with joined barlines is still read as a piano: pitch-ledger-ottava mild comes out as Piano, and trio severe as 1 part. Edge-case group 0.790 to 0.828. 0f00a0e: braces/brackets classified; a brace rule fixes clef-carousel 0.57 to 0.85 and ledger-ottava 0.59 to 0.78 but splits degraded pianos whose brace is missed (andantino 0.99 to 0.50), so it is off until brace detection is more reliable. |
@@ -163,7 +165,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | L21 | Only 2/4, 3/4 and 4/4 written: C, cut time, 2/2, 3/2, 6/8, 9/8, 12/8, 5/4, 5/8, 7/8 and time changes missing | Symbols + voices | Partial (template reader) | Coverage: 110 occurrences never written; time-3-4 55%, time-4-4 71%. 9a124ee: template digit reader on by default; first time signature right 342 to 352 of 365 challenge items; Maple Leaf Rag 2/4 read on both staves (overlay 0 to 2). Mid-piece changes still not written. |
 | L22 | Beams, slurs, fermatas, dynamics, hairpins, articulations, repeats and endings never written to MusicXML | Voices (MusicXML) + symbols | Partial (text round) | Coverage: beam 703, slur 100, fermata 130 occurrences, all 0%. Text round (6ed273c): dynamics (27 of 40 benchmark marks, precision 0.84), hairpins (coverage 84-86% clean/scan) and tempo/expression words now written. Beams, slurs, fermatas, articulations, repeats and endings still not written. 2b560bc: slurs now written too. |
 | L23 | Half and whole notes, dots, 32nd/64th notes partial | Noteheads + symbols | Queued for round 4 | Coverage: note-half 76%, note-whole 46%, dot 69% (adds false notes), note-32nd 11%. 2b560bc: grace notes written (coverage 21% clean, 2% severe); grace heads on scans are still taken as normal notes. |
-| L24 | Key signatures of 4+ sharps or flats and courtesy accidentals weak | Symbols | Queued for round 4 | Coverage: key-s4 25%, key-s6/s7 0%, acc-courtesy 22%. |
+| L24 | Key signatures of 4+ sharps or flats and courtesy accidentals weak | Symbols | Queued for round 4 | Coverage: key-s4 25%, key-s6/s7 0%, acc-courtesy 22%. Current matrix: keys with 4+ accidentals read 13-17 of 15-17 on clean/scan (the 25%/0% was an older matrix); severe scans and courtesy accidentals (16/39) remain. |
 | L25 | Lyrics: non-ASCII and elisions 0%, extenders 58%, multi-verse 73% | Lyrics | Queued for round 4 | Coverage: 4-language item lyrics 0.16. |
 | L26 | Memory grows about 46 MB per page (40-page book peaks at 2.2 GB) | UI + score | Queued for round 4 | Coverage perf: peak MB = 297 + 5.2 × total megapixels (R² 0.97); time per page flat at ~2.3–3 s. |
 
