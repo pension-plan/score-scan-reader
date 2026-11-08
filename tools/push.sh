@@ -9,6 +9,10 @@ set -euo pipefail
 ROOT=/Users/d.sloane/music
 SCRATCH=/tmp/claude-501/-Users-d-sloane-music/69a237da-a02e-40d9-a1a9-90390e5b5eb2/scratchpad
 cd "$ROOT"
+# one push at a time: agents share this working tree, and two runs interleaving
+# (one staging while another rebases) orphaned a commit once
+exec 9>"$ROOT/.git/push.sh.lock"
+if ! flock -w 900 9; then echo "refusing: another push.sh has held the lock for 15 minutes" >&2; exit 1; fi
 SUBJECT="${1:-chore: sync}"; BODY="${2:-}"
 shift $(( $# < 2 ? $# : 2 )); PATHS=("$@")
 # keep test-only corpus items out (ATTRIBUTION mentions restricted permission)
