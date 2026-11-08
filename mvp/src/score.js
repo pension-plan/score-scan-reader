@@ -532,9 +532,11 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     const lowest = +band === lowestSplit && +band !== topVocal;
     const prior = lowest ? pis[pis.length - 1] : pis[0];
     // a syllable under an onset that only one voice has adds about 1 to that
-    // voice's total; voices that share every onset tie
+    // voice's total; voices that share every onset tie. A voice whose onsets
+    // include the other's (eighths against quarters) can only gain, so a line
+    // between staves leaves the melody (upper voice) only on strong evidence.
     let best = prior;
-    for (const pi of pis) if (e[pi] > e[best] + 0.6) best = pi;
+    for (const pi of pis) if (e[pi] > (lowest ? e[best] + 0.6 : 1.25 * e[best] + 2)) best = pi;
     bandVoice[band] = best;
     if (pis.length > 1) lyrNotes.add(`Lyrics under staff ${+band + 1} attached to ${parts[best].name} (${best === prior ? (lowest ? 'nearest voice' : 'upper voice') : 'its rhythm fits the syllables best'}).`);
   }
@@ -542,7 +544,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     const { v, cands, sp } = L;
     let best = cands.find(c => c.pi === bandVoice[v.band]) || cands[0];
     // a clearly better local fit wins (a passage where the other voice sings the text)
-    for (const c of cands) if (c.soft >= best.soft + Math.max(1.5, 0.15 * v.syllables.length) && c.fit >= best.fit + 0.1) best = c;
+    if (best.fit < 0.6) for (const c of cands) if (c.fit >= 0.8 && c.soft >= best.soft + Math.max(1.5, 0.15 * v.syllables.length)) best = c;
     if (best.fit < L.minFit || !wordy(v.syllables)) { lyrNotes.add(`A text line under staff ${v.band + 1} does not follow the notes; not used as lyrics.`); continue; }
     const take = opts.copyLyrics ? cands.filter(c => c.fit >= L.minFit) : [best];
     if (opts.debug) opts.debug.push({ sys: L.sy.page + ':' + L.sy.index, band: v.band, n: v.number, nsyl: v.syllables.length, fits: cands.map(c => [c.p.name, +c.fit.toFixed(2), c.evs.length, +c.soft.toFixed(2)]), take: take.map(c => c.p.name) });

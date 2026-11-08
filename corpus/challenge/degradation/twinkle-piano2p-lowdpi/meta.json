@@ -1,0 +1,341 @@
+{
+ "id": "twinkle-piano2p-lowdpi",
+ "category": "degradation",
+ "piece": "twinkle-piano2p",
+ "variant": "lowdpi",
+ "title": "Theme and Variation on \"Ah! vous dirai-je, maman\" (piano, 2 pages) - lowdpi",
+ "edge_cases": [
+  "piano",
+  "grand_staff",
+  "must_not_split",
+  "grand_staff_multi_voice",
+  "multi_page",
+  "double_barline",
+  "dynamics",
+  "slurs",
+  "fermata",
+  "chords",
+  "low_dpi",
+  "low_dpi_100"
+ ],
+ "expected": {
+  "parts": [
+   "Piano"
+  ],
+  "must_not_split": true,
+  "shared_staves": [],
+  "notes": "Two-page piano piece on ONE grand staff. A correct conversion yields exactly ONE part \"Piano\" (2 staves, 24 bars, measures continue across the page turn); the held lower right-hand voice in the variation (bars 13-24) is voice 2 of the piano part, not a separate part. DAMAGE (lowdpi): Low resolution: mild 150 dpi, scan 100 dpi (staff space ~7 px, lyrics ~10 px high), severe 100 dpi + 1.5 deg skew + blur + JPEG 45."
+ },
+ "truth_limitations": "none: truth matches the engraving exactly (MIDI attacks, MIDI lyric events and PDF lyric text verified)",
+ "truth_scope": "truth.musicxml (MusicXML 4.0 partwise, XSD-valid) encodes parts/part-list (+ part-group bracket for the choir), staves, voices, pitches, durations, rests, ties, slurs, lyrics (verse number, syllabic, extend), dynamics, fermatas, staccatos, stems, clefs, key/time signatures and barline styles. It does NOT encode beams (LilyPond auto-beams), system/page breaks, bar-number display, header layout or any handwritten/damage marks. The same truth file is shared by every damaged variant of a piece.",
+ "degradations": {
+  "scan.pdf": {
+   "seed": 193059000,
+   "dpi": 100,
+   "pages": 2,
+   "image_px": [
+    [
+     827,
+     1170
+    ],
+    [
+     827,
+     1170
+    ]
+   ],
+   "image_mode": [
+    "L",
+    "L"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 100,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": 246,
+      "texture": 2
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": 22,
+     "stage": "content"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 2
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       236,
+       236,
+       234
+      ],
+      "noise": 2,
+      "edge_shadow": 0.35
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "jpeg",
+      "quality": 70
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": [
+    [],
+    []
+   ]
+  },
+  "scan-mild.pdf": {
+   "seed": 193059001,
+   "dpi": 150,
+   "pages": 2,
+   "image_px": [
+    [
+     1241,
+     1754
+    ],
+    [
+     1241,
+     1754
+    ]
+   ],
+   "image_mode": [
+    "L",
+    "L"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 150,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": 246,
+      "texture": 2
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": 22,
+     "stage": "content"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 2
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       236,
+       236,
+       234
+      ],
+      "noise": 2,
+      "edge_shadow": 0.35
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "jpeg",
+      "quality": 75
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": [
+    [],
+    []
+   ]
+  },
+  "scan-severe.pdf": {
+   "seed": 193059002,
+   "dpi": 100,
+   "pages": 2,
+   "image_px": [
+    [
+     881,
+     1214
+    ],
+    [
+     881,
+     1214
+    ]
+   ],
+   "image_mode": [
+    "L",
+    "L"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 100,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": 246,
+      "texture": 2
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": 22,
+     "stage": "content"
+    },
+    {
+     "op": "bed",
+     "params": {
+      "margin_mm": 3
+     },
+     "stage": "global"
+    },
+    {
+     "op": "rotate",
+     "params": {
+      "deg": 1.5
+     },
+     "stage": "global"
+    },
+    {
+     "op": "blur",
+     "params": {
+      "sigma": 0.8
+     },
+     "stage": "global"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 3
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       236,
+       236,
+       234
+      ],
+      "noise": 2,
+      "edge_shadow": 0.35
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "jpeg",
+      "quality": 45
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": [
+    [],
+    []
+   ]
+  },
+  "clean.pdf": {
+   "seed": null,
+   "dpi": 100,
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 100,
+     "tool": "pdftoppm -gray (LilyPond PDF)"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "png"
+     }
+    }
+   ]
+  }
+ },
+ "dpi": 100,
+ "license": "Theme public domain (French air \"Ah! vous dirai-je, maman\", c. 1761); variation, setting and engraving CC0-1.0",
+ "files": {
+  "scan": "twinkle-piano2p-lowdpi/scan.pdf",
+  "scan_mild": "twinkle-piano2p-lowdpi/scan-mild.pdf",
+  "scan_severe": "twinkle-piano2p-lowdpi/scan-severe.pdf",
+  "clean": "twinkle-piano2p-lowdpi/clean.pdf",
+  "truth": "twinkle-piano2p-lowdpi/truth.musicxml",
+  "engraving": "twinkle-piano2p-lowdpi/engraving.ly"
+ },
+ "measures": 24,
+ "vector_pages": 2,
+ "lyrics": [],
+ "shares_truth_with": [
+  "twinkle-piano2p-clean",
+  "twinkle-piano2p-skew",
+  "twinkle-piano2p-rot90",
+  "twinkle-piano2p-rot180",
+  "twinkle-piano2p-phone",
+  "twinkle-piano2p-book",
+  "twinkle-piano2p-yellowed",
+  "twinkle-piano2p-bleed",
+  "twinkle-piano2p-stain-pencil",
+  "twinkle-piano2p-holes-staple",
+  "twinkle-piano2p-crop",
+  "twinkle-piano2p-halftone",
+  "twinkle-piano2p-jpeg",
+  "twinkle-piano2p-photocopy-thin",
+  "twinkle-piano2p-photocopy-thick",
+  "twinkle-piano2p-highdpi",
+  "twinkle-piano2p-blur",
+  "twinkle-piano2p-noise",
+  "twinkle-piano2p-spread",
+  "twinkle-piano2p-scale",
+  "twinkle-piano2p-combo"
+ ],
+ "validation": {
+  "truth_xsd_valid": true,
+  "midi_attacks_match_truth": true,
+  "attacks": 215,
+  "midi_lyric_events_match_truth": true,
+  "lyric_syllables": 0,
+  "lyric_text_found_in_engraving_pdf": null,
+  "lilypond_warnings": [],
+  "scan_files_image_only": {
+   "scan.pdf": true,
+   "scan-mild.pdf": true,
+   "scan-severe.pdf": true,
+   "clean.pdf": true
+  }
+ },
+ "origin": "synthetic-scan (challenge: degradation extremes)",
+ "seed": 193059000
+}

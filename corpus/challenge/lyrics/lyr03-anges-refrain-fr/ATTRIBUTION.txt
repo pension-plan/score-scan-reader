@@ -1,0 +1,4 @@
+Text: "Les anges dans nos campagnes", traditional French carol (18th c.) - public domain.
+Melody: CC0, written for this corpus after the shape of the traditional GLORIA tune.
+
+Music (melody, harmonisation, accompaniment), engraving, rasterisation and damage were produced for this corpus by corpus/challenge/lyrics/_tools and are dedicated to the public domain (CC0 1.0).

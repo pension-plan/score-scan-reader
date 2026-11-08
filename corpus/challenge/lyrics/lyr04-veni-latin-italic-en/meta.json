@@ -1,0 +1,252 @@
+{
+  "id": "lyr04-veni-latin-italic-en",
+  "category": "lyrics",
+  "title": "Veni, veni, Emmanuel - Latin with italic English translation line",
+  "edge_cases": [
+    "translation_line_italic",
+    "two_languages",
+    "latin_text",
+    "unnumbered_lyric_lines",
+    "smaller_font_translation",
+    "extender_line",
+    "extender_across_barline",
+    "hyphen_across_melisma",
+    "rests_between_phrases",
+    "pickup",
+    "minor_key",
+    "halftone_moire",
+    "rotated_180"
+  ],
+  "expected": {
+    "must_not_split": false,
+    "shared_staves": [],
+    "notes": "Single melody part with two lyric lines: line 1 Latin (roman), line 2 English translation printed in a smaller ITALIC font. Truth: lyric number 1 (name \"Latin\") and number 2 (name \"translation\", <text font-style=\"italic\">). The italic line is a translation, not a second stanza, but it is still underlaid note-by-note and must be kept as its own lyric line. No verse numbers are printed. scan-severe.pdf is upside down (180 degrees).",
+    "parts": [
+      "Voice"
+    ]
+  },
+  "lyric_lines": [
+    {
+      "part": "Voice",
+      "lyric_number": 1,
+      "syllables": 48,
+      "elisions": 0,
+      "extenders": 3,
+      "name": "Latin"
+    },
+    {
+      "part": "Voice",
+      "lyric_number": 2,
+      "syllables": 48,
+      "elisions": 0,
+      "extenders": 3,
+      "italic": true,
+      "name": "translation"
+    }
+  ],
+  "truth_limitations": [
+    "Truth encodes pitches, durations, rests, ties, slurs, fermatas, stem directions of voices sharing a staff, lyrics (number, syllabic, text, elision, extend) and the part/staff structure; it has no <beam>, no system or page breaks, no positions and no font sizes.",
+    "Printed stanza labels (\"1.\", \"2.\" ...) are not encoded; lyric/@number carries the line number.",
+    "Only title, composer, lyricist and rights are encoded from the header; subtitle and the printed poet/composer lines are not encoded as credits.",
+    "LilyPond drops the hyphen when two syllables of a word are printed very close together; truth syllabic (begin/middle/end) still follows the word structure.",
+    "Scan damage (pencil marks, handwritten words, stains, holes, staples, cropped margins) is not part of the truth.",
+    "The translation line is lyric number 2 with font-style=italic; its smaller font size is not encoded."
+  ],
+  "text_block_stanzas": [],
+  "degradations": {
+    "scan.pdf": {
+      "seed": 5401,
+      "dpi": 300,
+      "mode": "gray",
+      "jpeg_quality": 55,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "page_ops": [],
+      "ops": [
+        {
+          "op": "halftone",
+          "lpi": 100,
+          "angle": 45,
+          "tint": 0.1
+        },
+        {
+          "op": "resample",
+          "factor": 0.83,
+          "filter": "nearest"
+        },
+        {
+          "op": "paper",
+          "color": [
+            244,
+            243,
+            238
+          ],
+          "texture": 3
+        },
+        {
+          "op": "rotate",
+          "deg": 1.5
+        },
+        {
+          "op": "noise",
+          "sigma": 4
+        }
+      ],
+      "tags": [
+        "halftone_moire",
+        "resample_aliasing",
+        "paper_texture",
+        "skew_1.5deg",
+        "gaussian_noise",
+        "jpeg_q55"
+      ],
+      "output_pages": 1,
+      "page_pixels": [
+        [
+          2550,
+          3300
+        ]
+      ],
+      "annotations": [],
+      "bytes": 1524746
+    },
+    "scan-mild.pdf": {
+      "seed": 5402,
+      "dpi": 400,
+      "mode": "gray",
+      "jpeg_quality": 60,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "page_ops": [],
+      "ops": [
+        {
+          "op": "paper",
+          "color": [
+            244,
+            243,
+            238
+          ],
+          "texture": 2
+        },
+        {
+          "op": "rotate",
+          "deg": -0.6
+        },
+        {
+          "op": "blur",
+          "sigma": 0.4
+        }
+      ],
+      "tags": [
+        "paper_texture",
+        "skew_0.6deg",
+        "focus_blur",
+        "jpeg_q60",
+        "high_dpi_400"
+      ],
+      "output_pages": 1,
+      "page_pixels": [
+        [
+          3400,
+          4400
+        ]
+      ],
+      "annotations": [],
+      "bytes": 400038
+    },
+    "scan-severe.pdf": {
+      "seed": 5403,
+      "dpi": 120,
+      "mode": "gray",
+      "jpeg_quality": 30,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "page_ops": [],
+      "ops": [
+        {
+          "op": "halftone",
+          "lpi": 45,
+          "angle": 30,
+          "tint": 0.15
+        },
+        {
+          "op": "resample",
+          "factor": 0.77,
+          "filter": "nearest"
+        },
+        {
+          "op": "paper",
+          "color": [
+            240,
+            239,
+            233
+          ],
+          "texture": 5
+        },
+        {
+          "op": "rotate",
+          "deg": 1.0
+        },
+        {
+          "op": "rot90",
+          "k": 2
+        },
+        {
+          "op": "noise",
+          "sigma": 9
+        }
+      ],
+      "tags": [
+        "halftone_moire",
+        "resample_aliasing",
+        "paper_texture",
+        "skew_1deg",
+        "rotated_180deg",
+        "gaussian_noise",
+        "jpeg_q30",
+        "low_dpi_120"
+      ],
+      "output_pages": 1,
+      "page_pixels": [
+        [
+          1020,
+          1320
+        ]
+      ],
+      "annotations": [],
+      "bytes": 273050
+    }
+  },
+  "dpi": 300,
+  "license": "Texts: public domain (Latin hymn; J. M. Neale 1851). Music: CC0-1.0 (own melody).",
+  "source": "Own modal melody; Latin \"Veni, veni, Emmanuel\" stanza 1 + refrain; English tr. John Mason Neale (1851).",
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "scan-mild.pdf",
+    "scan-severe.pdf",
+    "scan.pdf",
+    "truth.musicxml"
+  ],
+  "measures": 16,
+  "engraved_pages": 1,
+  "validation": {
+    "truth_xsd_valid": true,
+    "midi_attacks_match_truth": true,
+    "attacks": 55,
+    "midi_lyrics_match_truth": true,
+    "lyric_lines_checked": 2,
+    "syllables_checked": 96,
+    "pdf_text_items_checked": 96,
+    "pdf_text_missing": 0,
+    "scans_image_only": {
+      "scan.pdf": true,
+      "scan-mild.pdf": true,
+      "scan-severe.pdf": true
+    },
+    "lilypond_warnings": []
+  },
+  "engraver": "model -> LilyPond 2.24 (custom writer, corpus/challenge/lyrics/_tools)"
+}

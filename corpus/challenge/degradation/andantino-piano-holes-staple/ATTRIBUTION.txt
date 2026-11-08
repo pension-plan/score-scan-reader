@@ -1,0 +1,5 @@
+"Andantino" for piano: original composition for this corpus, CC0.
+
+Damage: holes-staple (simulated scan; see meta.json).
+
+Setting, engraving, rasterisation and damage simulation produced for the OMR challenge corpus (corpus/challenge/degradation/_tools); these files are dedicated to the public domain (CC0 1.0).

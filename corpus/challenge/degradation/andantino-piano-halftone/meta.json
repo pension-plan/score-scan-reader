@@ -1,0 +1,370 @@
+{
+ "id": "andantino-piano-halftone",
+ "category": "degradation",
+ "piece": "andantino-piano",
+ "variant": "halftone",
+ "title": "Andantino (piano, grand staff) - halftone",
+ "edge_cases": [
+  "piano",
+  "grand_staff",
+  "must_not_split",
+  "grand_staff_multi_voice",
+  "chords",
+  "dynamics",
+  "slurs",
+  "staccato",
+  "fermata",
+  "key_signature",
+  "halftone",
+  "moire",
+  "screened_reprint"
+ ],
+ "expected": {
+  "parts": [
+   "Piano"
+  ],
+  "must_not_split": true,
+  "shared_staves": [],
+  "notes": "Piano solo on ONE grand staff (brace). A correct conversion yields exactly ONE part \"Piano\" with 2 staves; it must NOT be split into right/left hand parts, and the second right-hand voice in bars 13-16 must stay inside the piano part (voice 2), not become a new part. DAMAGE (halftone): Page reproduced through a clustered-dot halftone screen (offset reprint of a photo of the page) and re-scanned by point sampling, giving moire: every stroke and the paper tone are made of dots. mild 150 lpi/45 deg, scan 110 lpi/15 deg with 0.97 rescale, severe 85 lpi/30 deg, 18% paper tone, 0.93 rescale + 0.7 deg rotation and JPEG 50. TRUTH LIMITATIONS: The 0.97 / 0.93 rescale makes the music slightly smaller than the page (centred)."
+ },
+ "truth_limitations": "The 0.97 / 0.93 rescale makes the music slightly smaller than the page (centred).",
+ "truth_scope": "truth.musicxml (MusicXML 4.0 partwise, XSD-valid) encodes parts/part-list (+ part-group bracket for the choir), staves, voices, pitches, durations, rests, ties, slurs, lyrics (verse number, syllabic, extend), dynamics, fermatas, staccatos, stems, clefs, key/time signatures and barline styles. It does NOT encode beams (LilyPond auto-beams), system/page breaks, bar-number display, header layout or any handwritten/damage marks. The same truth file is shared by every damaged variant of a piece.",
+ "degradations": {
+  "scan.pdf": {
+   "seed": 485987635,
+   "dpi": 300,
+   "pages": 1,
+   "image_px": [
+    [
+     2481,
+     3508
+    ]
+   ],
+   "image_mode": [
+    "L"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 300,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "halftone",
+     "params": {
+      "lpi": 110,
+      "angle": 15,
+      "paper_tone": 0.1,
+      "ink_tone": 0.9,
+      "rescale": 0.97
+     },
+     "stage": "content"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": 248,
+      "texture": 0
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": 22,
+     "stage": "content"
+    },
+    {
+     "op": "blur",
+     "params": {
+      "sigma": 0.5
+     },
+     "stage": "global"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 3
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       236,
+       236,
+       234
+      ],
+      "noise": 2,
+      "edge_shadow": 0.35
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "jpeg",
+      "quality": 70
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": [
+    []
+   ]
+  },
+  "scan-mild.pdf": {
+   "seed": 485987636,
+   "dpi": 300,
+   "pages": 1,
+   "image_px": [
+    [
+     2481,
+     3508
+    ]
+   ],
+   "image_mode": [
+    "L"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 300,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "halftone",
+     "params": {
+      "lpi": 150,
+      "angle": 45,
+      "paper_tone": 0.06,
+      "ink_tone": 0.95,
+      "rescale": 1.0
+     },
+     "stage": "content"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": 248,
+      "texture": 0
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": 22,
+     "stage": "content"
+    },
+    {
+     "op": "blur",
+     "params": {
+      "sigma": 0.4
+     },
+     "stage": "global"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 2
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       236,
+       236,
+       234
+      ],
+      "noise": 2,
+      "edge_shadow": 0.35
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "jpeg",
+      "quality": 85
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": [
+    []
+   ]
+  },
+  "scan-severe.pdf": {
+   "seed": 485987637,
+   "dpi": 300,
+   "pages": 1,
+   "image_px": [
+    [
+     2595,
+     3610
+    ]
+   ],
+   "image_mode": [
+    "L"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 300,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "halftone",
+     "params": {
+      "lpi": 85,
+      "angle": 30,
+      "paper_tone": 0.18,
+      "ink_tone": 0.85,
+      "rescale": 0.93
+     },
+     "stage": "content"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": 248,
+      "texture": 0
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": 22,
+     "stage": "content"
+    },
+    {
+     "op": "bed",
+     "params": {
+      "margin_mm": 3
+     },
+     "stage": "global"
+    },
+    {
+     "op": "rotate",
+     "params": {
+      "deg": 0.7
+     },
+     "stage": "global"
+    },
+    {
+     "op": "blur",
+     "params": {
+      "sigma": 0.6
+     },
+     "stage": "global"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 4
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       236,
+       236,
+       234
+      ],
+      "noise": 2,
+      "edge_shadow": 0.35
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "jpeg",
+      "quality": 50
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": [
+    []
+   ]
+  },
+  "clean.pdf": {
+   "seed": null,
+   "dpi": 300,
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 300,
+     "tool": "pdftoppm -gray (LilyPond PDF)"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "png"
+     }
+    }
+   ]
+  }
+ },
+ "dpi": 300,
+ "license": "Original composition and engraving, CC0-1.0",
+ "files": {
+  "scan": "andantino-piano-halftone/scan.pdf",
+  "scan_mild": "andantino-piano-halftone/scan-mild.pdf",
+  "scan_severe": "andantino-piano-halftone/scan-severe.pdf",
+  "clean": "andantino-piano-halftone/clean.pdf",
+  "truth": "andantino-piano-halftone/truth.musicxml",
+  "engraving": "andantino-piano-halftone/engraving.ly"
+ },
+ "measures": 16,
+ "vector_pages": 1,
+ "lyrics": [],
+ "shares_truth_with": [
+  "andantino-piano-clean",
+  "andantino-piano-skew",
+  "andantino-piano-rot90",
+  "andantino-piano-rot180",
+  "andantino-piano-phone",
+  "andantino-piano-book",
+  "andantino-piano-yellowed",
+  "andantino-piano-bleed",
+  "andantino-piano-stain-pencil",
+  "andantino-piano-holes-staple",
+  "andantino-piano-crop",
+  "andantino-piano-jpeg",
+  "andantino-piano-photocopy-thin",
+  "andantino-piano-photocopy-thick",
+  "andantino-piano-lowdpi",
+  "andantino-piano-highdpi",
+  "andantino-piano-blur",
+  "andantino-piano-noise",
+  "andantino-piano-spread",
+  "andantino-piano-combo"
+ ],
+ "validation": {
+  "truth_xsd_valid": true,
+  "midi_attacks_match_truth": true,
+  "attacks": 136,
+  "midi_lyric_events_match_truth": true,
+  "lyric_syllables": 0,
+  "lyric_text_found_in_engraving_pdf": null,
+  "lilypond_warnings": [],
+  "scan_files_image_only": {
+   "scan.pdf": true,
+   "scan-mild.pdf": true,
+   "scan-severe.pdf": true,
+   "clean.pdf": true
+  }
+ },
+ "origin": "synthetic-scan (challenge: degradation extremes)",
+ "seed": 485987635
+}

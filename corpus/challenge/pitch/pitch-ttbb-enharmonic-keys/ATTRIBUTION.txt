@@ -1,0 +1,4 @@
+"Now the Day Is Over" - text by Sabine Baring-Gould (1865), public domain.
+Melody and TTBB harmonisation composed for the pitch challenge corpus (2026), voiced with the corpus voice-leading solver.
+
+Composition, engraving, rasterisation and damage simulation produced for the pitch challenge corpus (corpus/challenge/pitch/_tools); dedicated to the public domain (CC0 1.0).

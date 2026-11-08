@@ -1,0 +1,267 @@
+{
+  "id": "lyr08-dejlig-multilingual-scandi",
+  "category": "lyrics",
+  "title": "Dejlig er jorden - five stacked verses in EN/DA/SV/NO",
+  "edge_cases": [
+    "multilingual_verses",
+    "scandinavian_characters",
+    "ae_ligature",
+    "o_slash",
+    "a_ring",
+    "stacked_verses_5",
+    "verse_labels_with_language",
+    "verse_specific_melisma",
+    "hyphen_across_skip",
+    "sans_serif_lyrics",
+    "melody_only",
+    "low_dpi_100",
+    "skew_10deg"
+  ],
+  "expected": {
+    "must_not_split": false,
+    "shared_staves": [],
+    "notes": "Single melody part, five stacked lyric lines in four languages (1 English, 2 Danish, 3 Swedish, 4 Norwegian, 5 Danish stanza 2), lyric numbers 1-5 (lyric/@name holds the language code). Labels \"1. EN\" .. \"5. DA\" are verse labels, not lyrics. Line 5 has one fewer syllable in phrase 3: the note after \"slæg-\" carries NO syllable in line 5 only (hyphen continues), while lines 1-4 have a syllable there. Keep å æ ø ä ö exactly. Lyrics are set in a sans-serif font. scan.pdf is only 100 dpi.",
+    "parts": [
+      "Voice"
+    ]
+  },
+  "lyric_lines": [
+    {
+      "part": "Voice",
+      "lyric_number": 1,
+      "syllables": 37,
+      "elisions": 0,
+      "extenders": 0,
+      "name": "en"
+    },
+    {
+      "part": "Voice",
+      "lyric_number": 2,
+      "syllables": 37,
+      "elisions": 0,
+      "extenders": 0,
+      "name": "da"
+    },
+    {
+      "part": "Voice",
+      "lyric_number": 3,
+      "syllables": 37,
+      "elisions": 0,
+      "extenders": 0,
+      "name": "sv"
+    },
+    {
+      "part": "Voice",
+      "lyric_number": 4,
+      "syllables": 37,
+      "elisions": 0,
+      "extenders": 0,
+      "name": "no"
+    },
+    {
+      "part": "Voice",
+      "lyric_number": 5,
+      "syllables": 36,
+      "elisions": 0,
+      "extenders": 0,
+      "name": "da"
+    }
+  ],
+  "truth_limitations": [
+    "Truth encodes pitches, durations, rests, ties, slurs, fermatas, stem directions of voices sharing a staff, lyrics (number, syllabic, text, elision, extend) and the part/staff structure; it has no <beam>, no system or page breaks, no positions and no font sizes.",
+    "Printed stanza labels (\"1.\", \"2.\" ...) are not encoded; lyric/@number carries the line number.",
+    "Only title, composer, lyricist and rights are encoded from the header; subtitle and the printed poet/composer lines are not encoded as credits.",
+    "LilyPond drops the hyphen when two syllables of a word are printed very close together; truth syllabic (begin/middle/end) still follows the word structure.",
+    "Scan damage (pencil marks, handwritten words, stains, holes, staples, cropped margins) is not part of the truth.",
+    "Language codes in lyric/@name (en, da, sv, no) are metadata, not printed text; the printed labels '1. EN' ... are not encoded."
+  ],
+  "text_block_stanzas": [],
+  "degradations": {
+    "scan.pdf": {
+      "seed": 5801,
+      "dpi": 100,
+      "mode": "gray",
+      "jpeg_quality": 40,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "page_ops": [],
+      "ops": [
+        {
+          "op": "paper",
+          "color": [
+            244,
+            243,
+            238
+          ],
+          "texture": 3
+        },
+        {
+          "op": "rotate",
+          "deg": 1.8
+        },
+        {
+          "op": "blur",
+          "sigma": 0.5
+        },
+        {
+          "op": "noise",
+          "sigma": 3
+        }
+      ],
+      "tags": [
+        "paper_texture",
+        "skew_1.8deg",
+        "focus_blur",
+        "gaussian_noise",
+        "jpeg_q40",
+        "low_dpi_100"
+      ],
+      "output_pages": 1,
+      "page_pixels": [
+        [
+          827,
+          1170
+        ]
+      ],
+      "annotations": [],
+      "bytes": 67277
+    },
+    "scan-mild.pdf": {
+      "seed": 5802,
+      "dpi": 200,
+      "mode": "rgb",
+      "jpeg_quality": 60,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "page_ops": [],
+      "ops": [
+        {
+          "op": "paper",
+          "color": [
+            218,
+            232,
+            240
+          ],
+          "texture": 4
+        },
+        {
+          "op": "rotate",
+          "deg": -0.4,
+          "fill": [
+            218,
+            232,
+            240
+          ]
+        }
+      ],
+      "tags": [
+        "coloured_paper",
+        "skew_0.4deg",
+        "rgb_scan",
+        "jpeg_q60"
+      ],
+      "output_pages": 1,
+      "page_pixels": [
+        [
+          1654,
+          2339
+        ]
+      ],
+      "annotations": [],
+      "bytes": 218432
+    },
+    "scan-severe.pdf": {
+      "seed": 5803,
+      "dpi": 150,
+      "mode": "gray",
+      "jpeg_quality": 15,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "page_ops": [],
+      "ops": [
+        {
+          "op": "paper",
+          "color": [
+            244,
+            243,
+            238
+          ],
+          "texture": 6
+        },
+        {
+          "op": "rotate",
+          "deg": 10.0,
+          "expand": true,
+          "fill": [
+            250,
+            250,
+            250
+          ]
+        },
+        {
+          "op": "motion",
+          "length": 5,
+          "angle": -10
+        },
+        {
+          "op": "noise",
+          "sigma": 14
+        },
+        {
+          "op": "saltpepper",
+          "amount": 0.004
+        }
+      ],
+      "tags": [
+        "paper_texture",
+        "skew_10deg",
+        "motion_blur",
+        "gaussian_noise",
+        "salt_pepper",
+        "jpeg_q15",
+        "low_dpi_150"
+      ],
+      "output_pages": 1,
+      "page_pixels": [
+        [
+          1527,
+          1944
+        ]
+      ],
+      "annotations": [],
+      "bytes": 131590
+    }
+  },
+  "dpi": 100,
+  "license": "Texts: public domain (Ingemann 1850, Willis 1850, Bååth-Holmberg 1884). Music: CC0-1.0 (own melody).",
+  "source": "Own melody; texts \"Dejlig er jorden\" (B. S. Ingemann), Swedish \"Härlig är jorden\" (C. Bååth-Holmberg), Norwegian orthography of Ingemann, \"Fairest Lord Jesus\" (R. S. Willis).",
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "scan-mild.pdf",
+    "scan-severe.pdf",
+    "scan.pdf",
+    "truth.musicxml"
+  ],
+  "measures": 20,
+  "engraved_pages": 1,
+  "validation": {
+    "truth_xsd_valid": true,
+    "midi_attacks_match_truth": true,
+    "attacks": 37,
+    "midi_lyrics_match_truth": true,
+    "lyric_lines_checked": 5,
+    "syllables_checked": 184,
+    "pdf_text_items_checked": 184,
+    "pdf_text_missing": 0,
+    "scans_image_only": {
+      "scan.pdf": true,
+      "scan-mild.pdf": true,
+      "scan-severe.pdf": true
+    },
+    "lilypond_warnings": []
+  },
+  "engraver": "model -> LilyPond 2.24 (custom writer, corpus/challenge/lyrics/_tools)"
+}

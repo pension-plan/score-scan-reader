@@ -1,0 +1,316 @@
+{
+  "id": "rh03-meter-changes-piano",
+  "category": "rhythm",
+  "title": "Changing Meters (piano)",
+  "composer": "OMR challenge corpus (CC0)",
+  "lyricist": "",
+  "edge_cases": [
+    "piano_grand_staff_must_not_split",
+    "two_voices_in_right_hand",
+    "time_signature_changes",
+    "irregular_meter_5_8",
+    "irregular_meter_7_8",
+    "beaming_3_2_and_2_2_3",
+    "half_note_beat_3_2",
+    "compound_9_8",
+    "meter_2_4",
+    "cut_time_symbol",
+    "common_time_symbol",
+    "numeric_4_4",
+    "courtesy_time_signature_at_system_end",
+    "whole_bar_rest_one_staff_only",
+    "pickup_anacrusis",
+    "incomplete_final_bar",
+    "tie_across_system_break",
+    "tie_across_time_signature_change",
+    "chord_tie_across_barline",
+    "double_dotted_chord",
+    "tie_quarter_to_16th",
+    "beam_across_rest",
+    "fermata_all_staves",
+    "phone_capture"
+  ],
+  "expected": {
+    "parts": [
+      "Piano"
+    ],
+    "must_not_split": true,
+    "shared_staves": [],
+    "notes": "ONE part with 2 staves (grand staff); the right hand's two voices (bars 1-2, 9, 13-15) belong to that part and must not become separate parts. 16 bars: quarter pickup in 4/4 (numeric) and incomplete 3-beat final bar; meters 3/4 (bar 3), 5/8 beamed 3+2 (4-5), 7/8 beamed 2+2+3 (6-7), 2/4 (8), 3/2 (9), 9/8 (10-11), 2/2 with cut symbol (12-13), 4/4 with C symbol (14-15); bars 3, 6, 9 and 12 start systems with a new meter, so courtesy signatures end the previous systems. Whole-bar rests in one staff only: LH bar 3 (3/4), RH bar 12 (2/2). Ties: RH a''2~a''8 over the system break and the 4/4->3/4 change (2->3), c'''4~c'''16 (bar 2), e''4.~e''8 (5), f''2~f''8 (13), LH chord <c e>4.~ over the barline 10->11. LH <e, b,>2.. fills a 7/8 bar. Fermatas on the final chords of both staves.",
+    "lyrics": [],
+    "measures": 16,
+    "first_measure_number": 0
+  },
+  "truth_limitations": [
+    "<beam> elements reproduce the engraved beam groups exactly (manual beaming); notes only - a rest inside a beam carries no <beam> element.",
+    "<tuplet bracket=...> follows LilyPond's default: bracket omitted only when one beam covers exactly the tuplet; implied tuplets have bracket=\"no\" show-number=\"none\"."
+  ],
+  "degradations": {
+    "scan.pdf": {
+      "seed": 710301,
+      "render_dpi": 200,
+      "dpi": 200,
+      "color": "rgb",
+      "format": "jpeg",
+      "jpeg_quality": 40,
+      "jpeg_passes": 1,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            245,
+            243,
+            238
+          ],
+          "texture": 3
+        },
+        {
+          "op": "perspective",
+          "margin": 0.06,
+          "jitter": 0.02,
+          "keystone": 0.04,
+          "bg": [
+            80,
+            70,
+            60
+          ]
+        },
+        {
+          "op": "blotch",
+          "strength": 0.15
+        },
+        {
+          "op": "vignette",
+          "strength": 0.25
+        },
+        {
+          "op": "shadow",
+          "strength": 0.25,
+          "pos": 0.25,
+          "soft": 0.06
+        },
+        {
+          "op": "blur",
+          "sigma": 1.0
+        },
+        {
+          "op": "noise",
+          "sigma": 4,
+          "chroma": 2
+        }
+      ],
+      "tags": [
+        "coloured_paper_rgb",
+        "paper_texture",
+        "perspective_phone_capture",
+        "blotch",
+        "vignette",
+        "shadow",
+        "blur",
+        "noise",
+        "jpeg_q40"
+      ],
+      "output_pages": 1,
+      "pixel_size": [
+        1852,
+        2537
+      ],
+      "image_mode": "RGB",
+      "bytes": 205053,
+      "image_only_check": {
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "pages": 1,
+        "text_chars": 0
+      },
+      "op_log": []
+    },
+    "scan-mild.pdf": {
+      "seed": 710302,
+      "render_dpi": 300,
+      "dpi": 300,
+      "color": "rgb",
+      "format": "jpeg",
+      "jpeg_quality": 60,
+      "jpeg_passes": 1,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            247,
+            246,
+            242
+          ],
+          "texture": 2
+        },
+        {
+          "op": "perspective",
+          "margin": 0.05,
+          "jitter": 0.008,
+          "keystone": 0.015,
+          "bg": [
+            90,
+            85,
+            80
+          ]
+        },
+        {
+          "op": "vignette",
+          "strength": 0.1
+        },
+        {
+          "op": "blur",
+          "sigma": 0.5
+        },
+        {
+          "op": "noise",
+          "sigma": 2
+        }
+      ],
+      "tags": [
+        "coloured_paper_rgb",
+        "paper_texture",
+        "perspective_phone_capture",
+        "vignette",
+        "blur",
+        "noise",
+        "jpeg_q60"
+      ],
+      "output_pages": 1,
+      "pixel_size": [
+        2729,
+        3756
+      ],
+      "image_mode": "RGB",
+      "bytes": 464829,
+      "image_only_check": {
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "pages": 1,
+        "text_chars": 0
+      },
+      "op_log": []
+    },
+    "scan-severe.pdf": {
+      "seed": 710303,
+      "render_dpi": 200,
+      "dpi": 100,
+      "color": "rgb",
+      "format": "jpeg",
+      "jpeg_quality": 15,
+      "jpeg_passes": 1,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            238,
+            235,
+            228
+          ],
+          "texture": 4
+        },
+        {
+          "op": "perspective",
+          "margin": 0.05,
+          "jitter": 0.035,
+          "keystone": 0.07,
+          "bg": [
+            50,
+            45,
+            40
+          ]
+        },
+        {
+          "op": "shadow",
+          "strength": 0.45,
+          "pos": 0.15,
+          "soft": 0.08
+        },
+        {
+          "op": "gradient",
+          "strength": 0.2
+        },
+        {
+          "op": "motion_blur",
+          "length": 6,
+          "angle": 20
+        },
+        {
+          "op": "noise",
+          "sigma": 8,
+          "chroma": 3
+        },
+        {
+          "op": "downsample",
+          "dpi": 100
+        }
+      ],
+      "tags": [
+        "coloured_paper_rgb",
+        "paper_texture",
+        "perspective_phone_capture",
+        "shadow",
+        "gradient",
+        "motion_blur",
+        "noise",
+        "downsampled_100dpi",
+        "jpeg_q15"
+      ],
+      "output_pages": 1,
+      "pixel_size": [
+        909,
+        1251
+      ],
+      "image_mode": "RGB",
+      "bytes": 40915,
+      "image_only_check": {
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "pages": 1,
+        "text_chars": 0
+      },
+      "op_log": []
+    }
+  },
+  "dpi": 200,
+  "license": "CC0-1.0 (music composed for this corpus; engraving, truth and scans CC0)",
+  "source": "Composed for this corpus (CC0).",
+  "pages": 1,
+  "files": {
+    "truth": "truth.musicxml",
+    "engraving": "engraving.ly",
+    "clean": "clean.pdf",
+    "scan": "scan.pdf",
+    "scan_mild": "scan-mild.pdf",
+    "scan_severe": "scan-severe.pdf",
+    "attribution": "ATTRIBUTION.txt"
+  },
+  "clean": {
+    "dpi": 300,
+    "pages": 1,
+    "ops": [],
+    "note": "undamaged raster render",
+    "image_only": true,
+    "fonts": [],
+    "images": 1,
+    "text_chars": 0
+  },
+  "validation": {
+    "truth_xsd_valid": true,
+    "engraving_event_dump_matches_truth": true,
+    "engraving_events_compared": 185,
+    "lyric_events_compared": 0,
+    "time_signatures_compared": 18,
+    "midi_attacks_match_truth": true,
+    "midi_attacks": 128,
+    "midi_grace_notes_excluded": 0,
+    "music21_reparse_matches_model": true,
+    "lyric_text_found_in_engraving": null,
+    "lilypond_warnings": [],
+    "method": "LilyPond event-dump engraver (rsynth/dump.ly) compared with the model the truth is written from: every note/rest/multi-bar rest (onset, pitch, notated type, dots, tuplet scale), grace offsets, ties, beam starts/stops, slurs, fermatas, lyric syllables/hyphens/extenders, bar numbers/measure positions and time signatures; plus MIDI attack multiset and a music21 re-parse of truth.musicxml."
+  },
+  "generator": "corpus/challenge/rhythm/_tools/run_all.py (rsynth/items.py, build.py, scan.py)"
+}

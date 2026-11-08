@@ -1,0 +1,480 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="4.0">
+  <work><work-title>Dejlig er jorden / Fairest Lord Jesus</work-title></work>
+  <identification>
+    <creator type="composer">CC0 melody</creator>
+    <creator type="lyricist">B. S. Ingemann (1850); R. S. Willis (1850); C. Bååth-Holmberg (1884)</creator>
+    <rights>Texts public domain; music CC0</rights>
+    <encoding>
+      <software>synthetic-scan corpus builder</software>
+      <encoding-date>2026-11-08</encoding-date>
+    </encoding>
+  </identification>
+  <part-list>
+    <score-part id="V">
+      <part-name>Voice</part-name>
+    </score-part>
+  </part-list>
+  <part id="V">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <key><fifths>2</fifths><mode>major</mode></key>
+        <time><beats>3</beats><beat-type>4</beat-type></time>
+        <clef><sign>G</sign><line>2</line></clef>
+      </attributes>
+      <note>
+        <pitch><step>D</step><octave>4</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <lyric number="1" name="en"><syllabic>begin</syllabic><text>Fair</text></lyric>
+        <lyric number="2" name="da"><syllabic>begin</syllabic><text>Dej</text></lyric>
+        <lyric number="3" name="sv"><syllabic>begin</syllabic><text>Här</text></lyric>
+        <lyric number="4" name="no"><syllabic>begin</syllabic><text>Dei</text></lyric>
+        <lyric number="5" name="da"><syllabic>begin</syllabic><text>Ti</text></lyric>
+      </note>
+      <note>
+        <pitch><step>D</step><octave>4</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1" name="en"><syllabic>end</syllabic><text>est</text></lyric>
+        <lyric number="2" name="da"><syllabic>end</syllabic><text>lig</text></lyric>
+        <lyric number="3" name="sv"><syllabic>end</syllabic><text>lig</text></lyric>
+        <lyric number="4" name="no"><syllabic>end</syllabic><text>lig</text></lyric>
+        <lyric number="5" name="da"><syllabic>end</syllabic><text>der</text></lyric>
+      </note>
+    </measure>
+    <measure number="2">
+      <note>
+        <pitch><step>E</step><octave>4</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <lyric number="1" name="en"><syllabic>single</syllabic><text>Lord</text></lyric>
+        <lyric number="2" name="da"><syllabic>single</syllabic><text>er</text></lyric>
+        <lyric number="3" name="sv"><syllabic>single</syllabic><text>är</text></lyric>
+        <lyric number="4" name="no"><syllabic>single</syllabic><text>er</text></lyric>
+        <lyric number="5" name="da"><syllabic>single</syllabic><text>skal</text></lyric>
+      </note>
+      <note>
+        <pitch><step>F</step><alter>1</alter><octave>4</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1" name="en"><syllabic>begin</syllabic><text>Je</text></lyric>
+        <lyric number="2" name="da"><syllabic>begin</syllabic><text>jor</text></lyric>
+        <lyric number="3" name="sv"><syllabic>begin</syllabic><text>jor</text></lyric>
+        <lyric number="4" name="no"><syllabic>begin</syllabic><text>jor</text></lyric>
+        <lyric number="5" name="da"><syllabic>begin</syllabic><text>kom</text></lyric>
+      </note>
+    </measure>
+    <measure number="3">
+      <note>
+        <pitch><step>D</step><octave>4</octave></pitch>
+        <duration>3</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <dot/>
+        <lyric number="1" name="en"><syllabic>end</syllabic><text>sus,</text></lyric>
+        <lyric number="2" name="da"><syllabic>end</syllabic><text>den,</text></lyric>
+        <lyric number="3" name="sv"><syllabic>end</syllabic><text>den,</text></lyric>
+        <lyric number="4" name="no"><syllabic>end</syllabic><text>den,</text></lyric>
+        <lyric number="5" name="da"><syllabic>end</syllabic><text>me,</text></lyric>
+      </note>
+    </measure>
+    <measure number="4">
+      <note>
+        <pitch><step>F</step><alter>1</alter><octave>4</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <lyric number="1" name="en"><syllabic>begin</syllabic><text>Rul</text></lyric>
+        <lyric number="2" name="da"><syllabic>begin</syllabic><text>præg</text></lyric>
+        <lyric number="3" name="sv"><syllabic>begin</syllabic><text>här</text></lyric>
+        <lyric number="4" name="no"><syllabic>begin</syllabic><text>prek</text></lyric>
+        <lyric number="5" name="da"><syllabic>begin</syllabic><text>ti</text></lyric>
+      </note>
+      <note>
+        <pitch><step>G</step><octave>4</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1" name="en"><syllabic>end</syllabic><text>er</text></lyric>
+        <lyric number="2" name="da"><syllabic>end</syllabic><text>tig</text></lyric>
+        <lyric number="3" name="sv"><syllabic>end</syllabic><text>lig</text></lyric>
+        <lyric number="4" name="no"><syllabic>end</syllabic><text>tig</text></lyric>
+        <lyric number="5" name="da"><syllabic>end</syllabic><text>der</text></lyric>
+      </note>
+    </measure>
+    <measure number="5">
+      <note>
+        <pitch><step>A</step><octave>4</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <lyric number="1" name="en"><syllabic>single</syllabic><text>of</text></lyric>
+        <lyric number="2" name="da"><syllabic>single</syllabic><text>er</text></lyric>
+        <lyric number="3" name="sv"><syllabic>single</syllabic><text>är</text></lyric>
+        <lyric number="4" name="no"><syllabic>single</syllabic><text>er</text></lyric>
+        <lyric number="5" name="da"><syllabic>single</syllabic><text>skal</text></lyric>
+      </note>
+      <note>
+        <pitch><step>A</step><octave>4</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1" name="en"><syllabic>single</syllabic><text>all</text></lyric>
+        <lyric number="2" name="da"><syllabic>single</syllabic><text>Guds</text></lyric>
+        <lyric number="3" name="sv"><syllabic>single</syllabic><text>Guds</text></lyric>
+        <lyric number="4" name="no"><syllabic>single</syllabic><text>Guds</text></lyric>
+        <lyric number="5" name="da"><syllabic>begin</syllabic><text>hen</text></lyric>
+      </note>
+    </measure>
+    <measure number="6">
+      <note>
+        <pitch><step>B</step><octave>4</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1" name="en"><syllabic>begin</syllabic><text>na</text></lyric>
+        <lyric number="2" name="da"><syllabic>begin</syllabic><text>him</text></lyric>
+        <lyric number="3" name="sv"><syllabic>begin</syllabic><text>him</text></lyric>
+        <lyric number="4" name="no"><syllabic>begin</syllabic><text>him</text></lyric>
+        <lyric number="5" name="da"><syllabic>middle</syllabic><text>rul</text></lyric>
+      </note>
+      <note>
+        <pitch><step>A</step><octave>4</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <lyric number="1" name="en"><syllabic>end</syllabic><text>ture,</text></lyric>
+        <lyric number="2" name="da"><syllabic>end</syllabic><text>mel,</text></lyric>
+        <lyric number="3" name="sv"><syllabic>end</syllabic><text>mel,</text></lyric>
+        <lyric number="4" name="no"><syllabic>end</syllabic><text>mel,</text></lyric>
+        <lyric number="5" name="da"><syllabic>end</syllabic><text>le,</text></lyric>
+      </note>
+    </measure>
+    <measure number="7">
+      <note>
+        <pitch><step>D</step><octave>5</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <lyric number="1" name="en"><syllabic>single</syllabic><text>O</text></lyric>
+        <lyric number="2" name="da"><syllabic>single</syllabic><text>skøn</text></lyric>
+        <lyric number="3" name="sv"><syllabic>single</syllabic><text>skön</text></lyric>
+        <lyric number="4" name="no"><syllabic>single</syllabic><text>skjønn</text></lyric>
+        <lyric number="5" name="da"><syllabic>single</syllabic><text>slægt</text></lyric>
+      </note>
+      <note>
+        <pitch><step>C</step><alter>1</alter><octave>5</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1" name="en"><syllabic>single</syllabic><text>thou</text></lyric>
+        <lyric number="2" name="da"><syllabic>single</syllabic><text>er</text></lyric>
+        <lyric number="3" name="sv"><syllabic>single</syllabic><text>är</text></lyric>
+        <lyric number="4" name="no"><syllabic>single</syllabic><text>er</text></lyric>
+        <lyric number="5" name="da"><syllabic>single</syllabic><text>skal</text></lyric>
+      </note>
+    </measure>
+    <measure number="8">
+      <note>
+        <pitch><step>B</step><octave>4</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <lyric number="1" name="en"><syllabic>single</syllabic><text>of</text></lyric>
+        <lyric number="2" name="da"><syllabic>begin</syllabic><text>sjæ</text></lyric>
+        <lyric number="3" name="sv"><syllabic>begin</syllabic><text>sjä</text></lyric>
+        <lyric number="4" name="no"><syllabic>begin</syllabic><text>sje</text></lyric>
+        <lyric number="5" name="da"><syllabic>begin</syllabic><text>føl</text></lyric>
+      </note>
+      <note>
+        <pitch><step>A</step><octave>4</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1" name="en"><syllabic>single</syllabic><text>God</text></lyric>
+        <lyric number="2" name="da"><syllabic>middle</syllabic><text>le</text></lyric>
+        <lyric number="3" name="sv"><syllabic>middle</syllabic><text>lar</text></lyric>
+        <lyric number="4" name="no"><syllabic>middle</syllabic><text>le</text></lyric>
+        <lyric number="5" name="da"><syllabic>end</syllabic><text>ge</text></lyric>
+      </note>
+    </measure>
+    <measure number="9">
+      <note>
+        <pitch><step>G</step><octave>4</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1" name="en"><syllabic>single</syllabic><text>and</text></lyric>
+        <lyric number="2" name="da"><syllabic>end</syllabic><text>nes</text></lyric>
+        <lyric number="3" name="sv"><syllabic>end</syllabic><text>nas</text></lyric>
+        <lyric number="4" name="no"><syllabic>end</syllabic><text>nes</text></lyric>
+        <lyric number="5" name="da"><syllabic>begin</syllabic><text>slæg</text></lyric>
+      </note>
+      <note>
+        <pitch><step>F</step><alter>1</alter><octave>4</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1" name="en"><syllabic>single</syllabic><text>man</text></lyric>
+        <lyric number="2" name="da"><syllabic>begin</syllabic><text>pil</text></lyric>
+        <lyric number="3" name="sv"><syllabic>begin</syllabic><text>pil</text></lyric>
+        <lyric number="4" name="no"><syllabic>begin</syllabic><text>pil</text></lyric>
+      </note>
+      <note>
+        <pitch><step>E</step><octave>4</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1" name="en"><syllabic>single</syllabic><text>the</text></lyric>
+        <lyric number="2" name="da"><syllabic>middle</syllabic><text>grims</text></lyric>
+        <lyric number="3" name="sv"><syllabic>middle</syllabic><text>grims</text></lyric>
+        <lyric number="4" name="no"><syllabic>middle</syllabic><text>grims</text></lyric>
+        <lyric number="5" name="da"><syllabic>end</syllabic><text>ters</text></lyric>
+      </note>
+    </measure>
+    <measure number="10">
+      <note>
+        <pitch><step>D</step><octave>4</octave></pitch>
+        <duration>3</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <dot/>
+        <lyric number="1" name="en"><syllabic>single</syllabic><text>Son,</text></lyric>
+        <lyric number="2" name="da"><syllabic>end</syllabic><text>gang.</text></lyric>
+        <lyric number="3" name="sv"><syllabic>end</syllabic><text>gång.</text></lyric>
+        <lyric number="4" name="no"><syllabic>end</syllabic><text>gang.</text></lyric>
+        <lyric number="5" name="da"><syllabic>single</syllabic><text>gang;</text></lyric>
+      </note>
+    </measure>
+    <measure number="11">
+      <note>
+        <pitch><step>F</step><alter>1</alter><octave>4</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <lyric number="1" name="en"><syllabic>single</syllabic><text>Thee</text></lyric>
+        <lyric number="2" name="da"><syllabic>begin</syllabic><text>Gen</text></lyric>
+        <lyric number="3" name="sv"><syllabic>begin</syllabic><text>Ge</text></lyric>
+        <lyric number="4" name="no"><syllabic>begin</syllabic><text>Gjen</text></lyric>
+        <lyric number="5" name="da"><syllabic>begin</syllabic><text>al</text></lyric>
+      </note>
+      <note>
+        <pitch><step>F</step><alter>1</alter><octave>4</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1" name="en"><syllabic>single</syllabic><text>will</text></lyric>
+        <lyric number="2" name="da"><syllabic>end</syllabic><text>nem</text></lyric>
+        <lyric number="3" name="sv"><syllabic>end</syllabic><text>nom</text></lyric>
+        <lyric number="4" name="no"><syllabic>end</syllabic><text>nom</text></lyric>
+        <lyric number="5" name="da"><syllabic>end</syllabic><text>drig</text></lyric>
+      </note>
+    </measure>
+    <measure number="12">
+      <note>
+        <pitch><step>G</step><octave>4</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <lyric number="1" name="en"><syllabic>single</syllabic><text>I</text></lyric>
+        <lyric number="2" name="da"><syllabic>single</syllabic><text>de</text></lyric>
+        <lyric number="3" name="sv"><syllabic>single</syllabic><text>de</text></lyric>
+        <lyric number="4" name="no"><syllabic>single</syllabic><text>de</text></lyric>
+        <lyric number="5" name="da"><syllabic>begin</syllabic><text>for</text></lyric>
+      </note>
+      <note>
+        <pitch><step>G</step><octave>4</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1" name="en"><syllabic>begin</syllabic><text>cher</text></lyric>
+        <lyric number="2" name="da"><syllabic>begin</syllabic><text>fag</text></lyric>
+        <lyric number="3" name="sv"><syllabic>begin</syllabic><text>fag</text></lyric>
+        <lyric number="4" name="no"><syllabic>begin</syllabic><text>fag</text></lyric>
+        <lyric number="5" name="da"><syllabic>middle</syllabic><text>stum</text></lyric>
+      </note>
+    </measure>
+    <measure number="13">
+      <note>
+        <pitch><step>A</step><octave>4</octave></pitch>
+        <duration>3</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <dot/>
+        <lyric number="1" name="en"><syllabic>end</syllabic><text>ish,</text></lyric>
+        <lyric number="2" name="da"><syllabic>end</syllabic><text>re</text></lyric>
+        <lyric number="3" name="sv"><syllabic>end</syllabic><text>ra</text></lyric>
+        <lyric number="4" name="no"><syllabic>end</syllabic><text>re</text></lyric>
+        <lyric number="5" name="da"><syllabic>end</syllabic><text>mer</text></lyric>
+      </note>
+    </measure>
+    <measure number="14">
+      <note>
+        <pitch><step>B</step><octave>4</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <lyric number="1" name="en"><syllabic>single</syllabic><text>Thee</text></lyric>
+        <lyric number="2" name="da"><syllabic>begin</syllabic><text>ri</text></lyric>
+        <lyric number="3" name="sv"><syllabic>begin</syllabic><text>ri</text></lyric>
+        <lyric number="4" name="no"><syllabic>begin</syllabic><text>ri</text></lyric>
+        <lyric number="5" name="da"><syllabic>begin</syllabic><text>to</text></lyric>
+      </note>
+      <note>
+        <pitch><step>B</step><octave>4</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1" name="en"><syllabic>single</syllabic><text>will</text></lyric>
+        <lyric number="2" name="da"><syllabic>end</syllabic><text>ger</text></lyric>
+        <lyric number="3" name="sv"><syllabic>end</syllabic><text>ken</text></lyric>
+        <lyric number="4" name="no"><syllabic>end</syllabic><text>ker</text></lyric>
+        <lyric number="5" name="da"><syllabic>end</syllabic><text>nen</text></lyric>
+      </note>
+    </measure>
+    <measure number="15">
+      <note>
+        <pitch><step>A</step><octave>4</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <lyric number="1" name="en"><syllabic>single</syllabic><text>I</text></lyric>
+        <lyric number="2" name="da"><syllabic>single</syllabic><text>på</text></lyric>
+        <lyric number="3" name="sv"><syllabic>single</syllabic><text>på</text></lyric>
+        <lyric number="4" name="no"><syllabic>single</syllabic><text>på</text></lyric>
+        <lyric number="5" name="da"><syllabic>single</syllabic><text>fra</text></lyric>
+      </note>
+      <note>
+        <pitch><step>G</step><octave>4</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1" name="en"><syllabic>begin</syllabic><text>hon</text></lyric>
+        <lyric number="2" name="da"><syllabic>begin</syllabic><text>jor</text></lyric>
+        <lyric number="3" name="sv"><syllabic>begin</syllabic><text>jor</text></lyric>
+        <lyric number="4" name="no"><syllabic>begin</syllabic><text>jor</text></lyric>
+        <lyric number="5" name="da"><syllabic>begin</syllabic><text>him</text></lyric>
+      </note>
+    </measure>
+    <measure number="16">
+      <note>
+        <pitch><step>F</step><alter>1</alter><octave>4</octave></pitch>
+        <duration>3</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <dot/>
+        <lyric number="1" name="en"><syllabic>end</syllabic><text>or,</text></lyric>
+        <lyric number="2" name="da"><syllabic>end</syllabic><text>den</text></lyric>
+        <lyric number="3" name="sv"><syllabic>end</syllabic><text>den</text></lyric>
+        <lyric number="4" name="no"><syllabic>end</syllabic><text>den</text></lyric>
+        <lyric number="5" name="da"><syllabic>end</syllabic><text>len</text></lyric>
+      </note>
+    </measure>
+    <measure number="17">
+      <note>
+        <pitch><step>A</step><octave>4</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <lyric number="1" name="en"><syllabic>single</syllabic><text>Thou,</text></lyric>
+        <lyric number="2" name="da"><syllabic>single</syllabic><text>går</text></lyric>
+        <lyric number="3" name="sv"><syllabic>single</syllabic><text>gå</text></lyric>
+        <lyric number="4" name="no"><syllabic>single</syllabic><text>går</text></lyric>
+        <lyric number="5" name="da"><syllabic>single</syllabic><text>i</text></lyric>
+      </note>
+      <note>
+        <pitch><step>B</step><octave>4</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1" name="en"><syllabic>single</syllabic><text>my</text></lyric>
+        <lyric number="2" name="da"><syllabic>single</syllabic><text>vi</text></lyric>
+        <lyric number="3" name="sv"><syllabic>single</syllabic><text>vi</text></lyric>
+        <lyric number="4" name="no"><syllabic>single</syllabic><text>vi</text></lyric>
+        <lyric number="5" name="da"><syllabic>begin</syllabic><text>sjæ</text></lyric>
+      </note>
+    </measure>
+    <measure number="18">
+      <note>
+        <pitch><step>A</step><octave>4</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <lyric number="1" name="en"><syllabic>single</syllabic><text>soul's</text></lyric>
+        <lyric number="2" name="da"><syllabic>single</syllabic><text>til</text></lyric>
+        <lyric number="3" name="sv"><syllabic>single</syllabic><text>till</text></lyric>
+        <lyric number="4" name="no"><syllabic>single</syllabic><text>til</text></lyric>
+        <lyric number="5" name="da"><syllabic>end</syllabic><text>lens</text></lyric>
+      </note>
+      <note>
+        <pitch><step>F</step><alter>1</alter><octave>4</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1" name="en"><syllabic>begin</syllabic><text>glo</text></lyric>
+        <lyric number="2" name="da"><syllabic>begin</syllabic><text>Pa</text></lyric>
+        <lyric number="3" name="sv"><syllabic>begin</syllabic><text>pa</text></lyric>
+        <lyric number="4" name="no"><syllabic>begin</syllabic><text>pa</text></lyric>
+        <lyric number="5" name="da"><syllabic>begin</syllabic><text>gla</text></lyric>
+      </note>
+    </measure>
+    <measure number="19">
+      <note>
+        <pitch><step>G</step><octave>4</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1" name="en"><syllabic>end</syllabic><text>ry,</text></lyric>
+        <lyric number="2" name="da"><syllabic>middle</syllabic><text>ra</text></lyric>
+        <lyric number="3" name="sv"><syllabic>middle</syllabic><text>ra</text></lyric>
+        <lyric number="4" name="no"><syllabic>middle</syllabic><text>ra</text></lyric>
+        <lyric number="5" name="da"><syllabic>end</syllabic><text>de</text></lyric>
+      </note>
+      <note>
+        <pitch><step>F</step><alter>1</alter><octave>4</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1" name="en"><syllabic>single</syllabic><text>joy,</text></lyric>
+        <lyric number="2" name="da"><syllabic>end</syllabic><text>dis</text></lyric>
+        <lyric number="3" name="sv"><syllabic>end</syllabic><text>dis</text></lyric>
+        <lyric number="4" name="no"><syllabic>end</syllabic><text>dis</text></lyric>
+        <lyric number="5" name="da"><syllabic>begin</syllabic><text>pil</text></lyric>
+      </note>
+      <note>
+        <pitch><step>E</step><octave>4</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1" name="en"><syllabic>single</syllabic><text>and</text></lyric>
+        <lyric number="2" name="da"><syllabic>single</syllabic><text>med</text></lyric>
+        <lyric number="3" name="sv"><syllabic>single</syllabic><text>med</text></lyric>
+        <lyric number="4" name="no"><syllabic>single</syllabic><text>med</text></lyric>
+        <lyric number="5" name="da"><syllabic>middle</syllabic><text>grims</text></lyric>
+      </note>
+    </measure>
+    <measure number="20">
+      <note>
+        <pitch><step>D</step><octave>4</octave></pitch>
+        <duration>3</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <dot/>
+        <notations><fermata type="upright"/></notations>
+        <lyric number="1" name="en"><syllabic>single</syllabic><text>crown.</text></lyric>
+        <lyric number="2" name="da"><syllabic>single</syllabic><text>sang.</text></lyric>
+        <lyric number="3" name="sv"><syllabic>single</syllabic><text>sång.</text></lyric>
+        <lyric number="4" name="no"><syllabic>single</syllabic><text>sang.</text></lyric>
+        <lyric number="5" name="da"><syllabic>end</syllabic><text>sang.</text></lyric>
+      </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
+    </measure>
+  </part>
+</score-partwise>

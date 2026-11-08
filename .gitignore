@@ -30,8 +30,10 @@ probe/
 *.tgz
 *.zip
 
-# challenge corpus: committed once validated (generators are still writing it)
-corpus/challenge/
+# challenge corpus: the scan-damage PDFs (~300 MB) are rebuilt in ~40 s with
+# .venv/bin/python corpus/challenge/degradation/_tools/run.py (see corpus/challenge/README.md)
+corpus/challenge/degradation/**/*.pdf
+corpus/challenge/degradation/_pieces/**/*.png
 
 # corpus items whose source encodings are licensed for testing only (regenerate locally,
 # see corpus/synthetic/_tools/run_all.py); maintained by tools/push.sh

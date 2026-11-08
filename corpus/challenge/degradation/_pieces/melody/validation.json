@@ -1,0 +1,41 @@
+{
+ "piece": "melody",
+ "xsd_valid": true,
+ "lily_warnings": [],
+ "bad_warnings": [],
+ "midi_attacks": {
+  "ok": true,
+  "expected_attacks": 25,
+  "midi_attacks": 25,
+  "missing": [],
+  "extra": [],
+  "n_missing": 0,
+  "n_extra": 0
+ },
+ "midi_lyrics": {
+  "ok": true,
+  "expected": 47,
+  "midi": 47,
+  "missing": [],
+  "extra": []
+ },
+ "lyric_text_found_in_pdf": 1.0,
+ "vector_pages": 1,
+ "measures": 11,
+ "music21": {
+  "parts": [
+   "Voice"
+  ],
+  "notes": 25
+ },
+ "parts": [
+  "Voice"
+ ],
+ "lyrics": [
+  {
+   "part": "Voice",
+   "verses": 2
+  }
+ ],
+ "ok": true
+}

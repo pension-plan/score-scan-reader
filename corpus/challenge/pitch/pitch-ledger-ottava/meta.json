@@ -1,0 +1,399 @@
+{
+  "id": "pitch-ledger-ottava",
+  "category": "pitch",
+  "title": "Heights and Depths (flute and tuba)",
+  "edge_cases": [
+    "extreme_ledger_lines_high",
+    "extreme_ledger_lines_low",
+    "ottava_8va",
+    "ottava_8vb",
+    "ottava_starting_mid_measure",
+    "ottava_spanning_line_break",
+    "same_display_position_after_ottava",
+    "passage_written_with_and_without_ottava",
+    "pencil_annotations",
+    "cropped_staff_ends",
+    "halftone_moire",
+    "high_dpi"
+  ],
+  "expected": {
+    "parts": [
+      "Flute",
+      "Tuba"
+    ],
+    "must_not_split": false,
+    "shared_staves": [],
+    "lyrics": [],
+    "notes": "Two parts (Flute, Tuba), C major, 16 bars.  Pitches in the truth are SOUNDING pitches; 8va / 8vb brackets are <octave-shift> directions (type down = 8va, type up = 8vb, MusicXML convention).  Flute reaches D7 (6 ledger lines when written at pitch, bars 2, 7, 15); bars 5-6 and 7-8 are the same music with and without 8va; bar 9 starts 8va on beat 2; bar 10 has C7 under 8va then C6 loco (same staff position, different octave); bars 11-13 8va crosses the line break.  Tuba goes down to C1 (5 ledger lines below the bass staff, bars 7, 16); 8vb (bars 5-6, 9-10, 12-13, the last across a line break).  A correct conversion must output the sounding octave for every note under a bracket and must NOT apply a bracket to notes after it ends.  Pencil marks (circles, breath marks, words) in the scans are not part of the music.  The scans are cropped through the left/right ends of the staves (instrument names, brackets and the final barline ends are cut; no notes are cut)."
+  },
+  "shared_staff_accidental_differences": [],
+  "courtesy_accidentals": [],
+  "truth_limitations": [],
+  "degradations": {
+    "scan.pdf": {
+      "dpi": 400,
+      "seed": 14001,
+      "color": "rgb",
+      "encoding": "jpeg q55",
+      "pages_in_pdf": 1,
+      "pixel_size": [
+        2880,
+        4678
+      ],
+      "summary": "400 dpi RGB: pencil circles / breath marks / words, page cropped through the staff starts (0.6 mm into the staff) and staff ends (0.8 mm), 0.8 deg skew, JPEG q55",
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            245,
+            244,
+            240
+          ],
+          "texture": 3
+        },
+        {
+          "op": "pencil",
+          "circles": 6,
+          "breath_marks": 3,
+          "texts": [
+            "slow",
+            "breathe"
+          ],
+          "alpha": 0.7
+        },
+        {
+          "op": "crop",
+          "left_into_mm": 0.6,
+          "right_into_mm": 0.8
+        },
+        {
+          "op": "rotate",
+          "deg": 0.8
+        },
+        {
+          "op": "blur",
+          "radius_px300": 0.4
+        },
+        {
+          "op": "noise",
+          "sigma": 3
+        }
+      ],
+      "pencil_marks": [
+        {
+          "page": 0,
+          "marks": [
+            {
+              "mark": "circle",
+              "x": 1507,
+              "y": 435
+            },
+            {
+              "mark": "circle",
+              "x": 646,
+              "y": 934
+            },
+            {
+              "mark": "circle",
+              "x": 1353,
+              "y": 1684
+            },
+            {
+              "mark": "circle",
+              "x": 1975,
+              "y": 410
+            },
+            {
+              "mark": "circle",
+              "x": 1162,
+              "y": 2539
+            },
+            {
+              "mark": "circle",
+              "x": 1353,
+              "y": 1301
+            },
+            {
+              "mark": "text",
+              "text": "slow",
+              "x": 948,
+              "y": 2130
+            },
+            {
+              "mark": "text",
+              "text": "breathe",
+              "x": 2135,
+              "y": 2145
+            },
+            {
+              "mark": "breath",
+              "x": 2063,
+              "y": 1696
+            },
+            {
+              "mark": "breath",
+              "x": 1714,
+              "y": 3207
+            },
+            {
+              "mark": "breath",
+              "x": 1237,
+              "y": 1591
+            }
+          ]
+        }
+      ],
+      "crop_px_LRTB": [
+        [
+          258,
+          170,
+          0,
+          0
+        ]
+      ]
+    },
+    "scan-mild.pdf": {
+      "dpi": 400,
+      "seed": 14002,
+      "color": "gray",
+      "encoding": "jpeg q60",
+      "pages_in_pdf": 1,
+      "pixel_size": [
+        3056,
+        4678
+      ],
+      "summary": "400 dpi grey: slight crop of the system brackets, three pencil circles, 0.3 deg skew, JPEG q60",
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            245,
+            244,
+            240
+          ],
+          "texture": 2
+        },
+        {
+          "op": "pencil",
+          "circles": 3,
+          "alpha": 0.6
+        },
+        {
+          "op": "crop",
+          "left_into_mm": 0.2
+        },
+        {
+          "op": "rotate",
+          "deg": -0.3
+        },
+        {
+          "op": "noise",
+          "sigma": 2
+        },
+        {
+          "op": "gray"
+        }
+      ],
+      "pencil_marks": [
+        {
+          "page": 0,
+          "marks": [
+            {
+              "mark": "circle",
+              "x": 638,
+              "y": 579
+            },
+            {
+              "mark": "circle",
+              "x": 1507,
+              "y": 435
+            },
+            {
+              "mark": "circle",
+              "x": 1447,
+              "y": 2931
+            }
+          ]
+        }
+      ],
+      "crop_px_LRTB": [
+        [
+          252,
+          0,
+          0,
+          0
+        ]
+      ]
+    },
+    "scan-severe.pdf": {
+      "dpi": 300,
+      "seed": 14003,
+      "color": "rgb",
+      "encoding": "jpeg q25",
+      "pages_in_pdf": 1,
+      "pixel_size": [
+        2387,
+        3650
+      ],
+      "summary": "halftone-screened reproduction (110 lpi, 45 deg) rescanned -> moire, bluish recycled paper, deeper crop (1.2 mm into staff starts and ends), 4 deg skew, JPEG q25",
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            226,
+            231,
+            236
+          ],
+          "texture": 4,
+          "ink_rgb": [
+            35,
+            38,
+            45
+          ]
+        },
+        {
+          "op": "crop",
+          "left_into_mm": 1.2,
+          "right_into_mm": 1.2
+        },
+        {
+          "op": "halftone",
+          "lpi": 110,
+          "angle": 45,
+          "oversample": 2
+        },
+        {
+          "op": "rotate",
+          "deg": 4.0,
+          "expand": true,
+          "fill": [
+            236,
+            236,
+            236
+          ]
+        },
+        {
+          "op": "noise",
+          "sigma": 5
+        }
+      ],
+      "crop_px_LRTB": [
+        [
+          201,
+          133,
+          0,
+          0
+        ]
+      ]
+    }
+  },
+  "dpi": {
+    "scan.pdf": 400,
+    "scan-mild.pdf": 400,
+    "scan-severe.pdf": 300
+  },
+  "clean_pdf": {
+    "dpi": 300,
+    "note": "undamaged 300 dpi grey raster of the LilyPond engraving (image only)"
+  },
+  "license": "CC0-1.0 (music, engraving, scans); lyrics texts public domain where present",
+  "source": "composed for this corpus",
+  "measures": 16,
+  "pages": 1,
+  "layout": "StaffGroup of two single staves, 4 systems x 4 bars",
+  "validation": {
+    "xsd_valid": true,
+    "midi_attacks_match_truth_file": true,
+    "attacks": 82,
+    "printed_accidentals_match": true,
+    "accidentals": {
+      "expected": 0,
+      "printed": 0,
+      "extra_natural": 0,
+      "parenthesized": 0,
+      "double": 0,
+      "tie_at_line_start": 0
+    },
+    "clefs": {
+      "stFL": {
+        "expected_changes": 0,
+        "rendered_changes": 0
+      },
+      "stTU": {
+        "expected_changes": 0,
+        "rendered_changes": 0
+      }
+    },
+    "keys": {
+      "stFL": {
+        "expected": [
+          "0:0"
+        ],
+        "rendered": [
+          "0:0"
+        ],
+        "cancellations": {}
+      },
+      "stTU": {
+        "expected": [
+          "0:0"
+        ],
+        "rendered": [
+          "0:0"
+        ],
+        "cancellations": {}
+      }
+    },
+    "ottava": {
+      "stFL": {
+        "expected": [
+          "16-22",
+          "33-36",
+          "41-49"
+        ],
+        "rendered": [
+          "16-22",
+          "33-36",
+          "41-49"
+        ],
+        "pieces": 4
+      },
+      "stTU": {
+        "expected": [
+          "16-22",
+          "34-38",
+          "44-48"
+        ],
+        "rendered": [
+          "16-22",
+          "34-38",
+          "44-48"
+        ],
+        "pieces": 4
+      }
+    },
+    "systems": 4,
+    "line_start_measures": [
+      1,
+      5,
+      9,
+      13
+    ],
+    "lyric_text_found_in_engraving": null,
+    "scan_files_image_only": {
+      "scan.pdf": true,
+      "scan-mild.pdf": true,
+      "scan-severe.pdf": true
+    }
+  },
+  "files": [
+    "engraving.ly",
+    "truth.musicxml",
+    "clean.pdf",
+    "scan.pdf",
+    "scan-mild.pdf",
+    "scan-severe.pdf",
+    "meta.json",
+    "ATTRIBUTION.txt"
+  ]
+}

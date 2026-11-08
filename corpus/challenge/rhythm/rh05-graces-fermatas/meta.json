@@ -1,0 +1,317 @@
+{
+  "id": "rh05-graces-fermatas",
+  "category": "rhythm",
+  "title": "Air with Graces (violin and piano)",
+  "composer": "OMR challenge corpus (CC0)",
+  "lyricist": "",
+  "edge_cases": [
+    "acciaccatura",
+    "appoggiatura",
+    "grace_group_16ths",
+    "grace_group_32nds",
+    "grace_at_bar_start",
+    "grace_before_first_note",
+    "unslashed_single_grace",
+    "fermata_on_note",
+    "fermata_on_rest",
+    "fermata_on_chord",
+    "simultaneous_fermatas_all_staves",
+    "sixteenth_beamed_groups",
+    "32nd_beamed_groups",
+    "dotted_16th_32nd",
+    "dotted_eighth_32nd_32nd",
+    "beam_across_16th_rest",
+    "beamlet_hook",
+    "tie_quarter_to_16th",
+    "piano_grand_staff_must_not_split",
+    "instrument_plus_piano",
+    "coffee_stain",
+    "foxing",
+    "bleed_through",
+    "yellowed_paper_rgb"
+  ],
+  "expected": {
+    "parts": [
+      "Violin",
+      "Piano"
+    ],
+    "must_not_split": true,
+    "shared_staves": [],
+    "notes": "Two parts: Violin (1 staff) and Piano (ONE part, 2 staves). 8 bars of 4/4 in D major. Grace notes take no time: slashed acciaccaturas (bar 1 beat 1 = before the very first note, bar 4 beat 1, bar 6 last eighth), unslashed appoggiatura (bar 1), unslashed grace groups of 2 x 16th (bar 1), 3 x 32nd (bar 2), 4 x 16th (bar 5) and a single unslashed grace (bar 7). Fermatas sound together in all three staves: bar 2 beat 1 (violin note, piano chords), bar 4 beat 1, bar 8 (final chord AND final quarter rest in every staff). Beamed 16th/32nd groups including 8.+32+32, 8+r16+16 (beam over a 16th rest, backward beamlet) and an 8-note 32nd run; tie b'4~b'16 (bar 7).",
+    "lyrics": [],
+    "measures": 8,
+    "first_measure_number": 1
+  },
+  "truth_limitations": [
+    "Grace notes are <grace/> notes without <duration> (slash=\"yes\" for acciaccaturas); the slur that LilyPond engraves for \\acciaccatura / \\appoggiatura is encoded as slur number 2.",
+    "<beam> elements reproduce the engraved beam groups exactly (manual beaming); notes only - a rest inside a beam carries no <beam> element."
+  ],
+  "degradations": {
+    "scan.pdf": {
+      "seed": 710501,
+      "render_dpi": 300,
+      "dpi": 300,
+      "color": "rgb",
+      "format": "jpeg",
+      "jpeg_quality": 55,
+      "jpeg_passes": 1,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            236,
+            224,
+            190
+          ],
+          "texture": 7,
+          "bleed": {
+            "strength": 0.12
+          }
+        },
+        {
+          "op": "foxing",
+          "n": 80,
+          "strength": 0.5
+        },
+        {
+          "op": "coffee",
+          "n": 1,
+          "radius_mm": 35,
+          "strength": 0.4,
+          "partial": true
+        },
+        {
+          "op": "rotate",
+          "deg": -0.7,
+          "bg": [
+            200,
+            200,
+            200
+          ]
+        },
+        {
+          "op": "gradient",
+          "strength": 0.1
+        },
+        {
+          "op": "blur",
+          "sigma": 0.5
+        },
+        {
+          "op": "noise",
+          "sigma": 3,
+          "chroma": 1.5
+        }
+      ],
+      "tags": [
+        "coloured_paper_rgb",
+        "paper_texture",
+        "bleed_through",
+        "foxing",
+        "coffee",
+        "rotation_-0.7deg",
+        "gradient",
+        "blur",
+        "noise",
+        "jpeg_q55"
+      ],
+      "output_pages": 1,
+      "pixel_size": [
+        2525,
+        3540
+      ],
+      "image_mode": "RGB",
+      "bytes": 651787,
+      "image_only_check": {
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "pages": 1,
+        "text_chars": 0
+      },
+      "op_log": []
+    },
+    "scan-mild.pdf": {
+      "seed": 710502,
+      "render_dpi": 300,
+      "dpi": 300,
+      "color": "rgb",
+      "format": "jpeg",
+      "jpeg_quality": 60,
+      "jpeg_passes": 1,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            242,
+            236,
+            215
+          ],
+          "texture": 4,
+          "bleed": {
+            "strength": 0.05
+          }
+        },
+        {
+          "op": "foxing",
+          "n": 25,
+          "strength": 0.3
+        },
+        {
+          "op": "blur",
+          "sigma": 0.4
+        },
+        {
+          "op": "noise",
+          "sigma": 2
+        }
+      ],
+      "tags": [
+        "coloured_paper_rgb",
+        "paper_texture",
+        "bleed_through",
+        "foxing",
+        "blur",
+        "noise",
+        "jpeg_q60"
+      ],
+      "output_pages": 1,
+      "pixel_size": [
+        2481,
+        3508
+      ],
+      "image_mode": "RGB",
+      "bytes": 482871,
+      "image_only_check": {
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "pages": 1,
+        "text_chars": 0
+      },
+      "op_log": []
+    },
+    "scan-severe.pdf": {
+      "seed": 710503,
+      "render_dpi": 300,
+      "dpi": 300,
+      "color": "rgb",
+      "format": "jpeg",
+      "jpeg_quality": 20,
+      "jpeg_passes": 1,
+      "ops": [
+        {
+          "op": "ink_dropout",
+          "amount": 0.2
+        },
+        {
+          "op": "paper",
+          "rgb": [
+            228,
+            212,
+            170
+          ],
+          "texture": 9,
+          "bleed": {
+            "strength": 0.25
+          },
+          "ink_var": 30
+        },
+        {
+          "op": "foxing",
+          "n": 200,
+          "strength": 0.7
+        },
+        {
+          "op": "coffee",
+          "n": 3,
+          "radius_mm": 45,
+          "strength": 0.6
+        },
+        {
+          "op": "rotate",
+          "deg": 1.4,
+          "bg": [
+            190,
+            190,
+            190
+          ]
+        },
+        {
+          "op": "blur",
+          "sigma": 0.9
+        },
+        {
+          "op": "noise",
+          "sigma": 4,
+          "chroma": 2
+        }
+      ],
+      "tags": [
+        "ink_dropout",
+        "coloured_paper_rgb",
+        "paper_texture",
+        "bleed_through",
+        "foxing",
+        "coffee",
+        "rotation_+1.4deg",
+        "blur",
+        "noise",
+        "jpeg_q20"
+      ],
+      "output_pages": 1,
+      "pixel_size": [
+        2567,
+        3568
+      ],
+      "image_mode": "RGB",
+      "bytes": 256355,
+      "image_only_check": {
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "pages": 1,
+        "text_chars": 0
+      },
+      "op_log": []
+    }
+  },
+  "dpi": 300,
+  "license": "CC0-1.0 (music composed for this corpus; engraving, truth and scans CC0)",
+  "source": "Composed for this corpus (CC0).",
+  "pages": 1,
+  "files": {
+    "truth": "truth.musicxml",
+    "engraving": "engraving.ly",
+    "clean": "clean.pdf",
+    "scan": "scan.pdf",
+    "scan_mild": "scan-mild.pdf",
+    "scan_severe": "scan-severe.pdf",
+    "attribution": "ATTRIBUTION.txt"
+  },
+  "clean": {
+    "dpi": 300,
+    "pages": 1,
+    "ops": [],
+    "note": "undamaged raster render",
+    "image_only": true,
+    "fonts": [],
+    "images": 1,
+    "text_chars": 0
+  },
+  "validation": {
+    "truth_xsd_valid": true,
+    "engraving_event_dump_matches_truth": true,
+    "engraving_events_compared": 219,
+    "lyric_events_compared": 0,
+    "time_signatures_compared": 3,
+    "midi_attacks_match_truth": true,
+    "midi_attacks": 134,
+    "midi_grace_notes_excluded": 14,
+    "music21_reparse_matches_model": true,
+    "lyric_text_found_in_engraving": null,
+    "lilypond_warnings": [],
+    "method": "LilyPond event-dump engraver (rsynth/dump.ly) compared with the model the truth is written from: every note/rest/multi-bar rest (onset, pitch, notated type, dots, tuplet scale), grace offsets, ties, beam starts/stops, slurs, fermatas, lyric syllables/hyphens/extenders, bar numbers/measure positions and time signatures; plus MIDI attack multiset and a music21 re-parse of truth.musicxml."
+  },
+  "generator": "corpus/challenge/rhythm/_tools/run_all.py (rsynth/items.py, build.py, scan.py)"
+}

@@ -1,0 +1,296 @@
+{
+  "id": "pitch-keysig-odyssey",
+  "category": "pitch",
+  "title": "Odyssey Through the Keys (solo violin)",
+  "edge_cases": [
+    "key_change_mid_piece",
+    "key_7_sharps",
+    "key_7_flats",
+    "key_cancellation_naturals",
+    "enharmonic_key_change",
+    "key_change_mid_system",
+    "key_change_without_double_bar",
+    "courtesy_key_signature_at_line_end",
+    "double_sharp",
+    "double_flat",
+    "natural_in_sharp_key",
+    "natural_in_flat_key",
+    "enharmonic_spelling_B_sharp_C_flat_F_flat_E_sharp",
+    "octave_boundary_spelling",
+    "minor_key_final_section"
+  ],
+  "expected": {
+    "parts": [
+      "Violin"
+    ],
+    "must_not_split": false,
+    "shared_staves": [],
+    "lyrics": [],
+    "notes": "One part (Violin), one staff, 32 bars of 4/4.  Key signature changes at bars 5 (C# major, 7 sharps), 9 (Db major: 7 naturals + 5 flats), 13 (Cb major, 7 flats), 17 (B major: 7 naturals + 5 sharps), 21 (F# major, no double bar), 25 (Gb major: 6 naturals + 6 flats, mid-system, no double bar) and 29 (A minor: 6 naturals).  Bars 9-28 are pairs of enharmonically equivalent keys, so the same staff positions must be read with different signatures.  A correct conversion has every <key> change at the right bar (fifths 7,-5,-7,5,6,-6,0) and spells B#4 (bar 6/7), F##5, Bbb4, Fb5, E#5, B#5 exactly; note B#4/B#5 belong to octave 4/5 (they sound C5/C6) and Cb5 to octave 5.  The cancellation naturals before each new signature are not notes.  The key change at bar 5 sits at a line break: LilyPond prints a courtesy key signature at the end of system 1."
+  },
+  "shared_staff_accidental_differences": [],
+  "courtesy_accidentals": [],
+  "truth_limitations": [],
+  "degradations": {
+    "scan.pdf": {
+      "dpi": 200,
+      "seed": 11001,
+      "color": "rgb",
+      "encoding": "jpeg q40",
+      "pages_in_pdf": 1,
+      "pixel_size": [
+        1794,
+        2437
+      ],
+      "summary": "yellowed paper (RGB) with texture and bleed-through, 3.5 deg skew, light gradient, slight focus blur, noise, JPEG q40",
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            236,
+            224,
+            196
+          ],
+          "ink_rgb": [
+            40,
+            34,
+            30
+          ],
+          "texture": 6,
+          "fibers": 3,
+          "bleed": 0.12
+        },
+        {
+          "op": "rotate",
+          "deg": 3.5,
+          "fill": [
+            250,
+            250,
+            248
+          ],
+          "expand": true
+        },
+        {
+          "op": "lighting",
+          "gradient": 0.12,
+          "angle": 30
+        },
+        {
+          "op": "blur",
+          "radius_px300": 0.6
+        },
+        {
+          "op": "noise",
+          "sigma": 4,
+          "chroma": 1.5
+        }
+      ]
+    },
+    "scan-mild.pdf": {
+      "dpi": 300,
+      "seed": 11002,
+      "color": "gray",
+      "encoding": "jpeg q60",
+      "pages_in_pdf": 1,
+      "pixel_size": [
+        2481,
+        3508
+      ],
+      "summary": "clean office scan: 0.6 deg skew, grey, light noise, JPEG q60",
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            245,
+            244,
+            240
+          ],
+          "texture": 2
+        },
+        {
+          "op": "rotate",
+          "deg": 0.6
+        },
+        {
+          "op": "blur",
+          "radius_px300": 0.4
+        },
+        {
+          "op": "noise",
+          "sigma": 2
+        },
+        {
+          "op": "gray"
+        }
+      ]
+    },
+    "scan-severe.pdf": {
+      "dpi": 120,
+      "seed": 11003,
+      "color": "rgb",
+      "encoding": "jpeg q20",
+      "pages_in_pdf": 1,
+      "pixel_size": [
+        1213,
+        1550
+      ],
+      "summary": "120 dpi, old yellowed copy: coffee ring + foxing, strong bleed-through, 9.5 deg skew, gradient + vignette, focus blur, noise, JPEG q20",
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            222,
+            205,
+            170
+          ],
+          "ink_rgb": [
+            48,
+            40,
+            34
+          ],
+          "texture": 8,
+          "fibers": 4,
+          "bleed": 0.18
+        },
+        {
+          "op": "stain",
+          "cx": 0.7,
+          "cy": 0.36,
+          "r": 0.14,
+          "strength": 0.45,
+          "rgb": [
+            150,
+            100,
+            55
+          ]
+        },
+        {
+          "op": "foxing",
+          "n": 60,
+          "strength": 0.45
+        },
+        {
+          "op": "rotate",
+          "deg": -9.5,
+          "fill": [
+            245,
+            245,
+            242
+          ],
+          "expand": true
+        },
+        {
+          "op": "lighting",
+          "gradient": 0.25,
+          "vignette": 0.2,
+          "angle": 200
+        },
+        {
+          "op": "blur",
+          "radius_px300": 1.6
+        },
+        {
+          "op": "noise",
+          "sigma": 6,
+          "chroma": 2
+        }
+      ]
+    }
+  },
+  "dpi": {
+    "scan.pdf": 200,
+    "scan-mild.pdf": 300,
+    "scan-severe.pdf": 120
+  },
+  "clean_pdf": {
+    "dpi": 300,
+    "note": "undamaged 300 dpi grey raster of the LilyPond engraving (image only)"
+  },
+  "license": "CC0-1.0 (music, engraving, scans); lyrics texts public domain where present",
+  "source": "composed for this corpus",
+  "measures": 32,
+  "pages": 1,
+  "layout": "single treble staff, 6 systems, explicit line breaks (4/6 bars per system)",
+  "validation": {
+    "xsd_valid": true,
+    "midi_attacks_match_truth_file": true,
+    "attacks": 138,
+    "printed_accidentals_match": true,
+    "accidentals": {
+      "expected": 21,
+      "printed": 21,
+      "extra_natural": 0,
+      "parenthesized": 0,
+      "double": 3,
+      "tie_at_line_start": 0
+    },
+    "clefs": {
+      "stV": {
+        "expected_changes": 0,
+        "rendered_changes": 0
+      }
+    },
+    "keys": {
+      "stV": {
+        "expected": [
+          "0:0",
+          "16:7",
+          "32:-5",
+          "48:-7",
+          "64:5",
+          "80:6",
+          "96:-6",
+          "112:0"
+        ],
+        "rendered": [
+          "0:0",
+          "16:7",
+          "32:-5",
+          "48:-7",
+          "64:5",
+          "80:6",
+          "96:-6",
+          "112:0"
+        ],
+        "cancellations": {
+          "32": "ABCDEFG",
+          "64": "ABCDEFG",
+          "96": "ACDEFG",
+          "112": "ABCDEG"
+        }
+      }
+    },
+    "ottava": {
+      "stV": {
+        "expected": [],
+        "rendered": [],
+        "pieces": 0
+      }
+    },
+    "systems": 6,
+    "line_start_measures": [
+      1,
+      5,
+      11,
+      15,
+      21,
+      27
+    ],
+    "lyric_text_found_in_engraving": null,
+    "scan_files_image_only": {
+      "scan.pdf": true,
+      "scan-mild.pdf": true,
+      "scan-severe.pdf": true
+    }
+  },
+  "files": [
+    "engraving.ly",
+    "truth.musicxml",
+    "clean.pdf",
+    "scan.pdf",
+    "scan-mild.pdf",
+    "scan-severe.pdf",
+    "meta.json",
+    "ATTRIBUTION.txt"
+  ]
+}

@@ -1,0 +1,270 @@
+{
+  "id": "rh06-closed-satb-crossrhythm",
+  "category": "rhythm",
+  "title": "O God, Our Help in Ages Past (closed SATB, cross-voice rhythms)",
+  "composer": "OMR challenge corpus (CC0)",
+  "lyricist": "Isaac Watts (1719)",
+  "edge_cases": [
+    "satb_closed_score",
+    "two_voices_per_staff_split",
+    "cross_voice_rhythm_differences",
+    "triplets_against_duplets",
+    "tuplet_in_one_voice_only",
+    "tie_in_one_voice_only",
+    "rest_in_one_voice_only",
+    "whole_bar_rest_lower_voice",
+    "unison_shared_notehead",
+    "dotted_vs_straight_between_voices",
+    "fermatas_at_different_onsets",
+    "pickup_anacrusis",
+    "incomplete_final_bar",
+    "lyrics",
+    "two_verses",
+    "lyrics_on_lower_staff_with_own_rhythm",
+    "lyric_melisma",
+    "high_dpi_600",
+    "halftone_moire",
+    "low_dpi"
+  ],
+  "expected": {
+    "parts": [
+      "Soprano",
+      "Alto",
+      "Tenor",
+      "Bass"
+    ],
+    "must_not_split": false,
+    "shared_staves": [
+      [
+        "Soprano",
+        "Alto"
+      ],
+      [
+        "Tenor",
+        "Bass"
+      ]
+    ],
+    "notes": "Closed score: split into 4 parts. Upper staff S (stems up) / A (stems down), lower staff T (up) / B (down), with independent rhythms: A quarter-note triplets against S quarters (bars 1, 3), A four eighths against S dotted quarter + eighth (bar 2), A ties against S dotted notes (bars 4, 7), A rests while S sings (bar 3 beat 1; bar 5 A half rest vs S quarter rest); T eighth-note triplets (bars 1, 3) and dotted rhythms against B; B whole-bar rest in bar 5 while T sings; T and B in unison on d at bar 8 beat 4 (one shared notehead, two notes). Quarter pickup, incomplete final bar of 3 beats; fermatas per voice at different onsets. Lyrics: Soprano verses 1 and 2 (between the staves, aligned to the soprano rhythm, melisma on \"hope\"/\"saints\"); Bass verse 1 (below the bass staff, aligned to the bass rhythm). Alto and Tenor have no lyrics in the score and in the truth.",
+    "lyrics": [
+      {
+        "part": "Soprano",
+        "voice": "1",
+        "verses": 2
+      },
+      {
+        "part": "Bass",
+        "voice": "1",
+        "verses": 1
+      }
+    ],
+    "measures": 10,
+    "first_measure_number": 0
+  },
+  "truth_limitations": [
+    "<beam> elements reproduce the engraved beam groups exactly (manual beaming); notes only - a rest inside a beam carries no <beam> element.",
+    "<tuplet bracket=...> follows LilyPond's default: bracket omitted only when one beam covers exactly the tuplet; implied tuplets have bracket=\"no\" show-number=\"none\".",
+    "Lyrics are attached only to the voices they are engraved under (S verses 1-2, B verse 1)."
+  ],
+  "degradations": {
+    "scan.pdf": {
+      "seed": 710601,
+      "render_dpi": 600,
+      "dpi": 600,
+      "color": "gray",
+      "format": "jpeg",
+      "jpeg_quality": 60,
+      "jpeg_passes": 1,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            246,
+            246,
+            244
+          ],
+          "texture": 2
+        },
+        {
+          "op": "halftone",
+          "lpi": 110,
+          "angle": 30,
+          "supersample": 1
+        },
+        {
+          "op": "rotate",
+          "deg": -1.2,
+          "bg": 230
+        },
+        {
+          "op": "noise",
+          "sigma": 4
+        }
+      ],
+      "tags": [
+        "paper_texture",
+        "halftone",
+        "rotation_-1.2deg",
+        "noise",
+        "jpeg_q60"
+      ],
+      "output_pages": 1,
+      "pixel_size": [
+        5107,
+        7120
+      ],
+      "image_mode": "L",
+      "bytes": 10185619,
+      "image_only_check": {
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "pages": 1,
+        "text_chars": 0
+      },
+      "op_log": []
+    },
+    "scan-mild.pdf": {
+      "seed": 710602,
+      "render_dpi": 600,
+      "dpi": 600,
+      "color": "gray",
+      "format": "jpeg",
+      "jpeg_quality": 60,
+      "jpeg_passes": 1,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            246,
+            246,
+            244
+          ],
+          "texture": 2
+        },
+        {
+          "op": "rotate",
+          "deg": 0.3,
+          "bg": 240
+        },
+        {
+          "op": "noise",
+          "sigma": 2
+        }
+      ],
+      "tags": [
+        "paper_texture",
+        "rotation_+0.3deg",
+        "noise",
+        "jpeg_q60"
+      ],
+      "output_pages": 1,
+      "pixel_size": [
+        4999,
+        7042
+      ],
+      "image_mode": "L",
+      "bytes": 1056900,
+      "image_only_check": {
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "pages": 1,
+        "text_chars": 0
+      },
+      "op_log": []
+    },
+    "scan-severe.pdf": {
+      "seed": 710603,
+      "render_dpi": 120,
+      "dpi": 120,
+      "color": "gray",
+      "format": "jpeg",
+      "jpeg_quality": 15,
+      "jpeg_passes": 1,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            244,
+            243,
+            240
+          ],
+          "texture": 3
+        },
+        {
+          "op": "rotate",
+          "deg": 1.5,
+          "bg": 220
+        },
+        {
+          "op": "blur",
+          "sigma": 0.9
+        },
+        {
+          "op": "noise",
+          "sigma": 6
+        }
+      ],
+      "tags": [
+        "paper_texture",
+        "rotation_+1.5deg",
+        "blur",
+        "noise",
+        "jpeg_q15"
+      ],
+      "output_pages": 1,
+      "pixel_size": [
+        1031,
+        1430
+      ],
+      "image_mode": "L",
+      "bytes": 62343,
+      "image_only_check": {
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "pages": 1,
+        "text_chars": 0
+      },
+      "op_log": []
+    }
+  },
+  "dpi": 600,
+  "license": "Text public domain (Watts 1719); music, engraving, truth and scans CC0-1.0",
+  "source": "Text: Isaac Watts, \"O God, our help in ages past\" (1719), public domain. Music composed for this corpus (CC0) - not the traditional tune St Anne.",
+  "pages": 1,
+  "files": {
+    "truth": "truth.musicxml",
+    "engraving": "engraving.ly",
+    "clean": "clean.pdf",
+    "scan": "scan.pdf",
+    "scan_mild": "scan-mild.pdf",
+    "scan_severe": "scan-severe.pdf",
+    "attribution": "ATTRIBUTION.txt"
+  },
+  "clean": {
+    "dpi": 300,
+    "pages": 1,
+    "ops": [],
+    "note": "undamaged raster render",
+    "image_only": true,
+    "fonts": [],
+    "images": 1,
+    "text_chars": 0
+  },
+  "validation": {
+    "truth_xsd_valid": true,
+    "engraving_event_dump_matches_truth": true,
+    "engraving_events_compared": 171,
+    "lyric_events_compared": 103,
+    "time_signatures_compared": 2,
+    "midi_attacks_match_truth": true,
+    "midi_attacks": 128,
+    "midi_grace_notes_excluded": 0,
+    "music21_reparse_matches_model": true,
+    "lyric_text_found_in_engraving": 1.0,
+    "lilypond_warnings": [],
+    "method": "LilyPond event-dump engraver (rsynth/dump.ly) compared with the model the truth is written from: every note/rest/multi-bar rest (onset, pitch, notated type, dots, tuplet scale), grace offsets, ties, beam starts/stops, slurs, fermatas, lyric syllables/hyphens/extenders, bar numbers/measure positions and time signatures; plus MIDI attack multiset and a music21 re-parse of truth.musicxml."
+  },
+  "generator": "corpus/challenge/rhythm/_tools/run_all.py (rsynth/items.py, build.py, scan.py)"
+}

@@ -1,0 +1,533 @@
+{
+  "id": "hymn-descant-cue-notes-amen-small",
+  "category": "layout",
+  "title": "Old Hundredth - closed SATB, reduced-size descant staff with cue notes, Amen at a smaller staff size",
+  "edge_cases": [
+    "satb_closed_score",
+    "descant_small_staff",
+    "mixed_staff_sizes_on_page",
+    "cue_notes",
+    "amen_smaller_staff_size",
+    "separate_score_block",
+    "hidden_empty_staff",
+    "systems_with_different_staff_counts",
+    "multi_verse",
+    "stanza_number_labels",
+    "lyrics",
+    "split_measures_between_passes",
+    "pickup",
+    "fermata",
+    "tempo_text",
+    "section_heading_text",
+    "page_numbers"
+  ],
+  "expected": {
+    "parts": [
+      "Descant",
+      "Soprano",
+      "Alto",
+      "Tenor",
+      "Bass"
+    ],
+    "must_not_split": false,
+    "shared_staves": [
+      [
+        "Soprano",
+        "Alto"
+      ],
+      [
+        "Tenor",
+        "Bass"
+      ]
+    ],
+    "staves_per_part": {
+      "Descant": 1,
+      "Soprano": 1,
+      "Alto": 1,
+      "Tenor": 1,
+      "Bass": 1
+    },
+    "lyrics": [
+      {
+        "part": "Descant",
+        "verses": 1
+      },
+      {
+        "part": "Soprano",
+        "verses": 4
+      }
+    ],
+    "notes": "Five parts: Descant, Soprano, Alto, Tenor, Bass. S+A share the treble staff and T+B the bass staff (closed score - split by stem direction). The Descant staff (75 % size) is hidden in the verse 1-3 systems (truth: invisible measure rests) and appears for verse 4; its first three measures are CUE-SIZE notes of the melody (encoded <cue/>, not sung): a correct conversion marks them as cue notes or omits them (rests) - they must not become sounding Descant notes and carry no lyrics. The hymn is written out twice (verses 1-3, then verse 4 + descant: the last bar of pass 1 and the pickup of pass 2 are both 2-beat measures). The final \"Amen\" (2 measures) is a separate smaller system (78 % staff size) continuing the S/A/T/B parts; the Descant has invisible rests there. Lyrics: Soprano lines 1-3 in pass 1, line 4 (Doxology) in pass 2, line 1 \"A-men\"; Descant line 1 from its 4th measure."
+  },
+  "truth_limitations": "Cue notes are encoded with <cue/> and <type size=\"cue\"> (they have no MIDI meaning). Staff sizes are <staff-details><staff-size> percentages. Stanza labels (\"1.\"-\"4.\") are not encoded. Lyrics under the S+A staff are attached to Soprano only. The Amen is engraved as a second LilyPond \\score; in the truth it simply continues the parts.",
+  "layout": "US letter, staff size 18; page 1: title + 2 closed-score systems (3 verses); page 2: 2 systems with the 75 % descant staff, then the Amen system at staff size 14",
+  "pages": 2,
+  "measures": 24,
+  "notes_in_truth": 296,
+  "hidden_staff_systems": [
+    {
+      "staff": "desc",
+      "measures": [
+        0,
+        5
+      ]
+    },
+    {
+      "staff": "desc",
+      "measures": [
+        6,
+        10
+      ]
+    },
+    {
+      "staff": "Descant (not engraved in this score block)",
+      "measures": [
+        22,
+        23
+      ]
+    }
+  ],
+  "dpi": 200,
+  "degradations": {
+    "scan.pdf": {
+      "seed": 15001,
+      "render_dpi": 200,
+      "dpi": 200,
+      "format": "jpeg q55",
+      "colour": "rgb",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1700,
+            2200
+          ],
+          "ops": [
+            [
+              "bleed_through",
+              {
+                "strength": 0.15,
+                "shift_px": 0
+              }
+            ],
+            [
+              "page_curl",
+              {
+                "side": "left",
+                "amp": 20,
+                "width": 0.25
+              }
+            ],
+            [
+              "paper_texture",
+              6
+            ],
+            [
+              "paper_colour",
+              [
+                232,
+                219,
+                186
+              ]
+            ],
+            [
+              "stains",
+              {
+                "foxing": 25
+              }
+            ],
+            [
+              "gutter_shadow",
+              {
+                "side": "left",
+                "width": 0.06,
+                "dark": 0.5
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              -0.8
+            ],
+            [
+              "halftone_moire",
+              {
+                "period": 4.2,
+                "angle": 45,
+                "amp": 28,
+                "shrink": 0.83
+              }
+            ],
+            [
+              "focus_blur_sigma",
+              0.5
+            ],
+            [
+              "gaussian_noise_sigma",
+              3
+            ]
+          ]
+        },
+        {
+          "image": 2,
+          "source_pages": [
+            2
+          ],
+          "size_px": [
+            1700,
+            2200
+          ],
+          "ops": [
+            [
+              "bleed_through",
+              {
+                "strength": 0.15,
+                "shift_px": 12
+              }
+            ],
+            [
+              "page_curl",
+              {
+                "side": "left",
+                "amp": 20,
+                "width": 0.25
+              }
+            ],
+            [
+              "paper_texture",
+              6
+            ],
+            [
+              "paper_colour",
+              [
+                232,
+                219,
+                186
+              ]
+            ],
+            [
+              "stains",
+              {
+                "foxing": 25
+              }
+            ],
+            [
+              "gutter_shadow",
+              {
+                "side": "left",
+                "width": 0.06,
+                "dark": 0.5
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              -0.8
+            ],
+            [
+              "halftone_moire",
+              {
+                "period": 4.2,
+                "angle": 45,
+                "amp": 28,
+                "shrink": 0.83
+              }
+            ],
+            [
+              "focus_blur_sigma",
+              0.5
+            ],
+            [
+              "gaussian_noise_sigma",
+              3
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 200,
+        "mode": "rgb",
+        "paper_rgb": [
+          232,
+          219,
+          186
+        ],
+        "texture": 6,
+        "foxing": {
+          "n": 25
+        },
+        "bleed": 0.15,
+        "gutter": {
+          "side": "left",
+          "width": 0.06,
+          "dark": 0.5
+        },
+        "curl": {
+          "side": "left",
+          "amp": 20,
+          "width": 0.25
+        },
+        "rotate": -0.8,
+        "halftone": {
+          "period": 4.2,
+          "angle": 45,
+          "amp": 28,
+          "shrink": 0.83
+        },
+        "blur": 0.5,
+        "noise": 3,
+        "jpeg": 55
+      },
+      "summary": "printed hymnal page: halftone screen + resampling moire, strong bleed-through, yellowed paper with foxing, gutter shadow and curl on the left, 200 dpi RGB, JPEG q55",
+      "bytes": 714287
+    },
+    "scan-mild.pdf": {
+      "seed": 15002,
+      "render_dpi": 300,
+      "dpi": 300,
+      "format": "jpeg q85",
+      "colour": "gray",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            2550,
+            3300
+          ],
+          "ops": [
+            [
+              "bleed_through",
+              {
+                "strength": 0.04,
+                "shift_px": 11
+              }
+            ],
+            [
+              "paper_texture",
+              2
+            ],
+            [
+              "skew_rotation_deg",
+              0.3
+            ],
+            [
+              "gaussian_noise_sigma",
+              2
+            ]
+          ]
+        },
+        {
+          "image": 2,
+          "source_pages": [
+            2
+          ],
+          "size_px": [
+            2550,
+            3300
+          ],
+          "ops": [
+            [
+              "bleed_through",
+              {
+                "strength": 0.04,
+                "shift_px": -7
+              }
+            ],
+            [
+              "paper_texture",
+              2
+            ],
+            [
+              "skew_rotation_deg",
+              0.3
+            ],
+            [
+              "gaussian_noise_sigma",
+              2
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 300,
+        "mode": "gray",
+        "texture": 2,
+        "bleed": 0.04,
+        "rotate": 0.3,
+        "noise": 2,
+        "jpeg": 85
+      },
+      "summary": "300 dpi grey, 0.3 deg skew, faint bleed-through",
+      "bytes": 1561490
+    },
+    "scan-severe.pdf": {
+      "seed": 15003,
+      "render_dpi": 300,
+      "dpi": 100,
+      "format": "png1",
+      "colour": "bw",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            850,
+            1100
+          ],
+          "ops": [
+            [
+              "bleed_through",
+              {
+                "strength": 0.12,
+                "shift_px": -20
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              2.5
+            ],
+            [
+              "halftone_moire",
+              {
+                "period": 4.0,
+                "angle": 30,
+                "amp": 30,
+                "shrink": 0.7
+              }
+            ],
+            [
+              "focus_blur_sigma",
+              0.7
+            ],
+            [
+              "gaussian_noise_sigma",
+              8
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 105,
+                "noise": 15
+              }
+            ],
+            [
+              "resampled_dpi",
+              [
+                300,
+                100
+              ]
+            ]
+          ]
+        },
+        {
+          "image": 2,
+          "source_pages": [
+            2
+          ],
+          "size_px": [
+            850,
+            1100
+          ],
+          "ops": [
+            [
+              "bleed_through",
+              {
+                "strength": 0.12,
+                "shift_px": -9
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              2.5
+            ],
+            [
+              "halftone_moire",
+              {
+                "period": 4.0,
+                "angle": 30,
+                "amp": 30,
+                "shrink": 0.7
+              }
+            ],
+            [
+              "focus_blur_sigma",
+              0.7
+            ],
+            [
+              "gaussian_noise_sigma",
+              8
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 105,
+                "noise": 15
+              }
+            ],
+            [
+              "resampled_dpi",
+              [
+                300,
+                100
+              ]
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 300,
+        "out_dpi": 100,
+        "rotate": 2.5,
+        "bleed": 0.12,
+        "halftone": {
+          "period": 4.0,
+          "angle": 30,
+          "amp": 30,
+          "shrink": 0.7
+        },
+        "blur": 0.7,
+        "noise": 8,
+        "binarize": 105,
+        "binarize_noise": 15,
+        "format": "png1"
+      },
+      "summary": "100 dpi (from 300) thin binarised copy of the halftoned page, 2.5 deg skew",
+      "bytes": 27405
+    }
+  },
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "scan-mild.pdf",
+    "scan-severe.pdf",
+    "scan.pdf",
+    "truth.musicxml"
+  ],
+  "license": "Melody and texts public domain; harmonisation, descant and engraving CC0-1.0",
+  "source": "self-authored harmonisation/descant (layout-challenge corpus); melody Genevan Psalter 1551, texts W. Kethe 1561 and T. Ken 1674",
+  "engraver": "internal model -> LilyPond 2.24 (custom writer, layout-challenge edition)",
+  "validation": {
+    "xsd_valid": true,
+    "music21_parse": "5 296",
+    "midi_attacks_match_truth": true,
+    "attacks": 296,
+    "lilypond_warnings": [],
+    "lyric_syllables_found_in_engraving": 1.0,
+    "lyric_syllables": 154,
+    "pages_planned": 2,
+    "image_only": {
+      "clean.pdf": true,
+      "scan.pdf": true,
+      "scan-mild.pdf": true,
+      "scan-severe.pdf": true
+    }
+  }
+}

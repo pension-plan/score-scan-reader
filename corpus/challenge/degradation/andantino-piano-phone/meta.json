@@ -1,0 +1,529 @@
+{
+ "id": "andantino-piano-phone",
+ "category": "degradation",
+ "piece": "andantino-piano",
+ "variant": "phone",
+ "title": "Andantino (piano, grand staff) - phone",
+ "edge_cases": [
+  "piano",
+  "grand_staff",
+  "must_not_split",
+  "grand_staff_multi_voice",
+  "chords",
+  "dynamics",
+  "slurs",
+  "staccato",
+  "fermata",
+  "key_signature",
+  "perspective_phone",
+  "keystone",
+  "uneven_lighting",
+  "vignette",
+  "hand_shadow",
+  "rgb_scan",
+  "background_visible"
+ ],
+ "expected": {
+  "parts": [
+   "Piano"
+  ],
+  "must_not_split": true,
+  "shared_staves": [],
+  "notes": "Piano solo on ONE grand staff (brace). A correct conversion yields exactly ONE part \"Piano\" with 2 staves; it must NOT be split into right/left hand parts, and the second right-hand voice in bars 13-16 must stay inside the piano part (voice 2), not become a new part. DAMAGE (phone): Phone photo of the page on a wooden table: random corner jitter + keystone (top narrower), warm colour cast, lighting gradient, vignette; scan/severe add a soft hand/phone shadow; severe adds motion blur and JPEG 45 at 200 dpi."
+ },
+ "truth_limitations": "none: truth matches the engraving exactly (MIDI attacks, MIDI lyric events and PDF lyric text verified)",
+ "truth_scope": "truth.musicxml (MusicXML 4.0 partwise, XSD-valid) encodes parts/part-list (+ part-group bracket for the choir), staves, voices, pitches, durations, rests, ties, slurs, lyrics (verse number, syllabic, extend), dynamics, fermatas, staccatos, stems, clefs, key/time signatures and barline styles. It does NOT encode beams (LilyPond auto-beams), system/page breaks, bar-number display, header layout or any handwritten/damage marks. The same truth file is shared by every damaged variant of a piece.",
+ "degradations": {
+  "scan.pdf": {
+   "seed": 2113888628,
+   "dpi": 250,
+   "pages": 1,
+   "image_px": [
+    [
+     511,
+     700
+    ]
+   ],
+   "image_mode": [
+    "RGB"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 250,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": [
+       244,
+       242,
+       236
+      ],
+      "texture": 3
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": 22,
+     "stage": "content"
+    },
+    {
+     "op": "perspective",
+     "params": {
+      "jitter": 0.045,
+      "keystone": 0.05,
+      "margin": 0.06,
+      "_corners_src": [
+       [
+        -15.4,
+        -123.6
+       ],
+       [
+        2328.6,
+        -115.4
+       ],
+       [
+        2279.6,
+        3193.3
+       ],
+       [
+        50.6,
+        3182.8
+       ]
+      ]
+     },
+     "stage": "global"
+    },
+    {
+     "op": "shadow",
+     "params": {
+      "strength": 0.35,
+      "pos": 0.22,
+      "angle": 140
+     },
+     "stage": "global"
+    },
+    {
+     "op": "gradient",
+     "params": {
+      "strength": 0.2,
+      "angle": 250
+     },
+     "stage": "global"
+    },
+    {
+     "op": "vignette",
+     "params": {
+      "strength": 0.25
+     },
+     "stage": "global"
+    },
+    {
+     "op": "color_cast",
+     "params": {
+      "rgb": [
+       255,
+       244,
+       225
+      ]
+     },
+     "stage": "global"
+    },
+    {
+     "op": "blur",
+     "params": {
+      "sigma": 1.1
+     },
+     "stage": "global"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 5,
+      "chroma": 3
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       104,
+       84,
+       66
+      ],
+      "noise": 4,
+      "texture": 18
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "RGB",
+      "format": "jpeg",
+      "quality": 65,
+      "subsampling": 2
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": [
+    []
+   ]
+  },
+  "scan-mild.pdf": {
+   "seed": 2113888629,
+   "dpi": 250,
+   "pages": 1,
+   "image_px": [
+    [
+     508,
+     700
+    ]
+   ],
+   "image_mode": [
+    "RGB"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 250,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": [
+       244,
+       242,
+       236
+      ],
+      "texture": 3
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": 22,
+     "stage": "content"
+    },
+    {
+     "op": "perspective",
+     "params": {
+      "jitter": 0.02,
+      "keystone": 0.02,
+      "margin": 0.05,
+      "_corners_src": [
+       [
+        -90.5,
+        -29.0
+       ],
+       [
+        2287.0,
+        -58.3
+       ],
+       [
+        2261.7,
+        3073.8
+       ],
+       [
+        -16.8,
+        3192.2
+       ]
+      ]
+     },
+     "stage": "global"
+    },
+    {
+     "op": "gradient",
+     "params": {
+      "strength": 0.12,
+      "angle": 30
+     },
+     "stage": "global"
+    },
+    {
+     "op": "vignette",
+     "params": {
+      "strength": 0.1
+     },
+     "stage": "global"
+    },
+    {
+     "op": "color_cast",
+     "params": {
+      "rgb": [
+       255,
+       248,
+       236
+      ]
+     },
+     "stage": "global"
+    },
+    {
+     "op": "blur",
+     "params": {
+      "sigma": 0.8
+     },
+     "stage": "global"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 3,
+      "chroma": 2
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       104,
+       84,
+       66
+      ],
+      "noise": 4,
+      "texture": 18
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "RGB",
+      "format": "jpeg",
+      "quality": 80,
+      "subsampling": 2
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": [
+    []
+   ]
+  },
+  "scan-severe.pdf": {
+   "seed": 2113888630,
+   "dpi": 200,
+   "pages": 1,
+   "image_px": [
+    [
+     513,
+     700
+    ]
+   ],
+   "image_mode": [
+    "RGB"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 200,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": [
+       244,
+       242,
+       236
+      ],
+      "texture": 3
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": 22,
+     "stage": "content"
+    },
+    {
+     "op": "perspective",
+     "params": {
+      "jitter": 0.08,
+      "keystone": 0.09,
+      "margin": 0.07,
+      "_corners_src": [
+       [
+        -141.5,
+        -182.4
+       ],
+       [
+        2025.5,
+        103.2
+       ],
+       [
+        1887.0,
+        2634.2
+       ],
+       [
+        -47.4,
+        2510.4
+       ]
+      ]
+     },
+     "stage": "global"
+    },
+    {
+     "op": "shadow",
+     "params": {
+      "strength": 0.5,
+      "pos": 0.1,
+      "angle": 200
+     },
+     "stage": "global"
+    },
+    {
+     "op": "blotch",
+     "params": {
+      "strength": 0.2
+     },
+     "stage": "global"
+    },
+    {
+     "op": "vignette",
+     "params": {
+      "strength": 0.35
+     },
+     "stage": "global"
+    },
+    {
+     "op": "color_cast",
+     "params": {
+      "rgb": [
+       255,
+       236,
+       210
+      ]
+     },
+     "stage": "global"
+    },
+    {
+     "op": "motion",
+     "params": {
+      "length": 7,
+      "angle": 30
+     },
+     "stage": "global"
+    },
+    {
+     "op": "blur",
+     "params": {
+      "sigma": 1.4
+     },
+     "stage": "global"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 7,
+      "chroma": 4
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       104,
+       84,
+       66
+      ],
+      "noise": 4,
+      "texture": 18
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "RGB",
+      "format": "jpeg",
+      "quality": 45,
+      "subsampling": 2
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": [
+    []
+   ]
+  },
+  "clean.pdf": {
+   "seed": null,
+   "dpi": 250,
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 250,
+     "tool": "pdftoppm -gray (LilyPond PDF)"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "png"
+     }
+    }
+   ]
+  }
+ },
+ "dpi": 250,
+ "license": "Original composition and engraving, CC0-1.0",
+ "files": {
+  "scan": "andantino-piano-phone/scan.pdf",
+  "scan_mild": "andantino-piano-phone/scan-mild.pdf",
+  "scan_severe": "andantino-piano-phone/scan-severe.pdf",
+  "clean": "andantino-piano-phone/clean.pdf",
+  "truth": "andantino-piano-phone/truth.musicxml",
+  "engraving": "andantino-piano-phone/engraving.ly"
+ },
+ "measures": 16,
+ "vector_pages": 1,
+ "lyrics": [],
+ "shares_truth_with": [
+  "andantino-piano-clean",
+  "andantino-piano-skew",
+  "andantino-piano-rot90",
+  "andantino-piano-rot180",
+  "andantino-piano-book",
+  "andantino-piano-yellowed",
+  "andantino-piano-bleed",
+  "andantino-piano-stain-pencil",
+  "andantino-piano-holes-staple",
+  "andantino-piano-crop",
+  "andantino-piano-halftone",
+  "andantino-piano-jpeg",
+  "andantino-piano-photocopy-thin",
+  "andantino-piano-photocopy-thick",
+  "andantino-piano-lowdpi",
+  "andantino-piano-highdpi",
+  "andantino-piano-blur",
+  "andantino-piano-noise",
+  "andantino-piano-spread",
+  "andantino-piano-combo"
+ ],
+ "validation": {
+  "truth_xsd_valid": true,
+  "midi_attacks_match_truth": true,
+  "attacks": 136,
+  "midi_lyric_events_match_truth": true,
+  "lyric_syllables": 0,
+  "lyric_text_found_in_engraving_pdf": null,
+  "lilypond_warnings": [],
+  "scan_files_image_only": {
+   "scan.pdf": true,
+   "scan-mild.pdf": true,
+   "scan-severe.pdf": true,
+   "clean.pdf": true
+  }
+ },
+ "origin": "synthetic-scan (challenge: degradation extremes)",
+ "seed": 2113888628
+}

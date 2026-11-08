@@ -1,0 +1,1324 @@
+{
+ "id": "twinkle-piano2p-stain-pencil",
+ "category": "degradation",
+ "piece": "twinkle-piano2p",
+ "variant": "stain-pencil",
+ "title": "Theme and Variation on \"Ah! vous dirai-je, maman\" (piano, 2 pages) - stain-pencil",
+ "edge_cases": [
+  "piano",
+  "grand_staff",
+  "must_not_split",
+  "grand_staff_multi_voice",
+  "multi_page",
+  "double_barline",
+  "dynamics",
+  "slurs",
+  "fermata",
+  "chords",
+  "coffee_stain",
+  "pencil_annotations",
+  "circled_notes",
+  "handwritten_text",
+  "breath_marks",
+  "rgb_scan",
+  "handwritten_fingering"
+ ],
+ "expected": {
+  "parts": [
+   "Piano"
+  ],
+  "must_not_split": true,
+  "shared_staves": [],
+  "notes": "Two-page piano piece on ONE grand staff. A correct conversion yields exactly ONE part \"Piano\" (2 staves, 24 bars, measures continue across the page turn); the held lower right-hand voice in the variation (bars 13-24) is voice 2 of the piano part, not a separate part. DAMAGE (stain-pencil): Rehearsal copy: coffee ring stains (scan: one ring over the music), graphite pencil marks - circled notes, handwritten words (\"rit.\", \"breathe\", \"p\", \"cresc.\" ...), breath ticks/commas, arrows, phrase arcs, fingering digits above notes. Severe adds three stains, yellow and pink highlighter over staff passages, blue ballpoint circles/words and margin scribbles. Exact positions of every mark are listed per file in meta.annotations. TRUTH LIMITATIONS: Handwritten marks (including handwritten dynamics such as \"p\", \"mf\", \"cresc.\", \"rit.\" and fingerings) are NOT in the truth: the truth only contains the engraved music. A conversion that adds them as dynamics/words/fingerings is wrong for scoring purposes."
+ },
+ "truth_limitations": "Handwritten marks (including handwritten dynamics such as \"p\", \"mf\", \"cresc.\", \"rit.\" and fingerings) are NOT in the truth: the truth only contains the engraved music. A conversion that adds them as dynamics/words/fingerings is wrong for scoring purposes.",
+ "truth_scope": "truth.musicxml (MusicXML 4.0 partwise, XSD-valid) encodes parts/part-list (+ part-group bracket for the choir), staves, voices, pitches, durations, rests, ties, slurs, lyrics (verse number, syllabic, extend), dynamics, fermatas, staccatos, stems, clefs, key/time signatures and barline styles. It does NOT encode beams (LilyPond auto-beams), system/page breaks, bar-number display, header layout or any handwritten/damage marks. The same truth file is shared by every damaged variant of a piece.",
+ "degradations": {
+  "scan.pdf": {
+   "seed": 204048829,
+   "dpi": 300,
+   "pages": 2,
+   "image_px": [
+    [
+     503,
+     700
+    ],
+    [
+     2589,
+     3606
+    ]
+   ],
+   "image_mode": [
+    "RGB",
+    "RGB"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 300,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": 246,
+      "texture": 2
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": 22,
+     "stage": "content"
+    },
+    {
+     "op": "stains",
+     "params": [
+      {
+       "x_mm": 42.147693325252376,
+       "y_mm": 164.25715760223807,
+       "radius_mm": 34,
+       "strength": 1.0
+      },
+      {
+       "x_mm": 92.022420733708,
+       "y_mm": 85.30396470613495,
+       "radius_mm": 22,
+       "strength": 0.8,
+       "partial": 1.2
+      }
+     ],
+     "stage": "content"
+    },
+    {
+     "op": "foxing",
+     "params": {
+      "n": 12,
+      "strength": 0.35,
+      "color": [
+       140,
+       95,
+       50
+      ]
+     },
+     "stage": "content"
+    },
+    {
+     "op": "annotations",
+     "params": [
+      {
+       "tool": "pencil",
+       "vocab": "piano",
+       "circles": 5,
+       "texts": 3,
+       "breaths": 3,
+       "arrows": 1,
+       "brackets": 1,
+       "fingerings": 5,
+       "alpha": 0.7,
+       "width_mm": 0.35
+      }
+     ],
+     "stage": "content"
+    },
+    {
+     "op": "bed",
+     "params": {
+      "margin_mm": 3
+     },
+     "stage": "global"
+    },
+    {
+     "op": "rotate",
+     "params": {
+      "deg": -0.6
+     },
+     "stage": "global"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 3,
+      "chroma": 2
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       236,
+       236,
+       234
+      ],
+      "noise": 2,
+      "edge_shadow": 0.35
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "RGB",
+      "format": "jpeg",
+      "quality": 72,
+      "subsampling": 2
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": [
+    [
+     {
+      "type": "stain",
+      "x_mm": 42.1,
+      "y_mm": 164.3,
+      "radius_mm": 34
+     },
+     {
+      "type": "stain",
+      "x_mm": 92.0,
+      "y_mm": 85.3,
+      "radius_mm": 22
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 161.5,
+      "y_mm": 241.5
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 172.9,
+      "y_mm": 241.6
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 37.5,
+      "y_mm": 79.4
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 82.0,
+      "y_mm": 237.7
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 167.1,
+      "y_mm": 53.3
+     },
+     {
+      "type": "handwritten_text",
+      "text": "count!",
+      "x_mm": 147.5,
+      "y_mm": 159.2
+     },
+     {
+      "type": "handwritten_text",
+      "text": "count!",
+      "x_mm": 167.9,
+      "y_mm": 160.1
+     },
+     {
+      "type": "handwritten_text",
+      "text": "pedal",
+      "x_mm": 75.5,
+      "y_mm": 66.8
+     },
+     {
+      "type": "fingering",
+      "text": "2",
+      "x_mm": 134.5,
+      "y_mm": 46.9
+     },
+     {
+      "type": "fingering",
+      "text": "3",
+      "x_mm": 114.0,
+      "y_mm": 137.5
+     },
+     {
+      "type": "fingering",
+      "text": "2",
+      "x_mm": 16.2,
+      "y_mm": 160.8
+     },
+     {
+      "type": "fingering",
+      "text": "2",
+      "x_mm": 76.3,
+      "y_mm": 44.2
+     },
+     {
+      "type": "fingering",
+      "text": "2",
+      "x_mm": 97.0,
+      "y_mm": 44.6
+     },
+     {
+      "type": "breath_tick",
+      "x_mm": 118.4,
+      "y_mm": 48.7
+     },
+     {
+      "type": "breath_tick",
+      "x_mm": 136.2,
+      "y_mm": 48.4
+     },
+     {
+      "type": "breath_tick",
+      "x_mm": 146.5,
+      "y_mm": 141.8
+     },
+     {
+      "type": "arrow",
+      "x_mm": 103.9,
+      "y_mm": 181.6
+     },
+     {
+      "type": "phrase_arc",
+      "x_mm": 85.4,
+      "y_mm": 139.1
+     }
+    ],
+    [
+     {
+      "type": "stain",
+      "x_mm": 42.1,
+      "y_mm": 164.3,
+      "radius_mm": 34
+     },
+     {
+      "type": "stain",
+      "x_mm": 92.0,
+      "y_mm": 85.3,
+      "radius_mm": 22
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 148.8,
+      "y_mm": 57.7
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 73.8,
+      "y_mm": 247.3
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 27.9,
+      "y_mm": 218.7
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 169.0,
+      "y_mm": 221.0
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 37.5,
+      "y_mm": 219.0
+     },
+     {
+      "type": "handwritten_text",
+      "text": "slower",
+      "x_mm": 15.6,
+      "y_mm": 235.7
+     },
+     {
+      "type": "handwritten_text",
+      "text": "pedal",
+      "x_mm": 127.5,
+      "y_mm": 119.7
+     },
+     {
+      "type": "handwritten_text",
+      "text": "pedal",
+      "x_mm": 119.5,
+      "y_mm": 48.7
+     },
+     {
+      "type": "fingering",
+      "text": "2",
+      "x_mm": 164.5,
+      "y_mm": 22.6
+     },
+     {
+      "type": "fingering",
+      "text": "5",
+      "x_mm": 193.6,
+      "y_mm": 49.5
+     },
+     {
+      "type": "fingering",
+      "text": "1",
+      "x_mm": 93.1,
+      "y_mm": 143.7
+     },
+     {
+      "type": "fingering",
+      "text": "2",
+      "x_mm": 120.9,
+      "y_mm": 24.7
+     },
+     {
+      "type": "fingering",
+      "text": "2",
+      "x_mm": 102.9,
+      "y_mm": 143.6
+     },
+     {
+      "type": "breath_tick",
+      "x_mm": 34.3,
+      "y_mm": 124.7
+     },
+     {
+      "type": "breath_comma",
+      "x_mm": 188.7,
+      "y_mm": 124.9
+     },
+     {
+      "type": "breath_comma",
+      "x_mm": 25.3,
+      "y_mm": 29.4
+     },
+     {
+      "type": "arrow",
+      "x_mm": 34.7,
+      "y_mm": 164.5
+     },
+     {
+      "type": "phrase_arc",
+      "x_mm": 79.7,
+      "y_mm": 26.2
+     }
+    ]
+   ]
+  },
+  "scan-mild.pdf": {
+   "seed": 204048830,
+   "dpi": 300,
+   "pages": 2,
+   "image_px": [
+    [
+     501,
+     700
+    ],
+    [
+     2571,
+     3592
+    ]
+   ],
+   "image_mode": [
+    "RGB",
+    "RGB"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 300,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": 246,
+      "texture": 2
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": 22,
+     "stage": "content"
+    },
+    {
+     "op": "stains",
+     "params": [
+      {
+       "x_mm": 141.83004248991983,
+       "y_mm": 119.41186253973662,
+       "radius_mm": 28,
+       "strength": 0.5
+      }
+     ],
+     "stage": "content"
+    },
+    {
+     "op": "annotations",
+     "params": [
+      {
+       "tool": "pencil",
+       "vocab": "piano",
+       "circles": 2,
+       "texts": 1,
+       "breaths": 2,
+       "fingerings": 2,
+       "alpha": 0.55,
+       "width_mm": 0.3
+      }
+     ],
+     "stage": "content"
+    },
+    {
+     "op": "bed",
+     "params": {
+      "margin_mm": 3
+     },
+     "stage": "global"
+    },
+    {
+     "op": "rotate",
+     "params": {
+      "deg": 0.3
+     },
+     "stage": "global"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 2
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       236,
+       236,
+       234
+      ],
+      "noise": 2,
+      "edge_shadow": 0.35
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "RGB",
+      "format": "jpeg",
+      "quality": 80,
+      "subsampling": 2
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": [
+    [
+     {
+      "type": "stain",
+      "x_mm": 141.8,
+      "y_mm": 119.4,
+      "radius_mm": 28
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 38.2,
+      "y_mm": 81.7
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 125.1,
+      "y_mm": 52.0
+     },
+     {
+      "type": "handwritten_text",
+      "text": "slower",
+      "x_mm": 54.6,
+      "y_mm": 251.6
+     },
+     {
+      "type": "fingering",
+      "text": "1",
+      "x_mm": 12.5,
+      "y_mm": 254.7
+     },
+     {
+      "type": "fingering",
+      "text": "1",
+      "x_mm": 12.9,
+      "y_mm": 160.7
+     },
+     {
+      "type": "breath_comma",
+      "x_mm": 149.0,
+      "y_mm": 258.5
+     },
+     {
+      "type": "breath_comma",
+      "x_mm": 120.6,
+      "y_mm": 70.0
+     }
+    ],
+    [
+     {
+      "type": "stain",
+      "x_mm": 141.8,
+      "y_mm": 119.4,
+      "radius_mm": 28
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 121.3,
+      "y_mm": 32.0
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 85.8,
+      "y_mm": 244.3
+     },
+     {
+      "type": "handwritten_text",
+      "text": "mf",
+      "x_mm": 40.9,
+      "y_mm": 164.5
+     },
+     {
+      "type": "fingering",
+      "text": "1",
+      "x_mm": 142.1,
+      "y_mm": 26.7
+     },
+     {
+      "type": "fingering",
+      "text": "2",
+      "x_mm": 139.3,
+      "y_mm": 215.8
+     },
+     {
+      "type": "breath_tick",
+      "x_mm": 152.6,
+      "y_mm": 242.0
+     },
+     {
+      "type": "breath_tick",
+      "x_mm": 103.2,
+      "y_mm": 218.9
+     }
+    ]
+   ]
+  },
+  "scan-severe.pdf": {
+   "seed": 204048831,
+   "dpi": 300,
+   "pages": 2,
+   "image_px": [
+    [
+     505,
+     700
+    ],
+    [
+     2615,
+     3622
+    ]
+   ],
+   "image_mode": [
+    "RGB",
+    "RGB"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 300,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": 246,
+      "texture": 2
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": 22,
+     "stage": "content"
+    },
+    {
+     "op": "stains",
+     "params": [
+      {
+       "x_mm": 50.8662397269692,
+       "y_mm": 144.50465253368841,
+       "radius_mm": 42,
+       "strength": 1.2,
+       "fill": 0.2
+      },
+      {
+       "x_mm": 141.76690231207067,
+       "y_mm": 246.16805021580285,
+       "radius_mm": 30,
+       "strength": 1.0,
+       "fill": 0.12,
+       "partial": 2.5359941801646486
+      },
+      {
+       "x_mm": 49.3388295575681,
+       "y_mm": 180.19200615758504,
+       "radius_mm": 18,
+       "strength": 1.4,
+       "fill": 0.3
+      }
+     ],
+     "stage": "content"
+    },
+    {
+     "op": "foxing",
+     "params": {
+      "n": 30,
+      "strength": 0.45,
+      "color": [
+       140,
+       95,
+       50
+      ]
+     },
+     "stage": "content"
+    },
+    {
+     "op": "highlighter",
+     "params": [
+      {
+       "len_mm": 45
+      },
+      {
+       "len_mm": 60,
+       "color": [
+        255,
+        150,
+        200
+       ],
+       "alpha": 0.45
+      }
+     ],
+     "stage": "content"
+    },
+    {
+     "op": "annotations",
+     "params": [
+      {
+       "tool": "pencil",
+       "vocab": "piano",
+       "circles": 8,
+       "texts": 5,
+       "breaths": 4,
+       "arrows": 2,
+       "brackets": 2,
+       "scribbles": 2,
+       "fingerings": 9,
+       "alpha": 0.8,
+       "width_mm": 0.4
+      },
+      {
+       "tool": "pen",
+       "vocab": "piano",
+       "circles": 3,
+       "texts": 2,
+       "color": [
+        35,
+        55,
+        160
+       ],
+       "alpha": 0.85,
+       "width_mm": 0.4
+      }
+     ],
+     "stage": "content"
+    },
+    {
+     "op": "bed",
+     "params": {
+      "margin_mm": 3
+     },
+     "stage": "global"
+    },
+    {
+     "op": "rotate",
+     "params": {
+      "deg": 1.0
+     },
+     "stage": "global"
+    },
+    {
+     "op": "blur",
+     "params": {
+      "sigma": 0.5
+     },
+     "stage": "global"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 4,
+      "chroma": 2
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       236,
+       236,
+       234
+      ],
+      "noise": 2,
+      "edge_shadow": 0.35
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "RGB",
+      "format": "jpeg",
+      "quality": 65,
+      "subsampling": 2
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": [
+    [
+     {
+      "type": "stain",
+      "x_mm": 50.9,
+      "y_mm": 144.5,
+      "radius_mm": 42
+     },
+     {
+      "type": "stain",
+      "x_mm": 141.8,
+      "y_mm": 246.2,
+      "radius_mm": 30
+     },
+     {
+      "type": "stain",
+      "x_mm": 49.3,
+      "y_mm": 180.2,
+      "radius_mm": 18
+     },
+     {
+      "type": "highlighter",
+      "x_mm": 79.2,
+      "y_mm": 72.1,
+      "w_mm": 45
+     },
+     {
+      "type": "highlighter",
+      "x_mm": 60.0,
+      "y_mm": 165.9,
+      "w_mm": 60
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 46.7,
+      "y_mm": 237.6
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 13.6,
+      "y_mm": 149.1
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 13.2,
+      "y_mm": 249.8
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 176.3,
+      "y_mm": 53.8
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 135.5,
+      "y_mm": 240.2
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 82.0,
+      "y_mm": 146.5
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 35.6,
+      "y_mm": 144.1
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 12.3,
+      "y_mm": 263.5
+     },
+     {
+      "type": "handwritten_text",
+      "text": "slower",
+      "x_mm": 152.9,
+      "y_mm": 253.0
+     },
+     {
+      "type": "handwritten_text",
+      "text": "L.H.",
+      "x_mm": 29.4,
+      "y_mm": 253.5
+     },
+     {
+      "type": "handwritten_text",
+      "text": "count!",
+      "x_mm": 125.2,
+      "y_mm": 230.2
+     },
+     {
+      "type": "handwritten_text",
+      "text": "legato!",
+      "x_mm": 152.5,
+      "y_mm": 230.9
+     },
+     {
+      "type": "handwritten_text",
+      "text": "L.H.",
+      "x_mm": 64.1,
+      "y_mm": 229.9
+     },
+     {
+      "type": "fingering",
+      "text": "2",
+      "x_mm": 135.5,
+      "y_mm": 45.3
+     },
+     {
+      "type": "fingering",
+      "text": "5",
+      "x_mm": 37.8,
+      "y_mm": 67.1
+     },
+     {
+      "type": "fingering",
+      "text": "4",
+      "x_mm": 88.1,
+      "y_mm": 43.5
+     },
+     {
+      "type": "fingering",
+      "text": "4",
+      "x_mm": 82.7,
+      "y_mm": 231.5
+     },
+     {
+      "type": "fingering",
+      "text": "5",
+      "x_mm": 12.8,
+      "y_mm": 161.8
+     },
+     {
+      "type": "fingering",
+      "text": "4",
+      "x_mm": 31.2,
+      "y_mm": 46.4
+     },
+     {
+      "type": "fingering",
+      "text": "2",
+      "x_mm": 57.7,
+      "y_mm": 232.3
+     },
+     {
+      "type": "fingering",
+      "text": "5",
+      "x_mm": 25.1,
+      "y_mm": 139.3
+     },
+     {
+      "type": "fingering",
+      "text": "2",
+      "x_mm": 113.8,
+      "y_mm": 139.2
+     },
+     {
+      "type": "breath_tick",
+      "x_mm": 61.2,
+      "y_mm": 142.0
+     },
+     {
+      "type": "breath_tick",
+      "x_mm": 147.7,
+      "y_mm": 258.4
+     },
+     {
+      "type": "breath_tick",
+      "x_mm": 65.5,
+      "y_mm": 71.1
+     },
+     {
+      "type": "breath_tick",
+      "x_mm": 81.0,
+      "y_mm": 258.3
+     },
+     {
+      "type": "arrow",
+      "x_mm": 104.4,
+      "y_mm": 65.1
+     },
+     {
+      "type": "arrow",
+      "x_mm": 83.2,
+      "y_mm": 182.2
+     },
+     {
+      "type": "phrase_arc",
+      "x_mm": 43.1,
+      "y_mm": 44.1
+     },
+     {
+      "type": "phrase_arc",
+      "x_mm": 69.2,
+      "y_mm": 67.3
+     },
+     {
+      "type": "margin_scribble",
+      "x_mm": 200.9,
+      "y_mm": 54.1
+     },
+     {
+      "type": "margin_scribble",
+      "x_mm": 203.1,
+      "y_mm": 116.3
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 45.7,
+      "y_mm": 54.4
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 167.0,
+      "y_mm": 54.3
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 115.4,
+      "y_mm": 144.7
+     },
+     {
+      "type": "handwritten_text",
+      "text": "legato!",
+      "x_mm": 54.7,
+      "y_mm": 232.0
+     },
+     {
+      "type": "handwritten_text",
+      "text": "cresc.",
+      "x_mm": 46.0,
+      "y_mm": 137.2
+     }
+    ],
+    [
+     {
+      "type": "stain",
+      "x_mm": 50.9,
+      "y_mm": 144.5,
+      "radius_mm": 42
+     },
+     {
+      "type": "stain",
+      "x_mm": 141.8,
+      "y_mm": 246.2,
+      "radius_mm": 30
+     },
+     {
+      "type": "stain",
+      "x_mm": 49.3,
+      "y_mm": 180.2,
+      "radius_mm": 18
+     },
+     {
+      "type": "highlighter",
+      "x_mm": 104.3,
+      "y_mm": 148.4,
+      "w_mm": 45
+     },
+     {
+      "type": "highlighter",
+      "x_mm": 86.8,
+      "y_mm": 243.1,
+      "w_mm": 60
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 198.7,
+      "y_mm": 234.6
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 58.6,
+      "y_mm": 32.0
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 170.1,
+      "y_mm": 28.5
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 193.0,
+      "y_mm": 152.0
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 147.0,
+      "y_mm": 151.1
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 139.9,
+      "y_mm": 249.9
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 161.8,
+      "y_mm": 155.4
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 150.7,
+      "y_mm": 223.9
+     },
+     {
+      "type": "handwritten_text",
+      "text": "cresc.",
+      "x_mm": 170.6,
+      "y_mm": 120.3
+     },
+     {
+      "type": "handwritten_text",
+      "text": "mf",
+      "x_mm": 21.8,
+      "y_mm": 23.5
+     },
+     {
+      "type": "handwritten_text",
+      "text": "count!",
+      "x_mm": 38.6,
+      "y_mm": 120.5
+     },
+     {
+      "type": "handwritten_text",
+      "text": "mf",
+      "x_mm": 53.7,
+      "y_mm": 70.1
+     },
+     {
+      "type": "handwritten_text",
+      "text": "p",
+      "x_mm": 100.7,
+      "y_mm": 236.6
+     },
+     {
+      "type": "fingering",
+      "text": "4",
+      "x_mm": 160.6,
+      "y_mm": 122.4
+     },
+     {
+      "type": "fingering",
+      "text": "3",
+      "x_mm": 35.7,
+      "y_mm": 119.5
+     },
+     {
+      "type": "fingering",
+      "text": "2",
+      "x_mm": 76.8,
+      "y_mm": 121.9
+     },
+     {
+      "type": "fingering",
+      "text": "4",
+      "x_mm": 84.5,
+      "y_mm": 23.4
+     },
+     {
+      "type": "fingering",
+      "text": "3",
+      "x_mm": 72.1,
+      "y_mm": 51.1
+     },
+     {
+      "type": "fingering",
+      "text": "3",
+      "x_mm": 114.4,
+      "y_mm": 49.7
+     },
+     {
+      "type": "fingering",
+      "text": "1",
+      "x_mm": 125.5,
+      "y_mm": 121.7
+     },
+     {
+      "type": "fingering",
+      "text": "5",
+      "x_mm": 167.7,
+      "y_mm": 214.6
+     },
+     {
+      "type": "fingering",
+      "text": "5",
+      "x_mm": 120.0,
+      "y_mm": 26.2
+     },
+     {
+      "type": "breath_tick",
+      "x_mm": 127.3,
+      "y_mm": 241.6
+     },
+     {
+      "type": "breath_comma",
+      "x_mm": 75.5,
+      "y_mm": 146.6
+     },
+     {
+      "type": "breath_comma",
+      "x_mm": 173.7,
+      "y_mm": 53.8
+     },
+     {
+      "type": "breath_comma",
+      "x_mm": 91.6,
+      "y_mm": 146.4
+     },
+     {
+      "type": "arrow",
+      "x_mm": 82.9,
+      "y_mm": 236.2
+     },
+     {
+      "type": "arrow",
+      "x_mm": 151.8,
+      "y_mm": 165.0
+     },
+     {
+      "type": "phrase_arc",
+      "x_mm": 60.8,
+      "y_mm": 237.3
+     },
+     {
+      "type": "phrase_arc",
+      "x_mm": 25.4,
+      "y_mm": 27.2
+     },
+     {
+      "type": "margin_scribble",
+      "x_mm": 204.6,
+      "y_mm": 225.2
+     },
+     {
+      "type": "margin_scribble",
+      "x_mm": 200.8,
+      "y_mm": 38.9
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 125.6,
+      "y_mm": 152.0
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 36.2,
+      "y_mm": 246.4
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 96.6,
+      "y_mm": 248.6
+     },
+     {
+      "type": "handwritten_text",
+      "text": "rit.",
+      "x_mm": 66.3,
+      "y_mm": 141.5
+     },
+     {
+      "type": "handwritten_text",
+      "text": "p",
+      "x_mm": 28.5,
+      "y_mm": 45.0
+     }
+    ]
+   ]
+  },
+  "clean.pdf": {
+   "seed": null,
+   "dpi": 300,
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 300,
+     "tool": "pdftoppm -gray (LilyPond PDF)"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "png"
+     }
+    }
+   ]
+  }
+ },
+ "dpi": 300,
+ "license": "Theme public domain (French air \"Ah! vous dirai-je, maman\", c. 1761); variation, setting and engraving CC0-1.0",
+ "files": {
+  "scan": "twinkle-piano2p-stain-pencil/scan.pdf",
+  "scan_mild": "twinkle-piano2p-stain-pencil/scan-mild.pdf",
+  "scan_severe": "twinkle-piano2p-stain-pencil/scan-severe.pdf",
+  "clean": "twinkle-piano2p-stain-pencil/clean.pdf",
+  "truth": "twinkle-piano2p-stain-pencil/truth.musicxml",
+  "engraving": "twinkle-piano2p-stain-pencil/engraving.ly"
+ },
+ "measures": 24,
+ "vector_pages": 2,
+ "lyrics": [],
+ "shares_truth_with": [
+  "twinkle-piano2p-clean",
+  "twinkle-piano2p-skew",
+  "twinkle-piano2p-rot90",
+  "twinkle-piano2p-rot180",
+  "twinkle-piano2p-phone",
+  "twinkle-piano2p-book",
+  "twinkle-piano2p-yellowed",
+  "twinkle-piano2p-bleed",
+  "twinkle-piano2p-holes-staple",
+  "twinkle-piano2p-crop",
+  "twinkle-piano2p-halftone",
+  "twinkle-piano2p-jpeg",
+  "twinkle-piano2p-photocopy-thin",
+  "twinkle-piano2p-photocopy-thick",
+  "twinkle-piano2p-lowdpi",
+  "twinkle-piano2p-highdpi",
+  "twinkle-piano2p-blur",
+  "twinkle-piano2p-noise",
+  "twinkle-piano2p-spread",
+  "twinkle-piano2p-scale",
+  "twinkle-piano2p-combo"
+ ],
+ "validation": {
+  "truth_xsd_valid": true,
+  "midi_attacks_match_truth": true,
+  "attacks": 215,
+  "midi_lyric_events_match_truth": true,
+  "lyric_syllables": 0,
+  "lyric_text_found_in_engraving_pdf": null,
+  "lilypond_warnings": [],
+  "scan_files_image_only": {
+   "scan.pdf": true,
+   "scan-mild.pdf": true,
+   "scan-severe.pdf": true,
+   "clean.pdf": true
+  }
+ },
+ "origin": "synthetic-scan (challenge: degradation extremes)",
+ "seed": 204048829
+}

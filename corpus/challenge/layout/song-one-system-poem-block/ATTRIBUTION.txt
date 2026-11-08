@@ -1,0 +1,4 @@
+"A Red, Red Rose": text by Robert Burns (1794) - public domain.
+Melody and piano accompaniment composed for this corpus - CC0 1.0.
+
+Engraving, rasterisation and damage simulation produced by the layout-challenge generator (corpus/challenge/layout/_tools); these derived files are dedicated to the public domain (CC0 1.0).

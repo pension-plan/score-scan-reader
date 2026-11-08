@@ -1,0 +1,275 @@
+{
+  "id": "pitch-clef-carousel",
+  "category": "pitch",
+  "title": "Clef Carousel (viola and violoncello)",
+  "edge_cases": [
+    "clef_change_mid_staff",
+    "clef_change_mid_measure",
+    "alto_clef",
+    "tenor_clef",
+    "treble_clef_cello",
+    "clef_change_at_line_break_courtesy_clef",
+    "two_clef_changes_same_bar",
+    "same_staff_position_different_pitch",
+    "ledger_lines_in_alto_clef",
+    "phone_photo"
+  ],
+  "expected": {
+    "parts": [
+      "Viola",
+      "Violoncello"
+    ],
+    "must_not_split": false,
+    "shared_staves": [],
+    "lyrics": [],
+    "notes": "Two parts (Viola, Violoncello), one staff each, 20 bars of 3/4 in F major.  Viola: alto clef, treble from bar 13 (at a line break: courtesy clef at the end of system 3) back to alto before beat 3 of bar 17.  Cello: bass -> tenor at bar 5 (line start, courtesy clef at end of system 1) -> treble before beat 2 of bar 6 -> tenor at bar 9 (line start) -> bass at bar 11 -> tenor before beat 2 of bar 17 -> bass at bar 19.  Small mid-bar clefs change the pitch of every following note; a correct conversion places each <clef> change at the exact beat and keeps all pitches (e.g. cello bar 6: G4 in tenor clef then Bb4, D5 in treble clef).  Courtesy clefs at system ends are not clef changes of the following bar content beyond what is listed."
+  },
+  "shared_staff_accidental_differences": [],
+  "courtesy_accidentals": [],
+  "truth_limitations": [],
+  "degradations": {
+    "scan.pdf": {
+      "dpi": 200,
+      "seed": 12001,
+      "color": "rgb",
+      "encoding": "jpeg q45",
+      "pages_in_pdf": 1,
+      "pixel_size": [
+        1852,
+        2537
+      ],
+      "summary": "phone photo: perspective keystone on dark desk, uneven light + vignette + warm cast, motion blur (3 px@300dpi, 20 deg), sensor noise, JPEG q45 (RGB)",
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            240,
+            238,
+            232
+          ],
+          "texture": 4
+        },
+        {
+          "op": "lighting",
+          "gradient": 0.15,
+          "blotch": 0.2,
+          "vignette": 0.3,
+          "warm": 0.06,
+          "angle": 120
+        },
+        {
+          "op": "phone",
+          "margin": 0.06,
+          "bg": [
+            62,
+            58,
+            54
+          ],
+          "jitter": 0.035
+        },
+        {
+          "op": "blur",
+          "motion_px300": 3,
+          "angle": 20
+        },
+        {
+          "op": "noise",
+          "sigma": 5,
+          "chroma": 2
+        }
+      ]
+    },
+    "scan-mild.pdf": {
+      "dpi": 250,
+      "seed": 12002,
+      "color": "rgb",
+      "encoding": "jpeg q60",
+      "pages_in_pdf": 1,
+      "pixel_size": [
+        2231,
+        3088
+      ],
+      "summary": "gentle phone photo: small keystone, mild gradient, slight blur, JPEG q60",
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            242,
+            240,
+            236
+          ],
+          "texture": 3
+        },
+        {
+          "op": "lighting",
+          "gradient": 0.1,
+          "angle": 60
+        },
+        {
+          "op": "phone",
+          "margin": 0.04,
+          "bg": [
+            80,
+            76,
+            70
+          ],
+          "jitter": 0.015
+        },
+        {
+          "op": "blur",
+          "radius_px300": 0.5
+        },
+        {
+          "op": "noise",
+          "sigma": 3
+        }
+      ]
+    },
+    "scan-severe.pdf": {
+      "dpi": 150,
+      "seed": 12003,
+      "color": "gray",
+      "encoding": "jpeg q30",
+      "pages_in_pdf": 1,
+      "pixel_size": [
+        1754,
+        1241
+      ],
+      "summary": "page scanned sideways (rotated 90 deg) + 1.2 deg skew, two punch holes, 150 dpi grey, gaussian + salt-and-pepper noise, JPEG q30",
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            245,
+            244,
+            240
+          ],
+          "texture": 2
+        },
+        {
+          "op": "holes",
+          "n": 2,
+          "side": "left",
+          "d_mm": 6,
+          "offset_mm": 9,
+          "spacing_mm": 80,
+          "fill": [
+            30,
+            30,
+            32
+          ]
+        },
+        {
+          "op": "rotate",
+          "deg": 1.2
+        },
+        {
+          "op": "rot90",
+          "k": 1
+        },
+        {
+          "op": "noise",
+          "sigma": 9,
+          "saltpepper": 0.003
+        },
+        {
+          "op": "gray"
+        }
+      ]
+    }
+  },
+  "dpi": {
+    "scan.pdf": 200,
+    "scan-mild.pdf": 250,
+    "scan-severe.pdf": 150
+  },
+  "clean_pdf": {
+    "dpi": 300,
+    "note": "undamaged 300 dpi grey raster of the LilyPond engraving (image only)"
+  },
+  "license": "CC0-1.0 (music, engraving, scans); lyrics texts public domain where present",
+  "source": "composed for this corpus",
+  "measures": 20,
+  "pages": 1,
+  "layout": "StaffGroup of two single staves, 5 systems x 4 bars",
+  "validation": {
+    "xsd_valid": true,
+    "midi_attacks_match_truth_file": true,
+    "attacks": 108,
+    "printed_accidentals_match": true,
+    "accidentals": {
+      "expected": 2,
+      "printed": 2,
+      "extra_natural": 0,
+      "parenthesized": 0,
+      "double": 0,
+      "tie_at_line_start": 0
+    },
+    "clefs": {
+      "stVA": {
+        "expected_changes": 2,
+        "rendered_changes": 2
+      },
+      "stVC": {
+        "expected_changes": 6,
+        "rendered_changes": 6
+      }
+    },
+    "keys": {
+      "stVA": {
+        "expected": [
+          "0:-1"
+        ],
+        "rendered": [
+          "0:-1"
+        ],
+        "cancellations": {}
+      },
+      "stVC": {
+        "expected": [
+          "0:-1"
+        ],
+        "rendered": [
+          "0:-1"
+        ],
+        "cancellations": {}
+      }
+    },
+    "ottava": {
+      "stVA": {
+        "expected": [],
+        "rendered": [],
+        "pieces": 0
+      },
+      "stVC": {
+        "expected": [],
+        "rendered": [],
+        "pieces": 0
+      }
+    },
+    "systems": 5,
+    "line_start_measures": [
+      1,
+      5,
+      9,
+      13,
+      17
+    ],
+    "lyric_text_found_in_engraving": null,
+    "scan_files_image_only": {
+      "scan.pdf": true,
+      "scan-mild.pdf": true,
+      "scan-severe.pdf": true
+    }
+  },
+  "files": [
+    "engraving.ly",
+    "truth.musicxml",
+    "clean.pdf",
+    "scan.pdf",
+    "scan-mild.pdf",
+    "scan-severe.pdf",
+    "meta.json",
+    "ATTRIBUTION.txt"
+  ]
+}

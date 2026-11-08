@@ -1,0 +1,402 @@
+{
+  "id": "rh07-compound-meter-fiddle",
+  "category": "rhythm",
+  "title": "The Crooked Road (fiddle: jig, slip jig, slide)",
+  "composer": "OMR challenge corpus (CC0)",
+  "lyricist": "",
+  "edge_cases": [
+    "compound_6_8",
+    "compound_9_8",
+    "compound_12_8",
+    "hemiola_bar_in_3_4",
+    "pickup_eighth",
+    "incomplete_final_bar",
+    "beam_across_rest_6_8",
+    "siciliano_dotted_figures",
+    "dotted_rests",
+    "duplet_12_8",
+    "grace_cuts_acciaccatura",
+    "plain_grace",
+    "double_stop_chord",
+    "chord_tie",
+    "tie_across_barline_and_time_change",
+    "fermata_mid_piece",
+    "rehearsal_marks",
+    "low_dpi_150",
+    "staple",
+    "punch_holes",
+    "pencil_annotations",
+    "cropped_edges",
+    "skew_4_and_7_degrees",
+    "gutter_shadow"
+  ],
+  "expected": {
+    "parts": [
+      "Fiddle"
+    ],
+    "must_not_split": false,
+    "shared_staves": [],
+    "notes": "19 bars: eighth pickup (measure 0) and incomplete final bar of 5 eighths. 6/8 (bars 1-6, 8, 15-18), one hemiola bar in 3/4 (7) entered by a tie a'8~a'4 across the barline and the time change, 9/8 slip jig (9-12, mark B) with beam over a rest, dotted quarter rests (12), 12/8 slide (13-14, mark C) with a 2:3 duplet and a tied double stop <d' b'>4.~<d' b'>4. Grace cuts: slashed acciaccaturas (bars 1, 15) and one plain grace (bar 11). Fermata mid-piece (bar 16). In scan-severe.pdf the left crop removes most of the instrument name and the right crop cuts the staff ends / final barlines; the part is still \"Fiddle\".",
+    "lyrics": [],
+    "measures": 19,
+    "first_measure_number": 0
+  },
+  "truth_limitations": [
+    "Grace notes are <grace/> notes without <duration> (slash=\"yes\" for acciaccaturas); the slur that LilyPond engraves for \\acciaccatura / \\appoggiatura is encoded as slur number 2.",
+    "<beam> elements reproduce the engraved beam groups exactly (manual beaming); notes only - a rest inside a beam carries no <beam> element.",
+    "Pencil marks in the damaged scans (circles, fingering digits, a fake \"3\" above notes, ticks, words) are not part of the music and are absent from the truth."
+  ],
+  "degradations": {
+    "scan.pdf": {
+      "seed": 710701,
+      "render_dpi": 150,
+      "dpi": 150,
+      "color": "gray",
+      "format": "jpeg",
+      "jpeg_quality": 50,
+      "jpeg_passes": 1,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            246,
+            246,
+            244
+          ],
+          "texture": 3
+        },
+        {
+          "op": "staple",
+          "corner": "tl"
+        },
+        {
+          "op": "punch_holes",
+          "n": 2,
+          "side": "left",
+          "bg": 30
+        },
+        {
+          "op": "rotate",
+          "deg": 4.0,
+          "bg": 200
+        },
+        {
+          "op": "gutter",
+          "side": "left",
+          "width": 0.06,
+          "dark": 0.5
+        },
+        {
+          "op": "saltpepper",
+          "amount": 0.001
+        },
+        {
+          "op": "noise",
+          "sigma": 4
+        }
+      ],
+      "tags": [
+        "paper_texture",
+        "staple",
+        "punch_holes",
+        "rotation_+4deg",
+        "gutter",
+        "saltpepper",
+        "noise",
+        "jpeg_q50"
+      ],
+      "output_pages": 1,
+      "pixel_size": [
+        1361,
+        1838
+      ],
+      "image_mode": "L",
+      "bytes": 176023,
+      "image_only_check": {
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "pages": 1,
+        "text_chars": 0
+      },
+      "op_log": [
+        {
+          "punch_holes_xy_px": [
+            [
+              70,
+              700
+            ],
+            [
+              70,
+              1113
+            ]
+          ]
+        }
+      ]
+    },
+    "scan-mild.pdf": {
+      "seed": 710702,
+      "render_dpi": 150,
+      "dpi": 150,
+      "color": "gray",
+      "format": "jpeg",
+      "jpeg_quality": 60,
+      "jpeg_passes": 1,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            246,
+            246,
+            244
+          ],
+          "texture": 2
+        },
+        {
+          "op": "rotate",
+          "deg": 0.7,
+          "bg": 230
+        },
+        {
+          "op": "noise",
+          "sigma": 2
+        }
+      ],
+      "tags": [
+        "paper_texture",
+        "rotation_+0.7deg",
+        "noise",
+        "jpeg_q60"
+      ],
+      "output_pages": 1,
+      "pixel_size": [
+        1263,
+        1770
+      ],
+      "image_mode": "L",
+      "bytes": 115245,
+      "image_only_check": {
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "pages": 1,
+        "text_chars": 0
+      },
+      "op_log": []
+    },
+    "scan-severe.pdf": {
+      "seed": 710703,
+      "render_dpi": 200,
+      "dpi": 200,
+      "color": "gray",
+      "format": "jpeg",
+      "jpeg_quality": 20,
+      "jpeg_passes": 1,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            244,
+            243,
+            238
+          ],
+          "texture": 3
+        },
+        {
+          "op": "pencil",
+          "circles": 5,
+          "fake_triplets": 2,
+          "fingerings": 5,
+          "ticks": 2,
+          "words": [
+            "rit.",
+            "slow!"
+          ]
+        },
+        {
+          "op": "crop",
+          "side": "left",
+          "into_staff": -0.3,
+          "bg": 255
+        },
+        {
+          "op": "crop",
+          "side": "right",
+          "into_staff": 0.5,
+          "bg": 255
+        },
+        {
+          "op": "rotate",
+          "deg": 7.0,
+          "bg": 60
+        },
+        {
+          "op": "perspective",
+          "margin": 0.03,
+          "jitter": 0.02,
+          "keystone": 0.03,
+          "bg": [
+            60,
+            60,
+            60
+          ]
+        },
+        {
+          "op": "blur",
+          "sigma": 0.8
+        }
+      ],
+      "tags": [
+        "paper_texture",
+        "pencil",
+        "crop",
+        "crop",
+        "rotation_+7deg",
+        "perspective_phone_capture",
+        "blur",
+        "jpeg_q20"
+      ],
+      "output_pages": 1,
+      "pixel_size": [
+        2042,
+        2639
+      ],
+      "image_mode": "L",
+      "bytes": 121293,
+      "image_only_check": {
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "pages": 1,
+        "text_chars": 0
+      },
+      "op_log": [
+        {
+          "pencil_marks": [
+            [
+              "circle",
+              211,
+              1111
+            ],
+            [
+              "circle",
+              212,
+              1108
+            ],
+            [
+              "circle",
+              946,
+              1148
+            ],
+            [
+              "circle",
+              271,
+              542
+            ],
+            [
+              "circle",
+              886,
+              833
+            ],
+            [
+              "fake_3",
+              1441,
+              1290
+            ],
+            [
+              "fake_3",
+              894,
+              468
+            ],
+            [
+              "digit",
+              1287
+            ],
+            [
+              "digit",
+              1220
+            ],
+            [
+              "digit",
+              1481
+            ],
+            [
+              "digit",
+              1482
+            ],
+            [
+              "digit",
+              395
+            ],
+            [
+              "tick",
+              1170
+            ],
+            [
+              "tick",
+              438
+            ],
+            [
+              "word",
+              "rit.",
+              944
+            ],
+            [
+              "word",
+              "slow!",
+              1056
+            ],
+            [
+              "bracket",
+              1173
+            ]
+          ]
+        },
+        {
+          "crop_x": 98
+        },
+        {
+          "crop_x": 1566
+        }
+      ]
+    }
+  },
+  "dpi": 150,
+  "license": "CC0-1.0 (music composed for this corpus; engraving, truth and scans CC0)",
+  "source": "Composed for this corpus (CC0).",
+  "pages": 1,
+  "files": {
+    "truth": "truth.musicxml",
+    "engraving": "engraving.ly",
+    "clean": "clean.pdf",
+    "scan": "scan.pdf",
+    "scan_mild": "scan-mild.pdf",
+    "scan_severe": "scan-severe.pdf",
+    "attribution": "ATTRIBUTION.txt"
+  },
+  "clean": {
+    "dpi": 300,
+    "pages": 1,
+    "ops": [],
+    "note": "undamaged raster render",
+    "image_only": true,
+    "fonts": [],
+    "images": 1,
+    "text_chars": 0
+  },
+  "validation": {
+    "truth_xsd_valid": true,
+    "engraving_event_dump_matches_truth": true,
+    "engraving_events_compared": 158,
+    "lyric_events_compared": 0,
+    "time_signatures_compared": 6,
+    "midi_attacks_match_truth": true,
+    "midi_attacks": 89,
+    "midi_grace_notes_excluded": 3,
+    "music21_reparse_matches_model": true,
+    "lyric_text_found_in_engraving": null,
+    "lilypond_warnings": [],
+    "method": "LilyPond event-dump engraver (rsynth/dump.ly) compared with the model the truth is written from: every note/rest/multi-bar rest (onset, pitch, notated type, dots, tuplet scale), grace offsets, ties, beam starts/stops, slurs, fermatas, lyric syllables/hyphens/extenders, bar numbers/measure positions and time signatures; plus MIDI attack multiset and a music21 re-parse of truth.musicxml."
+  },
+  "generator": "corpus/challenge/rhythm/_tools/run_all.py (rsynth/items.py, build.py, scan.py)"
+}

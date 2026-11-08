@@ -1,0 +1,576 @@
+"""Internal score model shared by the MusicXML writer (ground truth) and the
+LilyPond writer (engraving).  Both outputs are generated from the same model so
+the truth always matches what is printed.
+
+Durations are Fractions of a quarter note.  Pitches are (step, alter, octave).
+"""
+from __future__ import annotations
+
+import copy
+import re
+from dataclasses import dataclass, field
+from fractions import Fraction as F
+from typing import Dict, List, Optional, Tuple
+
+STEP_PC = {'C': 0, 'D': 2, 'E': 4, 'F': 5, 'G': 7, 'A': 9, 'B': 11}
+STEPS = 'CDEFGAB'
+TYPE_QL = {'breve': F(8), 'whole': F(4), 'half': F(2), 'quarter': F(1), 'eighth': F(1, 2),
+           '16th': F(1, 4), '32nd': F(1, 8), '64th': F(1, 16)}
+
+Pitch = Tuple[str, int, int]
+
+
+def midi(p: Pitch) -> int:
+    return 12 * (p[2] + 1) + STEP_PC[p[0]] + p[1]
+
+
+def display_ql(dtype: str, dots: int) -> F:
+    base = TYPE_QL[dtype]
+    tot, add = base, base
+    for _ in range(dots):
+        add /= 2
+        tot += add
+    return tot
+
+
+def ql_to_type(ql: F) -> Optional[Tuple[str, int]]:
+    """Plain (non-tuplet) duration -> (type, dots) or None if not expressible."""
+    for t, base in TYPE_QL.items():
+        for dots in range(0, 4):
+            if display_ql(t, dots) == ql:
+                return t, dots
+    return None
+
+
+def split_plain(ql: F) -> List[Tuple[str, int, F]]:
+    """Split an arbitrary duration into a list of expressible plain durations."""
+    out = []
+    rem = F(ql)
+    order = sorted(TYPE_QL.items(), key=lambda kv: -kv[1])
+    while rem > 0:
+        best = None
+        for t, base in order:
+            for dots in (2, 1, 0):
+                d = display_ql(t, dots)
+                if d <= rem:
+                    if best is None or d > best[2]:
+                        best = (t, dots, d)
+        if best is None:
+            raise ValueError(f'cannot split duration {ql}')
+        out.append(best)
+        rem -= best[2]
+    return out
+
+
+@dataclass
+class Lyric:
+    text: str
+    syllabic: str = 'single'   # single|begin|middle|end  (of the first / only part)
+    extend: bool = False
+    # elision: further (syllabic, text) parts sung on the same note, joined by
+    # an elision tie (MusicXML <elision>, LilyPond "a~b")
+    elided: List[Tuple[str, str]] = field(default_factory=list)
+    name: Optional[str] = None      # MusicXML lyric/@name override (e.g. 'refrain')
+    # last syllable of a line that simply stops (e.g. a stanza line before a
+    # refrain printed on another line): never draw an extender
+    no_extend: bool = False
+
+    @property
+    def last_syllabic(self):
+        return self.elided[-1][0] if self.elided else self.syllabic
+
+    def set_last_syllabic(self, v):
+        if self.elided:
+            self.elided[-1] = (v, self.elided[-1][1])
+        else:
+            self.syllabic = v
+
+    def full_text(self, joiner='\u203f'):
+        return joiner.join([self.text] + [t for _, t in self.elided])
+
+
+@dataclass
+class Event:
+    kind: str                      # note | rest | space | clef
+    dur: F = F(0)                  # sounding duration (quarters)
+    pitches: List[Pitch] = field(default_factory=list)
+    dtype: Optional[str] = None    # notated type
+    dots: int = 0
+    tuplet: Optional[Tuple[int, int]] = None   # (actual, normal)
+    tuplet_start: bool = False
+    tuplet_stop: bool = False
+    tie_start: set = field(default_factory=set)   # set of Pitch
+    tie_stop: set = field(default_factory=set)
+    lyrics: Dict[int, Lyric] = field(default_factory=dict)
+    fermata: bool = False
+    artic: List[str] = field(default_factory=list)      # staccato accent tenuto
+    dynamics: List[str] = field(default_factory=list)   # p f mf ...
+    slur_start: int = 0
+    slur_stop: int = 0
+    clef: Optional[str] = None     # for kind == clef
+    measure_rest: bool = False
+
+    @property
+    def is_note(self):
+        return self.kind == 'note'
+
+    def is_attack(self):
+        """True if this note event starts at least one new sounding pitch."""
+        return self.kind == 'note' and any(p not in self.tie_stop for p in self.pitches)
+
+    def is_tie_continuation(self):
+        return self.kind == 'note' and all(p in self.tie_stop for p in self.pitches)
+
+
+@dataclass
+class MeasureInfo:
+    number: int
+    dur: F                         # actual duration
+    nominal: F                     # time-signature bar length
+    time: Optional[Tuple[int, int]] = None      # set when (re)stated
+    time_symbol: Optional[str] = None           # common | cut | None
+    key: Optional[Tuple[int, str]] = None       # (fifths, mode) when (re)stated
+    left_bar: Optional[str] = None              # repeat-start
+    right_bar: Optional[str] = None             # repeat-end | double | final | dashed
+    implicit: bool = False
+
+
+@dataclass
+class VoiceDef:
+    key: str          # unique within part e.g. '1', '2', '5'
+    staff: int        # 1-based staff number within part
+
+
+@dataclass
+class Part:
+    id: str
+    name: str
+    abbr: str = ''
+    instrument: str = 'voice'      # voice | piano | other
+    staves: int = 1
+    clefs: List[str] = field(default_factory=lambda: ['treble'])   # initial clef per staff
+    voices: List[VoiceDef] = field(default_factory=list)
+    measures: List[Dict[str, List[Event]]] = field(default_factory=list)
+
+    def voice(self, key):
+        for v in self.voices:
+            if v.key == key:
+                return v
+        raise KeyError(key)
+
+
+@dataclass
+class Score:
+    title: str = ''
+    subtitle: str = ''
+    composer: str = ''
+    lyricist: str = ''
+    arranger: str = ''
+    rights: str = ''
+    source: str = ''
+    measures: List[MeasureInfo] = field(default_factory=list)
+    parts: List[Part] = field(default_factory=list)
+    groups: List[dict] = field(default_factory=list)   # part-groups for truth part-list
+    # per lyric line number: {'name': 'translation', 'italic': True}
+    lyric_line_attrs: Dict[int, dict] = field(default_factory=dict)
+    # stanzas printed as a text block below the music (hymnal style):
+    # list of {'label': '3.', 'lines': [...], 'page': 1}
+    text_stanzas: List[dict] = field(default_factory=list)
+    # part id -> 'above' | 'below': printed lyric placement relative to the staff
+    lyric_placement: Dict[str, str] = field(default_factory=dict)
+
+    def part(self, pid) -> Part:
+        for p in self.parts:
+            if p.id == pid:
+                return p
+        raise KeyError(pid)
+
+    def measure_offsets(self) -> List[F]:
+        offs, t = [], F(0)
+        for m in self.measures:
+            offs.append(t)
+            t += m.dur
+        return offs
+
+    def current_time(self, i):
+        """time signature in force at measure i"""
+        for j in range(i, -1, -1):
+            if self.measures[j].time:
+                return self.measures[j].time, self.measures[j].time_symbol
+        return (4, 4), None
+
+    def current_key(self, i):
+        for j in range(i, -1, -1):
+            if self.measures[j].key:
+                return self.measures[j].key
+        return (0, 'major')
+
+
+# ---------------------------------------------------------------- iteration
+
+def voice_events(score: Score, part: Part, vkey: str):
+    """yield (measure_idx, abs_onset, event) for a voice."""
+    offs = score.measure_offsets()
+    for i, mdict in enumerate(part.measures):
+        t = offs[i]
+        for ev in mdict.get(vkey, []):
+            yield i, t, ev
+            t += ev.dur
+
+
+def attacks(score: Score):
+    """multiset list of (onset, midi, part_id, vkey) for all attacks"""
+    out = []
+    for p in score.parts:
+        for v in p.voices:
+            for i, t, ev in voice_events(score, p, v.key):
+                if ev.kind == 'note':
+                    for pit in ev.pitches:
+                        if pit not in ev.tie_stop:
+                            out.append((t, midi(pit), p.id, v.key))
+    return out
+
+
+def lyric_verses(part: Part, vkey: str) -> List[int]:
+    vs = set()
+    for m in part.measures:
+        for ev in m.get(vkey, []):
+            vs.update(ev.lyrics.keys())
+    return sorted(vs)
+
+
+def voices_with_lyrics(score: Score):
+    out = []
+    for p in score.parts:
+        for v in p.voices:
+            vs = lyric_verses(p, v.key)
+            if vs:
+                out.append((p.id, v.key, vs))
+    return out
+
+
+# ---------------------------------------------------------------- lyric tools
+
+def compute_extenders(score: Score):
+    """Standard engraving convention: a word-final syllable followed by a
+    melisma (further attacks / tied notes before the next syllable or rest)
+    gets an extender line."""
+    for p in score.parts:
+        for v in p.voices:
+            evs = [ev for _, _, ev in voice_events(score, p, v.key)]
+            for verse in lyric_verses(p, v.key):
+                last = None   # (event, lyric)
+                melisma = False
+                for ev in evs:
+                    if ev.kind == 'rest':
+                        if last is not None:
+                            last[1].extend = melisma and last[1].last_syllabic in ('single', 'end') and not last[1].no_extend
+                        last, melisma = None, False
+                        continue
+                    if ev.kind != 'note':
+                        continue
+                    if verse in ev.lyrics:
+                        if last is not None:
+                            last[1].extend = melisma and last[1].last_syllabic in ('single', 'end') and not last[1].no_extend
+                        last, melisma = (ev, ev.lyrics[verse]), False
+                    elif last is not None:
+                        melisma = True
+                if last is not None:
+                    last[1].extend = melisma and last[1].last_syllabic in ('single', 'end') and not last[1].no_extend
+
+
+def parse_lyric_text(text: str):
+    """'O sa -- cred Head, now _ wound -- ed' -> list of Lyric or None (skip).
+    A token 'le~o' is an elision (two syllables on one note); '~' inside a
+    word joins parts, '^' inside a token stands for a literal space."""
+    # split on ASCII whitespace only: U+00A0 (no-break space) belongs to the syllable
+    toks = [t for t in re.split(r'[ \t\r\n]+', text) if t]
+    out = []
+    hy_next = False
+    for i, tk in enumerate(toks):
+        if tk == '--':
+            hy_next = True
+            if out and out[-1] is not None:
+                last = out[-1].last_syllabic
+                out[-1].set_last_syllabic({'single': 'begin', 'end': 'middle'}.get(last, last))
+            continue
+        if tk == '_':
+            out.append(None)
+            continue
+        parts = [x.replace('^', ' ') for x in tk.split('~')]
+        ly = Lyric(parts[0], 'end' if hy_next else 'single')
+        ly.elided = [('single', x) for x in parts[1:]]
+        out.append(ly)
+        hy_next = False
+    return out
+
+
+def note_slots(score: Score, part: Part, vkey: str, mode='lyric', verse=None):
+    """Events that can carry a syllable.  mode 'lyric': events carrying any
+    lyric now (or the given verse); mode 'attack': every non-tie-continuation."""
+    out = []
+    for i, t, ev in voice_events(score, part, vkey):
+        if ev.kind != 'note' or ev.is_tie_continuation():
+            continue
+        if mode == 'attack':
+            out.append((i, t, ev))
+        elif verse is not None:
+            if verse in ev.lyrics:
+                out.append((i, t, ev))
+        elif ev.lyrics:
+            out.append((i, t, ev))
+    return out
+
+
+def set_verses(score: Score, pid: str, vkey: str, verses: List[str], mode='lyric', slot_verse=None,
+               strict=True):
+    part = score.part(pid)
+    slots = note_slots(score, part, vkey, mode, slot_verse)
+    for _, _, ev in voice_events(score, part, vkey):
+        ev.lyrics = {}
+    for vn, text in enumerate(verses, 1):
+        syls = parse_lyric_text(text)
+        if strict and len(syls) != len(slots):
+            raise ValueError(f'{pid}:{vkey} verse {vn}: {len(syls)} syllables for {len(slots)} slots')
+        for (_, _, ev), ly in zip(slots, syls):
+            if ly is not None:
+                ev.lyrics[vn] = copy.copy(ly)
+    compute_extenders(score)
+
+
+def derive_lyrics(score: Score, src: Tuple[str, str], dst: Tuple[str, str], verses=None):
+    """Copy syllables from src voice to dst voice by onset time.  Each src
+    syllable onset must coincide with a dst attack; returns number assigned."""
+    sp, sv = score.part(src[0]), src[1]
+    dp, dv = score.part(dst[0]), dst[1]
+    dst_by_t = {}
+    for i, t, ev in voice_events(score, dp, dv):
+        if ev.kind == 'note' and not ev.is_tie_continuation():
+            dst_by_t.setdefault(t, ev)
+    n = 0
+    missing = 0
+    for i, t, ev in voice_events(score, sp, sv):
+        for vn, ly in ev.lyrics.items():
+            if verses and vn not in verses:
+                continue
+            d = dst_by_t.get(t)
+            if d is None:
+                missing += 1
+                continue
+            d.lyrics[vn] = Lyric(ly.text, ly.syllabic, False, list(ly.elided), ly.name)
+            n += 1
+    compute_extenders(score)
+    return n, missing
+
+
+def clear_lyrics(score: Score, pid: str, vkey: Optional[str] = None):
+    p = score.part(pid)
+    for m in p.measures:
+        for k, evs in m.items():
+            if vkey is None or k == vkey:
+                for ev in evs:
+                    ev.lyrics = {}
+
+
+# ---------------------------------------------------------------- structure tools
+
+def truncate(score: Score, start: int, end: int, final_bar=True):
+    """keep measures [start, end); restates time, key and clefs in force."""
+    (t, sym) = score.current_time(start)
+    key = score.current_key(start)
+    for p in score.parts:
+        clefs = list(p.clefs)
+        for i in range(start):
+            for v in p.voices:
+                for ev in p.measures[i].get(v.key, []):
+                    if ev.kind == 'clef':
+                        clefs[v.staff - 1] = ev.clef
+        # clef events at the very start of the new first measure become initial clefs
+        for v in p.voices:
+            evs = p.measures[start].get(v.key, [])
+            while evs and evs[0].kind == 'clef':
+                clefs[v.staff - 1] = evs.pop(0).clef
+        p.clefs = clefs
+    score.measures = score.measures[start:end]
+    for p in score.parts:
+        p.measures = p.measures[start:end]
+    m0 = score.measures[0]
+    m0.time, m0.time_symbol = t, sym
+    m0.key = key
+    m0.left_bar = None if m0.left_bar != 'repeat-start' else m0.left_bar
+    m0.implicit = m0.dur < m0.nominal
+    for p in score.parts:
+        for evs in p.measures[0].values():
+            for ev in evs:
+                ev.tie_stop = set()
+                if ev.slur_stop:
+                    ev.slur_stop = 0
+        for evs in p.measures[-1].values():
+            for ev in evs:
+                ev.tie_start = set()
+    # fix syllabic of a word cut at the end / beginning
+    for p in score.parts:
+        for v in p.voices:
+            evs = [ev for m in p.measures for ev in m.get(v.key, []) if ev.kind == 'note']
+            for verse in lyric_verses(p, v.key):
+                lys = [ev.lyrics[verse] for ev in evs if verse in ev.lyrics]
+                if lys:
+                    if lys[-1].syllabic == 'begin':
+                        lys[-1].syllabic = 'single'
+                    elif lys[-1].syllabic == 'middle':
+                        lys[-1].syllabic = 'end'
+                    if lys[0].syllabic == 'end':
+                        lys[0].syllabic = 'single'
+                    elif lys[0].syllabic == 'middle':
+                        lys[0].syllabic = 'begin'
+    if final_bar:
+        score.measures[-1].right_bar = 'final'
+    sanitize_ties(score)
+    fix_unbalanced_slurs(score)
+    compute_extenders(score)
+    renumber(score)
+
+
+def ensure_attributes(score: Score, time, time_symbol, key):
+    m0 = score.measures[0]
+    if not m0.time:
+        m0.time, m0.time_symbol = time, time_symbol
+    if not m0.key:
+        m0.key = key
+
+
+def renumber(score: Score):
+    n = 0 if score.measures and score.measures[0].implicit else 1
+    for m in score.measures:
+        m.number = n
+        n += 1
+
+
+def fix_unbalanced_slurs(score: Score):
+    """Make slurs single-level and balanced per voice (what LilyPond needs)."""
+    for p in score.parts:
+        for v in p.voices:
+            evs = [ev for _, _, ev in voice_events(score, p, v.key) if ev.kind in ('note', 'rest')]
+            open_ev = None
+            for ev in evs:
+                if ev.kind == 'rest':
+                    ev.slur_start = ev.slur_stop = 0
+                    continue
+                if ev.slur_stop and open_ev is not None and open_ev is not ev:
+                    ev.slur_stop = 1
+                    open_ev = None
+                else:
+                    ev.slur_stop = 0
+                if ev.slur_start:
+                    if open_ev is None:
+                        ev.slur_start = 1
+                        open_ev = ev
+                    else:
+                        ev.slur_start = 0
+            if open_ev is not None:
+                open_ev.slur_start = 0
+
+
+def transpose_octaves(score: Score, pid: str, n: int):
+    p = score.part(pid)
+    for m in p.measures:
+        for evs in m.values():
+            for ev in evs:
+                ev.pitches = [(s, a, o + n) for s, a, o in ev.pitches]
+                ev.tie_start = {(s, a, o + n) for s, a, o in ev.tie_start}
+                ev.tie_stop = {(s, a, o + n) for s, a, o in ev.tie_stop}
+
+
+def strip_marks(score: Score, dynamics=False, slurs=False, artic=False, fermata=False):
+    for p in score.parts:
+        for m in p.measures:
+            for evs in m.values():
+                for ev in evs:
+                    if dynamics:
+                        ev.dynamics = []
+                    if slurs:
+                        ev.slur_start = ev.slur_stop = 0
+                    if artic:
+                        ev.artic = []
+                    if fermata:
+                        ev.fermata = False
+
+
+def check(score: Score):
+    """consistency checks; raises on error"""
+    nm = len(score.measures)
+    for p in score.parts:
+        assert len(p.measures) == nm, (p.id, len(p.measures), nm)
+        for i, m in enumerate(p.measures):
+            for k, evs in m.items():
+                tot = sum((e.dur for e in evs), F(0))
+                if tot > score.measures[i].dur:
+                    raise ValueError(f'{p.id} voice {k} measure {i}: {tot} > {score.measures[i].dur}')
+                for e in evs:
+                    if e.kind in ('note', 'rest') and not e.measure_rest:
+                        if e.dtype is None:
+                            raise ValueError(f'{p.id} m{i} event without type {e}')
+                        d = display_ql(e.dtype, e.dots)
+                        if e.tuplet:
+                            d = d * e.tuplet[1] / e.tuplet[0]
+                        if d != e.dur:
+                            raise ValueError(f'{p.id} m{i} duration mismatch {e.dtype} {e.dots} {e.tuplet} {e.dur}')
+    return True
+
+
+def pad_voices(score: Score):
+    """Fill every voice of every measure up to the measure duration with
+    trailing spaces (needed by LilyPond so all voices stay in sync)."""
+    for p in score.parts:
+        for i, m in enumerate(p.measures):
+            for v in p.voices:
+                evs = m.setdefault(v.key, [])
+                tot = sum((e.dur for e in evs), F(0))
+                if tot < score.measures[i].dur:
+                    evs.append(Event('space', score.measures[i].dur - tot))
+
+
+def clean_text(t: str) -> str:
+    t = t.replace('­', '').replace(' ', ' ').strip()
+    t = re.sub(r'^\d+\.\s*', '', t)
+    return t
+
+
+def staff_roles(voice_keys_contents):
+    """voice_keys_contents: ordered list of (vkey, events) sharing one staff in
+    one measure.  Returns dict vkey -> role (0 = single voice, 1..4 = voiceOne..)."""
+    present = [k for k, evs in voice_keys_contents if any(e.kind in ('note', 'rest') for e in evs)]
+    roles = {}
+    if len(present) <= 1:
+        for k, _ in voice_keys_contents:
+            roles[k] = 0
+        return roles
+    for k, _ in voice_keys_contents:
+        roles[k] = present.index(k) + 1 if k in present else 0
+    return roles
+
+
+def sanitize_ties(score: Score):
+    """Ties only between consecutive note events of the same voice and pitch
+    (what LilyPond can engrave); truth and engraving then agree."""
+    for p in score.parts:
+        for v in p.voices:
+            prev = None
+            for mm in p.measures:
+                for ev in mm.get(v.key, []):
+                    if ev.kind == 'clef':
+                        continue
+                    if ev.kind != 'note':
+                        if prev is not None:
+                            prev.tie_start = set()
+                        prev = None
+                        continue
+                    if prev is None:
+                        ev.tie_stop = set()
+                    else:
+                        valid = {x for x in prev.tie_start if x in ev.pitches}
+                        prev.tie_start = valid
+                        ev.tie_stop = set(valid)
+                    prev = ev
+            if prev is not None:
+                prev.tie_start = set()

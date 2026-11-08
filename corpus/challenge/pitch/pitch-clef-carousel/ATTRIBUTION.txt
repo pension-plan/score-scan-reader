@@ -1,0 +1,3 @@
+"Clef Carousel" - duet composed for the pitch challenge corpus (2026).
+
+Composition, engraving, rasterisation and damage simulation produced for the pitch challenge corpus (corpus/challenge/pitch/_tools); dedicated to the public domain (CC0 1.0).

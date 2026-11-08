@@ -1,0 +1,4 @@
+Integer vitae. Text: Quintus Horatius Flaccus (Horace), Odes I.22, public domain.
+Music: composed for this challenge corpus (2026), CC0 1.0 (not the F. F. Flemming setting).
+
+Engraving, rasterisation and damage simulation produced by the challenge/voices generator (corpus/challenge/voices/_tools); all derived files are dedicated to the public domain (CC0 1.0).

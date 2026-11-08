@@ -1,0 +1,443 @@
+{
+  "id": "rh01-tuplet-etude",
+  "category": "rhythm",
+  "title": "Tuplet Etude (flute)",
+  "composer": "OMR challenge corpus (CC0)",
+  "lyricist": "",
+  "edge_cases": [
+    "eighth_triplets",
+    "quarter_triplets",
+    "half_note_triplets_cut_time",
+    "tuplet_with_rests",
+    "tuplet_mixed_values",
+    "quintuplet_16ths",
+    "quintuplet_8ths",
+    "sextuplet",
+    "septuplet",
+    "implied_triplets_no_number",
+    "duplets_6_8",
+    "duplets_12_8",
+    "quadruplets_6_8_12_8",
+    "sixteenth_triplets",
+    "thirtysecond_triplets",
+    "beam_across_two_tuplets",
+    "tuplet_inside_longer_beam",
+    "tie_into_tuplet",
+    "beam_across_rest_in_tuplet",
+    "beam_across_rest_6_8",
+    "time_signature_changes",
+    "common_time_symbol",
+    "cut_time_symbol",
+    "numeric_4_4_after_C",
+    "compound_6_8",
+    "compound_12_8",
+    "courtesy_time_signature_at_system_end",
+    "fermata_on_rest",
+    "multi_page",
+    "pencil_fake_tuplet_numbers"
+  ],
+  "expected": {
+    "parts": [
+      "Flute"
+    ],
+    "must_not_split": false,
+    "shared_staves": [],
+    "notes": "Single-staff flute part, 2 pages, 23 bars. A correct conversion must read every tuplet with its ratio: 3:2 on eighths, quarters (bars 2, 7, 21) and halves (bars 9, 11; cut time), 5:4 on 16ths (bar 4) and on eighths (bar 21, half-bar quintuplet), 6:4 and 7:4 (bars 4, 22), 2:3 duplets and 4:3 quadruplets in 6/8 and 12/8 (bars 14-16, 18), 3:2 sixteenth and 32nd triplets (bars 19-20); tuplets containing rests (bars 3, 12) and mixed values (quarter+eighth, bars 3, 11, 22); the four triplets of bar 6 print no \"3\" and no bracket (implied) and must still be 3:2. Time signatures take effect at bars 1 (C), 9 (2/2 cut symbol), 14 (6/8), 18 (12/8), 20 (4/4 numeric) - the courtesy signatures at the end of the preceding systems are not changes. Tie g''2 -> first note of a quarter-note triplet (bar 7); fermata on the quarter rest of bar 8 and on the final c'''. Pencil \"3\"s/fingerings in scan.pdf and scan-severe.pdf are not music.",
+    "lyrics": [],
+    "measures": 23,
+    "first_measure_number": 1
+  },
+  "truth_limitations": [
+    "<tuplet bracket=...> follows LilyPond's default: bracket omitted only when one beam covers exactly the tuplet; implied tuplets have bracket=\"no\" show-number=\"none\".",
+    "<beam> elements reproduce the engraved beam groups exactly (manual beaming); notes only - a rest inside a beam carries no <beam> element.",
+    "Pencil marks in the damaged scans (circles, fingering digits, a fake \"3\" above notes, ticks, words) are not part of the music and are absent from the truth."
+  ],
+  "degradations": {
+    "scan.pdf": {
+      "seed": 710101,
+      "render_dpi": 300,
+      "dpi": 300,
+      "color": "rgb",
+      "format": "jpeg",
+      "jpeg_quality": 45,
+      "jpeg_passes": 1,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            238,
+            228,
+            198
+          ],
+          "texture": 6
+        },
+        {
+          "op": "pencil",
+          "circles": 4,
+          "fake_triplets": 2,
+          "fingerings": 3,
+          "ticks": 2,
+          "words": [
+            "rit."
+          ]
+        },
+        {
+          "op": "rotate",
+          "deg": 1.8,
+          "bg": [
+            215,
+            215,
+            215
+          ]
+        },
+        {
+          "op": "gradient",
+          "strength": 0.12
+        },
+        {
+          "op": "blur",
+          "sigma": 0.6
+        },
+        {
+          "op": "noise",
+          "sigma": 4,
+          "chroma": 1.5
+        }
+      ],
+      "tags": [
+        "coloured_paper_rgb",
+        "paper_texture",
+        "pencil",
+        "rotation_+1.8deg",
+        "gradient",
+        "blur",
+        "noise",
+        "jpeg_q45"
+      ],
+      "output_pages": 2,
+      "pixel_size": [
+        2591,
+        3586
+      ],
+      "image_mode": "RGB",
+      "bytes": 661266,
+      "image_only_check": {
+        "image_only": true,
+        "fonts": [],
+        "images": 2,
+        "pages": 2,
+        "text_chars": 0
+      },
+      "op_log": [
+        {
+          "pencil_marks": [
+            [
+              "circle",
+              523,
+              3114
+            ],
+            [
+              "circle",
+              1191,
+              3141
+            ],
+            [
+              "circle",
+              1728,
+              3164
+            ],
+            [
+              "circle",
+              1659,
+              2233
+            ],
+            [
+              "fake_3",
+              831,
+              1214
+            ],
+            [
+              "fake_3",
+              1550,
+              2109
+            ],
+            [
+              "digit",
+              1974
+            ],
+            [
+              "digit",
+              592
+            ],
+            [
+              "digit",
+              832
+            ],
+            [
+              "tick",
+              1308
+            ],
+            [
+              "tick",
+              1610
+            ],
+            [
+              "word",
+              "rit.",
+              1071
+            ],
+            [
+              "bracket",
+              986
+            ]
+          ]
+        },
+        {
+          "pencil_marks": [
+            [
+              "circle",
+              471,
+              2016
+            ],
+            [
+              "circle",
+              2293,
+              215
+            ],
+            [
+              "circle",
+              349,
+              230
+            ],
+            [
+              "circle",
+              1166,
+              2049
+            ],
+            [
+              "fake_3",
+              1540,
+              73
+            ],
+            [
+              "fake_3",
+              1143,
+              1864
+            ],
+            [
+              "digit",
+              1701
+            ],
+            [
+              "digit",
+              1723
+            ],
+            [
+              "digit",
+              1130
+            ],
+            [
+              "tick",
+              1660
+            ],
+            [
+              "tick",
+              539
+            ],
+            [
+              "word",
+              "rit.",
+              1890
+            ],
+            [
+              "bracket",
+              1359
+            ]
+          ]
+        }
+      ]
+    },
+    "scan-mild.pdf": {
+      "seed": 710102,
+      "render_dpi": 300,
+      "dpi": 300,
+      "color": "gray",
+      "format": "jpeg",
+      "jpeg_quality": 60,
+      "jpeg_passes": 1,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            246,
+            246,
+            244
+          ],
+          "texture": 2
+        },
+        {
+          "op": "rotate",
+          "deg": -0.5,
+          "bg": 240
+        },
+        {
+          "op": "blur",
+          "sigma": 0.4
+        },
+        {
+          "op": "noise",
+          "sigma": 2
+        }
+      ],
+      "tags": [
+        "paper_texture",
+        "rotation_-0.5deg",
+        "blur",
+        "noise",
+        "jpeg_q60"
+      ],
+      "output_pages": 2,
+      "pixel_size": [
+        2513,
+        3530
+      ],
+      "image_mode": "L",
+      "bytes": 469978,
+      "image_only_check": {
+        "image_only": true,
+        "fonts": [],
+        "images": 2,
+        "pages": 2,
+        "text_chars": 0
+      },
+      "op_log": []
+    },
+    "scan-severe.pdf": {
+      "seed": 710103,
+      "render_dpi": 150,
+      "dpi": 150,
+      "color": "rgb",
+      "format": "jpeg",
+      "jpeg_quality": 20,
+      "jpeg_passes": 1,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            240,
+            236,
+            226
+          ],
+          "texture": 4
+        },
+        {
+          "op": "curl",
+          "side": "gutter",
+          "amp": 35,
+          "width": 0.3
+        },
+        {
+          "op": "gutter",
+          "side": "gutter",
+          "width": 0.08,
+          "dark": 0.6
+        },
+        {
+          "op": "two_up",
+          "seam_px": 6,
+          "seam": 40
+        },
+        {
+          "op": "perspective",
+          "margin": 0.04,
+          "jitter": 0.02,
+          "keystone": 0.03,
+          "bg": [
+            60,
+            55,
+            50
+          ]
+        },
+        {
+          "op": "vignette",
+          "strength": 0.3
+        },
+        {
+          "op": "motion_blur",
+          "length": 5,
+          "angle": 10
+        },
+        {
+          "op": "noise",
+          "sigma": 6,
+          "chroma": 2
+        }
+      ],
+      "tags": [
+        "coloured_paper_rgb",
+        "paper_texture",
+        "curl",
+        "gutter",
+        "double_page_spread_2up",
+        "perspective_phone_capture",
+        "vignette",
+        "motion_blur",
+        "noise",
+        "jpeg_q20"
+      ],
+      "output_pages": 1,
+      "pixel_size": [
+        2683,
+        1952
+      ],
+      "image_mode": "RGB",
+      "bytes": 132516,
+      "image_only_check": {
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "pages": 1,
+        "text_chars": 0
+      },
+      "op_log": []
+    }
+  },
+  "dpi": 300,
+  "license": "CC0-1.0 (music composed for this corpus; engraving, truth and scans CC0)",
+  "source": "Composed for this corpus (CC0).",
+  "pages": 2,
+  "files": {
+    "truth": "truth.musicxml",
+    "engraving": "engraving.ly",
+    "clean": "clean.pdf",
+    "scan": "scan.pdf",
+    "scan_mild": "scan-mild.pdf",
+    "scan_severe": "scan-severe.pdf",
+    "attribution": "ATTRIBUTION.txt"
+  },
+  "clean": {
+    "dpi": 300,
+    "pages": 2,
+    "ops": [],
+    "note": "undamaged raster render",
+    "image_only": true,
+    "fonts": [],
+    "images": 2,
+    "text_chars": 0
+  },
+  "validation": {
+    "truth_xsd_valid": true,
+    "engraving_event_dump_matches_truth": true,
+    "engraving_events_compared": 223,
+    "lyric_events_compared": 0,
+    "time_signatures_compared": 5,
+    "midi_attacks_match_truth": true,
+    "midi_attacks": 150,
+    "midi_grace_notes_excluded": 0,
+    "music21_reparse_matches_model": true,
+    "lyric_text_found_in_engraving": null,
+    "lilypond_warnings": [],
+    "method": "LilyPond event-dump engraver (rsynth/dump.ly) compared with the model the truth is written from: every note/rest/multi-bar rest (onset, pitch, notated type, dots, tuplet scale), grace offsets, ties, beam starts/stops, slurs, fermatas, lyric syllables/hyphens/extenders, bar numbers/measure positions and time signatures; plus MIDI attack multiset and a music21 re-parse of truth.musicxml."
+  },
+  "generator": "corpus/challenge/rhythm/_tools/run_all.py (rsynth/items.py, build.py, scan.py)"
+}

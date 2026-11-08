@@ -44,6 +44,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 16:21 | Round 1 shipped: aggregate 0.589 → 0.884, real scans 0.618 → 0.865, 0 crashes, all 20 outputs schema-valid, browser check passed at 1280 and 400 px in light and dark. Nothing reverted: removing any owner’s change lowered the score. App republished and pushed (GitHub Pages redeploys). |
 | 16:21 | Round 2 started: 5 owners in parallel working on beamed 8ths/16ths and dense chords, broken bass-staff clefs, tuplets and mid-staff clef changes, missing dots and flags, barline reconciliation, lyric voice assignment, merged OCR words, part-name labels, the 8-page cap and the stanza verses below the music; then integrate and ship. |
 | 16:28 | All times on this page and in the repo timeline are now Sydney daylight time (AEDT, UTC+11). |
+| 16:28 | Challenge set validated: 123 items, 365 image-only scans, all truths verified against LilyPond. Baseline with round 1 code: 0.747 (OCR), 0 crashes, but 35 files produce no notes. Worst: 90° pages, halftone screens, heavy noise, 2-up spreads, tuplets (8 divisions per quarter cannot represent them), double dots, multi-bar rests, double accidentals, 8va, mid-piece key/time changes, C clefs, two voices inside one part, bracketed instrument pairs read as piano. Nine new limits (L10–L18) queued for round 3. Committed to the repo except the 300 MB of scan-damage PDFs, which rebuild in about 40 s. |
 
 ## Accuracy by round
 
@@ -53,6 +54,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 |---|---|---|---|---|---|---|---|
 | v1 baseline | 0.589 | 0.493 | 0.542 | 0.439 | 0.727 | 1.000 | 0.618 |
 | Round 1 (shipped) | 0.884 | 0.863 | 0.822 | 0.817 | 0.987 | 1.000 | 0.865 |
+| Challenge set baseline (round 1 code, OCR) | 0.747 | – | – | – | – | – | – |
 
 ## Known limits
 
@@ -73,6 +75,15 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | L7 | Lyrics attached to every part in closed score (3–4× too many syllables) | Voices + lyrics | Resolved (round 1) | Lyrics between staves go to the upper voice only; lines under the lowest split staff go to both its voices; copying to every voice is opt-in. Lyrics 0.60 → 0.82. |
 | L8 | Lyric text or other glyphs read as noteheads on single-melody pages | Noteheads and staves | Resolved (round 1) | A notehead outside the staff must sit on or next to ledger lines, which removes lyric letters, tuplet numbers and dynamics. Jeanie 0.48 → 0.88, Silent Night 0.56 → 0.96. |
 | L9 | Part names generic or wrong (open score shows Staff N; TTBB named SATB, with an octave error) | Voices + lyrics | Resolved (round 1) | Part names from the clef pattern: SATB, TTBB (new treble-8vb clef), SSAA, SAB, solo above SATB, Voice. Reading printed name labels is still tracked under L3e. |
+| L10 | Pages rotated 90° produce nothing; 180° pages read badly (pitch 0.21) | Noteheads and staves (page orientation) | Queued for round 3 | Challenge baseline: rot90 0.15 (all 12 files empty), rot180 0.50. |
+| L11 | Halftone screens and heavy noise blank the page | Noteheads and staves (binarisation) | Queued for round 3 | Challenge: halftone 0.37 (6 of 12 empty), noise 0.50; 35 of 365 files produce no notes. |
+| L12 | Two-page spreads read as one wide system (8–13 parts) | Noteheads and staves (page split) | Queued for round 3 | Challenge: 2-up spread 0.56. |
+| L13 | Tuplets cannot be represented: 8 divisions per quarter | Symbols + voices + MusicXML | Queued for round 3 | Challenge: 0.2% of 461 tuplet notes have the right duration. Needs divisions 24+ and tuplet markup. |
+| L14 | Double dots, multi-bar rests and whole-bar rests | Symbols + voices | Queued for round 3 | Challenge: double-dotted 0%; rh04 26 bars instead of 40; whole-bar rests 17%. |
+| L15 | Double sharps/flats and 8va/8vb brackets | Symbols | Queued for round 3 | Challenge: double accidentals 1 of 9 pitches; 9% under 8va. |
+| L16 | Key and time-signature changes mid-piece not written; C clefs (alto/tenor) | Symbols + voices | Queued for round 3 | Challenge: later keys 31%, time changes 35%, C clefs 29%. (Overlaps L3d.) |
+| L17 | Two voices inside one part (piano right hand, divisi) merged into chords | Voices + MusicXML | Queued for round 3 | Challenge: always merged in 9 pieces. |
+| L18 | A bracketed instrument pair (violin + cello) read as a piano grand staff; organ pedal staff becomes a separate part | Voices (layout) | Queued for round 3 | Challenge: trio and clef-carousel read as Piano; organ comes out Piano + Voice. |
 
 ## Runs
 
@@ -82,7 +93,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | Run 2 | Scanned-PDF design | stopped | 0 of 4 | Stopped at 14:58 AEDT to restart with more agents in parallel. |
 | Run 3 | Max-parallel main workflow | running | 6 of 7 | Research only from here. It will be stopped when research returns; the full rebuild was dropped in favour of fix-forward rounds on v1. |
 | Run 4 | Fix-forward round 1 (shipped 0.884) | done | 7 of 7 |  |
-| Run 5 | Challenge test set (edge cases + scan damage) | running | 6 of 7 |  |
+| Run 5 | Challenge test set (edge cases + scan damage) | running | 7 of 7 |  |
 | Run 6 | Fix-forward round 2 | running | 0 of 5 |  |
 | Side | Agents launched directly from the session | running | 2 of 2 |  |
 
@@ -102,7 +113,7 @@ Every agent started for this build, including stopped runs. Outcomes are on the 
 | Run 2 | Research | research:corpus | stopped | 14:57 | 14:57 | 0 | 0 |
 | Run 3 | Research | web:omr | done | 14:58 | 15:11 | 13 | 77 |
 | Run 3 | Research | web:voices | done | 14:58 | 15:15 | 17 | 120 |
-| Run 3 | Research | spike:ml | run | 14:58 |  | 75 | 184 |
+| Run 3 | Research | spike:ml | run | 14:58 |  | 90 | 184 |
 | Run 3 | Research | spike:classical | done | 14:58 | 15:50 | 52 | 120 |
 | Run 3 | Research | spike:ocr | done | 14:58 | 15:58 | 60 | 129 |
 | Run 3 | Research | corpus:synthetic | done | 14:58 | 15:42 | 44 | 82 |
@@ -120,11 +131,11 @@ Every agent started for this build, including stopped runs. Outcomes are on the 
 | Run 5 | Generate | gen:lyrics | done | 15:55 | 16:10 | 15 | 83 |
 | Run 5 | Generate | gen:layout | done | 15:55 | 16:18 | 23 | 120 |
 | Run 5 | Generate | gen:degradation | done | 15:55 | 16:12 | 17 | 87 |
-| Run 5 | Validate | validate+baseline | run | 16:18 |  | 10 | 67 |
-| Run 6 | Fix | fix:r2:heads | run | 16:21 |  | 7 | 80 |
-| Run 6 | Fix | fix:r2:symbols | run | 16:21 |  | 6 | 69 |
-| Run 6 | Fix | fix:r2:score | run | 16:21 |  | 7 | 52 |
-| Run 6 | Fix | fix:r2:lyrics | run | 16:21 |  | 6 | 49 |
-| Run 6 | Fix | fix:r2:ui | run | 16:21 |  | 6 | 33 |
+| Run 5 | Validate | validate+baseline | done | 16:18 | 16:28 | 10 | 70 |
+| Run 6 | Fix | fix:r2:heads | run | 16:21 |  | 7 | 87 |
+| Run 6 | Fix | fix:r2:symbols | run | 16:21 |  | 7 | 73 |
+| Run 6 | Fix | fix:r2:score | run | 16:21 |  | 7 | 54 |
+| Run 6 | Fix | fix:r2:lyrics | run | 16:21 |  | 7 | 56 |
+| Run 6 | Fix | fix:r2:ui | run | 16:21 |  | 7 | 37 |
 | Side | Fast track | First version build (mvp/) | done | 15:19 | 15:29 | 10 | 69 |
 | Side | Fast track | Software design document | done | 15:20 | 15:22 | 2 | 16 |

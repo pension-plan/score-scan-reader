@@ -1,0 +1,796 @@
+{
+ "id": "wind-melody-combo",
+ "category": "degradation",
+ "piece": "wind-melody",
+ "variant": "combo",
+ "title": "Who Has Seen the Wind? (melody, 2 verses) - combo",
+ "edge_cases": [
+  "lyrics",
+  "multi_verse",
+  "melody",
+  "pickup",
+  "melisma",
+  "slurs",
+  "unequal_verse_syllables",
+  "key_signature",
+  "time_3_4",
+  "large_staff",
+  "combined_damage",
+  "yellowed_paper",
+  "rgb_scan",
+  "bleed_through",
+  "pencil_annotations",
+  "circled_notes",
+  "coffee_stain",
+  "perspective_phone",
+  "page_curl",
+  "book_gutter_shadow",
+  "skew_large",
+  "punch_holes",
+  "foxing",
+  "blur_motion",
+  "jpeg_q25",
+  "low_dpi"
+ ],
+ "expected": {
+  "parts": [
+   "Voice"
+  ],
+  "must_not_split": false,
+  "shared_staves": [],
+  "notes": "Single-staff melody with two stacked verses. Verse 1 has one syllable fewer than verse 2 in line 3 (\"trem-_-bling\" vs \"bow down their heads\"): bar 6 beat 3 (c''8) carries a verse-2 syllable (\"their\") but NO verse-1 syllable. The final melisma \"pass-ing _\" is slurred in both verses. DAMAGE (combo): Everything at once. mild: aged paper, bleed-through, a few pencil marks, 3 deg skew, JPEG 60. scan: phone photo (250 dpi) of an aged, stained, pencil-marked page with hand shadow, JPEG 50. severe: 150 dpi book scan with curl + gutter, -7 deg skew, foxing, 25% bleed-through, stain, pencil + ballpoint marks, punch holes, motion blur, noise and JPEG 25 - a worst case. TRUTH LIMITATIONS: Handwritten marks, stains, foxing and ghost notes are not music and are not in the truth. Severe is intentionally at (or beyond) the limit of human legibility at 150 dpi."
+ },
+ "truth_limitations": "Handwritten marks, stains, foxing and ghost notes are not music and are not in the truth. Severe is intentionally at (or beyond) the limit of human legibility at 150 dpi.",
+ "truth_scope": "truth.musicxml (MusicXML 4.0 partwise, XSD-valid) encodes parts/part-list (+ part-group bracket for the choir), staves, voices, pitches, durations, rests, ties, slurs, lyrics (verse number, syllabic, extend), dynamics, fermatas, staccatos, stems, clefs, key/time signatures and barline styles. It does NOT encode beams (LilyPond auto-beams), system/page breaks, bar-number display, header layout or any handwritten/damage marks. The same truth file is shared by every damaged variant of a piece.",
+ "degradations": {
+  "scan.pdf": {
+   "seed": 429892066,
+   "dpi": 250,
+   "pages": 1,
+   "image_px": [
+    [
+     511,
+     700
+    ]
+   ],
+   "image_mode": [
+    "RGB"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 250,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": [
+       236,
+       224,
+       192
+      ],
+      "texture": 5,
+      "fibers": 20,
+      "age_edges": 0.35
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": [
+      55,
+      45,
+      36
+     ],
+     "stage": "content"
+    },
+    {
+     "op": "ink_var",
+     "params": 20,
+     "stage": "content"
+    },
+    {
+     "op": "stains",
+     "params": [
+      {
+       "x_mm": 20.091577715870695,
+       "y_mm": 88.44039288395967,
+       "radius_mm": 32,
+       "strength": 1.0
+      }
+     ],
+     "stage": "content"
+    },
+    {
+     "op": "annotations",
+     "params": [
+      {
+       "tool": "pencil",
+       "vocab": "melody",
+       "circles": 4,
+       "texts": 3,
+       "breaths": 2,
+       "fingerings": 0,
+       "alpha": 0.7
+      }
+     ],
+     "stage": "content"
+    },
+    {
+     "op": "perspective",
+     "params": {
+      "jitter": 0.04,
+      "keystone": 0.05,
+      "margin": 0.06,
+      "_corners_src": [
+       [
+        -27.8,
+        82.1
+       ],
+       [
+        2356.9,
+        50.2
+       ],
+       [
+        2277.5,
+        3236.6
+       ],
+       [
+        -5.9,
+        3082.3
+       ]
+      ]
+     },
+     "stage": "global"
+    },
+    {
+     "op": "shadow",
+     "params": {
+      "strength": 0.35,
+      "pos": 0.2,
+      "angle": 60
+     },
+     "stage": "global"
+    },
+    {
+     "op": "vignette",
+     "params": {
+      "strength": 0.25
+     },
+     "stage": "global"
+    },
+    {
+     "op": "blur",
+     "params": {
+      "sigma": 1.0
+     },
+     "stage": "global"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 5,
+      "chroma": 3
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       104,
+       84,
+       66
+      ],
+      "noise": 4,
+      "texture": 18
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "RGB",
+      "format": "jpeg",
+      "quality": 50,
+      "subsampling": 2
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": [
+    [
+     {
+      "type": "stain",
+      "x_mm": 20.1,
+      "y_mm": 88.4,
+      "radius_mm": 32
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 14.6,
+      "y_mm": 41.6
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 70.4,
+      "y_mm": 185.3
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 57.6,
+      "y_mm": 91.2
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 13.0,
+      "y_mm": 144.0
+     },
+     {
+      "type": "handwritten_text",
+      "text": "legato",
+      "x_mm": 94.0,
+      "y_mm": 33.8
+     },
+     {
+      "type": "handwritten_text",
+      "text": "lift",
+      "x_mm": 122.3,
+      "y_mm": 78.3
+     },
+     {
+      "type": "handwritten_text",
+      "text": "mf",
+      "x_mm": 100.3,
+      "y_mm": 125.3
+     },
+     {
+      "type": "breath_tick",
+      "x_mm": 161.9,
+      "y_mm": 84.1
+     },
+     {
+      "type": "breath_tick",
+      "x_mm": 96.6,
+      "y_mm": 177.1
+     }
+    ]
+   ]
+  },
+  "scan-mild.pdf": {
+   "seed": 429892067,
+   "dpi": 300,
+   "pages": 1,
+   "image_px": [
+    [
+     519,
+     700
+    ]
+   ],
+   "image_mode": [
+    "RGB"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 300,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": [
+       242,
+       234,
+       212
+      ],
+      "texture": 4,
+      "age_edges": 0.2
+     },
+     "stage": "content"
+    },
+    {
+     "op": "bleed",
+     "params": {
+      "amount": 0.1,
+      "blur": 2.0
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": [
+      45,
+      40,
+      35
+     ],
+     "stage": "content"
+    },
+    {
+     "op": "annotations",
+     "params": [
+      {
+       "tool": "pencil",
+       "vocab": "melody",
+       "circles": 2,
+       "texts": 1,
+       "fingerings": 0,
+       "alpha": 0.6
+      }
+     ],
+     "stage": "content"
+    },
+    {
+     "op": "bed",
+     "params": {
+      "margin_mm": 5
+     },
+     "stage": "global"
+    },
+    {
+     "op": "rotate",
+     "params": {
+      "deg": 3.0
+     },
+     "stage": "global"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 3
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       236,
+       236,
+       234
+      ],
+      "noise": 2,
+      "edge_shadow": 0.35
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "RGB",
+      "format": "jpeg",
+      "quality": 60,
+      "subsampling": 2
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": [
+    [
+     {
+      "type": "circled_note",
+      "x_mm": 28.0,
+      "y_mm": 141.1
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 28.4,
+      "y_mm": 90.2
+     },
+     {
+      "type": "handwritten_text",
+      "text": "legato",
+      "x_mm": 55.6,
+      "y_mm": 52.4
+     }
+    ]
+   ]
+  },
+  "scan-severe.pdf": {
+   "seed": 429892068,
+   "dpi": 150,
+   "pages": 1,
+   "image_px": [
+    [
+     540,
+     700
+    ]
+   ],
+   "image_mode": [
+    "RGB"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 150,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "fade",
+     "params": 0.15,
+     "stage": "content"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": [
+       228,
+       210,
+       165
+      ],
+      "texture": 7,
+      "fibers": 50,
+      "age_edges": 0.5
+     },
+     "stage": "content"
+    },
+    {
+     "op": "bleed",
+     "params": {
+      "amount": 0.25,
+      "blur": 1.8,
+      "color": [
+       110,
+       85,
+       60
+      ]
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": [
+      70,
+      55,
+      40
+     ],
+     "stage": "content"
+    },
+    {
+     "op": "ink_var",
+     "params": 35,
+     "stage": "content"
+    },
+    {
+     "op": "stains",
+     "params": [
+      {
+       "x_mm": 149.0912661843085,
+       "y_mm": 181.58389880560713,
+       "radius_mm": 38,
+       "strength": 1.2
+      }
+     ],
+     "stage": "content"
+    },
+    {
+     "op": "foxing",
+     "params": {
+      "n": 80,
+      "strength": 0.5
+     },
+     "stage": "content"
+    },
+    {
+     "op": "annotations",
+     "params": [
+      {
+       "tool": "pencil",
+       "vocab": "melody",
+       "circles": 6,
+       "texts": 4,
+       "breaths": 3,
+       "arrows": 1,
+       "fingerings": 0,
+       "alpha": 0.8
+      },
+      {
+       "tool": "pen",
+       "vocab": "melody",
+       "circles": 2,
+       "texts": 1,
+       "color": [
+        35,
+        55,
+        160
+       ],
+       "alpha": 0.85
+      }
+     ],
+     "stage": "content"
+    },
+    {
+     "op": "holes",
+     "params": {
+      "x_mm": 9,
+      "offsets_mm": [
+       -40,
+       40
+      ],
+      "diam_mm": 6
+     },
+     "stage": "content"
+    },
+    {
+     "op": "curl",
+     "params": {
+      "amp_mm": 8,
+      "width": 0.3,
+      "shade": 0.3
+     },
+     "stage": "page_geometry"
+    },
+    {
+     "op": "gutter",
+     "params": {
+      "width": 0.08,
+      "dark": 0.6
+     },
+     "stage": "page_geometry"
+    },
+    {
+     "op": "bed",
+     "params": {
+      "margin_mm": 5
+     },
+     "stage": "global"
+    },
+    {
+     "op": "rotate",
+     "params": {
+      "deg": -7.0
+     },
+     "stage": "global"
+    },
+    {
+     "op": "vignette",
+     "params": {
+      "strength": 0.2
+     },
+     "stage": "global"
+    },
+    {
+     "op": "motion",
+     "params": {
+      "length": 5,
+      "angle": 80
+     },
+     "stage": "global"
+    },
+    {
+     "op": "blur",
+     "params": {
+      "sigma": 0.9
+     },
+     "stage": "global"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 8,
+      "chroma": 3
+     },
+     "stage": "global"
+    },
+    {
+     "op": "saltpepper",
+     "params": {
+      "amount": 0.003
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       32,
+       32,
+       34
+      ],
+      "noise": 4,
+      "texture": 4
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "RGB",
+      "format": "jpeg",
+      "quality": 25,
+      "subsampling": 2
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": [
+    [
+     {
+      "type": "stain",
+      "x_mm": 149.1,
+      "y_mm": 181.6,
+      "radius_mm": 38
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 27.5,
+      "y_mm": 90.0
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 86.4,
+      "y_mm": 92.2
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 27.8,
+      "y_mm": 182.3
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 13.3,
+      "y_mm": 190.3
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 14.6,
+      "y_mm": 85.0
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 181.9,
+      "y_mm": 140.1
+     },
+     {
+      "type": "handwritten_text",
+      "text": "rubato",
+      "x_mm": 53.5,
+      "y_mm": 32.7
+     },
+     {
+      "type": "handwritten_text",
+      "text": "p",
+      "x_mm": 148.5,
+      "y_mm": 170.6
+     },
+     {
+      "type": "handwritten_text",
+      "text": "breathe",
+      "x_mm": 120.3,
+      "y_mm": 79.9
+     },
+     {
+      "type": "handwritten_text",
+      "text": "p",
+      "x_mm": 73.4,
+      "y_mm": 32.6
+     },
+     {
+      "type": "breath_tick",
+      "x_mm": 190.1,
+      "y_mm": 130.2
+     },
+     {
+      "type": "breath_comma",
+      "x_mm": 42.6,
+      "y_mm": 37.1
+     },
+     {
+      "type": "breath_tick",
+      "x_mm": 185.1,
+      "y_mm": 175.9
+     },
+     {
+      "type": "arrow",
+      "x_mm": 47.6,
+      "y_mm": 147.7
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 86.2,
+      "y_mm": 92.8
+     },
+     {
+      "type": "circled_note",
+      "x_mm": 49.5,
+      "y_mm": 183.6
+     },
+     {
+      "type": "handwritten_text",
+      "text": "rubato",
+      "x_mm": 41.8,
+      "y_mm": 99.7
+     },
+     {
+      "type": "punch_hole",
+      "x_mm": 9,
+      "y_mm": 108.5,
+      "diam_mm": 6
+     },
+     {
+      "type": "punch_hole",
+      "x_mm": 9,
+      "y_mm": 188.5,
+      "diam_mm": 6
+     }
+    ]
+   ]
+  },
+  "clean.pdf": {
+   "seed": null,
+   "dpi": 250,
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 250,
+     "tool": "pdftoppm -gray (LilyPond PDF)"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "png"
+     }
+    }
+   ]
+  }
+ },
+ "dpi": 250,
+ "license": "Text public domain (Christina Rossetti, Sing-Song, 1872); melody and engraving CC0-1.0",
+ "files": {
+  "scan": "wind-melody-combo/scan.pdf",
+  "scan_mild": "wind-melody-combo/scan-mild.pdf",
+  "scan_severe": "wind-melody-combo/scan-severe.pdf",
+  "clean": "wind-melody-combo/clean.pdf",
+  "truth": "wind-melody-combo/truth.musicxml",
+  "engraving": "wind-melody-combo/engraving.ly"
+ },
+ "measures": 11,
+ "vector_pages": 1,
+ "lyrics": [
+  {
+   "part": "Voice",
+   "verses": 2
+  }
+ ],
+ "shares_truth_with": [
+  "wind-melody-clean",
+  "wind-melody-skew",
+  "wind-melody-rot90",
+  "wind-melody-rot180",
+  "wind-melody-phone",
+  "wind-melody-book",
+  "wind-melody-yellowed",
+  "wind-melody-bleed",
+  "wind-melody-stain-pencil",
+  "wind-melody-holes-staple",
+  "wind-melody-crop",
+  "wind-melody-halftone",
+  "wind-melody-jpeg",
+  "wind-melody-photocopy-thin",
+  "wind-melody-photocopy-thick",
+  "wind-melody-lowdpi",
+  "wind-melody-highdpi",
+  "wind-melody-blur",
+  "wind-melody-noise",
+  "wind-melody-spread"
+ ],
+ "validation": {
+  "truth_xsd_valid": true,
+  "midi_attacks_match_truth": true,
+  "attacks": 25,
+  "midi_lyric_events_match_truth": true,
+  "lyric_syllables": 47,
+  "lyric_text_found_in_engraving_pdf": 1.0,
+  "lilypond_warnings": [],
+  "scan_files_image_only": {
+   "scan.pdf": true,
+   "scan-mild.pdf": true,
+   "scan-severe.pdf": true,
+   "clean.pdf": true
+  }
+ },
+ "origin": "synthetic-scan (challenge: degradation extremes)",
+ "seed": 429892066
+}

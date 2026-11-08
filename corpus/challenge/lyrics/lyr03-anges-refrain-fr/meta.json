@@ -1,0 +1,310 @@
+{
+  "id": "lyr03-anges-refrain-fr",
+  "category": "lyrics",
+  "title": "Les anges dans nos campagnes - 4 French stanzas + shared refrain line",
+  "edge_cases": [
+    "refrain_shared_line",
+    "stacked_verses_4",
+    "verse_numbers",
+    "french_diacritics",
+    "oe_ligature",
+    "diaeresis",
+    "french_punctuation_nbsp",
+    "apostrophe_elision",
+    "elision_tie",
+    "long_melisma",
+    "hyphen_across_melisma",
+    "melody_only",
+    "phone_photo",
+    "rotated_90"
+  ],
+  "expected": {
+    "must_not_split": false,
+    "shared_staves": [],
+    "notes": "Single melody part. Verse section (bars 1-8): four stacked lines, lyric numbers 1-4. Refrain (bars 9-20): text printed ONCE on the first line and sung after every stanza; truth encodes it only as lyric number 1 (lyric/@name=\"refrain\"); lines 2-4 have no syllables in the refrain. \"Glo-\" is held over a 16-note melisma (hyphen, syllabic begin, no extend). Stanza 4 has an elision \"dre‿hom\" (two syllables on one note: <elision>). French punctuation is preceded by a no-break space (U+00A0) exactly as printed; a lenient scorer may normalise whitespace. scan-severe.pdf is a phone photo rotated 90 degrees.",
+    "parts": [
+      "Voice"
+    ]
+  },
+  "lyric_lines": [
+    {
+      "part": "Voice",
+      "lyric_number": 1,
+      "syllables": 50,
+      "elisions": 0,
+      "extenders": 0
+    },
+    {
+      "part": "Voice",
+      "lyric_number": 2,
+      "syllables": 32,
+      "elisions": 0,
+      "extenders": 0
+    },
+    {
+      "part": "Voice",
+      "lyric_number": 3,
+      "syllables": 32,
+      "elisions": 0,
+      "extenders": 0
+    },
+    {
+      "part": "Voice",
+      "lyric_number": 4,
+      "syllables": 32,
+      "elisions": 1,
+      "extenders": 0
+    }
+  ],
+  "truth_limitations": [
+    "Truth encodes pitches, durations, rests, ties, slurs, fermatas, stem directions of voices sharing a staff, lyrics (number, syllabic, text, elision, extend) and the part/staff structure; it has no <beam>, no system or page breaks, no positions and no font sizes.",
+    "Printed stanza labels (\"1.\", \"2.\" ...) are not encoded; lyric/@number carries the line number.",
+    "Only title, composer, lyricist and rights are encoded from the header; subtitle and the printed poet/composer lines are not encoded as credits.",
+    "LilyPond drops the hyphen when two syllables of a word are printed very close together; truth syllabic (begin/middle/end) still follows the word structure.",
+    "Scan damage (pencil marks, handwritten words, stains, holes, staples, cropped margins) is not part of the truth.",
+    "The refrain text is printed once (line 1) and encoded only as lyric number 1; a converter that copies it into lines 2-4 will differ from this truth.",
+    "French no-break spaces (U+00A0) before ; : ! ? are part of the syllable text."
+  ],
+  "text_block_stanzas": [],
+  "degradations": {
+    "scan.pdf": {
+      "seed": 5301,
+      "dpi": 200,
+      "mode": "rgb",
+      "jpeg_quality": 50,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "page_ops": [],
+      "ops": [
+        {
+          "op": "paper",
+          "color": [
+            236,
+            228,
+            210
+          ],
+          "texture": 6
+        },
+        {
+          "op": "curl",
+          "side": "right",
+          "amp": 18,
+          "width": 0.3,
+          "fill": [
+            236,
+            228,
+            210
+          ]
+        },
+        {
+          "op": "phone",
+          "margin": 0.06,
+          "bg": [
+            95,
+            80,
+            62
+          ],
+          "keystone": 0.05,
+          "jitter": 0.015
+        },
+        {
+          "op": "lighting",
+          "gradient": 0.25,
+          "vignette": 0.25,
+          "tint": [
+            255,
+            244,
+            225
+          ]
+        },
+        {
+          "op": "blur",
+          "sigma": 1.0
+        },
+        {
+          "op": "noise",
+          "sigma": 4,
+          "chroma": 2
+        }
+      ],
+      "tags": [
+        "coloured_paper",
+        "page_curl",
+        "phone_perspective",
+        "uneven_lighting",
+        "focus_blur",
+        "gaussian_noise",
+        "rgb_scan",
+        "jpeg_q50"
+      ],
+      "output_pages": 1,
+      "page_pixels": [
+        [
+          1852,
+          2537
+        ]
+      ],
+      "annotations": [],
+      "bytes": 264671
+    },
+    "scan-mild.pdf": {
+      "seed": 5302,
+      "dpi": 300,
+      "mode": "rgb",
+      "jpeg_quality": 60,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "page_ops": [],
+      "ops": [
+        {
+          "op": "paper",
+          "color": [
+            242,
+            234,
+            212
+          ],
+          "texture": 4
+        },
+        {
+          "op": "rotate",
+          "deg": 0.7,
+          "fill": [
+            242,
+            234,
+            212
+          ]
+        }
+      ],
+      "tags": [
+        "coloured_paper",
+        "skew_0.7deg",
+        "rgb_scan",
+        "jpeg_q60"
+      ],
+      "output_pages": 1,
+      "page_pixels": [
+        [
+          2481,
+          3508
+        ]
+      ],
+      "annotations": [],
+      "bytes": 419760
+    },
+    "scan-severe.pdf": {
+      "seed": 5303,
+      "dpi": 150,
+      "mode": "rgb",
+      "jpeg_quality": 25,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "page_ops": [],
+      "ops": [
+        {
+          "op": "paper",
+          "color": [
+            232,
+            224,
+            205
+          ],
+          "texture": 7
+        },
+        {
+          "op": "curl",
+          "side": "left",
+          "amp": 26,
+          "width": 0.35,
+          "fill": [
+            232,
+            224,
+            205
+          ]
+        },
+        {
+          "op": "phone",
+          "margin": 0.08,
+          "bg": [
+            60,
+            55,
+            50
+          ],
+          "keystone": 0.09,
+          "jitter": 0.03
+        },
+        {
+          "op": "lighting",
+          "gradient": 0.45,
+          "vignette": 0.4,
+          "blotch": 0.2
+        },
+        {
+          "op": "motion",
+          "length": 7,
+          "angle": 75
+        },
+        {
+          "op": "rot90",
+          "k": 1
+        },
+        {
+          "op": "noise",
+          "sigma": 7,
+          "chroma": 3
+        }
+      ],
+      "tags": [
+        "coloured_paper",
+        "page_curl",
+        "phone_perspective",
+        "uneven_lighting",
+        "motion_blur",
+        "rotated_90deg",
+        "gaussian_noise",
+        "rgb_scan",
+        "jpeg_q25",
+        "low_dpi_150"
+      ],
+      "output_pages": 1,
+      "page_pixels": [
+        [
+          1952,
+          1439
+        ]
+      ],
+      "annotations": [],
+      "bytes": 109462
+    }
+  },
+  "dpi": 200,
+  "license": "Text: public domain (traditional French carol). Music: CC0-1.0 (own melody after the carol).",
+  "source": "Own melody; traditional French text \"Les anges dans nos campagnes\" (stanzas 1-4).",
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "scan-mild.pdf",
+    "scan-severe.pdf",
+    "scan.pdf",
+    "truth.musicxml"
+  ],
+  "measures": 20,
+  "engraved_pages": 1,
+  "validation": {
+    "truth_xsd_valid": true,
+    "midi_attacks_match_truth": true,
+    "attacks": 80,
+    "midi_lyrics_match_truth": true,
+    "lyric_lines_checked": 4,
+    "syllables_checked": 146,
+    "pdf_text_items_checked": 147,
+    "pdf_text_missing": 0,
+    "scans_image_only": {
+      "scan.pdf": true,
+      "scan-mild.pdf": true,
+      "scan-severe.pdf": true
+    },
+    "lilypond_warnings": []
+  },
+  "engraver": "model -> LilyPond 2.24 (custom writer, corpus/challenge/lyrics/_tools)"
+}

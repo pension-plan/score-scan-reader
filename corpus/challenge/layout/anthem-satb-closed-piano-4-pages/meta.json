@@ -1,0 +1,917 @@
+{
+  "id": "anthem-satb-closed-piano-4-pages",
+  "category": "layout",
+  "title": "All Things Bright and Beautiful - SATB closed score + piano, 4 pages, hidden choir staves, endings, D.S.",
+  "edge_cases": [
+    "satb_closed_score",
+    "choir_plus_piano",
+    "bracket_vs_brace",
+    "piano_two_voices_on_rh_staff",
+    "hidden_empty_staves",
+    "systems_with_different_staff_counts",
+    "multi_page_3_4",
+    "page_numbers",
+    "running_headers",
+    "volta_1st_2nd_endings",
+    "stacked_verses_in_repeat",
+    "segno",
+    "to_coda",
+    "ds_al_coda",
+    "coda",
+    "rehearsal_marks",
+    "tempo_text",
+    "dynamics_text",
+    "lyrics",
+    "lyrics_on_both_choir_staves",
+    "must_not_split",
+    "ties",
+    "fermata"
+  ],
+  "expected": {
+    "parts": [
+      "Soprano",
+      "Alto",
+      "Tenor",
+      "Bass",
+      "Piano"
+    ],
+    "must_not_split": true,
+    "shared_staves": [
+      [
+        "Soprano",
+        "Alto"
+      ],
+      [
+        "Tenor",
+        "Bass"
+      ]
+    ],
+    "staves_per_part": {
+      "Soprano": 1,
+      "Alto": 1,
+      "Tenor": 1,
+      "Bass": 1,
+      "Piano": 2
+    },
+    "lyrics": [
+      {
+        "part": "Soprano",
+        "verses": 2
+      },
+      {
+        "part": "Tenor",
+        "verses": 2
+      }
+    ],
+    "notes": "Five parts: Soprano, Alto, Tenor, Bass (closed score: S+A share the treble staff, T+B the bass staff, bracketed; each shared staff MUST be split into two parts by stem direction) and Piano (braced grand staff, ONE part, never split - its right hand has two voices in the verse, which must stay inside the piano part). Systems 1 (introduction) and 4 (interlude) show only the piano: the choir parts have invisible whole-measure rests there. The verse (mm. 15-23) is repeated: verse 1 and verse 2 are stacked; m.22 = 1st ending (verse 1 \"ny wings\"), m.23 = 2nd ending (verse 2 \"the sky\"). Segno m.5, To Coda after m.10, D.S. al Coda after m.23, Coda m.24 - notated order, not unrolled. Lyrics are under both choir staves; truth attaches them to Soprano and Tenor (Alto/Bass sing the same syllables on the same rhythm)."
+  },
+  "truth_limitations": "Lyrics are encoded on Soprano (verses 1-2) and Tenor (copied by onset), not on Alto/Bass. Choir rests in piano-only systems are print-object=\"no\". Beaming not encoded.",
+  "layout": "US letter, staff size 20, 8 systems on 4 pages (2 per page); piano-only systems at the start of page 1 and the end of page 2",
+  "pages": 4,
+  "measures": 27,
+  "notes_in_truth": 584,
+  "hidden_staff_systems": [
+    {
+      "staff": "sa",
+      "measures": [
+        1,
+        4
+      ]
+    },
+    {
+      "staff": "sa",
+      "measures": [
+        13,
+        14
+      ]
+    },
+    {
+      "staff": "tb",
+      "measures": [
+        1,
+        4
+      ]
+    },
+    {
+      "staff": "tb",
+      "measures": [
+        13,
+        14
+      ]
+    }
+  ],
+  "dpi": 200,
+  "degradations": {
+    "scan.pdf": {
+      "seed": 12001,
+      "render_dpi": 200,
+      "dpi": 200,
+      "format": "jpeg q40",
+      "colour": "rgb",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1700,
+            2200
+          ],
+          "ops": [
+            [
+              "page_curl",
+              {
+                "side": "right",
+                "amp": 30,
+                "width": 0.28
+              }
+            ],
+            [
+              "paper_texture",
+              5
+            ],
+            [
+              "paper_colour",
+              [
+                236,
+                226,
+                198
+              ]
+            ],
+            [
+              "gutter_shadow",
+              {
+                "side": "right",
+                "width": 0.07,
+                "dark": 0.6
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              1.2
+            ],
+            [
+              "vignette",
+              0.15
+            ],
+            [
+              "focus_blur_sigma",
+              0.7
+            ],
+            [
+              "gaussian_noise_sigma",
+              4
+            ]
+          ]
+        },
+        {
+          "image": 2,
+          "source_pages": [
+            2,
+            3
+          ],
+          "size_px": [
+            3400,
+            2200
+          ],
+          "ops": [
+            [
+              "p2",
+              "page_curl",
+              {
+                "side": "right",
+                "amp": 30,
+                "width": 0.28
+              }
+            ],
+            [
+              "p2",
+              "paper_texture",
+              5
+            ],
+            [
+              "p2",
+              "paper_colour",
+              [
+                236,
+                226,
+                198
+              ]
+            ],
+            [
+              "p2",
+              "gutter_shadow",
+              {
+                "side": "right",
+                "width": 0.07,
+                "dark": 0.6
+              }
+            ],
+            [
+              "p3",
+              "page_curl",
+              {
+                "side": "left",
+                "amp": 30,
+                "width": 0.28
+              }
+            ],
+            [
+              "p3",
+              "paper_texture",
+              5
+            ],
+            [
+              "p3",
+              "paper_colour",
+              [
+                236,
+                226,
+                198
+              ]
+            ],
+            [
+              "p3",
+              "gutter_shadow",
+              {
+                "side": "left",
+                "width": 0.07,
+                "dark": 0.6
+              }
+            ],
+            [
+              "spread_2up",
+              [
+                2,
+                3
+              ]
+            ],
+            [
+              "skew_rotation_deg",
+              1.2
+            ],
+            [
+              "vignette",
+              0.15
+            ],
+            [
+              "focus_blur_sigma",
+              0.7
+            ],
+            [
+              "gaussian_noise_sigma",
+              4
+            ]
+          ]
+        },
+        {
+          "image": 3,
+          "source_pages": [
+            4
+          ],
+          "size_px": [
+            1700,
+            2200
+          ],
+          "ops": [
+            [
+              "page_curl",
+              {
+                "side": "left",
+                "amp": 30,
+                "width": 0.28
+              }
+            ],
+            [
+              "paper_texture",
+              5
+            ],
+            [
+              "paper_colour",
+              [
+                236,
+                226,
+                198
+              ]
+            ],
+            [
+              "gutter_shadow",
+              {
+                "side": "left",
+                "width": 0.07,
+                "dark": 0.6
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              1.2
+            ],
+            [
+              "vignette",
+              0.15
+            ],
+            [
+              "focus_blur_sigma",
+              0.7
+            ],
+            [
+              "gaussian_noise_sigma",
+              4
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 200,
+        "mode": "rgb",
+        "paper_rgb": [
+          236,
+          226,
+          198
+        ],
+        "texture": 5,
+        "spread": [
+          [
+            1,
+            2
+          ]
+        ],
+        "gutter": {
+          "side": "inner",
+          "width": 0.07,
+          "dark": 0.6
+        },
+        "curl": {
+          "side": "inner",
+          "amp": 30,
+          "width": 0.28
+        },
+        "rotate": 1.2,
+        "vignette": 0.15,
+        "blur": 0.7,
+        "noise": 4,
+        "jpeg": 40
+      },
+      "summary": "bound octavo scanned as a book: pages 2-3 as ONE 2-up image (double-page spread) with gutter shadow and page curl at the spine, yellowed paper (RGB), slight skew, vignette, JPEG q40",
+      "bytes": 778221
+    },
+    "scan-mild.pdf": {
+      "seed": 12002,
+      "render_dpi": 300,
+      "dpi": 300,
+      "format": "jpeg q80",
+      "colour": "rgb",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            2550,
+            3300
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              3
+            ],
+            [
+              "paper_colour",
+              [
+                243,
+                236,
+                214
+              ]
+            ],
+            [
+              "gutter_shadow",
+              {
+                "side": "right",
+                "width": 0.04,
+                "dark": 0.3
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              -0.6
+            ],
+            [
+              "gaussian_noise_sigma",
+              2
+            ]
+          ]
+        },
+        {
+          "image": 2,
+          "source_pages": [
+            2
+          ],
+          "size_px": [
+            2550,
+            3300
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              3
+            ],
+            [
+              "paper_colour",
+              [
+                243,
+                236,
+                214
+              ]
+            ],
+            [
+              "gutter_shadow",
+              {
+                "side": "left",
+                "width": 0.04,
+                "dark": 0.3
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              -0.6
+            ],
+            [
+              "gaussian_noise_sigma",
+              2
+            ]
+          ]
+        },
+        {
+          "image": 3,
+          "source_pages": [
+            3
+          ],
+          "size_px": [
+            2550,
+            3300
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              3
+            ],
+            [
+              "paper_colour",
+              [
+                243,
+                236,
+                214
+              ]
+            ],
+            [
+              "gutter_shadow",
+              {
+                "side": "right",
+                "width": 0.04,
+                "dark": 0.3
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              -0.6
+            ],
+            [
+              "gaussian_noise_sigma",
+              2
+            ]
+          ]
+        },
+        {
+          "image": 4,
+          "source_pages": [
+            4
+          ],
+          "size_px": [
+            2550,
+            3300
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              3
+            ],
+            [
+              "paper_colour",
+              [
+                243,
+                236,
+                214
+              ]
+            ],
+            [
+              "gutter_shadow",
+              {
+                "side": "left",
+                "width": 0.04,
+                "dark": 0.3
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              -0.6
+            ],
+            [
+              "gaussian_noise_sigma",
+              2
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 300,
+        "mode": "rgb",
+        "paper_rgb": [
+          243,
+          236,
+          214
+        ],
+        "texture": 3,
+        "rotate": -0.6,
+        "gutter": {
+          "side": "inner",
+          "width": 0.04,
+          "dark": 0.3
+        },
+        "noise": 2,
+        "jpeg": 80
+      },
+      "summary": "flatbed 300 dpi RGB, cream paper, -0.6 deg skew, mild gutter",
+      "bytes": 2899005
+    },
+    "scan-severe.pdf": {
+      "seed": 12003,
+      "render_dpi": 200,
+      "dpi": 120,
+      "format": "jpeg q20",
+      "colour": "rgb",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1,
+            2
+          ],
+          "size_px": [
+            2244,
+            1524
+          ],
+          "ops": [
+            [
+              "p1",
+              "page_curl",
+              {
+                "side": "right",
+                "amp": 40,
+                "width": 0.3
+              }
+            ],
+            [
+              "p1",
+              "paper_texture",
+              6
+            ],
+            [
+              "p1",
+              "paper_colour",
+              [
+                236,
+                226,
+                198
+              ]
+            ],
+            [
+              "p1",
+              "gutter_shadow",
+              {
+                "side": "right",
+                "width": 0.08,
+                "dark": 0.7
+              }
+            ],
+            [
+              "p2",
+              "page_curl",
+              {
+                "side": "left",
+                "amp": 40,
+                "width": 0.3
+              }
+            ],
+            [
+              "p2",
+              "paper_texture",
+              6
+            ],
+            [
+              "p2",
+              "paper_colour",
+              [
+                236,
+                226,
+                198
+              ]
+            ],
+            [
+              "p2",
+              "gutter_shadow",
+              {
+                "side": "left",
+                "width": 0.08,
+                "dark": 0.7
+              }
+            ],
+            [
+              "spread_2up",
+              [
+                1,
+                2
+              ]
+            ],
+            [
+              "skew_rotation_deg",
+              -2.0
+            ],
+            [
+              "perspective_phone",
+              {
+                "margin": 0.05,
+                "bg": 60,
+                "jitter": 0.035,
+                "keystone": 0.05,
+                "corners_src": [
+                  [
+                    -94,
+                    -15
+                  ],
+                  [
+                    3959,
+                    28
+                  ],
+                  [
+                    3855,
+                    2463
+                  ],
+                  [
+                    71,
+                    2497
+                  ]
+                ]
+              }
+            ],
+            [
+              "uneven_lighting",
+              0.25
+            ],
+            [
+              "vignette",
+              0.35
+            ],
+            [
+              "motion_blur",
+              {
+                "len": 6,
+                "angle": 15
+              }
+            ],
+            [
+              "gaussian_noise_sigma",
+              7
+            ],
+            [
+              "resampled_dpi",
+              [
+                200,
+                120
+              ]
+            ]
+          ]
+        },
+        {
+          "image": 2,
+          "source_pages": [
+            3,
+            4
+          ],
+          "size_px": [
+            2244,
+            1524
+          ],
+          "ops": [
+            [
+              "p3",
+              "page_curl",
+              {
+                "side": "right",
+                "amp": 40,
+                "width": 0.3
+              }
+            ],
+            [
+              "p3",
+              "paper_texture",
+              6
+            ],
+            [
+              "p3",
+              "paper_colour",
+              [
+                236,
+                226,
+                198
+              ]
+            ],
+            [
+              "p3",
+              "gutter_shadow",
+              {
+                "side": "right",
+                "width": 0.08,
+                "dark": 0.7
+              }
+            ],
+            [
+              "p4",
+              "page_curl",
+              {
+                "side": "left",
+                "amp": 40,
+                "width": 0.3
+              }
+            ],
+            [
+              "p4",
+              "paper_texture",
+              6
+            ],
+            [
+              "p4",
+              "paper_colour",
+              [
+                236,
+                226,
+                198
+              ]
+            ],
+            [
+              "p4",
+              "gutter_shadow",
+              {
+                "side": "left",
+                "width": 0.08,
+                "dark": 0.7
+              }
+            ],
+            [
+              "spread_2up",
+              [
+                3,
+                4
+              ]
+            ],
+            [
+              "skew_rotation_deg",
+              -2.0
+            ],
+            [
+              "perspective_phone",
+              {
+                "margin": 0.05,
+                "bg": 60,
+                "jitter": 0.035,
+                "keystone": 0.05,
+                "corners_src": [
+                  [
+                    -284,
+                    32
+                  ],
+                  [
+                    3968,
+                    -85
+                  ],
+                  [
+                    3771,
+                    2500
+                  ],
+                  [
+                    -78,
+                    2608
+                  ]
+                ]
+              }
+            ],
+            [
+              "uneven_lighting",
+              0.25
+            ],
+            [
+              "vignette",
+              0.35
+            ],
+            [
+              "motion_blur",
+              {
+                "len": 6,
+                "angle": 15
+              }
+            ],
+            [
+              "gaussian_noise_sigma",
+              7
+            ],
+            [
+              "resampled_dpi",
+              [
+                200,
+                120
+              ]
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 200,
+        "out_dpi": 120,
+        "mode": "rgb",
+        "paper_rgb": [
+          236,
+          226,
+          198
+        ],
+        "texture": 6,
+        "spread": [
+          [
+            0,
+            1
+          ],
+          [
+            2,
+            3
+          ]
+        ],
+        "gutter": {
+          "side": "inner",
+          "width": 0.08,
+          "dark": 0.7
+        },
+        "curl": {
+          "side": "inner",
+          "amp": 40,
+          "width": 0.3
+        },
+        "rotate": -2.0,
+        "phone": {
+          "margin": 0.05,
+          "bg": 60,
+          "jitter": 0.035,
+          "keystone": 0.05
+        },
+        "blotch": 0.25,
+        "vignette": 0.35,
+        "motion_blur": {
+          "len": 6,
+          "angle": 15
+        },
+        "noise": 7,
+        "jpeg": 20
+      },
+      "summary": "phone photos of two open double-page spreads (pages 1-2, 3-4): perspective/keystone, uneven lamp light, vignette, motion blur, 120 dpi, JPEG q20",
+      "bytes": 223883
+    }
+  },
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "scan-mild.pdf",
+    "scan-severe.pdf",
+    "scan.pdf",
+    "truth.musicxml"
+  ],
+  "license": "Text public domain (C. F. Alexander 1848); music, arrangement and engraving CC0-1.0",
+  "source": "self-authored (layout-challenge corpus); text \"All Things Bright and Beautiful\", Hymns for Little Children (1848)",
+  "engraver": "internal model -> LilyPond 2.24 (custom writer, layout-challenge edition)",
+  "validation": {
+    "xsd_valid": true,
+    "music21_parse": "6 478",
+    "midi_attacks_match_truth": true,
+    "attacks": 576,
+    "lilypond_warnings": [],
+    "lyric_syllables_found_in_engraving": 1.0,
+    "lyric_syllables": 168,
+    "pages_planned": 4,
+    "image_only": {
+      "clean.pdf": true,
+      "scan.pdf": true,
+      "scan-mild.pdf": true,
+      "scan-severe.pdf": true
+    }
+  }
+}

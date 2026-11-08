@@ -1,0 +1,269 @@
+{
+  "id": "rh04-rest-zoo-part",
+  "category": "rhythm",
+  "title": "Interlude - oboe part (every rest type, multi-bar rests)",
+  "composer": "OMR challenge corpus (CC0)",
+  "lyricist": "",
+  "edge_cases": [
+    "multi_measure_rest_hbar",
+    "multi_measure_rest_church_symbols",
+    "rehearsal_marks",
+    "general_pause_fermata_on_whole_bar_rest",
+    "whole_bar_rest_3_4",
+    "whole_bar_rest_6_8",
+    "whole_bar_rest_4_2_breve",
+    "plain_whole_rest_not_measure_rest",
+    "breve_rest",
+    "whole_rest",
+    "half_rest",
+    "quarter_rest",
+    "eighth_rest",
+    "16th_rest",
+    "32nd_rest",
+    "64th_rest",
+    "dotted_quarter_rest",
+    "dotted_eighth_rest",
+    "double_dotted_eighth_rest",
+    "double_dotted_half_rest",
+    "rest_in_triplet",
+    "rest_in_duplet",
+    "beam_across_rest_6_8",
+    "beam_across_rest_in_triplet",
+    "64th_notes",
+    "fermata_on_rest",
+    "time_signature_changes",
+    "meter_4_2",
+    "cut_time_symbol",
+    "page_rotated_90",
+    "high_dpi_400",
+    "halftone_moire",
+    "skew_10_degrees"
+  ],
+  "expected": {
+    "parts": [
+      "Oboe"
+    ],
+    "must_not_split": false,
+    "shared_staves": [],
+    "notes": "40 measures although only 22 bars are drawn: the multi-bar rests must expand to 12 (bars 1-12, H-bar with \"12\"), 3 (bars 18-20, 3/4, church-rest symbols), 5 (bars 27-31, 2/2, church-rest symbols) and 2 (bars 36-37, 4/4) measures of rest; rehearsal marks A (13), B (21), C (27), D (36). Bar 21 is a G.P.: whole-bar rest in 3/4 with fermata. Rest values: 64th, 32nd, 16th, 8th, quarter (bar 13), half (39), dotted quarter (14, 23), dotted eighth and double-dotted eighth (15), double-dotted half (16), whole-bar rest in 6/8 (25), duplet containing a rest (26), triplet starting with a rest (32), plain whole rest r1 in 2/2 (33, NOT a measure rest) and in 4/2 (34), whole-bar rest in 4/2 drawn as a breve rest (35), double-dotted eighth rest (38), triplet with a rest under a beam (39), fermatas on the final dotted half note and quarter rest. Beams span eighth rests in 6/8 (bar 22).",
+    "lyrics": [],
+    "measures": 40,
+    "first_measure_number": 1
+  },
+  "truth_limitations": [
+    "Whole-bar rests are <rest measure=\"yes\"/> with the bar duration and no <type>; each bar of a multi-bar rest has its own measure rest and the first bar carries <measure-style><multiple-rest> (use-symbols=\"yes\" where LilyPond draws church-rest symbols).",
+    "<beam> elements reproduce the engraved beam groups exactly (manual beaming); notes only - a rest inside a beam carries no <beam> element."
+  ],
+  "degradations": {
+    "scan.pdf": {
+      "seed": 710401,
+      "render_dpi": 400,
+      "dpi": 400,
+      "color": "gray",
+      "format": "jpeg",
+      "jpeg_quality": 50,
+      "jpeg_passes": 1,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            246,
+            246,
+            244
+          ],
+          "texture": 2
+        },
+        {
+          "op": "rotate",
+          "deg": 2.5,
+          "bg": 30
+        },
+        {
+          "op": "rot90",
+          "k": 1
+        },
+        {
+          "op": "noise",
+          "sigma": 5
+        },
+        {
+          "op": "saltpepper",
+          "amount": 0.0005
+        }
+      ],
+      "tags": [
+        "paper_texture",
+        "rotation_+2.5deg",
+        "page_rotated_90deg",
+        "noise",
+        "saltpepper",
+        "jpeg_q50"
+      ],
+      "output_pages": 1,
+      "pixel_size": [
+        4818,
+        3510
+      ],
+      "image_mode": "L",
+      "bytes": 920601,
+      "image_only_check": {
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "pages": 1,
+        "text_chars": 0
+      },
+      "op_log": []
+    },
+    "scan-mild.pdf": {
+      "seed": 710402,
+      "render_dpi": 400,
+      "dpi": 400,
+      "color": "gray",
+      "format": "jpeg",
+      "jpeg_quality": 60,
+      "jpeg_passes": 1,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            246,
+            246,
+            244
+          ],
+          "texture": 2
+        },
+        {
+          "op": "rotate",
+          "deg": 0.5,
+          "bg": 240
+        },
+        {
+          "op": "noise",
+          "sigma": 2
+        }
+      ],
+      "tags": [
+        "paper_texture",
+        "rotation_+0.5deg",
+        "noise",
+        "jpeg_q60"
+      ],
+      "output_pages": 1,
+      "pixel_size": [
+        3350,
+        4708
+      ],
+      "image_mode": "L",
+      "bytes": 442359,
+      "image_only_check": {
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "pages": 1,
+        "text_chars": 0
+      },
+      "op_log": []
+    },
+    "scan-severe.pdf": {
+      "seed": 710403,
+      "render_dpi": 300,
+      "dpi": 300,
+      "color": "gray",
+      "format": "jpeg",
+      "jpeg_quality": 35,
+      "jpeg_passes": 1,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            240,
+            238,
+            232
+          ],
+          "texture": 3
+        },
+        {
+          "op": "halftone",
+          "lpi": 85,
+          "angle": 45,
+          "supersample": 2
+        },
+        {
+          "op": "rotate",
+          "deg": 10,
+          "bg": 40
+        },
+        {
+          "op": "blur",
+          "sigma": 0.8
+        },
+        {
+          "op": "noise",
+          "sigma": 6
+        }
+      ],
+      "tags": [
+        "paper_texture",
+        "halftone",
+        "rotation_+10deg",
+        "blur",
+        "noise",
+        "jpeg_q35"
+      ],
+      "output_pages": 1,
+      "pixel_size": [
+        3053,
+        3886
+      ],
+      "image_mode": "L",
+      "bytes": 702561,
+      "image_only_check": {
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "pages": 1,
+        "text_chars": 0
+      },
+      "op_log": []
+    }
+  },
+  "dpi": 400,
+  "license": "CC0-1.0 (music composed for this corpus; engraving, truth and scans CC0)",
+  "source": "Composed for this corpus (CC0).",
+  "pages": 1,
+  "files": {
+    "truth": "truth.musicxml",
+    "engraving": "engraving.ly",
+    "clean": "clean.pdf",
+    "scan": "scan.pdf",
+    "scan_mild": "scan-mild.pdf",
+    "scan_severe": "scan-severe.pdf",
+    "attribution": "ATTRIBUTION.txt"
+  },
+  "clean": {
+    "dpi": 300,
+    "pages": 1,
+    "ops": [],
+    "note": "undamaged raster render",
+    "image_only": true,
+    "fonts": [],
+    "images": 1,
+    "text_chars": 0
+  },
+  "validation": {
+    "truth_xsd_valid": true,
+    "engraving_event_dump_matches_truth": true,
+    "engraving_events_compared": 78,
+    "lyric_events_compared": 0,
+    "time_signatures_compared": 6,
+    "midi_attacks_match_truth": true,
+    "midi_attacks": 31,
+    "midi_grace_notes_excluded": 0,
+    "music21_reparse_matches_model": true,
+    "lyric_text_found_in_engraving": null,
+    "lilypond_warnings": [],
+    "method": "LilyPond event-dump engraver (rsynth/dump.ly) compared with the model the truth is written from: every note/rest/multi-bar rest (onset, pitch, notated type, dots, tuplet scale), grace offsets, ties, beam starts/stops, slurs, fermatas, lyric syllables/hyphens/extenders, bar numbers/measure positions and time signatures; plus MIDI attack multiset and a music21 re-parse of truth.musicxml."
+  },
+  "generator": "corpus/challenge/rhythm/_tools/run_all.py (rsynth/items.py, build.py, scan.py)"
+}

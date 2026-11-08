@@ -23,6 +23,8 @@ const DEFAULTS = {
   goodAbs: 6,         // ... or at least this many of them
   lastStaffSp: 14,    // how far below the last staff of a system verse rows may reach ...
   maxRowGapSp: 1.5,   // ... provided each row follows the previous one within this gap
+  splitByNotes: true, // split tokens that span several note onsets (unprinted hyphens, merged words)
+  lang: null,         // underlay language for syllable rules ('en' | 'de' | 'la'); null = detect
 };
 
 // Returns [{band, sys, y0, y1, x0, x1}] text-line boxes in deskewed page coords.
@@ -270,7 +272,7 @@ function toSyllables(words) {
       for (const p of parts) {
         if (HY.test(p[0])) { toks.push({ hy: true }); continue; }
         const ww = sw * p.length / letters;
-        toks.push({ text: p, x: cx + ww / 2, conf: wd.conf });
+        toks.push({ text: p, x: cx + ww / 2, x0: cx, x1: cx + ww, conf: wd.conf });
         cx += ww;
       }
       wx += sw;
@@ -300,9 +302,189 @@ function toSyllables(words) {
     const hyBefore = i > 0 && toks[i - 1].hy && syl.length;
     const hyAfter = i + 1 < toks.length && toks[i + 1].hy;
     const syllabic = hyBefore ? (hyAfter ? 'middle' : 'end') : (hyAfter ? 'begin' : 'single');
-    syl.push({ text: t.text.replace(/^[^\p{L}'’]+|[^\p{L}'’!?,.;:]+$/gu, ''), x: t.x, syllabic, conf: t.conf });
+    syl.push({ text: t.text.replace(/^[^\p{L}'’]+|[^\p{L}'’!?,.;:]+$/gu, ''), x: t.x, x0: t.x0, x1: t.x1, syllabic, conf: t.conf });
   }
   return { number, syllables: syl.filter(s => s.text) };
+}
+
+// ---- unprinted hyphens and merged words --------------------------------
+// Engravers drop the hyphen when two syllables sit close ("Jeannie" over two
+// notes), and OCR glues tightly set words ("rapturethrills"). A token whose
+// letters span several note onsets of the staff above is split into one
+// syllable per onset, at the syllable break (vowel groups + consonant rules)
+// nearest to where the notes say it should be; a blank gap at the break marks
+// a word boundary instead of a syllable boundary.
+
+const VOWELS = 'aeiouyäöüàâæéèêëîïôœùûÿáíóúåøœ';
+const isV = (w, i) => {
+  const c = w[i];
+  if (c === 'y') return i > 0 && !VOWELS.includes(w[i + 1] || '#');
+  if (c === 'u' && i > 0 && (w[i - 1] === 'q')) return false;
+  return VOWELS.includes(c);
+};
+
+// language of the underlay (decides silent final e and Latin vowel hiatus)
+function detectLang(texts) {
+  const s = ' ' + texts.join(' ').toLowerCase().replace(/[^\p{L}' ]+/gu, ' ').replace(/\s+/g, ' ') + ' ';
+  const cnt = (re) => (s.match(re) || []).length;
+  const de = 2 * cnt(/[äöüß]/g) + cnt(/ (?:und|der|die|das|ich|ein|eine|einen|nicht|mit|dem|den|zu|ist|sich|auf|mich|mir|dich|dir|du|wie|im|von|wir|ihr|sein|seine|nun|herz|gott|es|er|sie|so|wo|noch|nach|aus)(?= )/g);
+  const la = cnt(/ (?:et|est|cum|dei|deo|deus|non|qui|quae|quod|tu|te|nos|nobis|ad|sancte|sanctus|domine|dominus|gloria|pacem|excelsis|ave|mater|filius|spiritus|amen|mea|meum|tibi|sicut|erat|sunt|pax|alleluia)(?= )/g)
+    + 0.3 * cnt(/\p{L}(?:us|um|ae|is|unt|orum|ibus) /gu);
+  const en = cnt(/ (?:the|and|of|to|my|thy|thee|with|is|that|for|our|all|thou|his|her|be|we|you|i|on|from|love|me|he|she|they|was|are|o'er|when|where)(?= )/g);
+  if (de > en && de >= la) return 'de';
+  if (la > en && la > de) return 'la';
+  return 'en';
+}
+
+// vowel groups of a lower-case letter string: [{a, b}] (letter index ranges)
+function vowelGroups(w, lang) {
+  const g = [];
+  for (let i = 0; i < w.length; i++) {
+    if (!isV(w, i)) continue;
+    const last = g[g.length - 1];
+    const pair = w[i - 1] + w[i];
+    const joins = lang !== 'la' || pair === 'ae' || pair === 'oe' || pair === 'au' || pair === 'eu';
+    if (last && last.b === i && joins) { last.b = i + 1; continue; }
+    g.push({ a: i, b: i + 1 });
+  }
+  if (lang === 'en' && g.length > 1) {
+    const n = w.length, L = g[g.length - 1];
+    // silent final e ("love", "smile"), but "-le" after a consonant is sung ("ta-ble")
+    if (L.a === n - 1 && L.b === n && w[n - 1] === 'e' && !(w[n - 2] === 'l' && n >= 3 && !isV(w, n - 3))) g.pop();
+    // silent "-gue(s)" / "-que(s)" ("tongues")
+    else if (/[gq]ues?$/.test(w) && L.b >= n - 1 && w[L.a - 1] && /[gq]/.test(w[L.a - 1])) g.pop();
+    // silent -es / -ed ("hopes", "named"), not after sibilants / t, d
+    else if (L.a === n - 2 && L.b === n - 1 && w[n - 2] === 'e' && ((w[n - 1] === 'd' && !/[td]/.test(w[n - 3])) || (w[n - 1] === 's' && !/[szxgch]/.test(w[n - 3])))) g.pop();
+  }
+  return g;
+}
+
+const UNITS = new Set(['ch', 'sh', 'th', 'ph', 'wh', 'sch', 'ck', 'qu', 'chr', 'thr', 'shr']);
+const ONSETS = new Set(['bl', 'br', 'cl', 'cr', 'dr', 'fl', 'fr', 'gl', 'gr', 'pl', 'pr', 'tr', 'ch', 'sh', 'th', 'ph', 'wh', 'qu', 'sp', 'st', 'sc', 'sk', 'sl', 'sm', 'sn', 'sw', 'tw', 'str', 'spr', 'scr', 'spl', 'thr', 'shr', 'chr', 'sch', 'squ']);
+// preferred break (letter index: break before it) in the consonants w[a..b)
+function preferredBreak(w, a, b, lang) {
+  const c = w.slice(a, b);
+  // English suffix "-ing": "wait-ing", "sigh-ing", but "sob-bing"
+  if (lang === 'en' && /^ings?$/.test(w.slice(b)) && c.length && !(c.length >= 2 && c[c.length - 1] === c[c.length - 2])) return b;
+  if (c === 'gh' || c.endsWith('gh')) return b;          // "sigh-ing", "night-ly"
+  if (c.length <= 1) return c === 'x' ? b : a;           // V-CV ("va-por"); "ex-alt"
+  if (UNITS.has(c)) return a;                           // "la-chen", "fa-thers"
+  if (c === 'ng' && lang === 'en') return b;            // "sing-ing"
+  for (let L = Math.min(3, c.length - 1); L >= 2; L--) if (ONSETS.has(c.slice(c.length - L)) && !(lang === 'de' && c.slice(c.length - L) === 'st')) return b - L;
+  return b - 1;                                         // VC-CV ("Brun-nen", "win-ning")
+}
+
+// s: syllable {text, x, x0, x1, syllabic}; voices: [[onset x...]] of the staff
+// above (one list, or upper / lower voice of a two-voice staff); r: where a
+// note sits within its syllable on this row (0.5 centred, ~0.2 left-aligned)
+function splitSyllable(s, voices, lang, r, hyphens) {
+  const text = s.text;
+  if (s.x0 == null || text.length < 2) return [s];
+  const cw = (s.x1 - s.x0) / text.length;
+  // a printed hyphen inside the token that OCR did not read ("mu-sic" -> "music")
+  const hy = (hyphens || []).filter(x => x > s.x0 + 0.8 * cw && x < s.x1 - 0.8 * cw);
+  if (hy.length) {
+    const pieces = cutAt(s, hy.map(x => ({ x })), lang, null);
+    if (pieces.length > 1) return pieces.flatMap(p => splitSyllable(p, voices, lang, r, null));
+  }
+  let inside = [];
+  for (const ons of voices) {
+    const ins = ons.filter(x => x > s.x0 + 0.5 * cw && x < s.x1 - 0.5 * cw);
+    if (ins.length > inside.length) inside = ins;
+  }
+  if (inside.length < 2) return [s];
+  // target for each boundary: the next syllable starts r of its width left of its note
+  const tgt = [];
+  const k = inside.length;
+  for (let m = 0; m + 1 < k; m++) tgt.push({ x: inside[m + 1] - r * (inside[m + 1] - inside[m]) });
+  return cutAt(s, tgt, lang, inside);
+}
+
+// cut a token at k-1 syllable breaks nearest the target x positions; pieces
+// take the onset x when given (ons), else their own centre
+function cutAt(s, tgt, lang, ons) {
+  const text = s.text;
+  const cw = (s.x1 - s.x0) / text.length;
+  const k = tgt.length + 1;
+  const idx = []; let low = '';
+  for (let i = 0; i < text.length; i++) if (/\p{L}/u.test(text[i])) { idx.push(i); low += text[i].toLowerCase(); }
+  const groups = vowelGroups(low, lang);
+  // more notes than syllables: a melisma or another voice's notes; leave it
+  if (groups.length < k) return [s];
+  const xOf = (ci) => s.x0 + ci * cw;
+  // candidate breaks per gap between vowel groups
+  const gaps = [];
+  for (let j = 0; j + 1 < groups.length; j++) {
+    const a = groups[j].b, b = groups[j + 1].a, pref = preferredBreak(low, a, b, lang);
+    const list = [];
+    for (let li = Math.max(1, a); li <= b; li++) list.push({ li, x: xOf(idx[li]), pen: li === pref ? 0 : 1.2 + 0.3 * Math.abs(li - pref) });
+    gaps.push(list);
+  }
+  // DP: boundary m placed in gap j (gaps strictly increasing)
+  const G = gaps.length;
+  const best = Array.from({ length: k - 1 }, () => new Array(G).fill(null));
+  for (let m = 0; m < k - 1; m++) for (let j = m; j < G; j++) {
+    let prev = m === 0 ? { cost: 0 } : null;
+    if (m > 0) for (let jj = m - 1; jj < j; jj++) if (best[m - 1][jj] && (!prev || best[m - 1][jj].cost < prev.cost)) prev = best[m - 1][jj];
+    if (!prev) continue;
+    let bc = null;
+    for (const c of gaps[j]) { const v = prev.cost + Math.abs(c.x - tgt[m].x) / cw + c.pen; if (!bc || v < bc.cost) bc = { cost: v, c, prev: m > 0 ? prev : null }; }
+    best[m][j] = bc;
+  }
+  let end = null;
+  for (let j = 0; j < G; j++) if (best[k - 2][j] && (!end || best[k - 2][j].cost < end.cost)) end = best[k - 2][j];
+  if (!end) return [s];
+  const cuts = [];
+  for (let b = end; b; b = b.prev) cuts.unshift(b.c);
+  const out = [];
+  const first = s.syllabic === 'middle' || s.syllabic === 'end', last = s.syllabic === 'begin' || s.syllabic === 'middle';
+  let from = 0;
+  cuts.concat([null]).forEach((c, m) => {
+    const to = c ? idx[c.li] : text.length;
+    const before = m > 0 || first, after = m < cuts.length || last;
+    out.push({ ...s, text: text.slice(from, to), x: ons ? ons[m] : (xOf(from) + xOf(to)) / 2, x0: xOf(from), x1: xOf(to), split: true,
+      syllabic: before ? (after ? 'middle' : 'end') : (after ? 'begin' : 'single') });
+    from = to;
+  });
+  return out.filter(p => /\p{L}/u.test(p.text));
+}
+
+// note onsets of one staff between x0 and x1: one list, or two (upper and
+// lower voice) when the staff carries two voices (opposed stems at one x)
+function staffVoices(fr, staff, x0, x1, sp) {
+  const hs = (fr.heads || []).filter(h => h.staff === staff && h.x >= x0 && h.x <= x1).sort((a, b) => a.x - b.x);
+  const cl = [];
+  for (const h of hs) {
+    const last = cl[cl.length - 1];
+    if (last && h.x - last.xr < 1.2 * sp) { last.xr = h.x; last.hs.push(h); } else cl.push({ xr: h.x, hs: [h] });
+  }
+  const mean = (a) => a.reduce((t, h) => t + h.x, 0) / a.length;
+  const all = cl.map(c => mean(c.hs));
+  const up = (h) => h.stemDir === 1 || h.stemDir === 2, dn = (h) => h.stemDir === -1;
+  const both = cl.filter(c => c.hs.some(up) && c.hs.some(dn)).length;
+  if (cl.length < 4 || both < 0.3 * cl.length) return [all];
+  const U = [], D = [];
+  for (const c of cl) {
+    const u = c.hs.filter(h => !dn(h)), d = c.hs.filter(h => !up(h));
+    if (u.length) U.push(mean(u));
+    if (d.length) D.push(mean(d));
+  }
+  return [U, D];
+}
+
+// where a note sits inside its (single-note) word on a row: 0.5 = centred
+// (modern engraving), ~0.2 = syllables left-aligned to their notes
+function noteOffset(syl, voices) {
+  const rs = [];
+  for (const s of syl) {
+    if (s.x0 == null || s.x1 - s.x0 < 1) continue;
+    const cw = (s.x1 - s.x0) / Math.max(1, s.text.length);
+    const ins = voices[0].filter(x => x > s.x0 - 0.2 * cw && x < s.x1);
+    if (ins.length === 1) rs.push((ins[0] - s.x0) / (s.x1 - s.x0));
+  }
+  if (rs.length < 3) return 0.5;
+  rs.sort((a, b) => a - b);
+  return Math.max(0.15, Math.min(0.5, rs[rs.length >> 1]));
 }
 
 // ocr(grayImage) -> Promise<[{text, conf, x0, x1}]> in the given image's pixels
@@ -312,6 +494,7 @@ async function readLyrics(fr, ocr, onProgress, opts) {
   const sysTops = fr.systems.map(sys => fr.staves[sys[0]].yAt(0, fr.staves[sys[0]].left));
   let done = 0;
   const all = [];
+  const geo = new Map();
   fr.systems.forEach((sys, si) => all.push(...findTextLines(fr, si, sysTops[si + 1] ?? fr.gray.height, o)));
   for (const ln of all) {
     const step = () => { done++; if (onProgress) onProgress(done, all.length); };
@@ -339,8 +522,20 @@ async function readLyrics(fr, ocr, onProgress, opts) {
     if (dbg) dbg.good = nGood + '/' + nTok;
     if (!mapped.length || meanConf < o.minLineConf * 0.8 || nOk < 0.6 * mapped.length || nGood2 < 2 || (nGood < o.goodFrac * nTok && nGood < o.goodAbs)) { if (dbg) dbg.reject = 'ocr'; step(); continue; }
     const { number, syllables } = toSyllables(kept.filter(w => w.ok || w.conf >= 60));
-    (out[ln.sys] ||= []).push({ band: ln.band, last: ln.last, y: ln.y0, printed: number, number, syllables, raw: mapped.map(w => w.text).join(' '), conf: meanConf });
+    const entry = { band: ln.band, last: ln.last, y: ln.y0, printed: number, number, syllables, raw: mapped.map(w => w.text).join(' '), conf: meanConf };
+    (out[ln.sys] ||= []).push(entry);
+    geo.set(entry, { sp: ln.sp, staff: fr.systems[ln.sys][ln.band], x0: ln.x0, x1: ln.x1, hyphens: row.clusters.filter((c, i) => row.hy[i]).map(([a, b]) => row.xa + (a + b) / 2) });
     step();
+  }
+  // unprinted hyphens / merged words: split tokens spanning several onsets
+  if (o.splitByNotes) {
+    const lang = o.lang || detectLang(Object.values(out).flat().map(v => v.syllables.map(s => s.text).join(' ')));
+    for (const [v, g] of geo) {
+      const voices = staffVoices(fr, g.staff, g.x0, g.x1, g.sp);
+      const r = noteOffset(v.syllables, voices);
+      v.syllables = v.syllables.flatMap(s => splitSyllable(s, voices, lang, r, g.hyphens));
+    }
+    Object.defineProperty(out, 'lang', { value: lang, enumerable: false });
   }
   // verse numbers: per system and band, rows top-down are verses 1..n
   for (const k in out) {

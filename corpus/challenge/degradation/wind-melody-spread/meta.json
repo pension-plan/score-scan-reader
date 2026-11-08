@@ -1,0 +1,439 @@
+{
+ "id": "wind-melody-spread",
+ "category": "degradation",
+ "piece": "wind-melody",
+ "variant": "spread",
+ "title": "Who Has Seen the Wind? (melody, 2 verses) - spread",
+ "edge_cases": [
+  "lyrics",
+  "multi_verse",
+  "melody",
+  "pickup",
+  "melisma",
+  "slurs",
+  "unequal_verse_syllables",
+  "key_signature",
+  "time_3_4",
+  "large_staff",
+  "two_up_spread",
+  "double_page",
+  "book_gutter_shadow",
+  "landscape_image",
+  "facing_text_page"
+ ],
+ "expected": {
+  "parts": [
+   "Voice"
+  ],
+  "must_not_split": false,
+  "shared_staves": [],
+  "notes": "Single-staff melody with two stacked verses. Verse 1 has one syllable fewer than verse 2 in line 3 (\"trem-_-bling\" vs \"bow down their heads\"): bar 6 beat 3 (c''8) carries a verse-2 syllable (\"their\") but NO verse-1 syllable. The final melisma \"pass-ing _\" is slurred in both verses. DAMAGE (spread): 2-up double-page spread: a text-only facing page (verso, \"Notes on the Music\", no music) on the left and the music page (recto) on the right, as ONE landscape image. The app must find the music on the right half and ignore the prose page. scan adds curl towards the gutter and 1 deg rotation; severe adds 3.5 deg rotation, perspective, aged paper (RGB). TRUTH LIMITATIONS: The facing page is prose only; its text is not part of the truth (no lyrics, no title)."
+ },
+ "truth_limitations": "The facing page is prose only; its text is not part of the truth (no lyrics, no title).",
+ "truth_scope": "truth.musicxml (MusicXML 4.0 partwise, XSD-valid) encodes parts/part-list (+ part-group bracket for the choir), staves, voices, pitches, durations, rests, ties, slurs, lyrics (verse number, syllabic, extend), dynamics, fermatas, staccatos, stems, clefs, key/time signatures and barline styles. It does NOT encode beams (LilyPond auto-beams), system/page breaks, bar-number display, header layout or any handwritten/damage marks. The same truth file is shared by every damaged variant of a piece.",
+ "degradations": {
+  "scan.pdf": {
+   "seed": 613427251,
+   "dpi": 200,
+   "pages": 1,
+   "image_px": [
+    [
+     3428,
+     2477
+    ]
+   ],
+   "image_mode": [
+    "L"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 200,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": 246,
+      "texture": 2
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": 22,
+     "stage": "content"
+    },
+    {
+     "op": "curl",
+     "params": {
+      "amp_mm": 5,
+      "width": 0.25,
+      "shade": 0.2
+     },
+     "stage": "page_geometry"
+    },
+    {
+     "op": "two_up_spread",
+     "params": {
+      "gutter_width": 0.05,
+      "gutter_dark": 0.55
+     },
+     "stage": "assembly"
+    },
+    {
+     "op": "bed",
+     "params": {
+      "margin_mm": 5
+     },
+     "stage": "global"
+    },
+    {
+     "op": "rotate",
+     "params": {
+      "deg": 1.0
+     },
+     "stage": "global"
+    },
+    {
+     "op": "gradient",
+     "params": {
+      "strength": 0.1
+     },
+     "stage": "global"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 3
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       32,
+       32,
+       34
+      ],
+      "noise": 4,
+      "texture": 4
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "jpeg",
+      "quality": 72
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": []
+  },
+  "scan-mild.pdf": {
+   "seed": 613427252,
+   "dpi": 200,
+   "pages": 1,
+   "image_px": [
+    [
+     3370,
+     2401
+    ]
+   ],
+   "image_mode": [
+    "L"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 200,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": 246,
+      "texture": 2
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": 22,
+     "stage": "content"
+    },
+    {
+     "op": "two_up_spread",
+     "params": {
+      "gutter_width": 0.04,
+      "gutter_dark": 0.35
+     },
+     "stage": "assembly"
+    },
+    {
+     "op": "bed",
+     "params": {
+      "margin_mm": 4
+     },
+     "stage": "global"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 2
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       236,
+       236,
+       234
+      ],
+      "noise": 2,
+      "edge_shadow": 0.35
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "jpeg",
+      "quality": 78
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": []
+  },
+  "scan-severe.pdf": {
+   "seed": 613427253,
+   "dpi": 200,
+   "pages": 1,
+   "image_px": [
+    [
+     700,
+     530
+    ]
+   ],
+   "image_mode": [
+    "RGB"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 200,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": [
+       240,
+       232,
+       210
+      ],
+      "texture": 5,
+      "age_edges": 0.2
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": [
+      45,
+      40,
+      35
+     ],
+     "stage": "content"
+    },
+    {
+     "op": "curl",
+     "params": {
+      "amp_mm": 10,
+      "width": 0.35,
+      "shade": 0.35
+     },
+     "stage": "page_geometry"
+    },
+    {
+     "op": "two_up_spread",
+     "params": {
+      "gutter_width": 0.07,
+      "gutter_dark": 0.75
+     },
+     "stage": "assembly"
+    },
+    {
+     "op": "bed",
+     "params": {
+      "margin_mm": 5
+     },
+     "stage": "global"
+    },
+    {
+     "op": "rotate",
+     "params": {
+      "deg": -3.5
+     },
+     "stage": "global"
+    },
+    {
+     "op": "perspective",
+     "params": {
+      "jitter": 0.03,
+      "keystone": 0.03,
+      "margin": 0.03,
+      "_corners_src": [
+       [
+        -194.1,
+        49.3
+       ],
+       [
+        3816.7,
+        -2.6
+       ],
+       [
+        3654.1,
+        2909.5
+       ],
+       [
+        9.2,
+        2875.5
+       ]
+      ]
+     },
+     "stage": "global"
+    },
+    {
+     "op": "vignette",
+     "params": {
+      "strength": 0.2
+     },
+     "stage": "global"
+    },
+    {
+     "op": "blur",
+     "params": {
+      "sigma": 0.8
+     },
+     "stage": "global"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 4,
+      "chroma": 2
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       32,
+       32,
+       34
+      ],
+      "noise": 4,
+      "texture": 4
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "RGB",
+      "format": "jpeg",
+      "quality": 60,
+      "subsampling": 2
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": []
+  },
+  "clean.pdf": {
+   "seed": null,
+   "dpi": 200,
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 200,
+     "tool": "pdftoppm -gray (LilyPond PDF)"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "png"
+     }
+    }
+   ]
+  }
+ },
+ "dpi": 200,
+ "license": "Text public domain (Christina Rossetti, Sing-Song, 1872); melody and engraving CC0-1.0",
+ "files": {
+  "scan": "wind-melody-spread/scan.pdf",
+  "scan_mild": "wind-melody-spread/scan-mild.pdf",
+  "scan_severe": "wind-melody-spread/scan-severe.pdf",
+  "clean": "wind-melody-spread/clean.pdf",
+  "truth": "wind-melody-spread/truth.musicxml",
+  "engraving": "wind-melody-spread/engraving.ly"
+ },
+ "measures": 11,
+ "vector_pages": 1,
+ "lyrics": [
+  {
+   "part": "Voice",
+   "verses": 2
+  }
+ ],
+ "shares_truth_with": [
+  "wind-melody-clean",
+  "wind-melody-skew",
+  "wind-melody-rot90",
+  "wind-melody-rot180",
+  "wind-melody-phone",
+  "wind-melody-book",
+  "wind-melody-yellowed",
+  "wind-melody-bleed",
+  "wind-melody-stain-pencil",
+  "wind-melody-holes-staple",
+  "wind-melody-crop",
+  "wind-melody-halftone",
+  "wind-melody-jpeg",
+  "wind-melody-photocopy-thin",
+  "wind-melody-photocopy-thick",
+  "wind-melody-lowdpi",
+  "wind-melody-highdpi",
+  "wind-melody-blur",
+  "wind-melody-noise",
+  "wind-melody-combo"
+ ],
+ "validation": {
+  "truth_xsd_valid": true,
+  "midi_attacks_match_truth": true,
+  "attacks": 25,
+  "midi_lyric_events_match_truth": true,
+  "lyric_syllables": 47,
+  "lyric_text_found_in_engraving_pdf": 1.0,
+  "lilypond_warnings": [],
+  "scan_files_image_only": {
+   "scan.pdf": true,
+   "scan-mild.pdf": true,
+   "scan-severe.pdf": true,
+   "clean.pdf": true
+  }
+ },
+ "origin": "synthetic-scan (challenge: degradation extremes)",
+ "seed": 613427251
+}

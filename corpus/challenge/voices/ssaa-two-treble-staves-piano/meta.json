@@ -1,0 +1,671 @@
+{
+  "id": "ssaa-two-treble-staves-piano",
+  "category": "voices",
+  "title": "Love Came Down at Christmas (SSAA on two treble staves + piano)",
+  "edge_cases": [
+    "ssaa_closed",
+    "two_treble_choir_staves",
+    "shared_staff_two_voices",
+    "piano_grand_staff",
+    "piano_rh_two_voices_must_not_split",
+    "piano_chords_must_stay_chords",
+    "choir_tacet_full_bar_rests",
+    "merged_full_bar_rests",
+    "piano_doubles_choir",
+    "lyrics_only_under_top_choir_staff",
+    "multi_verse",
+    "part_labels_roman_numerals",
+    "three_four_time",
+    "key_signature_sharps",
+    "multi_page"
+  ],
+  "expected": {
+    "parts": [
+      "Soprano I",
+      "Soprano II",
+      "Alto I",
+      "Alto II",
+      "Piano"
+    ],
+    "must_not_split": true,
+    "shared_staves": [
+      [
+        "Soprano I",
+        "Soprano II"
+      ],
+      [
+        "Alto I",
+        "Alto II"
+      ]
+    ],
+    "notes": "Two choir staves, BOTH in treble clef (Soprano I/II, Alto I/II) - do not mistake the alto staff for a second soprano part or for a piano right hand. Split each choir staff by stem direction into two parts (4 choir parts). The piano grand staff (brace, \"Piano\") is ONE part with two staves: its right hand has two voices (melody stems up, two-note chords stems down) and the left hand plays bass + chords - none of this may be split into separate parts and the chords stay chords. Choir is tacet in mm.1-2 (one merged whole-bar rest per choir staff stands for both parts). Two verses under the upper choir staff, aligned to Soprano I."
+  },
+  "degradations": {
+    "scan.pdf": {
+      "seed": 7601,
+      "render_dpi": 600,
+      "output_dpi": 200.0,
+      "mode": "rgb",
+      "format": "jpeg",
+      "jpeg_quality": 45,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "spread_2up": null,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            228,
+            222,
+            206
+          ],
+          "ink": [
+            30,
+            28,
+            30
+          ],
+          "texture": 3
+        },
+        {
+          "op": "halftone",
+          "lpi": 133,
+          "deg": 45,
+          "strength": 0.85,
+          "white": [
+            252,
+            250,
+            245
+          ]
+        },
+        {
+          "op": "resample",
+          "factor": 0.3333333333,
+          "filter": "bilinear"
+        },
+        {
+          "op": "scale",
+          "s": 0.97,
+          "pages": [
+            1
+          ],
+          "fill": [
+            240,
+            236,
+            226
+          ]
+        },
+        {
+          "op": "rotate",
+          "deg": 1.5,
+          "fill": [
+            236,
+            236,
+            236
+          ],
+          "pages": [
+            0
+          ]
+        },
+        {
+          "op": "rotate",
+          "deg": -0.8,
+          "fill": [
+            236,
+            236,
+            236
+          ],
+          "pages": [
+            1
+          ]
+        },
+        {
+          "op": "blur",
+          "sigma": 0.4
+        },
+        {
+          "op": "noise",
+          "sigma": 3
+        }
+      ],
+      "summary": "reproduction printed with a halftone screen (tinted paper), rendered at 600 dpi and rescanned at 200 dpi -> moire; page 2 photocopied at 97%; 1.5 / -0.8 deg skew",
+      "pdf_pages": 2,
+      "events": [
+        {
+          "pages": [
+            0
+          ],
+          "size_px": [
+            1654,
+            2339
+          ],
+          "events": []
+        },
+        {
+          "pages": [
+            1
+          ],
+          "size_px": [
+            1654,
+            2339
+          ],
+          "events": []
+        }
+      ]
+    },
+    "scan-mild.pdf": {
+      "seed": 7602,
+      "render_dpi": 300,
+      "output_dpi": 300,
+      "mode": "gray",
+      "format": "jpeg",
+      "jpeg_quality": 60,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "spread_2up": null,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            246,
+            246,
+            244
+          ],
+          "texture": 2
+        },
+        {
+          "op": "rotate",
+          "deg": 0.4,
+          "fill": 252,
+          "pages": [
+            0
+          ]
+        },
+        {
+          "op": "rotate",
+          "deg": 0.2,
+          "fill": 252,
+          "pages": [
+            1
+          ]
+        },
+        {
+          "op": "blur",
+          "sigma": 0.45
+        },
+        {
+          "op": "noise",
+          "sigma": 2
+        }
+      ],
+      "summary": "clean 2-page scan, 0.4 / 0.2 deg skew",
+      "pdf_pages": 2,
+      "events": [
+        {
+          "pages": [
+            0
+          ],
+          "size_px": [
+            2481,
+            3508
+          ],
+          "events": []
+        },
+        {
+          "pages": [
+            1
+          ],
+          "size_px": [
+            2481,
+            3508
+          ],
+          "events": []
+        }
+      ]
+    },
+    "scan-severe.pdf": {
+      "seed": 7603,
+      "render_dpi": 110,
+      "output_dpi": 110,
+      "mode": "rgb",
+      "format": "jpeg",
+      "jpeg_quality": 20,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "spread_2up": null,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            240,
+            234,
+            218
+          ],
+          "texture": 6
+        },
+        {
+          "op": "foxing",
+          "n": 40,
+          "size_mm": [
+            0.4,
+            1.8
+          ]
+        },
+        {
+          "op": "pencil",
+          "circles": 6,
+          "breaths": 4,
+          "ticks": 2,
+          "arrows": 1,
+          "texts": [
+            "S1!",
+            "A2 here",
+            "breathe",
+            "watch"
+          ],
+          "alpha": 0.7,
+          "width_mm": 0.4
+        },
+        {
+          "op": "pencil",
+          "circles": 3,
+          "color": [
+            190,
+            40,
+            40
+          ],
+          "alpha": 0.8,
+          "width_mm": 0.5
+        },
+        {
+          "op": "scale",
+          "s": 0.95,
+          "pages": [
+            1
+          ],
+          "fill": [
+            240,
+            234,
+            218
+          ]
+        },
+        {
+          "op": "rotate",
+          "deg": 7.0,
+          "fill": [
+            210,
+            210,
+            210
+          ],
+          "expand": true,
+          "pages": [
+            0
+          ]
+        },
+        {
+          "op": "rotate",
+          "deg": -5.0,
+          "fill": [
+            210,
+            210,
+            210
+          ],
+          "expand": true,
+          "pages": [
+            1
+          ]
+        },
+        {
+          "op": "motion_blur",
+          "len_mm": 0.6,
+          "deg": 0
+        },
+        {
+          "op": "noise",
+          "sigma": 6,
+          "chroma": 3
+        }
+      ],
+      "summary": "rehearsal copy at 110 dpi: heavy pencil (circled notes, part reminders, breath marks), red-pen circles, foxing, 7 / -5 deg skew, page 2 at 95%, motion blur, JPEG q20",
+      "pdf_pages": 2,
+      "events": [
+        {
+          "pages": [
+            0
+          ],
+          "size_px": [
+            1062,
+            1389
+          ],
+          "events": [
+            {
+              "op": "pencil",
+              "marks": [
+                [
+                  "circle",
+                  71.9,
+                  97.4
+                ],
+                [
+                  "circle",
+                  64.3,
+                  198.6
+                ],
+                [
+                  "circle",
+                  29.3,
+                  197.7
+                ],
+                [
+                  "circle",
+                  64.3,
+                  198.6
+                ],
+                [
+                  "circle",
+                  120.7,
+                  227.9
+                ],
+                [
+                  "circle",
+                  60.4,
+                  117.6
+                ],
+                [
+                  "tick",
+                  130.1,
+                  187.2
+                ],
+                [
+                  "tick",
+                  186.2,
+                  131.6
+                ],
+                [
+                  "breath_V",
+                  32.2,
+                  189.9
+                ],
+                [
+                  "breath_V",
+                  190.6,
+                  91.7
+                ],
+                [
+                  "breath_V",
+                  190.4,
+                  105.4
+                ],
+                [
+                  "breath_V",
+                  127.6,
+                  90.4
+                ],
+                [
+                  "arrow",
+                  107.0,
+                  239.8
+                ],
+                [
+                  "text",
+                  "S1!",
+                  54.7,
+                  186.9
+                ],
+                [
+                  "text",
+                  "A2 here",
+                  124.5,
+                  33.9
+                ],
+                [
+                  "text",
+                  "breathe",
+                  187.2,
+                  37.7
+                ],
+                [
+                  "text",
+                  "watch",
+                  33.1,
+                  187.7
+                ]
+              ]
+            },
+            {
+              "op": "pencil",
+              "marks": [
+                [
+                  "circle",
+                  86.9,
+                  100.2
+                ],
+                [
+                  "circle",
+                  145.3,
+                  267.3
+                ],
+                [
+                  "circle",
+                  188.8,
+                  117.6
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "pages": [
+            1
+          ],
+          "size_px": [
+            1020,
+            1363
+          ],
+          "events": [
+            {
+              "op": "pencil",
+              "marks": [
+                [
+                  "circle",
+                  159.2,
+                  31.7
+                ],
+                [
+                  "circle",
+                  94.9,
+                  89.8
+                ],
+                [
+                  "circle",
+                  159.2,
+                  89.8
+                ],
+                [
+                  "circle",
+                  94.9,
+                  66.9
+                ],
+                [
+                  "circle",
+                  133.3,
+                  30.7
+                ],
+                [
+                  "circle",
+                  167.2,
+                  105.3
+                ],
+                [
+                  "tick",
+                  88.5,
+                  77.1
+                ],
+                [
+                  "tick",
+                  46.9,
+                  197.3
+                ],
+                [
+                  "breath_V",
+                  72.5,
+                  97.1
+                ],
+                [
+                  "breath_V",
+                  150.3,
+                  55.6
+                ],
+                [
+                  "breath_V",
+                  72.0,
+                  81.5
+                ],
+                [
+                  "breath_V",
+                  108.0,
+                  58.5
+                ],
+                [
+                  "arrow",
+                  107.5,
+                  215.2
+                ],
+                [
+                  "text",
+                  "S1!",
+                  50.3,
+                  74.9
+                ],
+                [
+                  "text",
+                  "A2 here",
+                  45.7,
+                  15.1
+                ],
+                [
+                  "text",
+                  "breathe",
+                  33.8,
+                  19.4
+                ],
+                [
+                  "text",
+                  "watch",
+                  108.1,
+                  77.9
+                ]
+              ]
+            },
+            {
+              "op": "pencil",
+              "marks": [
+                [
+                  "circle",
+                  159.2,
+                  89.8
+                ],
+                [
+                  "circle",
+                  133.3,
+                  88.8
+                ],
+                [
+                  "circle",
+                  37.2,
+                  100.7
+                ]
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "dpi": 200.0,
+  "dpi_note": "output resolution of scan.pdf (render_dpi / output_dpi per file under degradations)",
+  "license": "Text public domain (Christina Rossetti, 1885); music and engraving CC0-1.0",
+  "source": "self-authored (challenge corpus); text: Christina Rossetti, \"Love came down at Christmas\" (1885), stanzas 1-2",
+  "files": {
+    "truth": "truth.musicxml",
+    "engraving": "engraving.ly",
+    "clean": "clean.pdf",
+    "scans": [
+      "scan-mild.pdf",
+      "scan-severe.pdf",
+      "scan.pdf"
+    ]
+  },
+  "pages_engraved": 2,
+  "measures": 16,
+  "parts_truth": [
+    {
+      "id": "S1",
+      "name": "Soprano I",
+      "voices": 1,
+      "staves": 1
+    },
+    {
+      "id": "S2",
+      "name": "Soprano II",
+      "voices": 1,
+      "staves": 1
+    },
+    {
+      "id": "A1",
+      "name": "Alto I",
+      "voices": 1,
+      "staves": 1
+    },
+    {
+      "id": "A2",
+      "name": "Alto II",
+      "voices": 1,
+      "staves": 1
+    },
+    {
+      "id": "P",
+      "name": "Piano",
+      "voices": 3,
+      "staves": 2
+    }
+  ],
+  "lyric_lines_printed": [
+    {
+      "kind": "lyricsto",
+      "voice": [
+        "S1",
+        "1"
+      ],
+      "verse": 1,
+      "syllables": 26
+    },
+    {
+      "kind": "lyricsto",
+      "voice": [
+        "S1",
+        "1"
+      ],
+      "verse": 2,
+      "syllables": 26
+    }
+  ],
+  "validation": {
+    "xsd": "/Users/d.sloane/music/corpus/challenge/voices/_work/ssaa-two-treble-staves-piano/truth.musicxml validates",
+    "truth_reparsed_music21_matches_model": true,
+    "midi_per_voice_matches_printed_truth": true,
+    "midi_lyrics_match_truth": true,
+    "attacks_truth": 297,
+    "attacks_hidden_in_engraving_carried_by_other_voice": 0,
+    "lyric_text_found_in_vector_pdf": 1.0,
+    "lilypond_warnings": [],
+    "scan_files_image_only": {
+      "scan": true,
+      "scan-mild": true,
+      "scan-severe": true
+    }
+  },
+  "truth_limitations": [
+    "Lyrics only on Soprano I in truth.",
+    "Full-bar rests in mm.1-2 are written as measure rests in every choir part even though each choir staff prints only one (merged) rest."
+  ]
+}

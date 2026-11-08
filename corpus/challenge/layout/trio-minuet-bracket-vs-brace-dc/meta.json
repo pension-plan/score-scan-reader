@@ -1,0 +1,463 @@
+{
+  "id": "trio-minuet-bracket-vs-brace-dc",
+  "category": "layout",
+  "title": "Minuet and Trio - reduced string staves in a bracket above a braced piano, Fine / D.C. al Fine",
+  "edge_cases": [
+    "bracket_vs_brace",
+    "bracketed_treble_bass_pair_is_two_parts",
+    "mixed_staff_sizes_on_page",
+    "reduced_instrument_staves",
+    "instrument_names_first_system_only",
+    "piano_grand_staff",
+    "must_not_split",
+    "dc_al_fine",
+    "fine",
+    "repeats",
+    "key_change",
+    "section_heading_text",
+    "tempo_text",
+    "dynamics_text",
+    "hairpin",
+    "staccato",
+    "slurs",
+    "page_numbers"
+  ],
+  "expected": {
+    "parts": [
+      "Violin",
+      "Violoncello",
+      "Piano"
+    ],
+    "must_not_split": true,
+    "shared_staves": [],
+    "staves_per_part": {
+      "Violin": 1,
+      "Violoncello": 1,
+      "Piano": 2
+    },
+    "lyrics": [],
+    "notes": "Three parts: Violin (small treble staff), Violoncello (small bass staff) and Piano (normal-size grand staff, ONE part). The violin and cello staves form a treble+bass pair joined by a BRACKET - they are two separate instruments and must NOT be merged into one two-staff part; the piano staves are joined by a BRACE and must NOT be split. Instrument names appear only on the first system. Menuetto (mm. 1-16, repeats, \"Fine\" after m.16), Trio (mm. 17-32, C major, repeats, \"Menuetto D.C. al Fine\" after m.32) - notated order, not unrolled."
+  },
+  "truth_limitations": "Beaming not encoded. Reduced staves are <staff-details><staff-size>75</staff-size>. The D.C./Fine semantics are <sound dacapo=\"yes\"/> and <sound fine=\"yes\"/>.",
+  "layout": "US letter, staff size 17 (strings 75 %), 4 systems of 4 staves per page, Trio on page 2",
+  "pages": 2,
+  "measures": 32,
+  "notes_in_truth": 425,
+  "hidden_staff_systems": [],
+  "dpi": 300,
+  "degradations": {
+    "scan.pdf": {
+      "seed": 16001,
+      "render_dpi": 300,
+      "dpi": 300,
+      "format": "png1",
+      "colour": "bw",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            2409,
+            3300
+          ],
+          "ops": [
+            [
+              "crop_ink_target_mm_into_staff_ends",
+              {
+                "right": 2.0
+              }
+            ],
+            [
+              "ink_weight",
+              1
+            ],
+            [
+              "punch_holes",
+              {
+                "side": "left",
+                "centers_px": [
+                  [
+                    130,
+                    1204
+                  ],
+                  [
+                    130,
+                    2096
+                  ]
+                ]
+              }
+            ],
+            [
+              "staple",
+              {
+                "corner": "tl",
+                "pos_px": [
+                  153,
+                  132
+                ]
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              0.4
+            ],
+            [
+              "focus_blur_sigma",
+              0.8
+            ],
+            [
+              "gaussian_noise_sigma",
+              10
+            ],
+            [
+              "speckles_per_mpx",
+              40
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 185,
+                "noise": 18
+              }
+            ],
+            [
+              "crop_edges",
+              {
+                "right": 0.0555
+              }
+            ]
+          ]
+        },
+        {
+          "image": 2,
+          "source_pages": [
+            2
+          ],
+          "size_px": [
+            2409,
+            3300
+          ],
+          "ops": [
+            [
+              "crop_ink_target_mm_into_staff_ends",
+              {
+                "right": 2.0
+              }
+            ],
+            [
+              "ink_weight",
+              1
+            ],
+            [
+              "punch_holes",
+              {
+                "side": "left",
+                "centers_px": [
+                  [
+                    130,
+                    1204
+                  ],
+                  [
+                    130,
+                    2096
+                  ]
+                ]
+              }
+            ],
+            [
+              "staple",
+              {
+                "corner": "tl",
+                "pos_px": [
+                  153,
+                  132
+                ]
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              0.4
+            ],
+            [
+              "focus_blur_sigma",
+              0.8
+            ],
+            [
+              "gaussian_noise_sigma",
+              10
+            ],
+            [
+              "speckles_per_mpx",
+              40
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 185,
+                "noise": 18
+              }
+            ],
+            [
+              "crop_edges",
+              {
+                "right": 0.0555
+              }
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 300,
+        "ink_weight": 1,
+        "rotate": 0.4,
+        "punch_holes": {
+          "n": 2,
+          "side": "left",
+          "level": 0
+        },
+        "staple": {
+          "corner": "tl"
+        },
+        "crop_ink": {
+          "right": 2.0
+        },
+        "blur": 0.8,
+        "noise": 10,
+        "binarize": 185,
+        "binarize_noise": 18,
+        "speckle": 40,
+        "format": "png1"
+      },
+      "summary": "dark (thick) binarised photocopy at 300 dpi, staple, two punch holes, right edge cropped 2 mm into the staff ends",
+      "bytes": 261982
+    },
+    "scan-mild.pdf": {
+      "seed": 16002,
+      "render_dpi": 300,
+      "dpi": 300,
+      "format": "jpeg q85",
+      "colour": "gray",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            2550,
+            3300
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              2
+            ],
+            [
+              "skew_rotation_deg",
+              -0.4
+            ],
+            [
+              "gaussian_noise_sigma",
+              2
+            ]
+          ]
+        },
+        {
+          "image": 2,
+          "source_pages": [
+            2
+          ],
+          "size_px": [
+            2550,
+            3300
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              2
+            ],
+            [
+              "skew_rotation_deg",
+              -0.4
+            ],
+            [
+              "gaussian_noise_sigma",
+              2
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 300,
+        "mode": "gray",
+        "texture": 2,
+        "rotate": -0.4,
+        "noise": 2,
+        "jpeg": 85
+      },
+      "summary": "300 dpi grey, 0.4 deg skew",
+      "bytes": 1853409
+    },
+    "scan-severe.pdf": {
+      "seed": 16003,
+      "render_dpi": 150,
+      "dpi": 150,
+      "format": "jpeg q25",
+      "colour": "gray",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1063,
+            1650
+          ],
+          "ops": [
+            [
+              "crop_ink_target_mm_into_staff_ends",
+              {
+                "right": 3.0,
+                "left": 1.5
+              }
+            ],
+            [
+              "paper_texture",
+              5
+            ],
+            [
+              "skew_rotation_deg",
+              6.0
+            ],
+            [
+              "focus_blur_sigma",
+              0.9
+            ],
+            [
+              "gaussian_noise_sigma",
+              9
+            ],
+            [
+              "salt_pepper",
+              0.003
+            ],
+            [
+              "crop_edges",
+              {
+                "right": 0.0602,
+                "left": 0.1073
+              }
+            ]
+          ]
+        },
+        {
+          "image": 2,
+          "source_pages": [
+            2
+          ],
+          "size_px": [
+            1066,
+            1650
+          ],
+          "ops": [
+            [
+              "crop_ink_target_mm_into_staff_ends",
+              {
+                "right": 3.0,
+                "left": 1.5
+              }
+            ],
+            [
+              "paper_texture",
+              5
+            ],
+            [
+              "skew_rotation_deg",
+              -1.5
+            ],
+            [
+              "focus_blur_sigma",
+              0.9
+            ],
+            [
+              "gaussian_noise_sigma",
+              9
+            ],
+            [
+              "salt_pepper",
+              0.003
+            ],
+            [
+              "crop_edges",
+              {
+                "right": 0.0602,
+                "left": 0.105
+              }
+            ],
+            [
+              "page_rotated_deg",
+              180
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 150,
+        "mode": "gray",
+        "texture": 5,
+        "rotate_pages": {
+          "0": 6.0,
+          "1": -1.5
+        },
+        "page_rotate": {
+          "1": 180
+        },
+        "crop_ink": {
+          "right": 3.0,
+          "left": 1.5
+        },
+        "blur": 0.9,
+        "noise": 9,
+        "saltpepper": 0.003,
+        "jpeg": 25
+      },
+      "summary": "page 1 skewed 6 deg, page 2 fed upside down (180 deg), 150 dpi grey, left/right edges cropped into the staves, salt & pepper, JPEG q25",
+      "bytes": 299746
+    }
+  },
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "scan-mild.pdf",
+    "scan-severe.pdf",
+    "scan.pdf",
+    "truth.musicxml"
+  ],
+  "license": "CC0-1.0 (composition, engraving, scans)",
+  "source": "self-authored (layout-challenge corpus)",
+  "engraver": "internal model -> LilyPond 2.24 (custom writer, layout-challenge edition)",
+  "validation": {
+    "xsd_valid": true,
+    "music21_parse": "4 265",
+    "midi_attacks_match_truth": true,
+    "attacks": 425,
+    "lilypond_warnings": [
+      "warning: ragged-bottom was specified, but page must be compressed",
+      "warning: page 1 has been compressed"
+    ],
+    "lyric_syllables_found_in_engraving": null,
+    "lyric_syllables": 0,
+    "pages_planned": 2,
+    "image_only": {
+      "clean.pdf": true,
+      "scan.pdf": true,
+      "scan-mild.pdf": true,
+      "scan-severe.pdf": true
+    }
+  }
+}

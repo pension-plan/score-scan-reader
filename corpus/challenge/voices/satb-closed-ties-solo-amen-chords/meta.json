@@ -1,0 +1,312 @@
+{
+  "id": "satb-closed-ties-solo-amen-chords",
+  "category": "voices",
+  "title": "Hark! the Herald Angels Sing (closed SATB, S A / T B labels, ties vs re-attacks, bass solo, chords on one stem)",
+  "edge_cases": [
+    "satb_closed",
+    "part_labels_single_letters",
+    "unison_whole_phrase_two_stems",
+    "tie_in_one_voice_reattack_in_other",
+    "one_voice_rests_other_sings",
+    "bass_solo_lower_staff_lyrics",
+    "lyrics_lower_staff_only_for_solo",
+    "chords_on_soprano_stem_closed_score",
+    "bass_octave_chord_on_stem",
+    "chords_must_stay_chords",
+    "merged_rests",
+    "cut_time_alla_breve",
+    "dynamics",
+    "fermata"
+  ],
+  "expected": {
+    "parts": [
+      "Soprano",
+      "Alto",
+      "Tenor",
+      "Bass"
+    ],
+    "must_not_split": true,
+    "shared_staves": [
+      [
+        "Soprano",
+        "Alto"
+      ],
+      [
+        "Tenor",
+        "Bass"
+      ]
+    ],
+    "notes": "Closed score labelled only \"S A\" and \"T B\". mm.1-2: soprano and alto sing the same notes (every head carries an up- and a down-stem) - both parts get the full phrase. m.4-5: the soprano g' is TIED over the barline while the alto RE-ATTACKS g' on m.5 beat 1 (same head position): truth has a tie in Soprano and a new note in Alto; the same happens in mm.7-8 on the bass staff (tenor a tied, bass re-attacks a). mm.5-6: upper voices and tenor rest while the bass sings a solo whose words (\"Peace on earth, and mercy mild\") are printed under the bass staff and belong to the Bass. m.7: alto enters after a quarter rest. Amen (mm.9-10): the soprano sings two-note chords on its up-stem and the bass octaves on its down-stem - these must stay chords inside Soprano/Bass (must_not_split refers to these chords), the alto and tenor single notes are separate parts. Exactly 4 parts."
+  },
+  "degradations": {
+    "scan.pdf": {
+      "seed": 7701,
+      "render_dpi": 150,
+      "output_dpi": 150,
+      "mode": "rgb",
+      "format": "jpeg",
+      "jpeg_quality": 30,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "spread_2up": null,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            212,
+            225,
+            238
+          ],
+          "ink": [
+            36,
+            40,
+            58
+          ],
+          "texture": 5,
+          "fibers": 2
+        },
+        {
+          "op": "rotate",
+          "deg": -1.8,
+          "fill": [
+            30,
+            30,
+            32
+          ]
+        },
+        {
+          "op": "gradient",
+          "strength": 0.3,
+          "angle": 270
+        },
+        {
+          "op": "vignette",
+          "strength": 0.15
+        },
+        {
+          "op": "blur",
+          "sigma": 0.7
+        },
+        {
+          "op": "noise",
+          "sigma": 4.5,
+          "chroma": 2
+        }
+      ],
+      "summary": "copy on light-blue paper scanned at 150 dpi with the lid open: dark top border, strong lighting gradient, -1.8 deg skew, JPEG q30",
+      "pdf_pages": 1,
+      "events": [
+        {
+          "pages": [
+            0
+          ],
+          "size_px": [
+            1275,
+            1650
+          ],
+          "events": []
+        }
+      ]
+    },
+    "scan-mild.pdf": {
+      "seed": 7702,
+      "render_dpi": 300,
+      "output_dpi": 300,
+      "mode": "gray",
+      "format": "jpeg",
+      "jpeg_quality": 60,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "spread_2up": null,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            245,
+            245,
+            243
+          ],
+          "texture": 2
+        },
+        {
+          "op": "rotate",
+          "deg": 0.7,
+          "fill": 252
+        },
+        {
+          "op": "blur",
+          "sigma": 0.45
+        },
+        {
+          "op": "noise",
+          "sigma": 2
+        }
+      ],
+      "summary": "office scan, 0.7 deg skew",
+      "pdf_pages": 1,
+      "events": [
+        {
+          "pages": [
+            0
+          ],
+          "size_px": [
+            2550,
+            3300
+          ],
+          "events": []
+        }
+      ]
+    },
+    "scan-severe.pdf": {
+      "seed": 7703,
+      "render_dpi": 125,
+      "output_dpi": 125,
+      "mode": "bilevel",
+      "format": "png",
+      "jpeg_quality": null,
+      "jpeg_passes": null,
+      "binarize": {
+        "thr": 105,
+        "noise": 20,
+        "pre_blur": 0.7
+      },
+      "spread_2up": null,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            238,
+            238,
+            238
+          ],
+          "texture": 9
+        },
+        {
+          "op": "crop",
+          "cut_staff_right_mm": 3.0,
+          "top_mm": 6
+        },
+        {
+          "op": "rotate",
+          "deg": 10.0,
+          "fill": 255,
+          "expand": true
+        },
+        {
+          "op": "blur",
+          "sigma": 0.8
+        },
+        {
+          "op": "speckle",
+          "per_mpx": 140
+        },
+        {
+          "op": "saltpepper",
+          "amount": 0.0012
+        }
+      ],
+      "summary": "thin binarized copy at 125 dpi, right edge cropped through the staff ends, 10 deg skew, speckles",
+      "pdf_pages": 1,
+      "events": [
+        {
+          "pages": [
+            0
+          ],
+          "size_px": [
+            1217,
+            1500
+          ],
+          "events": [
+            {
+              "op": "crop",
+              "staff_right_px": 1012,
+              "cut_at_px": 997,
+              "cut_into_staff_mm": 3.05
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "dpi": 150,
+  "dpi_note": "output resolution of scan.pdf (render_dpi / output_dpi per file under degradations)",
+  "license": "Text public domain (Charles Wesley, 1739; alt. G. Whitefield, 1753); music and engraving CC0-1.0",
+  "source": "self-authored (challenge corpus); text: Wesley/Whitefield \"Hark! the herald angels sing\", stanza 1 lines 1-4",
+  "files": {
+    "truth": "truth.musicxml",
+    "engraving": "engraving.ly",
+    "clean": "clean.pdf",
+    "scans": [
+      "scan-mild.pdf",
+      "scan-severe.pdf",
+      "scan.pdf"
+    ]
+  },
+  "pages_engraved": 1,
+  "measures": 10,
+  "parts_truth": [
+    {
+      "id": "S",
+      "name": "Soprano",
+      "voices": 1,
+      "staves": 1
+    },
+    {
+      "id": "A",
+      "name": "Alto",
+      "voices": 1,
+      "staves": 1
+    },
+    {
+      "id": "T",
+      "name": "Tenor",
+      "voices": 1,
+      "staves": 1
+    },
+    {
+      "id": "B",
+      "name": "Bass",
+      "voices": 1,
+      "staves": 1
+    }
+  ],
+  "lyric_lines_printed": [
+    {
+      "kind": "lyricsto",
+      "voice": [
+        "S",
+        "1"
+      ],
+      "verse": 1,
+      "syllables": 23
+    },
+    {
+      "kind": "lyricsto",
+      "voice": [
+        "B",
+        "1"
+      ],
+      "verse": 1,
+      "syllables": 7
+    }
+  ],
+  "validation": {
+    "xsd": "/Users/d.sloane/music/corpus/challenge/voices/_work/satb-closed-ties-solo-amen-chords/truth.musicxml validates",
+    "truth_reparsed_music21_matches_model": true,
+    "midi_per_voice_matches_printed_truth": true,
+    "midi_lyrics_match_truth": true,
+    "attacks_truth": 94,
+    "attacks_hidden_in_engraving_carried_by_other_voice": 0,
+    "lyric_text_found_in_vector_pdf": 1.0,
+    "lilypond_warnings": [],
+    "scan_files_image_only": {
+      "scan": true,
+      "scan-mild": true,
+      "scan-severe": true
+    }
+  },
+  "truth_limitations": [
+    "Upper lyric line on Soprano only in truth; lower line (bass solo) on Bass.",
+    "Rests merged by the engraver (one printed rest for two voices) are explicit rests in both parts in truth."
+  ]
+}

@@ -1,0 +1,225 @@
+{
+  "id": "pitch-accidental-storm",
+  "category": "pitch",
+  "title": "Accidental Storm (flute study)",
+  "edge_cases": [
+    "accidental_carries_through_bar",
+    "barline_cancels_accidental_no_courtesy",
+    "courtesy_accidental_parenthesized",
+    "courtesy_accidental_unparenthesized",
+    "double_sharp",
+    "double_flat",
+    "natural_sharp_after_double_sharp",
+    "natural_flat_after_double_flat",
+    "chromatic_scale_ascending_sharps",
+    "chromatic_scale_descending_flats",
+    "tie_across_barline_accidental_restated",
+    "accidental_octave_specific",
+    "e_sharp",
+    "c_flat",
+    "binarized_photocopy"
+  ],
+  "expected": {
+    "parts": [
+      "Flute"
+    ],
+    "must_not_split": false,
+    "shared_staves": [],
+    "lyrics": [],
+    "notes": "One part (Flute), G major, 20 bars.  Bar 2: second C#5 has no sign (carried within the bar).  Bar 3: C5 is natural with NO printed natural (barline cancels the C# of bar 2).  Bar 6: D5 with a parenthesised courtesy natural; bar 8: C5 with an unparenthesised courtesy natural.  Bar 9: F##5, G#5, then F#5 printed as natural+sharp, then F5 natural.  Bar 11: Bb4, Bbb4, Bb4 (natural+flat), Ab4.  Bars 13-16: chromatic scales (sharps up, flats down; E#4 in bar 13; F5 natural in bar 14 then a parenthesised courtesy sharp on F#5 in bar 15).  Bars 17-18: G#4 tied over the barline; the next G#4 in bar 18 carries its sharp again.  Bar 19: C#5 then C4 without sign (accidentals only bind their own octave, so C4 is natural) then C5 with a natural sign.  Courtesy accidentals are encoded as <accidental cautionary=\"yes\"> (with parentheses=\"yes\" where printed in parentheses)."
+  },
+  "shared_staff_accidental_differences": [],
+  "courtesy_accidentals": [],
+  "truth_limitations": [],
+  "degradations": {
+    "scan.pdf": {
+      "dpi": 300,
+      "seed": 13001,
+      "color": "bilevel",
+      "encoding": "png (1-bit)",
+      "pages_in_pdf": 1,
+      "pixel_size": [
+        2481,
+        3508
+      ],
+      "summary": "thick binarised photocopy: ink spread (+1 px), 1.5 deg skew, toner speckles, threshold 165 with noise -> 1-bit PNG",
+      "ops": [
+        {
+          "op": "ink",
+          "weight": 1
+        },
+        {
+          "op": "paper",
+          "rgb": [
+            245,
+            244,
+            240
+          ],
+          "texture": 2
+        },
+        {
+          "op": "rotate",
+          "deg": 1.5
+        },
+        {
+          "op": "noise",
+          "speckle": 150
+        },
+        {
+          "op": "binarize",
+          "threshold": 165,
+          "noise": 18,
+          "pre_blur_px300": 0.6
+        }
+      ]
+    },
+    "scan-mild.pdf": {
+      "dpi": 300,
+      "seed": 13002,
+      "color": "gray",
+      "encoding": "jpeg q55",
+      "pages_in_pdf": 1,
+      "pixel_size": [
+        2481,
+        3508
+      ],
+      "summary": "light grey photocopy: -0.5 deg skew, faint noise, JPEG q55",
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            242,
+            242,
+            240
+          ],
+          "texture": 2
+        },
+        {
+          "op": "rotate",
+          "deg": -0.5
+        },
+        {
+          "op": "noise",
+          "sigma": 3
+        },
+        {
+          "op": "gray"
+        }
+      ]
+    },
+    "scan-severe.pdf": {
+      "dpi": 150,
+      "seed": 13003,
+      "color": "bilevel",
+      "encoding": "png (1-bit)",
+      "pages_in_pdf": 1,
+      "pixel_size": [
+        1309,
+        1802
+      ],
+      "summary": "thin light photocopy at 150 dpi: -2.2 deg skew, low threshold (105) with noise -> dotted/broken staff lines and thin stems, salt-and-pepper, 1-bit PNG",
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            245,
+            244,
+            240
+          ],
+          "texture": 2
+        },
+        {
+          "op": "rotate",
+          "deg": -2.2,
+          "expand": true
+        },
+        {
+          "op": "noise",
+          "saltpepper": 0.003
+        },
+        {
+          "op": "binarize",
+          "threshold": 105,
+          "noise": 18,
+          "pre_blur_px300": 0.6
+        }
+      ]
+    }
+  },
+  "dpi": {
+    "scan.pdf": 300,
+    "scan-mild.pdf": 300,
+    "scan-severe.pdf": 150
+  },
+  "clean_pdf": {
+    "dpi": 300,
+    "note": "undamaged 300 dpi grey raster of the LilyPond engraving (image only)"
+  },
+  "license": "CC0-1.0 (music, engraving, scans); lyrics texts public domain where present",
+  "source": "composed for this corpus",
+  "measures": 20,
+  "pages": 1,
+  "layout": "single treble staff, 5 systems x 4 bars",
+  "validation": {
+    "xsd_valid": true,
+    "midi_attacks_match_truth_file": true,
+    "attacks": 93,
+    "printed_accidentals_match": true,
+    "accidentals": {
+      "expected": 35,
+      "printed": 35,
+      "extra_natural": 2,
+      "parenthesized": 2,
+      "double": 2,
+      "tie_at_line_start": 0
+    },
+    "clefs": {
+      "stFL": {
+        "expected_changes": 0,
+        "rendered_changes": 0
+      }
+    },
+    "keys": {
+      "stFL": {
+        "expected": [
+          "0:1"
+        ],
+        "rendered": [
+          "0:1"
+        ],
+        "cancellations": {}
+      }
+    },
+    "ottava": {
+      "stFL": {
+        "expected": [],
+        "rendered": [],
+        "pieces": 0
+      }
+    },
+    "systems": 5,
+    "line_start_measures": [
+      1,
+      5,
+      9,
+      13,
+      17
+    ],
+    "lyric_text_found_in_engraving": null,
+    "scan_files_image_only": {
+      "scan.pdf": true,
+      "scan-mild.pdf": true,
+      "scan-severe.pdf": true
+    }
+  },
+  "files": [
+    "engraving.ly",
+    "truth.musicxml",
+    "clean.pdf",
+    "scan.pdf",
+    "scan-mild.pdf",
+    "scan-severe.pdf",
+    "meta.json",
+    "ATTRIBUTION.txt"
+  ]
+}

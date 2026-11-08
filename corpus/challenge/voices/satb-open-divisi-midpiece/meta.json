@@ -1,0 +1,380 @@
+{
+  "id": "satb-open-divisi-midpiece",
+  "category": "voices",
+  "title": "Ave verum corpus (open score; divisi appears mid-piece)",
+  "edge_cases": [
+    "satb_open_score",
+    "divisi_mid_piece",
+    "divisi_two_voices_one_staff_same_part",
+    "divisi_chords_one_stem",
+    "bass_octave_divisi_chord",
+    "chords_must_stay_chords",
+    "div_unis_markings",
+    "tenor_treble_8vb_clef",
+    "lyrics_under_every_staff",
+    "latin_text",
+    "part_labels_full_then_abbrev",
+    "multi_page",
+    "dynamics",
+    "fermata",
+    "accidental_natural"
+  ],
+  "expected": {
+    "parts": [
+      "Soprano",
+      "Alto",
+      "Tenor",
+      "Bass"
+    ],
+    "must_not_split": true,
+    "shared_staves": [],
+    "notes": "Open score, one staff per part, every staff labelled (full names on page 1, then S./A./T./B.). MUST NOT create extra parts for the divisi passages: in mm.7-8 the Tenor staff splits into two voices (\"div.\", stems up/down, back to \"unis.\" in m.9) - both voices belong to the Tenor part (truth: Tenor voice 1 and voice 2); in m.18 and mm.20-21 the Soprano sings two-note chords on one stem and in mm.20-21 the Bass sings octave chords: these stay chords inside Soprano/Bass. Exactly 4 parts. The tenor clef is a treble clef with a small 8 below (sounds an octave lower than written): truth pitches are sounding pitches (e.g. m.16 tenor B3 natural). Lyrics are printed under every staff and belong to each part (the second tenor voice in mm.7-8 has none)."
+  },
+  "degradations": {
+    "scan.pdf": {
+      "seed": 7401,
+      "render_dpi": 300,
+      "output_dpi": 300,
+      "mode": "gray",
+      "format": "jpeg",
+      "jpeg_quality": 50,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "spread_2up": null,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            242,
+            242,
+            238
+          ],
+          "texture": 4,
+          "bleed": {
+            "strength": 0.09,
+            "blur_mm": 0.4,
+            "shift_mm": 2
+          }
+        },
+        {
+          "op": "scale",
+          "s": 0.965,
+          "pages": [
+            1
+          ],
+          "dx_mm": 3,
+          "dy_mm": -2
+        },
+        {
+          "op": "rotate",
+          "deg": 0.9,
+          "fill": 250,
+          "pages": [
+            0
+          ]
+        },
+        {
+          "op": "rotate",
+          "deg": -1.6,
+          "fill": 250,
+          "pages": [
+            1
+          ]
+        },
+        {
+          "op": "rot90",
+          "k": 1,
+          "pages": [
+            1
+          ]
+        },
+        {
+          "op": "gradient",
+          "strength": 0.08
+        },
+        {
+          "op": "blur",
+          "sigma": 0.6
+        },
+        {
+          "op": "noise",
+          "sigma": 3.5
+        }
+      ],
+      "summary": "2-page flatbed scan; page 2 placed sideways (rotated 90 deg) and photocopied at 96.5%; bleed-through of the facing page",
+      "pdf_pages": 2,
+      "events": [
+        {
+          "pages": [
+            0
+          ],
+          "size_px": [
+            2481,
+            3508
+          ],
+          "events": []
+        },
+        {
+          "pages": [
+            1
+          ],
+          "size_px": [
+            3508,
+            2481
+          ],
+          "events": []
+        }
+      ]
+    },
+    "scan-mild.pdf": {
+      "seed": 7402,
+      "render_dpi": 600,
+      "output_dpi": 600,
+      "mode": "gray",
+      "format": "jpeg",
+      "jpeg_quality": 60,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "spread_2up": null,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            246,
+            246,
+            244
+          ],
+          "texture": 2
+        },
+        {
+          "op": "rotate",
+          "deg": 0.3,
+          "fill": 252,
+          "pages": [
+            0
+          ]
+        },
+        {
+          "op": "rotate",
+          "deg": -0.5,
+          "fill": 252,
+          "pages": [
+            1
+          ]
+        },
+        {
+          "op": "blur",
+          "sigma": 0.45
+        },
+        {
+          "op": "noise",
+          "sigma": 2
+        }
+      ],
+      "summary": "2-page clean high-resolution scan at 600 dpi, slight skews 0.3/-0.5 deg",
+      "pdf_pages": 2,
+      "events": [
+        {
+          "pages": [
+            0
+          ],
+          "size_px": [
+            4961,
+            7016
+          ],
+          "events": []
+        },
+        {
+          "pages": [
+            1
+          ],
+          "size_px": [
+            4961,
+            7016
+          ],
+          "events": []
+        }
+      ]
+    },
+    "scan-severe.pdf": {
+      "seed": 7403,
+      "render_dpi": 150,
+      "output_dpi": 150,
+      "mode": "rgb",
+      "format": "jpeg",
+      "jpeg_quality": 28,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "spread_2up": {
+        "pairs": [
+          [
+            0,
+            1
+          ]
+        ],
+        "gap_mm": 0,
+        "gutter": 0.6,
+        "gutter_width": 0.06,
+        "fill": 60
+      },
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            236,
+            228,
+            205
+          ],
+          "texture": 7
+        },
+        {
+          "op": "wave",
+          "amp_mm": 2.0,
+          "period": 1.0,
+          "phase": 1.57,
+          "fill": [
+            60,
+            55,
+            50
+          ]
+        },
+        {
+          "op": "rotate",
+          "deg": 3.0,
+          "fill": [
+            55,
+            52,
+            48
+          ],
+          "expand": true
+        },
+        {
+          "op": "vignette",
+          "strength": 0.18
+        },
+        {
+          "op": "blur",
+          "sigma": 0.9
+        },
+        {
+          "op": "noise",
+          "sigma": 5,
+          "chroma": 2
+        }
+      ],
+      "summary": "open book scanned as one 2-up double-page spread at 150 dpi: gutter shadow and curl, 3 deg skew, yellowed paper, JPEG q28",
+      "pdf_pages": 1,
+      "events": [
+        {
+          "pages": [
+            0,
+            1
+          ],
+          "size_px": [
+            2572,
+            1882
+          ],
+          "events": []
+        }
+      ]
+    }
+  },
+  "dpi": 300,
+  "dpi_note": "output resolution of scan.pdf (render_dpi / output_dpi per file under degradations)",
+  "license": "Text public domain (Ave verum corpus, 14th-century Latin hymn); music and engraving CC0-1.0",
+  "source": "self-authored (challenge corpus); text: \"Ave verum corpus\" (14th c.), lines 1-6 + Amen",
+  "files": {
+    "truth": "truth.musicxml",
+    "engraving": "engraving.ly",
+    "clean": "clean.pdf",
+    "scans": [
+      "scan-mild.pdf",
+      "scan-severe.pdf",
+      "scan.pdf"
+    ]
+  },
+  "pages_engraved": 2,
+  "measures": 21,
+  "parts_truth": [
+    {
+      "id": "S",
+      "name": "Soprano",
+      "voices": 1,
+      "staves": 1
+    },
+    {
+      "id": "A",
+      "name": "Alto",
+      "voices": 1,
+      "staves": 1
+    },
+    {
+      "id": "T",
+      "name": "Tenor",
+      "voices": 2,
+      "staves": 1
+    },
+    {
+      "id": "B",
+      "name": "Bass",
+      "voices": 1,
+      "staves": 1
+    }
+  ],
+  "lyric_lines_printed": [
+    {
+      "kind": "lyricsto",
+      "voice": [
+        "S",
+        "1"
+      ],
+      "verse": 1,
+      "syllables": 48
+    },
+    {
+      "kind": "lyricsto",
+      "voice": [
+        "A",
+        "1"
+      ],
+      "verse": 1,
+      "syllables": 48
+    },
+    {
+      "kind": "lyricsto",
+      "voice": [
+        "T",
+        "1"
+      ],
+      "verse": 1,
+      "syllables": 48
+    },
+    {
+      "kind": "lyricsto",
+      "voice": [
+        "B",
+        "1"
+      ],
+      "verse": 1,
+      "syllables": 48
+    }
+  ],
+  "validation": {
+    "xsd": "/Users/d.sloane/music/corpus/challenge/voices/_work/satb-open-divisi-midpiece/truth.musicxml validates",
+    "truth_reparsed_music21_matches_model": true,
+    "midi_per_voice_matches_printed_truth": true,
+    "midi_lyrics_match_truth": true,
+    "attacks_truth": 202,
+    "attacks_hidden_in_engraving_carried_by_other_voice": 0,
+    "lyric_text_found_in_vector_pdf": 1.0,
+    "lilypond_warnings": [],
+    "scan_files_image_only": {
+      "scan": true,
+      "scan-mild": true,
+      "scan-severe": true
+    }
+  },
+  "truth_limitations": [
+    "Divisi voice 2 of the Tenor exists only in mm.7-8; elsewhere it is an empty voice (<forward> in truth)."
+  ]
+}

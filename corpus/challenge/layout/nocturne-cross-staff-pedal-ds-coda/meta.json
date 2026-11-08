@@ -1,0 +1,470 @@
+{
+  "id": "nocturne-cross-staff-pedal-ds-coda",
+  "category": "layout",
+  "title": "Nocturne in E-flat - cross-staff beams, pedal marks, Segno / To Coda / D.S. al Coda",
+  "edge_cases": [
+    "cross_staff_beams",
+    "cross_staff_notes_lh_to_treble",
+    "cross_staff_notes_rh_to_bass",
+    "pedal_marks",
+    "segno",
+    "to_coda",
+    "ds_al_coda",
+    "coda",
+    "tempo_text",
+    "dotted_metronome_mark",
+    "expression_text",
+    "dynamics_text",
+    "hairpin",
+    "accidentals_cross_staff",
+    "piano_grand_staff",
+    "must_not_split",
+    "double_barline",
+    "ties",
+    "slurs",
+    "fermata"
+  ],
+  "expected": {
+    "parts": [
+      "Piano"
+    ],
+    "must_not_split": true,
+    "shared_staves": [],
+    "staves_per_part": {
+      "Piano": 2
+    },
+    "lyrics": [],
+    "notes": "One part: Piano (2 staves) - must NOT be split even though left-hand notes appear on the treble staff (beams cross between the staves) and right-hand notes on the bass staff. Cross-staff notes keep their voice (LH voice 5 / RH voice 1) and carry the staff they are printed on (<staff>). Notated order: segno at m.3, \"To Coda\" after m.8, \"D.S. al Coda\" after m.18, coda from m.19 - do not unroll. \"Ped.\" / \"*\" signs, \"cantabile\", \"cresc.\", \"dim.\", \"rit.\", \"morendo\", tempo text are not notes or lyrics."
+  },
+  "truth_limitations": "Beaming is not encoded (no <beam>); the cross-staff beams are only visible in the engraving. Pedal is encoded as <pedal type=\"stop\"/> + <pedal type=\"start\"/> at each change (LilyPond prints \"*Ped.\"). Stem directions are not encoded for single-voice staves.",
+  "layout": "US letter, staff size 20, 6 systems on 2 pages; page 2 begins with the bars before the D.S.",
+  "pages": 2,
+  "measures": 23,
+  "notes_in_truth": 211,
+  "hidden_staff_systems": [],
+  "dpi": 200,
+  "degradations": {
+    "scan.pdf": {
+      "seed": 14001,
+      "render_dpi": 200,
+      "dpi": 200,
+      "format": "jpeg q35",
+      "colour": "rgb",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1904,
+            2404
+          ],
+          "ops": [
+            [
+              "page_curl",
+              {
+                "side": "right",
+                "amp": 35,
+                "width": 0.3
+              }
+            ],
+            [
+              "paper_texture",
+              4
+            ],
+            [
+              "paper_colour",
+              [
+                246,
+                242,
+                232
+              ]
+            ],
+            [
+              "stains",
+              {
+                "coffee": [
+                  [
+                    590,
+                    350,
+                    187
+                  ]
+                ]
+              }
+            ],
+            [
+              "perspective_phone",
+              {
+                "margin": 0.06,
+                "bg": 50,
+                "jitter": 0.03,
+                "keystone": 0.06,
+                "corners_src": [
+                  [
+                    -126,
+                    -17
+                  ],
+                  [
+                    2056,
+                    9
+                  ],
+                  [
+                    1929,
+                    2473
+                  ],
+                  [
+                    30,
+                    2340
+                  ]
+                ]
+              }
+            ],
+            [
+              "uneven_lighting",
+              0.3
+            ],
+            [
+              "vignette",
+              0.3
+            ],
+            [
+              "focus_blur_sigma",
+              0.8
+            ],
+            [
+              "motion_blur",
+              {
+                "len": 5,
+                "angle": 30
+              }
+            ],
+            [
+              "gaussian_noise_sigma",
+              5
+            ]
+          ]
+        },
+        {
+          "image": 2,
+          "source_pages": [
+            2
+          ],
+          "size_px": [
+            1904,
+            2404
+          ],
+          "ops": [
+            [
+              "page_curl",
+              {
+                "side": "right",
+                "amp": 35,
+                "width": 0.3
+              }
+            ],
+            [
+              "paper_texture",
+              4
+            ],
+            [
+              "paper_colour",
+              [
+                246,
+                242,
+                232
+              ]
+            ],
+            [
+              "stains",
+              {
+                "coffee": [
+                  [
+                    295,
+                    595,
+                    187
+                  ]
+                ]
+              }
+            ],
+            [
+              "perspective_phone",
+              {
+                "margin": 0.06,
+                "bg": 50,
+                "jitter": 0.03,
+                "keystone": 0.06,
+                "corners_src": [
+                  [
+                    -161,
+                    13
+                  ],
+                  [
+                    2047,
+                    -53
+                  ],
+                  [
+                    1884,
+                    2358
+                  ],
+                  [
+                    21,
+                    2335
+                  ]
+                ]
+              }
+            ],
+            [
+              "uneven_lighting",
+              0.3
+            ],
+            [
+              "vignette",
+              0.3
+            ],
+            [
+              "focus_blur_sigma",
+              0.8
+            ],
+            [
+              "motion_blur",
+              {
+                "len": 5,
+                "angle": 30
+              }
+            ],
+            [
+              "gaussian_noise_sigma",
+              5
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 200,
+        "mode": "rgb",
+        "paper_rgb": [
+          246,
+          242,
+          232
+        ],
+        "texture": 4,
+        "coffee": {
+          "n": 1,
+          "r": 0.11,
+          "strength": 1.0
+        },
+        "curl": {
+          "side": "right",
+          "amp": 35,
+          "width": 0.3
+        },
+        "phone": {
+          "margin": 0.06,
+          "bg": 50,
+          "jitter": 0.03,
+          "keystone": 0.06
+        },
+        "blotch": 0.3,
+        "vignette": 0.3,
+        "motion_blur": {
+          "len": 5,
+          "angle": 30
+        },
+        "blur": 0.8,
+        "noise": 5,
+        "jpeg": 35
+      },
+      "summary": "phone photo: perspective + keystone, page curl, uneven lighting, vignette, coffee ring stain, motion + focus blur, RGB, JPEG q35",
+      "bytes": 356816
+    },
+    "scan-mild.pdf": {
+      "seed": 14002,
+      "render_dpi": 400,
+      "dpi": 400,
+      "format": "jpeg q80",
+      "colour": "gray",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            3400,
+            4400
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              2
+            ],
+            [
+              "skew_rotation_deg",
+              1.0
+            ],
+            [
+              "gaussian_noise_sigma",
+              2
+            ]
+          ]
+        },
+        {
+          "image": 2,
+          "source_pages": [
+            2
+          ],
+          "size_px": [
+            3400,
+            4400
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              2
+            ],
+            [
+              "skew_rotation_deg",
+              1.0
+            ],
+            [
+              "gaussian_noise_sigma",
+              2
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 400,
+        "mode": "gray",
+        "texture": 2,
+        "rotate": 1.0,
+        "noise": 2,
+        "jpeg": 80
+      },
+      "summary": "high-resolution 400 dpi grey flatbed scan, 1 deg skew",
+      "bytes": 1898725
+    },
+    "scan-severe.pdf": {
+      "seed": 14003,
+      "render_dpi": 150,
+      "dpi": 150,
+      "format": "jpeg q15",
+      "colour": "gray",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1275,
+            1650
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              6
+            ],
+            [
+              "skew_rotation_deg",
+              10.0
+            ],
+            [
+              "focus_blur_sigma",
+              1.6
+            ],
+            [
+              "gaussian_noise_sigma",
+              12
+            ]
+          ]
+        },
+        {
+          "image": 2,
+          "source_pages": [
+            2
+          ],
+          "size_px": [
+            1275,
+            1650
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              6
+            ],
+            [
+              "skew_rotation_deg",
+              -8.0
+            ],
+            [
+              "focus_blur_sigma",
+              1.6
+            ],
+            [
+              "gaussian_noise_sigma",
+              12
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 150,
+        "mode": "gray",
+        "texture": 6,
+        "rotate_pages": {
+          "0": 10.0,
+          "1": -8.0
+        },
+        "blur": 1.6,
+        "noise": 12,
+        "jpeg": 15
+      },
+      "summary": "150 dpi grey, 10 deg / -8 deg skew, heavy blur, noise, JPEG q15",
+      "bytes": 133865
+    }
+  },
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "scan-mild.pdf",
+    "scan-severe.pdf",
+    "scan.pdf",
+    "truth.musicxml"
+  ],
+  "license": "CC0-1.0 (composition, engraving, scans)",
+  "source": "self-authored (layout-challenge corpus)",
+  "engraver": "internal model -> LilyPond 2.24 (custom writer, layout-challenge edition)",
+  "validation": {
+    "xsd_valid": true,
+    "music21_parse": "2 208",
+    "midi_attacks_match_truth": true,
+    "attacks": 208,
+    "lilypond_warnings": [
+      "engraving.ly:50:116: warning: this Voice needs a \\voiceXx or \\shiftXx setting",
+      "engraving.ly:53:78: warning: no viable initial configuration found: may not find good beam slope",
+      "engraving.ly:56:73: warning: no viable initial configuration found: may not find good beam slope",
+      "engraving.ly:57:78: warning: no viable initial configuration found: may not find good beam slope",
+      "engraving.ly:63:73: warning: no viable initial configuration found: may not find good beam slope",
+      "engraving.ly:64:78: warning: no viable initial configuration found: may not find good beam slope",
+      "engraving.ly:38:33: warning: no viable initial configuration found: may not find good beam slope",
+      "engraving.ly:38:104: warning: no viable initial configuration found: may not find good beam slope",
+      "engraving.ly:66:55: warning: no viable initial configuration found: may not find good beam slope",
+      "engraving.ly:67:73: warning: no viable initial configuration found: may not find good beam slope",
+      "engraving.ly:68:78: warning: no viable initial configuration found: may not find good beam slope",
+      "engraving.ly:70:78: warning: no viable initial configuration found: may not find good beam slope"
+    ],
+    "lyric_syllables_found_in_engraving": null,
+    "lyric_syllables": 0,
+    "pages_planned": 2,
+    "image_only": {
+      "clean.pdf": true,
+      "scan.pdf": true,
+      "scan-mild.pdf": true,
+      "scan-severe.pdf": true
+    }
+  }
+}

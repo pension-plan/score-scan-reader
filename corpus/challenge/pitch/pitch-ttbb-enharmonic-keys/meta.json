@@ -1,0 +1,322 @@
+{
+  "id": "pitch-ttbb-enharmonic-keys",
+  "category": "pitch",
+  "title": "Now the Day Is Over (TTBB closed, enharmonic key change)",
+  "edge_cases": [
+    "ttbb_closed_score",
+    "treble_8vb_clef",
+    "key_6_flats",
+    "key_6_sharps",
+    "enharmonic_key_change_same_sounding_music",
+    "key_cancellation_12_glyphs",
+    "key_change_mid_system",
+    "double_flat_in_chord",
+    "double_sharp_in_chord",
+    "b_sharp",
+    "shared_staff_accidentals",
+    "lyrics",
+    "staple",
+    "punch_holes",
+    "book_page_curl"
+  ],
+  "expected": {
+    "parts": [
+      "Tenor I",
+      "Tenor II",
+      "Baritone",
+      "Bass"
+    ],
+    "must_not_split": false,
+    "shared_staves": [
+      [
+        "Tenor I",
+        "Tenor II"
+      ],
+      [
+        "Baritone",
+        "Bass"
+      ]
+    ],
+    "lyrics": [
+      {
+        "part": "Tenor I",
+        "verses": 1
+      }
+    ],
+    "notes": "Closed male-voice score: Tenor I + Tenor II on a treble-8vb staff (sounding an octave below the written treble pitch), Baritone + Bass on a bass staff -> FOUR parts with lyrics on Tenor I.  Stanza 1 (bars 1-8) in Gb major (6 flats), stanza 2 (bars 9-16) in F# major (6 sharps) - the SAME sounding melody respelled; the change at bar 9 is mid-system and LilyPond prints 6 naturals + 6 sharps.  Coda (bars 17-20) in D major (4 cancelling naturals).  Chromatic chords give Ebb (Cb minor, bar 5), C natural (Ab7), B# (G#7), F## (D#7), D natural (B minor), E and D naturals (E7), Bb (G minor).  Every Tenor I/II pitch must be one octave below the written treble position (clef-octave-change -1)."
+  },
+  "shared_staff_accidental_differences": [],
+  "courtesy_accidentals": [
+    {
+      "measure": 6,
+      "part": "Baritone",
+      "pitch": "Eb3",
+      "courtesy": "parenthesised"
+    }
+  ],
+  "truth_limitations": [
+    "Per-part <accidental> display (see shared_staff_accidental_differences for the few notes where the engraved shared staff prints differently)."
+  ],
+  "degradations": {
+    "scan.pdf": {
+      "dpi": 300,
+      "seed": 16001,
+      "color": "rgb",
+      "encoding": "jpeg q55",
+      "pages_in_pdf": 1,
+      "pixel_size": [
+        2481,
+        3508
+      ],
+      "summary": "photocopied page from a bound book: yellowed RGB paper, left page curl + gutter shadow, staple at top-left, three punch holes (scanner lid shows white), JPEG q55",
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            238,
+            228,
+            205
+          ],
+          "texture": 5,
+          "fibers": 2,
+          "ink_rgb": [
+            36,
+            32,
+            30
+          ]
+        },
+        {
+          "op": "staple",
+          "corner": "tl",
+          "angle": -30,
+          "x_mm": 10,
+          "y_mm": 8
+        },
+        {
+          "op": "holes",
+          "n": 3,
+          "side": "left",
+          "d_mm": 5.0,
+          "offset_mm": 5,
+          "spacing_mm": 95,
+          "fill": [
+            246,
+            246,
+            244
+          ]
+        },
+        {
+          "op": "curl",
+          "side": "left",
+          "amp": 18,
+          "width": 0.28
+        },
+        {
+          "op": "gutter",
+          "side": "left",
+          "width": 0.06,
+          "dark": 0.5
+        },
+        {
+          "op": "rotate",
+          "deg": -0.6
+        },
+        {
+          "op": "noise",
+          "sigma": 3,
+          "chroma": 1
+        }
+      ]
+    },
+    "scan-mild.pdf": {
+      "dpi": 300,
+      "seed": 16002,
+      "color": "rgb",
+      "encoding": "jpeg q60",
+      "pages_in_pdf": 1,
+      "pixel_size": [
+        2481,
+        3508
+      ],
+      "summary": "light gutter shadow, ivory paper, 0.4 deg skew, JPEG q60",
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            244,
+            238,
+            222
+          ],
+          "texture": 3
+        },
+        {
+          "op": "gutter",
+          "side": "left",
+          "width": 0.05,
+          "dark": 0.4
+        },
+        {
+          "op": "rotate",
+          "deg": 0.4
+        },
+        {
+          "op": "noise",
+          "sigma": 2
+        }
+      ]
+    },
+    "scan-severe.pdf": {
+      "dpi": 200,
+      "seed": 16003,
+      "color": "rgb",
+      "encoding": "jpeg q20",
+      "pages_in_pdf": 1,
+      "pixel_size": [
+        1654,
+        2339
+      ],
+      "summary": "strong book curl with wavy warp and deep gutter, vertical camera shake (motion blur 5 px@300dpi), noise, JPEG q20 (RGB)",
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            234,
+            222,
+            196
+          ],
+          "texture": 6
+        },
+        {
+          "op": "curl",
+          "side": "left",
+          "amp": 40,
+          "width": 0.35,
+          "wave": 10
+        },
+        {
+          "op": "gutter",
+          "side": "left",
+          "width": 0.1,
+          "dark": 0.7
+        },
+        {
+          "op": "blur",
+          "motion_px300": 5,
+          "angle": 80
+        },
+        {
+          "op": "noise",
+          "sigma": 7,
+          "chroma": 2
+        }
+      ]
+    }
+  },
+  "dpi": {
+    "scan.pdf": 300,
+    "scan-mild.pdf": 300,
+    "scan-severe.pdf": 200
+  },
+  "clean_pdf": {
+    "dpi": 300,
+    "note": "undamaged 300 dpi grey raster of the LilyPond engraving (image only)"
+  },
+  "license": "CC0-1.0 (music, engraving, scans); lyrics texts public domain where present",
+  "source": "music composed for this corpus; text S. Baring-Gould (1865)",
+  "measures": 20,
+  "pages": 1,
+  "layout": "closed TTBB score (treble_8 + bass), 4 systems x 5 bars",
+  "validation": {
+    "xsd_valid": true,
+    "midi_attacks_match_truth_file": true,
+    "attacks": 204,
+    "printed_accidentals_match": true,
+    "accidentals": {
+      "expected": 11,
+      "printed": 11,
+      "extra_natural": 1,
+      "parenthesized": 1,
+      "double": 2,
+      "tie_at_line_start": 0
+    },
+    "clefs": {
+      "upper": {
+        "expected_changes": 0,
+        "rendered_changes": 0
+      },
+      "lower": {
+        "expected_changes": 0,
+        "rendered_changes": 0
+      }
+    },
+    "keys": {
+      "upper": {
+        "expected": [
+          "0:-6",
+          "32:6",
+          "64:2"
+        ],
+        "rendered": [
+          "0:-6",
+          "32:6",
+          "64:2"
+        ],
+        "cancellations": {
+          "32": "ABCDEG",
+          "64": "ADEG"
+        }
+      },
+      "lower": {
+        "expected": [
+          "0:-6",
+          "32:6",
+          "64:2"
+        ],
+        "rendered": [
+          "0:-6",
+          "32:6",
+          "64:2"
+        ],
+        "cancellations": {
+          "32": "ABCDEG",
+          "64": "ADEG"
+        }
+      }
+    },
+    "ottava": {
+      "upper": {
+        "expected": [],
+        "rendered": [],
+        "pieces": 0
+      },
+      "lower": {
+        "expected": [],
+        "rendered": [],
+        "pieces": 0
+      }
+    },
+    "systems": 4,
+    "line_start_measures": [
+      1,
+      6,
+      11,
+      16
+    ],
+    "lyric_text_found_in_engraving": 1.0,
+    "scan_files_image_only": {
+      "scan.pdf": true,
+      "scan-mild.pdf": true,
+      "scan-severe.pdf": true
+    }
+  },
+  "files": [
+    "engraving.ly",
+    "truth.musicxml",
+    "clean.pdf",
+    "scan.pdf",
+    "scan-mild.pdf",
+    "scan-severe.pdf",
+    "meta.json",
+    "ATTRIBUTION.txt"
+  ]
+}

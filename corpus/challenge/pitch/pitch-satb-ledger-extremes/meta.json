@@ -1,0 +1,374 @@
+{
+  "id": "pitch-satb-ledger-extremes",
+  "category": "pitch",
+  "title": "All Things Bright and Beautiful (SATB closed, extreme ranges)",
+  "edge_cases": [
+    "satb_closed_score",
+    "ledger_lines_between_staves",
+    "soprano_to_D6",
+    "bass_to_A1",
+    "tenor_to_A4_in_bass_clef",
+    "alto_to_A3_below_treble",
+    "ledger_lines_near_lyrics",
+    "lyrics_two_verses",
+    "pencil_reminder_accidentals",
+    "coffee_stain",
+    "high_dpi_600",
+    "low_dpi_100"
+  ],
+  "expected": {
+    "parts": [
+      "Soprano",
+      "Alto",
+      "Tenor",
+      "Bass"
+    ],
+    "must_not_split": false,
+    "shared_staves": [
+      [
+        "Soprano",
+        "Alto"
+      ],
+      [
+        "Tenor",
+        "Bass"
+      ]
+    ],
+    "lyrics": [
+      {
+        "part": "Soprano",
+        "verses": 2
+      }
+    ],
+    "notes": "Closed score -> FOUR parts (Soprano, Alto, Tenor, Bass), D major 3/4, 12 bars, two verses under the Soprano.  Extreme ledger-line notes: Soprano D6 and C#6 (bar 8), A5/B5 often; Alto A3 (2 ledger lines below the treble staff, bar 1); Tenor up to A4 (above 3 ledger lines over the bass staff, bars 7 and 10); Bass down to A1 (3 ledger lines below the bass staff, bars 3, 5, 11) and B1 (bars 2, 7).  The alto/tenor ledger lines intrude into the lyric band between the staves.  Pencil sharps/flats drawn next to some notes in the scans only REMIND of the existing key-signature/accidental pitch (they agree with the truth); pencil circles, breath marks and words are not music."
+  },
+  "shared_staff_accidental_differences": [],
+  "courtesy_accidentals": [],
+  "truth_limitations": [],
+  "degradations": {
+    "scan.pdf": {
+      "dpi": 600,
+      "seed": 18001,
+      "color": "rgb",
+      "encoding": "jpeg q60",
+      "pages_in_pdf": 1,
+      "pixel_size": [
+        4961,
+        7016
+      ],
+      "summary": "600 dpi RGB scan of a rehearsal copy: pencil circles, reminder sharps, breath marks and words, coffee ring at top right, 0.4 deg skew, JPEG q60",
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            246,
+            246,
+            243
+          ],
+          "texture": 2
+        },
+        {
+          "op": "pencil",
+          "circles": 6,
+          "reminders": 4,
+          "breath_marks": 3,
+          "texts": [
+            "breathe!",
+            "tenors sing out"
+          ],
+          "alpha": 0.75
+        },
+        {
+          "op": "stain",
+          "cx": 0.82,
+          "cy": 0.12,
+          "r": 0.09,
+          "strength": 0.4
+        },
+        {
+          "op": "rotate",
+          "deg": 0.4
+        },
+        {
+          "op": "noise",
+          "sigma": 2
+        }
+      ],
+      "pencil_marks": [
+        {
+          "page": 0,
+          "marks": [
+            {
+              "mark": "circle",
+              "x": 2173,
+              "y": 3399
+            },
+            {
+              "mark": "circle",
+              "x": 4409,
+              "y": 2092
+            },
+            {
+              "mark": "circle",
+              "x": 4025,
+              "y": 1276
+            },
+            {
+              "mark": "circle",
+              "x": 3280,
+              "y": 3398
+            },
+            {
+              "mark": "circle",
+              "x": 636,
+              "y": 2736
+            },
+            {
+              "mark": "circle",
+              "x": 874,
+              "y": 3336
+            },
+            {
+              "mark": "reminder_sharp",
+              "x": 1149,
+              "y": 3667
+            },
+            {
+              "mark": "reminder_sharp",
+              "x": 3018,
+              "y": 3668
+            },
+            {
+              "mark": "reminder_sharp",
+              "x": 1877,
+              "y": 2840
+            },
+            {
+              "mark": "reminder_sharp",
+              "x": 1148,
+              "y": 2758
+            },
+            {
+              "mark": "text",
+              "text": "breathe!",
+              "x": 1442,
+              "y": 2591
+            },
+            {
+              "mark": "text",
+              "text": "tenors sing out",
+              "x": 2173,
+              "y": 1256
+            },
+            {
+              "mark": "breath",
+              "x": 3392,
+              "y": 883
+            },
+            {
+              "mark": "breath",
+              "x": 727,
+              "y": 3564
+            },
+            {
+              "mark": "breath",
+              "x": 2265,
+              "y": 2467
+            }
+          ]
+        }
+      ]
+    },
+    "scan-mild.pdf": {
+      "dpi": 400,
+      "seed": 18002,
+      "color": "gray",
+      "encoding": "jpeg q60",
+      "pages_in_pdf": 1,
+      "pixel_size": [
+        3308,
+        4678
+      ],
+      "summary": "400 dpi grey, three pencil circles, -0.3 deg skew, JPEG q60",
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            245,
+            244,
+            240
+          ],
+          "texture": 2
+        },
+        {
+          "op": "pencil",
+          "circles": 3,
+          "alpha": 0.6
+        },
+        {
+          "op": "rotate",
+          "deg": -0.3
+        },
+        {
+          "op": "noise",
+          "sigma": 2
+        },
+        {
+          "op": "gray"
+        }
+      ],
+      "pencil_marks": [
+        {
+          "page": 0,
+          "marks": [
+            {
+              "mark": "circle",
+              "x": 2564,
+              "y": 2513
+            },
+            {
+              "mark": "circle",
+              "x": 1252,
+              "y": 2403
+            },
+            {
+              "mark": "circle",
+              "x": 961,
+              "y": 2431
+            }
+          ]
+        }
+      ]
+    },
+    "scan-severe.pdf": {
+      "dpi": 100,
+      "seed": 18003,
+      "color": "gray",
+      "encoding": "jpeg q15",
+      "pages_in_pdf": 1,
+      "pixel_size": [
+        945,
+        1252
+      ],
+      "summary": "100 dpi grey, 6 deg skew, focus blur, heavy noise, JPEG q15",
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            245,
+            244,
+            240
+          ],
+          "texture": 2
+        },
+        {
+          "op": "rotate",
+          "deg": 6.0,
+          "expand": true
+        },
+        {
+          "op": "blur",
+          "radius_px300": 0.9
+        },
+        {
+          "op": "noise",
+          "sigma": 8
+        },
+        {
+          "op": "gray"
+        }
+      ]
+    }
+  },
+  "dpi": {
+    "scan.pdf": 600,
+    "scan-mild.pdf": 400,
+    "scan-severe.pdf": 100
+  },
+  "clean_pdf": {
+    "dpi": 300,
+    "note": "undamaged 300 dpi grey raster of the LilyPond engraving (image only)"
+  },
+  "license": "CC0-1.0 (music, engraving, scans); lyrics texts public domain where present",
+  "source": "music composed for this corpus; text C. F. Alexander (1848)",
+  "measures": 12,
+  "pages": 1,
+  "layout": "closed score (ChoirStaff, 2 staves), 2 systems x 6 bars, 2 verses between the staves",
+  "validation": {
+    "xsd_valid": true,
+    "midi_attacks_match_truth_file": true,
+    "attacks": 104,
+    "printed_accidentals_match": true,
+    "accidentals": {
+      "expected": 0,
+      "printed": 0,
+      "extra_natural": 0,
+      "parenthesized": 0,
+      "double": 0,
+      "tie_at_line_start": 0
+    },
+    "clefs": {
+      "upper": {
+        "expected_changes": 0,
+        "rendered_changes": 0
+      },
+      "lower": {
+        "expected_changes": 0,
+        "rendered_changes": 0
+      }
+    },
+    "keys": {
+      "upper": {
+        "expected": [
+          "0:2"
+        ],
+        "rendered": [
+          "0:2"
+        ],
+        "cancellations": {}
+      },
+      "lower": {
+        "expected": [
+          "0:2"
+        ],
+        "rendered": [
+          "0:2"
+        ],
+        "cancellations": {}
+      }
+    },
+    "ottava": {
+      "upper": {
+        "expected": [],
+        "rendered": [],
+        "pieces": 0
+      },
+      "lower": {
+        "expected": [],
+        "rendered": [],
+        "pieces": 0
+      }
+    },
+    "systems": 2,
+    "line_start_measures": [
+      1,
+      7
+    ],
+    "lyric_text_found_in_engraving": 1.0,
+    "scan_files_image_only": {
+      "scan.pdf": true,
+      "scan-mild.pdf": true,
+      "scan-severe.pdf": true
+    }
+  },
+  "files": [
+    "engraving.ly",
+    "truth.musicxml",
+    "clean.pdf",
+    "scan.pdf",
+    "scan-mild.pdf",
+    "scan-severe.pdf",
+    "meta.json",
+    "ATTRIBUTION.txt"
+  ]
+}

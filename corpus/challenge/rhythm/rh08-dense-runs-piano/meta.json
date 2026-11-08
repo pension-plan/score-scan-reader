@@ -1,0 +1,302 @@
+{
+  "id": "rh08-dense-runs-piano",
+  "category": "rhythm",
+  "title": "Toccatina (piano: 16th/32nd/64th runs)",
+  "composer": "OMR challenge corpus (CC0)",
+  "lyricist": "",
+  "edge_cases": [
+    "piano_grand_staff_must_not_split",
+    "two_voices_in_right_hand",
+    "sixteenth_beamed_groups",
+    "32nd_run",
+    "64th_run",
+    "sextuplets",
+    "sixteenth_triplets",
+    "dotted_16th_32nd",
+    "double_dotted_eighth_32nd",
+    "dotted_eighth_32nd_32nd",
+    "beam_across_rest",
+    "beam_starting_after_rest",
+    "beamlet_hooks",
+    "tie_quarter_to_16th",
+    "fermata_all_staves",
+    "motion_blur",
+    "pencil_fingerings",
+    "binarized_thick_low_dpi_100"
+  ],
+  "expected": {
+    "parts": [
+      "Piano"
+    ],
+    "must_not_split": true,
+    "shared_staves": [],
+    "notes": "ONE part with 2 staves; right-hand voice 2 (16th accompaniment, bars 1-2; c'4 r4 in bar 11) stays inside the piano part. 12 bars of 2/4: 32nd run of 8 (bar 3), 64th run of 8 (bar 7), sextuplet 16ths (bar 5), 16th triplets (bars 6 LH, 10 RH), dotted-16th + 32nd pairs and double-dotted eighth + 32nd (bar 6), 8.+32+32 (bar 4), beams across 16th and eighth rests (LH bars 5, 8; RH bar 9), groups that start after a 16th rest (bar 8), tie e'4~e'16 (bar 11), fermatas on the final chords. At 100 dpi (scan-severe.pdf) 32nd and 64th beams merge into solid bands: the number of beams must still be inferred.",
+    "lyrics": [],
+    "measures": 12,
+    "first_measure_number": 1
+  },
+  "truth_limitations": [
+    "<beam> elements reproduce the engraved beam groups exactly (manual beaming); notes only - a rest inside a beam carries no <beam> element.",
+    "<tuplet bracket=...> follows LilyPond's default: bracket omitted only when one beam covers exactly the tuplet; implied tuplets have bracket=\"no\" show-number=\"none\".",
+    "Pencil marks in the damaged scans (circles, fingering digits, a fake \"3\" above notes, ticks, words) are not part of the music and are absent from the truth."
+  ],
+  "degradations": {
+    "scan.pdf": {
+      "seed": 710801,
+      "render_dpi": 300,
+      "dpi": 300,
+      "color": "gray",
+      "format": "jpeg",
+      "jpeg_quality": 35,
+      "jpeg_passes": 1,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            246,
+            246,
+            244
+          ],
+          "texture": 2
+        },
+        {
+          "op": "pencil",
+          "circles": 2,
+          "fake_triplets": 1,
+          "fingerings": 8,
+          "ticks": 1,
+          "words": [],
+          "bracket": false
+        },
+        {
+          "op": "motion_blur",
+          "length": 4,
+          "angle": 0
+        },
+        {
+          "op": "blur",
+          "sigma": 0.7
+        },
+        {
+          "op": "noise",
+          "sigma": 4
+        }
+      ],
+      "tags": [
+        "paper_texture",
+        "pencil",
+        "motion_blur",
+        "blur",
+        "noise",
+        "jpeg_q35"
+      ],
+      "output_pages": 1,
+      "pixel_size": [
+        2481,
+        3508
+      ],
+      "image_mode": "L",
+      "bytes": 217278,
+      "image_only_check": {
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "pages": 1,
+        "text_chars": 0
+      },
+      "op_log": [
+        {
+          "pencil_marks": [
+            [
+              "circle",
+              1925,
+              1439
+            ],
+            [
+              "circle",
+              451,
+              1225
+            ],
+            [
+              "fake_3",
+              1994,
+              1274
+            ],
+            [
+              "digit",
+              1757
+            ],
+            [
+              "digit",
+              1388
+            ],
+            [
+              "digit",
+              1843
+            ],
+            [
+              "digit",
+              1443
+            ],
+            [
+              "digit",
+              1187
+            ],
+            [
+              "digit",
+              835
+            ],
+            [
+              "digit",
+              1265
+            ],
+            [
+              "digit",
+              1018
+            ],
+            [
+              "tick",
+              1733
+            ]
+          ]
+        }
+      ]
+    },
+    "scan-mild.pdf": {
+      "seed": 710802,
+      "render_dpi": 300,
+      "dpi": 300,
+      "color": "gray",
+      "format": "jpeg",
+      "jpeg_quality": 60,
+      "jpeg_passes": 1,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            246,
+            246,
+            244
+          ],
+          "texture": 2
+        },
+        {
+          "op": "blur",
+          "sigma": 0.4
+        },
+        {
+          "op": "noise",
+          "sigma": 2
+        }
+      ],
+      "tags": [
+        "paper_texture",
+        "blur",
+        "noise",
+        "jpeg_q60"
+      ],
+      "output_pages": 1,
+      "pixel_size": [
+        2481,
+        3508
+      ],
+      "image_mode": "L",
+      "bytes": 321190,
+      "image_only_check": {
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "pages": 1,
+        "text_chars": 0
+      },
+      "op_log": []
+    },
+    "scan-severe.pdf": {
+      "seed": 710803,
+      "render_dpi": 100,
+      "dpi": 100,
+      "color": "gray",
+      "format": "png1",
+      "jpeg_quality": null,
+      "jpeg_passes": null,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            246,
+            246,
+            244
+          ]
+        },
+        {
+          "op": "rotate",
+          "deg": -0.9,
+          "bg": 255
+        },
+        {
+          "op": "binarize",
+          "threshold": 170,
+          "pre_blur": 0.6,
+          "noise": 10
+        }
+      ],
+      "tags": [
+        "rotation_-0.9deg",
+        "binarized_photocopy_thick"
+      ],
+      "output_pages": 1,
+      "pixel_size": [
+        847,
+        1184
+      ],
+      "image_mode": "1",
+      "bytes": 14161,
+      "image_only_check": {
+        "image_only": true,
+        "fonts": [],
+        "images": 1,
+        "pages": 1,
+        "text_chars": 0
+      },
+      "op_log": []
+    }
+  },
+  "dpi": 300,
+  "license": "CC0-1.0 (music composed for this corpus; engraving, truth and scans CC0)",
+  "source": "Composed for this corpus (CC0).",
+  "pages": 1,
+  "files": {
+    "truth": "truth.musicxml",
+    "engraving": "engraving.ly",
+    "clean": "clean.pdf",
+    "scan": "scan.pdf",
+    "scan_mild": "scan-mild.pdf",
+    "scan_severe": "scan-severe.pdf",
+    "attribution": "ATTRIBUTION.txt"
+  },
+  "clean": {
+    "dpi": 300,
+    "pages": 1,
+    "ops": [],
+    "note": "undamaged raster render",
+    "image_only": true,
+    "fonts": [],
+    "images": 1,
+    "text_chars": 0
+  },
+  "validation": {
+    "truth_xsd_valid": true,
+    "engraving_event_dump_matches_truth": true,
+    "engraving_events_compared": 244,
+    "lyric_events_compared": 0,
+    "time_signatures_compared": 2,
+    "midi_attacks_match_truth": true,
+    "midi_attacks": 159,
+    "midi_grace_notes_excluded": 0,
+    "music21_reparse_matches_model": true,
+    "lyric_text_found_in_engraving": null,
+    "lilypond_warnings": [],
+    "method": "LilyPond event-dump engraver (rsynth/dump.ly) compared with the model the truth is written from: every note/rest/multi-bar rest (onset, pitch, notated type, dots, tuplet scale), grace offsets, ties, beam starts/stops, slurs, fermatas, lyric syllables/hyphens/extenders, bar numbers/measure positions and time signatures; plus MIDI attack multiset and a music21 re-parse of truth.musicxml."
+  },
+  "generator": "corpus/challenge/rhythm/_tools/run_all.py (rsynth/items.py, build.py, scan.py)"
+}

@@ -1,0 +1,5505 @@
+[
+  {
+    "id": "variations-piano-12-pages",
+    "category": "layout",
+    "title": "Variations on \"Ah! vous dirai-je, maman\" - 12-page piano score with headers, voltas, key/time changes",
+    "edge_cases": [
+      "multi_page_10plus",
+      "page_numbers",
+      "running_headers",
+      "title_block_text",
+      "copyright_footer",
+      "tempo_text",
+      "section_heading_text",
+      "dynamics_text",
+      "repeats",
+      "volta_1st_2nd_endings",
+      "key_change",
+      "time_change",
+      "triplets",
+      "pedal_marks",
+      "piano_grand_staff",
+      "must_not_split",
+      "variation_starts_new_system",
+      "fermata",
+      "hairpin",
+      "cautionary_key_signature"
+    ],
+    "expected": {
+      "parts": [
+        "Piano"
+      ],
+      "must_not_split": true,
+      "shared_staves": [],
+      "staves_per_part": {
+        "Piano": 2
+      },
+      "lyrics": [],
+      "notes": "One part: Piano with 2 staves, the grand staff must stay ONE part on every one of the 12 pages. Measures are in notated order (repeats and 1st/2nd endings NOT unrolled): 232 measures. Running headers, page numbers, the title block, \"Var. ...\" headings, tempo words, \"cresc.\" and the copyright footer are text, not notes or lyrics. Key changes to C minor (Var. V) and back (Var. VI); time signature changes to 6/8 at Var. VIII. No lyrics."
+    },
+    "truth_limitations": "Beaming not encoded. Page headers/numbers are <credit> elements without coordinates. Repeats/voltas are encoded in notated order (<repeat>, <ending>), not unrolled.",
+    "layout": "A4 portrait, staff size 19, 4 systems on page 1 and 5 per following page, each variation starts a new system; headers on pages 2-12 alternate odd/even text with page numbers",
+    "pages": 12,
+    "measures": 232,
+    "notes_in_truth": 2455,
+    "hidden_staff_systems": [],
+    "dpi": 200,
+    "degradations": {
+      "scan.pdf": {
+        "seed": 11001,
+        "render_dpi": 200,
+        "dpi": 200,
+        "format": "jpeg q50",
+        "colour": "gray",
+        "pdf_pages": [
+          {
+            "image": 1,
+            "source_pages": [
+              1
+            ],
+            "size_px": [
+              1654,
+              2339
+            ],
+            "ops": [
+              [
+                "punch_holes",
+                {
+                  "side": "left",
+                  "centers_px": [
+                    [
+                      87,
+                      316
+                    ],
+                    [
+                      87,
+                      1170
+                    ],
+                    [
+                      87,
+                      2023
+                    ]
+                  ]
+                }
+              ],
+              [
+                "bleed_through",
+                {
+                  "strength": 0.08,
+                  "shift_px": 0
+                }
+              ],
+              [
+                "paper_texture",
+                4
+              ],
+              [
+                "paper_colour",
+                [
+                  246,
+                  246,
+                  244
+                ]
+              ],
+              [
+                "skew_rotation_deg",
+                0.6
+              ],
+              [
+                "lighting_gradient",
+                {
+                  "strength": 0.08,
+                  "angle_deg": 171.2
+                }
+              ],
+              [
+                "focus_blur_sigma",
+                0.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                4
+              ],
+              [
+                "speckles_per_mpx",
+                60
+              ]
+            ]
+          },
+          {
+            "image": 2,
+            "source_pages": [
+              2
+            ],
+            "size_px": [
+              1654,
+              2339
+            ],
+            "ops": [
+              [
+                "punch_holes",
+                {
+                  "side": "left",
+                  "centers_px": [
+                    [
+                      87,
+                      316
+                    ],
+                    [
+                      87,
+                      1170
+                    ],
+                    [
+                      87,
+                      2023
+                    ]
+                  ]
+                }
+              ],
+              [
+                "bleed_through",
+                {
+                  "strength": 0.08,
+                  "shift_px": -3
+                }
+              ],
+              [
+                "paper_texture",
+                4
+              ],
+              [
+                "paper_colour",
+                [
+                  246,
+                  246,
+                  244
+                ]
+              ],
+              [
+                "skew_rotation_deg",
+                -1.1
+              ],
+              [
+                "lighting_gradient",
+                {
+                  "strength": 0.08,
+                  "angle_deg": 338.0
+                }
+              ],
+              [
+                "focus_blur_sigma",
+                0.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                4
+              ],
+              [
+                "speckles_per_mpx",
+                60
+              ]
+            ]
+          },
+          {
+            "image": 3,
+            "source_pages": [
+              3
+            ],
+            "size_px": [
+              1654,
+              2339
+            ],
+            "ops": [
+              [
+                "punch_holes",
+                {
+                  "side": "left",
+                  "centers_px": [
+                    [
+                      87,
+                      316
+                    ],
+                    [
+                      87,
+                      1170
+                    ],
+                    [
+                      87,
+                      2023
+                    ]
+                  ]
+                }
+              ],
+              [
+                "bleed_through",
+                {
+                  "strength": 0.08,
+                  "shift_px": -9
+                }
+              ],
+              [
+                "paper_texture",
+                4
+              ],
+              [
+                "paper_colour",
+                [
+                  246,
+                  246,
+                  244
+                ]
+              ],
+              [
+                "skew_rotation_deg",
+                1.8
+              ],
+              [
+                "lighting_gradient",
+                {
+                  "strength": 0.08,
+                  "angle_deg": 50.5
+                }
+              ],
+              [
+                "focus_blur_sigma",
+                0.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                4
+              ],
+              [
+                "speckles_per_mpx",
+                60
+              ]
+            ]
+          },
+          {
+            "image": 4,
+            "source_pages": [
+              4
+            ],
+            "size_px": [
+              1654,
+              2339
+            ],
+            "ops": [
+              [
+                "punch_holes",
+                {
+                  "side": "left",
+                  "centers_px": [
+                    [
+                      87,
+                      316
+                    ],
+                    [
+                      87,
+                      1170
+                    ],
+                    [
+                      87,
+                      2023
+                    ]
+                  ]
+                }
+              ],
+              [
+                "bleed_through",
+                {
+                  "strength": 0.08,
+                  "shift_px": -6
+                }
+              ],
+              [
+                "paper_texture",
+                4
+              ],
+              [
+                "paper_colour",
+                [
+                  246,
+                  246,
+                  244
+                ]
+              ],
+              [
+                "skew_rotation_deg",
+                -0.5
+              ],
+              [
+                "scale",
+                0.97
+              ],
+              [
+                "lighting_gradient",
+                {
+                  "strength": 0.08,
+                  "angle_deg": 23.3
+                }
+              ],
+              [
+                "focus_blur_sigma",
+                0.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                4
+              ],
+              [
+                "speckles_per_mpx",
+                60
+              ]
+            ]
+          },
+          {
+            "image": 5,
+            "source_pages": [
+              5
+            ],
+            "size_px": [
+              1654,
+              2339
+            ],
+            "ops": [
+              [
+                "punch_holes",
+                {
+                  "side": "left",
+                  "centers_px": [
+                    [
+                      87,
+                      316
+                    ],
+                    [
+                      87,
+                      1170
+                    ],
+                    [
+                      87,
+                      2023
+                    ]
+                  ]
+                }
+              ],
+              [
+                "bleed_through",
+                {
+                  "strength": 0.08,
+                  "shift_px": 13
+                }
+              ],
+              [
+                "paper_texture",
+                4
+              ],
+              [
+                "paper_colour",
+                [
+                  246,
+                  246,
+                  244
+                ]
+              ],
+              [
+                "skew_rotation_deg",
+                2.4
+              ],
+              [
+                "lighting_gradient",
+                {
+                  "strength": 0.08,
+                  "angle_deg": 74.6
+                }
+              ],
+              [
+                "focus_blur_sigma",
+                0.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                4
+              ],
+              [
+                "speckles_per_mpx",
+                60
+              ]
+            ]
+          },
+          {
+            "image": 6,
+            "source_pages": [
+              6
+            ],
+            "size_px": [
+              1654,
+              2339
+            ],
+            "ops": [
+              [
+                "punch_holes",
+                {
+                  "side": "left",
+                  "centers_px": [
+                    [
+                      87,
+                      316
+                    ],
+                    [
+                      87,
+                      1170
+                    ],
+                    [
+                      87,
+                      2023
+                    ]
+                  ]
+                }
+              ],
+              [
+                "bleed_through",
+                {
+                  "strength": 0.08,
+                  "shift_px": -10
+                }
+              ],
+              [
+                "paper_texture",
+                4
+              ],
+              [
+                "paper_colour",
+                [
+                  246,
+                  246,
+                  244
+                ]
+              ],
+              [
+                "skew_rotation_deg",
+                -1.6
+              ],
+              [
+                "lighting_gradient",
+                {
+                  "strength": 0.08,
+                  "angle_deg": 159.0
+                }
+              ],
+              [
+                "focus_blur_sigma",
+                0.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                4
+              ],
+              [
+                "speckles_per_mpx",
+                60
+              ]
+            ]
+          },
+          {
+            "image": 7,
+            "source_pages": [
+              7
+            ],
+            "size_px": [
+              1654,
+              2339
+            ],
+            "ops": [
+              [
+                "punch_holes",
+                {
+                  "side": "left",
+                  "centers_px": [
+                    [
+                      87,
+                      316
+                    ],
+                    [
+                      87,
+                      1170
+                    ],
+                    [
+                      87,
+                      2023
+                    ]
+                  ]
+                }
+              ],
+              [
+                "bleed_through",
+                {
+                  "strength": 0.08,
+                  "shift_px": -7
+                }
+              ],
+              [
+                "paper_texture",
+                4
+              ],
+              [
+                "paper_colour",
+                [
+                  246,
+                  246,
+                  244
+                ]
+              ],
+              [
+                "skew_rotation_deg",
+                0.9
+              ],
+              [
+                "scale",
+                1.025
+              ],
+              [
+                "lighting_gradient",
+                {
+                  "strength": 0.08,
+                  "angle_deg": 184.9
+                }
+              ],
+              [
+                "focus_blur_sigma",
+                0.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                4
+              ],
+              [
+                "speckles_per_mpx",
+                60
+              ]
+            ]
+          },
+          {
+            "image": 8,
+            "source_pages": [
+              8
+            ],
+            "size_px": [
+              1654,
+              2339
+            ],
+            "ops": [
+              [
+                "punch_holes",
+                {
+                  "side": "left",
+                  "centers_px": [
+                    [
+                      87,
+                      316
+                    ],
+                    [
+                      87,
+                      1170
+                    ],
+                    [
+                      87,
+                      2023
+                    ]
+                  ]
+                }
+              ],
+              [
+                "bleed_through",
+                {
+                  "strength": 0.08,
+                  "shift_px": 8
+                }
+              ],
+              [
+                "paper_texture",
+                4
+              ],
+              [
+                "paper_colour",
+                [
+                  246,
+                  246,
+                  244
+                ]
+              ],
+              [
+                "skew_rotation_deg",
+                0.7
+              ],
+              [
+                "lighting_gradient",
+                {
+                  "strength": 0.08,
+                  "angle_deg": 271.1
+                }
+              ],
+              [
+                "focus_blur_sigma",
+                0.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                4
+              ],
+              [
+                "speckles_per_mpx",
+                60
+              ],
+              [
+                "page_rotated_deg",
+                180
+              ]
+            ]
+          },
+          {
+            "image": 9,
+            "source_pages": [
+              9
+            ],
+            "size_px": [
+              1654,
+              2339
+            ],
+            "ops": [
+              [
+                "punch_holes",
+                {
+                  "side": "left",
+                  "centers_px": [
+                    [
+                      87,
+                      316
+                    ],
+                    [
+                      87,
+                      1170
+                    ],
+                    [
+                      87,
+                      2023
+                    ]
+                  ]
+                }
+              ],
+              [
+                "bleed_through",
+                {
+                  "strength": 0.08,
+                  "shift_px": 5
+                }
+              ],
+              [
+                "paper_texture",
+                4
+              ],
+              [
+                "paper_colour",
+                [
+                  246,
+                  246,
+                  244
+                ]
+              ],
+              [
+                "skew_rotation_deg",
+                -2.9
+              ],
+              [
+                "lighting_gradient",
+                {
+                  "strength": 0.08,
+                  "angle_deg": 231.4
+                }
+              ],
+              [
+                "focus_blur_sigma",
+                0.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                4
+              ],
+              [
+                "speckles_per_mpx",
+                60
+              ]
+            ]
+          },
+          {
+            "image": 10,
+            "source_pages": [
+              10
+            ],
+            "size_px": [
+              1654,
+              2339
+            ],
+            "ops": [
+              [
+                "punch_holes",
+                {
+                  "side": "left",
+                  "centers_px": [
+                    [
+                      87,
+                      316
+                    ],
+                    [
+                      87,
+                      1170
+                    ],
+                    [
+                      87,
+                      2023
+                    ]
+                  ]
+                }
+              ],
+              [
+                "bleed_through",
+                {
+                  "strength": 0.08,
+                  "shift_px": 8
+                }
+              ],
+              [
+                "paper_texture",
+                4
+              ],
+              [
+                "paper_colour",
+                [
+                  246,
+                  246,
+                  244
+                ]
+              ],
+              [
+                "skew_rotation_deg",
+                1.3
+              ],
+              [
+                "lighting_gradient",
+                {
+                  "strength": 0.08,
+                  "angle_deg": 121.0
+                }
+              ],
+              [
+                "focus_blur_sigma",
+                0.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                4
+              ],
+              [
+                "speckles_per_mpx",
+                60
+              ]
+            ]
+          },
+          {
+            "image": 11,
+            "source_pages": [
+              11
+            ],
+            "size_px": [
+              1654,
+              2339
+            ],
+            "ops": [
+              [
+                "punch_holes",
+                {
+                  "side": "left",
+                  "centers_px": [
+                    [
+                      87,
+                      316
+                    ],
+                    [
+                      87,
+                      1170
+                    ],
+                    [
+                      87,
+                      2023
+                    ]
+                  ]
+                }
+              ],
+              [
+                "bleed_through",
+                {
+                  "strength": 0.08,
+                  "shift_px": -7
+                }
+              ],
+              [
+                "paper_texture",
+                4
+              ],
+              [
+                "paper_colour",
+                [
+                  246,
+                  246,
+                  244
+                ]
+              ],
+              [
+                "skew_rotation_deg",
+                -0.8
+              ],
+              [
+                "scale",
+                0.985
+              ],
+              [
+                "lighting_gradient",
+                {
+                  "strength": 0.08,
+                  "angle_deg": 47.9
+                }
+              ],
+              [
+                "focus_blur_sigma",
+                0.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                4
+              ],
+              [
+                "speckles_per_mpx",
+                60
+              ]
+            ]
+          },
+          {
+            "image": 12,
+            "source_pages": [
+              12
+            ],
+            "size_px": [
+              1654,
+              2339
+            ],
+            "ops": [
+              [
+                "punch_holes",
+                {
+                  "side": "left",
+                  "centers_px": [
+                    [
+                      87,
+                      316
+                    ],
+                    [
+                      87,
+                      1170
+                    ],
+                    [
+                      87,
+                      2023
+                    ]
+                  ]
+                }
+              ],
+              [
+                "bleed_through",
+                {
+                  "strength": 0.08,
+                  "shift_px": 7
+                }
+              ],
+              [
+                "paper_texture",
+                4
+              ],
+              [
+                "paper_colour",
+                [
+                  246,
+                  246,
+                  244
+                ]
+              ],
+              [
+                "skew_rotation_deg",
+                3.4
+              ],
+              [
+                "lighting_gradient",
+                {
+                  "strength": 0.08,
+                  "angle_deg": 276.8
+                }
+              ],
+              [
+                "focus_blur_sigma",
+                0.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                4
+              ],
+              [
+                "speckles_per_mpx",
+                60
+              ]
+            ]
+          }
+        ],
+        "params": {
+          "dpi": 200,
+          "mode": "gray",
+          "paper_rgb": [
+            246,
+            246,
+            244
+          ],
+          "texture": 4,
+          "ink_rgb": [
+            25,
+            25,
+            25
+          ],
+          "punch_holes": {
+            "n": 3,
+            "side": "left",
+            "level": 28
+          },
+          "rotate_pages": {
+            "0": 0.6,
+            "1": -1.1,
+            "2": 1.8,
+            "3": -0.5,
+            "4": 2.4,
+            "5": -1.6,
+            "6": 0.9,
+            "7": 0.7,
+            "8": -2.9,
+            "9": 1.3,
+            "10": -0.8,
+            "11": 3.4
+          },
+          "page_rotate": {
+            "7": 180
+          },
+          "scale_pages": {
+            "3": 0.97,
+            "6": 1.025,
+            "10": 0.985
+          },
+          "bleed": 0.08,
+          "gradient": 0.08,
+          "blur": 0.6,
+          "noise": 4,
+          "speckle": 60,
+          "jpeg": 50
+        },
+        "summary": "ring-binder photocopies scanned at 200 dpi grey: punch holes, a different skew on every page, page 8 fed upside down (180 deg), 3 pages at a different scale, bleed-through of the reverse page, toner speckles, JPEG q50",
+        "bytes": 3014404
+      },
+      "scan-mild.pdf": {
+        "seed": 11002,
+        "render_dpi": 300,
+        "dpi": 300,
+        "format": "jpeg q85",
+        "colour": "gray",
+        "pdf_pages": [
+          {
+            "image": 1,
+            "source_pages": [
+              1
+            ],
+            "size_px": [
+              2481,
+              3508
+            ],
+            "ops": [
+              [
+                "paper_texture",
+                2
+              ],
+              [
+                "skew_rotation_deg",
+                0.5
+              ],
+              [
+                "gaussian_noise_sigma",
+                2
+              ]
+            ]
+          },
+          {
+            "image": 2,
+            "source_pages": [
+              2
+            ],
+            "size_px": [
+              2481,
+              3508
+            ],
+            "ops": [
+              [
+                "paper_texture",
+                2
+              ],
+              [
+                "skew_rotation_deg",
+                0.5
+              ],
+              [
+                "gaussian_noise_sigma",
+                2
+              ]
+            ]
+          },
+          {
+            "image": 3,
+            "source_pages": [
+              3
+            ],
+            "size_px": [
+              2481,
+              3508
+            ],
+            "ops": [
+              [
+                "paper_texture",
+                2
+              ],
+              [
+                "skew_rotation_deg",
+                0.5
+              ],
+              [
+                "gaussian_noise_sigma",
+                2
+              ]
+            ]
+          },
+          {
+            "image": 4,
+            "source_pages": [
+              4
+            ],
+            "size_px": [
+              2481,
+              3508
+            ],
+            "ops": [
+              [
+                "paper_texture",
+                2
+              ],
+              [
+                "skew_rotation_deg",
+                0.5
+              ],
+              [
+                "gaussian_noise_sigma",
+                2
+              ]
+            ]
+          },
+          {
+            "image": 5,
+            "source_pages": [
+              5
+            ],
+            "size_px": [
+              2481,
+              3508
+            ],
+            "ops": [
+              [
+                "paper_texture",
+                2
+              ],
+              [
+                "skew_rotation_deg",
+                0.5
+              ],
+              [
+                "gaussian_noise_sigma",
+                2
+              ]
+            ]
+          },
+          {
+            "image": 6,
+            "source_pages": [
+              6
+            ],
+            "size_px": [
+              2481,
+              3508
+            ],
+            "ops": [
+              [
+                "paper_texture",
+                2
+              ],
+              [
+                "skew_rotation_deg",
+                0.5
+              ],
+              [
+                "gaussian_noise_sigma",
+                2
+              ]
+            ]
+          },
+          {
+            "image": 7,
+            "source_pages": [
+              7
+            ],
+            "size_px": [
+              2481,
+              3508
+            ],
+            "ops": [
+              [
+                "paper_texture",
+                2
+              ],
+              [
+                "skew_rotation_deg",
+                0.5
+              ],
+              [
+                "gaussian_noise_sigma",
+                2
+              ]
+            ]
+          },
+          {
+            "image": 8,
+            "source_pages": [
+              8
+            ],
+            "size_px": [
+              2481,
+              3508
+            ],
+            "ops": [
+              [
+                "paper_texture",
+                2
+              ],
+              [
+                "skew_rotation_deg",
+                0.5
+              ],
+              [
+                "gaussian_noise_sigma",
+                2
+              ]
+            ]
+          },
+          {
+            "image": 9,
+            "source_pages": [
+              9
+            ],
+            "size_px": [
+              2481,
+              3508
+            ],
+            "ops": [
+              [
+                "paper_texture",
+                2
+              ],
+              [
+                "skew_rotation_deg",
+                0.5
+              ],
+              [
+                "gaussian_noise_sigma",
+                2
+              ]
+            ]
+          },
+          {
+            "image": 10,
+            "source_pages": [
+              10
+            ],
+            "size_px": [
+              2481,
+              3508
+            ],
+            "ops": [
+              [
+                "paper_texture",
+                2
+              ],
+              [
+                "skew_rotation_deg",
+                0.5
+              ],
+              [
+                "gaussian_noise_sigma",
+                2
+              ]
+            ]
+          },
+          {
+            "image": 11,
+            "source_pages": [
+              11
+            ],
+            "size_px": [
+              2481,
+              3508
+            ],
+            "ops": [
+              [
+                "paper_texture",
+                2
+              ],
+              [
+                "skew_rotation_deg",
+                0.5
+              ],
+              [
+                "gaussian_noise_sigma",
+                2
+              ]
+            ]
+          },
+          {
+            "image": 12,
+            "source_pages": [
+              12
+            ],
+            "size_px": [
+              2481,
+              3508
+            ],
+            "ops": [
+              [
+                "paper_texture",
+                2
+              ],
+              [
+                "skew_rotation_deg",
+                0.5
+              ],
+              [
+                "gaussian_noise_sigma",
+                2
+              ]
+            ]
+          }
+        ],
+        "params": {
+          "dpi": 300,
+          "mode": "gray",
+          "texture": 2,
+          "rotate": 0.5,
+          "noise": 2,
+          "jpeg": 85
+        },
+        "summary": "clean flatbed scan, 300 dpi grey, 0.5 deg skew, JPEG q85",
+        "bytes": 10222824
+      },
+      "scan-severe.pdf": {
+        "seed": 11003,
+        "render_dpi": 300,
+        "dpi": 150,
+        "format": "png1",
+        "colour": "bw",
+        "pdf_pages": [
+          {
+            "image": 1,
+            "source_pages": [
+              1
+            ],
+            "size_px": [
+              1240,
+              1754
+            ],
+            "ops": [
+              [
+                "faded_ink",
+                0.15
+              ],
+              [
+                "skew_rotation_deg",
+                2.1
+              ],
+              [
+                "focus_blur_sigma",
+                0.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                8
+              ],
+              [
+                "salt_pepper",
+                0.0015
+              ],
+              [
+                "speckles_per_mpx",
+                150
+              ],
+              [
+                "binarized_photocopy",
+                {
+                  "threshold": 118,
+                  "noise": 20
+                }
+              ],
+              [
+                "resampled_dpi",
+                [
+                  300,
+                  150
+                ]
+              ]
+            ]
+          },
+          {
+            "image": 2,
+            "source_pages": [
+              2
+            ],
+            "size_px": [
+              1240,
+              1754
+            ],
+            "ops": [
+              [
+                "faded_ink",
+                0.15
+              ],
+              [
+                "skew_rotation_deg",
+                -3.3
+              ],
+              [
+                "focus_blur_sigma",
+                0.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                8
+              ],
+              [
+                "salt_pepper",
+                0.0015
+              ],
+              [
+                "speckles_per_mpx",
+                150
+              ],
+              [
+                "binarized_photocopy",
+                {
+                  "threshold": 118,
+                  "noise": 20
+                }
+              ],
+              [
+                "resampled_dpi",
+                [
+                  300,
+                  150
+                ]
+              ]
+            ]
+          },
+          {
+            "image": 3,
+            "source_pages": [
+              3
+            ],
+            "size_px": [
+              1240,
+              1754
+            ],
+            "ops": [
+              [
+                "faded_ink",
+                0.15
+              ],
+              [
+                "skew_rotation_deg",
+                4.6
+              ],
+              [
+                "focus_blur_sigma",
+                0.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                8
+              ],
+              [
+                "salt_pepper",
+                0.0015
+              ],
+              [
+                "speckles_per_mpx",
+                150
+              ],
+              [
+                "binarized_photocopy",
+                {
+                  "threshold": 118,
+                  "noise": 20
+                }
+              ],
+              [
+                "resampled_dpi",
+                [
+                  300,
+                  150
+                ]
+              ]
+            ]
+          },
+          {
+            "image": 4,
+            "source_pages": [
+              4
+            ],
+            "size_px": [
+              1240,
+              1754
+            ],
+            "ops": [
+              [
+                "faded_ink",
+                0.15
+              ],
+              [
+                "skew_rotation_deg",
+                -2.2
+              ],
+              [
+                "focus_blur_sigma",
+                0.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                8
+              ],
+              [
+                "salt_pepper",
+                0.0015
+              ],
+              [
+                "speckles_per_mpx",
+                150
+              ],
+              [
+                "binarized_photocopy",
+                {
+                  "threshold": 118,
+                  "noise": 20
+                }
+              ],
+              [
+                "resampled_dpi",
+                [
+                  300,
+                  150
+                ]
+              ]
+            ]
+          },
+          {
+            "image": 5,
+            "source_pages": [
+              5
+            ],
+            "size_px": [
+              1240,
+              1754
+            ],
+            "ops": [
+              [
+                "faded_ink",
+                0.15
+              ],
+              [
+                "skew_rotation_deg",
+                3.0
+              ],
+              [
+                "focus_blur_sigma",
+                0.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                8
+              ],
+              [
+                "salt_pepper",
+                0.0015
+              ],
+              [
+                "speckles_per_mpx",
+                150
+              ],
+              [
+                "binarized_photocopy",
+                {
+                  "threshold": 118,
+                  "noise": 20
+                }
+              ],
+              [
+                "page_rotated_deg",
+                180
+              ],
+              [
+                "resampled_dpi",
+                [
+                  300,
+                  150
+                ]
+              ]
+            ]
+          },
+          {
+            "image": 6,
+            "source_pages": [
+              6
+            ],
+            "size_px": [
+              1240,
+              1754
+            ],
+            "ops": [
+              [
+                "faded_ink",
+                0.15
+              ],
+              [
+                "skew_rotation_deg",
+                -5.8
+              ],
+              [
+                "focus_blur_sigma",
+                0.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                8
+              ],
+              [
+                "salt_pepper",
+                0.0015
+              ],
+              [
+                "speckles_per_mpx",
+                150
+              ],
+              [
+                "binarized_photocopy",
+                {
+                  "threshold": 118,
+                  "noise": 20
+                }
+              ],
+              [
+                "resampled_dpi",
+                [
+                  300,
+                  150
+                ]
+              ]
+            ]
+          },
+          {
+            "image": 7,
+            "source_pages": [
+              7
+            ],
+            "size_px": [
+              1240,
+              1754
+            ],
+            "ops": [
+              [
+                "faded_ink",
+                0.15
+              ],
+              [
+                "skew_rotation_deg",
+                2.7
+              ],
+              [
+                "focus_blur_sigma",
+                0.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                8
+              ],
+              [
+                "salt_pepper",
+                0.0015
+              ],
+              [
+                "speckles_per_mpx",
+                150
+              ],
+              [
+                "binarized_photocopy",
+                {
+                  "threshold": 118,
+                  "noise": 20
+                }
+              ],
+              [
+                "resampled_dpi",
+                [
+                  300,
+                  150
+                ]
+              ]
+            ]
+          },
+          {
+            "image": 8,
+            "source_pages": [
+              8
+            ],
+            "size_px": [
+              1240,
+              1754
+            ],
+            "ops": [
+              [
+                "faded_ink",
+                0.15
+              ],
+              [
+                "skew_rotation_deg",
+                -4.1
+              ],
+              [
+                "focus_blur_sigma",
+                0.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                8
+              ],
+              [
+                "salt_pepper",
+                0.0015
+              ],
+              [
+                "speckles_per_mpx",
+                150
+              ],
+              [
+                "binarized_photocopy",
+                {
+                  "threshold": 118,
+                  "noise": 20
+                }
+              ],
+              [
+                "resampled_dpi",
+                [
+                  300,
+                  150
+                ]
+              ]
+            ]
+          },
+          {
+            "image": 9,
+            "source_pages": [
+              9
+            ],
+            "size_px": [
+              1240,
+              1754
+            ],
+            "ops": [
+              [
+                "faded_ink",
+                0.15
+              ],
+              [
+                "skew_rotation_deg",
+                6.0
+              ],
+              [
+                "focus_blur_sigma",
+                0.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                8
+              ],
+              [
+                "salt_pepper",
+                0.0015
+              ],
+              [
+                "speckles_per_mpx",
+                150
+              ],
+              [
+                "binarized_photocopy",
+                {
+                  "threshold": 118,
+                  "noise": 20
+                }
+              ],
+              [
+                "resampled_dpi",
+                [
+                  300,
+                  150
+                ]
+              ]
+            ]
+          },
+          {
+            "image": 10,
+            "source_pages": [
+              10
+            ],
+            "size_px": [
+              1240,
+              1754
+            ],
+            "ops": [
+              [
+                "faded_ink",
+                0.15
+              ],
+              [
+                "skew_rotation_deg",
+                -2.5
+              ],
+              [
+                "focus_blur_sigma",
+                0.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                8
+              ],
+              [
+                "salt_pepper",
+                0.0015
+              ],
+              [
+                "speckles_per_mpx",
+                150
+              ],
+              [
+                "binarized_photocopy",
+                {
+                  "threshold": 118,
+                  "noise": 20
+                }
+              ],
+              [
+                "resampled_dpi",
+                [
+                  300,
+                  150
+                ]
+              ]
+            ]
+          },
+          {
+            "image": 11,
+            "source_pages": [
+              11
+            ],
+            "size_px": [
+              1240,
+              1754
+            ],
+            "ops": [
+              [
+                "faded_ink",
+                0.15
+              ],
+              [
+                "skew_rotation_deg",
+                3.8
+              ],
+              [
+                "focus_blur_sigma",
+                0.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                8
+              ],
+              [
+                "salt_pepper",
+                0.0015
+              ],
+              [
+                "speckles_per_mpx",
+                150
+              ],
+              [
+                "binarized_photocopy",
+                {
+                  "threshold": 118,
+                  "noise": 20
+                }
+              ],
+              [
+                "resampled_dpi",
+                [
+                  300,
+                  150
+                ]
+              ]
+            ]
+          },
+          {
+            "image": 12,
+            "source_pages": [
+              12
+            ],
+            "size_px": [
+              1240,
+              1754
+            ],
+            "ops": [
+              [
+                "faded_ink",
+                0.15
+              ],
+              [
+                "skew_rotation_deg",
+                -3.0
+              ],
+              [
+                "focus_blur_sigma",
+                0.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                8
+              ],
+              [
+                "salt_pepper",
+                0.0015
+              ],
+              [
+                "speckles_per_mpx",
+                150
+              ],
+              [
+                "binarized_photocopy",
+                {
+                  "threshold": 118,
+                  "noise": 20
+                }
+              ],
+              [
+                "resampled_dpi",
+                [
+                  300,
+                  150
+                ]
+              ]
+            ]
+          }
+        ],
+        "params": {
+          "dpi": 300,
+          "out_dpi": 150,
+          "ink_dropout": 0.15,
+          "rotate_pages": {
+            "0": 2.1,
+            "1": -3.3,
+            "2": 4.6,
+            "3": -2.2,
+            "4": 3.0,
+            "5": -5.8,
+            "6": 2.7,
+            "7": -4.1,
+            "8": 6.0,
+            "9": -2.5,
+            "10": 3.8,
+            "11": -3.0
+          },
+          "page_rotate": {
+            "4": 180
+          },
+          "blur": 0.6,
+          "noise": 8,
+          "binarize": 118,
+          "binarize_noise": 20,
+          "saltpepper": 0.0015,
+          "speckle": 150,
+          "format": "png1"
+        },
+        "summary": "thin, faded binarised photocopy at 150 dpi (from 300): broken staff lines, 2-6 deg skew per page, page 5 upside down, salt & pepper, speckles",
+        "bytes": 469713
+      }
+    },
+    "files": [
+      "ATTRIBUTION.txt",
+      "clean.pdf",
+      "engraving.ly",
+      "meta.json",
+      "scan-mild.pdf",
+      "scan-severe.pdf",
+      "scan.pdf",
+      "truth.musicxml"
+    ],
+    "license": "Public domain melody; variations, engraving and scans CC0-1.0",
+    "source": "self-authored (layout-challenge corpus); theme: French melody \"Ah! vous dirai-je, maman\" (1761)",
+    "engraver": "internal model -> LilyPond 2.24 (custom writer, layout-challenge edition)",
+    "validation": {
+      "xsd_valid": true,
+      "music21_parse": "2 1906",
+      "midi_attacks_match_truth": true,
+      "attacks": 2455,
+      "lilypond_warnings": [],
+      "lyric_syllables_found_in_engraving": null,
+      "lyric_syllables": 0,
+      "pages_planned": 12,
+      "image_only": {
+        "clean.pdf": true,
+        "scan.pdf": true,
+        "scan-mild.pdf": true,
+        "scan-severe.pdf": true
+      }
+    }
+  },
+  {
+    "id": "anthem-satb-closed-piano-4-pages",
+    "category": "layout",
+    "title": "All Things Bright and Beautiful - SATB closed score + piano, 4 pages, hidden choir staves, endings, D.S.",
+    "edge_cases": [
+      "satb_closed_score",
+      "choir_plus_piano",
+      "bracket_vs_brace",
+      "piano_two_voices_on_rh_staff",
+      "hidden_empty_staves",
+      "systems_with_different_staff_counts",
+      "multi_page_3_4",
+      "page_numbers",
+      "running_headers",
+      "volta_1st_2nd_endings",
+      "stacked_verses_in_repeat",
+      "segno",
+      "to_coda",
+      "ds_al_coda",
+      "coda",
+      "rehearsal_marks",
+      "tempo_text",
+      "dynamics_text",
+      "lyrics",
+      "lyrics_on_both_choir_staves",
+      "must_not_split",
+      "ties",
+      "fermata"
+    ],
+    "expected": {
+      "parts": [
+        "Soprano",
+        "Alto",
+        "Tenor",
+        "Bass",
+        "Piano"
+      ],
+      "must_not_split": true,
+      "shared_staves": [
+        [
+          "Soprano",
+          "Alto"
+        ],
+        [
+          "Tenor",
+          "Bass"
+        ]
+      ],
+      "staves_per_part": {
+        "Soprano": 1,
+        "Alto": 1,
+        "Tenor": 1,
+        "Bass": 1,
+        "Piano": 2
+      },
+      "lyrics": [
+        {
+          "part": "Soprano",
+          "verses": 2
+        },
+        {
+          "part": "Tenor",
+          "verses": 2
+        }
+      ],
+      "notes": "Five parts: Soprano, Alto, Tenor, Bass (closed score: S+A share the treble staff, T+B the bass staff, bracketed; each shared staff MUST be split into two parts by stem direction) and Piano (braced grand staff, ONE part, never split - its right hand has two voices in the verse, which must stay inside the piano part). Systems 1 (introduction) and 4 (interlude) show only the piano: the choir parts have invisible whole-measure rests there. The verse (mm. 15-23) is repeated: verse 1 and verse 2 are stacked; m.22 = 1st ending (verse 1 \"ny wings\"), m.23 = 2nd ending (verse 2 \"the sky\"). Segno m.5, To Coda after m.10, D.S. al Coda after m.23, Coda m.24 - notated order, not unrolled. Lyrics are under both choir staves; truth attaches them to Soprano and Tenor (Alto/Bass sing the same syllables on the same rhythm)."
+    },
+    "truth_limitations": "Lyrics are encoded on Soprano (verses 1-2) and Tenor (copied by onset), not on Alto/Bass. Choir rests in piano-only systems are print-object=\"no\". Beaming not encoded.",
+    "layout": "US letter, staff size 20, 8 systems on 4 pages (2 per page); piano-only systems at the start of page 1 and the end of page 2",
+    "pages": 4,
+    "measures": 27,
+    "notes_in_truth": 584,
+    "hidden_staff_systems": [
+      {
+        "staff": "sa",
+        "measures": [
+          1,
+          4
+        ]
+      },
+      {
+        "staff": "sa",
+        "measures": [
+          13,
+          14
+        ]
+      },
+      {
+        "staff": "tb",
+        "measures": [
+          1,
+          4
+        ]
+      },
+      {
+        "staff": "tb",
+        "measures": [
+          13,
+          14
+        ]
+      }
+    ],
+    "dpi": 200,
+    "degradations": {
+      "scan.pdf": {
+        "seed": 12001,
+        "render_dpi": 200,
+        "dpi": 200,
+        "format": "jpeg q40",
+        "colour": "rgb",
+        "pdf_pages": [
+          {
+            "image": 1,
+            "source_pages": [
+              1
+            ],
+            "size_px": [
+              1700,
+              2200
+            ],
+            "ops": [
+              [
+                "page_curl",
+                {
+                  "side": "right",
+                  "amp": 30,
+                  "width": 0.28
+                }
+              ],
+              [
+                "paper_texture",
+                5
+              ],
+              [
+                "paper_colour",
+                [
+                  236,
+                  226,
+                  198
+                ]
+              ],
+              [
+                "gutter_shadow",
+                {
+                  "side": "right",
+                  "width": 0.07,
+                  "dark": 0.6
+                }
+              ],
+              [
+                "skew_rotation_deg",
+                1.2
+              ],
+              [
+                "vignette",
+                0.15
+              ],
+              [
+                "focus_blur_sigma",
+                0.7
+              ],
+              [
+                "gaussian_noise_sigma",
+                4
+              ]
+            ]
+          },
+          {
+            "image": 2,
+            "source_pages": [
+              2,
+              3
+            ],
+            "size_px": [
+              3400,
+              2200
+            ],
+            "ops": [
+              [
+                "p2",
+                "page_curl",
+                {
+                  "side": "right",
+                  "amp": 30,
+                  "width": 0.28
+                }
+              ],
+              [
+                "p2",
+                "paper_texture",
+                5
+              ],
+              [
+                "p2",
+                "paper_colour",
+                [
+                  236,
+                  226,
+                  198
+                ]
+              ],
+              [
+                "p2",
+                "gutter_shadow",
+                {
+                  "side": "right",
+                  "width": 0.07,
+                  "dark": 0.6
+                }
+              ],
+              [
+                "p3",
+                "page_curl",
+                {
+                  "side": "left",
+                  "amp": 30,
+                  "width": 0.28
+                }
+              ],
+              [
+                "p3",
+                "paper_texture",
+                5
+              ],
+              [
+                "p3",
+                "paper_colour",
+                [
+                  236,
+                  226,
+                  198
+                ]
+              ],
+              [
+                "p3",
+                "gutter_shadow",
+                {
+                  "side": "left",
+                  "width": 0.07,
+                  "dark": 0.6
+                }
+              ],
+              [
+                "spread_2up",
+                [
+                  2,
+                  3
+                ]
+              ],
+              [
+                "skew_rotation_deg",
+                1.2
+              ],
+              [
+                "vignette",
+                0.15
+              ],
+              [
+                "focus_blur_sigma",
+                0.7
+              ],
+              [
+                "gaussian_noise_sigma",
+                4
+              ]
+            ]
+          },
+          {
+            "image": 3,
+            "source_pages": [
+              4
+            ],
+            "size_px": [
+              1700,
+              2200
+            ],
+            "ops": [
+              [
+                "page_curl",
+                {
+                  "side": "left",
+                  "amp": 30,
+                  "width": 0.28
+                }
+              ],
+              [
+                "paper_texture",
+                5
+              ],
+              [
+                "paper_colour",
+                [
+                  236,
+                  226,
+                  198
+                ]
+              ],
+              [
+                "gutter_shadow",
+                {
+                  "side": "left",
+                  "width": 0.07,
+                  "dark": 0.6
+                }
+              ],
+              [
+                "skew_rotation_deg",
+                1.2
+              ],
+              [
+                "vignette",
+                0.15
+              ],
+              [
+                "focus_blur_sigma",
+                0.7
+              ],
+              [
+                "gaussian_noise_sigma",
+                4
+              ]
+            ]
+          }
+        ],
+        "params": {
+          "dpi": 200,
+          "mode": "rgb",
+          "paper_rgb": [
+            236,
+            226,
+            198
+          ],
+          "texture": 5,
+          "spread": [
+            [
+              1,
+              2
+            ]
+          ],
+          "gutter": {
+            "side": "inner",
+            "width": 0.07,
+            "dark": 0.6
+          },
+          "curl": {
+            "side": "inner",
+            "amp": 30,
+            "width": 0.28
+          },
+          "rotate": 1.2,
+          "vignette": 0.15,
+          "blur": 0.7,
+          "noise": 4,
+          "jpeg": 40
+        },
+        "summary": "bound octavo scanned as a book: pages 2-3 as ONE 2-up image (double-page spread) with gutter shadow and page curl at the spine, yellowed paper (RGB), slight skew, vignette, JPEG q40",
+        "bytes": 778221
+      },
+      "scan-mild.pdf": {
+        "seed": 12002,
+        "render_dpi": 300,
+        "dpi": 300,
+        "format": "jpeg q80",
+        "colour": "rgb",
+        "pdf_pages": [
+          {
+            "image": 1,
+            "source_pages": [
+              1
+            ],
+            "size_px": [
+              2550,
+              3300
+            ],
+            "ops": [
+              [
+                "paper_texture",
+                3
+              ],
+              [
+                "paper_colour",
+                [
+                  243,
+                  236,
+                  214
+                ]
+              ],
+              [
+                "gutter_shadow",
+                {
+                  "side": "right",
+                  "width": 0.04,
+                  "dark": 0.3
+                }
+              ],
+              [
+                "skew_rotation_deg",
+                -0.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                2
+              ]
+            ]
+          },
+          {
+            "image": 2,
+            "source_pages": [
+              2
+            ],
+            "size_px": [
+              2550,
+              3300
+            ],
+            "ops": [
+              [
+                "paper_texture",
+                3
+              ],
+              [
+                "paper_colour",
+                [
+                  243,
+                  236,
+                  214
+                ]
+              ],
+              [
+                "gutter_shadow",
+                {
+                  "side": "left",
+                  "width": 0.04,
+                  "dark": 0.3
+                }
+              ],
+              [
+                "skew_rotation_deg",
+                -0.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                2
+              ]
+            ]
+          },
+          {
+            "image": 3,
+            "source_pages": [
+              3
+            ],
+            "size_px": [
+              2550,
+              3300
+            ],
+            "ops": [
+              [
+                "paper_texture",
+                3
+              ],
+              [
+                "paper_colour",
+                [
+                  243,
+                  236,
+                  214
+                ]
+              ],
+              [
+                "gutter_shadow",
+                {
+                  "side": "right",
+                  "width": 0.04,
+                  "dark": 0.3
+                }
+              ],
+              [
+                "skew_rotation_deg",
+                -0.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                2
+              ]
+            ]
+          },
+          {
+            "image": 4,
+            "source_pages": [
+              4
+            ],
+            "size_px": [
+              2550,
+              3300
+            ],
+            "ops": [
+              [
+                "paper_texture",
+                3
+              ],
+              [
+                "paper_colour",
+                [
+                  243,
+                  236,
+                  214
+                ]
+              ],
+              [
+                "gutter_shadow",
+                {
+                  "side": "left",
+                  "width": 0.04,
+                  "dark": 0.3
+                }
+              ],
+              [
+                "skew_rotation_deg",
+                -0.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                2
+              ]
+            ]
+          }
+        ],
+        "params": {
+          "dpi": 300,
+          "mode": "rgb",
+          "paper_rgb": [
+            243,
+            236,
+            214
+          ],
+          "texture": 3,
+          "rotate": -0.6,
+          "gutter": {
+            "side": "inner",
+            "width": 0.04,
+            "dark": 0.3
+          },
+          "noise": 2,
+          "jpeg": 80
+        },
+        "summary": "flatbed 300 dpi RGB, cream paper, -0.6 deg skew, mild gutter",
+        "bytes": 2899005
+      },
+      "scan-severe.pdf": {
+        "seed": 12003,
+        "render_dpi": 200,
+        "dpi": 120,
+        "format": "jpeg q20",
+        "colour": "rgb",
+        "pdf_pages": [
+          {
+            "image": 1,
+            "source_pages": [
+              1,
+              2
+            ],
+            "size_px": [
+              2244,
+              1524
+            ],
+            "ops": [
+              [
+                "p1",
+                "page_curl",
+                {
+                  "side": "right",
+                  "amp": 40,
+                  "width": 0.3
+                }
+              ],
+              [
+                "p1",
+                "paper_texture",
+                6
+              ],
+              [
+                "p1",
+                "paper_colour",
+                [
+                  236,
+                  226,
+                  198
+                ]
+              ],
+              [
+                "p1",
+                "gutter_shadow",
+                {
+                  "side": "right",
+                  "width": 0.08,
+                  "dark": 0.7
+                }
+              ],
+              [
+                "p2",
+                "page_curl",
+                {
+                  "side": "left",
+                  "amp": 40,
+                  "width": 0.3
+                }
+              ],
+              [
+                "p2",
+                "paper_texture",
+                6
+              ],
+              [
+                "p2",
+                "paper_colour",
+                [
+                  236,
+                  226,
+                  198
+                ]
+              ],
+              [
+                "p2",
+                "gutter_shadow",
+                {
+                  "side": "left",
+                  "width": 0.08,
+                  "dark": 0.7
+                }
+              ],
+              [
+                "spread_2up",
+                [
+                  1,
+                  2
+                ]
+              ],
+              [
+                "skew_rotation_deg",
+                -2.0
+              ],
+              [
+                "perspective_phone",
+                {
+                  "margin": 0.05,
+                  "bg": 60,
+                  "jitter": 0.035,
+                  "keystone": 0.05,
+                  "corners_src": [
+                    [
+                      -94,
+                      -15
+                    ],
+                    [
+                      3959,
+                      28
+                    ],
+                    [
+                      3855,
+                      2463
+                    ],
+                    [
+                      71,
+                      2497
+                    ]
+                  ]
+                }
+              ],
+              [
+                "uneven_lighting",
+                0.25
+              ],
+              [
+                "vignette",
+                0.35
+              ],
+              [
+                "motion_blur",
+                {
+                  "len": 6,
+                  "angle": 15
+                }
+              ],
+              [
+                "gaussian_noise_sigma",
+                7
+              ],
+              [
+                "resampled_dpi",
+                [
+                  200,
+                  120
+                ]
+              ]
+            ]
+          },
+          {
+            "image": 2,
+            "source_pages": [
+              3,
+              4
+            ],
+            "size_px": [
+              2244,
+              1524
+            ],
+            "ops": [
+              [
+                "p3",
+                "page_curl",
+                {
+                  "side": "right",
+                  "amp": 40,
+                  "width": 0.3
+                }
+              ],
+              [
+                "p3",
+                "paper_texture",
+                6
+              ],
+              [
+                "p3",
+                "paper_colour",
+                [
+                  236,
+                  226,
+                  198
+                ]
+              ],
+              [
+                "p3",
+                "gutter_shadow",
+                {
+                  "side": "right",
+                  "width": 0.08,
+                  "dark": 0.7
+                }
+              ],
+              [
+                "p4",
+                "page_curl",
+                {
+                  "side": "left",
+                  "amp": 40,
+                  "width": 0.3
+                }
+              ],
+              [
+                "p4",
+                "paper_texture",
+                6
+              ],
+              [
+                "p4",
+                "paper_colour",
+                [
+                  236,
+                  226,
+                  198
+                ]
+              ],
+              [
+                "p4",
+                "gutter_shadow",
+                {
+                  "side": "left",
+                  "width": 0.08,
+                  "dark": 0.7
+                }
+              ],
+              [
+                "spread_2up",
+                [
+                  3,
+                  4
+                ]
+              ],
+              [
+                "skew_rotation_deg",
+                -2.0
+              ],
+              [
+                "perspective_phone",
+                {
+                  "margin": 0.05,
+                  "bg": 60,
+                  "jitter": 0.035,
+                  "keystone": 0.05,
+                  "corners_src": [
+                    [
+                      -284,
+                      32
+                    ],
+                    [
+                      3968,
+                      -85
+                    ],
+                    [
+                      3771,
+                      2500
+                    ],
+                    [
+                      -78,
+                      2608
+                    ]
+                  ]
+                }
+              ],
+              [
+                "uneven_lighting",
+                0.25
+              ],
+              [
+                "vignette",
+                0.35
+              ],
+              [
+                "motion_blur",
+                {
+                  "len": 6,
+                  "angle": 15
+                }
+              ],
+              [
+                "gaussian_noise_sigma",
+                7
+              ],
+              [
+                "resampled_dpi",
+                [
+                  200,
+                  120
+                ]
+              ]
+            ]
+          }
+        ],
+        "params": {
+          "dpi": 200,
+          "out_dpi": 120,
+          "mode": "rgb",
+          "paper_rgb": [
+            236,
+            226,
+            198
+          ],
+          "texture": 6,
+          "spread": [
+            [
+              0,
+              1
+            ],
+            [
+              2,
+              3
+            ]
+          ],
+          "gutter": {
+            "side": "inner",
+            "width": 0.08,
+            "dark": 0.7
+          },
+          "curl": {
+            "side": "inner",
+            "amp": 40,
+            "width": 0.3
+          },
+          "rotate": -2.0,
+          "phone": {
+            "margin": 0.05,
+            "bg": 60,
+            "jitter": 0.035,
+            "keystone": 0.05
+          },
+          "blotch": 0.25,
+          "vignette": 0.35,
+          "motion_blur": {
+            "len": 6,
+            "angle": 15
+          },
+          "noise": 7,
+          "jpeg": 20
+        },
+        "summary": "phone photos of two open double-page spreads (pages 1-2, 3-4): perspective/keystone, uneven lamp light, vignette, motion blur, 120 dpi, JPEG q20",
+        "bytes": 223883
+      }
+    },
+    "files": [
+      "ATTRIBUTION.txt",
+      "clean.pdf",
+      "engraving.ly",
+      "meta.json",
+      "scan-mild.pdf",
+      "scan-severe.pdf",
+      "scan.pdf",
+      "truth.musicxml"
+    ],
+    "license": "Text public domain (C. F. Alexander 1848); music, arrangement and engraving CC0-1.0",
+    "source": "self-authored (layout-challenge corpus); text \"All Things Bright and Beautiful\", Hymns for Little Children (1848)",
+    "engraver": "internal model -> LilyPond 2.24 (custom writer, layout-challenge edition)",
+    "validation": {
+      "xsd_valid": true,
+      "music21_parse": "6 478",
+      "midi_attacks_match_truth": true,
+      "attacks": 576,
+      "lilypond_warnings": [],
+      "lyric_syllables_found_in_engraving": 1.0,
+      "lyric_syllables": 168,
+      "pages_planned": 4,
+      "image_only": {
+        "clean.pdf": true,
+        "scan.pdf": true,
+        "scan-mild.pdf": true,
+        "scan-severe.pdf": true
+      }
+    }
+  },
+  {
+    "id": "organ-chorale-3-staves-landscape",
+    "category": "layout",
+    "title": "Nun danket alle Gott - organ on 3 staves (pedal), landscape, manualiter system, 1st/2nd endings",
+    "edge_cases": [
+      "organ_three_staves",
+      "pedal_staff",
+      "brace_on_manuals_only",
+      "landscape_page",
+      "hidden_empty_staff",
+      "systems_with_different_staff_counts",
+      "single_system_page",
+      "two_voices_on_manual_staff",
+      "volta_1st_2nd_endings",
+      "repeats",
+      "registration_text",
+      "tempo_text",
+      "must_not_split",
+      "fermata",
+      "page_numbers"
+    ],
+    "expected": {
+      "parts": [
+        "Organ"
+      ],
+      "must_not_split": true,
+      "shared_staves": [],
+      "staves_per_part": {
+        "Organ": 3
+      },
+      "lyrics": [],
+      "notes": "One part: Organ with THREE staves (manual I treble, manual II bass, pedal bass). Manual I carries two voices (soprano stems up, alto stems down) that must stay in the organ part - this is not closed-score choir music. The brace joins only the two manual staves; the pedal staff is outside the brace but still belongs to the same Organ part. System 1 (mm. 1-3, manualiter) has no pedal staff at all; the truth carries invisible whole-measure rests (print-object=\"no\") for the pedal there. Endings: m.7 = 1st ending (with repeat), m.8 = 2nd ending; notated order, not unrolled. Registration texts and \"manualiter\" are words, not lyrics. Page 3 holds exactly one system."
+    },
+    "truth_limitations": "Beaming not encoded. The pedal rests of the hidden system are encoded as <note print-object=\"no\"><rest measure=\"yes\"/>. Registration texts are <words> directions. Organ represented as ONE part with 3 staves (<staves>3</staves>, <part-symbol top-staff=\"1\" bottom-staff=\"2\">brace</part-symbol>).",
+    "layout": "A4 landscape, staff size 19; page 1: title + system 1 (2 staves, pedal hidden) + system 2 (3 staves); page 2: two 3-staff systems; page 3: one system",
+    "pages": 3,
+    "measures": 18,
+    "notes_in_truth": 259,
+    "hidden_staff_systems": [
+      {
+        "staff": "ped",
+        "measures": [
+          1,
+          3
+        ]
+      }
+    ],
+    "dpi": 150,
+    "degradations": {
+      "scan.pdf": {
+        "seed": 13001,
+        "render_dpi": 150,
+        "dpi": 150,
+        "format": "jpeg q45",
+        "colour": "rgb",
+        "pdf_pages": [
+          {
+            "image": 1,
+            "source_pages": [
+              1
+            ],
+            "size_px": [
+              1241,
+              1754
+            ],
+            "ops": [
+              [
+                "pencil_annotations",
+                {
+                  "circled": [
+                    [
+                      908,
+                      750
+                    ],
+                    [
+                      273,
+                      341
+                    ],
+                    [
+                      210,
+                      748
+                    ]
+                  ],
+                  "marks": [
+                    [
+                      1562,
+                      635
+                    ],
+                    [
+                      1029,
+                      734
+                    ]
+                  ],
+                  "texts": [
+                    [
+                      "Sw.",
+                      465,
+                      608
+                    ],
+                    [
+                      "+ Oboe",
+                      1377,
+                      627
+                    ],
+                    [
+                      "II",
+                      784,
+                      474
+                    ],
+                    [
+                      "Gt.",
+                      785,
+                      712
+                    ]
+                  ],
+                  "lines": 1
+                }
+              ],
+              [
+                "paper_texture",
+                5
+              ],
+              [
+                "paper_colour",
+                [
+                  236,
+                  226,
+                  198
+                ]
+              ],
+              [
+                "stains",
+                {
+                  "foxing": 60
+                }
+              ],
+              [
+                "skew_rotation_deg",
+                1.5
+              ],
+              [
+                "focus_blur_sigma",
+                0.5
+              ],
+              [
+                "gaussian_noise_sigma",
+                4
+              ],
+              [
+                "page_rotated_deg",
+                90
+              ]
+            ]
+          },
+          {
+            "image": 2,
+            "source_pages": [
+              2
+            ],
+            "size_px": [
+              1241,
+              1754
+            ],
+            "ops": [
+              [
+                "pencil_annotations",
+                {
+                  "circled": [
+                    [
+                      552,
+                      741
+                    ],
+                    [
+                      1112,
+                      519
+                    ],
+                    [
+                      650,
+                      521
+                    ]
+                  ],
+                  "marks": [
+                    [
+                      691,
+                      505
+                    ],
+                    [
+                      433,
+                      633
+                    ]
+                  ],
+                  "texts": [
+                    [
+                      "Sw.",
+                      270,
+                      609
+                    ],
+                    [
+                      "+ Oboe",
+                      834,
+                      220
+                    ],
+                    [
+                      "II",
+                      514,
+                      731
+                    ],
+                    [
+                      "Gt.",
+                      312,
+                      63
+                    ]
+                  ],
+                  "lines": 1
+                }
+              ],
+              [
+                "paper_texture",
+                5
+              ],
+              [
+                "paper_colour",
+                [
+                  236,
+                  226,
+                  198
+                ]
+              ],
+              [
+                "stains",
+                {
+                  "foxing": 60
+                }
+              ],
+              [
+                "skew_rotation_deg",
+                1.5
+              ],
+              [
+                "focus_blur_sigma",
+                0.5
+              ],
+              [
+                "gaussian_noise_sigma",
+                4
+              ],
+              [
+                "page_rotated_deg",
+                90
+              ]
+            ]
+          },
+          {
+            "image": 3,
+            "source_pages": [
+              3
+            ],
+            "size_px": [
+              1241,
+              1754
+            ],
+            "ops": [
+              [
+                "pencil_annotations",
+                {
+                  "circled": [
+                    [
+                      663,
+                      231
+                    ],
+                    [
+                      356,
+                      230
+                    ],
+                    [
+                      766,
+                      229
+                    ]
+                  ],
+                  "marks": [
+                    [
+                      963,
+                      323
+                    ],
+                    [
+                      860,
+                      182
+                    ]
+                  ],
+                  "texts": [
+                    [
+                      "Sw.",
+                      449,
+                      101
+                    ],
+                    [
+                      "+ Oboe",
+                      744,
+                      87
+                    ],
+                    [
+                      "II",
+                      1034,
+                      77
+                    ],
+                    [
+                      "Gt.",
+                      827,
+                      282
+                    ]
+                  ],
+                  "lines": 1
+                }
+              ],
+              [
+                "paper_texture",
+                5
+              ],
+              [
+                "paper_colour",
+                [
+                  236,
+                  226,
+                  198
+                ]
+              ],
+              [
+                "stains",
+                {
+                  "foxing": 60
+                }
+              ],
+              [
+                "skew_rotation_deg",
+                1.5
+              ],
+              [
+                "focus_blur_sigma",
+                0.5
+              ],
+              [
+                "gaussian_noise_sigma",
+                4
+              ],
+              [
+                "page_rotated_deg",
+                270
+              ]
+            ]
+          }
+        ],
+        "params": {
+          "dpi": 150,
+          "mode": "rgb",
+          "paper_rgb": [
+            236,
+            226,
+            198
+          ],
+          "texture": 5,
+          "foxing": {
+            "n": 60
+          },
+          "pencil": {
+            "circles": 3,
+            "marks": 2,
+            "texts": [
+              "Sw.",
+              "+ Oboe",
+              "II",
+              "Gt."
+            ],
+            "lines": 1
+          },
+          "rotate": 1.5,
+          "page_rotate": {
+            "0": 90,
+            "1": 90,
+            "2": 270
+          },
+          "blur": 0.5,
+          "noise": 4,
+          "jpeg": 45
+        },
+        "summary": "landscape pages scanned portrait (all pages rotated 90/270 deg), 150 dpi RGB on yellowed paper with foxing, pencil registration notes and circled notes, 1.5 deg skew, JPEG q45",
+        "bytes": 371139
+      },
+      "scan-mild.pdf": {
+        "seed": 13002,
+        "render_dpi": 300,
+        "dpi": 300,
+        "format": "jpeg q85",
+        "colour": "gray",
+        "pdf_pages": [
+          {
+            "image": 1,
+            "source_pages": [
+              1
+            ],
+            "size_px": [
+              3508,
+              2481
+            ],
+            "ops": [
+              [
+                "paper_texture",
+                2
+              ],
+              [
+                "skew_rotation_deg",
+                0.5
+              ],
+              [
+                "gaussian_noise_sigma",
+                2
+              ]
+            ]
+          },
+          {
+            "image": 2,
+            "source_pages": [
+              2
+            ],
+            "size_px": [
+              3508,
+              2481
+            ],
+            "ops": [
+              [
+                "paper_texture",
+                2
+              ],
+              [
+                "skew_rotation_deg",
+                0.5
+              ],
+              [
+                "gaussian_noise_sigma",
+                2
+              ]
+            ]
+          },
+          {
+            "image": 3,
+            "source_pages": [
+              3
+            ],
+            "size_px": [
+              3508,
+              2481
+            ],
+            "ops": [
+              [
+                "paper_texture",
+                2
+              ],
+              [
+                "skew_rotation_deg",
+                0.5
+              ],
+              [
+                "gaussian_noise_sigma",
+                2
+              ]
+            ]
+          }
+        ],
+        "params": {
+          "dpi": 300,
+          "mode": "gray",
+          "texture": 2,
+          "rotate": 0.5,
+          "noise": 2,
+          "jpeg": 85
+        },
+        "summary": "300 dpi grey, upright, 0.5 deg skew",
+        "bytes": 2116292
+      },
+      "scan-severe.pdf": {
+        "seed": 13003,
+        "render_dpi": 200,
+        "dpi": 200,
+        "format": "png1",
+        "colour": "bw",
+        "pdf_pages": [
+          {
+            "image": 1,
+            "source_pages": [
+              1
+            ],
+            "size_px": [
+              2339,
+              1654
+            ],
+            "ops": [
+              [
+                "ink_weight",
+                1
+              ],
+              [
+                "punch_holes",
+                {
+                  "side": "left",
+                  "centers_px": [
+                    [
+                      87,
+                      604
+                    ],
+                    [
+                      87,
+                      1050
+                    ]
+                  ]
+                }
+              ],
+              [
+                "staple",
+                {
+                  "corner": "tl",
+                  "pos_px": [
+                    140,
+                    66
+                  ]
+                }
+              ],
+              [
+                "skew_rotation_deg",
+                4.0
+              ],
+              [
+                "focus_blur_sigma",
+                0.9
+              ],
+              [
+                "gaussian_noise_sigma",
+                12
+              ],
+              [
+                "salt_pepper",
+                0.002
+              ],
+              [
+                "binarized_photocopy",
+                {
+                  "threshold": 200,
+                  "noise": 20
+                }
+              ]
+            ]
+          },
+          {
+            "image": 2,
+            "source_pages": [
+              2
+            ],
+            "size_px": [
+              1654,
+              2339
+            ],
+            "ops": [
+              [
+                "ink_weight",
+                1
+              ],
+              [
+                "punch_holes",
+                {
+                  "side": "left",
+                  "centers_px": [
+                    [
+                      87,
+                      604
+                    ],
+                    [
+                      87,
+                      1050
+                    ]
+                  ]
+                }
+              ],
+              [
+                "staple",
+                {
+                  "corner": "tl",
+                  "pos_px": [
+                    140,
+                    66
+                  ]
+                }
+              ],
+              [
+                "skew_rotation_deg",
+                4.0
+              ],
+              [
+                "focus_blur_sigma",
+                0.9
+              ],
+              [
+                "gaussian_noise_sigma",
+                12
+              ],
+              [
+                "salt_pepper",
+                0.002
+              ],
+              [
+                "binarized_photocopy",
+                {
+                  "threshold": 200,
+                  "noise": 20
+                }
+              ],
+              [
+                "page_rotated_deg",
+                90
+              ]
+            ]
+          },
+          {
+            "image": 3,
+            "source_pages": [
+              3
+            ],
+            "size_px": [
+              2339,
+              1654
+            ],
+            "ops": [
+              [
+                "ink_weight",
+                1
+              ],
+              [
+                "punch_holes",
+                {
+                  "side": "left",
+                  "centers_px": [
+                    [
+                      87,
+                      604
+                    ],
+                    [
+                      87,
+                      1050
+                    ]
+                  ]
+                }
+              ],
+              [
+                "staple",
+                {
+                  "corner": "tl",
+                  "pos_px": [
+                    140,
+                    66
+                  ]
+                }
+              ],
+              [
+                "skew_rotation_deg",
+                4.0
+              ],
+              [
+                "focus_blur_sigma",
+                0.9
+              ],
+              [
+                "gaussian_noise_sigma",
+                12
+              ],
+              [
+                "salt_pepper",
+                0.002
+              ],
+              [
+                "binarized_photocopy",
+                {
+                  "threshold": 200,
+                  "noise": 20
+                }
+              ]
+            ]
+          }
+        ],
+        "params": {
+          "dpi": 200,
+          "ink_weight": 1,
+          "rotate": 4.0,
+          "page_rotate": {
+            "1": 90
+          },
+          "punch_holes": {
+            "n": 2,
+            "side": "left",
+            "level": 10
+          },
+          "staple": {
+            "corner": "tl"
+          },
+          "blur": 0.9,
+          "noise": 12,
+          "binarize": 200,
+          "binarize_noise": 20,
+          "saltpepper": 0.002,
+          "format": "png1"
+        },
+        "summary": "thick dark binarised photocopy, 4 deg skew, page 2 rotated 90 deg, salt & pepper, staple and two punch holes",
+        "bytes": 484569
+      }
+    },
+    "files": [
+      "ATTRIBUTION.txt",
+      "clean.pdf",
+      "engraving.ly",
+      "meta.json",
+      "scan-mild.pdf",
+      "scan-severe.pdf",
+      "scan.pdf",
+      "truth.musicxml"
+    ],
+    "license": "Public domain composition (Crüger 1647 / Bach BWV 252); intro, coda, layout and engraving CC0-1.0",
+    "source": "music21 corpus bach/bwv252.mxl (soprano, alto, tenor, bass parts) + self-authored intro/coda",
+    "engraver": "internal model -> LilyPond 2.24 (custom writer, layout-challenge edition)",
+    "validation": {
+      "xsd_valid": true,
+      "music21_parse": "3 258",
+      "midi_attacks_match_truth": true,
+      "attacks": 257,
+      "lilypond_warnings": [],
+      "lyric_syllables_found_in_engraving": null,
+      "lyric_syllables": 0,
+      "pages_planned": 3,
+      "image_only": {
+        "clean.pdf": true,
+        "scan.pdf": true,
+        "scan-mild.pdf": true,
+        "scan-severe.pdf": true
+      }
+    }
+  },
+  {
+    "id": "nocturne-cross-staff-pedal-ds-coda",
+    "category": "layout",
+    "title": "Nocturne in E-flat - cross-staff beams, pedal marks, Segno / To Coda / D.S. al Coda",
+    "edge_cases": [
+      "cross_staff_beams",
+      "cross_staff_notes_lh_to_treble",
+      "cross_staff_notes_rh_to_bass",
+      "pedal_marks",
+      "segno",
+      "to_coda",
+      "ds_al_coda",
+      "coda",
+      "tempo_text",
+      "dotted_metronome_mark",
+      "expression_text",
+      "dynamics_text",
+      "hairpin",
+      "accidentals_cross_staff",
+      "piano_grand_staff",
+      "must_not_split",
+      "double_barline",
+      "ties",
+      "slurs",
+      "fermata"
+    ],
+    "expected": {
+      "parts": [
+        "Piano"
+      ],
+      "must_not_split": true,
+      "shared_staves": [],
+      "staves_per_part": {
+        "Piano": 2
+      },
+      "lyrics": [],
+      "notes": "One part: Piano (2 staves) - must NOT be split even though left-hand notes appear on the treble staff (beams cross between the staves) and right-hand notes on the bass staff. Cross-staff notes keep their voice (LH voice 5 / RH voice 1) and carry the staff they are printed on (<staff>). Notated order: segno at m.3, \"To Coda\" after m.8, \"D.S. al Coda\" after m.18, coda from m.19 - do not unroll. \"Ped.\" / \"*\" signs, \"cantabile\", \"cresc.\", \"dim.\", \"rit.\", \"morendo\", tempo text are not notes or lyrics."
+    },
+    "truth_limitations": "Beaming is not encoded (no <beam>); the cross-staff beams are only visible in the engraving. Pedal is encoded as <pedal type=\"stop\"/> + <pedal type=\"start\"/> at each change (LilyPond prints \"*Ped.\"). Stem directions are not encoded for single-voice staves.",
+    "layout": "US letter, staff size 20, 6 systems on 2 pages; page 2 begins with the bars before the D.S.",
+    "pages": 2,
+    "measures": 23,
+    "notes_in_truth": 211,
+    "hidden_staff_systems": [],
+    "dpi": 200,
+    "degradations": {
+      "scan.pdf": {
+        "seed": 14001,
+        "render_dpi": 200,
+        "dpi": 200,
+        "format": "jpeg q35",
+        "colour": "rgb",
+        "pdf_pages": [
+          {
+            "image": 1,
+            "source_pages": [
+              1
+            ],
+            "size_px": [
+              1904,
+              2404
+            ],
+            "ops": [
+              [
+                "page_curl",
+                {
+                  "side": "right",
+                  "amp": 35,
+                  "width": 0.3
+                }
+              ],
+              [
+                "paper_texture",
+                4
+              ],
+              [
+                "paper_colour",
+                [
+                  246,
+                  242,
+                  232
+                ]
+              ],
+              [
+                "stains",
+                {
+                  "coffee": [
+                    [
+                      590,
+                      350,
+                      187
+                    ]
+                  ]
+                }
+              ],
+              [
+                "perspective_phone",
+                {
+                  "margin": 0.06,
+                  "bg": 50,
+                  "jitter": 0.03,
+                  "keystone": 0.06,
+                  "corners_src": [
+                    [
+                      -126,
+                      -17
+                    ],
+                    [
+                      2056,
+                      9
+                    ],
+                    [
+                      1929,
+                      2473
+                    ],
+                    [
+                      30,
+                      2340
+                    ]
+                  ]
+                }
+              ],
+              [
+                "uneven_lighting",
+                0.3
+              ],
+              [
+                "vignette",
+                0.3
+              ],
+              [
+                "focus_blur_sigma",
+                0.8
+              ],
+              [
+                "motion_blur",
+                {
+                  "len": 5,
+                  "angle": 30
+                }
+              ],
+              [
+                "gaussian_noise_sigma",
+                5
+              ]
+            ]
+          },
+          {
+            "image": 2,
+            "source_pages": [
+              2
+            ],
+            "size_px": [
+              1904,
+              2404
+            ],
+            "ops": [
+              [
+                "page_curl",
+                {
+                  "side": "right",
+                  "amp": 35,
+                  "width": 0.3
+                }
+              ],
+              [
+                "paper_texture",
+                4
+              ],
+              [
+                "paper_colour",
+                [
+                  246,
+                  242,
+                  232
+                ]
+              ],
+              [
+                "stains",
+                {
+                  "coffee": [
+                    [
+                      295,
+                      595,
+                      187
+                    ]
+                  ]
+                }
+              ],
+              [
+                "perspective_phone",
+                {
+                  "margin": 0.06,
+                  "bg": 50,
+                  "jitter": 0.03,
+                  "keystone": 0.06,
+                  "corners_src": [
+                    [
+                      -161,
+                      13
+                    ],
+                    [
+                      2047,
+                      -53
+                    ],
+                    [
+                      1884,
+                      2358
+                    ],
+                    [
+                      21,
+                      2335
+                    ]
+                  ]
+                }
+              ],
+              [
+                "uneven_lighting",
+                0.3
+              ],
+              [
+                "vignette",
+                0.3
+              ],
+              [
+                "focus_blur_sigma",
+                0.8
+              ],
+              [
+                "motion_blur",
+                {
+                  "len": 5,
+                  "angle": 30
+                }
+              ],
+              [
+                "gaussian_noise_sigma",
+                5
+              ]
+            ]
+          }
+        ],
+        "params": {
+          "dpi": 200,
+          "mode": "rgb",
+          "paper_rgb": [
+            246,
+            242,
+            232
+          ],
+          "texture": 4,
+          "coffee": {
+            "n": 1,
+            "r": 0.11,
+            "strength": 1.0
+          },
+          "curl": {
+            "side": "right",
+            "amp": 35,
+            "width": 0.3
+          },
+          "phone": {
+            "margin": 0.06,
+            "bg": 50,
+            "jitter": 0.03,
+            "keystone": 0.06
+          },
+          "blotch": 0.3,
+          "vignette": 0.3,
+          "motion_blur": {
+            "len": 5,
+            "angle": 30
+          },
+          "blur": 0.8,
+          "noise": 5,
+          "jpeg": 35
+        },
+        "summary": "phone photo: perspective + keystone, page curl, uneven lighting, vignette, coffee ring stain, motion + focus blur, RGB, JPEG q35",
+        "bytes": 356816
+      },
+      "scan-mild.pdf": {
+        "seed": 14002,
+        "render_dpi": 400,
+        "dpi": 400,
+        "format": "jpeg q80",
+        "colour": "gray",
+        "pdf_pages": [
+          {
+            "image": 1,
+            "source_pages": [
+              1
+            ],
+            "size_px": [
+              3400,
+              4400
+            ],
+            "ops": [
+              [
+                "paper_texture",
+                2
+              ],
+              [
+                "skew_rotation_deg",
+                1.0
+              ],
+              [
+                "gaussian_noise_sigma",
+                2
+              ]
+            ]
+          },
+          {
+            "image": 2,
+            "source_pages": [
+              2
+            ],
+            "size_px": [
+              3400,
+              4400
+            ],
+            "ops": [
+              [
+                "paper_texture",
+                2
+              ],
+              [
+                "skew_rotation_deg",
+                1.0
+              ],
+              [
+                "gaussian_noise_sigma",
+                2
+              ]
+            ]
+          }
+        ],
+        "params": {
+          "dpi": 400,
+          "mode": "gray",
+          "texture": 2,
+          "rotate": 1.0,
+          "noise": 2,
+          "jpeg": 80
+        },
+        "summary": "high-resolution 400 dpi grey flatbed scan, 1 deg skew",
+        "bytes": 1898725
+      },
+      "scan-severe.pdf": {
+        "seed": 14003,
+        "render_dpi": 150,
+        "dpi": 150,
+        "format": "jpeg q15",
+        "colour": "gray",
+        "pdf_pages": [
+          {
+            "image": 1,
+            "source_pages": [
+              1
+            ],
+            "size_px": [
+              1275,
+              1650
+            ],
+            "ops": [
+              [
+                "paper_texture",
+                6
+              ],
+              [
+                "skew_rotation_deg",
+                10.0
+              ],
+              [
+                "focus_blur_sigma",
+                1.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                12
+              ]
+            ]
+          },
+          {
+            "image": 2,
+            "source_pages": [
+              2
+            ],
+            "size_px": [
+              1275,
+              1650
+            ],
+            "ops": [
+              [
+                "paper_texture",
+                6
+              ],
+              [
+                "skew_rotation_deg",
+                -8.0
+              ],
+              [
+                "focus_blur_sigma",
+                1.6
+              ],
+              [
+                "gaussian_noise_sigma",
+                12
+              ]
+            ]
+          }
+        ],
+        "params": {
+          "dpi": 150,
+          "mode": "gray",
+          "texture": 6,
+          "rotate_pages": {
+            "0": 10.0,
+            "1": -8.0
+          },
+          "blur": 1.6,
+          "noise": 12,
+          "jpeg": 15
+        },
+        "summary": "150 dpi grey, 10 deg / -8 deg skew, heavy blur, noise, JPEG q15",
+        "bytes": 133865
+      }
+    },
+    "files": [
+      "ATTRIBUTION.txt",
+      "clean.pdf",
+      "engraving.ly",
+      "meta.json",
+      "scan-mild.pdf",
+      "scan-severe.pdf",
+      "scan.pdf",
+      "truth.musicxml"
+    ],
+    "license": "CC0-1.0 (composition, engraving, scans)",
+    "source": "self-authored (layout-challenge corpus)",
+    "engraver": "internal model -> LilyPond 2.24 (custom writer, layout-challenge edition)",
+    "validation": {
+      "xsd_valid": true,
+      "music21_parse": "2 208",
+      "midi_attacks_match_truth": true,
+      "attacks": 208,
+      "lilypond_warnings": [
+        "engraving.ly:50:116: warning: this Voice needs a \\voiceXx or \\shiftXx setting",
+        "engraving.ly:53:78: warning: no viable initial configuration found: may not find good beam slope",
+        "engraving.ly:56:73: warning: no viable initial configuration found: may not find good beam slope",
+        "engraving.ly:57:78: warning: no viable initial configuration found: may not find good beam slope",
+        "engraving.ly:63:73: warning: no viable initial configuration found: may not find good beam slope",
+        "engraving.ly:64:78: warning: no viable initial configuration found: may not find good beam slope",
+        "engraving.ly:38:33: warning: no viable initial configuration found: may not find good beam slope",
+        "engraving.ly:38:104: warning: no viable initial configuration found: may not find good beam slope",
+        "engraving.ly:66:55: warning: no viable initial configuration found: may not find good beam slope",
+        "engraving.ly:67:73: warning: no viable initial configuration found: may not find good beam slope",
+        "engraving.ly:68:78: warning: no viable initial configuration found: may not find good beam slope",
+        "engraving.ly:70:78: warning: no viable initial configuration found: may not find good beam slope"
+      ],
+      "lyric_syllables_found_in_engraving": null,
+      "lyric_syllables": 0,
+      "pages_planned": 2,
+      "image_only": {
+        "clean.pdf": true,
+        "scan.pdf": true,
+        "scan-mild.pdf": true,
+        "scan-severe.pdf": true
+      }
+    }
+  },
+  {
+    "id": "hymn-descant-cue-notes-amen-small",
+    "category": "layout",
+    "title": "Old Hundredth - closed SATB, reduced-size descant staff with cue notes, Amen at a smaller staff size",
+    "edge_cases": [
+      "satb_closed_score",
+      "descant_small_staff",
+      "mixed_staff_sizes_on_page",
+      "cue_notes",
+      "amen_smaller_staff_size",
+      "separate_score_block",
+      "hidden_empty_staff",
+      "systems_with_different_staff_counts",
+      "multi_verse",
+      "stanza_number_labels",
+      "lyrics",
+      "split_measures_between_passes",
+      "pickup",
+      "fermata",
+      "tempo_text",
+      "section_heading_text",
+      "page_numbers"
+    ],
+    "expected": {
+      "parts": [
+        "Descant",
+        "Soprano",
+        "Alto",
+        "Tenor",
+        "Bass"
+      ],
+      "must_not_split": false,
+      "shared_staves": [
+        [
+          "Soprano",
+          "Alto"
+        ],
+        [
+          "Tenor",
+          "Bass"
+        ]
+      ],
+      "staves_per_part": {
+        "Descant": 1,
+        "Soprano": 1,
+        "Alto": 1,
+        "Tenor": 1,
+        "Bass": 1
+      },
+      "lyrics": [
+        {
+          "part": "Descant",
+          "verses": 1
+        },
+        {
+          "part": "Soprano",
+          "verses": 4
+        }
+      ],
+      "notes": "Five parts: Descant, Soprano, Alto, Tenor, Bass. S+A share the treble staff and T+B the bass staff (closed score - split by stem direction). The Descant staff (75 % size) is hidden in the verse 1-3 systems (truth: invisible measure rests) and appears for verse 4; its first three measures are CUE-SIZE notes of the melody (encoded <cue/>, not sung): a correct conversion marks them as cue notes or omits them (rests) - they must not become sounding Descant notes and carry no lyrics. The hymn is written out twice (verses 1-3, then verse 4 + descant: the last bar of pass 1 and the pickup of pass 2 are both 2-beat measures). The final \"Amen\" (2 measures) is a separate smaller system (78 % staff size) continuing the S/A/T/B parts; the Descant has invisible rests there. Lyrics: Soprano lines 1-3 in pass 1, line 4 (Doxology) in pass 2, line 1 \"A-men\"; Descant line 1 from its 4th measure."
+    },
+    "truth_limitations": "Cue notes are encoded with <cue/> and <type size=\"cue\"> (they have no MIDI meaning). Staff sizes are <staff-details><staff-size> percentages. Stanza labels (\"1.\"-\"4.\") are not encoded. Lyrics under the S+A staff are attached to Soprano only. The Amen is engraved as a second LilyPond \\score; in the truth it simply continues the parts.",
+    "layout": "US letter, staff size 18; page 1: title + 2 closed-score systems (3 verses); page 2: 2 systems with the 75 % descant staff, then the Amen system at staff size 14",
+    "pages": 2,
+    "measures": 24,
+    "notes_in_truth": 296,
+    "hidden_staff_systems": [
+      {
+        "staff": "desc",
+        "measures": [
+          0,
+          5
+        ]
+      },
+      {
+        "staff": "desc",
+        "measures": [
+          6,
+          10
+        ]
+      },
+      {
+        "staff": "Descant (not engraved in this score block)",
+        "measures": [
+          22,
+          23
+        ]
+      }
+    ],
+    "dpi": 200,
+    "degradations": {
+      "scan.pdf": {
+        "seed": 15001,
+        "render_dpi": 200,
+        "dpi": 200,
+        "format": "jpeg q55",
+        "colour": "rgb",
+        "pdf_pages": [
+          {
+            "image": 1,
+            "source_pages": [
+              1
+            ],
+            "size_px": [
+              1700,
+              2200
+            ],
+            "ops": [
+              [
+                "bleed_through",
+                {
+                  "strength": 0.15,
+                  "shift_px": 0
+                }
+              ],
+              [
+                "page_curl",
+                {
+                  "side": "left",
+                  "amp": 20,
+                  "width": 0.25
+                }
+              ],
+              [
+                "paper_texture",
+                6
+              ],
+              [
+                "paper_colour",
+                [
+                  232,
+                  219,
+                  186
+                ]
+              ],
+              [
+                "stains",
+                {
+                  "foxing": 25
+                }
+              ],
+              [
+                "gutter_shadow",
+                {
+                  "side": "left",
+                  "width": 0.06,
+                  "dark": 0.5
+                }
+              ],
+              [
+                "skew_rotation_deg",
+                -0.8
+              ],
+              [
+                "halftone_moire",
+                {
+                  "period": 4.2,
+                  "angle": 45,
+                  "amp": 28,
+                  "shrink": 0.83
+                }
+              ],
+              [
+                "focus_blur_sigma",
+                0.5
+              ],
+              [
+                "gaussian_noise_sigma",
+                3
+              ]
+            ]
+          },
+          {
+            "image": 2,
+            "source_pages": [
+              2
+            ],
+            "size_px": [
+              1700,
+              2200
+            ],
+            "ops": [
+              [
+                "bleed_through",
+                {
+                  "strength": 0.15,
+                  "shift_px": 12
+                }
+              ],
+              [
+                "page_curl",
+                {
+                  "side": "left",
+                  "amp": 20,
+                  "width": 0.25
+                }
+              ],
+              [
+                "paper_texture",
+                6
+              ],
+              [
+                "paper_colour",
+                [
+                  232,
+                  219,
+                  186
+                ]
+              ],
+              [
+                "stains",
+                {
+                  "foxing": 25
+                }
+              ],
+              [
+                "gutter_shadow",
+                {
+                  "side": "left",
+                  "width": 0.06,
+                  "dark": 0.5
+                }
+              ],
+              [
+                "skew_rotation_deg",
+                -0.8
+              ],
+              [
+                "halftone_moire",
+                {
+                  "period": 4.2,
+                  "angle": 45,
+                  "amp": 28,
+                  "shrink": 0.83
+                }
+              ],
+              [
+                "focus_blur_sigma",
+                0.5
+              ],
+              [
+                "gaussian_noise_sigma",
+                3
+              ]
+            ]
+          }
+        ],
+        "params": {
+          "dpi": 200,
+          "mode": "rgb",
+          "paper_rgb": [
+            232,
+            219,
+            186
+          ],
+          "texture": 6,
+          "foxing": {
+            "n": 25
+          },
+          "bleed": 0.15,
+          "gutter": {
+            "side": "left",
+            "width": 0.06,
+            "dark": 0.5
+          },
+          "curl": {
+            "side": "left",
+            "amp": 20,
+            "width": 0.25
+          },
+          "rotate": -0.8,
+          "halftone": {
+            "period": 4.2,
+            "angle": 45,
+            "amp": 28,
+            "shrink": 0.83
+          },
+          "blur": 0.5,
+          "noise": 3,
+          "jpeg": 55
+        },
+        "summary": "printed hymnal page: halftone screen + resampling moire, strong bleed-through, yellowed paper with foxing, gutter shadow and curl on the left, 200 dpi RGB, JPEG q55",
+        "bytes": 714287
+      },
+      "scan-mild.pdf": {
+        "seed": 15002,
+        "render_dpi": 300,
+        "dpi": 300,
+        "format": "jpeg q85",
+        "colour": "gray",
+        "pdf_pages": [
+          {
+            "image": 1,
+            "source_pages": [
+              1
+            ],
+            "size_px": [
+              2550,
+              3300
+            ],
+            "ops": [
+              [
+                "bleed_through",
+                {
+                  "strength": 0.04,
+                  "shift_px": 11
+                }
+              ],
+              [
+                "paper_texture",
+                2
+              ],
+              [
+                "skew_rotation_deg",
+                0.3
+              ],
+              [
+                "gaussian_noise_sigma",
+                2
+              ]
+            ]
+          },
+          {
+            "image": 2,
+            "source_pages": [
+              2
+            ],
+            "size_px": [
+              2550,
+              3300
+            ],
+            "ops": [
+              [
+                "bleed_through",
+                {
+                  "strength": 0.04,
+                  "shift_px": -7
+                }
+              ],
+              [
+                "paper_texture",
+                2
+              ],
+              [
+                "skew_rotation_deg",
+                0.3
+              ],
+              [
+                "gaussian_noise_sigma",
+                2
+              ]
+            ]
+          }
+        ],
+        "params": {
+          "dpi": 300,
+          "mode": "gray",
+          "texture": 2,
+          "bleed": 0.04,
+          "rotate": 0.3,
+          "noise": 2,
+          "jpeg": 85
+        },
+        "summary": "300 dpi grey, 0.3 deg skew, faint bleed-through",
+        "bytes": 1561490
+      },
+      "scan-severe.pdf": {
+        "seed": 15003,
+        "render_dpi": 300,
+        "dpi": 100,
+        "format": "png1",
+        "colour": "bw",
+        "pdf_pages": [
+          {
+            "image": 1,
+            "source_pages": [
+              1
+            ],
+            "size_px": [
+              850,
+              1100
+            ],
+            "ops": [
+              [
+                "bleed_through",
+                {
+                  "strength": 0.12,
+                  "shift_px": -20
+                }
+              ],
+              [
+                "skew_rotation_deg",
+                2.5
+              ],
+              [
+                "halftone_moire",
+                {
+                  "period": 4.0,
+                  "angle": 30,
+                  "amp": 30,
+                  "shrink": 0.7
+                }
+              ],
+              [
+                "focus_blur_sigma",
+                0.7
+              ],
+              [
+                "gaussian_noise_sigma",
+                8
+              ],
+              [
+                "binarized_photocopy",
+                {
+                  "threshold": 105,
+                  "noise": 15
+                }
+              ],
+              [
+                "resampled_dpi",
+                [
+                  300,
+                  100
+                ]
+              ]
+            ]
+          },
+          {
+            "image": 2,
+            "source_pages": [
+              2
+            ],
+            "size_px": [
+              850,
+              1100
+            ],
+            "ops": [
+              [
+                "bleed_through",
+                {
+                  "strength": 0.12,
+                  "shift_px": -9
+                }
+              ],
+              [
+                "skew_rotation_deg",
+                2.5
+              ],
+              [
+                "halftone_moire",
+                {
+                  "period": 4.0,
+                  "angle": 30,
+                  "amp": 30,
+                  "shrink": 0.7
+                }
+              ],
+              [
+                "focus_blur_sigma",
+                0.7
+              ],
+              [
+                "gaussian_noise_sigma",
+                8
+              ],
+              [
+                "binarized_photocopy",
+                {
+                  "threshold": 105,
+                  "noise": 15
+                }
+              ],
+              [
+                "resampled_dpi",
+                [
+                  300,
+                  100
+                ]
+              ]
+            ]
+          }
+        ],
+        "params": {
+          "dpi": 300,
+          "out_dpi": 100,
+          "rotate": 2.5,
+          "bleed": 0.12,
+          "halftone": {
+            "period": 4.0,
+            "angle": 30,
+            "amp": 30,
+            "shrink": 0.7
+          },
+          "blur": 0.7,
+          "noise": 8,
+          "binarize": 105,
+          "binarize_noise": 15,
+          "format": "png1"
+        },
+        "summary": "100 dpi (from 300) thin binarised copy of the halftoned page, 2.5 deg skew",
+        "bytes": 27405
+      }
+    },
+    "files": [
+      "ATTRIBUTION.txt",
+      "clean.pdf",
+      "engraving.ly",
+      "meta.json",
+      "scan-mild.pdf",
+      "scan-severe.pdf",
+      "scan.pdf",
+      "truth.musicxml"
+    ],
+    "license": "Melody and texts public domain; harmonisation, descant and engraving CC0-1.0",
+    "source": "self-authored harmonisation/descant (layout-challenge corpus); melody Genevan Psalter 1551, texts W. Kethe 1561 and T. Ken 1674",
+    "engraver": "internal model -> LilyPond 2.24 (custom writer, layout-challenge edition)",
+    "validation": {
+      "xsd_valid": true,
+      "music21_parse": "5 296",
+      "midi_attacks_match_truth": true,
+      "attacks": 296,
+      "lilypond_warnings": [],
+      "lyric_syllables_found_in_engraving": 1.0,
+      "lyric_syllables": 154,
+      "pages_planned": 2,
+      "image_only": {
+        "clean.pdf": true,
+        "scan.pdf": true,
+        "scan-mild.pdf": true,
+        "scan-severe.pdf": true
+      }
+    }
+  },
+  {
+    "id": "trio-minuet-bracket-vs-brace-dc",
+    "category": "layout",
+    "title": "Minuet and Trio - reduced string staves in a bracket above a braced piano, Fine / D.C. al Fine",
+    "edge_cases": [
+      "bracket_vs_brace",
+      "bracketed_treble_bass_pair_is_two_parts",
+      "mixed_staff_sizes_on_page",
+      "reduced_instrument_staves",
+      "instrument_names_first_system_only",
+      "piano_grand_staff",
+      "must_not_split",
+      "dc_al_fine",
+      "fine",
+      "repeats",
+      "key_change",
+      "section_heading_text",
+      "tempo_text",
+      "dynamics_text",
+      "hairpin",
+      "staccato",
+      "slurs",
+      "page_numbers"
+    ],
+    "expected": {
+      "parts": [
+        "Violin",
+        "Violoncello",
+        "Piano"
+      ],
+      "must_not_split": true,
+      "shared_staves": [],
+      "staves_per_part": {
+        "Violin": 1,
+        "Violoncello": 1,
+        "Piano": 2
+      },
+      "lyrics": [],
+      "notes": "Three parts: Violin (small treble staff), Violoncello (small bass staff) and Piano (normal-size grand staff, ONE part). The violin and cello staves form a treble+bass pair joined by a BRACKET - they are two separate instruments and must NOT be merged into one two-staff part; the piano staves are joined by a BRACE and must NOT be split. Instrument names appear only on the first system. Menuetto (mm. 1-16, repeats, \"Fine\" after m.16), Trio (mm. 17-32, C major, repeats, \"Menuetto D.C. al Fine\" after m.32) - notated order, not unrolled."
+    },
+    "truth_limitations": "Beaming not encoded. Reduced staves are <staff-details><staff-size>75</staff-size>. The D.C./Fine semantics are <sound dacapo=\"yes\"/> and <sound fine=\"yes\"/>.",
+    "layout": "US letter, staff size 17 (strings 75 %), 4 systems of 4 staves per page, Trio on page 2",
+    "pages": 2,
+    "measures": 32,
+    "notes_in_truth": 425,
+    "hidden_staff_systems": [],
+    "dpi": 300,
+    "degradations": {
+      "scan.pdf": {
+        "seed": 16001,
+        "render_dpi": 300,
+        "dpi": 300,
+        "format": "png1",
+        "colour": "bw",
+        "pdf_pages": [
+          {
+            "image": 1,
+            "source_pages": [
+              1
+            ],
+            "size_px": [
+              2409,
+              3300
+            ],
+            "ops": [
+              [
+                "crop_ink_target_mm_into_staff_ends",
+                {
+                  "right": 2.0
+                }
+              ],
+              [
+                "ink_weight",
+                1
+              ],
+              [
+                "punch_holes",
+                {
+                  "side": "left",
+                  "centers_px": [
+                    [
+                      130,
+                      1204
+                    ],
+                    [
+                      130,
+                      2096
+                    ]
+                  ]
+                }
+              ],
+              [
+                "staple",
+                {
+                  "corner": "tl",
+                  "pos_px": [
+                    153,
+                    132
+                  ]
+                }
+              ],
+              [
+                "skew_rotation_deg",
+                0.4
+              ],
+              [
+                "focus_blur_sigma",
+                0.8
+              ],
+              [
+                "gaussian_noise_sigma",
+                10
+              ],
+              [
+                "speckles_per_mpx",
+                40
+              ],
+              [
+                "binarized_photocopy",
+                {
+                  "threshold": 185,
+                  "noise": 18
+                }
+              ],
+              [
+                "crop_edges",
+                {
+                  "right": 0.0555
+                }
+              ]
+            ]
+          },
+          {
+            "image": 2,
+            "source_pages": [
+              2
+            ],
+            "size_px": [
+              2409,
+              3300
+            ],
+            "ops": [
+              [
+                "crop_ink_target_mm_into_staff_ends",
+                {
+                  "right": 2.0
+                }
+              ],
+              [
+                "ink_weight",
+                1
+              ],
+              [
+                "punch_holes",
+                {
+                  "side": "left",
+                  "centers_px": [
+                    [
+                      130,
+                      1204
+                    ],
+                    [
+                      130,
+                      2096
+                    ]
+                  ]
+                }
+              ],
+              [
+                "staple",
+                {
+                  "corner": "tl",
+                  "pos_px": [
+                    153,
+                    132
+                  ]
+                }
+              ],
+              [
+                "skew_rotation_deg",
+                0.4
+              ],
+              [
+                "focus_blur_sigma",
+                0.8
+              ],
+              [
+                "gaussian_noise_sigma",
+                10
+              ],
+              [
+                "speckles_per_mpx",
+                40
+              ],
+              [
+                "binarized_photocopy",
+                {
+                  "threshold": 185,
+                  "noise": 18
+                }
+              ],
+              [
+                "crop_edges",
+                {
+                  "right": 0.0555
+                }
+              ]
+            ]
+          }
+        ],
+        "params": {
+          "dpi": 300,
+          "ink_weight": 1,
+          "rotate": 0.4,
+          "punch_holes": {
+            "n": 2,
+            "side": "left",
+            "level": 0
+          },
+          "staple": {
+            "corner": "tl"
+          },
+          "crop_ink": {
+            "right": 2.0
+          },
+          "blur": 0.8,
+          "noise": 10,
+          "binarize": 185,
+          "binarize_noise": 18,
+          "speckle": 40,
+          "format": "png1"
+        },
+        "summary": "dark (thick) binarised photocopy at 300 dpi, staple, two punch holes, right edge cropped 2 mm into the staff ends",
+        "bytes": 261982
+      },
+      "scan-mild.pdf": {
+        "seed": 16002,
+        "render_dpi": 300,
+        "dpi": 300,
+        "format": "jpeg q85",
+        "colour": "gray",
+        "pdf_pages": [
+          {
+            "image": 1,
+            "source_pages": [
+              1
+            ],
+            "size_px": [
+              2550,
+              3300
+            ],
+            "ops": [
+              [
+                "paper_texture",
+                2
+              ],
+              [
+                "skew_rotation_deg",
+                -0.4
+              ],
+              [
+                "gaussian_noise_sigma",
+                2
+              ]
+            ]
+          },
+          {
+            "image": 2,
+            "source_pages": [
+              2
+            ],
+            "size_px": [
+              2550,
+              3300
+            ],
+            "ops": [
+              [
+                "paper_texture",
+                2
+              ],
+              [
+                "skew_rotation_deg",
+                -0.4
+              ],
+              [
+                "gaussian_noise_sigma",
+                2
+              ]
+            ]
+          }
+        ],
+        "params": {
+          "dpi": 300,
+          "mode": "gray",
+          "texture": 2,
+          "rotate": -0.4,
+          "noise": 2,
+          "jpeg": 85
+        },
+        "summary": "300 dpi grey, 0.4 deg skew",
+        "bytes": 1853409
+      },
+      "scan-severe.pdf": {
+        "seed": 16003,
+        "render_dpi": 150,
+        "dpi": 150,
+        "format": "jpeg q25",
+        "colour": "gray",
+        "pdf_pages": [
+          {
+            "image": 1,
+            "source_pages": [
+              1
+            ],
+            "size_px": [
+              1063,
+              1650
+            ],
+            "ops": [
+              [
+                "crop_ink_target_mm_into_staff_ends",
+                {
+                  "right": 3.0,
+                  "left": 1.5
+                }
+              ],
+              [
+                "paper_texture",
+                5
+              ],
+              [
+                "skew_rotation_deg",
+                6.0
+              ],
+              [
+                "focus_blur_sigma",
+                0.9
+              ],
+              [
+                "gaussian_noise_sigma",
+                9
+              ],
+              [
+                "salt_pepper",
+                0.003
+              ],
+              [
+                "crop_edges",
+                {
+                  "right": 0.0602,
+                  "left": 0.1073
+                }
+              ]
+            ]
+          },
+          {
+            "image": 2,
+            "source_pages": [
+              2
+            ],
+            "size_px": [
+              1066,
+              1650
+            ],
+            "ops": [
+              [
+                "crop_ink_target_mm_into_staff_ends",
+                {
+                  "right": 3.0,
+                  "left": 1.5
+                }
+              ],
+              [
+                "paper_texture",
+                5
+              ],
+              [
+                "skew_rotation_deg",
+                -1.5
+              ],
+              [
+                "focus_blur_sigma",
+                0.9
+              ],
+              [
+                "gaussian_noise_sigma",
+                9
+              ],
+              [
+                "salt_pepper",
+                0.003
+              ],
+              [
+                "crop_edges",
+                {
+                  "right": 0.0602,
+                  "left": 0.105
+                }
+              ],
+              [
+                "page_rotated_deg",
+                180
+              ]
+            ]
+          }
+        ],
+        "params": {
+          "dpi": 150,
+          "mode": "gray",
+          "texture": 5,
+          "rotate_pages": {
+            "0": 6.0,
+            "1": -1.5
+          },
+          "page_rotate": {
+            "1": 180
+          },
+          "crop_ink": {
+            "right": 3.0,
+            "left": 1.5
+          },
+          "blur": 0.9,
+          "noise": 9,
+          "saltpepper": 0.003,
+          "jpeg": 25
+        },
+        "summary": "page 1 skewed 6 deg, page 2 fed upside down (180 deg), 150 dpi grey, left/right edges cropped into the staves, salt & pepper, JPEG q25",
+        "bytes": 299746
+      }
+    },
+    "files": [
+      "ATTRIBUTION.txt",
+      "clean.pdf",
+      "engraving.ly",
+      "meta.json",
+      "scan-mild.pdf",
+      "scan-severe.pdf",
+      "scan.pdf",
+      "truth.musicxml"
+    ],
+    "license": "CC0-1.0 (composition, engraving, scans)",
+    "source": "self-authored (layout-challenge corpus)",
+    "engraver": "internal model -> LilyPond 2.24 (custom writer, layout-challenge edition)",
+    "validation": {
+      "xsd_valid": true,
+      "music21_parse": "4 265",
+      "midi_attacks_match_truth": true,
+      "attacks": 425,
+      "lilypond_warnings": [
+        "warning: ragged-bottom was specified, but page must be compressed",
+        "warning: page 1 has been compressed"
+      ],
+      "lyric_syllables_found_in_engraving": null,
+      "lyric_syllables": 0,
+      "pages_planned": 2,
+      "image_only": {
+        "clean.pdf": true,
+        "scan.pdf": true,
+        "scan-mild.pdf": true,
+        "scan-severe.pdf": true
+      }
+    }
+  },
+  {
+    "id": "song-one-system-poem-block",
+    "category": "layout",
+    "title": "A Red, Red Rose - a page with only one system, poem stanzas as a text block",
+    "edge_cases": [
+      "single_system_page",
+      "title_block_text",
+      "dedication_text",
+      "tempo_text",
+      "dynamics_text",
+      "copyright_footer",
+      "extra_stanzas_as_text_block_not_lyrics",
+      "pickup",
+      "lyrics",
+      "voice_piano",
+      "piano_grand_staff",
+      "must_not_split",
+      "stanza_number_label",
+      "fermata",
+      "hairpin"
+    ],
+    "expected": {
+      "parts": [
+        "Voice",
+        "Piano"
+      ],
+      "must_not_split": true,
+      "shared_staves": [],
+      "staves_per_part": {
+        "Voice": 1,
+        "Piano": 2
+      },
+      "lyrics": [
+        {
+          "part": "Voice",
+          "verses": 1
+        }
+      ],
+      "notes": "Two parts: Voice (1 staff, lyrics stanza 1 only) and Piano (ONE part, 2 staves). The page has a single system. Stanzas 2-4 are printed as a poem block below the music and must NOT be attached to notes as lyrics; title/dedication/poet/composer/tempo/copyright text must not become notes or lyrics. The stanza label \"1.\" is not a syllable."
+    },
+    "truth_limitations": "Beaming is not encoded (no <beam>). Header/footer text is recorded as <credit> elements (no positions). The poem block (stanzas 2-4) is recorded only in meta, not in the truth.",
+    "layout": "A4 portrait, staff size 17, one system: Voice + Piano grand staff, 9 measures incl. pickup",
+    "pages": 1,
+    "measures": 9,
+    "notes_in_truth": 125,
+    "hidden_staff_systems": [],
+    "dpi": 600,
+    "degradations": {
+      "scan.pdf": {
+        "seed": 17001,
+        "render_dpi": 600,
+        "dpi": 600,
+        "format": "jpeg q60",
+        "colour": "rgb",
+        "pdf_pages": [
+          {
+            "image": 1,
+            "source_pages": [
+              1
+            ],
+            "size_px": [
+              4961,
+              7016
+            ],
+            "ops": [
+              [
+                "pencil_annotations",
+                {
+                  "circled": [
+                    [
+                      4535,
+                      1893
+                    ],
+                    [
+                      3454,
+                      1628
+                    ],
+                    [
+                      3104,
+                      1214
+                    ],
+                    [
+                      3692,
+                      1681
+                    ]
+                  ],
+                  "marks": [
+                    [
+                      4071,
+                      1350
+                    ],
+                    [
+                      598,
+                      1146
+                    ],
+                    [
+                      2637,
+                      1061
+                    ],
+                    [
+                      2810,
+                      1537
+                    ]
+                  ],
+                  "texts": [
+                    [
+                      "breathe",
+                      3457,
+                      1705
+                    ],
+                    [
+                      "rit.",
+                      3453,
+                      1751
+                    ],
+                    [
+                      "p!",
+                      3849,
+                      1710
+                    ]
+                  ],
+                  "lines": 2
+                }
+              ],
+              [
+                "paper_texture",
+                5
+              ],
+              [
+                "paper_colour",
+                [
+                  236,
+                  226,
+                  198
+                ]
+              ],
+              [
+                "stains",
+                {
+                  "coffee": [
+                    [
+                      1243,
+                      3295,
+                      446
+                    ]
+                  ],
+                  "foxing": 50
+                }
+              ],
+              [
+                "skew_rotation_deg",
+                0.8
+              ],
+              [
+                "focus_blur_sigma",
+                0.4
+              ],
+              [
+                "gaussian_noise_sigma",
+                3
+              ]
+            ]
+          }
+        ],
+        "params": {
+          "dpi": 600,
+          "mode": "rgb",
+          "paper_rgb": [
+            236,
+            226,
+            198
+          ],
+          "texture": 5,
+          "pencil": {
+            "circles": 4,
+            "marks": 4,
+            "texts": [
+              "breathe",
+              "rit.",
+              "p!"
+            ],
+            "lines": 2
+          },
+          "foxing": {
+            "n": 50
+          },
+          "coffee": {
+            "n": 1,
+            "r": 0.09,
+            "strength": 0.8
+          },
+          "rotate": 0.8,
+          "blur": 0.4,
+          "noise": 3,
+          "jpeg": 60
+        },
+        "summary": "high-resolution 600 dpi RGB scan of an old yellowed copy: pencil annotations (circled notes, breath marks, words), foxing, a coffee ring, 0.8 deg skew, JPEG q60",
+        "bytes": 1317566
+      },
+      "scan-mild.pdf": {
+        "seed": 17002,
+        "render_dpi": 300,
+        "dpi": 300,
+        "format": "jpeg q85",
+        "colour": "gray",
+        "pdf_pages": [
+          {
+            "image": 1,
+            "source_pages": [
+              1
+            ],
+            "size_px": [
+              2481,
+              3508
+            ],
+            "ops": [
+              [
+                "paper_texture",
+                2
+              ],
+              [
+                "skew_rotation_deg",
+                0.3
+              ],
+              [
+                "gaussian_noise_sigma",
+                2
+              ]
+            ]
+          }
+        ],
+        "params": {
+          "dpi": 300,
+          "mode": "gray",
+          "texture": 2,
+          "rotate": 0.3,
+          "noise": 2,
+          "jpeg": 85
+        },
+        "summary": "300 dpi grey, 0.3 deg skew",
+        "bytes": 711623
+      },
+      "scan-severe.pdf": {
+        "seed": 17003,
+        "render_dpi": 150,
+        "dpi": 150,
+        "format": "jpeg q18",
+        "colour": "rgb",
+        "pdf_pages": [
+          {
+            "image": 1,
+            "source_pages": [
+              1
+            ],
+            "size_px": [
+              1413,
+              1926
+            ],
+            "ops": [
+              [
+                "paper_texture",
+                6
+              ],
+              [
+                "paper_colour",
+                [
+                  243,
+                  236,
+                  214
+                ]
+              ],
+              [
+                "skew_rotation_deg",
+                7.0
+              ],
+              [
+                "perspective_phone",
+                {
+                  "margin": 0.07,
+                  "bg": 45,
+                  "jitter": 0.04,
+                  "keystone": 0.08,
+                  "corners_src": [
+                    [
+                      -104,
+                      -48
+                    ],
+                    [
+                      1480,
+                      -10
+                    ],
+                    [
+                      1461,
+                      1853
+                    ],
+                    [
+                      18,
+                      1978
+                    ]
+                  ]
+                }
+              ],
+              [
+                "uneven_lighting",
+                0.2
+              ],
+              [
+                "vignette",
+                0.4
+              ],
+              [
+                "motion_blur",
+                {
+                  "len": 7,
+                  "angle": 60
+                }
+              ],
+              [
+                "gaussian_noise_sigma",
+                6
+              ],
+              [
+                "salt_pepper",
+                0.001
+              ]
+            ]
+          }
+        ],
+        "params": {
+          "dpi": 150,
+          "mode": "rgb",
+          "paper_rgb": [
+            243,
+            236,
+            214
+          ],
+          "texture": 6,
+          "rotate": 7.0,
+          "phone": {
+            "margin": 0.07,
+            "bg": 45,
+            "jitter": 0.04,
+            "keystone": 0.08
+          },
+          "vignette": 0.4,
+          "blotch": 0.2,
+          "motion_blur": {
+            "len": 7,
+            "angle": 60
+          },
+          "noise": 6,
+          "saltpepper": 0.001,
+          "jpeg": 18
+        },
+        "summary": "phone photo at an angle: 7 deg rotation, strong keystone, vignette, motion blur, salt & pepper, 150 dpi, JPEG q18",
+        "bytes": 64302
+      }
+    },
+    "files": [
+      "ATTRIBUTION.txt",
+      "clean.pdf",
+      "engraving.ly",
+      "meta.json",
+      "scan-mild.pdf",
+      "scan-severe.pdf",
+      "scan.pdf",
+      "truth.musicxml"
+    ],
+    "license": "Text public domain (Burns 1794); melody, accompaniment and engraving CC0-1.0",
+    "source": "self-authored (layout-challenge corpus); text Robert Burns, \"A Red, Red Rose\" (1794)",
+    "engraver": "internal model -> LilyPond 2.24 (custom writer, layout-challenge edition)",
+    "validation": {
+      "xsd_valid": true,
+      "music21_parse": "3 71",
+      "midi_attacks_match_truth": true,
+      "attacks": 125,
+      "lilypond_warnings": [],
+      "lyric_syllables_found_in_engraving": 1.0,
+      "lyric_syllables": 28,
+      "pages_planned": 1,
+      "image_only": {
+        "clean.pdf": true,
+        "scan.pdf": true,
+        "scan-mild.pdf": true,
+        "scan-severe.pdf": true
+      }
+    }
+  }
+]

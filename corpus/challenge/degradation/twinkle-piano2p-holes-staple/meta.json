@@ -1,0 +1,568 @@
+{
+ "id": "twinkle-piano2p-holes-staple",
+ "category": "degradation",
+ "piece": "twinkle-piano2p",
+ "variant": "holes-staple",
+ "title": "Theme and Variation on \"Ah! vous dirai-je, maman\" (piano, 2 pages) - holes-staple",
+ "edge_cases": [
+  "piano",
+  "grand_staff",
+  "must_not_split",
+  "grand_staff_multi_voice",
+  "multi_page",
+  "double_barline",
+  "dynamics",
+  "slurs",
+  "fermata",
+  "chords",
+  "punch_holes",
+  "staple",
+  "dog_ear",
+  "lid_open_dark_border"
+ ],
+ "expected": {
+  "parts": [
+   "Piano"
+  ],
+  "must_not_split": true,
+  "shared_staves": [],
+  "notes": "Two-page piano piece on ONE grand staff. A correct conversion yields exactly ONE part \"Piano\" (2 staves, 24 bars, measures continue across the page turn); the held lower right-hand voice in the variation (bars 13-24) is voice 2 of the piano part, not a separate part. DAMAGE (holes-staple): Filing damage: mild 2 ISO punch holes in the margin (show the white lid); scan 3 US holes (black, lid open) + a staple at the top-left; severe 4 holes centred 1 mm left of the staff start (they bite into braces/brackets, the system-start barline and possibly the left edge of a clef where they meet a staff) + staple + folded top-right corner. TRUTH LIMITATIONS: Severe: where a hole meets a system its left end (brace/bracket/start barline, part of the clef) is physically missing; the folded corner can hide header text (composer/arranger). Music content is unchanged and the truth is complete."
+ },
+ "truth_limitations": "Severe: where a hole meets a system its left end (brace/bracket/start barline, part of the clef) is physically missing; the folded corner can hide header text (composer/arranger). Music content is unchanged and the truth is complete.",
+ "truth_scope": "truth.musicxml (MusicXML 4.0 partwise, XSD-valid) encodes parts/part-list (+ part-group bracket for the choir), staves, voices, pitches, durations, rests, ties, slurs, lyrics (verse number, syllabic, extend), dynamics, fermatas, staccatos, stems, clefs, key/time signatures and barline styles. It does NOT encode beams (LilyPond auto-beams), system/page breaks, bar-number display, header layout or any handwritten/damage marks. The same truth file is shared by every damaged variant of a piece.",
+ "degradations": {
+  "scan.pdf": {
+   "seed": 297554588,
+   "dpi": 300,
+   "pages": 2,
+   "image_px": [
+    [
+     2619,
+     3634
+    ],
+    [
+     2619,
+     3634
+    ]
+   ],
+   "image_mode": [
+    "L",
+    "L"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 300,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": 246,
+      "texture": 2
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": 22,
+     "stage": "content"
+    },
+    {
+     "op": "holes",
+     "params": {
+      "x_mm": 10,
+      "offsets_mm": [
+       -108,
+       0,
+       108
+      ],
+      "diam_mm": 6.5
+     },
+     "stage": "content"
+    },
+    {
+     "op": "staple",
+     "params": {
+      "x_mm": 12,
+      "y_mm": 11,
+      "len_mm": 12,
+      "angle": 35
+     },
+     "stage": "content"
+    },
+    {
+     "op": "bed",
+     "params": {
+      "margin_mm": 4
+     },
+     "stage": "global"
+    },
+    {
+     "op": "rotate",
+     "params": {
+      "deg": -0.7
+     },
+     "stage": "global"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 3
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       32,
+       32,
+       34
+      ],
+      "noise": 4,
+      "texture": 4
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "jpeg",
+      "quality": 75
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": [
+    [
+     {
+      "type": "punch_hole",
+      "x_mm": 10,
+      "y_mm": 40.5,
+      "diam_mm": 6.5
+     },
+     {
+      "type": "punch_hole",
+      "x_mm": 10,
+      "y_mm": 148.5,
+      "diam_mm": 6.5
+     },
+     {
+      "type": "punch_hole",
+      "x_mm": 10,
+      "y_mm": 256.5,
+      "diam_mm": 6.5
+     },
+     {
+      "type": "staple",
+      "x_mm": 12,
+      "y_mm": 11
+     }
+    ],
+    [
+     {
+      "type": "punch_hole",
+      "x_mm": 10,
+      "y_mm": 40.5,
+      "diam_mm": 6.5
+     },
+     {
+      "type": "punch_hole",
+      "x_mm": 10,
+      "y_mm": 148.5,
+      "diam_mm": 6.5
+     },
+     {
+      "type": "punch_hole",
+      "x_mm": 10,
+      "y_mm": 256.5,
+      "diam_mm": 6.5
+     },
+     {
+      "type": "staple",
+      "x_mm": 12,
+      "y_mm": 11
+     }
+    ]
+   ]
+  },
+  "scan-mild.pdf": {
+   "seed": 297554589,
+   "dpi": 300,
+   "pages": 2,
+   "image_px": [
+    [
+     2551,
+     3578
+    ],
+    [
+     2551,
+     3578
+    ]
+   ],
+   "image_mode": [
+    "L",
+    "L"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 300,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": 246,
+      "texture": 2
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": 22,
+     "stage": "content"
+    },
+    {
+     "op": "holes",
+     "params": {
+      "x_mm": 9,
+      "offsets_mm": [
+       -40,
+       40
+      ],
+      "diam_mm": 5.5
+     },
+     "stage": "content"
+    },
+    {
+     "op": "bed",
+     "params": {
+      "margin_mm": 3
+     },
+     "stage": "global"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 2
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       236,
+       236,
+       234
+      ],
+      "noise": 2,
+      "edge_shadow": 0.35
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "jpeg",
+      "quality": 80
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": [
+    [
+     {
+      "type": "punch_hole",
+      "x_mm": 9,
+      "y_mm": 108.5,
+      "diam_mm": 5.5
+     },
+     {
+      "type": "punch_hole",
+      "x_mm": 9,
+      "y_mm": 188.5,
+      "diam_mm": 5.5
+     }
+    ],
+    [
+     {
+      "type": "punch_hole",
+      "x_mm": 9,
+      "y_mm": 108.5,
+      "diam_mm": 5.5
+     },
+     {
+      "type": "punch_hole",
+      "x_mm": 9,
+      "y_mm": 188.5,
+      "diam_mm": 5.5
+     }
+    ]
+   ]
+  },
+  "scan-severe.pdf": {
+   "seed": 297554590,
+   "dpi": 300,
+   "pages": 2,
+   "image_px": [
+    [
+     2669,
+     3670
+    ],
+    [
+     2669,
+     3670
+    ]
+   ],
+   "image_mode": [
+    "L",
+    "L"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 300,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": 246,
+      "texture": 2
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": 22,
+     "stage": "content"
+    },
+    {
+     "op": "holes",
+     "params": {
+      "x_mm": 8.906,
+      "offsets_mm": [
+       -120,
+       -40,
+       40,
+       120
+      ],
+      "diam_mm": 7
+     },
+     "stage": "content"
+    },
+    {
+     "op": "staple",
+     "params": {
+      "x_mm": 14,
+      "y_mm": 10,
+      "len_mm": 13,
+      "angle": 50
+     },
+     "stage": "content"
+    },
+    {
+     "op": "dogear",
+     "params": {
+      "corner": "tr",
+      "size_mm": 24.0
+     },
+     "stage": "content"
+    },
+    {
+     "op": "bed",
+     "params": {
+      "margin_mm": 4
+     },
+     "stage": "global"
+    },
+    {
+     "op": "rotate",
+     "params": {
+      "deg": 1.5
+     },
+     "stage": "global"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 3
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       32,
+       32,
+       34
+      ],
+      "noise": 4,
+      "texture": 4
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "jpeg",
+      "quality": 70
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": [
+    [
+     {
+      "type": "punch_hole",
+      "x_mm": 8.9,
+      "y_mm": 28.5,
+      "diam_mm": 7
+     },
+     {
+      "type": "punch_hole",
+      "x_mm": 8.9,
+      "y_mm": 108.5,
+      "diam_mm": 7
+     },
+     {
+      "type": "punch_hole",
+      "x_mm": 8.9,
+      "y_mm": 188.5,
+      "diam_mm": 7
+     },
+     {
+      "type": "punch_hole",
+      "x_mm": 8.9,
+      "y_mm": 268.5,
+      "diam_mm": 7
+     },
+     {
+      "type": "staple",
+      "x_mm": 14,
+      "y_mm": 10
+     },
+     {
+      "type": "dog_ear",
+      "corner": "tr",
+      "size_mm": 24.0
+     }
+    ],
+    [
+     {
+      "type": "punch_hole",
+      "x_mm": 8.9,
+      "y_mm": 28.5,
+      "diam_mm": 7
+     },
+     {
+      "type": "punch_hole",
+      "x_mm": 8.9,
+      "y_mm": 108.5,
+      "diam_mm": 7
+     },
+     {
+      "type": "punch_hole",
+      "x_mm": 8.9,
+      "y_mm": 188.5,
+      "diam_mm": 7
+     },
+     {
+      "type": "punch_hole",
+      "x_mm": 8.9,
+      "y_mm": 268.5,
+      "diam_mm": 7
+     },
+     {
+      "type": "staple",
+      "x_mm": 14,
+      "y_mm": 10
+     },
+     {
+      "type": "dog_ear",
+      "corner": "tr",
+      "size_mm": 24.0
+     }
+    ]
+   ]
+  },
+  "clean.pdf": {
+   "seed": null,
+   "dpi": 300,
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 300,
+     "tool": "pdftoppm -gray (LilyPond PDF)"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "png"
+     }
+    }
+   ]
+  }
+ },
+ "dpi": 300,
+ "license": "Theme public domain (French air \"Ah! vous dirai-je, maman\", c. 1761); variation, setting and engraving CC0-1.0",
+ "files": {
+  "scan": "twinkle-piano2p-holes-staple/scan.pdf",
+  "scan_mild": "twinkle-piano2p-holes-staple/scan-mild.pdf",
+  "scan_severe": "twinkle-piano2p-holes-staple/scan-severe.pdf",
+  "clean": "twinkle-piano2p-holes-staple/clean.pdf",
+  "truth": "twinkle-piano2p-holes-staple/truth.musicxml",
+  "engraving": "twinkle-piano2p-holes-staple/engraving.ly"
+ },
+ "measures": 24,
+ "vector_pages": 2,
+ "lyrics": [],
+ "shares_truth_with": [
+  "twinkle-piano2p-clean",
+  "twinkle-piano2p-skew",
+  "twinkle-piano2p-rot90",
+  "twinkle-piano2p-rot180",
+  "twinkle-piano2p-phone",
+  "twinkle-piano2p-book",
+  "twinkle-piano2p-yellowed",
+  "twinkle-piano2p-bleed",
+  "twinkle-piano2p-stain-pencil",
+  "twinkle-piano2p-crop",
+  "twinkle-piano2p-halftone",
+  "twinkle-piano2p-jpeg",
+  "twinkle-piano2p-photocopy-thin",
+  "twinkle-piano2p-photocopy-thick",
+  "twinkle-piano2p-lowdpi",
+  "twinkle-piano2p-highdpi",
+  "twinkle-piano2p-blur",
+  "twinkle-piano2p-noise",
+  "twinkle-piano2p-spread",
+  "twinkle-piano2p-scale",
+  "twinkle-piano2p-combo"
+ ],
+ "validation": {
+  "truth_xsd_valid": true,
+  "midi_attacks_match_truth": true,
+  "attacks": 215,
+  "midi_lyric_events_match_truth": true,
+  "lyric_syllables": 0,
+  "lyric_text_found_in_engraving_pdf": null,
+  "lilypond_warnings": [],
+  "scan_files_image_only": {
+   "scan.pdf": true,
+   "scan-mild.pdf": true,
+   "scan-severe.pdf": true,
+   "clean.pdf": true
+  }
+ },
+ "origin": "synthetic-scan (challenge: degradation extremes)",
+ "seed": 297554588
+}

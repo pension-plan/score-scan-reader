@@ -1,0 +1,369 @@
+{
+ "id": "wind-melody-crop",
+ "category": "degradation",
+ "piece": "wind-melody",
+ "variant": "crop",
+ "title": "Who Has Seen the Wind? (melody, 2 verses) - crop",
+ "edge_cases": [
+  "lyrics",
+  "multi_verse",
+  "melody",
+  "pickup",
+  "melisma",
+  "slurs",
+  "unequal_verse_syllables",
+  "key_signature",
+  "time_3_4",
+  "large_staff",
+  "cropped_edges",
+  "cropped_staff_ends",
+  "no_margins",
+  "missing_system_barlines",
+  "cropped_header"
+ ],
+ "expected": {
+  "parts": [
+   "Voice"
+  ],
+  "must_not_split": false,
+  "shared_staves": [],
+  "notes": "Single-staff melody with two stacked verses. Verse 1 has one syllable fewer than verse 2 in line 3 (\"trem-_-bling\" vs \"bow down their heads\"): bar 6 beat 3 (c''8) carries a verse-2 syllable (\"their\") but NO verse-1 syllable. The final melisma \"pass-ing _\" is slurred in both verses. DAMAGE (crop): Image edges cut through the staves. Mild: tight crop 0.4 mm outside the staff ends (braces/brackets cut off), header kept. Scan: header (title/credits) cropped away, 0.8 mm cut into the staff starts and 3.0 mm off the staff ends (end barlines gone). Severe: cut 1.49 mm into the staff starts (up to just before the first clef / part name / lyric) and 8.61 mm off the ends (to just after the right-most notehead/stem/lyric). Cut amounts are computed per page from the clean raster so that no clef, key/time signature, notehead, stem, accidental, lyric or part name is removed - only staff-line ends, brackets/braces, barlines and the header. TRUTH LIMITATIONS: Barlines at system starts/ends (incl. the final barline) are partly or completely cut off - they are still present in the truth. scan/severe: title/composer/poet header text is not visible; ignore work-title/creators when scoring."
+ },
+ "truth_limitations": "Barlines at system starts/ends (incl. the final barline) are partly or completely cut off - they are still present in the truth. scan/severe: title/composer/poet header text is not visible; ignore work-title/creators when scoring.",
+ "truth_scope": "truth.musicxml (MusicXML 4.0 partwise, XSD-valid) encodes parts/part-list (+ part-group bracket for the choir), staves, voices, pitches, durations, rests, ties, slurs, lyrics (verse number, syllabic, extend), dynamics, fermatas, staccatos, stems, clefs, key/time signatures and barline styles. It does NOT encode beams (LilyPond auto-beams), system/page breaks, bar-number display, header layout or any handwritten/damage marks. The same truth file is shared by every damaged variant of a piece.",
+ "degradations": {
+  "scan.pdf": {
+   "seed": 1290472355,
+   "dpi": 300,
+   "pages": 1,
+   "image_px": [
+    [
+     2200,
+     1980
+    ]
+   ],
+   "image_mode": [
+    "L"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 300,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": 246,
+      "texture": 2
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": 22,
+     "stage": "content"
+    },
+    {
+     "op": "crop",
+     "params": {
+      "left_mm": 10.79,
+      "right_mm": 196.98,
+      "top_mm": 36.15,
+      "bottom_mm": 203.78
+     },
+     "stage": "content"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 2
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       236,
+       236,
+       234
+      ],
+      "noise": 2,
+      "edge_shadow": 0.35
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "jpeg",
+      "quality": 78
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": [
+    [
+     {
+      "type": "crop",
+      "box_mm": [
+       10.79,
+       36.15,
+       196.98,
+       203.78
+      ]
+     }
+    ]
+   ]
+  },
+  "scan-mild.pdf": {
+   "seed": 1290472356,
+   "dpi": 300,
+   "pages": 1,
+   "image_px": [
+    [
+     2254,
+     2182
+    ]
+   ],
+   "image_mode": [
+    "L"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 300,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": 246,
+      "texture": 2
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": 22,
+     "stage": "content"
+    },
+    {
+     "op": "crop",
+     "params": {
+      "left_mm": 9.59,
+      "right_mm": 200.38,
+      "top_mm": 20.1,
+      "bottom_mm": 204.78
+     },
+     "stage": "content"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 2
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       236,
+       236,
+       234
+      ],
+      "noise": 2,
+      "edge_shadow": 0.35
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "jpeg",
+      "quality": 80
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": [
+    [
+     {
+      "type": "crop",
+      "box_mm": [
+       9.59,
+       20.1,
+       200.38,
+       204.78
+      ]
+     }
+    ]
+   ]
+  },
+  "scan-severe.pdf": {
+   "seed": 1290472357,
+   "dpi": 300,
+   "pages": 1,
+   "image_px": [
+    [
+     2124,
+     1974
+    ]
+   ],
+   "image_mode": [
+    "L"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 300,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": 246,
+      "texture": 2
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": 22,
+     "stage": "content"
+    },
+    {
+     "op": "crop",
+     "params": {
+      "left_mm": 11.48,
+      "right_mm": 191.37,
+      "top_mm": 36.15,
+      "bottom_mm": 203.28
+     },
+     "stage": "content"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 3
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       236,
+       236,
+       234
+      ],
+      "noise": 2,
+      "edge_shadow": 0.35
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "jpeg",
+      "quality": 70
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": [
+    [
+     {
+      "type": "crop",
+      "box_mm": [
+       11.48,
+       36.15,
+       191.37,
+       203.28
+      ]
+     }
+    ]
+   ]
+  },
+  "clean.pdf": {
+   "seed": null,
+   "dpi": 300,
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 300,
+     "tool": "pdftoppm -gray (LilyPond PDF)"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "png"
+     }
+    }
+   ]
+  }
+ },
+ "dpi": 300,
+ "license": "Text public domain (Christina Rossetti, Sing-Song, 1872); melody and engraving CC0-1.0",
+ "files": {
+  "scan": "wind-melody-crop/scan.pdf",
+  "scan_mild": "wind-melody-crop/scan-mild.pdf",
+  "scan_severe": "wind-melody-crop/scan-severe.pdf",
+  "clean": "wind-melody-crop/clean.pdf",
+  "truth": "wind-melody-crop/truth.musicxml",
+  "engraving": "wind-melody-crop/engraving.ly"
+ },
+ "measures": 11,
+ "vector_pages": 1,
+ "lyrics": [
+  {
+   "part": "Voice",
+   "verses": 2
+  }
+ ],
+ "shares_truth_with": [
+  "wind-melody-clean",
+  "wind-melody-skew",
+  "wind-melody-rot90",
+  "wind-melody-rot180",
+  "wind-melody-phone",
+  "wind-melody-book",
+  "wind-melody-yellowed",
+  "wind-melody-bleed",
+  "wind-melody-stain-pencil",
+  "wind-melody-holes-staple",
+  "wind-melody-halftone",
+  "wind-melody-jpeg",
+  "wind-melody-photocopy-thin",
+  "wind-melody-photocopy-thick",
+  "wind-melody-lowdpi",
+  "wind-melody-highdpi",
+  "wind-melody-blur",
+  "wind-melody-noise",
+  "wind-melody-spread",
+  "wind-melody-combo"
+ ],
+ "validation": {
+  "truth_xsd_valid": true,
+  "midi_attacks_match_truth": true,
+  "attacks": 25,
+  "midi_lyric_events_match_truth": true,
+  "lyric_syllables": 47,
+  "lyric_text_found_in_engraving_pdf": 1.0,
+  "lilypond_warnings": [],
+  "scan_files_image_only": {
+   "scan.pdf": true,
+   "scan-mild.pdf": true,
+   "scan-severe.pdf": true,
+   "clean.pdf": true
+  }
+ },
+ "origin": "synthetic-scan (challenge: degradation extremes)",
+ "seed": 1290472355
+}

@@ -1,0 +1,542 @@
+{
+  "id": "lyr06-amazing-grace-textblock",
+  "category": "lyrics",
+  "title": "Amazing Grace - hymnal page, stanzas 4-6 as text block below the music",
+  "edge_cases": [
+    "text_block_stanzas",
+    "two_column_text_block",
+    "stacked_verses_3",
+    "verse_numbers",
+    "typographic_apostrophes",
+    "punctuation",
+    "satb_closed",
+    "lyrics_between_staves",
+    "pickup",
+    "short_melisma_extenders",
+    "hyphen_across_melisma",
+    "pencil_annotations",
+    "circled_notes",
+    "punch_holes",
+    "staple",
+    "binarized_thick"
+  ],
+  "expected": {
+    "must_not_split": false,
+    "shared_staves": [
+      [
+        "Soprano",
+        "Alto"
+      ],
+      [
+        "Tenor",
+        "Bass"
+      ]
+    ],
+    "notes": "Closed SATB hymn -> 4 parts. Stanzas 1-3 are underlaid between the staves and belong to the SOPRANO (lyric numbers 1-3). Stanzas 4-6 are printed as a two-column TEXT BLOCK below the music: they are not aligned to notes, so truth.musicxml carries them as <credit> elements (credit-type \"lyrics\", one per stanza, label + lines). truth-underlaid.musicxml is an alternative truth for converters that syllabify the block and underlay it as lyric lines 4-6 (it has no credits). Pencil marks, circled notes and handwritten words (\"breathe\", \"rit.\" ...) in the scans are NOT part of the music or lyrics. Apostrophes are typographic (U+2019).",
+    "parts": [
+      "Soprano",
+      "Alto",
+      "Tenor",
+      "Bass"
+    ]
+  },
+  "lyric_lines": [
+    {
+      "part": "Soprano",
+      "lyric_number": 1,
+      "syllables": 28,
+      "elisions": 0,
+      "extenders": 9
+    },
+    {
+      "part": "Soprano",
+      "lyric_number": 2,
+      "syllables": 28,
+      "elisions": 0,
+      "extenders": 7
+    },
+    {
+      "part": "Soprano",
+      "lyric_number": 3,
+      "syllables": 28,
+      "elisions": 0,
+      "extenders": 8
+    }
+  ],
+  "truth_limitations": [
+    "Truth encodes pitches, durations, rests, ties, slurs, fermatas, stem directions of voices sharing a staff, lyrics (number, syllabic, text, elision, extend) and the part/staff structure; it has no <beam>, no system or page breaks, no positions and no font sizes.",
+    "Printed stanza labels (\"1.\", \"2.\" ...) are not encoded; lyric/@number carries the line number.",
+    "Only title, composer, lyricist and rights are encoded from the header; subtitle and the printed poet/composer lines are not encoded as credits.",
+    "LilyPond drops the hyphen when two syllables of a word are printed very close together; truth syllabic (begin/middle/end) still follows the word structure.",
+    "Scan damage (pencil marks, handwritten words, stains, holes, staples, cropped margins) is not part of the truth.",
+    "Stanzas 4-6 are a text block, encoded as <credit> (credit-type 'lyrics') in truth.musicxml; truth-underlaid.musicxml is the alternative with them syllabified as lyric lines 4-6 (syllabification by the corpus author).",
+    "Lyrics are encoded on the Soprano only (lower voices share the rhythm)."
+  ],
+  "text_block_stanzas": [
+    {
+      "label": "4.",
+      "lines": [
+        "The Lord has promised good to me,",
+        "His word my hope secures;",
+        "He will my shield and portion be,",
+        "As long as life endures."
+      ],
+      "page": 1
+    },
+    {
+      "label": "5.",
+      "lines": [
+        "Yea, when this flesh and heart shall fail,",
+        "And mortal life shall cease,",
+        "I shall possess, within the veil,",
+        "A life of joy and peace."
+      ],
+      "page": 1
+    },
+    {
+      "label": "6.",
+      "lines": [
+        "The earth shall soon dissolve like snow,",
+        "The sun forbear to shine;",
+        "But God, who called me here below,",
+        "Will be forever mine."
+      ],
+      "page": 1
+    }
+  ],
+  "degradations": {
+    "scan.pdf": {
+      "seed": 5601,
+      "dpi": 300,
+      "mode": "gray",
+      "jpeg_quality": 60,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "page_ops": [],
+      "ops": [
+        {
+          "op": "paper",
+          "color": [
+            244,
+            243,
+            238
+          ],
+          "texture": 3
+        },
+        {
+          "op": "pencil",
+          "circles": 5,
+          "ticks": 6,
+          "lines": 2,
+          "words": [
+            "breathe",
+            "rit.",
+            "p",
+            "v.3 men only",
+            "cresc."
+          ]
+        },
+        {
+          "op": "holes",
+          "n": 2,
+          "side": "left",
+          "diam_mm": 6,
+          "offset_mm": 11,
+          "spacing_mm": 80
+        },
+        {
+          "op": "staple",
+          "corner": "tl",
+          "angle": 35
+        },
+        {
+          "op": "rotate",
+          "deg": 0.6
+        },
+        {
+          "op": "noise",
+          "sigma": 4
+        }
+      ],
+      "tags": [
+        "paper_texture",
+        "pencil_annotations",
+        "punch_holes",
+        "staple",
+        "skew_0.6deg",
+        "gaussian_noise",
+        "jpeg_q60"
+      ],
+      "output_pages": 1,
+      "page_pixels": [
+        [
+          2550,
+          3300
+        ]
+      ],
+      "annotations": [
+        [
+          {
+            "pencil_marks": [
+              [
+                "circle",
+                2068,
+                897
+              ],
+              [
+                "circle",
+                1204,
+                1484
+              ],
+              [
+                "circle",
+                2176,
+                2089
+              ],
+              [
+                "circle",
+                1348,
+                1264
+              ],
+              [
+                "circle",
+                555,
+                299
+              ],
+              [
+                "tick",
+                481,
+                1453
+              ],
+              [
+                "tick",
+                868,
+                262
+              ],
+              [
+                "tick",
+                2383,
+                2446
+              ],
+              [
+                "tick",
+                1000,
+                2432
+              ],
+              [
+                "tick",
+                1557,
+                2048
+              ],
+              [
+                "tick",
+                2386,
+                1835
+              ],
+              [
+                "word",
+                "breathe",
+                984,
+                3032
+              ],
+              [
+                "word",
+                "rit.",
+                1367,
+                2403
+              ],
+              [
+                "word",
+                "p",
+                719,
+                837
+              ],
+              [
+                "word",
+                "v.3 men only",
+                1378,
+                626
+              ],
+              [
+                "word",
+                "cresc.",
+                1706,
+                223
+              ]
+            ]
+          }
+        ]
+      ],
+      "bytes": 697944
+    },
+    "scan-mild.pdf": {
+      "seed": 5602,
+      "dpi": 200,
+      "mode": "gray",
+      "jpeg_quality": 60,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "page_ops": [],
+      "ops": [
+        {
+          "op": "paper",
+          "color": [
+            244,
+            243,
+            238
+          ],
+          "texture": 2
+        },
+        {
+          "op": "holes",
+          "n": 2,
+          "side": "left",
+          "diam_mm": 6,
+          "offset_mm": 11,
+          "spacing_mm": 80
+        },
+        {
+          "op": "fold",
+          "y": 0.48,
+          "dark": 0.12
+        },
+        {
+          "op": "rotate",
+          "deg": -0.3
+        }
+      ],
+      "tags": [
+        "paper_texture",
+        "punch_holes",
+        "fold_crease",
+        "skew_0.3deg",
+        "jpeg_q60"
+      ],
+      "output_pages": 1,
+      "page_pixels": [
+        [
+          1700,
+          2200
+        ]
+      ],
+      "annotations": [],
+      "bytes": 276447
+    },
+    "scan-severe.pdf": {
+      "seed": 5603,
+      "dpi": 200,
+      "mode": "bw",
+      "jpeg_quality": null,
+      "jpeg_passes": 1,
+      "binarize": {
+        "style": "thick_photocopy",
+        "threshold": 200,
+        "noise": 16,
+        "blur": 0.8
+      },
+      "page_ops": [],
+      "ops": [
+        {
+          "op": "ink",
+          "weight": 1
+        },
+        {
+          "op": "paper",
+          "color": [
+            244,
+            243,
+            238
+          ],
+          "texture": 6
+        },
+        {
+          "op": "pencil",
+          "circles": 8,
+          "ticks": 4,
+          "lines": 3,
+          "alpha": 0.9,
+          "words": [
+            "breathe!",
+            "p",
+            "alto only",
+            "slower",
+            "v.2 tacet"
+          ]
+        },
+        {
+          "op": "holes",
+          "n": 4,
+          "side": "left",
+          "diam_mm": 5.5,
+          "offset_mm": 10,
+          "spacing_mm": 70
+        },
+        {
+          "op": "staple",
+          "corner": "tl",
+          "angle": 50
+        },
+        {
+          "op": "rotate",
+          "deg": -2.0
+        },
+        {
+          "op": "speckle",
+          "per_mpx": 300
+        }
+      ],
+      "tags": [
+        "ink_thicken",
+        "paper_texture",
+        "pencil_annotations",
+        "punch_holes",
+        "staple",
+        "skew_2deg",
+        "speckles",
+        "binarized_thick_photocopy"
+      ],
+      "output_pages": 1,
+      "page_pixels": [
+        [
+          1700,
+          2200
+        ]
+      ],
+      "annotations": [
+        [
+          {
+            "pencil_marks": [
+              [
+                "circle",
+                1437,
+                451
+              ],
+              [
+                "circle",
+                783,
+                1245
+              ],
+              [
+                "circle",
+                459,
+                988
+              ],
+              [
+                "circle",
+                1061,
+                1245
+              ],
+              [
+                "circle",
+                210,
+                842
+              ],
+              [
+                "circle",
+                935,
+                597
+              ],
+              [
+                "circle",
+                1467,
+                1392
+              ],
+              [
+                "circle",
+                363,
+                597
+              ],
+              [
+                "tick",
+                508,
+                431
+              ],
+              [
+                "tick",
+                613,
+                1627
+              ],
+              [
+                "tick",
+                835,
+                963
+              ],
+              [
+                "tick",
+                358,
+                580
+              ],
+              [
+                "word",
+                "breathe!",
+                1183,
+                414
+              ],
+              [
+                "word",
+                "p",
+                302,
+                811
+              ],
+              [
+                "word",
+                "alto only",
+                1028,
+                1345
+              ],
+              [
+                "word",
+                "slower",
+                643,
+                806
+              ],
+              [
+                "word",
+                "v.2 tacet",
+                233,
+                552
+              ]
+            ]
+          }
+        ]
+      ],
+      "bytes": 106983
+    }
+  },
+  "dpi": 300,
+  "license": "Melody (NEW BRITAIN, 1829/1831) and text (John Newton, 1779): public domain. Harmonisation: CC0-1.0.",
+  "source": "NEW BRITAIN melody (Virginia Harmony 1831); text John Newton, Olney Hymns (1779); own harmonisation.",
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "scan-mild.pdf",
+    "scan-severe.pdf",
+    "scan.pdf",
+    "truth-underlaid.musicxml",
+    "truth.musicxml"
+  ],
+  "measures": 17,
+  "engraved_pages": 1,
+  "validation": {
+    "truth_xsd_valid": true,
+    "midi_attacks_match_truth": true,
+    "attacks": 110,
+    "midi_lyrics_match_truth": true,
+    "lyric_lines_checked": 3,
+    "syllables_checked": 84,
+    "pdf_text_items_checked": 96,
+    "pdf_text_missing": 0,
+    "scans_image_only": {
+      "scan.pdf": true,
+      "scan-mild.pdf": true,
+      "scan-severe.pdf": true
+    },
+    "lilypond_warnings": [
+      "warning: too few pages: 1 (should have at least 2)",
+      "warning: too few pages: 1 (should have at least 2)"
+    ]
+  },
+  "engraver": "model -> LilyPond 2.24 (custom writer, corpus/challenge/lyrics/_tools)"
+}

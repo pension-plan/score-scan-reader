@@ -1,0 +1,6 @@
+Texts: B. S. Ingemann, "Dejlig er jorden" (1850), stanzas 1-2 and Norwegian spelling - public domain;
+Cecilia Bååth-Holmberg, "Härlig är jorden" (1884) - public domain;
+Richard Storrs Willis, "Fairest Lord Jesus" (1850) - public domain.
+Melody: CC0, written for this corpus (not the Silesian folk tune).
+
+Music (melody, harmonisation, accompaniment), engraving, rasterisation and damage were produced for this corpus by corpus/challenge/lyrics/_tools and are dedicated to the public domain (CC0 1.0).

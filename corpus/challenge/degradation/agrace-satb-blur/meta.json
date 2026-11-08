@@ -1,0 +1,358 @@
+{
+ "id": "agrace-satb-blur",
+ "category": "degradation",
+ "piece": "agrace-satb",
+ "variant": "blur",
+ "title": "Amazing Grace (SATB, closed score, 3 verses) - blur",
+ "edge_cases": [
+  "lyrics",
+  "multi_verse",
+  "satb_closed",
+  "multi_voice_staff",
+  "shared_staves",
+  "pickup",
+  "melisma",
+  "slurs",
+  "ties",
+  "compound_lyric_hyphen_over_melisma",
+  "hymn",
+  "key_signature",
+  "time_3_4",
+  "blur_focus",
+  "blur_motion"
+ ],
+ "expected": {
+  "parts": [
+   "Soprano",
+   "Alto",
+   "Tenor",
+   "Bass"
+  ],
+  "must_not_split": false,
+  "shared_staves": [
+   [
+    "Soprano",
+    "Alto"
+   ],
+   [
+    "Tenor",
+    "Bass"
+   ]
+  ],
+  "notes": "Closed-score SATB: Soprano+Alto share the treble staff, Tenor+Bass share the bass staff. A correct conversion yields FOUR parts (Soprano, Alto, Tenor, Bass), each with its own notes; all three verses belong to the Soprano part (lyric numbers 1-3) and must stay attached to soprano notes, including melisma skips (e.g. \"pre - cious\" spans a slurred melisma). DAMAGE (blur): Out-of-focus and moving camera/scanner head: gaussian sigma 1.3 / 2.0 / 2.8 px (at 300 dpi) plus horizontal motion blur 6 px (scan) and 14 px at 35 deg (severe). Staff lines blur into grey bands; ledger lines and accidentals smear."
+ },
+ "truth_limitations": "none: truth matches the engraving exactly (MIDI attacks, MIDI lyric events and PDF lyric text verified)",
+ "truth_scope": "truth.musicxml (MusicXML 4.0 partwise, XSD-valid) encodes parts/part-list (+ part-group bracket for the choir), staves, voices, pitches, durations, rests, ties, slurs, lyrics (verse number, syllabic, extend), dynamics, fermatas, staccatos, stems, clefs, key/time signatures and barline styles. It does NOT encode beams (LilyPond auto-beams), system/page breaks, bar-number display, header layout or any handwritten/damage marks. The same truth file is shared by every damaged variant of a piece.",
+ "degradations": {
+  "scan.pdf": {
+   "seed": 866196461,
+   "dpi": 300,
+   "pages": 1,
+   "image_px": [
+    [
+     2481,
+     3508
+    ]
+   ],
+   "image_mode": [
+    "L"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 300,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": 246,
+      "texture": 2
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": 22,
+     "stage": "content"
+    },
+    {
+     "op": "blur",
+     "params": {
+      "sigma": 2.0
+     },
+     "stage": "global"
+    },
+    {
+     "op": "motion",
+     "params": {
+      "length": 6,
+      "angle": 0
+     },
+     "stage": "global"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 2
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       236,
+       236,
+       234
+      ],
+      "noise": 2,
+      "edge_shadow": 0.35
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "jpeg",
+      "quality": 78
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": [
+    []
+   ]
+  },
+  "scan-mild.pdf": {
+   "seed": 866196462,
+   "dpi": 300,
+   "pages": 1,
+   "image_px": [
+    [
+     2481,
+     3508
+    ]
+   ],
+   "image_mode": [
+    "L"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 300,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": 246,
+      "texture": 2
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": 22,
+     "stage": "content"
+    },
+    {
+     "op": "blur",
+     "params": {
+      "sigma": 1.3
+     },
+     "stage": "global"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 2
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       236,
+       236,
+       234
+      ],
+      "noise": 2,
+      "edge_shadow": 0.35
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "jpeg",
+      "quality": 80
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": [
+    []
+   ]
+  },
+  "scan-severe.pdf": {
+   "seed": 866196463,
+   "dpi": 300,
+   "pages": 1,
+   "image_px": [
+    [
+     2481,
+     3508
+    ]
+   ],
+   "image_mode": [
+    "L"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 300,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": 246,
+      "texture": 2
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": 22,
+     "stage": "content"
+    },
+    {
+     "op": "blur",
+     "params": {
+      "sigma": 2.8
+     },
+     "stage": "global"
+    },
+    {
+     "op": "motion",
+     "params": {
+      "length": 14,
+      "angle": 35
+     },
+     "stage": "global"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 4
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       236,
+       236,
+       234
+      ],
+      "noise": 2,
+      "edge_shadow": 0.35
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "jpeg",
+      "quality": 70
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": [
+    []
+   ]
+  },
+  "clean.pdf": {
+   "seed": null,
+   "dpi": 300,
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 300,
+     "tool": "pdftoppm -gray (LilyPond PDF)"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "png"
+     }
+    }
+   ]
+  }
+ },
+ "dpi": 300,
+ "license": "Public domain melody (NEW BRITAIN, 1829) and text (John Newton, 1779); SATB setting and engraving CC0-1.0",
+ "files": {
+  "scan": "agrace-satb-blur/scan.pdf",
+  "scan_mild": "agrace-satb-blur/scan-mild.pdf",
+  "scan_severe": "agrace-satb-blur/scan-severe.pdf",
+  "clean": "agrace-satb-blur/clean.pdf",
+  "truth": "agrace-satb-blur/truth.musicxml",
+  "engraving": "agrace-satb-blur/engraving.ly"
+ },
+ "measures": 17,
+ "vector_pages": 1,
+ "lyrics": [
+  {
+   "part": "Soprano",
+   "verses": 3
+  }
+ ],
+ "shares_truth_with": [
+  "agrace-satb-clean",
+  "agrace-satb-skew",
+  "agrace-satb-rot90",
+  "agrace-satb-rot180",
+  "agrace-satb-phone",
+  "agrace-satb-book",
+  "agrace-satb-yellowed",
+  "agrace-satb-bleed",
+  "agrace-satb-stain-pencil",
+  "agrace-satb-holes-staple",
+  "agrace-satb-crop",
+  "agrace-satb-halftone",
+  "agrace-satb-jpeg",
+  "agrace-satb-photocopy-thin",
+  "agrace-satb-photocopy-thick",
+  "agrace-satb-lowdpi",
+  "agrace-satb-highdpi",
+  "agrace-satb-noise",
+  "agrace-satb-spread",
+  "agrace-satb-combo"
+ ],
+ "validation": {
+  "truth_xsd_valid": true,
+  "midi_attacks_match_truth": true,
+  "attacks": 119,
+  "midi_lyric_events_match_truth": true,
+  "lyric_syllables": 84,
+  "lyric_text_found_in_engraving_pdf": 1.0,
+  "lilypond_warnings": [],
+  "scan_files_image_only": {
+   "scan.pdf": true,
+   "scan-mild.pdf": true,
+   "scan-severe.pdf": true,
+   "clean.pdf": true
+  }
+ },
+ "origin": "synthetic-scan (challenge: degradation extremes)",
+ "seed": 866196461
+}

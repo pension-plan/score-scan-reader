@@ -1,0 +1,286 @@
+{
+  "id": "ttbb-treble8-a2-unis",
+  "category": "voices",
+  "title": "Integer vitae (TTBB closed score, octave treble clef, a 2 / unis.)",
+  "edge_cases": [
+    "ttbb_closed",
+    "treble_8vb_clef_octave",
+    "shared_staff_two_voices",
+    "a2_one_voice_both_parts",
+    "unis_one_voice_both_parts",
+    "divided_again_after_a2",
+    "unison_one_head_two_stems",
+    "part_labels_roman_numerals",
+    "lyrics_only_under_upper_staff",
+    "latin_text",
+    "eighth_notes",
+    "dynamics",
+    "fermata"
+  ],
+  "expected": {
+    "parts": [
+      "Tenor I",
+      "Tenor II",
+      "Bass I",
+      "Bass II"
+    ],
+    "must_not_split": false,
+    "shared_staves": [
+      [
+        "Tenor I",
+        "Tenor II"
+      ],
+      [
+        "Bass I",
+        "Bass II"
+      ]
+    ],
+    "notes": "TTBB closed score. The upper staff uses a treble clef with a small 8 below: tenor notes SOUND an octave lower than a plain treble clef would suggest (truth pitches, e.g. first note D4 not D5). Split by stem direction into Tenor I/II and Bass I/II. Where \"a 2\" (tenors, mm.4-6 and m.12 to beat 2 of m.13) or \"unis.\" (basses, mm.7-9 and m.12 to beat 2 of m.13) is printed, the staff shows a single line with one stem direction; BOTH parts of that staff sing it, so the notes must appear in both parts (e.g. Tenor II in m.5 = Bb3 C4 D4 Eb4). The final chord is divided again (stems up/down). Lyrics: one line between the staves aligned to Tenor I (truth carries them on Tenor I only)."
+  },
+  "degradations": {
+    "scan.pdf": {
+      "seed": 7501,
+      "render_dpi": 200,
+      "output_dpi": 200,
+      "mode": "bilevel",
+      "format": "png",
+      "jpeg_quality": null,
+      "jpeg_passes": null,
+      "binarize": {
+        "thr": 172,
+        "noise": 14,
+        "pre_blur": 0.7
+      },
+      "spread_2up": null,
+      "ops": [
+        {
+          "op": "ink_weight",
+          "n": 1
+        },
+        {
+          "op": "paper",
+          "rgb": [
+            244,
+            244,
+            244
+          ],
+          "texture": 5
+        },
+        {
+          "op": "coffee",
+          "x": 0.72,
+          "y": 0.42,
+          "r_mm": 38,
+          "strength": 0.55,
+          "partial": true
+        },
+        {
+          "op": "rotate",
+          "deg": 4.0,
+          "fill": 255,
+          "expand": true
+        },
+        {
+          "op": "blur",
+          "sigma": 0.8
+        },
+        {
+          "op": "speckle",
+          "per_mpx": 60
+        }
+      ],
+      "summary": "thick binarized photocopy at 200 dpi with a coffee ring, 4 deg skew",
+      "pdf_pages": 1,
+      "events": [
+        {
+          "pages": [
+            0
+          ],
+          "size_px": [
+            1814,
+            2449
+          ],
+          "events": []
+        }
+      ]
+    },
+    "scan-mild.pdf": {
+      "seed": 7502,
+      "render_dpi": 300,
+      "output_dpi": 300,
+      "mode": "gray",
+      "format": "jpeg",
+      "jpeg_quality": 55,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "spread_2up": null,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            245,
+            244,
+            240
+          ],
+          "texture": 3
+        },
+        {
+          "op": "coffee",
+          "x": 0.72,
+          "y": 0.42,
+          "r_mm": 38,
+          "strength": 0.25
+        },
+        {
+          "op": "rotate",
+          "deg": 0.5,
+          "fill": 250
+        },
+        {
+          "op": "blur",
+          "sigma": 0.5
+        },
+        {
+          "op": "noise",
+          "sigma": 2.5
+        }
+      ],
+      "summary": "flatbed scan, 0.5 deg skew, light coffee ring",
+      "pdf_pages": 1,
+      "events": [
+        {
+          "pages": [
+            0
+          ],
+          "size_px": [
+            2481,
+            3508
+          ],
+          "events": []
+        }
+      ]
+    },
+    "scan-severe.pdf": {
+      "seed": 7503,
+      "render_dpi": 100,
+      "output_dpi": 100,
+      "mode": "gray",
+      "format": "jpeg",
+      "jpeg_quality": 15,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "spread_2up": null,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            238,
+            238,
+            236
+          ],
+          "texture": 6
+        },
+        {
+          "op": "rotate",
+          "deg": -9.5,
+          "fill": 225,
+          "expand": true
+        },
+        {
+          "op": "blur",
+          "sigma": 1.6
+        },
+        {
+          "op": "noise",
+          "sigma": 7
+        }
+      ],
+      "summary": "100 dpi, 9.5 deg skew, out of focus, JPEG q15 (the clef 8 is barely visible)",
+      "pdf_pages": 1,
+      "events": [
+        {
+          "pages": [
+            0
+          ],
+          "size_px": [
+            1009,
+            1292
+          ],
+          "events": []
+        }
+      ]
+    }
+  },
+  "dpi": 200,
+  "dpi_note": "output resolution of scan.pdf (render_dpi / output_dpi per file under degradations)",
+  "license": "Text public domain (Horace, Odes I.22, c. 23 BC); music and engraving CC0-1.0",
+  "source": "self-authored (challenge corpus); text: Horace, Carmina I.22, stanza 1 (+ repeat of \"Fusce, pharetra\")",
+  "files": {
+    "truth": "truth.musicxml",
+    "engraving": "engraving.ly",
+    "clean": "clean.pdf",
+    "scans": [
+      "scan-mild.pdf",
+      "scan-severe.pdf",
+      "scan.pdf"
+    ]
+  },
+  "pages_engraved": 1,
+  "measures": 13,
+  "parts_truth": [
+    {
+      "id": "T1",
+      "name": "Tenor I",
+      "voices": 1,
+      "staves": 1
+    },
+    {
+      "id": "T2",
+      "name": "Tenor II",
+      "voices": 1,
+      "staves": 1
+    },
+    {
+      "id": "B1",
+      "name": "Bass I",
+      "voices": 1,
+      "staves": 1
+    },
+    {
+      "id": "B2",
+      "name": "Bass II",
+      "voices": 1,
+      "staves": 1
+    }
+  ],
+  "lyric_lines_printed": [
+    {
+      "kind": "lyricsto",
+      "voice": [
+        "T1",
+        "1"
+      ],
+      "verse": 1,
+      "syllables": 44
+    }
+  ],
+  "validation": {
+    "xsd": "/Users/d.sloane/music/corpus/challenge/voices/_work/ttbb-treble8-a2-unis/truth.musicxml validates",
+    "truth_reparsed_music21_matches_model": true,
+    "midi_per_voice_matches_printed_truth": true,
+    "midi_lyrics_match_truth": true,
+    "attacks_truth": 174,
+    "attacks_hidden_in_engraving_carried_by_other_voice": 31,
+    "lyric_text_found_in_vector_pdf": 1.0,
+    "lilypond_warnings": [],
+    "scan_files_image_only": {
+      "scan": true,
+      "scan-mild": true,
+      "scan-severe": true
+    }
+  },
+  "truth_limitations": [
+    "In the a 2 / unis. bars the second part is not drawn at all: its notes in truth are exact copies of the printed line (verified: every such note has an identical printed carrier on the same staff).",
+    "Lyrics only on Tenor I in truth."
+  ]
+}

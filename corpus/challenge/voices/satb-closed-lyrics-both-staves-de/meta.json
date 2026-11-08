@@ -1,0 +1,364 @@
+{
+  "id": "satb-closed-lyrics-both-staves-de",
+  "category": "voices",
+  "title": "Nun danket alle Gott (closed SATB, German, lyrics under both staves, lyrics switch voice)",
+  "edge_cases": [
+    "satb_closed",
+    "shared_staff_two_voices",
+    "lyrics_under_each_staff",
+    "lyrics_lower_staff_bass",
+    "lyric_line_switches_voice",
+    "independent_bass_rhythm_lyrics_offset",
+    "one_voice_rests_other_sings",
+    "whole_bar_rests_in_one_voice",
+    "part_labels_german_center_column",
+    "unison_one_head_two_stems",
+    "german_umlauts",
+    "dynamics",
+    "fermata",
+    "common_time_symbol"
+  ],
+  "expected": {
+    "parts": [
+      "Sopran",
+      "Alt",
+      "Tenor",
+      "Bass"
+    ],
+    "must_not_split": false,
+    "shared_staves": [
+      [
+        "Sopran",
+        "Alt"
+      ],
+      [
+        "Tenor",
+        "Bass"
+      ]
+    ],
+    "notes": "Closed score with German labels \"Sopran/Alt\" and \"Tenor/Bass\" (abbreviated \"S./A.\", \"T./B.\" on later systems). Split each staff by stem direction into four parts. There is one lyric line under EACH staff: the upper line belongs to the Sopran, except mm.9-10 where the Sopran has whole-bar rests and the same line carries the Alt echo \"an uns und allen Enden\"; the lower line belongs to the Bass, except mm.9-10 where the Bass rests and the line belongs to the Tenor. In m.3 the Bass sings a dotted rhythm, so its syllable \"Her-\" sits half a beat after the Sopran's. A correct conversion attaches each syllable to the voice whose note it is printed under (truth: Sopran mm.1-8,11-12; Alt mm.9-10; Bass mm.1-8,11-12; Tenor mm.9-10)."
+  },
+  "degradations": {
+    "scan.pdf": {
+      "seed": 7201,
+      "render_dpi": 200,
+      "output_dpi": 200,
+      "mode": "rgb",
+      "format": "jpeg",
+      "jpeg_quality": 35,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "spread_2up": null,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            240,
+            236,
+            226
+          ],
+          "texture": 4
+        },
+        {
+          "op": "curl",
+          "side": "left",
+          "amp_mm": 5,
+          "width": 0.22,
+          "fill": [
+            60,
+            55,
+            50
+          ],
+          "shade": 0.3
+        },
+        {
+          "op": "gutter",
+          "side": "left",
+          "width": 0.08,
+          "dark": 0.5
+        },
+        {
+          "op": "perspective",
+          "margin": 0.05,
+          "bg": [
+            92,
+            80,
+            66
+          ],
+          "keystone": 0.045,
+          "jitter": 0.015,
+          "shadow": 0.25
+        },
+        {
+          "op": "vignette",
+          "strength": 0.32
+        },
+        {
+          "op": "blotch",
+          "strength": 0.12
+        },
+        {
+          "op": "motion_blur",
+          "len_mm": 0.35,
+          "deg": 25
+        },
+        {
+          "op": "blur",
+          "sigma": 0.7
+        },
+        {
+          "op": "noise",
+          "sigma": 5,
+          "chroma": 2.5
+        }
+      ],
+      "summary": "phone photo of a book page: keystone perspective, page curl + gutter shadow, vignette, motion blur",
+      "pdf_pages": 1,
+      "events": [
+        {
+          "pages": [
+            0
+          ],
+          "size_px": [
+            1818,
+            2503
+          ],
+          "events": []
+        }
+      ]
+    },
+    "scan-mild.pdf": {
+      "seed": 7202,
+      "render_dpi": 300,
+      "output_dpi": 300,
+      "mode": "rgb",
+      "format": "jpeg",
+      "jpeg_quality": 60,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "spread_2up": null,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            244,
+            242,
+            236
+          ],
+          "texture": 2
+        },
+        {
+          "op": "perspective",
+          "margin": 0.03,
+          "bg": [
+            120,
+            110,
+            100
+          ],
+          "jitter": 0.008
+        },
+        {
+          "op": "gradient",
+          "strength": 0.12,
+          "angle": 200
+        },
+        {
+          "op": "blur",
+          "sigma": 0.5
+        },
+        {
+          "op": "noise",
+          "sigma": 2.5
+        }
+      ],
+      "summary": "careful phone photo: slight perspective, mild gradient",
+      "pdf_pages": 1,
+      "events": [
+        {
+          "pages": [
+            0
+          ],
+          "size_px": [
+            2629,
+            3656
+          ],
+          "events": []
+        }
+      ]
+    },
+    "scan-severe.pdf": {
+      "seed": 7203,
+      "render_dpi": 150,
+      "output_dpi": 150,
+      "mode": "rgb",
+      "format": "jpeg",
+      "jpeg_quality": 18,
+      "jpeg_passes": 1,
+      "binarize": null,
+      "spread_2up": null,
+      "ops": [
+        {
+          "op": "paper",
+          "rgb": [
+            232,
+            226,
+            210
+          ],
+          "texture": 6
+        },
+        {
+          "op": "curl",
+          "side": "right",
+          "amp_mm": 10,
+          "width": 0.3,
+          "fill": [
+            40,
+            36,
+            32
+          ],
+          "shade": 0.45
+        },
+        {
+          "op": "perspective",
+          "margin": 0.07,
+          "bg": [
+            50,
+            44,
+            40
+          ],
+          "keystone": 0.09,
+          "jitter": 0.03,
+          "shadow": 0.4
+        },
+        {
+          "op": "vignette",
+          "strength": 0.55
+        },
+        {
+          "op": "blotch",
+          "strength": 0.2
+        },
+        {
+          "op": "motion_blur",
+          "len_mm": 0.9,
+          "deg": -15
+        },
+        {
+          "op": "blur",
+          "sigma": 1.2
+        },
+        {
+          "op": "noise",
+          "sigma": 11,
+          "chroma": 5
+        }
+      ],
+      "summary": "low-light phone photo: strong keystone, deep curl, dark vignette, motion + focus blur, heavy noise, JPEG q18",
+      "pdf_pages": 1,
+      "events": [
+        {
+          "pages": [
+            0
+          ],
+          "size_px": [
+            1413,
+            1926
+          ],
+          "events": []
+        }
+      ]
+    }
+  },
+  "dpi": 200,
+  "dpi_note": "output resolution of scan.pdf (render_dpi / output_dpi per file under degradations)",
+  "license": "Text public domain (Martin Rinkart, 1636); music and engraving CC0-1.0",
+  "source": "self-authored (challenge corpus); text: Martin Rinkart, \"Nun danket alle Gott\" (1636), stanza 1, lines 1-4",
+  "files": {
+    "truth": "truth.musicxml",
+    "engraving": "engraving.ly",
+    "clean": "clean.pdf",
+    "scans": [
+      "scan-mild.pdf",
+      "scan-severe.pdf",
+      "scan.pdf"
+    ]
+  },
+  "pages_engraved": 1,
+  "measures": 12,
+  "parts_truth": [
+    {
+      "id": "S",
+      "name": "Sopran",
+      "voices": 1,
+      "staves": 1
+    },
+    {
+      "id": "A",
+      "name": "Alt",
+      "voices": 1,
+      "staves": 1
+    },
+    {
+      "id": "T",
+      "name": "Tenor",
+      "voices": 1,
+      "staves": 1
+    },
+    {
+      "id": "B",
+      "name": "Bass",
+      "voices": 1,
+      "staves": 1
+    }
+  ],
+  "lyric_lines_printed": [
+    {
+      "kind": "timed",
+      "sources": [
+        [
+          "S",
+          "1"
+        ],
+        [
+          "A",
+          "1"
+        ]
+      ],
+      "verse": 1,
+      "syllables": 39
+    },
+    {
+      "kind": "timed",
+      "sources": [
+        [
+          "B",
+          "1"
+        ],
+        [
+          "T",
+          "1"
+        ]
+      ],
+      "verse": 1,
+      "syllables": 39
+    }
+  ],
+  "validation": {
+    "xsd": "/Users/d.sloane/music/corpus/challenge/voices/_work/satb-closed-lyrics-both-staves-de/truth.musicxml validates",
+    "truth_reparsed_music21_matches_model": true,
+    "midi_per_voice_matches_printed_truth": true,
+    "midi_lyrics_match_truth": true,
+    "attacks_truth": 142,
+    "attacks_hidden_in_engraving_carried_by_other_voice": 0,
+    "lyric_text_found_in_vector_pdf": 1.0,
+    "lilypond_warnings": [],
+    "scan_files_image_only": {
+      "scan": true,
+      "scan-mild": true,
+      "scan-severe": true
+    }
+  },
+  "truth_limitations": [
+    "The lyric lines are printed as single rows that change voice; truth attributes each syllable to the voice whose note head it is aligned with (verse number 1 for all)."
+  ]
+}

@@ -1,0 +1,364 @@
+{
+ "id": "andantino-piano-crop",
+ "category": "degradation",
+ "piece": "andantino-piano",
+ "variant": "crop",
+ "title": "Andantino (piano, grand staff) - crop",
+ "edge_cases": [
+  "piano",
+  "grand_staff",
+  "must_not_split",
+  "grand_staff_multi_voice",
+  "chords",
+  "dynamics",
+  "slurs",
+  "staccato",
+  "fermata",
+  "key_signature",
+  "cropped_edges",
+  "cropped_staff_ends",
+  "no_margins",
+  "missing_system_barlines",
+  "cropped_header"
+ ],
+ "expected": {
+  "parts": [
+   "Piano"
+  ],
+  "must_not_split": true,
+  "shared_staves": [],
+  "notes": "Piano solo on ONE grand staff (brace). A correct conversion yields exactly ONE part \"Piano\" with 2 staves; it must NOT be split into right/left hand parts, and the second right-hand voice in bars 13-16 must stay inside the piano part (voice 2), not become a new part. DAMAGE (crop): Image edges cut through the staves. Mild: tight crop 0.4 mm outside the staff ends (braces/brackets cut off), header kept. Scan: header (title/credits) cropped away, -1.06 mm cut into the staff starts and 3.0 mm off the staff ends (end barlines gone). Severe: cut -0.96 mm into the staff starts (up to just before the first clef / part name / lyric) and 6.32 mm off the ends (to just after the right-most notehead/stem/lyric). Cut amounts are computed per page from the clean raster so that no clef, key/time signature, notehead, stem, accidental, lyric or part name is removed - only staff-line ends, brackets/braces, barlines and the header. TRUTH LIMITATIONS: Barlines at system starts/ends (incl. the final barline) are partly or completely cut off - they are still present in the truth. scan/severe: title/composer/poet header text is not visible; ignore work-title/creators when scoring."
+ },
+ "truth_limitations": "Barlines at system starts/ends (incl. the final barline) are partly or completely cut off - they are still present in the truth. scan/severe: title/composer/poet header text is not visible; ignore work-title/creators when scoring.",
+ "truth_scope": "truth.musicxml (MusicXML 4.0 partwise, XSD-valid) encodes parts/part-list (+ part-group bracket for the choir), staves, voices, pitches, durations, rests, ties, slurs, lyrics (verse number, syllabic, extend), dynamics, fermatas, staccatos, stems, clefs, key/time signatures and barline styles. It does NOT encode beams (LilyPond auto-beams), system/page breaks, bar-number display, header layout or any handwritten/damage marks. The same truth file is shared by every damaged variant of a piece.",
+ "degradations": {
+  "scan.pdf": {
+   "seed": 1004576237,
+   "dpi": 300,
+   "pages": 1,
+   "image_px": [
+    [
+     2222,
+     2388
+    ]
+   ],
+   "image_mode": [
+    "L"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 300,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": 246,
+      "texture": 2
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": 22,
+     "stage": "content"
+    },
+    {
+     "op": "crop",
+     "params": {
+      "left_mm": 8.85,
+      "right_mm": 196.98,
+      "top_mm": 39.62,
+      "bottom_mm": 241.79
+     },
+     "stage": "content"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 2
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       236,
+       236,
+       234
+      ],
+      "noise": 2,
+      "edge_shadow": 0.35
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "jpeg",
+      "quality": 78
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": [
+    [
+     {
+      "type": "crop",
+      "box_mm": [
+       8.85,
+       39.62,
+       196.98,
+       241.79
+      ]
+     }
+    ]
+   ]
+  },
+  "scan-mild.pdf": {
+   "seed": 1004576238,
+   "dpi": 300,
+   "pages": 1,
+   "image_px": [
+    [
+     2264,
+     2657
+    ]
+   ],
+   "image_mode": [
+    "L"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 300,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": 246,
+      "texture": 2
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": 22,
+     "stage": "content"
+    },
+    {
+     "op": "crop",
+     "params": {
+      "left_mm": 8.75,
+      "right_mm": 200.38,
+      "top_mm": 17.9,
+      "bottom_mm": 242.79
+     },
+     "stage": "content"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 2
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       236,
+       236,
+       234
+      ],
+      "noise": 2,
+      "edge_shadow": 0.35
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "jpeg",
+      "quality": 80
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": [
+    [
+     {
+      "type": "crop",
+      "box_mm": [
+       8.75,
+       17.9,
+       200.38,
+       242.79
+      ]
+     }
+    ]
+   ]
+  },
+  "scan-severe.pdf": {
+   "seed": 1004576239,
+   "dpi": 300,
+   "pages": 1,
+   "image_px": [
+    [
+     2181,
+     2382
+    ]
+   ],
+   "image_mode": [
+    "L"
+   ],
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 300,
+     "tool": "pdftoppm -gray -aa yes -aaVector yes (LilyPond PDF)"
+    },
+    {
+     "op": "paper",
+     "params": {
+      "color": 246,
+      "texture": 2
+     },
+     "stage": "content"
+    },
+    {
+     "op": "ink_color",
+     "params": 22,
+     "stage": "content"
+    },
+    {
+     "op": "crop",
+     "params": {
+      "left_mm": 8.95,
+      "right_mm": 193.66,
+      "top_mm": 39.62,
+      "bottom_mm": 241.29
+     },
+     "stage": "content"
+    },
+    {
+     "op": "noise",
+     "params": {
+      "sigma": 3
+     },
+     "stage": "global"
+    },
+    {
+     "op": "background",
+     "params": {
+      "color": [
+       236,
+       236,
+       234
+      ],
+      "noise": 2,
+      "edge_shadow": 0.35
+     },
+     "stage": "composite"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "jpeg",
+      "quality": 70
+     },
+     "stage": "encode"
+    }
+   ],
+   "annotations": [
+    [
+     {
+      "type": "crop",
+      "box_mm": [
+       8.95,
+       39.62,
+       193.66,
+       241.29
+      ]
+     }
+    ]
+   ]
+  },
+  "clean.pdf": {
+   "seed": null,
+   "dpi": 300,
+   "steps": [
+    {
+     "op": "rasterise",
+     "dpi": 300,
+     "tool": "pdftoppm -gray (LilyPond PDF)"
+    },
+    {
+     "op": "output",
+     "params": {
+      "mode": "L",
+      "format": "png"
+     }
+    }
+   ]
+  }
+ },
+ "dpi": 300,
+ "license": "Original composition and engraving, CC0-1.0",
+ "files": {
+  "scan": "andantino-piano-crop/scan.pdf",
+  "scan_mild": "andantino-piano-crop/scan-mild.pdf",
+  "scan_severe": "andantino-piano-crop/scan-severe.pdf",
+  "clean": "andantino-piano-crop/clean.pdf",
+  "truth": "andantino-piano-crop/truth.musicxml",
+  "engraving": "andantino-piano-crop/engraving.ly"
+ },
+ "measures": 16,
+ "vector_pages": 1,
+ "lyrics": [],
+ "shares_truth_with": [
+  "andantino-piano-clean",
+  "andantino-piano-skew",
+  "andantino-piano-rot90",
+  "andantino-piano-rot180",
+  "andantino-piano-phone",
+  "andantino-piano-book",
+  "andantino-piano-yellowed",
+  "andantino-piano-bleed",
+  "andantino-piano-stain-pencil",
+  "andantino-piano-holes-staple",
+  "andantino-piano-halftone",
+  "andantino-piano-jpeg",
+  "andantino-piano-photocopy-thin",
+  "andantino-piano-photocopy-thick",
+  "andantino-piano-lowdpi",
+  "andantino-piano-highdpi",
+  "andantino-piano-blur",
+  "andantino-piano-noise",
+  "andantino-piano-spread",
+  "andantino-piano-combo"
+ ],
+ "validation": {
+  "truth_xsd_valid": true,
+  "midi_attacks_match_truth": true,
+  "attacks": 136,
+  "midi_lyric_events_match_truth": true,
+  "lyric_syllables": 0,
+  "lyric_text_found_in_engraving_pdf": null,
+  "lilypond_warnings": [],
+  "scan_files_image_only": {
+   "scan.pdf": true,
+   "scan-mild.pdf": true,
+   "scan-severe.pdf": true,
+   "clean.pdf": true
+  }
+ },
+ "origin": "synthetic-scan (challenge: degradation extremes)",
+ "seed": 1004576237
+}
