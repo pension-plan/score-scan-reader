@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 02:34 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 02:44 AEDT.
 
 ## Events
 
@@ -147,6 +147,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 02:28 | perf 34dad95: load-time work (phone first render 48.9 to 15.8 s, result 54.5 to 48.8 s, desktop 4.13 to 3.99 s; output unchanged). push.sh lock b40e518 (L33). uiux a942ffe stanza toggle live (sets 0 stanzas on the examples; voices fixing). perf next: progressive first result (L34). |
 | 02:33 | Grace drop accepted: the 7 lost benchmark graces were sharps misread as small heads (truth has none); real graces restored by 84d0451 (severe coverage 95 to 116 of 252). Held release merged (accidentals, D.S., trio labels, worn meters by bar contents, load time, stanza option, dist untracked, push lock). cautionary=yes to structure. |
 | 02:34 | Release 0.30.0 merged. Isolated gate of main vs 0.29.0: challenge 0.838 to 0.839 (no item down), benchmark+OCR 0.951 to 0.955; only flag is the accepted benchmark grace 36 to 29 (false graces). |
+| 02:44 | structure round 3 (c03021c, b51ba25): worn meters by bar contents, bar drift causes fixed (perf-pages-10 205 to 199 bars, truth 196), anthem-satb-4-pages severe +0.38; challenge 0.8391 to 0.8407. Next: cautionary accidentals, perf-pages-10 page-1 clef pitch errors, scan drift, rh03 final C. |
 
 ## Accuracy by round
 

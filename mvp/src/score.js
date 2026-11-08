@@ -2223,7 +2223,17 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, unitTime, unitBar
             // (overlay only: the value written for this head, first part that writes it)
             h.shown ||= { q: e.q, type: tt ? tt.type : null, dots: tt ? tt.dots : 0, tuplet: tmod ? tu.actual : 0 };
             if (!noted.has(h)) { noted.add(h); noteAt.push([h, L.length]); }
-            const acc = h.acc && !e.tieStop ? `<accidental>${h.acc}</accidental>` : '';
+            // a courtesy (cautionary) accidental: it does not change the pitch the key and the bar so
+            // far already give (the same staff's earlier accidentals, any voice)
+            let caut = '';
+            if (h.acc && !e.tieStop) {
+              let prior = null;
+              for (const a of line) { if (a.t > t0 - 1e-6) break; if (a.k === kk) prior = a.a; }
+              const own = { sharp: 1, flat: -1, natural: 0, 'double-sharp': 2, 'flat-flat': -2 }[h.acc];
+              const implied = prior != null ? prior : (hAlt[pk.step] || 0);
+              if (own != null && own === implied) caut = ' cautionary="yes"';
+            }
+            const acc = h.acc && !e.tieStop ? `<accidental${caut}${h.accParen ? ' parentheses="yes"' : ''}>${h.acc}</accidental>` : '';
             // ties: a note cut at a barline (e.tieStart / e.tieStop) or a tie read on the page (h.tieOn / h.tieOff);
             // slurs read on the page (h.slurOn / h.slurOff)
             const tStop = e.tieStop || h.tieOff, tStart = e.tieStart || h.tieOn;
