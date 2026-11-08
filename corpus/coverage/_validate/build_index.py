@@ -408,11 +408,54 @@ def write_readme(man, entries, fam_rows, tag_items, tag_occ, xtags, lay_items, l
         t = covj.get('totals', {})
         w(f'### Baseline ({covj.get("generated", "")[:10]}, source hash `{covj.get("inputs", {}).get("src_hash")}`)')
         w('')
-        w(f'{t.get("items")} items / {t.get("variants")} PDFs: **{t.get("tags_supported")} tags supported, '
-          f'{t.get("tags_partial")} partial, {t.get("tags_unsupported")} unsupported**, {t.get("tags_not_measured")} '
-          f'not measurable from MusicXML, {t.get("tags_without_items")} without items. Full matrix: '
-          '[docs/COVERAGE.md](../../docs/COVERAGE.md).')
+        src = covj.get('inputs', {}).get('eval', '')
+        w(f'Symbol and layout matrix from `{src}`: {t.get("items")} items / {t.get("variants")} PDFs'
+          + (' (every family except `perf`, whose 21 items repeat one hymn page, one piano page and one piano book at '
+             'different resolutions and lengths and would count the same notes up to 8 times; the unfiltered matrix '
+             'is in `mvp/work/COVERAGE-all-items.md`)' if 'noperf' in src else '')
+          + f': **{t.get("tags_supported")} taxonomy and x- tags supported, {t.get("tags_partial")} partial, '
+          f'{t.get("tags_unsupported")} unsupported**, {t.get("tags_not_measured")} not measurable from MusicXML. '
+          'Full matrix: [docs/COVERAGE.md](../../docs/COVERAGE.md).')
         w('')
+        tx = [x for x in covj.get('tags', {}).values() if x.get('tag') in TAGS]
+        stc = Counter(x.get('status') for x in tx)
+        w(f'Taxonomy tags only ({len(tx)}): ' + ', '.join(f'{k} {v}' for k, v in sorted(stc.items(), key=lambda kv: -kv[1])) + '.')
+        w('')
+        lays = covj.get('layouts', {})
+        if lays:
+            w('| layout | items | status | aggregate clean / scan / severe | part structure (scan) |')
+            w('|---|---:|---|---|---:|')
+            for l in LAYOUTS:
+                v = lays.get(l)
+                if not v:
+                    continue
+                bv = v.get('by_variant', {})
+                ag = ' / '.join(f'{(bv.get(k) or {}).get("aggregate", 0):.2f}' for k in ('clean', 'scan', 'scan-severe'))
+                w(f'| `{l}` | {len(v.get("items") or [])} | {v.get("status")} | {ag} | '
+                  f'{(bv.get("scan") or {}).get("layout_score", 0):.2f} |')
+            w('')
+        pf = covj.get('perf') or {}
+        if pf.get('by_pages'):
+            w(f'Speed and memory (`{pf.get("source")}`, {pf.get("scope")}, raster {pf.get("config", {}).get("dpi")} dpi, '
+              f'OCR {"on" if pf.get("config", {}).get("ocr") else "off"}, {pf.get("config", {}).get("jobs")} jobs, load '
+              f'average {(pf.get("config", {}).get("loadavg") or ["?"])[0]} on {pf.get("config", {}).get("cpus")} CPUs, so '
+              'timings are noisy):')
+            w('')
+            w('| scan dpi | MP/page | ms/page (median) | peak MB (median / max) |')
+            w('|---|---:|---:|---:|')
+            for r in pf.get('by_src_dpi', []):
+                w(f'| {r["src_dpi"]} | {r["mp_per_page"]} | {r["ms_per_page_median"]} | {r["peak_rss_mb_median"]} / {r["peak_rss_mb_max"]} |')
+            w('')
+            w('| pages (1 = every single-page perf PDF, all dpi and sizes; 5-40 = the A4 300 dpi books) | ms/page (median) | peak MB (median / max) |')
+            w('|---|---:|---:|')
+            for r in pf.get('by_pages', []):
+                w(f'| {r["pages"]} | {r["ms_per_page_median"]} | {r["peak_rss_mb_median"]} / {r["peak_rss_mb_max"]} |')
+            w('')
+            f1, f2 = pf.get('fit_ms_per_page_vs_mp') or {}, pf.get('fit_peak_mb_vs_total_mp') or {}
+            if f1 and f2:
+                w(f'Fits: ms/page = {f1["intercept"]} + {f1["slope"]} x MP/page (R² {f1["r2"]}); peak MB = '
+                  f'{f2["intercept"]} + {f2["slope"]} x total MP of the document (R² {f2["r2"]}).')
+                w('')
     (COV / 'README.md').write_text('\n'.join(L) + '\n')
 
 

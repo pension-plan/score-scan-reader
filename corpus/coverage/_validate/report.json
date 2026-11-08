@@ -601,7 +601,7 @@
     "system-break": 1
    },
    "render": {
-    "lilypond_s": 1.9,
+    "lilypond_s": 2.0,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -850,7 +850,7 @@
     "system-break": 1
    },
    "render": {
-    "lilypond_s": 2.3,
+    "lilypond_s": 2.1,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -1313,7 +1313,7 @@
     "system-break": 1
    },
    "render": {
-    "lilypond_s": 2.1,
+    "lilypond_s": 2.0,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -1536,7 +1536,7 @@
     "system-break": 1
    },
    "render": {
-    "lilypond_s": 2.0,
+    "lilypond_s": 1.9,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -1770,7 +1770,7 @@
     "system-break": 1
    },
    "render": {
-    "lilypond_s": 2.0,
+    "lilypond_s": 2.2,
     "lilypond_exit": 0,
     "lilypond_warnings": [
      "engraving.ly:40:39: warning: no viable initial configuration found: may not find good beam slope",
@@ -2018,7 +2018,7 @@
     "system-break": 1
    },
    "render": {
-    "lilypond_s": 2.1,
+    "lilypond_s": 2.0,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -2507,7 +2507,7 @@
     "system-break": 2
    },
    "render": {
-    "lilypond_s": 2.3,
+    "lilypond_s": 2.4,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -2992,7 +2992,7 @@
     "multi-page": 1
    },
    "render": {
-    "lilypond_s": 2.1,
+    "lilypond_s": 1.9,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -3257,7 +3257,7 @@
     "system-break": 3
    },
    "render": {
-    "lilypond_s": 1.8,
+    "lilypond_s": 1.9,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -3494,7 +3494,7 @@
     "system-break": 3
    },
    "render": {
-    "lilypond_s": 2.2,
+    "lilypond_s": 2.1,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -3777,7 +3777,7 @@
     "multi-page": 1
    },
    "render": {
-    "lilypond_s": 2.2,
+    "lilypond_s": 2.3,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -4006,7 +4006,7 @@
     "system-break": 1
    },
    "render": {
-    "lilypond_s": 2.1,
+    "lilypond_s": 2.0,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -4272,7 +4272,7 @@
     "system-break": 2
    },
    "render": {
-    "lilypond_s": 1.9,
+    "lilypond_s": 2.2,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -4543,7 +4543,7 @@
     "system-break": 2
    },
    "render": {
-    "lilypond_s": 1.8,
+    "lilypond_s": 2.2,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -4772,7 +4772,7 @@
     "system-break": 1
    },
    "render": {
-    "lilypond_s": 2.2,
+    "lilypond_s": 2.0,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -5293,7 +5293,7 @@
     "system-break": 1
    },
    "render": {
-    "lilypond_s": 2.3,
+    "lilypond_s": 2.0,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -5541,7 +5541,7 @@
     "system-break": 1
    },
    "render": {
-    "lilypond_s": 2.1,
+    "lilypond_s": 2.0,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -5758,7 +5758,7 @@
     "system-break": 2
    },
    "render": {
-    "lilypond_s": 2.0,
+    "lilypond_s": 1.9,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -5977,7 +5977,7 @@
     "system-break": 2
    },
    "render": {
-    "lilypond_s": 1.8,
+    "lilypond_s": 1.9,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -6195,7 +6195,7 @@
     "system-break": 3
    },
    "render": {
-    "lilypond_s": 1.9,
+    "lilypond_s": 2.1,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -6421,7 +6421,7 @@
     "system-break": 2
    },
    "render": {
-    "lilypond_s": 1.9,
+    "lilypond_s": 2.2,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -6640,7 +6640,7 @@
     "system-break": 3
    },
    "render": {
-    "lilypond_s": 2.0,
+    "lilypond_s": 2.1,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -7084,7 +7084,7 @@
     "system-break": 2
    },
    "render": {
-    "lilypond_s": 2.4,
+    "lilypond_s": 2.0,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -7572,7 +7572,7 @@
     "system-break": 1
    },
    "render": {
-    "lilypond_s": 1.9,
+    "lilypond_s": 2.2,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -7782,7 +7782,7 @@
     "system-break": 5
    },
    "render": {
-    "lilypond_s": 1.8,
+    "lilypond_s": 2.0,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -8001,7 +8001,7 @@
     "system-break": 5
    },
    "render": {
-    "lilypond_s": 1.8,
+    "lilypond_s": 2.1,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -8216,7 +8216,7 @@
     "system-break": 3
    },
    "render": {
-    "lilypond_s": 1.9,
+    "lilypond_s": 1.8,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -8435,7 +8435,7 @@
     "system-break": 5
    },
    "render": {
-    "lilypond_s": 1.8,
+    "lilypond_s": 1.9,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -8633,7 +8633,7 @@
     "system-break": 3
    },
    "render": {
-    "lilypond_s": 2.3,
+    "lilypond_s": 1.8,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -8840,7 +8840,7 @@
     "system-break": 3
    },
    "render": {
-    "lilypond_s": 1.8,
+    "lilypond_s": 2.1,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -9252,7 +9252,7 @@
     "system-break": 2
    },
    "render": {
-    "lilypond_s": 1.8,
+    "lilypond_s": 2.2,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -9468,7 +9468,7 @@
     "system-break": 2
    },
    "render": {
-    "lilypond_s": 1.8,
+    "lilypond_s": 2.1,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -9693,7 +9693,7 @@
     "system-break": 2
    },
    "render": {
-    "lilypond_s": 1.9,
+    "lilypond_s": 2.0,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -9902,11 +9902,14 @@
     "system-break",
     "tempo-mark",
     "time-4-4",
-    "x-clef-percussion0+0",
+    "x-clef-percussion",
     "x-measures",
+    "x-notehead-x",
     "x-noteheads",
     "x-parts",
-    "x-staves"
+    "x-staff-1-line",
+    "x-staves",
+    "x-unpitched"
    ],
    "hash": {
     "engraving": "d5153341b959af24",
@@ -9940,7 +9943,7 @@
     "system-break": 1
    },
    "render": {
-    "lilypond_s": 2.0,
+    "lilypond_s": 2.1,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -10207,7 +10210,7 @@
     "system-break": 3
    },
    "render": {
-    "lilypond_s": 2.1,
+    "lilypond_s": 2.0,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -10474,7 +10477,7 @@
     "system-break": 3
    },
    "render": {
-    "lilypond_s": 1.9,
+    "lilypond_s": 2.0,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -10741,7 +10744,7 @@
     "system-break": 3
    },
    "render": {
-    "lilypond_s": 2.0,
+    "lilypond_s": 2.1,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -11008,7 +11011,7 @@
     "system-break": 3
    },
    "render": {
-    "lilypond_s": 2.0,
+    "lilypond_s": 1.9,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -11275,7 +11278,7 @@
     "system-break": 3
    },
    "render": {
-    "lilypond_s": 2.0,
+    "lilypond_s": 1.9,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -11809,7 +11812,7 @@
     "system-break": 3
    },
    "render": {
-    "lilypond_s": 2.1,
+    "lilypond_s": 2.2,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -12076,7 +12079,7 @@
     "system-break": 3
    },
    "render": {
-    "lilypond_s": 1.9,
+    "lilypond_s": 2.1,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -12287,7 +12290,7 @@
     "system-break": 3
    },
    "render": {
-    "lilypond_s": 2.0,
+    "lilypond_s": 1.9,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -12655,7 +12658,7 @@
     "multi-page": 1
    },
    "render": {
-    "lilypond_s": 3.9,
+    "lilypond_s": 3.7,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -13173,7 +13176,7 @@
     "multi-page": 1
    },
    "render": {
-    "lilypond_s": 4.6,
+    "lilypond_s": 5.4,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -14679,7 +14682,7 @@
     "multi-page": 1
    },
    "render": {
-    "lilypond_s": 13.3,
+    "lilypond_s": 13.7,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -15843,7 +15846,7 @@
     "system-break": 4
    },
    "render": {
-    "lilypond_s": 2.0,
+    "lilypond_s": 2.5,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -16230,7 +16233,7 @@
     "system-break": 4
    },
    "render": {
-    "lilypond_s": 2.3,
+    "lilypond_s": 2.1,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -16617,7 +16620,7 @@
     "system-break": 4
    },
    "render": {
-    "lilypond_s": 2.0,
+    "lilypond_s": 2.4,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -17004,7 +17007,7 @@
     "system-break": 4
    },
    "render": {
-    "lilypond_s": 2.1,
+    "lilypond_s": 2.3,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -17391,7 +17394,7 @@
     "system-break": 4
    },
    "render": {
-    "lilypond_s": 2.0,
+    "lilypond_s": 2.3,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -17778,7 +17781,7 @@
     "system-break": 4
    },
    "render": {
-    "lilypond_s": 2.2,
+    "lilypond_s": 2.3,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -18165,7 +18168,7 @@
     "system-break": 4
    },
    "render": {
-    "lilypond_s": 2.2,
+    "lilypond_s": 2.1,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -18377,7 +18380,7 @@
     "system-break": 1
    },
    "render": {
-    "lilypond_s": 2.0,
+    "lilypond_s": 1.9,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -18587,7 +18590,7 @@
     "system-break": 2
    },
    "render": {
-    "lilypond_s": 1.9,
+    "lilypond_s": 2.1,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -18788,7 +18791,7 @@
     "system-break": 3
    },
    "render": {
-    "lilypond_s": 2.1,
+    "lilypond_s": 2.0,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -18997,7 +19000,7 @@
     "system-break": 3
    },
    "render": {
-    "lilypond_s": 2.0,
+    "lilypond_s": 1.9,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -19203,7 +19206,7 @@
     "system-break": 1
    },
    "render": {
-    "lilypond_s": 2.0,
+    "lilypond_s": 1.8,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -19416,7 +19419,7 @@
     "system-break": 3
    },
    "render": {
-    "lilypond_s": 1.8,
+    "lilypond_s": 2.1,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -19627,7 +19630,7 @@
     "system-break": 3
    },
    "render": {
-    "lilypond_s": 2.1,
+    "lilypond_s": 1.9,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -20265,7 +20268,7 @@
     "system-break": 3
    },
    "render": {
-    "lilypond_s": 1.9,
+    "lilypond_s": 2.0,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -20687,7 +20690,7 @@
     "system-break": 2
    },
    "render": {
-    "lilypond_s": 2.0,
+    "lilypond_s": 1.9,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -21349,7 +21352,7 @@
     "system-break": 3
    },
    "render": {
-    "lilypond_s": 1.8,
+    "lilypond_s": 1.9,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -21565,7 +21568,7 @@
     "system-break": 3
    },
    "render": {
-    "lilypond_s": 2.0,
+    "lilypond_s": 2.1,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -21992,7 +21995,7 @@
     "system-break": 3
    },
    "render": {
-    "lilypond_s": 1.9,
+    "lilypond_s": 1.8,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -22484,7 +22487,7 @@
     "system-break": 5
    },
    "render": {
-    "lilypond_s": 1.9,
+    "lilypond_s": 2.1,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -22707,7 +22710,7 @@
     "system-break": 2
    },
    "render": {
-    "lilypond_s": 2.2,
+    "lilypond_s": 2.1,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -22910,7 +22913,7 @@
     "system-break": 3
    },
    "render": {
-    "lilypond_s": 1.9,
+    "lilypond_s": 2.0,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -23123,7 +23126,7 @@
     "system-break": 3
    },
    "render": {
-    "lilypond_s": 1.9,
+    "lilypond_s": 2.5,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -23805,7 +23808,7 @@
     "system-break": 3
    },
    "render": {
-    "lilypond_s": 1.9,
+    "lilypond_s": 2.3,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -24119,7 +24122,7 @@
     "multi-page": 1
    },
    "render": {
-    "lilypond_s": 2.2,
+    "lilypond_s": 2.1,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -24462,7 +24465,7 @@
     "multi-page": 1
    },
    "render": {
-    "lilypond_s": 3.1,
+    "lilypond_s": 3.0,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -24921,7 +24924,7 @@
     "multi-page": 1
    },
    "render": {
-    "lilypond_s": 3.6,
+    "lilypond_s": 3.4,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -25463,7 +25466,7 @@
     "system-break": 4
    },
    "render": {
-    "lilypond_s": 2.0,
+    "lilypond_s": 1.9,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -25911,7 +25914,7 @@
     "system-break": 3
    },
    "render": {
-    "lilypond_s": 1.9,
+    "lilypond_s": 2.3,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -26139,7 +26142,7 @@
     "system-break": 3
    },
    "render": {
-    "lilypond_s": 2.0,
+    "lilypond_s": 2.1,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -26364,7 +26367,7 @@
     "system-break": 2
    },
    "render": {
-    "lilypond_s": 1.9,
+    "lilypond_s": 2.6,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -26588,7 +26591,7 @@
     "system-break": 3
    },
    "render": {
-    "lilypond_s": 2.1,
+    "lilypond_s": 2.0,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [
@@ -27305,7 +27308,7 @@
     "system-break": 2
    },
    "render": {
-    "lilypond_s": 1.9,
+    "lilypond_s": 2.0,
     "lilypond_exit": 0,
     "lilypond_warnings": [],
     "midi_files": [

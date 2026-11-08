@@ -1,0 +1,9 @@
+{
+  "name": "spike-opencv",
+  "private": true,
+  "description": "OpenCV.js fallback symbol-identifier spike (experiment code; not shipped)",
+  "license": "MIT",
+  "dependencies": {
+    "@techstark/opencv-js": "4.10.0-release.1"
+  }
+}

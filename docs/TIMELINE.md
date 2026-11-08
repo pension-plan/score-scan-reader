@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 18:20 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 18:24 AEDT.
 
 ## Events
 
@@ -78,6 +78,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 18:16 | Round 3 ML owner finished: copista-2m integrated as a correction pass over the app’s own reading; benchmark 0.942 → 0.957, real scans 0.922 → 0.943, challenge 0.802 → 0.814, Maple Leaf Rag 0.907 → 0.928. Shipped as an option; turning it on by default needs a small UI change, left to the round 3 integrator. |
 | 18:16 | An extra noteheads candidate (snap3) measured: challenge 0.892 → 0.903, fixes several severe yellowed and photocopy scans but regresses a phone-photographed piano scan by 0.26. Not shipped; handed to the round integrator / round 4 (scratchpad/round4-notes.md). |
 | 18:20 | User asked to investigate OpenCV as a fallback for identifying symbols: OpenCV.js trial started (template matching, contour features + kNN/SVM, HOG + SVM), as a fallback only, measured on and off, prototype behind an option if it wins. |
+| 18:24 | Coverage suite complete (18:22 AEDT): 102 items validated, all 139 symbol tags and 19 layouts covered. App baseline: 22 tags supported, 38 partial, 79 unsupported; 18 of 19 layouts supported. Speed ~2.3–3.7 s per page, flat with page count; memory grows ~46 MB per page. Seven new limits (L20–L26) queued for round 4. Report: docs/COVERAGE.md (also on Pages). |
 
 ## Accuracy by round
 
@@ -123,6 +124,13 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | L17 | Two voices inside one part (piano right hand, divisi) merged into chords | Voices + MusicXML | Resolved (round 3) | Piano staves with two rhythms are written as voices 1/2 (5/6 lower) inside one part. Beach piano 0.881 → 0.955; benchmark +0.004. |
 | L18 | A bracketed instrument pair (violin + cello) read as a piano grand staff; organ pedal staff becomes a separate part | Voices (layout) | Partial (round 3) | A staff printed at ≤85% of the system’s largest staff size is its own instrument part. Trio-minuet 0.48 → 0.81 (3 parts, pitch 0.24 → 0.73). Names are still generic (Instrument 1/2). |
 | L19 | Regressions found after shipping: after 0.3.0, 4 challenge items (wind-melody thick photocopy severe, German SATB severe, lyr08 Scandinavian, hymn-descant mild); after 0.7.0, 3 severe challenge scans (German SATB −0.119, andantino phone −0.072, andantino skew −0.060) | Round 3 owners (heads, lyrics, score) | Queued for round 3 | docs/regressions/v0.3.0-vs-v0.2.0.md, docs/regressions/v0.7.0-vs-v0.5.0.md |
+| L20 | Ties never written (only 5 of 79), including ties across systems | Symbols + voices | Queued for round 4 | Coverage: tie 0%; tied pitches themselves read 95%. |
+| L21 | Only 2/4, 3/4 and 4/4 written: C, cut time, 2/2, 3/2, 6/8, 9/8, 12/8, 5/4, 5/8, 7/8 and time changes missing | Symbols + voices | Queued for round 4 | Coverage: 110 occurrences never written; time-3-4 55%, time-4-4 71%. |
+| L22 | Beams, slurs, fermatas, dynamics, hairpins, articulations, repeats and endings never written to MusicXML | Voices (MusicXML) + symbols | Queued for round 4 | Coverage: beam 703, slur 100, fermata 130 occurrences, all 0%. |
+| L23 | Half and whole notes, dots, 32nd/64th notes partial | Noteheads + symbols | Queued for round 4 | Coverage: note-half 76%, note-whole 46%, dot 69% (adds false notes), note-32nd 11%. |
+| L24 | Key signatures of 4+ sharps or flats and courtesy accidentals weak | Symbols | Queued for round 4 | Coverage: key-s4 25%, key-s6/s7 0%, acc-courtesy 22%. |
+| L25 | Lyrics: non-ASCII and elisions 0%, extenders 58%, multi-verse 73% | Lyrics | Queued for round 4 | Coverage: 4-language item lyrics 0.16. |
+| L26 | Memory grows about 46 MB per page (40-page book peaks at 2.2 GB) | UI + score | Queued for round 4 | Coverage perf: peak MB = 297 + 5.2 × total megapixels (R² 0.97); time per page flat at ~2.3–3 s. |
 
 ## Runs
 
@@ -134,8 +142,8 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | Run 5 | Challenge test set (edge cases + scan damage) | done | 7 of 7 |  |
 | Run 3 | Max-parallel main workflow (research) | stopped | 7 of 10 | Stopped at 16:30 AEDT once all 7 research items returned, as planned; its 3 design-proposal agents had just started and were stopped with it. The full rebuild was replaced by fix-forward rounds on v1. |
 | Run 6 | Fix-forward round 2 (shipped 0.925 as v0.5.0) | done | 6 of 6 |  |
-| Run 7 | Fix-forward round 3 (6 owners incl. ML) | running | 3 of 6 |  |
-| Run 8 | Coverage suite (every symbol and layout + speed) | running | 9 of 10 |  |
+| Run 7 | Fix-forward round 3 (6 owners incl. ML) | running | 5 of 6 |  |
+| Run 8 | Coverage suite (every symbol and layout + speed) | running | 10 of 10 |  |
 | Side | Agents launched directly from the session | running | 3 of 7 |  |
 
 ## Agents
@@ -183,9 +191,9 @@ Every agent started for this build, including stopped runs. Outcomes are on the 
 | Run 6 | Fix | fix:r2:ui | done | 16:21 | 16:45 | 24 | 87 |
 | Run 6 | Integrate | integrate:r2 | done | 17:12 | 17:34 | 22 | 93 |
 | Run 7 | Fix | fix:r3:heads | done | 17:36 | 18:15 | 39 | 187 |
-| Run 7 | Fix | fix:r3:symbols | run | 17:36 |  | 43 | 171 |
-| Run 7 | Fix | fix:r3:score | run | 17:36 |  | 31 | 134 |
-| Run 7 | Fix | fix:r3:lyrics | run | 17:36 |  | 44 | 151 |
+| Run 7 | Fix | fix:r3:symbols | run | 17:36 |  | 48 | 190 |
+| Run 7 | Fix | fix:r3:score | done | 17:36 | 18:07 | 31 | 134 |
+| Run 7 | Fix | fix:r3:lyrics | done | 17:36 | 18:22 | 46 | 156 |
 | Run 7 | Fix | fix:r3:ui | done | 17:36 | 17:59 | 23 | 91 |
 | Run 7 | Fix | fix:r3:ml | done | 17:36 | 18:08 | 32 | 192 |
 | Run 8 | Harness | harness:coverage | done | 17:34 | 17:50 | 16 | 98 |
@@ -197,11 +205,11 @@ Every agent started for this build, including stopped runs. Outcomes are on the 
 | Run 8 | Generate | gen:structure | done | 17:34 | 17:53 | 19 | 95 |
 | Run 8 | Generate | gen:layouts | done | 17:34 | 17:56 | 22 | 131 |
 | Run 8 | Generate | gen:perf | done | 17:34 | 18:05 | 31 | 92 |
-| Run 8 | Baseline | validate+baseline | run | 18:05 |  | 15 | 102 |
-| Side | Fast track | a5575cc38e20927a6 | run | 18:07 |  | 8 | 19 |
+| Run 8 | Baseline | validate+baseline | done | 18:05 | 18:24 | 19 | 113 |
+| Side | Fast track | a5575cc38e20927a6 | run | 18:07 |  | 14 | 27 |
 | Side | Fast track | ae52f1cf560b35868 | run | 18:15 |  | 4 | 29 |
 | Side | ML demo | copista-2m demo page for GitHub Pages | done | 16:38 | 16:41 | 3 | 21 |
 | Side | Fast track | First version build (mvp/) | done | 15:19 | 15:29 | 10 | 69 |
-| Side | Research | OpenCV.js symbol-fallback investigation | run | 18:20 |  | 0 | 1 |
+| Side | Research | OpenCV.js symbol-fallback investigation | run | 18:20 |  | 1 | 18 |
 | Side | Hotfix | Rests fix (L3a, user-reported) | run | 17:33 |  | 35 | 179 |
 | Side | Fast track | Software design document | done | 15:20 | 15:22 | 2 | 16 |

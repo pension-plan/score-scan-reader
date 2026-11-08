@@ -222,7 +222,7 @@ Tags with exactly one item (accuracy for them rests on one piece): `cue-note` (n
 
 Extra tags (`x-` prefix) used by the families for symbols outside the taxonomy:
 
-`x-acc-courtesy-paren` (2), `x-acc-natural-flat` (1), `x-acc-natural-sharp` (2), `x-clef-percussion0+0` (1), `x-cross-staff-note` (1), `x-dyn-fff` (1), `x-dyn-fp` (1), `x-dyn-fz` (1), `x-dyn-ppp` (1), `x-dyn-sf` (2), `x-dyn-sfp` (1), `x-group-bracket` (11), `x-group-square` (1), `x-inverted-mordent` (2), `x-inverted-turn` (1), `x-key-cancel` (1), `x-key-minor` (3), `x-multi-staff-part` (6), `x-pedal-release` (2), `x-portato` (1), `x-rest-fermata` (4), `x-rest-in-beam` (1), `x-rest-in-tuplet` (1), `x-rest-lowered` (2), `x-rest-multibar-hbar` (1), `x-rest-multibar-symbols` (1), `x-rest-raised` (3), `x-rest-whole-bar-shared-staff` (1), `x-tie-across-page` (1), `x-time-3-8` (1), `x-time-4-2` (3), `x-time-6-4` (1), `x-time-courtesy` (8), `x-to-coda` (2), `x-tuplet-4` (2), `x-two-voice-staff-measure` (5), `x-volta-3` (1).
+`x-acc-courtesy-paren` (2), `x-acc-natural-flat` (1), `x-acc-natural-sharp` (2), `x-clef-percussion` (1), `x-cross-staff-note` (1), `x-dyn-fff` (1), `x-dyn-fp` (1), `x-dyn-fz` (1), `x-dyn-ppp` (1), `x-dyn-sf` (2), `x-dyn-sfp` (1), `x-group-bracket` (11), `x-group-square` (1), `x-inverted-mordent` (2), `x-inverted-turn` (1), `x-key-cancel` (1), `x-key-minor` (3), `x-multi-staff-part` (6), `x-notehead-x` (1), `x-pedal-release` (2), `x-portato` (1), `x-rest-fermata` (4), `x-rest-in-beam` (1), `x-rest-in-tuplet` (1), `x-rest-lowered` (2), `x-rest-multibar-hbar` (1), `x-rest-multibar-symbols` (1), `x-rest-raised` (3), `x-rest-whole-bar-shared-staff` (1), `x-staff-1-line` (1), `x-tie-across-page` (1), `x-time-3-8` (1), `x-time-4-2` (3), `x-time-6-4` (1), `x-time-courtesy` (8), `x-to-coda` (2), `x-tuplet-4` (2), `x-two-voice-staff-measure` (5), `x-unpitched` (1), `x-volta-3` (1).
 
 ## Layout coverage
 
@@ -472,4 +472,53 @@ cd .. && node tools/coverage.mjs --eval mvp/work/eval-coverage-baseline.json --p
 ```
 
 `tools/coverage.mjs` writes `docs/COVERAGE.md` and `docs/coverage.json`: per tag occurrences, how often the app emits it, accuracy on clean/scan/scan-severe, status (supported >= 0.8, partial, unsupported < 0.2), confusion; per layout part structure scores; ms/page and peak memory by dpi, page size and page count.
+
+### Baseline (2026-11-08, source hash `97a35a4c7752`)
+
+Symbol and layout matrix from `mvp/work/eval-coverage-baseline-noperf.json`: 81 items / 243 PDFs (every family except `perf`, whose 21 items repeat one hymn page, one piano page and one piano book at different resolutions and lengths and would count the same notes up to 8 times; the unfiltered matrix is in `mvp/work/COVERAGE-all-items.md`): **22 taxonomy and x- tags supported, 40 partial, 92 unsupported**, 30 not measurable from MusicXML. Full matrix: [docs/COVERAGE.md](../../docs/COVERAGE.md).
+
+Taxonomy tags only (139): unsupported 79, partial 38, supported 22.
+
+| layout | items | status | aggregate clean / scan / severe | part structure (scan) |
+|---|---:|---|---|---:|
+| `melody` | 32 | supported | 0.86 / 0.85 / 0.79 | 0.96 |
+| `melody-lyrics` | 4 | supported | 0.91 / 0.93 / 0.89 | 1.00 |
+| `piano` | 16 | supported | 0.92 / 0.92 / 0.79 | 1.00 |
+| `voice-piano` | 3 | supported | 0.97 / 0.95 / 0.52 | 1.00 |
+| `choir-closed-satb` | 1 | supported | 0.98 / 0.99 / 0.99 | 1.00 |
+| `choir-open-satb` | 1 | supported | 0.92 / 0.93 / 0.88 | 1.00 |
+| `choir-sab` | 1 | supported | 0.98 / 1.00 / 0.33 | 1.00 |
+| `choir-ttbb` | 1 | supported | 1.00 / 1.00 / 0.35 | 1.00 |
+| `choir-ssaa` | 1 | supported | 0.99 / 0.99 / 0.98 | 0.98 |
+| `choir-piano` | 1 | supported | 1.00 / 1.00 / 0.53 | 1.00 |
+| `organ` | 2 | supported | 0.96 / 0.93 / 0.73 | 1.00 |
+| `string-quartet` | 6 | supported | 0.89 / 0.95 / 0.74 | 0.95 |
+| `orchestral` | 2 | supported | 0.98 / 0.97 / 0.77 | 0.93 |
+| `lead-sheet` | 2 | supported | 0.93 / 0.94 / 0.85 | 0.83 |
+| `hymnal-stanzas` | 1 | supported | 1.00 / 1.00 / 1.00 | 1.00 |
+| `divisi` | 2 | supported | 0.98 / 0.97 / 0.94 | 0.96 |
+| `cross-staff` | 1 | supported | 0.87 / 0.87 / 0.79 | 1.00 |
+| `two-voices-one-staff-instrument` | 3 | supported | 0.92 / 0.92 / 0.77 | 0.89 |
+| `percussion-none` | 1 | partial | 0.61 / 0.62 / 0.63 | 0.44 |
+
+Speed and memory (`mvp/work/eval-coverage-baseline-perf.json`, perf family, raster native dpi, OCR on, 8 jobs, load average 166.9 on 192 CPUs, so timings are noisy):
+
+| scan dpi | MP/page | ms/page (median) | peak MB (median / max) |
+|---|---:|---:|---:|
+| 100 | 0.968 | 3227 | 309.4 / 374.5 |
+| 150 | 2.178 | 3332 | 318.2 / 376.2 |
+| 200 | 3.869 | 3110 | 252.2 / 337.6 |
+| 300 | 8.703 | 3185 | 375.3 / 2184.3 |
+| 400 | 15.475 | 5593 | 446 / 557.8 |
+| 600 | 34.806 | 4819 | 418 / 445.6 |
+
+| pages (1 = every single-page perf PDF, all dpi and sizes; 5-40 = the A4 300 dpi books) | ms/page (median) | peak MB (median / max) |
+|---|---:|---:|
+| 1 | 3782 | 336.6 / 557.8 |
+| 5 | 2740 | 572.1 / 666.1 |
+| 10 | 2614 | 891.3 / 908.4 |
+| 20 | 2602 | 1301.1 / 1302.1 |
+| 40 | 2429 | 2180.8 / 2184.3 |
+
+Fits: ms/page = 3056.2 + 51.49 x MP/page (R² 0.2); peak MB = 296.9 + 5.2 x total MP of the document (R² 0.968).
 

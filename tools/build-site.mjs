@@ -96,7 +96,7 @@ for (const f of docs) {
 }
 
 // landing page
-const label = { 'SDD.md': 'Software design document', 'research-omr.md': 'Research: current OMR methods', 'research-voices.md': 'Research: voice and part separation', 'spike-classical.md': 'Trial: plain-JS image pipeline', 'spike-ocr.md': 'Trial: lyric OCR', 'spike-ml.md': 'Trial: pretrained ML models', 'TIMELINE.md': 'Build timeline (AEDT)' };
+const label = { 'SDD.md': 'Software design document', 'research-omr.md': 'Research: current OMR methods', 'research-voices.md': 'Research: voice and part separation', 'spike-classical.md': 'Trial: plain-JS image pipeline', 'spike-ocr.md': 'Trial: lyric OCR', 'spike-ml.md': 'Trial: pretrained ML models', 'TIMELINE.md': 'Build timeline (AEDT)', 'COVERAGE.md': 'Symbol and layout coverage, speed and memory' };
 const docLinks = docs.map((f) => `<li><a href="docs/${f.replace(/\.md$/, '.html')}">${label[f] || f.replace(/\.md$/, '')}</a></li>`).join('\n');
 fs.writeFileSync(path.join(OUT, 'index.html'), head('Score Scan Reader', DOC_CSS) + `<main>
 <h1>Score Scan Reader</h1>

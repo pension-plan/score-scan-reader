@@ -4403,7 +4403,7 @@
     "pitch/pitch-cov-accidentals-melody"
    ]
   },
-  "x-clef-percussion0+0": {
+  "x-clef-percussion": {
    "items": 1,
    "occurrences": 2,
    "item_ids": [
@@ -4556,6 +4556,13 @@
     "layouts/voice-piano-night-song"
    ]
   },
+  "x-notehead-x": {
+   "items": 1,
+   "occurrences": 58,
+   "item_ids": [
+    "percussion/perc01-parade-flute-snare-drumset"
+   ]
+  },
   "x-noteheads": {
    "items": 23,
    "occurrences": 2249,
@@ -4691,6 +4698,13 @@
     "rests/rst06-two-voice-rests"
    ]
   },
+  "x-staff-1-line": {
+   "items": 1,
+   "occurrences": 1,
+   "item_ids": [
+    "percussion/perc01-parade-flute-snare-drumset"
+   ]
+  },
   "x-staves": {
    "items": 23,
    "occurrences": 71,
@@ -4789,6 +4803,13 @@
     "layouts/divisi-strings-lament",
     "layouts/organ-three-staves-chorale-prelude",
     "layouts/two-voices-piano-song-without-words"
+   ]
+  },
+  "x-unpitched": {
+   "items": 1,
+   "occurrences": 139,
+   "item_ids": [
+    "percussion/perc01-parade-flute-snare-drumset"
    ]
   },
   "x-volta-3": {
@@ -17575,11 +17596,14 @@
     "system-break",
     "tempo-mark",
     "time-4-4",
-    "x-clef-percussion0+0",
+    "x-clef-percussion",
     "x-measures",
+    "x-notehead-x",
     "x-noteheads",
     "x-parts",
-    "x-staves"
+    "x-staff-1-line",
+    "x-staves",
+    "x-unpitched"
    ],
    "counts": {
     "accent": 8,
@@ -17605,11 +17629,14 @@
     "system-break": 1,
     "tempo-mark": 1,
     "time-4-4": 1,
-    "x-clef-percussion0+0": 2,
+    "x-clef-percussion": 2,
     "x-measures": 8,
+    "x-notehead-x": 58,
     "x-noteheads": 33,
     "x-parts": 3,
-    "x-staves": 3
+    "x-staff-1-line": 1,
+    "x-staves": 3,
+    "x-unpitched": 139
    },
    "expected": {
     "parts": [
