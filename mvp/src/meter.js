@@ -345,6 +345,40 @@ function readMeters(fr, asm, stats = {}) {
         }
       }
     }
+    // a multi-bar rest (an H-bar or a church rest, rests.js) is a bar of its own: on a faded scan
+    // the barlines around it are not found and it shares a 'bar' with notes, where it would be
+    // dropped. The ends of an H-bar stand for the barlines missed there; a church rest stands
+    // in the middle of its bar. (An H-bar without its number may be a beam or a stray line.)
+    for (let k = 0; k < sy.measures.length; k++) {
+      const [xa, xb] = sy.measures[k];
+      const sp = fr.ss;
+      let hs = [];
+      for (const s of sy.staves) { try { hs = hs.concat(detectRests({ R, comps: asm.comps, s, xa, xb }).filter(r => (r.kind === 'multi' && r.multi > 0) || r.kind === 'long' || r.kind === 'breve')); } catch (e) { /* none */ } }
+      if (!hs.length) continue;
+      const h = hs[0].box;
+      let a = h.x0 - 0.8 * sp, b = h.x1 + 0.8 * sp;
+      if (hs[0].kind !== 'multi') {
+        const xs = sy.staves.flatMap(s => s.chords.map(c => c.x));
+        const l = Math.max(xa, ...xs.filter(x => x < h.x0)), r = Math.min(xb, ...xs.filter(x => x > h.x1));
+        a = Math.min(a, (l + h.x0) / 2); b = Math.max(b, (h.x1 + r) / 2);
+      }
+      // (heads before it within a clef's width of the header's end are a clef or a signature
+      // the header reading missed on a worn page: the bar holds the rest alone)
+      if (k === 0) for (const s of sy.staves) {
+        const end = ((s.hdr && s.hdr.end) || -1e9) + 3 * sp;
+        if (!s.chords.some(c => c.x > xa && c.x < h.x0 && c.x >= end)) s.chords = s.chords.filter(c => !(c.x > xa && c.x < h.x0));
+      }
+      const notes = (x0, x1) => sy.staves.some(s => s.chords.some(c => c.x > x0 && c.x < x1));
+      const cuts = [];
+      if (a > xa + 2 * sp && notes(xa, a)) cuts.push(a);
+      if (b < xb - 2 * sp && notes(b, xb)) cuts.push(b);
+      if (!cuts.length) continue;
+      const parts = [xa, ...cuts, xb], ms = [];
+      for (let i = 0; i + 1 < parts.length; i++) ms.push([parts[i], parts[i + 1]]);
+      sy.measures.splice(k, 1, ...ms);
+      k += ms.length - 1;
+      stats.hbarBars = (stats.hbarBars || 0) + cuts.length;
+    }
     // a signature with no barline before it: the bar is split there
     for (const m of meters) {
       if (!m.split) continue;

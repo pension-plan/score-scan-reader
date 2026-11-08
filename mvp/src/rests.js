@@ -21,13 +21,13 @@ const { readRestGlyph } = require('./cv');
 function rowProfile(R, c) {
   const W = R.width, rows = [];
   for (let y = c.y0; y <= c.y1; y++) {
-    let a = -1, b = -1, runs = 0, prev = 0;
+    let a = -1, b = -1, runs = 0, prev = 0, n = 0;
     for (let x = c.x0; x <= c.x1; x++) {
       const v = R.data[y * W + x];
-      if (v) { if (a < 0) a = x; b = x; if (!prev) runs++; }
+      if (v) { if (a < 0) a = x; b = x; if (!prev) runs++; n++; }
       prev = v;
     }
-    rows.push({ a, b, runs });
+    rows.push({ a, b, runs, n });
   }
   return rows;
 }
@@ -151,6 +151,9 @@ function readDigit(R, c) {
   const topW = Math.max(span(0, 0.15), solid(0, 0.2)), botW = solid(0.8, 1);
   if (topW > 0.8 && botW < 0.5) return 7;
   if (botW > 0.8) return 2;
+  // a 6 whose bowl a worn scan opened (no hole): its left side runs on down where a 5's bowl
+  // leaves it open
+  if (topW < 0.75 && left(0.6, 0.75) < 0.15) return 6;
   if (topW > 0.75 && left(0.1, 0.4) < 0.3) return 5;
   if (left(0.35, 0.65) > 0.3) return 3;
   return 5;
@@ -159,11 +162,20 @@ function readDigit(R, c) {
 // the number printed above a multi-bar rest: digit components over its
 // middle, left to right (touching digits are cut at their thinnest column)
 function readNumber(R, comps, st, sp, x0, x1) {
-  const ds = comps.filter(c => {
+  let ds = comps.filter(c => {
     const xc = (c.x0 + c.x1) / 2, y0 = st.yAt(0, xc);
-    const h = (c.y1 - c.y0 + 1) / sp;
-    return xc > x0 && xc < x1 && c.y1 < y0 - 0.2 * sp && c.y0 > y0 - 5 * sp && h >= 1.2 && h <= 2.8;
+    return xc > x0 && xc < x1 && c.y1 < y0 - 0.2 * sp && c.y0 > y0 - 5 * sp && c.y1 - c.y0 + 1 <= 2.8 * sp && c.area >= 0.05 * sp * sp;
   }).sort((a, b) => a.x0 - b.x0);
+  // a worn scan breaks a digit in pieces stacked over each other: joined again
+  for (let k = ds.length - 1; k > 0; k--) for (let i = 0; i < k; i++) {
+    const a = ds[i], b = ds[k];
+    if (Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0) < 0.5 * Math.min(a.x1 - a.x0, b.x1 - b.x0) || Math.max(a.y0, b.y0) - Math.min(a.y1, b.y1) > 0.3 * sp ||
+      Math.max(a.y1, b.y1) - Math.min(a.y0, b.y0) + 1 > 2.8 * sp) continue;
+    ds[i] = { x0: Math.min(a.x0, b.x0), x1: Math.max(a.x1, b.x1), y0: Math.min(a.y0, b.y0), y1: Math.max(a.y1, b.y1), area: a.area + b.area };
+    ds.splice(k, 1);
+    break;
+  }
+  ds = ds.filter(c => (c.y1 - c.y0 + 1) / sp >= 1.2);
   if (!ds.length) return 0;
   // the number is the row of digits nearest the staff (a tempo mark or
   // rehearsal letter may stand higher)
@@ -239,11 +251,12 @@ function detectRests({ R, comps, s, xa, xb, debug }) {
     } else if (f.fill >= 0.8 && f.h >= 0.85 && f.h <= 1.25 && f.w >= 0.35 && f.w <= 0.75 && Math.abs(f.cy - 1.5) < 0.25) { kind = 'breve'; q = 8; bars = 2; }
     else if (f.fill >= 0.8 && f.h >= 1.75 && f.h <= 2.3 && f.w >= 0.35 && f.w <= 0.75 && Math.abs(f.cy - 2) < 0.3) { kind = 'long'; q = 16; bars = 4; }
     else if (f.w >= 2.5 && f.h <= 2.8 && f.cy > 1.2 && f.cy < 2.8) {
-      // H-bar: rows spanning nearly the whole width around the middle line
+      // H-bar: rows spanning nearly the whole width around the middle line (solid, or
+      // nearly so: a worn scan pits the bar)
       const rows = rowProfile(R, c);
       let run = 0, best = 0, mid = 0;
       rows.forEach((r, i) => {
-        if (r.a >= 0 && r.b - r.a + 1 >= 0.85 * (c.x1 - c.x0 + 1) && r.runs === 1) { run++; if (run > best) { best = run; mid = i - run / 2; } } else run = 0;
+        if (r.a >= 0 && r.b - r.a + 1 >= 0.85 * (c.x1 - c.x0 + 1) && (r.runs === 1 || r.n >= 0.9 * (r.b - r.a + 1))) { run++; if (run > best) { best = run; mid = i - run / 2; } } else run = 0;
       });
       const pos = (c.y0 + mid - st.yAt(0, f.xc)) / sp;
       if (best >= 0.3 * sp && best <= 1.1 * sp && Math.abs(pos - 2) < 0.6) {
@@ -279,8 +292,12 @@ function detectRests({ R, comps, s, xa, xb, debug }) {
       const pad = (kind === 'breve' || kind === 'long' ? 1.2 : 0.9) * sp;
       if (heads.some(hd => hd !== onHead && hd.x > c.x0 - 2 * sp && hd.x < c.x1 + 2 * sp && hd.y > c.y0 - sp && hd.y < c.y1 + sp && kind !== 'multi')) continue;
       // (a barline beside it is fine: a thin stroke at least a staff tall)
+      // (nor is the rest of a broken H-bar: a wide piece across the middle line, or a detached
+      // end stroke or a worn barline)
+      const piece = (o) => kind === 'multi' && ((o.x1 - o.x0 >= 2 * sp && o.y0 < st.yAt(2, (o.x0 + o.x1) / 2) && o.y1 > st.yAt(2, (o.x0 + o.x1) / 2)) ||
+        (o.x1 - o.x0 + 1 <= 0.4 * sp && o.y1 - o.y0 + 1 >= 1.5 * sp));
       if (near.some(o => o !== c && o.area >= 0.1 * sp * sp && (o.x1 - o.x0 > 0.75 * sp || o.y1 - o.y0 > 0.75 * sp) &&
-        !(o.x1 - o.x0 + 1 <= 0.4 * sp && o.y1 - o.y0 + 1 >= 2.5 * sp) &&
+        !(o.x1 - o.x0 + 1 <= 0.4 * sp && o.y1 - o.y0 + 1 >= 2.5 * sp) && !piece(o) &&
         o.x1 > c.x0 - pad && o.x0 < c.x1 + pad && o.y1 > c.y0 - 0.5 * sp && o.y0 < c.y1 + 0.5 * sp)) continue;
     }
     // a glyph directly left of a notehead at its height is an accidental
@@ -304,7 +321,18 @@ function detectRests({ R, comps, s, xa, xb, debug }) {
     if (onHead && !/^flag/.test(kind) && kind !== 'whole' && kind !== 'half') continue;
     out.push({ x: f.xc, pos: f.cy, q, dots, kind, box: c, bars, multi, onHead, onHeads: onHeads || (onHead ? [onHead] : null) });
   }
-  return out.sort((a, b) => a.x - b.x);
+  out.sort((a, b) => a.x - b.x);
+  // an H-bar broken in pieces (a worn scan) is one rest; its number sits over the whole bar
+  for (let i = out.length - 1; i > 0; i--) {
+    const p = out[i - 1], r = out[i];
+    if (p.kind !== 'multi' || r.kind !== 'multi' || r.box.x0 - p.box.x1 > 4 * sp) continue;
+    // (two H-bars have a barline between them)
+    if (near.some(o => o.x0 >= p.box.x1 && o.x1 <= r.box.x0 && o.y1 - o.y0 >= 3 * sp && o.y0 < st.yAt(2, o.x0) && o.y1 > st.yAt(2, o.x0))) continue;
+    const box = { x0: p.box.x0, x1: r.box.x1, y0: Math.min(p.box.y0, r.box.y0), y1: Math.max(p.box.y1, r.box.y1), area: p.box.area + r.box.area };
+    const x = (box.x0 + box.x1) / 2;
+    out.splice(i - 1, 2, { ...p, x, box, multi: readNumber(R, comps, st, sp, x - 3 * sp, x + 3 * sp) || p.multi || r.multi });
+  }
+  return out;
 }
 
 module.exports = { detectRests, readNumber, _features: features, _rowProfile: rowProfile };
