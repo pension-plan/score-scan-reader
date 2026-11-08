@@ -1,11 +1,11 @@
 {
- "generated": "2026-11-08T15:45:43.059Z",
+ "generated": "2026-11-08T15:56:55.783Z",
  "inputs": {
-  "eval": "../r24/eval-coverage-ocr2.json",
-  "eval_when": "2026-11-08T15:45:42.040Z",
-  "perf": null,
-  "coverage_dir": "../../../../../../Users/d.sloane/music/corpus/coverage",
-  "src_hash": "1308ea920bb7",
+  "eval": "mvp/work/eval-coverage-text.json",
+  "eval_when": "2026-11-08T15:56:54.586Z",
+  "perf": "mvp/work/eval-coverage-baseline-perf.json",
+  "coverage_dir": "corpus/coverage",
+  "src_hash": "bd1a6df06b7f",
   "ocr": true,
   "dpi": 200
  },
@@ -25,8 +25,8 @@
    "scan-severe"
   ],
   "skipped": [],
-  "tags_supported": 84,
-  "tags_partial": 44,
+  "tags_supported": 86,
+  "tags_partial": 42,
   "tags_unsupported": 26,
   "tags_not_measured": 30,
   "tags_without_items": 0
@@ -6534,8 +6534,8 @@
      "n": 9,
      "hit": 9,
      "read": 1,
-     "emitted": 0,
-     "emitted_any_item": 0,
+     "emitted": 9,
+     "emitted_any_item": 2,
      "crashes": 0,
      "accuracy": 1,
      "false_notes_per_note_in": 0,
@@ -6553,8 +6553,8 @@
      "n": 9,
      "hit": 9,
      "read": 1,
-     "emitted": 0,
-     "emitted_any_item": 0,
+     "emitted": 9,
+     "emitted_any_item": 2,
      "crashes": 0,
      "accuracy": 1,
      "false_notes_per_note_in": 0,
@@ -6572,8 +6572,8 @@
      "n": 9,
      "hit": 8,
      "read": 0.8889,
-     "emitted": 0,
-     "emitted_any_item": 0,
+     "emitted": 10,
+     "emitted_any_item": 2,
      "crashes": 0,
      "accuracy": 0.8889,
      "false_notes_per_note_in": 0.0769,
@@ -6587,13 +6587,11 @@
      }
     }
    },
-   "notes": [
-    "<accidental> never emitted"
-   ],
+   "notes": [],
    "status_variant": "scan",
-   "emitted_anywhere": false,
+   "emitted_anywhere": true,
    "accuracy": 1,
-   "status": "partial",
+   "status": "supported",
    "confusion": {
     "variant": "clean",
     "false_per_note_in": 0,
@@ -11797,12 +11795,12 @@
     "clean": {
      "variants": 2,
      "n": 61,
-     "hit": 33,
+     "hit": 51,
      "read": null,
-     "emitted": 33,
+     "emitted": 51,
      "emitted_any_item": 2,
      "crashes": 0,
-     "accuracy": 0.541,
+     "accuracy": 0.8361,
      "false_notes_per_note_in": 0.0211,
      "false_notes_per_note_out": 0.0421,
      "false_baseline": "all items",
@@ -11816,12 +11814,12 @@
     "scan": {
      "variants": 2,
      "n": 61,
-     "hit": 32,
+     "hit": 52,
      "read": null,
-     "emitted": 32,
+     "emitted": 52,
      "emitted_any_item": 2,
      "crashes": 0,
-     "accuracy": 0.5246,
+     "accuracy": 0.8525,
      "false_notes_per_note_in": 0.0105,
      "false_notes_per_note_out": 0.0452,
      "false_baseline": "all items",
@@ -11835,12 +11833,12 @@
     "scan-severe": {
      "variants": 2,
      "n": 61,
-     "hit": 27,
+     "hit": 40,
      "read": null,
-     "emitted": 27,
+     "emitted": 40,
      "emitted_any_item": 2,
      "crashes": 0,
-     "accuracy": 0.4426,
+     "accuracy": 0.6557,
      "false_notes_per_note_in": 0.0421,
      "false_notes_per_note_out": 0.1458,
      "false_baseline": "all items",
@@ -11855,8 +11853,8 @@
    "notes": [],
    "status_variant": "scan",
    "emitted_anywhere": true,
-   "accuracy": 0.5246,
-   "status": "partial",
+   "accuracy": 0.8525,
+   "status": "supported",
    "confusion": {
     "variant": "clean",
     "false_per_note_in": 0.0211,
@@ -18044,8 +18042,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 116,
-   "ms_per_page": 1463,
-   "peak_rss_mb": 279.1,
+   "ms_per_page": 1565,
+   "peak_rss_mb": 288.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -18081,8 +18079,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 116,
-   "ms_per_page": 1644,
-   "peak_rss_mb": 284.3,
+   "ms_per_page": 1675,
+   "peak_rss_mb": 281.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -18118,8 +18116,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 116,
-   "ms_per_page": 1585,
-   "peak_rss_mb": 281.1,
+   "ms_per_page": 1627,
+   "peak_rss_mb": 286.2,
    "pages": 1,
    "layout_score": 0.9971
   },
@@ -18155,8 +18153,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 75,
-   "ms_per_page": 1990,
-   "peak_rss_mb": 285.9,
+   "ms_per_page": 2000,
+   "peak_rss_mb": 298.3,
    "pages": 1,
    "layout_score": 0.9954
   },
@@ -18192,8 +18190,8 @@
    "crash": 0,
    "false_notes": 4,
    "truth_notes": 75,
-   "ms_per_page": 2161,
-   "peak_rss_mb": 304,
+   "ms_per_page": 2223,
+   "peak_rss_mb": 299.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -18229,8 +18227,8 @@
    "crash": 0,
    "false_notes": 4,
    "truth_notes": 75,
-   "ms_per_page": 2142,
-   "peak_rss_mb": 312.5,
+   "ms_per_page": 2144,
+   "peak_rss_mb": 315.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -18268,8 +18266,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 215,
-   "ms_per_page": 2756,
-   "peak_rss_mb": 335.6,
+   "ms_per_page": 2859,
+   "peak_rss_mb": 365.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -18307,8 +18305,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 215,
-   "ms_per_page": 3081,
-   "peak_rss_mb": 373.9,
+   "ms_per_page": 3285,
+   "peak_rss_mb": 364,
    "pages": 1,
    "layout_score": 1
   },
@@ -18346,8 +18344,8 @@
    "crash": 0,
    "false_notes": 10,
    "truth_notes": 215,
-   "ms_per_page": 5322,
-   "peak_rss_mb": 489,
+   "ms_per_page": 5754,
+   "peak_rss_mb": 525,
    "pages": 1,
    "layout_score": 0.9984
   },
@@ -18381,8 +18379,8 @@
    "crash": 0,
    "false_notes": 7,
    "truth_notes": 84,
-   "ms_per_page": 1810,
-   "peak_rss_mb": 279.2,
+   "ms_per_page": 1894,
+   "peak_rss_mb": 287,
    "pages": 1,
    "layout_score": 1
   },
@@ -18416,8 +18414,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 84,
-   "ms_per_page": 2040,
-   "peak_rss_mb": 282.4,
+   "ms_per_page": 2026,
+   "peak_rss_mb": 284.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -18449,8 +18447,8 @@
    "crash": 0,
    "false_notes": 51,
    "truth_notes": 84,
-   "ms_per_page": 2813,
-   "peak_rss_mb": 427.7,
+   "ms_per_page": 3027,
+   "peak_rss_mb": 433.9,
    "pages": 1,
    "layout_score": 0.2349
   },
@@ -18486,8 +18484,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 116,
-   "ms_per_page": 1468,
-   "peak_rss_mb": 286.6,
+   "ms_per_page": 1534,
+   "peak_rss_mb": 274.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -18523,8 +18521,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 116,
-   "ms_per_page": 1594,
-   "peak_rss_mb": 275.9,
+   "ms_per_page": 1602,
+   "peak_rss_mb": 285.1,
    "pages": 1,
    "layout_score": 0.9792
   },
@@ -18560,8 +18558,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 116,
-   "ms_per_page": 1665,
-   "peak_rss_mb": 278,
+   "ms_per_page": 1629,
+   "peak_rss_mb": 291.6,
    "pages": 1,
    "layout_score": 0.9943
   },
@@ -18597,8 +18595,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 112,
-   "ms_per_page": 1509,
-   "peak_rss_mb": 269.9,
+   "ms_per_page": 1570,
+   "peak_rss_mb": 270.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -18634,8 +18632,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 112,
-   "ms_per_page": 1715,
-   "peak_rss_mb": 290.6,
+   "ms_per_page": 1722,
+   "peak_rss_mb": 284.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -18671,8 +18669,8 @@
    "crash": 0,
    "false_notes": 43,
    "truth_notes": 112,
-   "ms_per_page": 3351,
-   "peak_rss_mb": 372.2,
+   "ms_per_page": 3568,
+   "peak_rss_mb": 350,
    "pages": 1,
    "layout_score": 0.9797
   },
@@ -18702,8 +18700,8 @@
    "crash": 0,
    "false_notes": 18,
    "truth_notes": 76,
-   "ms_per_page": 1177,
-   "peak_rss_mb": 266.9,
+   "ms_per_page": 1206,
+   "peak_rss_mb": 268.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -18733,8 +18731,8 @@
    "crash": 0,
    "false_notes": 15,
    "truth_notes": 76,
-   "ms_per_page": 1292,
-   "peak_rss_mb": 281.9,
+   "ms_per_page": 1373,
+   "peak_rss_mb": 286.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -18764,8 +18762,8 @@
    "crash": 0,
    "false_notes": 27,
    "truth_notes": 76,
-   "ms_per_page": 1235,
-   "peak_rss_mb": 264,
+   "ms_per_page": 1333,
+   "peak_rss_mb": 278.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -18801,8 +18799,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 126,
-   "ms_per_page": 3421,
-   "peak_rss_mb": 376.8,
+   "ms_per_page": 3505,
+   "peak_rss_mb": 357.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -18838,8 +18836,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 126,
-   "ms_per_page": 3583,
-   "peak_rss_mb": 389.3,
+   "ms_per_page": 3834,
+   "peak_rss_mb": 339.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -18875,8 +18873,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 126,
-   "ms_per_page": 3483,
-   "peak_rss_mb": 376.2,
+   "ms_per_page": 3691,
+   "peak_rss_mb": 332,
    "pages": 1,
    "layout_score": 1
   },
@@ -18912,8 +18910,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 126,
-   "ms_per_page": 1712,
-   "peak_rss_mb": 300.1,
+   "ms_per_page": 1691,
+   "peak_rss_mb": 289.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -18949,8 +18947,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 126,
-   "ms_per_page": 1736,
-   "peak_rss_mb": 290.8,
+   "ms_per_page": 1821,
+   "peak_rss_mb": 293.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -18986,8 +18984,8 @@
    "crash": 0,
    "false_notes": 6,
    "truth_notes": 126,
-   "ms_per_page": 1856,
-   "peak_rss_mb": 319.6,
+   "ms_per_page": 1956,
+   "peak_rss_mb": 308.1,
    "pages": 1,
    "layout_score": 0.9763
   },
@@ -19023,8 +19021,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 128,
-   "ms_per_page": 2122,
-   "peak_rss_mb": 307.5,
+   "ms_per_page": 2270,
+   "peak_rss_mb": 300.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -19060,8 +19058,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 128,
-   "ms_per_page": 2142,
-   "peak_rss_mb": 308.4,
+   "ms_per_page": 2249,
+   "peak_rss_mb": 295,
    "pages": 1,
    "layout_score": 1
   },
@@ -19097,8 +19095,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 128,
-   "ms_per_page": 2137,
-   "peak_rss_mb": 295.5,
+   "ms_per_page": 2247,
+   "peak_rss_mb": 326.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -19128,8 +19126,8 @@
    "crash": 0,
    "false_notes": 4,
    "truth_notes": 47,
-   "ms_per_page": 1926,
-   "peak_rss_mb": 288.9,
+   "ms_per_page": 1901,
+   "peak_rss_mb": 298.4,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -19159,8 +19157,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 47,
-   "ms_per_page": 2031,
-   "peak_rss_mb": 276.3,
+   "ms_per_page": 2033,
+   "peak_rss_mb": 270.9,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -19190,8 +19188,8 @@
    "crash": 0,
    "false_notes": 6,
    "truth_notes": 47,
-   "ms_per_page": 1984,
-   "peak_rss_mb": 303.8,
+   "ms_per_page": 2060,
+   "peak_rss_mb": 303.9,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -19221,8 +19219,8 @@
    "crash": 0,
    "false_notes": 13,
    "truth_notes": 40,
-   "ms_per_page": 1046,
-   "peak_rss_mb": 314.1,
+   "ms_per_page": 1069,
+   "peak_rss_mb": 282.9,
    "pages": 2,
    "layout_score": 1
   },
@@ -19252,8 +19250,8 @@
    "crash": 0,
    "false_notes": 16,
    "truth_notes": 40,
-   "ms_per_page": 1231,
-   "peak_rss_mb": 312.5,
+   "ms_per_page": 1199,
+   "peak_rss_mb": 331.8,
    "pages": 2,
    "layout_score": 1
   },
@@ -19283,8 +19281,8 @@
    "crash": 0,
    "false_notes": 20,
    "truth_notes": 40,
-   "ms_per_page": 1255,
-   "peak_rss_mb": 313.9,
+   "ms_per_page": 1361,
+   "peak_rss_mb": 328.2,
    "pages": 2,
    "layout_score": 0.6667
   },
@@ -19314,8 +19312,8 @@
    "crash": 0,
    "false_notes": 4,
    "truth_notes": 55,
-   "ms_per_page": 1176,
-   "peak_rss_mb": 273.1,
+   "ms_per_page": 1220,
+   "peak_rss_mb": 277.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -19345,8 +19343,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 55,
-   "ms_per_page": 1296,
-   "peak_rss_mb": 269.4,
+   "ms_per_page": 1341,
+   "peak_rss_mb": 274.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -19376,8 +19374,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 55,
-   "ms_per_page": 2633,
-   "peak_rss_mb": 428,
+   "ms_per_page": 2742,
+   "peak_rss_mb": 447.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -19407,8 +19405,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 39,
-   "ms_per_page": 1415,
-   "peak_rss_mb": 273.7,
+   "ms_per_page": 1451,
+   "peak_rss_mb": 282.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -19438,8 +19436,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 39,
-   "ms_per_page": 1571,
-   "peak_rss_mb": 282.1,
+   "ms_per_page": 1611,
+   "peak_rss_mb": 289.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -19469,8 +19467,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 39,
-   "ms_per_page": 1442,
-   "peak_rss_mb": 277.5,
+   "ms_per_page": 1491,
+   "peak_rss_mb": 282.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -19516,8 +19514,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 250,
-   "ms_per_page": 3237,
-   "peak_rss_mb": 469.5,
+   "ms_per_page": 3232,
+   "peak_rss_mb": 492.5,
    "pages": 2,
    "layout_score": 0.8889
   },
@@ -19563,8 +19561,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 250,
-   "ms_per_page": 3553,
-   "peak_rss_mb": 473.4,
+   "ms_per_page": 3721,
+   "peak_rss_mb": 516.8,
    "pages": 2,
    "layout_score": 0.8889
   },
@@ -19610,8 +19608,8 @@
    "crash": 0,
    "false_notes": 41,
    "truth_notes": 250,
-   "ms_per_page": 4884,
-   "peak_rss_mb": 575.2,
+   "ms_per_page": 4955,
+   "peak_rss_mb": 567.9,
    "pages": 2,
    "layout_score": 0.8704
   },
@@ -19641,8 +19639,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 104,
-   "ms_per_page": 1643,
-   "peak_rss_mb": 280.8,
+   "ms_per_page": 1697,
+   "peak_rss_mb": 281.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -19672,8 +19670,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 104,
-   "ms_per_page": 1645,
-   "peak_rss_mb": 280.1,
+   "ms_per_page": 1731,
+   "peak_rss_mb": 285.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -19703,8 +19701,8 @@
    "crash": 0,
    "false_notes": 77,
    "truth_notes": 104,
-   "ms_per_page": 4450,
-   "peak_rss_mb": 364.9,
+   "ms_per_page": 4205,
+   "peak_rss_mb": 430.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -19734,8 +19732,8 @@
    "crash": 0,
    "false_notes": 23,
    "truth_notes": 131,
-   "ms_per_page": 1263,
-   "peak_rss_mb": 285.2,
+   "ms_per_page": 1397,
+   "peak_rss_mb": 285.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -19765,8 +19763,8 @@
    "crash": 0,
    "false_notes": 7,
    "truth_notes": 131,
-   "ms_per_page": 1491,
-   "peak_rss_mb": 284.8,
+   "ms_per_page": 1573,
+   "peak_rss_mb": 276.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -19796,8 +19794,8 @@
    "crash": 0,
    "false_notes": 9,
    "truth_notes": 131,
-   "ms_per_page": 1410,
-   "peak_rss_mb": 283.7,
+   "ms_per_page": 1495,
+   "peak_rss_mb": 279.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -19833,8 +19831,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 128,
-   "ms_per_page": 2974,
-   "peak_rss_mb": 372.7,
+   "ms_per_page": 3029,
+   "peak_rss_mb": 363,
    "pages": 1,
    "layout_score": 0.8958
   },
@@ -19870,8 +19868,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 128,
-   "ms_per_page": 3376,
-   "peak_rss_mb": 371.4,
+   "ms_per_page": 3663,
+   "peak_rss_mb": 376.3,
    "pages": 1,
    "layout_score": 0.9974
   },
@@ -19906,8 +19904,8 @@
    "crash": 0,
    "false_notes": 4,
    "truth_notes": 128,
-   "ms_per_page": 3317,
-   "peak_rss_mb": 339.8,
+   "ms_per_page": 3267,
+   "peak_rss_mb": 363,
    "pages": 1,
    "layout_score": 0.4217
   },
@@ -19937,8 +19935,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 70,
-   "ms_per_page": 1210,
-   "peak_rss_mb": 264.7,
+   "ms_per_page": 1269,
+   "peak_rss_mb": 273.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -19968,8 +19966,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 70,
-   "ms_per_page": 1491,
-   "peak_rss_mb": 286.2,
+   "ms_per_page": 1420,
+   "peak_rss_mb": 288.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -19999,8 +19997,8 @@
    "crash": 0,
    "false_notes": 58,
    "truth_notes": 70,
-   "ms_per_page": 2826,
-   "peak_rss_mb": 348.7,
+   "ms_per_page": 3340,
+   "peak_rss_mb": 368.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -20032,8 +20030,8 @@
    "crash": 0,
    "false_notes": 5,
    "truth_notes": 122,
-   "ms_per_page": 1699,
-   "peak_rss_mb": 285.4,
+   "ms_per_page": 1667,
+   "peak_rss_mb": 275.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -20065,8 +20063,8 @@
    "crash": 0,
    "false_notes": 6,
    "truth_notes": 122,
-   "ms_per_page": 1781,
-   "peak_rss_mb": 285,
+   "ms_per_page": 1801,
+   "peak_rss_mb": 280.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -20098,8 +20096,8 @@
    "crash": 0,
    "false_notes": 109,
    "truth_notes": 122,
-   "ms_per_page": 3636,
-   "peak_rss_mb": 394.4,
+   "ms_per_page": 3800,
+   "peak_rss_mb": 386.9,
    "pages": 1,
    "layout_score": 0.9259
   },
@@ -20129,8 +20127,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 24,
-   "ms_per_page": 1594,
-   "peak_rss_mb": 285.8,
+   "ms_per_page": 1613,
+   "peak_rss_mb": 286,
    "pages": 1,
    "layout_score": 1
   },
@@ -20160,8 +20158,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 24,
-   "ms_per_page": 1709,
-   "peak_rss_mb": 302.8,
+   "ms_per_page": 1780,
+   "peak_rss_mb": 294.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -20191,8 +20189,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 24,
-   "ms_per_page": 1682,
-   "peak_rss_mb": 280,
+   "ms_per_page": 1716,
+   "peak_rss_mb": 281.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -20222,8 +20220,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 32,
-   "ms_per_page": 1858,
-   "peak_rss_mb": 285.2,
+   "ms_per_page": 1953,
+   "peak_rss_mb": 278.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -20253,8 +20251,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 32,
-   "ms_per_page": 1962,
-   "peak_rss_mb": 286,
+   "ms_per_page": 2046,
+   "peak_rss_mb": 277.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -20284,8 +20282,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 32,
-   "ms_per_page": 2142,
-   "peak_rss_mb": 305.8,
+   "ms_per_page": 2149,
+   "peak_rss_mb": 329.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -20315,8 +20313,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 58,
-   "ms_per_page": 1179,
-   "peak_rss_mb": 270.6,
+   "ms_per_page": 1229,
+   "peak_rss_mb": 285.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -20346,8 +20344,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 58,
-   "ms_per_page": 1250,
-   "peak_rss_mb": 281,
+   "ms_per_page": 1350,
+   "peak_rss_mb": 286.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -20377,8 +20375,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 58,
-   "ms_per_page": 1404,
-   "peak_rss_mb": 284.1,
+   "ms_per_page": 1465,
+   "peak_rss_mb": 287.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -20408,8 +20406,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 33,
-   "ms_per_page": 1170,
-   "peak_rss_mb": 257.5,
+   "ms_per_page": 1211,
+   "peak_rss_mb": 261.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -20439,8 +20437,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 33,
-   "ms_per_page": 1342,
-   "peak_rss_mb": 290.6,
+   "ms_per_page": 1374,
+   "peak_rss_mb": 293.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -20470,8 +20468,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 33,
-   "ms_per_page": 2692,
-   "peak_rss_mb": 402.7,
+   "ms_per_page": 2885,
+   "peak_rss_mb": 417.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -20501,8 +20499,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 44,
-   "ms_per_page": 1310,
-   "peak_rss_mb": 272.1,
+   "ms_per_page": 1359,
+   "peak_rss_mb": 270.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -20532,8 +20530,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 44,
-   "ms_per_page": 1501,
-   "peak_rss_mb": 289.6,
+   "ms_per_page": 1530,
+   "peak_rss_mb": 277.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -20563,8 +20561,8 @@
    "crash": 0,
    "false_notes": 6,
    "truth_notes": 44,
-   "ms_per_page": 1903,
-   "peak_rss_mb": 325.2,
+   "ms_per_page": 2039,
+   "peak_rss_mb": 333.9,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -20594,8 +20592,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 96,
-   "ms_per_page": 1616,
-   "peak_rss_mb": 277.1,
+   "ms_per_page": 1632,
+   "peak_rss_mb": 279.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -20625,8 +20623,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 96,
-   "ms_per_page": 1742,
-   "peak_rss_mb": 286.3,
+   "ms_per_page": 1785,
+   "peak_rss_mb": 277.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -20656,8 +20654,8 @@
    "crash": 0,
    "false_notes": 14,
    "truth_notes": 96,
-   "ms_per_page": 1773,
-   "peak_rss_mb": 325,
+   "ms_per_page": 1857,
+   "peak_rss_mb": 326.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -20687,8 +20685,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 59,
-   "ms_per_page": 1517,
-   "peak_rss_mb": 269.3,
+   "ms_per_page": 1601,
+   "peak_rss_mb": 271.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -20718,8 +20716,8 @@
    "crash": 0,
    "false_notes": 8,
    "truth_notes": 59,
-   "ms_per_page": 1626,
-   "peak_rss_mb": 287.8,
+   "ms_per_page": 1673,
+   "peak_rss_mb": 283.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -20749,8 +20747,8 @@
    "crash": 0,
    "false_notes": 10,
    "truth_notes": 59,
-   "ms_per_page": 1609,
-   "peak_rss_mb": 298.1,
+   "ms_per_page": 1735,
+   "peak_rss_mb": 292.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -20780,8 +20778,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 48,
-   "ms_per_page": 1513,
-   "peak_rss_mb": 288.1,
+   "ms_per_page": 1527,
+   "peak_rss_mb": 276.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -20811,8 +20809,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 48,
-   "ms_per_page": 1680,
-   "peak_rss_mb": 293.3,
+   "ms_per_page": 1646,
+   "peak_rss_mb": 291.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -20842,8 +20840,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 48,
-   "ms_per_page": 3351,
-   "peak_rss_mb": 344,
+   "ms_per_page": 3681,
+   "peak_rss_mb": 332.2,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -20875,8 +20873,8 @@
    "crash": 0,
    "false_notes": 4,
    "truth_notes": 130,
-   "ms_per_page": 1670,
-   "peak_rss_mb": 279.5,
+   "ms_per_page": 1679,
+   "peak_rss_mb": 280.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -20908,8 +20906,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 130,
-   "ms_per_page": 1707,
-   "peak_rss_mb": 311.6,
+   "ms_per_page": 1781,
+   "peak_rss_mb": 299.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -20941,8 +20939,8 @@
    "crash": 0,
    "false_notes": 15,
    "truth_notes": 130,
-   "ms_per_page": 1903,
-   "peak_rss_mb": 330.3,
+   "ms_per_page": 2070,
+   "peak_rss_mb": 314.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -20978,8 +20976,8 @@
    "crash": 0,
    "false_notes": 6,
    "truth_notes": 126,
-   "ms_per_page": 1842,
-   "peak_rss_mb": 308.7,
+   "ms_per_page": 1906,
+   "peak_rss_mb": 315.2,
    "pages": 1,
    "layout_score": 0.9974
   },
@@ -21015,8 +21013,8 @@
    "crash": 0,
    "false_notes": 7,
    "truth_notes": 126,
-   "ms_per_page": 2025,
-   "peak_rss_mb": 321.6,
+   "ms_per_page": 2053,
+   "peak_rss_mb": 324.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -21052,8 +21050,8 @@
    "crash": 0,
    "false_notes": 14,
    "truth_notes": 126,
-   "ms_per_page": 2029,
-   "peak_rss_mb": 309.5,
+   "ms_per_page": 2059,
+   "peak_rss_mb": 278.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -21083,8 +21081,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 29,
-   "ms_per_page": 1269,
-   "peak_rss_mb": 260.2,
+   "ms_per_page": 1301,
+   "peak_rss_mb": 266.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -21114,8 +21112,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 29,
-   "ms_per_page": 1558,
-   "peak_rss_mb": 269.4,
+   "ms_per_page": 1638,
+   "peak_rss_mb": 295.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -21145,8 +21143,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 29,
-   "ms_per_page": 1718,
-   "peak_rss_mb": 357.5,
+   "ms_per_page": 1739,
+   "peak_rss_mb": 357.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -21176,8 +21174,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 96,
-   "ms_per_page": 1310,
-   "peak_rss_mb": 293.3,
+   "ms_per_page": 1369,
+   "peak_rss_mb": 281.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -21207,8 +21205,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 96,
-   "ms_per_page": 1450,
-   "peak_rss_mb": 286.7,
+   "ms_per_page": 1515,
+   "peak_rss_mb": 287.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -21238,8 +21236,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 96,
-   "ms_per_page": 1460,
-   "peak_rss_mb": 292.6,
+   "ms_per_page": 1538,
+   "peak_rss_mb": 318.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -21269,8 +21267,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 42,
-   "ms_per_page": 1136,
-   "peak_rss_mb": 244,
+   "ms_per_page": 1233,
+   "peak_rss_mb": 270.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -21300,8 +21298,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 42,
-   "ms_per_page": 1336,
-   "peak_rss_mb": 281.5,
+   "ms_per_page": 1364,
+   "peak_rss_mb": 287.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -21331,8 +21329,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 42,
-   "ms_per_page": 1366,
-   "peak_rss_mb": 293,
+   "ms_per_page": 1373,
+   "peak_rss_mb": 287.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -21362,8 +21360,8 @@
    "crash": 0,
    "false_notes": 18,
    "truth_notes": 138,
-   "ms_per_page": 1296,
-   "peak_rss_mb": 283.3,
+   "ms_per_page": 1367,
+   "peak_rss_mb": 286.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -21393,8 +21391,8 @@
    "crash": 0,
    "false_notes": 10,
    "truth_notes": 138,
-   "ms_per_page": 1501,
-   "peak_rss_mb": 297.8,
+   "ms_per_page": 1528,
+   "peak_rss_mb": 303.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -21424,8 +21422,8 @@
    "crash": 0,
    "false_notes": 24,
    "truth_notes": 138,
-   "ms_per_page": 1596,
-   "peak_rss_mb": 265.2,
+   "ms_per_page": 1641,
+   "peak_rss_mb": 320,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -21455,8 +21453,8 @@
    "crash": 0,
    "false_notes": 5,
    "truth_notes": 72,
-   "ms_per_page": 1287,
-   "peak_rss_mb": 269.3,
+   "ms_per_page": 1370,
+   "peak_rss_mb": 286.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -21486,8 +21484,8 @@
    "crash": 0,
    "false_notes": 11,
    "truth_notes": 72,
-   "ms_per_page": 1428,
-   "peak_rss_mb": 303.4,
+   "ms_per_page": 1486,
+   "peak_rss_mb": 303.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -21517,8 +21515,8 @@
    "crash": 0,
    "false_notes": 13,
    "truth_notes": 72,
-   "ms_per_page": 1450,
-   "peak_rss_mb": 311.5,
+   "ms_per_page": 1483,
+   "peak_rss_mb": 305.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -21548,8 +21546,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 200,
-   "ms_per_page": 1237,
-   "peak_rss_mb": 284.3,
+   "ms_per_page": 1305,
+   "peak_rss_mb": 278.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -21579,8 +21577,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 200,
-   "ms_per_page": 1369,
-   "peak_rss_mb": 271,
+   "ms_per_page": 1446,
+   "peak_rss_mb": 285,
    "pages": 1,
    "layout_score": 1
   },
@@ -21610,8 +21608,8 @@
    "crash": 0,
    "false_notes": 8,
    "truth_notes": 200,
-   "ms_per_page": 1488,
-   "peak_rss_mb": 288.2,
+   "ms_per_page": 1524,
+   "peak_rss_mb": 294.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -21641,8 +21639,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 144,
-   "ms_per_page": 1301,
-   "peak_rss_mb": 285,
+   "ms_per_page": 1335,
+   "peak_rss_mb": 279.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -21672,8 +21670,8 @@
    "crash": 0,
    "false_notes": 8,
    "truth_notes": 144,
-   "ms_per_page": 1468,
-   "peak_rss_mb": 291.3,
+   "ms_per_page": 1560,
+   "peak_rss_mb": 285.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -21703,8 +21701,8 @@
    "crash": 0,
    "false_notes": 4,
    "truth_notes": 144,
-   "ms_per_page": 1501,
-   "peak_rss_mb": 294.9,
+   "ms_per_page": 1534,
+   "peak_rss_mb": 278.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -21734,8 +21732,8 @@
    "crash": 0,
    "false_notes": 22,
    "truth_notes": 93,
-   "ms_per_page": 1319,
-   "peak_rss_mb": 274.9,
+   "ms_per_page": 1358,
+   "peak_rss_mb": 299.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -21765,8 +21763,8 @@
    "crash": 0,
    "false_notes": 26,
    "truth_notes": 93,
-   "ms_per_page": 1451,
-   "peak_rss_mb": 294.7,
+   "ms_per_page": 1562,
+   "peak_rss_mb": 289,
    "pages": 1,
    "layout_score": 1
   },
@@ -21796,8 +21794,8 @@
    "crash": 0,
    "false_notes": 17,
    "truth_notes": 93,
-   "ms_per_page": 1499,
-   "peak_rss_mb": 278,
+   "ms_per_page": 1493,
+   "peak_rss_mb": 309.4,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -21827,8 +21825,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 93,
-   "ms_per_page": 1235,
-   "peak_rss_mb": 277.9,
+   "ms_per_page": 1257,
+   "peak_rss_mb": 305.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -21858,8 +21856,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 93,
-   "ms_per_page": 1375,
-   "peak_rss_mb": 306.5,
+   "ms_per_page": 1494,
+   "peak_rss_mb": 294.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -21889,8 +21887,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 93,
-   "ms_per_page": 1527,
-   "peak_rss_mb": 287.6,
+   "ms_per_page": 1551,
+   "peak_rss_mb": 300.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -21920,8 +21918,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 30,
-   "ms_per_page": 1303,
-   "peak_rss_mb": 258.6,
+   "ms_per_page": 1412,
+   "peak_rss_mb": 276.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -21951,8 +21949,8 @@
    "crash": 0,
    "false_notes": 8,
    "truth_notes": 30,
-   "ms_per_page": 1451,
-   "peak_rss_mb": 304.8,
+   "ms_per_page": 1504,
+   "peak_rss_mb": 282.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -21982,8 +21980,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 30,
-   "ms_per_page": 1857,
-   "peak_rss_mb": 352.2,
+   "ms_per_page": 1952,
+   "peak_rss_mb": 361.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -22013,8 +22011,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 14,
-   "ms_per_page": 1110,
-   "peak_rss_mb": 246.6,
+   "ms_per_page": 1181,
+   "peak_rss_mb": 265.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -22044,8 +22042,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 14,
-   "ms_per_page": 1283,
-   "peak_rss_mb": 290.1,
+   "ms_per_page": 1412,
+   "peak_rss_mb": 285.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -22075,8 +22073,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 14,
-   "ms_per_page": 1574,
-   "peak_rss_mb": 337.8,
+   "ms_per_page": 1772,
+   "peak_rss_mb": 305.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -22106,8 +22104,8 @@
    "crash": 0,
    "false_notes": 12,
    "truth_notes": 60,
-   "ms_per_page": 1188,
-   "peak_rss_mb": 264.4,
+   "ms_per_page": 1255,
+   "peak_rss_mb": 280.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -22137,8 +22135,8 @@
    "crash": 0,
    "false_notes": 7,
    "truth_notes": 60,
-   "ms_per_page": 1362,
-   "peak_rss_mb": 282.4,
+   "ms_per_page": 1438,
+   "peak_rss_mb": 287.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -22168,8 +22166,8 @@
    "crash": 0,
    "false_notes": 16,
    "truth_notes": 60,
-   "ms_per_page": 4549,
-   "peak_rss_mb": 541.7,
+   "ms_per_page": 4689,
+   "peak_rss_mb": 497.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -22199,8 +22197,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 153,
-   "ms_per_page": 1255,
-   "peak_rss_mb": 301.8,
+   "ms_per_page": 1326,
+   "peak_rss_mb": 275.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -22230,8 +22228,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 153,
-   "ms_per_page": 1417,
-   "peak_rss_mb": 308.6,
+   "ms_per_page": 1470,
+   "peak_rss_mb": 292.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -22261,8 +22259,8 @@
    "crash": 0,
    "false_notes": 8,
    "truth_notes": 153,
-   "ms_per_page": 1462,
-   "peak_rss_mb": 299.2,
+   "ms_per_page": 1526,
+   "peak_rss_mb": 308.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -22295,8 +22293,8 @@
    "crash": 0,
    "false_notes": 54,
    "truth_notes": 172,
-   "ms_per_page": 1516,
-   "peak_rss_mb": 274.4,
+   "ms_per_page": 1578,
+   "peak_rss_mb": 276.2,
    "pages": 1,
    "layout_score": 0.4444
   },
@@ -22329,8 +22327,8 @@
    "crash": 0,
    "false_notes": 69,
    "truth_notes": 172,
-   "ms_per_page": 1633,
-   "peak_rss_mb": 282.3,
+   "ms_per_page": 1746,
+   "peak_rss_mb": 297.2,
    "pages": 1,
    "layout_score": 0.4444
   },
@@ -22363,8 +22361,8 @@
    "crash": 0,
    "false_notes": 50,
    "truth_notes": 172,
-   "ms_per_page": 1695,
-   "peak_rss_mb": 285,
+   "ms_per_page": 1742,
+   "peak_rss_mb": 289,
    "pages": 1,
    "layout_score": 0.4444
   },
@@ -22394,8 +22392,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 90,
-   "ms_per_page": 1296,
-   "peak_rss_mb": 288.7,
+   "ms_per_page": 1381,
+   "peak_rss_mb": 280.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -22425,8 +22423,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 90,
-   "ms_per_page": 1401,
-   "peak_rss_mb": 287.5,
+   "ms_per_page": 1462,
+   "peak_rss_mb": 296.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -22456,8 +22454,8 @@
    "crash": 0,
    "false_notes": 6,
    "truth_notes": 90,
-   "ms_per_page": 1491,
-   "peak_rss_mb": 280.5,
+   "ms_per_page": 1610,
+   "peak_rss_mb": 281.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -22487,8 +22485,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 49,
-   "ms_per_page": 1307,
-   "peak_rss_mb": 277.2,
+   "ms_per_page": 1412,
+   "peak_rss_mb": 273.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -22518,8 +22516,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 49,
-   "ms_per_page": 1481,
-   "peak_rss_mb": 277.4,
+   "ms_per_page": 1568,
+   "peak_rss_mb": 274.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -22549,8 +22547,8 @@
    "crash": 0,
    "false_notes": 11,
    "truth_notes": 49,
-   "ms_per_page": 1500,
-   "peak_rss_mb": 288.7,
+   "ms_per_page": 1562,
+   "peak_rss_mb": 275.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -22580,8 +22578,8 @@
    "crash": 0,
    "false_notes": 9,
    "truth_notes": 67,
-   "ms_per_page": 1314,
-   "peak_rss_mb": 292.6,
+   "ms_per_page": 1350,
+   "peak_rss_mb": 284.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -22611,8 +22609,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 67,
-   "ms_per_page": 1462,
-   "peak_rss_mb": 281.6,
+   "ms_per_page": 1524,
+   "peak_rss_mb": 284.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -22642,8 +22640,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 67,
-   "ms_per_page": 6104,
-   "peak_rss_mb": 360.6,
+   "ms_per_page": 6849,
+   "peak_rss_mb": 353.2,
    "pages": 1,
    "layout_score": 0.3333
   },
@@ -22673,8 +22671,8 @@
    "crash": 0,
    "false_notes": 49,
    "truth_notes": 80,
-   "ms_per_page": 1253,
-   "peak_rss_mb": 272.8,
+   "ms_per_page": 1290,
+   "peak_rss_mb": 259.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -22704,8 +22702,8 @@
    "crash": 0,
    "false_notes": 49,
    "truth_notes": 80,
-   "ms_per_page": 1426,
-   "peak_rss_mb": 274.1,
+   "ms_per_page": 1519,
+   "peak_rss_mb": 281.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -22735,8 +22733,8 @@
    "crash": 0,
    "false_notes": 59,
    "truth_notes": 80,
-   "ms_per_page": 1938,
-   "peak_rss_mb": 343.1,
+   "ms_per_page": 2073,
+   "peak_rss_mb": 349.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -22772,8 +22770,8 @@
    "crash": 0,
    "false_notes": 13,
    "truth_notes": 113,
-   "ms_per_page": 1558,
-   "peak_rss_mb": 282.8,
+   "ms_per_page": 1671,
+   "peak_rss_mb": 294.1,
    "pages": 1,
    "layout_score": 0.9935
   },
@@ -22809,8 +22807,8 @@
    "crash": 0,
    "false_notes": 15,
    "truth_notes": 113,
-   "ms_per_page": 1737,
-   "peak_rss_mb": 265.8,
+   "ms_per_page": 1790,
+   "peak_rss_mb": 281.3,
    "pages": 1,
    "layout_score": 0.9902
   },
@@ -22846,8 +22844,8 @@
    "crash": 0,
    "false_notes": 20,
    "truth_notes": 113,
-   "ms_per_page": 1903,
-   "peak_rss_mb": 316.2,
+   "ms_per_page": 2105,
+   "peak_rss_mb": 312,
    "pages": 1,
    "layout_score": 1
   },
@@ -22877,8 +22875,8 @@
    "crash": 0,
    "false_notes": 4,
    "truth_notes": 112,
-   "ms_per_page": 1544,
-   "peak_rss_mb": 300.7,
+   "ms_per_page": 1686,
+   "peak_rss_mb": 292.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -22908,8 +22906,8 @@
    "crash": 0,
    "false_notes": 5,
    "truth_notes": 112,
-   "ms_per_page": 1688,
-   "peak_rss_mb": 309.2,
+   "ms_per_page": 1764,
+   "peak_rss_mb": 305.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -22939,8 +22937,8 @@
    "crash": 0,
    "false_notes": 14,
    "truth_notes": 112,
-   "ms_per_page": 1782,
-   "peak_rss_mb": 325.5,
+   "ms_per_page": 1837,
+   "peak_rss_mb": 290.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -22970,8 +22968,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 98,
-   "ms_per_page": 1433,
-   "peak_rss_mb": 261.5,
+   "ms_per_page": 1507,
+   "peak_rss_mb": 267.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -23001,8 +22999,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 98,
-   "ms_per_page": 1640,
-   "peak_rss_mb": 280.9,
+   "ms_per_page": 1637,
+   "peak_rss_mb": 300.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -23032,8 +23030,8 @@
    "crash": 0,
    "false_notes": 65,
    "truth_notes": 98,
-   "ms_per_page": 2039,
-   "peak_rss_mb": 290.7,
+   "ms_per_page": 2087,
+   "peak_rss_mb": 311.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -23063,8 +23061,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 88,
-   "ms_per_page": 1322,
-   "peak_rss_mb": 275.5,
+   "ms_per_page": 1390,
+   "peak_rss_mb": 263.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -23094,8 +23092,8 @@
    "crash": 0,
    "false_notes": 6,
    "truth_notes": 88,
-   "ms_per_page": 1480,
-   "peak_rss_mb": 282.8,
+   "ms_per_page": 1556,
+   "peak_rss_mb": 283.4,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -23125,8 +23123,8 @@
    "crash": 0,
    "false_notes": 15,
    "truth_notes": 88,
-   "ms_per_page": 2047,
-   "peak_rss_mb": 347,
+   "ms_per_page": 2151,
+   "peak_rss_mb": 340.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -23156,8 +23154,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 49,
-   "ms_per_page": 1272,
-   "peak_rss_mb": 298.5,
+   "ms_per_page": 1341,
+   "peak_rss_mb": 269.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -23187,8 +23185,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 49,
-   "ms_per_page": 1429,
-   "peak_rss_mb": 277,
+   "ms_per_page": 1517,
+   "peak_rss_mb": 278.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -23218,8 +23216,8 @@
    "crash": 0,
    "false_notes": 5,
    "truth_notes": 49,
-   "ms_per_page": 1490,
-   "peak_rss_mb": 274.7,
+   "ms_per_page": 1602,
+   "peak_rss_mb": 300.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -23249,8 +23247,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 48,
-   "ms_per_page": 1321,
-   "peak_rss_mb": 270.7,
+   "ms_per_page": 1358,
+   "peak_rss_mb": 258.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -23280,8 +23278,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 48,
-   "ms_per_page": 1433,
-   "peak_rss_mb": 312.1,
+   "ms_per_page": 1575,
+   "peak_rss_mb": 284.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -23311,8 +23309,8 @@
    "crash": 0,
    "false_notes": 50,
    "truth_notes": 48,
-   "ms_per_page": 1642,
-   "peak_rss_mb": 256.7,
+   "ms_per_page": 1679,
+   "peak_rss_mb": 290.8,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -23342,8 +23340,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 37,
-   "ms_per_page": 1171,
-   "peak_rss_mb": 270.7,
+   "ms_per_page": 1233,
+   "peak_rss_mb": 281.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -23373,8 +23371,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 37,
-   "ms_per_page": 1305,
-   "peak_rss_mb": 298.2,
+   "ms_per_page": 1369,
+   "peak_rss_mb": 288.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -23404,8 +23402,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 37,
-   "ms_per_page": 1880,
-   "peak_rss_mb": 334.9,
+   "ms_per_page": 1980,
+   "peak_rss_mb": 357.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -23435,8 +23433,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 62,
-   "ms_per_page": 1430,
-   "peak_rss_mb": 290.1,
+   "ms_per_page": 1519,
+   "peak_rss_mb": 290.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -23466,8 +23464,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 62,
-   "ms_per_page": 1481,
-   "peak_rss_mb": 283.5,
+   "ms_per_page": 1533,
+   "peak_rss_mb": 288,
    "pages": 1,
    "layout_score": 1
   },
@@ -23497,8 +23495,8 @@
    "crash": 0,
    "false_notes": 7,
    "truth_notes": 62,
-   "ms_per_page": 1961,
-   "peak_rss_mb": 324.8,
+   "ms_per_page": 2071,
+   "peak_rss_mb": 312.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -23528,8 +23526,8 @@
    "crash": 0,
    "false_notes": 12,
    "truth_notes": 33,
-   "ms_per_page": 1291,
-   "peak_rss_mb": 275.2,
+   "ms_per_page": 1363,
+   "peak_rss_mb": 267.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -23559,8 +23557,8 @@
    "crash": 0,
    "false_notes": 12,
    "truth_notes": 33,
-   "ms_per_page": 1489,
-   "peak_rss_mb": 283,
+   "ms_per_page": 1594,
+   "peak_rss_mb": 295.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -23590,8 +23588,8 @@
    "crash": 0,
    "false_notes": 43,
    "truth_notes": 33,
-   "ms_per_page": 1789,
-   "peak_rss_mb": 356.8,
+   "ms_per_page": 1842,
+   "peak_rss_mb": 362.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -23621,8 +23619,8 @@
    "crash": 0,
    "false_notes": 6,
    "truth_notes": 34,
-   "ms_per_page": 1403,
-   "peak_rss_mb": 288,
+   "ms_per_page": 1495,
+   "peak_rss_mb": 290.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -23652,8 +23650,8 @@
    "crash": 0,
    "false_notes": 6,
    "truth_notes": 34,
-   "ms_per_page": 1539,
-   "peak_rss_mb": 283.6,
+   "ms_per_page": 1598,
+   "peak_rss_mb": 280,
    "pages": 1,
    "layout_score": 1
   },
@@ -23683,8 +23681,8 @@
    "crash": 0,
    "false_notes": 14,
    "truth_notes": 34,
-   "ms_per_page": 1612,
-   "peak_rss_mb": 295,
+   "ms_per_page": 1665,
+   "peak_rss_mb": 276.3,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -23714,8 +23712,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 10,
-   "ms_per_page": 1251,
-   "peak_rss_mb": 272.1,
+   "ms_per_page": 1325,
+   "peak_rss_mb": 281.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -23745,8 +23743,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 10,
-   "ms_per_page": 1504,
-   "peak_rss_mb": 289.2,
+   "ms_per_page": 1515,
+   "peak_rss_mb": 313.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -23776,8 +23774,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 10,
-   "ms_per_page": 2647,
-   "peak_rss_mb": 384.8,
+   "ms_per_page": 2875,
+   "peak_rss_mb": 405.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -23807,8 +23805,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 19,
-   "ms_per_page": 1331,
-   "peak_rss_mb": 272.7,
+   "ms_per_page": 1367,
+   "peak_rss_mb": 257.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -23838,8 +23836,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 19,
-   "ms_per_page": 1391,
-   "peak_rss_mb": 282.9,
+   "ms_per_page": 1461,
+   "peak_rss_mb": 298,
    "pages": 1,
    "layout_score": 1
   },
@@ -23869,8 +23867,8 @@
    "crash": 0,
    "false_notes": 4,
    "truth_notes": 19,
-   "ms_per_page": 2358,
-   "peak_rss_mb": 345.9,
+   "ms_per_page": 2440,
+   "peak_rss_mb": 390.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -23900,8 +23898,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 19,
-   "ms_per_page": 1422,
-   "peak_rss_mb": 282.9,
+   "ms_per_page": 1463,
+   "peak_rss_mb": 278,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -23931,8 +23929,8 @@
    "crash": 0,
    "false_notes": 7,
    "truth_notes": 19,
-   "ms_per_page": 1515,
-   "peak_rss_mb": 280,
+   "ms_per_page": 1708,
+   "peak_rss_mb": 286.8,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -23962,8 +23960,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 19,
-   "ms_per_page": 1645,
-   "peak_rss_mb": 310.6,
+   "ms_per_page": 1818,
+   "peak_rss_mb": 309.9,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -23993,8 +23991,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 49,
-   "ms_per_page": 1219,
-   "peak_rss_mb": 290.2,
+   "ms_per_page": 1297,
+   "peak_rss_mb": 281,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -24024,8 +24022,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 49,
-   "ms_per_page": 1370,
-   "peak_rss_mb": 309.5,
+   "ms_per_page": 1454,
+   "peak_rss_mb": 281.8,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -24055,8 +24053,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 49,
-   "ms_per_page": 1454,
-   "peak_rss_mb": 295.5,
+   "ms_per_page": 1594,
+   "peak_rss_mb": 313.9,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -24086,8 +24084,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 54,
-   "ms_per_page": 1447,
-   "peak_rss_mb": 291.1,
+   "ms_per_page": 1528,
+   "peak_rss_mb": 274.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -24117,8 +24115,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 54,
-   "ms_per_page": 1548,
-   "peak_rss_mb": 277.2,
+   "ms_per_page": 1596,
+   "peak_rss_mb": 297.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -24148,8 +24146,8 @@
    "crash": 0,
    "false_notes": 7,
    "truth_notes": 54,
-   "ms_per_page": 1618,
-   "peak_rss_mb": 298.8,
+   "ms_per_page": 1662,
+   "peak_rss_mb": 285.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -24179,8 +24177,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 78,
-   "ms_per_page": 1645,
-   "peak_rss_mb": 281.6,
+   "ms_per_page": 1672,
+   "peak_rss_mb": 270,
    "pages": 1,
    "layout_score": 1
   },
@@ -24210,8 +24208,8 @@
    "crash": 0,
    "false_notes": 8,
    "truth_notes": 78,
-   "ms_per_page": 1653,
-   "peak_rss_mb": 302.9,
+   "ms_per_page": 1840,
+   "peak_rss_mb": 295.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -24241,8 +24239,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 78,
-   "ms_per_page": 17337,
-   "peak_rss_mb": 601.3,
+   "ms_per_page": 18860,
+   "peak_rss_mb": 668.4,
    "pages": 1,
    "layout_score": 0.3333
   },
@@ -24278,8 +24276,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 66,
-   "ms_per_page": 2654,
-   "peak_rss_mb": 378.9,
+   "ms_per_page": 2812,
+   "peak_rss_mb": 365.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -24315,8 +24313,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 66,
-   "ms_per_page": 2961,
-   "peak_rss_mb": 346.9,
+   "ms_per_page": 3036,
+   "peak_rss_mb": 356.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -24352,8 +24350,8 @@
    "crash": 0,
    "false_notes": 5,
    "truth_notes": 66,
-   "ms_per_page": 3026,
-   "peak_rss_mb": 412.8,
+   "ms_per_page": 3187,
+   "peak_rss_mb": 408.3,
    "pages": 1,
    "layout_score": 0.9841
   },
@@ -24383,8 +24381,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 59,
-   "ms_per_page": 1231,
-   "peak_rss_mb": 283.5,
+   "ms_per_page": 1267,
+   "peak_rss_mb": 289,
    "pages": 1,
    "layout_score": 1
   },
@@ -24414,8 +24412,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 59,
-   "ms_per_page": 1468,
-   "peak_rss_mb": 265.2,
+   "ms_per_page": 1439,
+   "peak_rss_mb": 306.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -24445,8 +24443,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 59,
-   "ms_per_page": 1312,
-   "peak_rss_mb": 276.2,
+   "ms_per_page": 1414,
+   "peak_rss_mb": 290.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -24476,8 +24474,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 164,
-   "ms_per_page": 1360,
-   "peak_rss_mb": 294.2,
+   "ms_per_page": 1518,
+   "peak_rss_mb": 276,
    "pages": 1,
    "layout_score": 1
   },
@@ -24507,8 +24505,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 164,
-   "ms_per_page": 1539,
-   "peak_rss_mb": 288.8,
+   "ms_per_page": 1570,
+   "peak_rss_mb": 295.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -24538,8 +24536,8 @@
    "crash": 0,
    "false_notes": 4,
    "truth_notes": 164,
-   "ms_per_page": 2742,
-   "peak_rss_mb": 347.2,
+   "ms_per_page": 2882,
+   "peak_rss_mb": 349.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -24575,8 +24573,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 192,
-   "ms_per_page": 3635,
-   "peak_rss_mb": 372.4,
+   "ms_per_page": 3697,
+   "peak_rss_mb": 362.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -24612,8 +24610,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 192,
-   "ms_per_page": 4191,
-   "peak_rss_mb": 392.9,
+   "ms_per_page": 4286,
+   "peak_rss_mb": 386.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -24650,8 +24648,8 @@
    "crash": 0,
    "false_notes": 124,
    "truth_notes": 192,
-   "ms_per_page": 4668,
-   "peak_rss_mb": 397.7,
+   "ms_per_page": 4756,
+   "peak_rss_mb": 462,
    "pages": 1,
    "layout_score": 0.4435
   },
@@ -24681,8 +24679,8 @@
    "crash": 0,
    "false_notes": 12,
    "truth_notes": 57,
-   "ms_per_page": 1384,
-   "peak_rss_mb": 263.6,
+   "ms_per_page": 1525,
+   "peak_rss_mb": 252.4,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -24712,8 +24710,8 @@
    "crash": 0,
    "false_notes": 4,
    "truth_notes": 57,
-   "ms_per_page": 1581,
-   "peak_rss_mb": 266,
+   "ms_per_page": 1635,
+   "peak_rss_mb": 287.6,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -24743,8 +24741,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 57,
-   "ms_per_page": 1481,
-   "peak_rss_mb": 277.5,
+   "ms_per_page": 1537,
+   "peak_rss_mb": 294.7,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -24774,8 +24772,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 168,
-   "ms_per_page": 1530,
-   "peak_rss_mb": 294.7,
+   "ms_per_page": 1624,
+   "peak_rss_mb": 281.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -24805,8 +24803,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 168,
-   "ms_per_page": 1653,
-   "peak_rss_mb": 286.9,
+   "ms_per_page": 1779,
+   "peak_rss_mb": 297.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -24836,8 +24834,8 @@
    "crash": 0,
    "false_notes": 13,
    "truth_notes": 168,
-   "ms_per_page": 3492,
-   "peak_rss_mb": 347.8,
+   "ms_per_page": 3858,
+   "peak_rss_mb": 362.5,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -24869,8 +24867,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 158,
-   "ms_per_page": 2523,
-   "peak_rss_mb": 525.3,
+   "ms_per_page": 2685,
+   "peak_rss_mb": 501.5,
    "pages": 2,
    "layout_score": 1
   },
@@ -24902,8 +24900,8 @@
    "crash": 0,
    "false_notes": 5,
    "truth_notes": 158,
-   "ms_per_page": 2902,
-   "peak_rss_mb": 519.1,
+   "ms_per_page": 2856,
+   "peak_rss_mb": 496.8,
    "pages": 2,
    "layout_score": 1
   },
@@ -24935,8 +24933,8 @@
    "crash": 0,
    "false_notes": 9,
    "truth_notes": 158,
-   "ms_per_page": 10452,
-   "peak_rss_mb": 657.3,
+   "ms_per_page": 10690,
+   "peak_rss_mb": 686.5,
    "pages": 1,
    "layout_score": 0.9972
   },
@@ -24978,8 +24976,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 708,
-   "ms_per_page": 3082,
-   "peak_rss_mb": 520,
+   "ms_per_page": 3211,
+   "peak_rss_mb": 534.9,
    "pages": 5,
    "layout_score": 0.9524
   },
@@ -25021,8 +25019,8 @@
    "crash": 0,
    "false_notes": 5,
    "truth_notes": 708,
-   "ms_per_page": 3376,
-   "peak_rss_mb": 526.2,
+   "ms_per_page": 3557,
+   "peak_rss_mb": 565.2,
    "pages": 5,
    "layout_score": 0.9798
   },
@@ -25064,8 +25062,8 @@
    "crash": 0,
    "false_notes": 27,
    "truth_notes": 708,
-   "ms_per_page": 3974,
-   "peak_rss_mb": 629.4,
+   "ms_per_page": 4129,
+   "peak_rss_mb": 591.4,
    "pages": 5,
    "layout_score": 0.943
   },
@@ -25095,8 +25093,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 1152,
-   "ms_per_page": 1144,
-   "peak_rss_mb": 463,
+   "ms_per_page": 1180,
+   "peak_rss_mb": 477.6,
    "pages": 12,
    "layout_score": 1
   },
@@ -25126,8 +25124,8 @@
    "crash": 0,
    "false_notes": 16,
    "truth_notes": 1152,
-   "ms_per_page": 1284,
-   "peak_rss_mb": 495,
+   "ms_per_page": 1383,
+   "peak_rss_mb": 471.3,
    "pages": 12,
    "layout_score": 1
   },
@@ -25157,8 +25155,8 @@
    "crash": 0,
    "false_notes": 26,
    "truth_notes": 1152,
-   "ms_per_page": 1349,
-   "peak_rss_mb": 452.8,
+   "ms_per_page": 1406,
+   "peak_rss_mb": 460.7,
    "pages": 12,
    "layout_score": 1
   },
@@ -25188,8 +25186,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 41,
-   "ms_per_page": 1353,
-   "peak_rss_mb": 275.1,
+   "ms_per_page": 1430,
+   "peak_rss_mb": 262.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -25219,8 +25217,8 @@
    "crash": 0,
    "false_notes": 4,
    "truth_notes": 41,
-   "ms_per_page": 1534,
-   "peak_rss_mb": 270.4,
+   "ms_per_page": 1586,
+   "peak_rss_mb": 279.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -25250,8 +25248,8 @@
    "crash": 0,
    "false_notes": 8,
    "truth_notes": 41,
-   "ms_per_page": 1641,
-   "peak_rss_mb": 267.4,
+   "ms_per_page": 1715,
+   "peak_rss_mb": 309.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -25281,8 +25279,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 59,
-   "ms_per_page": 1499,
-   "peak_rss_mb": 274.5,
+   "ms_per_page": 1539,
+   "peak_rss_mb": 277.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -25312,8 +25310,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 59,
-   "ms_per_page": 1609,
-   "peak_rss_mb": 286.6,
+   "ms_per_page": 1624,
+   "peak_rss_mb": 292,
    "pages": 1,
    "layout_score": 1
   },
@@ -25343,8 +25341,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 59,
-   "ms_per_page": 1692,
-   "peak_rss_mb": 291.8,
+   "ms_per_page": 1793,
+   "peak_rss_mb": 312.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -25374,8 +25372,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 85,
-   "ms_per_page": 1427,
-   "peak_rss_mb": 283.1,
+   "ms_per_page": 1454,
+   "peak_rss_mb": 259,
    "pages": 1,
    "layout_score": 1
   },
@@ -25405,8 +25403,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 85,
-   "ms_per_page": 1713,
-   "peak_rss_mb": 300.3,
+   "ms_per_page": 1628,
+   "peak_rss_mb": 289.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -25436,8 +25434,8 @@
    "crash": 0,
    "false_notes": 5,
    "truth_notes": 85,
-   "ms_per_page": 1748,
-   "peak_rss_mb": 302.5,
+   "ms_per_page": 1840,
+   "peak_rss_mb": 311.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -25467,8 +25465,8 @@
    "crash": 0,
    "false_notes": 4,
    "truth_notes": 34,
-   "ms_per_page": 1576,
-   "peak_rss_mb": 287.9,
+   "ms_per_page": 1491,
+   "peak_rss_mb": 285.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -25498,8 +25496,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 34,
-   "ms_per_page": 1619,
-   "peak_rss_mb": 296.9,
+   "ms_per_page": 1593,
+   "peak_rss_mb": 285.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -25529,8 +25527,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 34,
-   "ms_per_page": 1638,
-   "peak_rss_mb": 288.5,
+   "ms_per_page": 1631,
+   "peak_rss_mb": 295.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -25560,8 +25558,8 @@
    "crash": 0,
    "false_notes": 5,
    "truth_notes": 59,
-   "ms_per_page": 1334,
-   "peak_rss_mb": 276.1,
+   "ms_per_page": 1384,
+   "peak_rss_mb": 282.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -25591,8 +25589,8 @@
    "crash": 0,
    "false_notes": 4,
    "truth_notes": 59,
-   "ms_per_page": 1494,
-   "peak_rss_mb": 290.1,
+   "ms_per_page": 1569,
+   "peak_rss_mb": 286.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -25622,8 +25620,8 @@
    "crash": 0,
    "false_notes": 4,
    "truth_notes": 59,
-   "ms_per_page": 1968,
-   "peak_rss_mb": 296.6,
+   "ms_per_page": 2007,
+   "peak_rss_mb": 312.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -25653,8 +25651,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 78,
-   "ms_per_page": 1125,
-   "peak_rss_mb": 287.7,
+   "ms_per_page": 1171,
+   "peak_rss_mb": 267.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -25684,8 +25682,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 78,
-   "ms_per_page": 1254,
-   "peak_rss_mb": 293.3,
+   "ms_per_page": 1310,
+   "peak_rss_mb": 295.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -25715,8 +25713,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 78,
-   "ms_per_page": 1500,
-   "peak_rss_mb": 315.3,
+   "ms_per_page": 1460,
+   "peak_rss_mb": 283.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -25746,8 +25744,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 52,
-   "ms_per_page": 1160,
-   "peak_rss_mb": 269.7,
+   "ms_per_page": 1209,
+   "peak_rss_mb": 273.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -25777,8 +25775,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 52,
-   "ms_per_page": 1334,
-   "peak_rss_mb": 285.6,
+   "ms_per_page": 1390,
+   "peak_rss_mb": 281.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -25808,8 +25806,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 52,
-   "ms_per_page": 1514,
-   "peak_rss_mb": 307.2,
+   "ms_per_page": 1498,
+   "peak_rss_mb": 305.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -25839,8 +25837,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 77,
-   "ms_per_page": 1137,
-   "peak_rss_mb": 329.2,
+   "ms_per_page": 1193,
+   "peak_rss_mb": 313.2,
    "pages": 2,
    "layout_score": 1
   },
@@ -25870,8 +25868,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 77,
-   "ms_per_page": 1291,
-   "peak_rss_mb": 298,
+   "ms_per_page": 1287,
+   "peak_rss_mb": 313.5,
    "pages": 2,
    "layout_score": 1
   },
@@ -25901,8 +25899,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 77,
-   "ms_per_page": 4369,
-   "peak_rss_mb": 492.2,
+   "ms_per_page": 4784,
+   "peak_rss_mb": 466.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -25932,8 +25930,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 37,
-   "ms_per_page": 1113,
-   "peak_rss_mb": 280.3,
+   "ms_per_page": 1149,
+   "peak_rss_mb": 267.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -25963,8 +25961,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 37,
-   "ms_per_page": 1303,
-   "peak_rss_mb": 299.6,
+   "ms_per_page": 1300,
+   "peak_rss_mb": 295.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -25994,8 +25992,8 @@
    "crash": 0,
    "false_notes": 11,
    "truth_notes": 37,
-   "ms_per_page": 1859,
-   "peak_rss_mb": 313.3,
+   "ms_per_page": 1951,
+   "peak_rss_mb": 312.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -26031,8 +26029,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 89,
-   "ms_per_page": 1694,
-   "peak_rss_mb": 283.8,
+   "ms_per_page": 1755,
+   "peak_rss_mb": 274.9,
    "pages": 1,
    "layout_score": 0.9962
   },
@@ -26068,8 +26066,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 89,
-   "ms_per_page": 1889,
-   "peak_rss_mb": 293.3,
+   "ms_per_page": 1990,
+   "peak_rss_mb": 305.9,
    "pages": 1,
    "layout_score": 0.9962
   },
@@ -26105,3714 +26103,468 @@
    "crash": 0,
    "false_notes": 15,
    "truth_notes": 89,
-   "ms_per_page": 1889,
-   "peak_rss_mb": 306.4,
+   "ms_per_page": 1867,
+   "peak_rss_mb": 333.7,
    "pages": 1,
    "layout_score": 0.9629
   }
  ],
  "perf": {
-  "source": "../r24/eval-coverage-ocr2.json",
-  "scope": "all coverage items, no perf family yet",
+  "source": "mvp/work/eval-coverage-baseline-perf.json",
+  "scope": "perf family",
   "config": {
-   "dpi": 200,
+   "dpi": "native",
    "jobs": 8,
    "ocr": true,
    "loadavg": [
-    52.5,
-    52.8,
-    51.4
+    166.9,
+    174.1,
+    214.4
    ],
    "cpus": 192
   },
-  "n": 249,
+  "n": 63,
   "by_src_dpi": [
    {
     "src_dpi": "100",
-    "n": 4,
-    "mp_per_page": 4.582,
-    "ms_per_page_median": 1500,
-    "ms_per_page_max": 3492,
-    "peak_rss_mb_median": 315.3,
-    "peak_rss_mb_max": 347.8
-   },
-   {
-    "src_dpi": "110",
-    "n": 2,
-    "mp_per_page": 4.555,
-    "ms_per_page_median": 1889,
-    "ms_per_page_max": 1889,
-    "peak_rss_mb_median": 306.4,
-    "peak_rss_mb_max": 306.4
-   },
-   {
-    "src_dpi": "120",
-    "n": 8,
-    "mp_per_page": 3.869,
-    "ms_per_page_median": 1692,
-    "ms_per_page_max": 4884,
-    "peak_rss_mb_median": 291.8,
-    "peak_rss_mb_max": 575.2
+    "n": 6,
+    "mp_per_page": 0.968,
+    "ms_per_page_median": 3227,
+    "ms_per_page_max": 4464,
+    "peak_rss_mb_median": 309.4,
+    "peak_rss_mb_max": 374.5
    },
    {
     "src_dpi": "150",
-    "n": 40,
-    "mp_per_page": 4.31,
-    "ms_per_page_median": 1938,
-    "ms_per_page_max": 17337,
-    "peak_rss_mb_median": 319.6,
-    "peak_rss_mb_max": 657.3
+    "n": 6,
+    "mp_per_page": 2.178,
+    "ms_per_page_median": 3332,
+    "ms_per_page_max": 4900,
+    "peak_rss_mb_median": 318.2,
+    "peak_rss_mb_max": 376.2
    },
    {
     "src_dpi": "200",
-    "n": 45,
-    "mp_per_page": 4.018,
-    "ms_per_page_median": 1596,
-    "ms_per_page_max": 4668,
-    "peak_rss_mb_median": 293,
-    "peak_rss_mb_max": 629.4
-   },
-   {
-    "src_dpi": "240",
-    "n": 3,
-    "mp_per_page": 3.873,
-    "ms_per_page_median": 2031,
-    "ms_per_page_max": 2040,
-    "peak_rss_mb_median": 282.4,
-    "peak_rss_mb_max": 312.5
-   },
-   {
-    "src_dpi": "250",
-    "n": 17,
-    "mp_per_page": 3.87,
-    "ms_per_page_median": 1594,
-    "ms_per_page_max": 3583,
-    "peak_rss_mb_median": 293.3,
-    "peak_rss_mb_max": 473.4
+    "n": 6,
+    "mp_per_page": 3.869,
+    "ms_per_page_median": 3110,
+    "ms_per_page_max": 4225,
+    "peak_rss_mb_median": 252.2,
+    "peak_rss_mb_max": 337.6
    },
    {
     "src_dpi": "300",
-    "n": 130,
-    "mp_per_page": 3.869,
-    "ms_per_page_median": 1468,
-    "ms_per_page_max": 4191,
-    "peak_rss_mb_median": 285.4,
-    "peak_rss_mb_max": 526.2
+    "n": 33,
+    "mp_per_page": 8.703,
+    "ms_per_page_median": 3185,
+    "ms_per_page_max": 5352,
+    "peak_rss_mb_median": 375.3,
+    "peak_rss_mb_max": 2184.3
+   },
+   {
+    "src_dpi": "400",
+    "n": 6,
+    "mp_per_page": 15.475,
+    "ms_per_page_median": 5593,
+    "ms_per_page_max": 7527,
+    "peak_rss_mb_median": 446,
+    "peak_rss_mb_max": 557.8
+   },
+   {
+    "src_dpi": "600",
+    "n": 6,
+    "mp_per_page": 34.806,
+    "ms_per_page_median": 4819,
+    "ms_per_page_max": 5363,
+    "peak_rss_mb_median": 418,
+    "peak_rss_mb_max": 445.6
    }
   ],
   "by_raster_dpi": [
    {
+    "raster_dpi": "100",
+    "n": 6,
+    "mp_per_page": 0.968,
+    "ms_per_page_median": 3227,
+    "ms_per_page_max": 4464,
+    "peak_rss_mb_median": 309.4,
+    "peak_rss_mb_max": 374.5
+   },
+   {
+    "raster_dpi": "150",
+    "n": 6,
+    "mp_per_page": 2.178,
+    "ms_per_page_median": 3332,
+    "ms_per_page_max": 4900,
+    "peak_rss_mb_median": 318.2,
+    "peak_rss_mb_max": 376.2
+   },
+   {
     "raster_dpi": "200",
-    "n": 249,
+    "n": 6,
     "mp_per_page": 3.869,
-    "ms_per_page_median": 1544,
-    "ms_per_page_max": 17337,
-    "peak_rss_mb_median": 290.1,
-    "peak_rss_mb_max": 657.3
+    "ms_per_page_median": 3110,
+    "ms_per_page_max": 4225,
+    "peak_rss_mb_median": 252.2,
+    "peak_rss_mb_max": 337.6
+   },
+   {
+    "raster_dpi": "300",
+    "n": 33,
+    "mp_per_page": 8.703,
+    "ms_per_page_median": 3185,
+    "ms_per_page_max": 5352,
+    "peak_rss_mb_median": 375.3,
+    "peak_rss_mb_max": 2184.3
+   },
+   {
+    "raster_dpi": "400",
+    "n": 6,
+    "mp_per_page": 15.475,
+    "ms_per_page_median": 5593,
+    "ms_per_page_max": 7527,
+    "peak_rss_mb_median": 446,
+    "peak_rss_mb_max": 557.8
+   },
+   {
+    "raster_dpi": "600",
+    "n": 6,
+    "mp_per_page": 34.806,
+    "ms_per_page_median": 4819,
+    "ms_per_page_max": 5363,
+    "peak_rss_mb_median": 418,
+    "peak_rss_mb_max": 445.6
    }
   ],
   "by_paper": [
    {
-    "paper": "~A3 landscape",
+    "paper": "~A3",
     "n": 1,
-    "mp_per_page": 9.314,
-    "ms_per_page_median": 4369,
-    "ms_per_page_max": 4369,
-    "peak_rss_mb_median": 492.2,
-    "peak_rss_mb_max": 492.2
-   },
-   {
-    "paper": "~A4",
-    "n": 39,
-    "mp_per_page": 4.234,
-    "ms_per_page_median": 1638,
-    "ms_per_page_max": 17337,
-    "peak_rss_mb_median": 298.1,
-    "peak_rss_mb_max": 601.3
+    "mp_per_page": 20.49,
+    "ms_per_page_median": 5259,
+    "ms_per_page_max": 5259,
+    "peak_rss_mb_median": 417.9,
+    "peak_rss_mb_max": 417.9
    },
    {
     "paper": "~B4",
-    "n": 19,
-    "mp_per_page": 4.697,
-    "ms_per_page_median": 1938,
-    "ms_per_page_max": 5322,
-    "peak_rss_mb_median": 316.2,
-    "peak_rss_mb_max": 541.7
+    "n": 6,
+    "mp_per_page": 10.25,
+    "ms_per_page_median": 5352,
+    "ms_per_page_max": 7527,
+    "peak_rss_mb_median": 419.1,
+    "peak_rss_mb_max": 557.8
    },
    {
-    "paper": "A3 landscape",
+    "paper": "~Letter",
     "n": 1,
-    "mp_per_page": 7.742,
-    "ms_per_page_median": 10452,
-    "ms_per_page_max": 10452,
-    "peak_rss_mb_median": 657.3,
-    "peak_rss_mb_max": 657.3
+    "mp_per_page": 9.965,
+    "ms_per_page_median": 4833,
+    "ms_per_page_max": 4833,
+    "peak_rss_mb_median": 453.1,
+    "peak_rss_mb_max": 453.1
+   },
+   {
+    "paper": "A3",
+    "n": 5,
+    "mp_per_page": 17.403,
+    "ms_per_page_median": 3617,
+    "ms_per_page_max": 4266,
+    "peak_rss_mb_median": 345.9,
+    "peak_rss_mb_max": 411.7
    },
    {
     "paper": "A4",
-    "n": 188,
-    "mp_per_page": 3.869,
-    "ms_per_page_median": 1501,
-    "ms_per_page_max": 4884,
-    "peak_rss_mb_median": 286,
-    "peak_rss_mb_max": 629.4
+    "n": 45,
+    "mp_per_page": 8.703,
+    "ms_per_page_median": 2993,
+    "ms_per_page_max": 6659,
+    "peak_rss_mb_median": 345.4,
+    "peak_rss_mb_max": 2184.3
    },
    {
-    "paper": "A4 landscape",
-    "n": 1,
-    "mp_per_page": 3.871,
-    "ms_per_page_median": 1961,
-    "ms_per_page_max": 1961,
-    "peak_rss_mb_median": 324.8,
-    "peak_rss_mb_max": 324.8
+    "paper": "Letter",
+    "n": 5,
+    "mp_per_page": 8.415,
+    "ms_per_page_median": 3717,
+    "ms_per_page_max": 4452,
+    "peak_rss_mb_median": 336.6,
+    "peak_rss_mb_max": 369.5
    }
   ],
   "by_pages": [
    {
     "pages": "1",
-    "n": 233,
-    "mp_per_page": 3.869,
-    "ms_per_page_median": 1544,
-    "ms_per_page_max": 17337,
-    "peak_rss_mb_median": 288.5,
-    "peak_rss_mb_max": 657.3
-   },
-   {
-    "pages": "2",
-    "n": 10,
-    "mp_per_page": 3.869,
-    "ms_per_page_median": 2523,
-    "ms_per_page_max": 4884,
-    "peak_rss_mb_median": 469.5,
-    "peak_rss_mb_max": 575.2
+    "n": 51,
+    "mp_per_page": 8.703,
+    "ms_per_page_median": 3782,
+    "ms_per_page_max": 7527,
+    "peak_rss_mb_median": 336.6,
+    "peak_rss_mb_max": 557.8
    },
    {
     "pages": "5",
     "n": 3,
-    "mp_per_page": 3.869,
-    "ms_per_page_median": 3376,
-    "ms_per_page_max": 3974,
-    "peak_rss_mb_median": 526.2,
-    "peak_rss_mb_max": 629.4
+    "mp_per_page": 8.703,
+    "ms_per_page_median": 2740,
+    "ms_per_page_max": 2993,
+    "peak_rss_mb_median": 572.1,
+    "peak_rss_mb_max": 666.1
    },
    {
-    "pages": "12",
+    "pages": "10",
     "n": 3,
-    "mp_per_page": 3.869,
-    "ms_per_page_median": 1284,
-    "ms_per_page_max": 1349,
-    "peak_rss_mb_median": 463,
-    "peak_rss_mb_max": 495
+    "mp_per_page": 8.703,
+    "ms_per_page_median": 2614,
+    "ms_per_page_max": 2864,
+    "peak_rss_mb_median": 891.3,
+    "peak_rss_mb_max": 908.4
+   },
+   {
+    "pages": "20",
+    "n": 3,
+    "mp_per_page": 8.703,
+    "ms_per_page_median": 2602,
+    "ms_per_page_max": 2727,
+    "peak_rss_mb_median": 1301.1,
+    "peak_rss_mb_max": 1302.1
+   },
+   {
+    "pages": "40",
+    "n": 3,
+    "mp_per_page": 8.703,
+    "ms_per_page_median": 2429,
+    "ms_per_page_max": 2632,
+    "peak_rss_mb_median": 2180.8,
+    "peak_rss_mb_max": 2184.3
    }
   ],
   "fit_ms_per_page_vs_mp": {
-   "n": 249,
-   "slope": 1000.8,
-   "intercept": -2122.8,
-   "r2": 0.121
+   "n": 63,
+   "slope": 51.49,
+   "intercept": 3056.2,
+   "r2": 0.2
   },
   "fit_peak_mb_vs_total_mp": {
-   "n": 249,
-   "slope": 6.24,
-   "intercept": 283.5,
-   "r2": 0.217
+   "n": 63,
+   "slope": 5.2,
+   "intercept": 296.9,
+   "r2": 0.968
   },
-  "ms_per_megapixel_overall": 480,
+  "ms_per_megapixel_overall": 301,
   "rows": [
    {
-    "id": "layouts/choir-closed-satb-light-of-morning/clean",
+    "id": "perf/perf-hymn-a3-300dpi/clean",
     "variant": "clean",
     "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
+    "raster_dpi": 300,
+    "paper": "A3",
     "page_pts": [
-     595.4,
-     841.9
+     841.9,
+     1190.6
     ],
     "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1463,
+    "mp_per_page": 17.403,
+    "ms_per_page": 3932,
     "page_ms": [
-     1299.8
+     3912.6
     ],
-    "assemble_ms": 158.2,
-    "runtime_ms": 1463,
-    "wall_ms": 2016,
-    "peak_rss_mb": 279.1
+    "assemble_ms": 18.8,
+    "runtime_ms": 3932,
+    "wall_ms": 4812,
+    "peak_rss_mb": 411.7
    },
    {
-    "id": "layouts/choir-closed-satb-light-of-morning/scan",
+    "id": "perf/perf-hymn-a3-300dpi/scan",
     "variant": "scan",
     "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
+    "raster_dpi": 300,
+    "paper": "A3",
     "page_pts": [
-     595.4,
-     841.9
+     841.9,
+     1190.6
     ],
     "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1644,
+    "mp_per_page": 17.403,
+    "ms_per_page": 4266,
     "page_ms": [
-     1477.9
+     4244.1
     ],
-    "assemble_ms": 162.4,
-    "runtime_ms": 1644,
-    "wall_ms": 2204,
-    "peak_rss_mb": 284.3
+    "assemble_ms": 21.5,
+    "runtime_ms": 4266,
+    "wall_ms": 5041,
+    "peak_rss_mb": 361.9
    },
    {
-    "id": "layouts/choir-closed-satb-light-of-morning/scan-severe",
+    "id": "perf/perf-hymn-a3-300dpi/scan-severe",
     "variant": "scan-severe",
-    "src_dpi": 120,
-    "raster_dpi": 200,
-    "paper": "A4",
+    "src_dpi": 300,
+    "raster_dpi": 300,
+    "paper": "~A3",
     "page_pts": [
-     595.2,
-     841.8
+     925.9,
+     1274.6
     ],
     "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1585,
+    "mp_per_page": 20.49,
+    "ms_per_page": 5259,
     "page_ms": [
-     1398.4
+     5239.8
     ],
-    "assemble_ms": 182.3,
-    "runtime_ms": 1585,
-    "wall_ms": 2129,
-    "peak_rss_mb": 281.1
+    "assemble_ms": 19.2,
+    "runtime_ms": 5259,
+    "wall_ms": 6191,
+    "peak_rss_mb": 417.9
    },
    {
-    "id": "layouts/choir-open-satb-gloria/clean",
+    "id": "perf/perf-hymn-a4-100dpi/clean",
     "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
+    "src_dpi": 100,
+    "raster_dpi": 100,
     "paper": "A4",
     "page_pts": [
      595.4,
-     841.9
+     842.4
     ],
     "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1990,
+    "mp_per_page": 0.968,
+    "ms_per_page": 3227,
     "page_ms": [
-     1789
+     3206.7
     ],
-    "assemble_ms": 196.5,
-    "runtime_ms": 1990,
-    "wall_ms": 2528,
-    "peak_rss_mb": 285.9
+    "assemble_ms": 20.3,
+    "runtime_ms": 3227,
+    "wall_ms": 3685,
+    "peak_rss_mb": 288.8
    },
    {
-    "id": "layouts/choir-open-satb-gloria/scan",
+    "id": "perf/perf-hymn-a4-100dpi/scan",
     "variant": "scan",
-    "src_dpi": 200,
-    "raster_dpi": 200,
+    "src_dpi": 100,
+    "raster_dpi": 100,
     "paper": "A4",
     "page_pts": [
      595.4,
-     842
+     842.4
     ],
     "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 2161,
+    "mp_per_page": 0.968,
+    "ms_per_page": 3479,
     "page_ms": [
-     1936.6
+     3460.8
     ],
-    "assemble_ms": 220.1,
-    "runtime_ms": 2161,
-    "wall_ms": 2702,
-    "peak_rss_mb": 304
-   },
-   {
-    "id": "layouts/choir-open-satb-gloria/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.2,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 2142,
-    "page_ms": [
-     1876.6
-    ],
-    "assemble_ms": 261,
-    "runtime_ms": 2142,
-    "wall_ms": 2727,
+    "assemble_ms": 17.6,
+    "runtime_ms": 3479,
+    "wall_ms": 3926,
     "peak_rss_mb": 312.5
    },
    {
-    "id": "layouts/choir-piano-song-of-rejoicing/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 2756,
-    "page_ms": [
-     2401.1
-    ],
-    "assemble_ms": 350.6,
-    "runtime_ms": 2756,
-    "wall_ms": 3287,
-    "peak_rss_mb": 335.6
-   },
-   {
-    "id": "layouts/choir-piano-song-of-rejoicing/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 3081,
-    "page_ms": [
-     2710
-    ],
-    "assemble_ms": 366.3,
-    "runtime_ms": 3081,
-    "wall_ms": 3627,
-    "peak_rss_mb": 373.9
-   },
-   {
-    "id": "layouts/choir-piano-song-of-rejoicing/scan-severe",
+    "id": "perf/perf-hymn-a4-100dpi/scan-severe",
     "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
+    "src_dpi": 100,
+    "raster_dpi": 100,
     "paper": "~B4",
     "page_pts": [
-     666.7,
-     913
+     654.5,
+     901.4
     ],
     "pages": 1,
-    "mp_per_page": 4.697,
-    "ms_per_page": 5322,
+    "mp_per_page": 1.138,
+    "ms_per_page": 4464,
     "page_ms": [
-     4988.1
+     4439
     ],
-    "assemble_ms": 328.4,
-    "runtime_ms": 5322,
-    "wall_ms": 5870,
-    "peak_rss_mb": 489
+    "assemble_ms": 23.9,
+    "runtime_ms": 4464,
+    "wall_ms": 4905,
+    "peak_rss_mb": 374.5
    },
    {
-    "id": "layouts/choir-sab-summer-song/clean",
+    "id": "perf/perf-hymn-a4-150dpi/clean",
     "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1810,
-    "page_ms": [
-     1614.5
-    ],
-    "assemble_ms": 190.5,
-    "runtime_ms": 1810,
-    "wall_ms": 2329,
-    "peak_rss_mb": 279.2
-   },
-   {
-    "id": "layouts/choir-sab-summer-song/scan",
-    "variant": "scan",
-    "src_dpi": 240,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.5,
-     842.1
-    ],
-    "pages": 1,
-    "mp_per_page": 3.873,
-    "ms_per_page": 2040,
-    "page_ms": [
-     1801.8
-    ],
-    "assemble_ms": 233.2,
-    "runtime_ms": 2040,
-    "wall_ms": 2581,
-    "peak_rss_mb": 282.4
-   },
-   {
-    "id": "layouts/choir-sab-summer-song/scan-severe",
-    "variant": "scan-severe",
     "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "~B4",
-    "page_pts": [
-     666.7,
-     913
-    ],
-    "pages": 1,
-    "mp_per_page": 4.697,
-    "ms_per_page": 2813,
-    "page_ms": [
-     2513.9
-    ],
-    "assemble_ms": 293.4,
-    "runtime_ms": 2813,
-    "wall_ms": 3337,
-    "peak_rss_mb": 427.7
-   },
-   {
-    "id": "layouts/choir-ssaa-winter-night/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1468,
-    "page_ms": [
-     1335
-    ],
-    "assemble_ms": 128.1,
-    "runtime_ms": 1468,
-    "wall_ms": 1986,
-    "peak_rss_mb": 286.6
-   },
-   {
-    "id": "layouts/choir-ssaa-winter-night/scan",
-    "variant": "scan",
-    "src_dpi": 250,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.3,
-     842.1
-    ],
-    "pages": 1,
-    "mp_per_page": 3.87,
-    "ms_per_page": 1594,
-    "page_ms": [
-     1464.9
-    ],
-    "assemble_ms": 124.4,
-    "runtime_ms": 1594,
-    "wall_ms": 2107,
-    "peak_rss_mb": 275.9
-   },
-   {
-    "id": "layouts/choir-ssaa-winter-night/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
+    "raster_dpi": 150,
     "paper": "A4",
     "page_pts": [
      595.7,
      841.9
     ],
     "pages": 1,
-    "mp_per_page": 3.871,
-    "ms_per_page": 1665,
+    "mp_per_page": 2.178,
+    "ms_per_page": 3332,
     "page_ms": [
-     1532.1
+     3312.7
     ],
-    "assemble_ms": 128.9,
-    "runtime_ms": 1665,
-    "wall_ms": 2196,
-    "peak_rss_mb": 278
+    "assemble_ms": 18.6,
+    "runtime_ms": 3332,
+    "wall_ms": 3828,
+    "peak_rss_mb": 322.4
    },
    {
-    "id": "layouts/choir-ttbb-evening-bells/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1509,
-    "page_ms": [
-     1330.4
-    ],
-    "assemble_ms": 174.3,
-    "runtime_ms": 1509,
-    "wall_ms": 2032,
-    "peak_rss_mb": 269.9
-   },
-   {
-    "id": "layouts/choir-ttbb-evening-bells/scan",
+    "id": "perf/perf-hymn-a4-150dpi/scan",
     "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1715,
-    "page_ms": [
-     1512.5
-    ],
-    "assemble_ms": 197.6,
-    "runtime_ms": 1715,
-    "wall_ms": 2261,
-    "peak_rss_mb": 290.6
-   },
-   {
-    "id": "layouts/choir-ttbb-evening-bells/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     842
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 3351,
-    "page_ms": [
-     3158.1
-    ],
-    "assemble_ms": 187.3,
-    "runtime_ms": 3351,
-    "wall_ms": 3891,
-    "peak_rss_mb": 372.2
-   },
-   {
-    "id": "layouts/cross-staff-piano-arpeggio-study/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1177,
-    "page_ms": [
-     1060.1
-    ],
-    "assemble_ms": 113,
-    "runtime_ms": 1177,
-    "wall_ms": 1700,
-    "peak_rss_mb": 266.9
-   },
-   {
-    "id": "layouts/cross-staff-piano-arpeggio-study/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1292,
-    "page_ms": [
-     1181.6
-    ],
-    "assemble_ms": 105,
-    "runtime_ms": 1292,
-    "wall_ms": 1798,
-    "peak_rss_mb": 281.9
-   },
-   {
-    "id": "layouts/cross-staff-piano-arpeggio-study/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 120,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.2,
-     841.8
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1235,
-    "page_ms": [
-     1107.8
-    ],
-    "assemble_ms": 123.5,
-    "runtime_ms": 1235,
-    "wall_ms": 1770,
-    "peak_rss_mb": 264
-   },
-   {
-    "id": "layouts/divisi-choir-bright-new-day/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 3421,
-    "page_ms": [
-     2881.7
-    ],
-    "assemble_ms": 533.7,
-    "runtime_ms": 3421,
-    "wall_ms": 3949,
-    "peak_rss_mb": 376.8
-   },
-   {
-    "id": "layouts/divisi-choir-bright-new-day/scan",
-    "variant": "scan",
-    "src_dpi": 250,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.3,
-     842.1
-    ],
-    "pages": 1,
-    "mp_per_page": 3.87,
-    "ms_per_page": 3583,
-    "page_ms": [
-     3019.4
-    ],
-    "assemble_ms": 559,
-    "runtime_ms": 3583,
-    "wall_ms": 4112,
-    "peak_rss_mb": 389.3
-   },
-   {
-    "id": "layouts/divisi-choir-bright-new-day/scan-severe",
-    "variant": "scan-severe",
     "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.2,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 3483,
-    "page_ms": [
-     2938.8
-    ],
-    "assemble_ms": 540.2,
-    "runtime_ms": 3483,
-    "wall_ms": 4013,
-    "peak_rss_mb": 376.2
-   },
-   {
-    "id": "layouts/divisi-strings-lament/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1712,
-    "page_ms": [
-     1435.7
-    ],
-    "assemble_ms": 270.9,
-    "runtime_ms": 1712,
-    "wall_ms": 2254,
-    "peak_rss_mb": 300.1
-   },
-   {
-    "id": "layouts/divisi-strings-lament/scan",
-    "variant": "scan",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     842
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1736,
-    "page_ms": [
-     1470
-    ],
-    "assemble_ms": 262.2,
-    "runtime_ms": 1736,
-    "wall_ms": 2264,
-    "peak_rss_mb": 290.8
-   },
-   {
-    "id": "layouts/divisi-strings-lament/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
+    "raster_dpi": 150,
     "paper": "A4",
     "page_pts": [
      595.7,
      841.9
     ],
     "pages": 1,
-    "mp_per_page": 3.871,
-    "ms_per_page": 1856,
+    "mp_per_page": 2.178,
+    "ms_per_page": 3818,
     "page_ms": [
-     1535
+     3796.2
     ],
-    "assemble_ms": 316.5,
-    "runtime_ms": 1856,
-    "wall_ms": 2395,
-    "peak_rss_mb": 319.6
-   },
-   {
-    "id": "layouts/hymnal-stanzas-light-of-ages/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 2122,
-    "page_ms": [
-     1951.3
-    ],
-    "assemble_ms": 166.1,
-    "runtime_ms": 2122,
-    "wall_ms": 2648,
-    "peak_rss_mb": 307.5
-   },
-   {
-    "id": "layouts/hymnal-stanzas-light-of-ages/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 2142,
-    "page_ms": [
-     1961.2
-    ],
-    "assemble_ms": 176.6,
-    "runtime_ms": 2142,
-    "wall_ms": 2677,
-    "peak_rss_mb": 308.4
-   },
-   {
-    "id": "layouts/hymnal-stanzas-light-of-ages/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.7,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.871,
-    "ms_per_page": 2137,
-    "page_ms": [
-     1943.4
-    ],
-    "assemble_ms": 189.1,
-    "runtime_ms": 2137,
-    "wall_ms": 2646,
-    "peak_rss_mb": 295.5
-   },
-   {
-    "id": "layouts/lead-sheet-long-road/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1926,
-    "page_ms": [
-     1719.5
-    ],
-    "assemble_ms": 202.3,
-    "runtime_ms": 1926,
-    "wall_ms": 2469,
-    "peak_rss_mb": 288.9
-   },
-   {
-    "id": "layouts/lead-sheet-long-road/scan",
-    "variant": "scan",
-    "src_dpi": 240,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.5,
-     842.1
-    ],
-    "pages": 1,
-    "mp_per_page": 3.873,
-    "ms_per_page": 2031,
-    "page_ms": [
-     1851.5
-    ],
-    "assemble_ms": 174.1,
-    "runtime_ms": 2031,
-    "wall_ms": 2566,
-    "peak_rss_mb": 276.3
-   },
-   {
-    "id": "layouts/lead-sheet-long-road/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.2,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1984,
-    "page_ms": [
-     1829.7
-    ],
-    "assemble_ms": 148.8,
-    "runtime_ms": 1984,
-    "wall_ms": 2530,
-    "peak_rss_mb": 303.8
-   },
-   {
-    "id": "layouts/melody-cello-elegy-2page/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 2,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1046,
-    "page_ms": [
-     1056.6,
-     867.2
-    ],
-    "assemble_ms": 164.1,
-    "runtime_ms": 2092,
-    "wall_ms": 2633,
-    "peak_rss_mb": 314.1
-   },
-   {
-    "id": "layouts/melody-cello-elegy-2page/scan",
-    "variant": "scan",
-    "src_dpi": 240,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.5,
-     842.1
-    ],
-    "pages": 2,
-    "mp_per_page": 3.873,
-    "ms_per_page": 1231,
-    "page_ms": [
-     1154.4,
-     1125.1
-    ],
-    "assemble_ms": 177.3,
-    "runtime_ms": 2461,
-    "wall_ms": 2988,
-    "peak_rss_mb": 312.5
-   },
-   {
-    "id": "layouts/melody-cello-elegy-2page/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.7,
-     841.9
-    ],
-    "pages": 2,
-    "mp_per_page": 3.871,
-    "ms_per_page": 1255,
-    "page_ms": [
-     1235.1,
-     1071.8
-    ],
-    "assemble_ms": 198.3,
-    "runtime_ms": 2509,
-    "wall_ms": 3052,
-    "peak_rss_mb": 313.9
-   },
-   {
-    "id": "layouts/melody-flute-air/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1176,
-    "page_ms": [
-     1056.9
-    ],
-    "assemble_ms": 114.6,
-    "runtime_ms": 1176,
-    "wall_ms": 1701,
-    "peak_rss_mb": 273.1
-   },
-   {
-    "id": "layouts/melody-flute-air/scan",
-    "variant": "scan",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     842
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1296,
-    "page_ms": [
-     1175.1
-    ],
-    "assemble_ms": 116.7,
-    "runtime_ms": 1296,
-    "wall_ms": 1819,
-    "peak_rss_mb": 269.4
-   },
-   {
-    "id": "layouts/melody-flute-air/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "~B4",
-    "page_pts": [
-     666.7,
-     913
-    ],
-    "pages": 1,
-    "mp_per_page": 4.697,
-    "ms_per_page": 2633,
-    "page_ms": [
-     2395.4
-    ],
-    "assemble_ms": 231.6,
-    "runtime_ms": 2633,
-    "wall_ms": 3193,
-    "peak_rss_mb": 428
-   },
-   {
-    "id": "layouts/melody-lyrics-morning-song/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1415,
-    "page_ms": [
-     1296.1
-    ],
-    "assemble_ms": 114.5,
-    "runtime_ms": 1415,
-    "wall_ms": 1945,
-    "peak_rss_mb": 273.7
-   },
-   {
-    "id": "layouts/melody-lyrics-morning-song/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1571,
-    "page_ms": [
-     1427
-    ],
-    "assemble_ms": 139.9,
-    "runtime_ms": 1571,
-    "wall_ms": 2115,
-    "peak_rss_mb": 282.1
-   },
-   {
-    "id": "layouts/melody-lyrics-morning-song/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 120,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.2,
-     841.8
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1442,
-    "page_ms": [
-     1294.3
-    ],
-    "assemble_ms": 142.6,
-    "runtime_ms": 1442,
-    "wall_ms": 1970,
+    "assemble_ms": 22.3,
+    "runtime_ms": 3818,
+    "wall_ms": 4305,
     "peak_rss_mb": 277.5
    },
    {
-    "id": "layouts/orchestral-festive-march-9-staves/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 2,
-    "mp_per_page": 3.869,
-    "ms_per_page": 3237,
-    "page_ms": [
-     2695.8,
-     2932.6
-    ],
-    "assemble_ms": 838.8,
-    "runtime_ms": 6473,
-    "wall_ms": 7018,
-    "peak_rss_mb": 469.5
-   },
-   {
-    "id": "layouts/orchestral-festive-march-9-staves/scan",
-    "variant": "scan",
-    "src_dpi": 250,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.3,
-     842.1
-    ],
-    "pages": 2,
-    "mp_per_page": 3.87,
-    "ms_per_page": 3553,
-    "page_ms": [
-     3078.7,
-     3039.2
-    ],
-    "assemble_ms": 983.2,
-    "runtime_ms": 7105,
-    "wall_ms": 7672,
-    "peak_rss_mb": 473.4
-   },
-   {
-    "id": "layouts/orchestral-festive-march-9-staves/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 120,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.2,
-     841.8
-    ],
-    "pages": 2,
-    "mp_per_page": 3.869,
-    "ms_per_page": 4884,
-    "page_ms": [
-     3668,
-     3256.4
-    ],
-    "assemble_ms": 2837.6,
-    "runtime_ms": 9767,
-    "wall_ms": 10319,
-    "peak_rss_mb": 575.2
-   },
-   {
-    "id": "layouts/organ-three-staves-chorale-prelude/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1643,
-    "page_ms": [
-     1439.1
-    ],
-    "assemble_ms": 198.3,
-    "runtime_ms": 1643,
-    "wall_ms": 2172,
-    "peak_rss_mb": 280.8
-   },
-   {
-    "id": "layouts/organ-three-staves-chorale-prelude/scan",
-    "variant": "scan",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     842
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1645,
-    "page_ms": [
-     1445.1
-    ],
-    "assemble_ms": 196,
-    "runtime_ms": 1645,
-    "wall_ms": 2188,
-    "peak_rss_mb": 280.1
-   },
-   {
-    "id": "layouts/organ-three-staves-chorale-prelude/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     842
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 4450,
-    "page_ms": [
-     4198.6
-    ],
-    "assemble_ms": 246.8,
-    "runtime_ms": 4450,
-    "wall_ms": 4995,
-    "peak_rss_mb": 364.9
-   },
-   {
-    "id": "layouts/piano-grand-staff-prelude/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1263,
-    "page_ms": [
-     1094.6
-    ],
-    "assemble_ms": 163.8,
-    "runtime_ms": 1263,
-    "wall_ms": 1780,
-    "peak_rss_mb": 285.2
-   },
-   {
-    "id": "layouts/piano-grand-staff-prelude/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1491,
-    "page_ms": [
-     1314.4
-    ],
-    "assemble_ms": 172.4,
-    "runtime_ms": 1491,
-    "wall_ms": 2015,
-    "peak_rss_mb": 284.8
-   },
-   {
-    "id": "layouts/piano-grand-staff-prelude/scan-severe",
+    "id": "perf/perf-hymn-a4-150dpi/scan-severe",
     "variant": "scan-severe",
     "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.2,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1410,
-    "page_ms": [
-     1245.2
-    ],
-    "assemble_ms": 160.4,
-    "runtime_ms": 1410,
-    "wall_ms": 1934,
-    "peak_rss_mb": 283.7
-   },
-   {
-    "id": "layouts/string-quartet-minuet/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 2974,
-    "page_ms": [
-     2413.9
-    ],
-    "assemble_ms": 556.5,
-    "runtime_ms": 2974,
-    "wall_ms": 3508,
-    "peak_rss_mb": 372.7
-   },
-   {
-    "id": "layouts/string-quartet-minuet/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 3376,
-    "page_ms": [
-     2745.2
-    ],
-    "assemble_ms": 626.7,
-    "runtime_ms": 3376,
-    "wall_ms": 3895,
-    "peak_rss_mb": 371.4
-   },
-   {
-    "id": "layouts/string-quartet-minuet/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.2,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 3317,
-    "page_ms": [
-     2655
-    ],
-    "assemble_ms": 658.3,
-    "runtime_ms": 3317,
-    "wall_ms": 3878,
-    "peak_rss_mb": 339.8
-   },
-   {
-    "id": "layouts/two-voices-piano-song-without-words/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1210,
-    "page_ms": [
-     1082.3
-    ],
-    "assemble_ms": 122.1,
-    "runtime_ms": 1210,
-    "wall_ms": 1733,
-    "peak_rss_mb": 264.7
-   },
-   {
-    "id": "layouts/two-voices-piano-song-without-words/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1491,
-    "page_ms": [
-     1356.7
-    ],
-    "assemble_ms": 130,
-    "runtime_ms": 1491,
-    "wall_ms": 2026,
-    "peak_rss_mb": 286.2
-   },
-   {
-    "id": "layouts/two-voices-piano-song-without-words/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     842
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 2826,
-    "page_ms": [
-     2681
-    ],
-    "assemble_ms": 140.2,
-    "runtime_ms": 2826,
-    "wall_ms": 3364,
-    "peak_rss_mb": 348.7
-   },
-   {
-    "id": "layouts/voice-piano-night-song/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1699,
-    "page_ms": [
-     1478.9
-    ],
-    "assemble_ms": 215.8,
-    "runtime_ms": 1699,
-    "wall_ms": 2235,
-    "peak_rss_mb": 285.4
-   },
-   {
-    "id": "layouts/voice-piano-night-song/scan",
-    "variant": "scan",
-    "src_dpi": 250,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.3,
-     842.1
-    ],
-    "pages": 1,
-    "mp_per_page": 3.87,
-    "ms_per_page": 1781,
-    "page_ms": [
-     1558.9
-    ],
-    "assemble_ms": 218.4,
-    "runtime_ms": 1781,
-    "wall_ms": 2321,
-    "peak_rss_mb": 285
-   },
-   {
-    "id": "layouts/voice-piano-night-song/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     842
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 3636,
-    "page_ms": [
-     3283.1
-    ],
-    "assemble_ms": 348.1,
-    "runtime_ms": 3636,
-    "wall_ms": 4227,
-    "peak_rss_mb": 394.4
-   },
-   {
-    "id": "lyrics/lyr01-elisions-three-languages/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1594,
-    "page_ms": [
-     1490.9
-    ],
-    "assemble_ms": 99.5,
-    "runtime_ms": 1594,
-    "wall_ms": 2136,
-    "peak_rss_mb": 285.8
-   },
-   {
-    "id": "lyrics/lyr01-elisions-three-languages/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1709,
-    "page_ms": [
-     1607.8
-    ],
-    "assemble_ms": 95.8,
-    "runtime_ms": 1709,
-    "wall_ms": 2266,
-    "peak_rss_mb": 302.8
-   },
-   {
-    "id": "lyrics/lyr01-elisions-three-languages/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 120,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.2,
-     841.8
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1682,
-    "page_ms": [
-     1547.8
-    ],
-    "assemble_ms": 130.4,
-    "runtime_ms": 1682,
-    "wall_ms": 2221,
-    "peak_rss_mb": 280
-   },
-   {
-    "id": "lyrics/lyr02-non-ascii-four-languages/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1858,
-    "page_ms": [
-     1744.4
-    ],
-    "assemble_ms": 108.8,
-    "runtime_ms": 1858,
-    "wall_ms": 2368,
-    "peak_rss_mb": 285.2
-   },
-   {
-    "id": "lyrics/lyr02-non-ascii-four-languages/scan",
-    "variant": "scan",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     842
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1962,
-    "page_ms": [
-     1832.7
-    ],
-    "assemble_ms": 125.3,
-    "runtime_ms": 1962,
-    "wall_ms": 2471,
-    "peak_rss_mb": 286
-   },
-   {
-    "id": "lyrics/lyr02-non-ascii-four-languages/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "~B4",
-    "page_pts": [
-     666.7,
-     913
-    ],
-    "pages": 1,
-    "mp_per_page": 4.697,
-    "ms_per_page": 2142,
-    "page_ms": [
-     2045.1
-    ],
-    "assemble_ms": 92.2,
-    "runtime_ms": 2142,
-    "wall_ms": 2670,
-    "peak_rss_mb": 305.8
-   },
-   {
-    "id": "marks/mk01-articulations-violin/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1179,
-    "page_ms": [
-     1061.9
-    ],
-    "assemble_ms": 111.7,
-    "runtime_ms": 1179,
-    "wall_ms": 1705,
-    "peak_rss_mb": 270.6
-   },
-   {
-    "id": "marks/mk01-articulations-violin/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     604.6,
-     848.2
-    ],
-    "pages": 1,
-    "mp_per_page": 3.958,
-    "ms_per_page": 1250,
-    "page_ms": [
-     1142.6
-    ],
-    "assemble_ms": 102.9,
-    "runtime_ms": 1250,
-    "wall_ms": 1817,
-    "peak_rss_mb": 281
-   },
-   {
-    "id": "marks/mk01-articulations-violin/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     646.6,
-     877.4
-    ],
-    "pages": 1,
-    "mp_per_page": 4.379,
-    "ms_per_page": 1404,
-    "page_ms": [
-     1281.8
-    ],
-    "assemble_ms": 117,
-    "runtime_ms": 1404,
-    "wall_ms": 1932,
-    "peak_rss_mb": 284.1
-   },
-   {
-    "id": "marks/mk02-ornaments-fermatas-flute/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1170,
-    "page_ms": [
-     1065.6
-    ],
-    "assemble_ms": 99.5,
-    "runtime_ms": 1170,
-    "wall_ms": 1693,
-    "peak_rss_mb": 257.5
-   },
-   {
-    "id": "marks/mk02-ornaments-fermatas-flute/scan",
-    "variant": "scan",
-    "src_dpi": 250,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     608.5,
-     851.9
-    ],
-    "pages": 1,
-    "mp_per_page": 4.003,
-    "ms_per_page": 1342,
-    "page_ms": [
-     1223.7
-    ],
-    "assemble_ms": 112.9,
-    "runtime_ms": 1342,
-    "wall_ms": 1882,
-    "peak_rss_mb": 290.6
-   },
-   {
-    "id": "marks/mk02-ornaments-fermatas-flute/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "~B4",
-    "page_pts": [
-     654.5,
-     901.1
-    ],
-    "pages": 1,
-    "mp_per_page": 4.55,
-    "ms_per_page": 2692,
-    "page_ms": [
-     2526.5
-    ],
-    "assemble_ms": 160,
-    "runtime_ms": 2692,
-    "wall_ms": 3236,
-    "peak_rss_mb": 402.7
-   },
-   {
-    "id": "marks/mk03-dynamics-hairpins-cello/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1310,
-    "page_ms": [
-     1174.7
-    ],
-    "assemble_ms": 131.5,
-    "runtime_ms": 1310,
-    "wall_ms": 1829,
-    "peak_rss_mb": 272.1
-   },
-   {
-    "id": "marks/mk03-dynamics-hairpins-cello/scan",
-    "variant": "scan",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     613.4,
-     855
-    ],
-    "pages": 1,
-    "mp_per_page": 4.047,
-    "ms_per_page": 1501,
-    "page_ms": [
-     1354.3
-    ],
-    "assemble_ms": 142.8,
-    "runtime_ms": 1501,
-    "wall_ms": 2035,
-    "peak_rss_mb": 289.6
-   },
-   {
-    "id": "marks/mk03-dynamics-hairpins-cello/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     652.8,
-     881.8
-    ],
-    "pages": 1,
-    "mp_per_page": 4.444,
-    "ms_per_page": 1903,
-    "page_ms": [
-     1723.4
-    ],
-    "assemble_ms": 175.1,
-    "runtime_ms": 1903,
-    "wall_ms": 2423,
-    "peak_rss_mb": 325.2
-   },
-   {
-    "id": "marks/mk04-piano-pedal-arpeggio-fingering/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1616,
-    "page_ms": [
-     1418.9
-    ],
-    "assemble_ms": 192.5,
-    "runtime_ms": 1616,
-    "wall_ms": 2159,
-    "peak_rss_mb": 277.1
-   },
-   {
-    "id": "marks/mk04-piano-pedal-arpeggio-fingering/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     603.1,
-     847.2
-    ],
-    "pages": 1,
-    "mp_per_page": 3.945,
-    "ms_per_page": 1742,
-    "page_ms": [
-     1525.4
-    ],
-    "assemble_ms": 211.5,
-    "runtime_ms": 1742,
-    "wall_ms": 2288,
-    "peak_rss_mb": 286.3
-   },
-   {
-    "id": "marks/mk04-piano-pedal-arpeggio-fingering/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     632.2,
-     867.2
-    ],
-    "pages": 1,
-    "mp_per_page": 4.23,
-    "ms_per_page": 1773,
-    "page_ms": [
-     1559.2
-    ],
-    "assemble_ms": 210.1,
-    "runtime_ms": 1773,
-    "wall_ms": 2302,
-    "peak_rss_mb": 325
-   },
-   {
-    "id": "marks/mk05-tempo-text-rehearsal-oboe/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1517,
-    "page_ms": [
-     1320.4
-    ],
-    "assemble_ms": 191.9,
-    "runtime_ms": 1517,
-    "wall_ms": 2062,
-    "peak_rss_mb": 269.3
-   },
-   {
-    "id": "marks/mk05-tempo-text-rehearsal-oboe/scan",
-    "variant": "scan",
-    "src_dpi": 250,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     607.4,
-     850.8
-    ],
-    "pages": 1,
-    "mp_per_page": 3.99,
-    "ms_per_page": 1626,
-    "page_ms": [
-     1460.3
-    ],
-    "assemble_ms": 161.6,
-    "runtime_ms": 1626,
-    "wall_ms": 2160,
-    "peak_rss_mb": 287.8
-   },
-   {
-    "id": "marks/mk05-tempo-text-rehearsal-oboe/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 110,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     624.4,
-     862
-    ],
-    "pages": 1,
-    "mp_per_page": 4.155,
-    "ms_per_page": 1609,
-    "page_ms": [
-     1396.7
-    ],
-    "assemble_ms": 207.9,
-    "runtime_ms": 1609,
-    "wall_ms": 2160,
-    "peak_rss_mb": 298.1
-   },
-   {
-    "id": "marks/mk06-lead-sheet-chord-symbols/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1513,
-    "page_ms": [
-     1377.8
-    ],
-    "assemble_ms": 130.2,
-    "runtime_ms": 1513,
-    "wall_ms": 2042,
-    "peak_rss_mb": 288.1
-   },
-   {
-    "id": "marks/mk06-lead-sheet-chord-symbols/scan",
-    "variant": "scan",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     610.6,
-     852.8
-    ],
-    "pages": 1,
-    "mp_per_page": 4.018,
-    "ms_per_page": 1680,
-    "page_ms": [
-     1543.4
-    ],
-    "assemble_ms": 131.8,
-    "runtime_ms": 1680,
-    "wall_ms": 2200,
-    "peak_rss_mb": 293.3
-   },
-   {
-    "id": "marks/mk06-lead-sheet-chord-symbols/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     617.4,
-     857.2
-    ],
-    "pages": 1,
-    "mp_per_page": 4.083,
-    "ms_per_page": 3351,
-    "page_ms": [
-     3218.7
-    ],
-    "assemble_ms": 126.4,
-    "runtime_ms": 3351,
-    "wall_ms": 3895,
-    "peak_rss_mb": 344
-   },
-   {
-    "id": "marks/mk07-vocalise-voice-piano/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1670,
-    "page_ms": [
-     1468.4
-    ],
-    "assemble_ms": 196.7,
-    "runtime_ms": 1670,
-    "wall_ms": 2200,
-    "peak_rss_mb": 279.5
-   },
-   {
-    "id": "marks/mk07-vocalise-voice-piano/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     601.7,
-     846.2
-    ],
-    "pages": 1,
-    "mp_per_page": 3.931,
-    "ms_per_page": 1707,
-    "page_ms": [
-     1514.6
-    ],
-    "assemble_ms": 189.4,
-    "runtime_ms": 1707,
-    "wall_ms": 2231,
-    "peak_rss_mb": 311.6
-   },
-   {
-    "id": "marks/mk07-vocalise-voice-piano/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 250,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     639.1,
-     872.6
-    ],
-    "pages": 1,
-    "mp_per_page": 4.305,
-    "ms_per_page": 1903,
-    "page_ms": [
-     1618.3
-    ],
-    "assemble_ms": 280.3,
-    "runtime_ms": 1903,
-    "wall_ms": 2457,
-    "peak_rss_mb": 330.3
-   },
-   {
-    "id": "marks/mk08-string-quartet-marks/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1842,
-    "page_ms": [
-     1544.7
-    ],
-    "assemble_ms": 293.8,
-    "runtime_ms": 1842,
-    "wall_ms": 2386,
-    "peak_rss_mb": 308.7
-   },
-   {
-    "id": "marks/mk08-string-quartet-marks/scan",
-    "variant": "scan",
-    "src_dpi": 250,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     605.7,
-     849.6
-    ],
-    "pages": 1,
-    "mp_per_page": 3.972,
-    "ms_per_page": 2025,
-    "page_ms": [
-     1733.4
-    ],
-    "assemble_ms": 286,
-    "runtime_ms": 2025,
-    "wall_ms": 2562,
-    "peak_rss_mb": 321.6
-   },
-   {
-    "id": "marks/mk08-string-quartet-marks/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "~B4",
-    "page_pts": [
-     666.7,
-     890.9
-    ],
-    "pages": 1,
-    "mp_per_page": 4.584,
-    "ms_per_page": 2029,
-    "page_ms": [
-     1599.9
-    ],
-    "assemble_ms": 423.9,
-    "runtime_ms": 2029,
-    "wall_ms": 2563,
-    "peak_rss_mb": 309.5
-   },
-   {
-    "id": "marks/mk09-stacked-marks-viola/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1269,
-    "page_ms": [
-     1164
-    ],
-    "assemble_ms": 99.9,
-    "runtime_ms": 1269,
-    "wall_ms": 1809,
-    "peak_rss_mb": 260.2
-   },
-   {
-    "id": "marks/mk09-stacked-marks-viola/scan",
-    "variant": "scan",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     609.1,
-     851.4
-    ],
-    "pages": 1,
-    "mp_per_page": 4.002,
-    "ms_per_page": 1558,
-    "page_ms": [
-     1438.7
-    ],
-    "assemble_ms": 113.9,
-    "runtime_ms": 1558,
-    "wall_ms": 2097,
-    "peak_rss_mb": 269.4
-   },
-   {
-    "id": "marks/mk09-stacked-marks-viola/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     643,
-     889.6
-    ],
-    "pages": 1,
-    "mp_per_page": 4.413,
-    "ms_per_page": 1718,
-    "page_ms": [
-     1597.5
-    ],
-    "assemble_ms": 115.9,
-    "runtime_ms": 1718,
-    "wall_ms": 2281,
-    "peak_rss_mb": 357.5
-   },
-   {
-    "id": "marks/mk10-piano-pedal-brackets/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1310,
-    "page_ms": [
-     1111.7
-    ],
-    "assemble_ms": 193.1,
-    "runtime_ms": 1310,
-    "wall_ms": 1830,
-    "peak_rss_mb": 293.3
-   },
-   {
-    "id": "marks/mk10-piano-pedal-brackets/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     604.6,
-     848.2
-    ],
-    "pages": 1,
-    "mp_per_page": 3.958,
-    "ms_per_page": 1450,
-    "page_ms": [
-     1259.9
-    ],
-    "assemble_ms": 186.3,
-    "runtime_ms": 1450,
-    "wall_ms": 1978,
-    "peak_rss_mb": 286.7
-   },
-   {
-    "id": "marks/mk10-piano-pedal-brackets/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     625,
-     862.9
-    ],
-    "pages": 1,
-    "mp_per_page": 4.161,
-    "ms_per_page": 1460,
-    "page_ms": [
-     1229.6
-    ],
-    "assemble_ms": 225.3,
-    "runtime_ms": 1460,
-    "wall_ms": 2003,
-    "peak_rss_mb": 292.6
-   },
-   {
-    "id": "marks/mk11-violin-circled-rehearsal-numbers/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1136,
-    "page_ms": [
-     1022.4
-    ],
-    "assemble_ms": 108.4,
-    "runtime_ms": 1136,
-    "wall_ms": 1659,
-    "peak_rss_mb": 244
-   },
-   {
-    "id": "marks/mk11-violin-circled-rehearsal-numbers/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     601.7,
-     846.2
-    ],
-    "pages": 1,
-    "mp_per_page": 3.931,
-    "ms_per_page": 1336,
-    "page_ms": [
-     1219.8
-    ],
-    "assemble_ms": 111.9,
-    "runtime_ms": 1336,
-    "wall_ms": 1870,
-    "peak_rss_mb": 281.5
-   },
-   {
-    "id": "marks/mk11-violin-circled-rehearsal-numbers/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     617.8,
-     857.9
-    ],
-    "pages": 1,
-    "mp_per_page": 4.089,
-    "ms_per_page": 1366,
-    "page_ms": [
-     1218.5
-    ],
-    "assemble_ms": 142,
-    "runtime_ms": 1366,
-    "wall_ms": 1877,
-    "peak_rss_mb": 293
-   },
-   {
-    "id": "notes/nt01-note-values/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1296,
-    "page_ms": [
-     1124.1
-    ],
-    "assemble_ms": 166.2,
-    "runtime_ms": 1296,
-    "wall_ms": 1841,
-    "peak_rss_mb": 283.3
-   },
-   {
-    "id": "notes/nt01-note-values/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     606,
-     849.6
-    ],
-    "pages": 1,
-    "mp_per_page": 3.974,
-    "ms_per_page": 1501,
-    "page_ms": [
-     1308.6
-    ],
-    "assemble_ms": 188,
-    "runtime_ms": 1501,
-    "wall_ms": 2050,
-    "peak_rss_mb": 297.8
-   },
-   {
-    "id": "notes/nt01-note-values/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     630.7,
-     866.5
-    ],
-    "pages": 1,
-    "mp_per_page": 4.217,
-    "ms_per_page": 1596,
-    "page_ms": [
-     1261.5
-    ],
-    "assemble_ms": 329.1,
-    "runtime_ms": 1596,
-    "wall_ms": 2141,
-    "peak_rss_mb": 265.2
-   },
-   {
-    "id": "notes/nt02-dots/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1287,
-    "page_ms": [
-     1120.7
-    ],
-    "assemble_ms": 161.2,
-    "runtime_ms": 1287,
-    "wall_ms": 1822,
-    "peak_rss_mb": 269.3
-   },
-   {
-    "id": "notes/nt02-dots/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     611.8,
-     853.4
-    ],
-    "pages": 1,
-    "mp_per_page": 4.031,
-    "ms_per_page": 1428,
-    "page_ms": [
-     1263.1
-    ],
-    "assemble_ms": 159.8,
-    "runtime_ms": 1428,
-    "wall_ms": 1957,
-    "peak_rss_mb": 303.4
-   },
-   {
-    "id": "notes/nt02-dots/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 100,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     640.1,
-     872.6
-    ],
-    "pages": 1,
-    "mp_per_page": 4.312,
-    "ms_per_page": 1450,
-    "page_ms": [
-     1221
-    ],
-    "assemble_ms": 223.8,
-    "runtime_ms": 1450,
-    "wall_ms": 2005,
-    "peak_rss_mb": 311.5
-   },
-   {
-    "id": "notes/nt03-chords/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1237,
-    "page_ms": [
-     1098.9
-    ],
-    "assemble_ms": 134.4,
-    "runtime_ms": 1237,
-    "wall_ms": 1745,
-    "peak_rss_mb": 284.3
-   },
-   {
-    "id": "notes/nt03-chords/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     601.7,
-     846.2
-    ],
-    "pages": 1,
-    "mp_per_page": 3.931,
-    "ms_per_page": 1369,
-    "page_ms": [
-     1235.6
-    ],
-    "assemble_ms": 127.7,
-    "runtime_ms": 1369,
-    "wall_ms": 1903,
-    "peak_rss_mb": 271
-   },
-   {
-    "id": "notes/nt03-chords/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "~B4",
-    "page_pts": [
-     654.5,
-     901.1
-    ],
-    "pages": 1,
-    "mp_per_page": 4.55,
-    "ms_per_page": 1488,
-    "page_ms": [
-     1357.3
-    ],
-    "assemble_ms": 126.1,
-    "runtime_ms": 1488,
-    "wall_ms": 2017,
-    "peak_rss_mb": 288.2
-   },
-   {
-    "id": "notes/nt04-beams/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1301,
-    "page_ms": [
-     1125.9
-    ],
-    "assemble_ms": 169.5,
-    "runtime_ms": 1301,
-    "wall_ms": 1821,
-    "peak_rss_mb": 285
-   },
-   {
-    "id": "notes/nt04-beams/scan",
-    "variant": "scan",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     614.9,
-     855.7
-    ],
-    "pages": 1,
-    "mp_per_page": 4.06,
-    "ms_per_page": 1468,
-    "page_ms": [
-     1283.6
-    ],
-    "assemble_ms": 178.2,
-    "runtime_ms": 1468,
-    "wall_ms": 2000,
-    "peak_rss_mb": 291.3
-   },
-   {
-    "id": "notes/nt04-beams/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     621.8,
-     860.6
-    ],
-    "pages": 1,
-    "mp_per_page": 4.132,
-    "ms_per_page": 1501,
-    "page_ms": [
-     1316.9
-    ],
-    "assemble_ms": 179.9,
-    "runtime_ms": 1501,
-    "wall_ms": 2004,
-    "peak_rss_mb": 294.9
-   },
-   {
-    "id": "notes/nt05-flags-stems/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1319,
-    "page_ms": [
-     1135.3
-    ],
-    "assemble_ms": 178,
-    "runtime_ms": 1319,
-    "wall_ms": 1852,
-    "peak_rss_mb": 274.9
-   },
-   {
-    "id": "notes/nt05-flags-stems/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     603.1,
-     847.2
-    ],
-    "pages": 1,
-    "mp_per_page": 3.945,
-    "ms_per_page": 1451,
-    "page_ms": [
-     1266.3
-    ],
-    "assemble_ms": 179.7,
-    "runtime_ms": 1451,
-    "wall_ms": 1966,
-    "peak_rss_mb": 294.7
-   },
-   {
-    "id": "notes/nt05-flags-stems/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     619.2,
-     858.6
-    ],
-    "pages": 1,
-    "mp_per_page": 4.105,
-    "ms_per_page": 1499,
-    "page_ms": [
-     1320.2
-    ],
-    "assemble_ms": 174.9,
-    "runtime_ms": 1499,
-    "wall_ms": 2029,
-    "peak_rss_mb": 278
-   },
-   {
-    "id": "notes/nt06-ledger-lines/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1235,
-    "page_ms": [
-     1154.4
-    ],
-    "assemble_ms": 76.2,
-    "runtime_ms": 1235,
-    "wall_ms": 1762,
-    "peak_rss_mb": 277.9
-   },
-   {
-    "id": "notes/nt06-ledger-lines/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     608.9,
-     851.5
-    ],
-    "pages": 1,
-    "mp_per_page": 4.003,
-    "ms_per_page": 1375,
-    "page_ms": [
-     1306.5
-    ],
-    "assemble_ms": 63.8,
-    "runtime_ms": 1375,
-    "wall_ms": 1893,
-    "peak_rss_mb": 306.5
-   },
-   {
-    "id": "notes/nt06-ledger-lines/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     653,
-     881.8
-    ],
-    "pages": 1,
-    "mp_per_page": 4.444,
-    "ms_per_page": 1527,
-    "page_ms": [
-     1445.1
-    ],
-    "assemble_ms": 76.8,
-    "runtime_ms": 1527,
-    "wall_ms": 2055,
-    "peak_rss_mb": 287.6
-   },
-   {
-    "id": "notes/nt07-grace-notes/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1303,
-    "page_ms": [
-     1153
-    ],
-    "assemble_ms": 145.2,
-    "runtime_ms": 1303,
-    "wall_ms": 1832,
-    "peak_rss_mb": 258.6
-   },
-   {
-    "id": "notes/nt07-grace-notes/scan",
-    "variant": "scan",
-    "src_dpi": 250,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     610.3,
-     852.5
-    ],
-    "pages": 1,
-    "mp_per_page": 4.016,
-    "ms_per_page": 1451,
-    "page_ms": [
-     1310.1
-    ],
-    "assemble_ms": 136.6,
-    "runtime_ms": 1451,
-    "wall_ms": 1990,
-    "peak_rss_mb": 304.8
-   },
-   {
-    "id": "notes/nt07-grace-notes/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     625,
-     862.9
-    ],
-    "pages": 1,
-    "mp_per_page": 4.161,
-    "ms_per_page": 1857,
-    "page_ms": [
-     1694.6
-    ],
-    "assemble_ms": 157.7,
-    "runtime_ms": 1857,
-    "wall_ms": 2392,
-    "peak_rss_mb": 352.2
-   },
-   {
-    "id": "notes/nt08-cue-notes/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1110,
-    "page_ms": [
-     1013.1
-    ],
-    "assemble_ms": 93.4,
-    "runtime_ms": 1110,
-    "wall_ms": 1632,
-    "peak_rss_mb": 246.6
-   },
-   {
-    "id": "notes/nt08-cue-notes/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     607.4,
-     850.6
-    ],
-    "pages": 1,
-    "mp_per_page": 3.989,
-    "ms_per_page": 1283,
-    "page_ms": [
-     1193.7
-    ],
-    "assemble_ms": 85,
-    "runtime_ms": 1283,
-    "wall_ms": 1815,
-    "peak_rss_mb": 290.1
-   },
-   {
-    "id": "notes/nt08-cue-notes/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     627.6,
-     864.5
-    ],
-    "pages": 1,
-    "mp_per_page": 4.189,
-    "ms_per_page": 1574,
-    "page_ms": [
-     1460.6
-    ],
-    "assemble_ms": 109.2,
-    "runtime_ms": 1574,
-    "wall_ms": 2128,
-    "peak_rss_mb": 337.8
-   },
-   {
-    "id": "notes/nt09-tremolos/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1188,
-    "page_ms": [
-     1069.2
-    ],
-    "assemble_ms": 114.7,
-    "runtime_ms": 1188,
-    "wall_ms": 1709,
-    "peak_rss_mb": 264.4
-   },
-   {
-    "id": "notes/nt09-tremolos/scan",
-    "variant": "scan",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     604.8,
-     848.5
-    ],
-    "pages": 1,
-    "mp_per_page": 3.96,
-    "ms_per_page": 1362,
-    "page_ms": [
-     1245
-    ],
-    "assemble_ms": 113.2,
-    "runtime_ms": 1362,
-    "wall_ms": 1913,
-    "peak_rss_mb": 282.4
-   },
-   {
-    "id": "notes/nt09-tremolos/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "~B4",
-    "page_pts": [
-     681.1,
-     900.5
-    ],
-    "pages": 1,
-    "mp_per_page": 4.734,
-    "ms_per_page": 4549,
-    "page_ms": [
-     4191
-    ],
-    "assemble_ms": 353.3,
-    "runtime_ms": 4549,
-    "wall_ms": 5108,
-    "peak_rss_mb": 541.7
-   },
-   {
-    "id": "notes/nt10-piano-etude/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1255,
-    "page_ms": [
-     1120.8
-    ],
-    "assemble_ms": 129.8,
-    "runtime_ms": 1255,
-    "wall_ms": 1773,
-    "peak_rss_mb": 301.8
-   },
-   {
-    "id": "notes/nt10-piano-etude/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     616.1,
-     856.3
-    ],
-    "pages": 1,
-    "mp_per_page": 4.073,
-    "ms_per_page": 1417,
-    "page_ms": [
-     1277.8
-    ],
-    "assemble_ms": 134.3,
-    "runtime_ms": 1417,
-    "wall_ms": 1942,
-    "peak_rss_mb": 308.6
-   },
-   {
-    "id": "notes/nt10-piano-etude/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     639.8,
-     872.6
-    ],
-    "pages": 1,
-    "mp_per_page": 4.31,
-    "ms_per_page": 1462,
-    "page_ms": [
-     1327.5
-    ],
-    "assemble_ms": 130.6,
-    "runtime_ms": 1462,
-    "wall_ms": 1983,
-    "peak_rss_mb": 299.2
-   },
-   {
-    "id": "percussion/perc01-parade-flute-snare-drumset/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1516,
-    "page_ms": [
-     1338.5
-    ],
-    "assemble_ms": 171.4,
-    "runtime_ms": 1516,
-    "wall_ms": 2049,
-    "peak_rss_mb": 274.4
-   },
-   {
-    "id": "percussion/perc01-parade-flute-snare-drumset/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1633,
-    "page_ms": [
-     1446.3
-    ],
-    "assemble_ms": 182,
-    "runtime_ms": 1633,
-    "wall_ms": 2161,
-    "peak_rss_mb": 282.3
-   },
-   {
-    "id": "percussion/perc01-parade-flute-snare-drumset/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.2,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1695,
-    "page_ms": [
-     1482.3
-    ],
-    "assemble_ms": 207.6,
-    "runtime_ms": 1695,
-    "wall_ms": 2211,
-    "peak_rss_mb": 285
-   },
-   {
-    "id": "pitch/pitch-cov-accidentals-chords-piano/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1296,
-    "page_ms": [
-     1150.1
-    ],
-    "assemble_ms": 139.9,
-    "runtime_ms": 1296,
-    "wall_ms": 1805,
-    "peak_rss_mb": 288.7
-   },
-   {
-    "id": "pitch/pitch-cov-accidentals-chords-piano/scan",
-    "variant": "scan",
-    "src_dpi": 250,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.3,
-     842.1
-    ],
-    "pages": 1,
-    "mp_per_page": 3.87,
-    "ms_per_page": 1401,
-    "page_ms": [
-     1236.6
-    ],
-    "assemble_ms": 158.3,
-    "runtime_ms": 1401,
-    "wall_ms": 1938,
-    "peak_rss_mb": 287.5
-   },
-   {
-    "id": "pitch/pitch-cov-accidentals-chords-piano/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     632.2,
-     867.2
-    ],
-    "pages": 1,
-    "mp_per_page": 4.23,
-    "ms_per_page": 1491,
-    "page_ms": [
-     1333.7
-    ],
-    "assemble_ms": 152.1,
-    "runtime_ms": 1491,
-    "wall_ms": 2010,
-    "peak_rss_mb": 280.5
-   },
-   {
-    "id": "pitch/pitch-cov-accidentals-melody/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1307,
-    "page_ms": [
-     1113.8
-    ],
-    "assemble_ms": 190,
-    "runtime_ms": 1307,
-    "wall_ms": 1812,
-    "peak_rss_mb": 277.2
-   },
-   {
-    "id": "pitch/pitch-cov-accidentals-melody/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1481,
-    "page_ms": [
-     1289.8
-    ],
-    "assemble_ms": 185.6,
-    "runtime_ms": 1481,
-    "wall_ms": 2010,
-    "peak_rss_mb": 277.4
-   },
-   {
-    "id": "pitch/pitch-cov-accidentals-melody/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 100,
-    "raster_dpi": 200,
-    "paper": "~B4",
-    "page_pts": [
-     667.4,
-     891.4
-    ],
-    "pages": 1,
-    "mp_per_page": 4.591,
-    "ms_per_page": 1500,
-    "page_ms": [
-     1258.4
-    ],
-    "assemble_ms": 237.4,
-    "runtime_ms": 1500,
-    "wall_ms": 2017,
-    "peak_rss_mb": 288.7
-   },
-   {
-    "id": "pitch/pitch-cov-clef-changes-piano/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1314,
-    "page_ms": [
-     1160.2
-    ],
-    "assemble_ms": 150.7,
-    "runtime_ms": 1314,
-    "wall_ms": 1854,
-    "peak_rss_mb": 292.6
-   },
-   {
-    "id": "pitch/pitch-cov-clef-changes-piano/scan",
-    "variant": "scan",
-    "src_dpi": 250,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.3,
-     842.1
-    ],
-    "pages": 1,
-    "mp_per_page": 3.87,
-    "ms_per_page": 1462,
-    "page_ms": [
-     1287.8
-    ],
-    "assemble_ms": 168.9,
-    "runtime_ms": 1462,
-    "wall_ms": 1999,
-    "peak_rss_mb": 281.6
-   },
-   {
-    "id": "pitch/pitch-cov-clef-changes-piano/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     639.8,
-     872.6
-    ],
-    "pages": 1,
-    "mp_per_page": 4.31,
-    "ms_per_page": 6104,
-    "page_ms": [
-     6099.2
-    ],
-    "assemble_ms": 1.5,
-    "runtime_ms": 6104,
-    "wall_ms": 6658,
-    "peak_rss_mb": 360.6
-   },
-   {
-    "id": "pitch/pitch-cov-clefs-all/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1253,
-    "page_ms": [
-     1062.7
-    ],
-    "assemble_ms": 186.7,
-    "runtime_ms": 1253,
-    "wall_ms": 1771,
-    "peak_rss_mb": 272.8
-   },
-   {
-    "id": "pitch/pitch-cov-clefs-all/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1426,
-    "page_ms": [
-     1251.5
-    ],
-    "assemble_ms": 168.8,
-    "runtime_ms": 1426,
-    "wall_ms": 1974,
-    "peak_rss_mb": 274.1
-   },
-   {
-    "id": "pitch/pitch-cov-clefs-all/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "~B4",
-    "page_pts": [
-     687.8,
-     904.3
-    ],
-    "pages": 1,
-    "mp_per_page": 4.8,
-    "ms_per_page": 1938,
-    "page_ms": [
-     1731.8
-    ],
-    "assemble_ms": 199.6,
-    "runtime_ms": 1938,
-    "wall_ms": 2471,
-    "peak_rss_mb": 343.1
-   },
-   {
-    "id": "pitch/pitch-cov-clefs-quartet/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1558,
-    "page_ms": [
-     1304
-    ],
-    "assemble_ms": 248.5,
-    "runtime_ms": 1558,
-    "wall_ms": 2065,
-    "peak_rss_mb": 282.8
-   },
-   {
-    "id": "pitch/pitch-cov-clefs-quartet/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1737,
-    "page_ms": [
-     1483.5
-    ],
-    "assemble_ms": 250.6,
-    "runtime_ms": 1737,
-    "wall_ms": 2270,
-    "peak_rss_mb": 265.8
-   },
-   {
-    "id": "pitch/pitch-cov-clefs-quartet/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "~B4",
-    "page_pts": [
-     666.7,
-     913
-    ],
-    "pages": 1,
-    "mp_per_page": 4.697,
-    "ms_per_page": 1903,
-    "page_ms": [
-     1606
-    ],
-    "assemble_ms": 291.2,
-    "runtime_ms": 1903,
-    "wall_ms": 2421,
-    "peak_rss_mb": 316.2
-   },
-   {
-    "id": "pitch/pitch-cov-key-changes-organ/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1544,
-    "page_ms": [
-     1373.3
-    ],
-    "assemble_ms": 167.5,
-    "runtime_ms": 1544,
-    "wall_ms": 2073,
-    "peak_rss_mb": 300.7
-   },
-   {
-    "id": "pitch/pitch-cov-key-changes-organ/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1688,
-    "page_ms": [
-     1511
-    ],
-    "assemble_ms": 172.6,
-    "runtime_ms": 1688,
-    "wall_ms": 2232,
-    "peak_rss_mb": 309.2
-   },
-   {
-    "id": "pitch/pitch-cov-key-changes-organ/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.7,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.871,
-    "ms_per_page": 1782,
-    "page_ms": [
-     1575.8
-    ],
-    "assemble_ms": 201,
-    "runtime_ms": 1782,
-    "wall_ms": 2334,
-    "peak_rss_mb": 325.5
-   },
-   {
-    "id": "pitch/pitch-cov-keys-major-flats/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1433,
-    "page_ms": [
-     1261.1
-    ],
-    "assemble_ms": 167.2,
-    "runtime_ms": 1433,
-    "wall_ms": 1963,
-    "peak_rss_mb": 261.5
-   },
-   {
-    "id": "pitch/pitch-cov-keys-major-flats/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1640,
-    "page_ms": [
-     1445.3
-    ],
-    "assemble_ms": 189.7,
-    "runtime_ms": 1640,
-    "wall_ms": 2176,
-    "peak_rss_mb": 280.9
-   },
-   {
-    "id": "pitch/pitch-cov-keys-major-flats/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     653,
-     881.6
-    ],
-    "pages": 1,
-    "mp_per_page": 4.442,
-    "ms_per_page": 2039,
-    "page_ms": [
-     1719.2
-    ],
-    "assemble_ms": 314.2,
-    "runtime_ms": 2039,
-    "wall_ms": 2571,
-    "peak_rss_mb": 290.7
-   },
-   {
-    "id": "pitch/pitch-cov-keys-major-sharps/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1322,
-    "page_ms": [
-     1169
-    ],
-    "assemble_ms": 147.7,
-    "runtime_ms": 1322,
-    "wall_ms": 1853,
-    "peak_rss_mb": 275.5
-   },
-   {
-    "id": "pitch/pitch-cov-keys-major-sharps/scan",
-    "variant": "scan",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     842
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1480,
-    "page_ms": [
-     1303.8
-    ],
-    "assemble_ms": 172.8,
-    "runtime_ms": 1480,
-    "wall_ms": 2014,
-    "peak_rss_mb": 282.8
-   },
-   {
-    "id": "pitch/pitch-cov-keys-major-sharps/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 120,
-    "raster_dpi": 200,
-    "paper": "~B4",
-    "page_pts": [
-     720.6,
-     926.4
-    ],
-    "pages": 1,
-    "mp_per_page": 5.153,
-    "ms_per_page": 2047,
-    "page_ms": [
-     1832.7
-    ],
-    "assemble_ms": 207.6,
-    "runtime_ms": 2047,
-    "wall_ms": 2576,
-    "peak_rss_mb": 347
-   },
-   {
-    "id": "pitch/pitch-cov-keys-minor-flats/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1272,
-    "page_ms": [
-     1123
-    ],
-    "assemble_ms": 144.3,
-    "runtime_ms": 1272,
-    "wall_ms": 1806,
-    "peak_rss_mb": 298.5
-   },
-   {
-    "id": "pitch/pitch-cov-keys-minor-flats/scan",
-    "variant": "scan",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     842
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1429,
-    "page_ms": [
-     1252.7
-    ],
-    "assemble_ms": 171.9,
-    "runtime_ms": 1429,
-    "wall_ms": 1936,
-    "peak_rss_mb": 277
-   },
-   {
-    "id": "pitch/pitch-cov-keys-minor-flats/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     598,
-     878
-    ],
-    "pages": 1,
-    "mp_per_page": 4.051,
-    "ms_per_page": 1490,
-    "page_ms": [
-     1303.3
-    ],
-    "assemble_ms": 183.4,
-    "runtime_ms": 1490,
-    "wall_ms": 2008,
-    "peak_rss_mb": 274.7
-   },
-   {
-    "id": "pitch/pitch-cov-keys-minor-sharps/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1321,
-    "page_ms": [
-     1167.3
-    ],
-    "assemble_ms": 147.9,
-    "runtime_ms": 1321,
-    "wall_ms": 1842,
-    "peak_rss_mb": 270.7
-   },
-   {
-    "id": "pitch/pitch-cov-keys-minor-sharps/scan",
-    "variant": "scan",
-    "src_dpi": 250,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.3,
-     842.1
-    ],
-    "pages": 1,
-    "mp_per_page": 3.87,
-    "ms_per_page": 1433,
-    "page_ms": [
-     1286.2
-    ],
-    "assemble_ms": 143.1,
-    "runtime_ms": 1433,
-    "wall_ms": 1959,
-    "peak_rss_mb": 312.1
-   },
-   {
-    "id": "pitch/pitch-cov-keys-minor-sharps/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     625.4,
-     863
-    ],
-    "pages": 1,
-    "mp_per_page": 4.168,
-    "ms_per_page": 1642,
-    "page_ms": [
-     1439.8
-    ],
-    "assemble_ms": 196.3,
-    "runtime_ms": 1642,
-    "wall_ms": 2173,
-    "peak_rss_mb": 256.7
-   },
-   {
-    "id": "pitch/pitch-cov-ottava-ledger-melody/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1171,
-    "page_ms": [
-     1088
-    ],
-    "assemble_ms": 79.2,
-    "runtime_ms": 1171,
-    "wall_ms": 1702,
-    "peak_rss_mb": 270.7
-   },
-   {
-    "id": "pitch/pitch-cov-ottava-ledger-melody/scan",
-    "variant": "scan",
-    "src_dpi": 250,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.3,
-     842.1
-    ],
-    "pages": 1,
-    "mp_per_page": 3.87,
-    "ms_per_page": 1305,
-    "page_ms": [
-     1226.6
-    ],
-    "assemble_ms": 74.6,
-    "runtime_ms": 1305,
-    "wall_ms": 1837,
-    "peak_rss_mb": 298.2
-   },
-   {
-    "id": "pitch/pitch-cov-ottava-ledger-melody/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
+    "raster_dpi": 150,
     "paper": "~B4",
     "page_pts": [
      655.2,
      901.4
     ],
     "pages": 1,
-    "mp_per_page": 4.56,
-    "ms_per_page": 1880,
+    "mp_per_page": 2.563,
+    "ms_per_page": 4900,
     "page_ms": [
-     1778.7
+     4862.8
     ],
-    "assemble_ms": 95.7,
-    "runtime_ms": 1880,
-    "wall_ms": 2398,
-    "peak_rss_mb": 334.9
+    "assemble_ms": 37.7,
+    "runtime_ms": 4900,
+    "wall_ms": 5383,
+    "peak_rss_mb": 376.2
    },
    {
-    "id": "pitch/pitch-cov-ottava-piano/clean",
+    "id": "perf/perf-hymn-a4-200dpi/clean",
     "variant": "clean",
-    "src_dpi": 300,
+    "src_dpi": 200,
     "raster_dpi": 200,
     "paper": "A4",
     "page_pts": [
      595.4,
-     841.9
+     842
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1430,
+    "ms_per_page": 3906,
     "page_ms": [
-     1299.6
+     3886.6
     ],
-    "assemble_ms": 125,
-    "runtime_ms": 1430,
-    "wall_ms": 1969,
-    "peak_rss_mb": 290.1
+    "assemble_ms": 18.5,
+    "runtime_ms": 3906,
+    "wall_ms": 4334,
+    "peak_rss_mb": 298
    },
    {
-    "id": "pitch/pitch-cov-ottava-piano/scan",
+    "id": "perf/perf-hymn-a4-200dpi/scan",
     "variant": "scan",
     "src_dpi": 200,
     "raster_dpi": 200,
@@ -29823,395 +26575,17 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1481,
+    "ms_per_page": 4225,
     "page_ms": [
-     1346.1
+     4191
     ],
-    "assemble_ms": 129.2,
-    "runtime_ms": 1481,
-    "wall_ms": 2011,
-    "peak_rss_mb": 283.5
+    "assemble_ms": 33.4,
+    "runtime_ms": 4225,
+    "wall_ms": 4637,
+    "peak_rss_mb": 337.6
    },
    {
-    "id": "pitch/pitch-cov-ottava-piano/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "A4 landscape",
-    "page_pts": [
-     841.9,
-     595.7
-    ],
-    "pages": 1,
-    "mp_per_page": 3.871,
-    "ms_per_page": 1961,
-    "page_ms": [
-     1825.3
-    ],
-    "assemble_ms": 132.2,
-    "runtime_ms": 1961,
-    "wall_ms": 2481,
-    "peak_rss_mb": 324.8
-   },
-   {
-    "id": "rests/rst01-rest-values/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1291,
-    "page_ms": [
-     1121
-    ],
-    "assemble_ms": 166.4,
-    "runtime_ms": 1291,
-    "wall_ms": 1804,
-    "peak_rss_mb": 275.2
-   },
-   {
-    "id": "rests/rst01-rest-values/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     604.6,
-     848.2
-    ],
-    "pages": 1,
-    "mp_per_page": 3.958,
-    "ms_per_page": 1489,
-    "page_ms": [
-     1285.2
-    ],
-    "assemble_ms": 199.4,
-    "runtime_ms": 1489,
-    "wall_ms": 2011,
-    "peak_rss_mb": 283
-   },
-   {
-    "id": "rests/rst01-rest-values/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     641.3,
-     874.1
-    ],
-    "pages": 1,
-    "mp_per_page": 4.327,
-    "ms_per_page": 1789,
-    "page_ms": [
-     1487.6
-    ],
-    "assemble_ms": 296.3,
-    "runtime_ms": 1789,
-    "wall_ms": 2335,
-    "peak_rss_mb": 356.8
-   },
-   {
-    "id": "rests/rst02-dotted-rests/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1403,
-    "page_ms": [
-     1165.5
-    ],
-    "assemble_ms": 233.9,
-    "runtime_ms": 1403,
-    "wall_ms": 1909,
-    "peak_rss_mb": 288
-   },
-   {
-    "id": "rests/rst02-dotted-rests/scan",
-    "variant": "scan",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     609.1,
-     851.4
-    ],
-    "pages": 1,
-    "mp_per_page": 4.002,
-    "ms_per_page": 1539,
-    "page_ms": [
-     1299.6
-    ],
-    "assemble_ms": 233.9,
-    "runtime_ms": 1539,
-    "wall_ms": 2074,
-    "peak_rss_mb": 283.6
-   },
-   {
-    "id": "rests/rst02-dotted-rests/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     630.7,
-     866.5
-    ],
-    "pages": 1,
-    "mp_per_page": 4.217,
-    "ms_per_page": 1612,
-    "page_ms": [
-     1301.8
-    ],
-    "assemble_ms": 305.3,
-    "runtime_ms": 1612,
-    "wall_ms": 2130,
-    "peak_rss_mb": 295
-   },
-   {
-    "id": "rests/rst03-whole-bar-rests-simple/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1251,
-    "page_ms": [
-     1091.6
-    ],
-    "assemble_ms": 155,
-    "runtime_ms": 1251,
-    "wall_ms": 1774,
-    "peak_rss_mb": 272.1
-   },
-   {
-    "id": "rests/rst03-whole-bar-rests-simple/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     611.8,
-     853.4
-    ],
-    "pages": 1,
-    "mp_per_page": 4.031,
-    "ms_per_page": 1504,
-    "page_ms": [
-     1322.9
-    ],
-    "assemble_ms": 175.8,
-    "runtime_ms": 1504,
-    "wall_ms": 2042,
-    "peak_rss_mb": 289.2
-   },
-   {
-    "id": "rests/rst03-whole-bar-rests-simple/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     642.7,
-     889
-    ],
-    "pages": 1,
-    "mp_per_page": 4.411,
-    "ms_per_page": 2647,
-    "page_ms": [
-     2422.8
-    ],
-    "assemble_ms": 219.5,
-    "runtime_ms": 2647,
-    "wall_ms": 3177,
-    "peak_rss_mb": 384.8
-   },
-   {
-    "id": "rests/rst04-whole-bar-rests-compound/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1331,
-    "page_ms": [
-     1137.7
-    ],
-    "assemble_ms": 188.4,
-    "runtime_ms": 1331,
-    "wall_ms": 1842,
-    "peak_rss_mb": 272.7
-   },
-   {
-    "id": "rests/rst04-whole-bar-rests-compound/scan",
-    "variant": "scan",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     601.9,
-     846.4
-    ],
-    "pages": 1,
-    "mp_per_page": 3.931,
-    "ms_per_page": 1391,
-    "page_ms": [
-     1216.1
-    ],
-    "assemble_ms": 169.9,
-    "runtime_ms": 1391,
-    "wall_ms": 1919,
-    "peak_rss_mb": 282.9
-   },
-   {
-    "id": "rests/rst04-whole-bar-rests-compound/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     653,
-     881.6
-    ],
-    "pages": 1,
-    "mp_per_page": 4.442,
-    "ms_per_page": 2358,
-    "page_ms": [
-     2117.4
-    ],
-    "assemble_ms": 236.3,
-    "runtime_ms": 2358,
-    "wall_ms": 2882,
-    "peak_rss_mb": 345.9
-   },
-   {
-    "id": "rests/rst05-multibar-rests/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1422,
-    "page_ms": [
-     1187.7
-    ],
-    "assemble_ms": 229.5,
-    "runtime_ms": 1422,
-    "wall_ms": 1958,
-    "peak_rss_mb": 282.9
-   },
-   {
-    "id": "rests/rst05-multibar-rests/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     603.1,
-     847.2
-    ],
-    "pages": 1,
-    "mp_per_page": 3.945,
-    "ms_per_page": 1515,
-    "page_ms": [
-     1317.9
-    ],
-    "assemble_ms": 192.6,
-    "runtime_ms": 1515,
-    "wall_ms": 2026,
-    "peak_rss_mb": 280
-   },
-   {
-    "id": "rests/rst05-multibar-rests/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     639.4,
-     872.2
-    ],
-    "pages": 1,
-    "mp_per_page": 4.303,
-    "ms_per_page": 1645,
-    "page_ms": [
-     1530.5
-    ],
-    "assemble_ms": 109.4,
-    "runtime_ms": 1645,
-    "wall_ms": 2178,
-    "peak_rss_mb": 310.6
-   },
-   {
-    "id": "rests/rst06-two-voice-rests/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1219,
-    "page_ms": [
-     1097.7
-    ],
-    "assemble_ms": 116.5,
-    "runtime_ms": 1219,
-    "wall_ms": 1735,
-    "peak_rss_mb": 290.2
-   },
-   {
-    "id": "rests/rst06-two-voice-rests/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     607.4,
-     850.6
-    ],
-    "pages": 1,
-    "mp_per_page": 3.989,
-    "ms_per_page": 1370,
-    "page_ms": [
-     1259.4
-    ],
-    "assemble_ms": 105.6,
-    "runtime_ms": 1370,
-    "wall_ms": 1911,
-    "peak_rss_mb": 309.5
-   },
-   {
-    "id": "rests/rst06-two-voice-rests/scan-severe",
+    "id": "perf/perf-hymn-a4-200dpi/scan-severe",
     "variant": "scan-severe",
     "src_dpi": 200,
     "raster_dpi": 200,
@@ -30222,637 +26596,987 @@
     ],
     "pages": 1,
     "mp_per_page": 4.55,
-    "ms_per_page": 1454,
+    "ms_per_page": 3110,
     "page_ms": [
-     1333
+     3089.7
     ],
-    "assemble_ms": 115.9,
-    "runtime_ms": 1454,
-    "wall_ms": 1984,
-    "peak_rss_mb": 295.5
+    "assemble_ms": 19.5,
+    "runtime_ms": 3110,
+    "wall_ms": 3539,
+    "peak_rss_mb": 249.4
    },
    {
-    "id": "rests/rst07-piano-rests/clean",
+    "id": "perf/perf-hymn-a4-300dpi/clean",
     "variant": "clean",
     "src_dpi": 300,
-    "raster_dpi": 200,
+    "raster_dpi": 300,
     "paper": "A4",
     "page_pts": [
      595.4,
      841.9
     ],
     "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1447,
+    "mp_per_page": 8.703,
+    "ms_per_page": 4147,
     "page_ms": [
-     1213
+     4125.7
     ],
-    "assemble_ms": 228.5,
-    "runtime_ms": 1447,
-    "wall_ms": 1983,
-    "peak_rss_mb": 291.1
+    "assemble_ms": 21,
+    "runtime_ms": 4147,
+    "wall_ms": 4778,
+    "peak_rss_mb": 332.9
    },
    {
-    "id": "rests/rst07-piano-rests/scan",
+    "id": "perf/perf-hymn-a4-300dpi/scan",
     "variant": "scan",
-    "src_dpi": 200,
-    "raster_dpi": 200,
+    "src_dpi": 300,
+    "raster_dpi": 300,
     "paper": "A4",
     "page_pts": [
-     606.2,
-     850
+     595.4,
+     841.9
     ],
     "pages": 1,
-    "mp_per_page": 3.976,
-    "ms_per_page": 1548,
+    "mp_per_page": 8.703,
+    "ms_per_page": 4166,
     "page_ms": [
-     1314.9
+     4139
     ],
-    "assemble_ms": 229.2,
-    "runtime_ms": 1548,
-    "wall_ms": 2078,
-    "peak_rss_mb": 277.2
+    "assemble_ms": 26.4,
+    "runtime_ms": 4166,
+    "wall_ms": 4741,
+    "peak_rss_mb": 336.1
    },
    {
-    "id": "rests/rst07-piano-rests/scan-severe",
+    "id": "perf/perf-hymn-a4-300dpi/scan-severe",
     "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "~A4",
+    "src_dpi": 300,
+    "raster_dpi": 300,
+    "paper": "~B4",
     "page_pts": [
-     647.5,
-     878.4
+     655,
+     901.4
     ],
     "pages": 1,
-    "mp_per_page": 4.39,
-    "ms_per_page": 1618,
+    "mp_per_page": 10.25,
+    "ms_per_page": 5352,
     "page_ms": [
-     1327.7
+     5330.9
     ],
-    "assemble_ms": 284.9,
-    "runtime_ms": 1618,
-    "wall_ms": 2137,
-    "peak_rss_mb": 298.8
+    "assemble_ms": 20.6,
+    "runtime_ms": 5352,
+    "wall_ms": 6040,
+    "peak_rss_mb": 419.1
    },
    {
-    "id": "rests/rst08-tuplet-beam-rests/clean",
+    "id": "perf/perf-hymn-a4-400dpi/clean",
     "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
+    "src_dpi": 400,
+    "raster_dpi": 400,
     "paper": "A4",
     "page_pts": [
      595.4,
-     841.9
+     842
     ],
     "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1645,
+    "mp_per_page": 15.475,
+    "ms_per_page": 5593,
     "page_ms": [
-     1493.2
+     5568.5
     ],
-    "assemble_ms": 146.7,
-    "runtime_ms": 1645,
-    "wall_ms": 2175,
-    "peak_rss_mb": 281.6
+    "assemble_ms": 23.7,
+    "runtime_ms": 5593,
+    "wall_ms": 6476,
+    "peak_rss_mb": 446
    },
    {
-    "id": "rests/rst08-tuplet-beam-rests/scan",
+    "id": "perf/perf-hymn-a4-400dpi/scan",
     "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
+    "src_dpi": 400,
+    "raster_dpi": 400,
     "paper": "A4",
     "page_pts": [
-     600.2,
-     845.3
+     595.4,
+     842
     ],
     "pages": 1,
-    "mp_per_page": 3.918,
-    "ms_per_page": 1653,
+    "mp_per_page": 15.475,
+    "ms_per_page": 6659,
     "page_ms": [
-     1489.3
+     6639.3
     ],
-    "assemble_ms": 158.8,
-    "runtime_ms": 1653,
-    "wall_ms": 2159,
-    "peak_rss_mb": 302.9
+    "assemble_ms": 19,
+    "runtime_ms": 6659,
+    "wall_ms": 7408,
+    "peak_rss_mb": 454.5
    },
    {
-    "id": "rests/rst08-tuplet-beam-rests/scan-severe",
+    "id": "perf/perf-hymn-a4-400dpi/scan-severe",
     "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "~A4",
+    "src_dpi": 400,
+    "raster_dpi": 400,
+    "paper": "~B4",
     "page_pts": [
-     636.5,
-     870.7
+     654.8,
+     901.4
     ],
     "pages": 1,
-    "mp_per_page": 4.277,
-    "ms_per_page": 17337,
+    "mp_per_page": 18.219,
+    "ms_per_page": 7527,
     "page_ms": [
-     17329.2
+     7504.1
     ],
-    "assemble_ms": 1.5,
-    "runtime_ms": 17337,
-    "wall_ms": 17897,
-    "peak_rss_mb": 601.3
+    "assemble_ms": 20.9,
+    "runtime_ms": 7527,
+    "wall_ms": 8477,
+    "peak_rss_mb": 557.8
    },
    {
-    "id": "rests/rst09-quartet-rests/clean",
+    "id": "perf/perf-hymn-a4-600dpi/clean",
     "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 2654,
-    "page_ms": [
-     2297.7
-    ],
-    "assemble_ms": 351.4,
-    "runtime_ms": 2654,
-    "wall_ms": 3187,
-    "peak_rss_mb": 378.9
-   },
-   {
-    "id": "rests/rst09-quartet-rests/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     610.3,
-     852.5
-    ],
-    "pages": 1,
-    "mp_per_page": 4.016,
-    "ms_per_page": 2961,
-    "page_ms": [
-     2584.1
-    ],
-    "assemble_ms": 373.3,
-    "runtime_ms": 2961,
-    "wall_ms": 3511,
-    "peak_rss_mb": 346.9
-   },
-   {
-    "id": "rests/rst09-quartet-rests/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     627.8,
-     864.4
-    ],
-    "pages": 1,
-    "mp_per_page": 4.187,
-    "ms_per_page": 3026,
-    "page_ms": [
-     2610.3
-    ],
-    "assemble_ms": 410.1,
-    "runtime_ms": 3026,
-    "wall_ms": 3547,
-    "peak_rss_mb": 412.8
-   },
-   {
-    "id": "structure/str01-double-final-barlines/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1231,
-    "page_ms": [
-     1059.7
-    ],
-    "assemble_ms": 166.9,
-    "runtime_ms": 1231,
-    "wall_ms": 1744,
-    "peak_rss_mb": 283.5
-   },
-   {
-    "id": "structure/str01-double-final-barlines/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1468,
-    "page_ms": [
-     1303.5
-    ],
-    "assemble_ms": 160.6,
-    "runtime_ms": 1468,
-    "wall_ms": 2003,
-    "peak_rss_mb": 265.2
-   },
-   {
-    "id": "structure/str01-double-final-barlines/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.2,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1312,
-    "page_ms": [
-     1157
-    ],
-    "assemble_ms": 150.1,
-    "runtime_ms": 1312,
-    "wall_ms": 1827,
-    "peak_rss_mb": 276.2
-   },
-   {
-    "id": "structure/str02-repeat-signs-piano/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1360,
-    "page_ms": [
-     1137.9
-    ],
-    "assemble_ms": 218.5,
-    "runtime_ms": 1360,
-    "wall_ms": 1904,
-    "peak_rss_mb": 294.2
-   },
-   {
-    "id": "structure/str02-repeat-signs-piano/scan",
-    "variant": "scan",
-    "src_dpi": 250,
-    "raster_dpi": 200,
+    "src_dpi": 600,
+    "raster_dpi": 600,
     "paper": "A4",
     "page_pts": [
      595.3,
-     842.1
+     841.9
     ],
     "pages": 1,
-    "mp_per_page": 3.87,
-    "ms_per_page": 1539,
+    "mp_per_page": 34.806,
+    "ms_per_page": 4819,
     "page_ms": [
-     1282.4
+     4798
     ],
-    "assemble_ms": 251.8,
-    "runtime_ms": 1539,
-    "wall_ms": 2074,
-    "peak_rss_mb": 288.8
+    "assemble_ms": 20.4,
+    "runtime_ms": 4819,
+    "wall_ms": 6160,
+    "peak_rss_mb": 319.2
    },
    {
-    "id": "structure/str02-repeat-signs-piano/scan-severe",
+    "id": "perf/perf-hymn-a4-600dpi/scan",
+    "variant": "scan",
+    "src_dpi": 600,
+    "raster_dpi": 600,
+    "paper": "A4",
+    "page_pts": [
+     595.3,
+     841.9
+    ],
+    "pages": 1,
+    "mp_per_page": 34.806,
+    "ms_per_page": 4958,
+    "page_ms": [
+     4937.9
+    ],
+    "assemble_ms": 19.6,
+    "runtime_ms": 4958,
+    "wall_ms": 6034,
+    "peak_rss_mb": 424.7
+   },
+   {
+    "id": "perf/perf-hymn-a4-600dpi/scan-severe",
     "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
+    "src_dpi": 600,
+    "raster_dpi": 600,
     "paper": "~B4",
     "page_pts": [
-     666.7,
-     913
+     654.8,
+     901.4
     ],
     "pages": 1,
-    "mp_per_page": 4.697,
-    "ms_per_page": 2742,
+    "mp_per_page": 40.993,
+    "ms_per_page": 5363,
     "page_ms": [
-     2529.5
+     5343.7
     ],
-    "assemble_ms": 206.5,
-    "runtime_ms": 2742,
-    "wall_ms": 3257,
-    "peak_rss_mb": 347.2
+    "assemble_ms": 18,
+    "runtime_ms": 5363,
+    "wall_ms": 6837,
+    "peak_rss_mb": 445.6
    },
    {
-    "id": "structure/str03-voltas-string-quartet/clean",
+    "id": "perf/perf-hymn-letter-300dpi/clean",
     "variant": "clean",
     "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
+    "raster_dpi": 300,
+    "paper": "Letter",
     "page_pts": [
-     595.4,
-     841.9
+     612,
+     792
     ],
     "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 3635,
+    "mp_per_page": 8.415,
+    "ms_per_page": 4452,
     "page_ms": [
-     2700
+     4431.2
     ],
-    "assemble_ms": 929.9,
-    "runtime_ms": 3635,
-    "wall_ms": 4169,
-    "peak_rss_mb": 372.4
+    "assemble_ms": 20.4,
+    "runtime_ms": 4452,
+    "wall_ms": 5110,
+    "peak_rss_mb": 324.7
    },
    {
-    "id": "structure/str03-voltas-string-quartet/scan",
+    "id": "perf/perf-hymn-letter-300dpi/scan",
     "variant": "scan",
     "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
+    "raster_dpi": 300,
+    "paper": "Letter",
     "page_pts": [
-     595.4,
-     841.9
+     612,
+     792
     ],
     "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 4191,
+    "mp_per_page": 8.415,
+    "ms_per_page": 4238,
     "page_ms": [
-     3134.5
+     4217.7
     ],
-    "assemble_ms": 1053.3,
-    "runtime_ms": 4191,
-    "wall_ms": 4731,
-    "peak_rss_mb": 392.9
+    "assemble_ms": 20,
+    "runtime_ms": 4238,
+    "wall_ms": 4825,
+    "peak_rss_mb": 336.6
    },
    {
-    "id": "structure/str03-voltas-string-quartet/scan-severe",
+    "id": "perf/perf-hymn-letter-300dpi/scan-severe",
     "variant": "scan-severe",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "A4",
+    "src_dpi": 300,
+    "raster_dpi": 300,
+    "paper": "~Letter",
     "page_pts": [
-     595.4,
-     842
+     673,
+     853
     ],
     "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 4668,
+    "mp_per_page": 9.965,
+    "ms_per_page": 4833,
     "page_ms": [
-     2852.3
+     4799.9
     ],
-    "assemble_ms": 1811.8,
-    "runtime_ms": 4668,
-    "wall_ms": 5206,
-    "peak_rss_mb": 397.7
+    "assemble_ms": 32.8,
+    "runtime_ms": 4833,
+    "wall_ms": 5575,
+    "peak_rss_mb": 453.1
    },
    {
-    "id": "structure/str04-segno-coda-ds/clean",
+    "id": "perf/perf-pages-01/clean",
     "variant": "clean",
     "src_dpi": 300,
-    "raster_dpi": 200,
+    "raster_dpi": 300,
     "paper": "A4",
     "page_pts": [
      595.4,
      841.9
     ],
     "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1384,
+    "mp_per_page": 8.703,
+    "ms_per_page": 2362,
     "page_ms": [
-     1205.7
+     2344.9
     ],
-    "assemble_ms": 172.4,
-    "runtime_ms": 1384,
-    "wall_ms": 1900,
-    "peak_rss_mb": 263.6
+    "assemble_ms": 17.7,
+    "runtime_ms": 2362,
+    "wall_ms": 2974,
+    "peak_rss_mb": 318
    },
    {
-    "id": "structure/str04-segno-coda-ds/scan",
+    "id": "perf/perf-pages-01/scan",
     "variant": "scan",
-    "src_dpi": 200,
-    "raster_dpi": 200,
+    "src_dpi": 300,
+    "raster_dpi": 300,
     "paper": "A4",
     "page_pts": [
      595.4,
-     842
+     841.9
     ],
     "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1581,
+    "mp_per_page": 8.703,
+    "ms_per_page": 2690,
     "page_ms": [
-     1398
+     2671.1
     ],
-    "assemble_ms": 178.1,
-    "runtime_ms": 1581,
-    "wall_ms": 2126,
-    "peak_rss_mb": 266
+    "assemble_ms": 19.2,
+    "runtime_ms": 2690,
+    "wall_ms": 3266,
+    "peak_rss_mb": 335.3
    },
    {
-    "id": "structure/str04-segno-coda-ds/scan-severe",
+    "id": "perf/perf-pages-01/scan-severe",
     "variant": "scan-severe",
+    "src_dpi": 300,
+    "raster_dpi": 300,
+    "paper": "A4",
+    "page_pts": [
+     595.4,
+     841.9
+    ],
+    "pages": 1,
+    "mp_per_page": 8.703,
+    "ms_per_page": 2544,
+    "page_ms": [
+     2526.3
+    ],
+    "assemble_ms": 17.4,
+    "runtime_ms": 2544,
+    "wall_ms": 3147,
+    "peak_rss_mb": 345.4
+   },
+   {
+    "id": "perf/perf-pages-05/clean",
+    "variant": "clean",
+    "src_dpi": 300,
+    "raster_dpi": 300,
+    "paper": "A4",
+    "page_pts": [
+     595.4,
+     841.9
+    ],
+    "pages": 5,
+    "mp_per_page": 8.703,
+    "ms_per_page": 2718,
+    "page_ms": [
+     2821.8,
+     2330,
+     3081.6,
+     2741,
+     2538.5
+    ],
+    "assemble_ms": 78.5,
+    "runtime_ms": 13592,
+    "wall_ms": 15090,
+    "peak_rss_mb": 522.2
+   },
+   {
+    "id": "perf/perf-pages-05/scan",
+    "variant": "scan",
+    "src_dpi": 300,
+    "raster_dpi": 300,
+    "paper": "A4",
+    "page_pts": [
+     595.4,
+     841.9
+    ],
+    "pages": 5,
+    "mp_per_page": 8.703,
+    "ms_per_page": 2993,
+    "page_ms": [
+     2931.5,
+     2940.4,
+     3404.6,
+     2907.3,
+     2718.1
+    ],
+    "assemble_ms": 62.1,
+    "runtime_ms": 14964,
+    "wall_ms": 16207,
+    "peak_rss_mb": 666.1
+   },
+   {
+    "id": "perf/perf-pages-05/scan-severe",
+    "variant": "scan-severe",
+    "src_dpi": 300,
+    "raster_dpi": 300,
+    "paper": "A4",
+    "page_pts": [
+     595.4,
+     841.9
+    ],
+    "pages": 5,
+    "mp_per_page": 8.703,
+    "ms_per_page": 2740,
+    "page_ms": [
+     2421.3,
+     3277.8,
+     2963.1,
+     2499.7,
+     2477.1
+    ],
+    "assemble_ms": 60.3,
+    "runtime_ms": 13700,
+    "wall_ms": 14886,
+    "peak_rss_mb": 572.1
+   },
+   {
+    "id": "perf/perf-pages-10/clean",
+    "variant": "clean",
+    "src_dpi": 300,
+    "raster_dpi": 300,
+    "paper": "A4",
+    "page_pts": [
+     595.4,
+     841.9
+    ],
+    "pages": 10,
+    "mp_per_page": 8.703,
+    "ms_per_page": 2614,
+    "page_ms": [
+     2871.3,
+     2361,
+     2913.5,
+     2357.2,
+     2458.2,
+     3628.4,
+     2403.9,
+     2760.2,
+     2151.7,
+     2112.9
+    ],
+    "assemble_ms": 117.6,
+    "runtime_ms": 26136,
+    "wall_ms": 28729,
+    "peak_rss_mb": 795.6
+   },
+   {
+    "id": "perf/perf-pages-10/scan",
+    "variant": "scan",
+    "src_dpi": 300,
+    "raster_dpi": 300,
+    "paper": "A4",
+    "page_pts": [
+     595.4,
+     841.9
+    ],
+    "pages": 10,
+    "mp_per_page": 8.703,
+    "ms_per_page": 2864,
+    "page_ms": [
+     3203.9,
+     2886.4,
+     3163.6,
+     2945.6,
+     2874.7,
+     3530.3,
+     2672.9,
+     2619,
+     2321,
+     2338.1
+    ],
+    "assemble_ms": 87.9,
+    "runtime_ms": 28644,
+    "wall_ms": 30660,
+    "peak_rss_mb": 891.3
+   },
+   {
+    "id": "perf/perf-pages-10/scan-severe",
+    "variant": "scan-severe",
+    "src_dpi": 300,
+    "raster_dpi": 300,
+    "paper": "A4",
+    "page_pts": [
+     595.4,
+     841.9
+    ],
+    "pages": 10,
+    "mp_per_page": 8.703,
+    "ms_per_page": 2607,
+    "page_ms": [
+     2529.5,
+     2802.2,
+     2999.6,
+     2398.8,
+     2391.5,
+     3284.7,
+     2695.5,
+     2545.4,
+     1988.4,
+     2313.4
+    ],
+    "assemble_ms": 124.2,
+    "runtime_ms": 26074,
+    "wall_ms": 28026,
+    "peak_rss_mb": 908.4
+   },
+   {
+    "id": "perf/perf-pages-20/clean",
+    "variant": "clean",
+    "src_dpi": 300,
+    "raster_dpi": 300,
+    "paper": "A4",
+    "page_pts": [
+     595.4,
+     841.9
+    ],
+    "pages": 20,
+    "mp_per_page": 8.703,
+    "ms_per_page": 2358,
+    "page_ms": [
+     2741.8,
+     2404.2,
+     3098.5,
+     2436.7,
+     2468,
+     3488.9,
+     2331.7,
+     2372.3,
+     2092.9,
+     2022,
+     2215.4,
+     2059.6,
+     2193.7,
+     2045.3,
+     1950.5,
+     1951,
+     2028.6,
+     2473.5,
+     2600.5,
+     2021.7
+    ],
+    "assemble_ms": 163.6,
+    "runtime_ms": 47161,
+    "wall_ms": 51931,
+    "peak_rss_mb": 1137.6
+   },
+   {
+    "id": "perf/perf-pages-20/scan",
+    "variant": "scan",
+    "src_dpi": 300,
+    "raster_dpi": 300,
+    "paper": "A4",
+    "page_pts": [
+     595.4,
+     841.9
+    ],
+    "pages": 20,
+    "mp_per_page": 8.703,
+    "ms_per_page": 2727,
+    "page_ms": [
+     3115.3,
+     2921.5,
+     3169.4,
+     3307.4,
+     3120.3,
+     3623.3,
+     2750.1,
+     2589.9,
+     2305.5,
+     2329.8,
+     2355.2,
+     2561.8,
+     2773.3,
+     2245.6,
+     2465.8,
+     2306.3,
+     2276.2,
+     2978.2,
+     2568.3,
+     2584.5
+    ],
+    "assemble_ms": 189.8,
+    "runtime_ms": 54537,
+    "wall_ms": 58256,
+    "peak_rss_mb": 1302.1
+   },
+   {
+    "id": "perf/perf-pages-20/scan-severe",
+    "variant": "scan-severe",
+    "src_dpi": 300,
+    "raster_dpi": 300,
+    "paper": "A4",
+    "page_pts": [
+     595.4,
+     841.9
+    ],
+    "pages": 20,
+    "mp_per_page": 8.703,
+    "ms_per_page": 2602,
+    "page_ms": [
+     2954.1,
+     3258.6,
+     3239,
+     2673.3,
+     2523.2,
+     3342.8,
+     2648.3,
+     2663.6,
+     1972.1,
+     2377.9,
+     2445.6,
+     2288.5,
+     3143.2,
+     2008.7,
+     2070.9,
+     2294,
+     1995.8,
+     3046.1,
+     2475.5,
+     2354.7
+    ],
+    "assemble_ms": 273,
+    "runtime_ms": 52049,
+    "wall_ms": 55711,
+    "peak_rss_mb": 1301.1
+   },
+   {
+    "id": "perf/perf-pages-40/clean",
+    "variant": "clean",
+    "src_dpi": 300,
+    "raster_dpi": 300,
+    "paper": "A4",
+    "page_pts": [
+     595.4,
+     841.9
+    ],
+    "pages": 40,
+    "mp_per_page": 8.703,
+    "ms_per_page": 2284,
+    "page_ms": [
+     2693.6,
+     2211.4,
+     3135.4,
+     2362.5,
+     2372.7,
+     3446.1,
+     2373.1,
+     2296.8,
+     2146.4,
+     2043.5,
+     2164.6,
+     2136,
+     2306.6,
+     2422,
+     2135.1,
+     2021,
+     2118.3,
+     2532,
+     2156,
+     1972.6,
+     3137.9,
+     1916.9,
+     2071,
+     2065.4,
+     1937.1,
+     1979.7,
+     2207.1,
+     2513.2,
+     2836.7,
+     2258.4,
+     2591.5,
+     2327.6,
+     2140.4,
+     2079.3,
+     1980.7,
+     2263.5,
+     1884.5,
+     1915.5,
+     1903.4,
+     1994.2
+    ],
+    "assemble_ms": 313.6,
+    "runtime_ms": 91364,
+    "wall_ms": 100380,
+    "peak_rss_mb": 1830.6
+   },
+   {
+    "id": "perf/perf-pages-40/scan",
+    "variant": "scan",
+    "src_dpi": 300,
+    "raster_dpi": 300,
+    "paper": "A4",
+    "page_pts": [
+     595.4,
+     841.9
+    ],
+    "pages": 40,
+    "mp_per_page": 8.703,
+    "ms_per_page": 2632,
+    "page_ms": [
+     2786.1,
+     2958.8,
+     3138.1,
+     2817.6,
+     2663.9,
+     3567.2,
+     2661.2,
+     2623.5,
+     2311.4,
+     2366.6,
+     2549,
+     2465.3,
+     2941.5,
+     2443.8,
+     2333.8,
+     2274.7,
+     2392.6,
+     2819.1,
+     2420.1,
+     2263.7,
+     3441.8,
+     2364.2,
+     2364.9,
+     2342.4,
+     2240.2,
+     3003.3,
+     2644.5,
+     3723.1,
+     3604.1,
+     2611.4,
+     2625.6,
+     2538.5,
+     2300.1,
+     2267.1,
+     2272,
+     2761.5,
+     2314.6,
+     2259.3,
+     2244,
+     2275.3
+    ],
+    "assemble_ms": 287,
+    "runtime_ms": 105283,
+    "wall_ms": 112120,
+    "peak_rss_mb": 2184.3
+   },
+   {
+    "id": "perf/perf-pages-40/scan-severe",
+    "variant": "scan-severe",
+    "src_dpi": 300,
+    "raster_dpi": 300,
+    "paper": "A4",
+    "page_pts": [
+     595.4,
+     841.9
+    ],
+    "pages": 40,
+    "mp_per_page": 8.703,
+    "ms_per_page": 2429,
+    "page_ms": [
+     2483.6,
+     3313.3,
+     2926.4,
+     2572.6,
+     2461.3,
+     3346.1,
+     2849.3,
+     2792.6,
+     2265,
+     2449.6,
+     2437.3,
+     2114.8,
+     2937.5,
+     1852.3,
+     1868,
+     1899.6,
+     1965,
+     2877.4,
+     2466.4,
+     2292.7,
+     2851.3,
+     1901.9,
+     2003.9,
+     2326.6,
+     2848.2,
+     2491.6,
+     2308.9,
+     2595.6,
+     2926.9,
+     2572,
+     2145.5,
+     2171.2,
+     2355.1,
+     2270.5,
+     1917.8,
+     2918,
+     1892.1,
+     2256.7,
+     1925.3,
+     1940.1
+    ],
+    "assemble_ms": 380.3,
+    "runtime_ms": 97171,
+    "wall_ms": 103698,
+    "peak_rss_mb": 2180.8
+   },
+   {
+    "id": "perf/perf-piano-a3-300dpi/clean",
+    "variant": "clean",
+    "src_dpi": 300,
+    "raster_dpi": 300,
+    "paper": "A3",
+    "page_pts": [
+     841.9,
+     1190.6
+    ],
+    "pages": 1,
+    "mp_per_page": 17.403,
+    "ms_per_page": 3185,
+    "page_ms": [
+     3155.8
+    ],
+    "assemble_ms": 28.6,
+    "runtime_ms": 3185,
+    "wall_ms": 4062,
+    "peak_rss_mb": 345.9
+   },
+   {
+    "id": "perf/perf-piano-a3-300dpi/scan",
+    "variant": "scan",
+    "src_dpi": 300,
+    "raster_dpi": 300,
+    "paper": "A3",
+    "page_pts": [
+     841.9,
+     1190.6
+    ],
+    "pages": 1,
+    "mp_per_page": 17.403,
+    "ms_per_page": 3617,
+    "page_ms": [
+     3584.9
+    ],
+    "assemble_ms": 31.9,
+    "runtime_ms": 3617,
+    "wall_ms": 4419,
+    "peak_rss_mb": 343.5
+   },
+   {
+    "id": "perf/perf-piano-a3-300dpi/scan-severe",
+    "variant": "scan-severe",
+    "src_dpi": 300,
+    "raster_dpi": 300,
+    "paper": "A3",
+    "page_pts": [
+     841.9,
+     1190.6
+    ],
+    "pages": 1,
+    "mp_per_page": 17.403,
+    "ms_per_page": 3454,
+    "page_ms": [
+     3419.9
+    ],
+    "assemble_ms": 34.4,
+    "runtime_ms": 3454,
+    "wall_ms": 4192,
+    "peak_rss_mb": 334.9
+   },
+   {
+    "id": "perf/perf-piano-a4-100dpi/clean",
+    "variant": "clean",
+    "src_dpi": 100,
+    "raster_dpi": 100,
+    "paper": "A4",
+    "page_pts": [
+     595.4,
+     842.4
+    ],
+    "pages": 1,
+    "mp_per_page": 0.968,
+    "ms_per_page": 2863,
+    "page_ms": [
+     2831.7
+    ],
+    "assemble_ms": 30.7,
+    "runtime_ms": 2863,
+    "wall_ms": 3315,
+    "peak_rss_mb": 286.2
+   },
+   {
+    "id": "perf/perf-piano-a4-100dpi/scan",
+    "variant": "scan",
+    "src_dpi": 100,
+    "raster_dpi": 100,
+    "paper": "A4",
+    "page_pts": [
+     595.4,
+     842.4
+    ],
+    "pages": 1,
+    "mp_per_page": 0.968,
+    "ms_per_page": 2721,
+    "page_ms": [
+     2692.5
+    ],
+    "assemble_ms": 27.8,
+    "runtime_ms": 2721,
+    "wall_ms": 3149,
+    "peak_rss_mb": 277
+   },
+   {
+    "id": "perf/perf-piano-a4-100dpi/scan-severe",
+    "variant": "scan-severe",
+    "src_dpi": 100,
+    "raster_dpi": 100,
+    "paper": "A4",
+    "page_pts": [
+     595.4,
+     842.4
+    ],
+    "pages": 1,
+    "mp_per_page": 0.968,
+    "ms_per_page": 2808,
+    "page_ms": [
+     2768.5
+    ],
+    "assemble_ms": 39.1,
+    "runtime_ms": 2808,
+    "wall_ms": 3272,
+    "peak_rss_mb": 309.4
+   },
+   {
+    "id": "perf/perf-piano-a4-150dpi/clean",
+    "variant": "clean",
     "src_dpi": 150,
-    "raster_dpi": 200,
+    "raster_dpi": 150,
     "paper": "A4",
     "page_pts": [
      595.7,
      841.9
     ],
     "pages": 1,
-    "mp_per_page": 3.871,
-    "ms_per_page": 1481,
+    "mp_per_page": 2.178,
+    "ms_per_page": 2886,
     "page_ms": [
-     1262.7
+     2826.3
     ],
-    "assemble_ms": 214.3,
-    "runtime_ms": 1481,
-    "wall_ms": 1989,
-    "peak_rss_mb": 277.5
+    "assemble_ms": 59.9,
+    "runtime_ms": 2886,
+    "wall_ms": 3370,
+    "peak_rss_mb": 299.8
    },
    {
-    "id": "structure/str05-fine-dc-al-fine-piano/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1530,
-    "page_ms": [
-     1331.5
-    ],
-    "assemble_ms": 193.6,
-    "runtime_ms": 1530,
-    "wall_ms": 2058,
-    "peak_rss_mb": 294.7
-   },
-   {
-    "id": "structure/str05-fine-dc-al-fine-piano/scan",
+    "id": "perf/perf-piano-a4-150dpi/scan",
     "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
+    "src_dpi": 150,
+    "raster_dpi": 150,
     "paper": "A4",
     "page_pts": [
-     595.4,
+     595.7,
      841.9
     ],
     "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1653,
+    "mp_per_page": 2.178,
+    "ms_per_page": 2901,
     "page_ms": [
-     1451.2
+     2868.1
     ],
-    "assemble_ms": 196.6,
-    "runtime_ms": 1653,
-    "wall_ms": 2184,
-    "peak_rss_mb": 286.9
+    "assemble_ms": 33,
+    "runtime_ms": 2901,
+    "wall_ms": 3393,
+    "peak_rss_mb": 282.9
    },
    {
-    "id": "structure/str05-fine-dc-al-fine-piano/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 100,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.7
-    ],
-    "pages": 1,
-    "mp_per_page": 3.867,
-    "ms_per_page": 3492,
-    "page_ms": [
-     3356.1
-    ],
-    "assemble_ms": 132.1,
-    "runtime_ms": 3492,
-    "wall_ms": 4009,
-    "peak_rss_mb": 347.8
-   },
-   {
-    "id": "structure/str06-breaks-two-pages-song/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 2,
-    "mp_per_page": 3.869,
-    "ms_per_page": 2523,
-    "page_ms": [
-     2565.6,
-     2067.5
-    ],
-    "assemble_ms": 408.2,
-    "runtime_ms": 5045,
-    "wall_ms": 5612,
-    "peak_rss_mb": 525.3
-   },
-   {
-    "id": "structure/str06-breaks-two-pages-song/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 2,
-    "mp_per_page": 3.869,
-    "ms_per_page": 2902,
-    "page_ms": [
-     2866.5,
-     2546.8
-    ],
-    "assemble_ms": 385.8,
-    "runtime_ms": 5803,
-    "wall_ms": 6327,
-    "peak_rss_mb": 519.1
-   },
-   {
-    "id": "structure/str06-breaks-two-pages-song/scan-severe",
+    "id": "perf/perf-piano-a4-150dpi/scan-severe",
     "variant": "scan-severe",
     "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "A3 landscape",
+    "raster_dpi": 150,
+    "paper": "A4",
     "page_pts": [
-     1191.4,
+     595.7,
      841.9
     ],
     "pages": 1,
-    "mp_per_page": 7.742,
-    "ms_per_page": 10452,
+    "mp_per_page": 2.178,
+    "ms_per_page": 3271,
     "page_ms": [
-     10014
+     3239.7
     ],
-    "assemble_ms": 429.2,
-    "runtime_ms": 10452,
-    "wall_ms": 10986,
-    "peak_rss_mb": 657.3
+    "assemble_ms": 31.8,
+    "runtime_ms": 3271,
+    "wall_ms": 3833,
+    "peak_rss_mb": 318.2
    },
    {
-    "id": "structure/str07-orchestral-five-pages/clean",
+    "id": "perf/perf-piano-a4-200dpi/clean",
     "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 5,
-    "mp_per_page": 3.869,
-    "ms_per_page": 3082,
-    "page_ms": [
-     2657.1,
-     3211.9,
-     2304,
-     2240,
-     2414.5
-    ],
-    "assemble_ms": 2579,
-    "runtime_ms": 15411,
-    "wall_ms": 15937,
-    "peak_rss_mb": 520
-   },
-   {
-    "id": "structure/str07-orchestral-five-pages/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 5,
-    "mp_per_page": 3.869,
-    "ms_per_page": 3376,
-    "page_ms": [
-     2764.2,
-     2856.2,
-     2546.1,
-     2910.1,
-     2804.2
-    ],
-    "assemble_ms": 2994.4,
-    "runtime_ms": 16879,
-    "wall_ms": 17434,
-    "peak_rss_mb": 526.2
-   },
-   {
-    "id": "structure/str07-orchestral-five-pages/scan-severe",
-    "variant": "scan-severe",
     "src_dpi": 200,
     "raster_dpi": 200,
     "paper": "A4",
@@ -30860,55 +27584,19 @@
      595.4,
      842
     ],
-    "pages": 5,
+    "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 3974,
+    "ms_per_page": 2062,
     "page_ms": [
-     3061,
-     3105.4,
-     2771.3,
-     4056.6,
-     2798.2
+     2033.4
     ],
-    "assemble_ms": 4074.1,
-    "runtime_ms": 19872,
-    "wall_ms": 20447,
-    "peak_rss_mb": 629.4
+    "assemble_ms": 28.3,
+    "runtime_ms": 2062,
+    "wall_ms": 2464,
+    "peak_rss_mb": 232.4
    },
    {
-    "id": "structure/str08-variations-twelve-pages-piano/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 12,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1144,
-    "page_ms": [
-     1361.2,
-     1013.9,
-     922.2,
-     944.8,
-     1135.5,
-     839.5,
-     865.7,
-     996.1,
-     855.2,
-     871.5,
-     991.8,
-     823.9
-    ],
-    "assemble_ms": 2104.4,
-    "runtime_ms": 13730,
-    "wall_ms": 14258,
-    "peak_rss_mb": 463
-   },
-   {
-    "id": "structure/str08-variations-twelve-pages-piano/scan",
+    "id": "perf/perf-piano-a4-200dpi/scan",
     "variant": "scan",
     "src_dpi": 200,
     "raster_dpi": 200,
@@ -30917,691 +27605,289 @@
      595.4,
      842
     ],
-    "pages": 12,
+    "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1284,
+    "ms_per_page": 2113,
     "page_ms": [
-     1400.1,
-     1213.8,
-     1292.8,
-     1099.9,
-     1087.4,
-     941.6,
-     1021.7,
-     1102.9,
-     984.1,
-     975.1,
-     1078.9,
-     943.7
+     2083.6
     ],
-    "assemble_ms": 2264.3,
-    "runtime_ms": 15410,
-    "wall_ms": 15974,
-    "peak_rss_mb": 495
+    "assemble_ms": 28.9,
+    "runtime_ms": 2113,
+    "wall_ms": 2530,
+    "peak_rss_mb": 252.2
    },
    {
-    "id": "structure/str08-variations-twelve-pages-piano/scan-severe",
+    "id": "perf/perf-piano-a4-200dpi/scan-severe",
     "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.2,
-     841.9
-    ],
-    "pages": 12,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1349,
-    "page_ms": [
-     1432.3,
-     1296.3,
-     1143.3,
-     1260.7,
-     1039.9,
-     1367.7,
-     1071,
-     1166.9,
-     1008.4,
-     972.5,
-     1095.6,
-     966.1
-    ],
-    "assemble_ms": 2366.8,
-    "runtime_ms": 16192,
-    "wall_ms": 16749,
-    "peak_rss_mb": 452.8
-   },
-   {
-    "id": "time/t01-simple-meters/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1353,
-    "page_ms": [
-     1106.6
-    ],
-    "assemble_ms": 241.9,
-    "runtime_ms": 1353,
-    "wall_ms": 1900,
-    "peak_rss_mb": 275.1
-   },
-   {
-    "id": "time/t01-simple-meters/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     604.6,
-     848.2
-    ],
-    "pages": 1,
-    "mp_per_page": 3.958,
-    "ms_per_page": 1534,
-    "page_ms": [
-     1261.7
-    ],
-    "assemble_ms": 268.5,
-    "runtime_ms": 1534,
-    "wall_ms": 2057,
-    "peak_rss_mb": 270.4
-   },
-   {
-    "id": "time/t01-simple-meters/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     653.3,
-     882.2
-    ],
-    "pages": 1,
-    "mp_per_page": 4.449,
-    "ms_per_page": 1641,
-    "page_ms": [
-     1225.9
-    ],
-    "assemble_ms": 411.5,
-    "runtime_ms": 1641,
-    "wall_ms": 2176,
-    "peak_rss_mb": 267.4
-   },
-   {
-    "id": "time/t02-compound-irregular/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1499,
-    "page_ms": [
-     1204.7
-    ],
-    "assemble_ms": 289.9,
-    "runtime_ms": 1499,
-    "wall_ms": 2042,
-    "peak_rss_mb": 274.5
-   },
-   {
-    "id": "time/t02-compound-irregular/scan",
-    "variant": "scan",
-    "src_dpi": 250,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     608.5,
-     851.9
-    ],
-    "pages": 1,
-    "mp_per_page": 4.003,
-    "ms_per_page": 1609,
-    "page_ms": [
-     1346.6
-    ],
-    "assemble_ms": 258.7,
-    "runtime_ms": 1609,
-    "wall_ms": 2137,
-    "peak_rss_mb": 286.6
-   },
-   {
-    "id": "time/t02-compound-irregular/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 120,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     654,
-     900.6
-    ],
-    "pages": 1,
-    "mp_per_page": 4.546,
-    "ms_per_page": 1692,
-    "page_ms": [
-     1431.2
-    ],
-    "assemble_ms": 255.5,
-    "runtime_ms": 1692,
-    "wall_ms": 2219,
-    "peak_rss_mb": 291.8
-   },
-   {
-    "id": "time/t03-common-cut-piano/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1427,
-    "page_ms": [
-     1126.8
-    ],
-    "assemble_ms": 295,
-    "runtime_ms": 1427,
-    "wall_ms": 1978,
-    "peak_rss_mb": 283.1
-   },
-   {
-    "id": "time/t03-common-cut-piano/scan",
-    "variant": "scan",
     "src_dpi": 200,
     "raster_dpi": 200,
     "paper": "A4",
+    "page_pts": [
+     595.4,
+     842
+    ],
+    "pages": 1,
+    "mp_per_page": 3.869,
+    "ms_per_page": 2165,
+    "page_ms": [
+     2133.5
+    ],
+    "assemble_ms": 31.2,
+    "runtime_ms": 2165,
+    "wall_ms": 2595,
+    "peak_rss_mb": 240.4
+   },
+   {
+    "id": "perf/perf-piano-a4-300dpi/clean",
+    "variant": "clean",
+    "src_dpi": 300,
+    "raster_dpi": 300,
+    "paper": "A4",
+    "page_pts": [
+     595.4,
+     841.9
+    ],
+    "pages": 1,
+    "mp_per_page": 8.703,
+    "ms_per_page": 3131,
+    "page_ms": [
+     3095.3
+    ],
+    "assemble_ms": 35.7,
+    "runtime_ms": 3131,
+    "wall_ms": 3798,
+    "peak_rss_mb": 325.5
+   },
+   {
+    "id": "perf/perf-piano-a4-300dpi/scan",
+    "variant": "scan",
+    "src_dpi": 300,
+    "raster_dpi": 300,
+    "paper": "A4",
+    "page_pts": [
+     595.4,
+     841.9
+    ],
+    "pages": 1,
+    "mp_per_page": 8.703,
+    "ms_per_page": 3828,
+    "page_ms": [
+     3800.2
+    ],
+    "assemble_ms": 27.9,
+    "runtime_ms": 3828,
+    "wall_ms": 4478,
+    "peak_rss_mb": 354.6
+   },
+   {
+    "id": "perf/perf-piano-a4-300dpi/scan-severe",
+    "variant": "scan-severe",
+    "src_dpi": 300,
+    "raster_dpi": 300,
+    "paper": "A4",
+    "page_pts": [
+     595.4,
+     841.9
+    ],
+    "pages": 1,
+    "mp_per_page": 8.703,
+    "ms_per_page": 4508,
+    "page_ms": [
+     4470.2
+    ],
+    "assemble_ms": 37.7,
+    "runtime_ms": 4508,
+    "wall_ms": 5139,
+    "peak_rss_mb": 375.3
+   },
+   {
+    "id": "perf/perf-piano-a4-400dpi/clean",
+    "variant": "clean",
+    "src_dpi": 400,
+    "raster_dpi": 400,
+    "paper": "A4",
+    "page_pts": [
+     595.4,
+     842
+    ],
+    "pages": 1,
+    "mp_per_page": 15.475,
+    "ms_per_page": 3979,
+    "page_ms": [
+     3943.9
+    ],
+    "assemble_ms": 35,
+    "runtime_ms": 3979,
+    "wall_ms": 4856,
+    "peak_rss_mb": 349.9
+   },
+   {
+    "id": "perf/perf-piano-a4-400dpi/scan",
+    "variant": "scan",
+    "src_dpi": 400,
+    "raster_dpi": 400,
+    "paper": "A4",
+    "page_pts": [
+     595.4,
+     842
+    ],
+    "pages": 1,
+    "mp_per_page": 15.475,
+    "ms_per_page": 3782,
+    "page_ms": [
+     3754.6
+    ],
+    "assemble_ms": 27.2,
+    "runtime_ms": 3782,
+    "wall_ms": 4554,
+    "peak_rss_mb": 348
+   },
+   {
+    "id": "perf/perf-piano-a4-400dpi/scan-severe",
+    "variant": "scan-severe",
+    "src_dpi": 400,
+    "raster_dpi": 400,
+    "paper": "A4",
+    "page_pts": [
+     595.4,
+     842
+    ],
+    "pages": 1,
+    "mp_per_page": 15.475,
+    "ms_per_page": 3562,
+    "page_ms": [
+     3529.1
+    ],
+    "assemble_ms": 32.1,
+    "runtime_ms": 3562,
+    "wall_ms": 4294,
+    "peak_rss_mb": 345.6
+   },
+   {
+    "id": "perf/perf-piano-a4-600dpi/clean",
+    "variant": "clean",
+    "src_dpi": 600,
+    "raster_dpi": 600,
+    "paper": "A4",
+    "page_pts": [
+     595.3,
+     841.9
+    ],
+    "pages": 1,
+    "mp_per_page": 34.806,
+    "ms_per_page": 3781,
+    "page_ms": [
+     3752.3
+    ],
+    "assemble_ms": 28.4,
+    "runtime_ms": 3781,
+    "wall_ms": 5183,
+    "peak_rss_mb": 377.5
+   },
+   {
+    "id": "perf/perf-piano-a4-600dpi/scan",
+    "variant": "scan",
+    "src_dpi": 600,
+    "raster_dpi": 600,
+    "paper": "A4",
+    "page_pts": [
+     595.3,
+     841.9
+    ],
+    "pages": 1,
+    "mp_per_page": 34.806,
+    "ms_per_page": 4110,
+    "page_ms": [
+     4054.8
+    ],
+    "assemble_ms": 54.4,
+    "runtime_ms": 4110,
+    "wall_ms": 5274,
+    "peak_rss_mb": 418
+   },
+   {
+    "id": "perf/perf-piano-a4-600dpi/scan-severe",
+    "variant": "scan-severe",
+    "src_dpi": 600,
+    "raster_dpi": 600,
+    "paper": "A4",
+    "page_pts": [
+     595.3,
+     841.9
+    ],
+    "pages": 1,
+    "mp_per_page": 34.806,
+    "ms_per_page": 4090,
+    "page_ms": [
+     4015.2
+    ],
+    "assemble_ms": 74.8,
+    "runtime_ms": 4090,
+    "wall_ms": 5216,
+    "peak_rss_mb": 332.4
+   },
+   {
+    "id": "perf/perf-piano-letter-300dpi/clean",
+    "variant": "clean",
+    "src_dpi": 300,
+    "raster_dpi": 300,
+    "paper": "Letter",
     "page_pts": [
      612,
-     853.6
+     792
     ],
     "pages": 1,
-    "mp_per_page": 4.031,
-    "ms_per_page": 1713,
+    "mp_per_page": 8.415,
+    "ms_per_page": 3195,
     "page_ms": [
-     1382.4
+     3169.1
     ],
-    "assemble_ms": 326.2,
-    "runtime_ms": 1713,
-    "wall_ms": 2257,
-    "peak_rss_mb": 300.3
+    "assemble_ms": 25.4,
+    "runtime_ms": 3195,
+    "wall_ms": 3856,
+    "peak_rss_mb": 318.3
    },
    {
-    "id": "time/t03-common-cut-piano/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 120,
-    "raster_dpi": 200,
-    "paper": "~B4",
-    "page_pts": [
-     693.6,
-     908.4
-    ],
-    "pages": 1,
-    "mp_per_page": 4.864,
-    "ms_per_page": 1748,
-    "page_ms": [
-     1417.2
-    ],
-    "assemble_ms": 324,
-    "runtime_ms": 1748,
-    "wall_ms": 2286,
-    "peak_rss_mb": 302.5
-   },
-   {
-    "id": "time/t04-pickup-song/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1576,
-    "page_ms": [
-     1308.4
-    ],
-    "assemble_ms": 263,
-    "runtime_ms": 1576,
-    "wall_ms": 2140,
-    "peak_rss_mb": 287.9
-   },
-   {
-    "id": "time/t04-pickup-song/scan",
+    "id": "perf/perf-piano-letter-300dpi/scan",
     "variant": "scan",
     "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
+    "raster_dpi": 300,
+    "paper": "Letter",
     "page_pts": [
-     601.7,
-     846.2
+     612,
+     792
     ],
     "pages": 1,
-    "mp_per_page": 3.931,
-    "ms_per_page": 1619,
+    "mp_per_page": 8.415,
+    "ms_per_page": 3555,
     "page_ms": [
-     1460.4
+     3471.2
     ],
-    "assemble_ms": 154.7,
-    "runtime_ms": 1619,
-    "wall_ms": 2170,
-    "peak_rss_mb": 296.9
+    "assemble_ms": 83.6,
+    "runtime_ms": 3555,
+    "wall_ms": 4235,
+    "peak_rss_mb": 363.4
    },
    {
-    "id": "time/t04-pickup-song/scan-severe",
+    "id": "perf/perf-piano-letter-300dpi/scan-severe",
     "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     639.8,
-     872.6
-    ],
-    "pages": 1,
-    "mp_per_page": 4.31,
-    "ms_per_page": 1638,
-    "page_ms": [
-     1467.7
-    ],
-    "assemble_ms": 166.5,
-    "runtime_ms": 1638,
-    "wall_ms": 2184,
-    "peak_rss_mb": 288.5
-   },
-   {
-    "id": "time/t05-triplets-duplets/clean",
-    "variant": "clean",
     "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
+    "raster_dpi": 300,
+    "paper": "Letter",
     "page_pts": [
-     595.4,
-     841.9
+     612,
+     792
     ],
     "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1334,
+    "mp_per_page": 8.415,
+    "ms_per_page": 3717,
     "page_ms": [
-     1128.9
+     3686.1
     ],
-    "assemble_ms": 199.5,
-    "runtime_ms": 1334,
-    "wall_ms": 1848,
-    "peak_rss_mb": 276.1
-   },
-   {
-    "id": "time/t05-triplets-duplets/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     616.1,
-     856.3
-    ],
-    "pages": 1,
-    "mp_per_page": 4.073,
-    "ms_per_page": 1494,
-    "page_ms": [
-     1289.6
-    ],
-    "assemble_ms": 199.5,
-    "runtime_ms": 1494,
-    "wall_ms": 2036,
-    "peak_rss_mb": 290.1
-   },
-   {
-    "id": "time/t05-triplets-duplets/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     632.2,
-     867.8
-    ],
-    "pages": 1,
-    "mp_per_page": 4.234,
-    "ms_per_page": 1968,
-    "page_ms": [
-     1739.6
-    ],
-    "assemble_ms": 223.2,
-    "runtime_ms": 1968,
-    "wall_ms": 2498,
-    "peak_rss_mb": 296.6
-   },
-   {
-    "id": "time/t06-quint-sext-sept/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1125,
-    "page_ms": [
-     1018.6
-    ],
-    "assemble_ms": 102.6,
-    "runtime_ms": 1125,
-    "wall_ms": 1662,
-    "peak_rss_mb": 287.7
-   },
-   {
-    "id": "time/t06-quint-sext-sept/scan",
-    "variant": "scan",
-    "src_dpi": 250,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     605.7,
-     849.6
-    ],
-    "pages": 1,
-    "mp_per_page": 3.972,
-    "ms_per_page": 1254,
-    "page_ms": [
-     1143.8
-    ],
-    "assemble_ms": 105.5,
-    "runtime_ms": 1254,
-    "wall_ms": 1791,
-    "peak_rss_mb": 293.3
-   },
-   {
-    "id": "time/t06-quint-sext-sept/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 100,
-    "raster_dpi": 200,
-    "paper": "~B4",
-    "page_pts": [
-     666.7,
-     890.6
-    ],
-    "pages": 1,
-    "mp_per_page": 4.582,
-    "ms_per_page": 1500,
-    "page_ms": [
-     1354.1
-    ],
-    "assemble_ms": 141,
-    "runtime_ms": 1500,
-    "wall_ms": 2040,
-    "peak_rss_mb": 315.3
-   },
-   {
-    "id": "time/t07-nested-tuplets/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1160,
-    "page_ms": [
-     1034.8
-    ],
-    "assemble_ms": 120,
-    "runtime_ms": 1160,
-    "wall_ms": 1689,
-    "peak_rss_mb": 269.7
-   },
-   {
-    "id": "time/t07-nested-tuplets/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     600.2,
-     845.3
-    ],
-    "pages": 1,
-    "mp_per_page": 3.918,
-    "ms_per_page": 1334,
-    "page_ms": [
-     1215
-    ],
-    "assemble_ms": 115,
-    "runtime_ms": 1334,
-    "wall_ms": 1852,
-    "peak_rss_mb": 285.6
-   },
-   {
-    "id": "time/t07-nested-tuplets/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "~B4",
-    "page_pts": [
-     680.4,
-     900.4
-    ],
-    "pages": 1,
-    "mp_per_page": 4.727,
-    "ms_per_page": 1514,
-    "page_ms": [
-     1348
-    ],
-    "assemble_ms": 159.9,
-    "runtime_ms": 1514,
-    "wall_ms": 2051,
-    "peak_rss_mb": 307.2
-   },
-   {
-    "id": "time/t08-ties-systems-pages/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 2,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1137,
-    "page_ms": [
-     1118.6,
-     952.3
-    ],
-    "assemble_ms": 197.8,
-    "runtime_ms": 2273,
-    "wall_ms": 2798,
-    "peak_rss_mb": 329.2
-   },
-   {
-    "id": "time/t08-ties-systems-pages/scan",
-    "variant": "scan",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     607.7,
-     850.7
-    ],
-    "pages": 2,
-    "mp_per_page": 3.969,
-    "ms_per_page": 1291,
-    "page_ms": [
-     1233.1,
-     1145.9
-    ],
-    "assemble_ms": 196.5,
-    "runtime_ms": 2581,
-    "wall_ms": 3113,
-    "peak_rss_mb": 298
-   },
-   {
-    "id": "time/t08-ties-systems-pages/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 150,
-    "raster_dpi": 200,
-    "paper": "~A3 landscape",
-    "page_pts": [
-     1287.8,
-     937
-    ],
-    "pages": 1,
-    "mp_per_page": 9.314,
-    "ms_per_page": 4369,
-    "page_ms": [
-     4125.2
-    ],
-    "assemble_ms": 234.5,
-    "runtime_ms": 4369,
-    "wall_ms": 4894,
-    "peak_rss_mb": 492.2
-   },
-   {
-    "id": "time/t09-two-voices-guitar/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1113,
-    "page_ms": [
-     978
-    ],
-    "assemble_ms": 131.3,
-    "runtime_ms": 1113,
-    "wall_ms": 1654,
-    "peak_rss_mb": 280.3
-   },
-   {
-    "id": "time/t09-two-voices-guitar/scan",
-    "variant": "scan",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     610.3,
-     852.5
-    ],
-    "pages": 1,
-    "mp_per_page": 4.016,
-    "ms_per_page": 1303,
-    "page_ms": [
-     1167.9
-    ],
-    "assemble_ms": 129.4,
-    "runtime_ms": 1303,
-    "wall_ms": 1845,
-    "peak_rss_mb": 299.6
-   },
-   {
-    "id": "time/t09-two-voices-guitar/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 200,
-    "raster_dpi": 200,
-    "paper": "~A4",
-    "page_pts": [
-     653,
-     881.6
-    ],
-    "pages": 1,
-    "mp_per_page": 4.442,
-    "ms_per_page": 1859,
-    "page_ms": [
-     1687.2
-    ],
-    "assemble_ms": 166.3,
-    "runtime_ms": 1859,
-    "wall_ms": 2410,
-    "peak_rss_mb": 313.3
-   },
-   {
-    "id": "time/t10-quartet-meters/clean",
-    "variant": "clean",
-    "src_dpi": 300,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     595.4,
-     841.9
-    ],
-    "pages": 1,
-    "mp_per_page": 3.869,
-    "ms_per_page": 1694,
-    "page_ms": [
-     1298.1
-    ],
-    "assemble_ms": 391.2,
-    "runtime_ms": 1694,
-    "wall_ms": 2232,
-    "peak_rss_mb": 283.8
-   },
-   {
-    "id": "time/t10-quartet-meters/scan",
-    "variant": "scan",
-    "src_dpi": 250,
-    "raster_dpi": 200,
-    "paper": "A4",
-    "page_pts": [
-     608.5,
-     851.9
-    ],
-    "pages": 1,
-    "mp_per_page": 4.003,
-    "ms_per_page": 1889,
-    "page_ms": [
-     1479.2
-    ],
-    "assemble_ms": 404.8,
-    "runtime_ms": 1889,
-    "wall_ms": 2421,
-    "peak_rss_mb": 293.3
-   },
-   {
-    "id": "time/t10-quartet-meters/scan-severe",
-    "variant": "scan-severe",
-    "src_dpi": 110,
-    "raster_dpi": 200,
-    "paper": "~B4",
-    "page_pts": [
-     654.5,
-     901.3
-    ],
-    "pages": 1,
-    "mp_per_page": 4.555,
-    "ms_per_page": 1889,
-    "page_ms": [
-     1516.7
-    ],
-    "assemble_ms": 367.7,
-    "runtime_ms": 1889,
-    "wall_ms": 2443,
-    "peak_rss_mb": 306.4
+    "assemble_ms": 30.4,
+    "runtime_ms": 3717,
+    "wall_ms": 4351,
+    "peak_rss_mb": 369.5
    }
   ]
  }

@@ -1,7 +1,7 @@
 # Coverage matrix: symbols, layouts, performance
 
-Generated 2026-11-08 15:45 UTC by `tools/coverage.mjs` from `../r24/eval-coverage-ocr2.json` (eval 2026-11-08 15:45, app source hash `1308ea920bb7`, OCR on, raster 200 dpi).
-Corpus: `../../../../../../Users/d.sloane/music/corpus/coverage` — 83 items, 249 scored PDFs (clean, scan, scan-severe). Every item is a short LilyPond engraving with exact MusicXML truth and a `meta.json` listing its symbols, layout and per-symbol counts.
+Generated 2026-11-08 15:56 UTC by `tools/coverage.mjs` from `mvp/work/eval-coverage-text.json` (eval 2026-11-08 15:56, app source hash `bd1a6df06b7f`, OCR on, raster 200 dpi).
+Corpus: `corpus/coverage` — 83 items, 249 scored PDFs (clean, scan, scan-severe). Every item is a short LilyPond engraving with exact MusicXML truth and a `meta.json` listing its symbols, layout and per-symbol counts.
 
 Regenerate:
 
@@ -20,7 +20,7 @@ node tools/coverage.mjs --eval mvp/work/eval-coverage.json [--perf mvp/work/eval
 - **Status** (from the `scan` input, the typical 200–300 dpi scan): supported ≥ 0.8, partial 0.2–0.8, unsupported < 0.2 or the element is never emitted. Semantic tags whose MusicXML element exists but is never written (e.g. `<octave-shift>`, `<multiple-rest>`) are capped at partial.
 - **Confusion** (on `clean.pdf`): false notes (app notes that match no truth note) per truth note in the measures holding the symbol, minus the same rate in the other measures (all items' rate when the symbol is in every measure). *confused* = excess > 0.05 and at least 3 surplus false notes; *unclear* = excess > 0.05 on fewer than 10 truth notes; otherwise *not confused*: the app may drop the mark, but it does not turn it into extra notes. It matters most for marks the app does not output.
 
-**Totals:** 84 supported, 44 partial, 26 unsupported, 30 not measurable, 0 taxonomy tags without items yet.
+**Totals:** 86 supported, 42 partial, 26 unsupported, 30 not measurable, 0 taxonomy tags without items yet.
 
 ## Symbols: notes
 
@@ -98,7 +98,7 @@ node tools/coverage.mjs --eval mvp/work/eval-coverage.json [--perf mvp/work/eval
 | `acc-natural` | 53 | 10 | 49 | 92% (49/53) | 92% (49/53) | 75% (40/53) | 92% | supported | not confused (+0.01) | spelled pitch (step, alter, octave) (sem) |
 | `acc-double-sharp` | 7 | 3 | 4 | 71% (5/7) | 57% (4/7) | 0% (0/7) | 57% | partial | not confused (+0.03) | spelled pitch (step, alter, octave) (sem) |
 | `acc-double-flat` | 5 | 2 | 4 | 80% (4/5) | 80% (4/5) | 40% (2/5) | 80% | supported | not confused (+0.03) | spelled pitch (step, alter, octave) (sem) |
-| `acc-courtesy` | 9 | 2 | 0 | 100% (9/9) | 100% (9/9) | 89% (8/9) | 100% | partial — <accidental> never emitted | not confused (-0.01) | spelled pitch (step, alter, octave) (sem) |
+| `acc-courtesy` | 9 | 2 | 9 | 100% (9/9) | 100% (9/9) | 89% (8/9) | 100% | supported | not confused (-0.01) | spelled pitch (step, alter, octave) (sem) |
 | `ottava-8va` | 4 | 2 | 27 | 100% (28/28) | 96% (27/28) | 71% (20/28) | 96% | supported | not confused (+0.00) | sounding pitch of the notes under the line (sem) |
 | `ottava-8vb` | 4 | 2 | 22 | 100% (22/22) | 100% (22/22) | 100% (22/22) | 100% | supported | not confused (+0.00) | sounding pitch of the notes under the line (sem) |
 | `ottava-15ma` | 2 | 2 | 12 | 100% (12/12) | 100% (12/12) | 100% (12/12) | 100% | supported | not confused (+0.00) | sounding pitch of the notes under the line (sem) |
@@ -169,7 +169,7 @@ node tools/coverage.mjs --eval mvp/work/eval-coverage.json [--perf mvp/work/eval
 | `tempo-mark` | 61 | 55 | 58 | 67% (47/70) | 70% (49/70) | 46% (32/70) | – | partial | **confused** (+0.07) | same element/value at the aligned measure (+-1) |
 | `metronome` | 36 | 33 | 38 | 86% (31/36) | 89% (32/36) | 61% (22/36) | – | supported | **confused** (+0.08) | same element/value at the aligned measure (+-1) |
 | `rehearsal-mark` | 22 | 7 | 17 | 82% (18/22) | 64% (14/22) | 50% (11/22) | – | partial | not confused (+0.03) | same element/value at the aligned measure (+-1) |
-| `chord-symbol` | 61 | 2 | 32 | 54% (33/61) | 52% (32/61) | 44% (27/61) | – | partial | not confused (-0.02) | same element/value at the aligned measure (+-1) |
+| `chord-symbol` | 61 | 2 | 52 | 84% (51/61) | 85% (52/61) | 66% (40/61) | – | supported | not confused (-0.02) | same element/value at the aligned measure (+-1) |
 | `x-artic-detached-legato` | 4 | 1 | 0 | 0% (0/4) | 0% (0/4) | 0% (0/4) | 100% | **unsupported** — element never emitted | not confused (+0.00) | element on the aligned note |
 | `x-dyn-fff` | 1 | 1 | 0 | 100% (1/1) | 0% (0/1) | 0% (0/1) | – | **unsupported** — low n (1) | not confused (-0.02) | same element/value at the aligned measure (+-1) |
 | `x-dyn-fp` | 1 | 1 | 1 | 100% (1/1) | 100% (1/1) | 0% (0/1) | – | supported — low n (1) | not confused (-0.03) | same element/value at the aligned measure (+-1) |
@@ -276,127 +276,126 @@ Layout score = mean of part-count match (exact), part-name score and the share o
 
 ## Performance
 
-Source: `../r24/eval-coverage-ocr2.json` (all coverage items, no perf family yet; 249 PDFs; raster 200 dpi, OCR on, 8 parallel jobs on 192 CPUs, load average 52.5 at the start). Times are the converter in a Node child process, per page, run as the browser worker runs it (`createConverter()`: each page read from disk when its turn comes, `addPage`, then `releasePage` frees its image buffers and keeps the staff-removed binary bit-packed, then `finish`); peak memory is the child's peak RSS (`maxRSS`), including Node itself (~50 MB) and the OCR engine when OCR is on. With a fixed raster dpi the source scan dpi changes image quality, not pixel count; use `--dpi native` (raster at the scan resolution) or `--dpi app` (browser app: 2300 px wide) to measure the dpi effect.
+Source: `mvp/work/eval-coverage-baseline-perf.json` (perf family; 63 PDFs; raster native, OCR on, 8 parallel jobs on 192 CPUs, load average 166.9 at the start). Times are the converter in a Node child process, per page, run as the browser worker runs it (`createConverter()`: each page read from disk when its turn comes, `addPage`, then `releasePage` frees its image buffers and keeps the staff-removed binary bit-packed, then `finish`); peak memory is the child's peak RSS (`maxRSS`), including Node itself (~50 MB) and the OCR engine when OCR is on. Pages are rasterised at the resolution of the scan image, so pixel count follows the source dpi.
 
 **By source scan dpi**
 
 | Scan dpi | PDFs | MP/page | ms/page (median) | ms/page (max) | peak MB (median) | peak MB (max) |
 |---|---:|---:|---:|---:|---:|---:|
-| 100 | 4 | 4.582 | 1500 | 3492 | 315.3 | 347.8 |
-| 110 | 2 | 4.555 | 1889 | 1889 | 306.4 | 306.4 |
-| 120 | 8 | 3.869 | 1692 | 4884 | 291.8 | 575.2 |
-| 150 | 40 | 4.31 | 1938 | 17337 | 319.6 | 657.3 |
-| 200 | 45 | 4.018 | 1596 | 4668 | 293 | 629.4 |
-| 240 | 3 | 3.873 | 2031 | 2040 | 282.4 | 312.5 |
-| 250 | 17 | 3.87 | 1594 | 3583 | 293.3 | 473.4 |
-| 300 | 130 | 3.869 | 1468 | 4191 | 285.4 | 526.2 |
+| 100 | 6 | 0.968 | 3227 | 4464 | 309.4 | 374.5 |
+| 150 | 6 | 2.178 | 3332 | 4900 | 318.2 | 376.2 |
+| 200 | 6 | 3.869 | 3110 | 4225 | 252.2 | 337.6 |
+| 300 | 33 | 8.703 | 3185 | 5352 | 375.3 | 2184.3 |
+| 400 | 6 | 15.475 | 5593 | 7527 | 446 | 557.8 |
+| 600 | 6 | 34.806 | 4819 | 5363 | 418 | 445.6 |
 
 **By page size**
 
 | Page size | PDFs | MP/page | ms/page (median) | ms/page (max) | peak MB (median) | peak MB (max) |
 |---|---:|---:|---:|---:|---:|---:|
-| ~A3 landscape | 1 | 9.314 | 4369 | 4369 | 492.2 | 492.2 |
-| ~A4 | 39 | 4.234 | 1638 | 17337 | 298.1 | 601.3 |
-| ~B4 | 19 | 4.697 | 1938 | 5322 | 316.2 | 541.7 |
-| A3 landscape | 1 | 7.742 | 10452 | 10452 | 657.3 | 657.3 |
-| A4 | 188 | 3.869 | 1501 | 4884 | 286 | 629.4 |
-| A4 landscape | 1 | 3.871 | 1961 | 1961 | 324.8 | 324.8 |
+| ~A3 | 1 | 20.49 | 5259 | 5259 | 417.9 | 417.9 |
+| ~B4 | 6 | 10.25 | 5352 | 7527 | 419.1 | 557.8 |
+| ~Letter | 1 | 9.965 | 4833 | 4833 | 453.1 | 453.1 |
+| A3 | 5 | 17.403 | 3617 | 4266 | 345.9 | 411.7 |
+| A4 | 45 | 8.703 | 2993 | 6659 | 345.4 | 2184.3 |
+| Letter | 5 | 8.415 | 3717 | 4452 | 336.6 | 369.5 |
 
 **By page count**
 
 | Pages | PDFs | MP/page | ms/page (median) | ms/page (max) | peak MB (median) | peak MB (max) |
 |---|---:|---:|---:|---:|---:|---:|
-| 1 | 233 | 3.869 | 1544 | 17337 | 288.5 | 657.3 |
-| 2 | 10 | 3.869 | 2523 | 4884 | 469.5 | 575.2 |
-| 5 | 3 | 3.869 | 3376 | 3974 | 526.2 | 629.4 |
-| 12 | 3 | 3.869 | 1284 | 1349 | 463 | 495 |
+| 1 | 51 | 8.703 | 3782 | 7527 | 336.6 | 557.8 |
+| 5 | 3 | 8.703 | 2740 | 2993 | 572.1 | 666.1 |
+| 10 | 3 | 8.703 | 2614 | 2864 | 891.3 | 908.4 |
+| 20 | 3 | 8.703 | 2602 | 2727 | 1301.1 | 1302.1 |
+| 40 | 3 | 8.703 | 2429 | 2632 | 2180.8 | 2184.3 |
 
-**Linear fits.** ms per page = -2122.8 + **1000.8 ms per megapixel** × MP per page (n=249, R²=0.121). Peak MB = 283.5 + 6.24 MB per megapixel × total MP (n=249, R²=0.217). Overall: 480 ms of conversion per megapixel.
+**Linear fits.** ms per page = 3056.2 + **51.49 ms per megapixel** × MP per page (n=63, R²=0.2). Peak MB = 296.9 + 5.2 MB per megapixel × total MP (n=63, R²=0.968). Overall: 301 ms of conversion per megapixel.
 
 ## Items
 
 | Item | Layout | Aggregate clean | Aggregate scan | Aggregate scan-severe | Parts (expected → scan) | ms/page | peak MB |
 |---|---|---:|---:|---:|---|---:|---:|
-| `layouts/choir-closed-satb-light-of-morning` | choir-closed-satb | 0.982 | 0.989 | 0.986 | 4 → 4 | 1644 | 284 |
-| `layouts/choir-open-satb-gloria` | choir-open-satb | 0.916 | 0.938 | 0.879 | 4 → 4 | 2161 | 304 |
-| `layouts/choir-piano-song-of-rejoicing` | choir-piano | 1.000 | 1.000 | 0.972 | 5 → 5 | 3081 | 374 |
-| `layouts/choir-sab-summer-song` | choir-sab | 0.984 | 0.996 | 0.328 | 3 → 3 | 2040 | 282 |
-| `layouts/choir-ssaa-winter-night` | choir-ssaa | 0.996 | 0.992 | 0.982 | 4 → 4 | 1594 | 276 |
-| `layouts/choir-ttbb-evening-bells` | choir-ttbb | 1.000 | 1.000 | 0.767 | 4 → 4 | 1715 | 291 |
-| `layouts/cross-staff-piano-arpeggio-study` | cross-staff | 0.884 | 0.889 | 0.794 | 1 → 1 | 1292 | 282 |
-| `layouts/divisi-choir-bright-new-day` | divisi | 0.988 | 0.988 | 0.942 | 4 → 4 | 3583 | 389 |
-| `layouts/divisi-strings-lament` | divisi | 0.993 | 0.988 | 0.956 | 4 → 4 | 1736 | 291 |
-| `layouts/hymnal-stanzas-light-of-ages` | hymnal-stanzas | 1.000 | 0.999 | 0.996 | 4 → 4 | 2142 | 308 |
-| `layouts/lead-sheet-long-road` | lead-sheet | 0.888 | 0.920 | 0.840 | 1 → 1 | 2031 | 276 |
-| `layouts/melody-cello-elegy-2page` | melody | 0.902 | 0.855 | 0.732 | 1 → 1 | 1231 | 313 |
-| `layouts/melody-flute-air` | melody | 0.967 | 0.977 | 0.972 | 1 → 1 | 1296 | 269 |
-| `layouts/melody-lyrics-morning-song` | melody-lyrics | 1.000 | 1.000 | 0.938 | 1 → 1 | 1571 | 282 |
-| `layouts/orchestral-festive-march-9-staves` | orchestral | 0.973 | 0.958 | 0.905 | 9 → 9 | 3553 | 473 |
-| `layouts/organ-three-staves-chorale-prelude` | organ | 0.998 | 0.973 | 0.768 | 1 → 1 | 1645 | 280 |
-| `layouts/piano-grand-staff-prelude` | piano | 0.902 | 0.954 | 0.952 | 1 → 1 | 1491 | 285 |
-| `layouts/string-quartet-minuet` | string-quartet | 0.777 | 0.988 | 0.775 | 4 → 4 | 3376 | 371 |
-| `layouts/two-voices-piano-song-without-words` | two-voices-one-staff-instrument | 0.996 | 0.996 | 0.723 | 1 → 1 | 1491 | 286 |
-| `layouts/voice-piano-night-song` | voice-piano | 0.979 | 0.949 | 0.542 | 2 → 2 | 1781 | 285 |
-| `lyrics/lyr01-elisions-three-languages` | melody-lyrics | 0.985 | 0.979 | 0.890 | 1 → 1 | 1709 | 303 |
-| `lyrics/lyr02-non-ascii-four-languages` | melody-lyrics | 0.975 | 0.975 | 0.943 | 1 → 1 | 1962 | 286 |
-| `marks/mk01-articulations-violin` | melody | 0.974 | 0.974 | 0.967 | 1 → 1 | 1250 | 281 |
-| `marks/mk02-ornaments-fermatas-flute` | melody | 0.951 | 0.958 | 0.959 | 1 → 1 | 1342 | 291 |
-| `marks/mk03-dynamics-hairpins-cello` | melody | 0.994 | 0.968 | 0.780 | 1 → 1 | 1501 | 290 |
-| `marks/mk04-piano-pedal-arpeggio-fingering` | piano | 0.955 | 0.951 | 0.829 | 1 → 1 | 1742 | 286 |
-| `marks/mk05-tempo-text-rehearsal-oboe` | melody | 0.982 | 0.956 | 0.723 | 1 → 1 | 1626 | 288 |
-| `marks/mk06-lead-sheet-chord-symbols` | lead-sheet | 1.000 | 1.000 | 0.836 | 1 → 1 | 1680 | 293 |
-| `marks/mk07-vocalise-voice-piano` | voice-piano | 0.988 | 0.993 | 0.904 | 2 → 2 | 1707 | 312 |
-| `marks/mk08-string-quartet-marks` | string-quartet | 0.983 | 0.977 | 0.928 | 4 → 4 | 2025 | 322 |
-| `marks/mk09-stacked-marks-viola` | melody | 0.935 | 0.947 | 0.902 | 1 → 1 | 1558 | 269 |
-| `marks/mk10-piano-pedal-brackets` | piano | 0.977 | 0.979 | 0.902 | 1 → 1 | 1450 | 287 |
-| `marks/mk11-violin-circled-rehearsal-numbers` | melody | 0.933 | 0.956 | 0.985 | 1 → 1 | 1336 | 282 |
-| `notes/nt01-note-values` | melody | 0.895 | 0.924 | 0.673 | 1 → 1 | 1501 | 298 |
-| `notes/nt02-dots` | melody | 0.963 | 0.936 | 0.879 | 1 → 1 | 1428 | 303 |
-| `notes/nt03-chords` | piano | 0.975 | 0.972 | 0.900 | 1 → 1 | 1369 | 271 |
-| `notes/nt04-beams` | melody | 0.985 | 0.971 | 0.978 | 1 → 1 | 1468 | 291 |
-| `notes/nt05-flags-stems` | melody | 0.847 | 0.850 | 0.759 | 1 → 1 | 1451 | 295 |
-| `notes/nt06-ledger-lines` | piano | 1.000 | 0.953 | 0.953 | 1 → 1 | 1375 | 307 |
-| `notes/nt07-grace-notes` | melody | 0.971 | 0.927 | 0.946 | 1 → 1 | 1451 | 305 |
-| `notes/nt08-cue-notes` | melody | 0.960 | 0.946 | 0.947 | 1 → 1 | 1283 | 290 |
-| `notes/nt09-tremolos` | piano | 0.719 | 0.751 | 0.635 | 1 → 1 | 1362 | 282 |
-| `notes/nt10-piano-etude` | piano | 0.989 | 0.988 | 0.959 | 1 → 1 | 1417 | 309 |
-| `percussion/perc01-parade-flute-snare-drumset` | percussion-none | 0.646 | 0.628 | 0.639 | 3 → 2 | 1633 | 282 |
-| `pitch/pitch-cov-accidentals-chords-piano` | piano | 1.000 | 0.997 | 0.879 | 1 → 1 | 1401 | 288 |
-| `pitch/pitch-cov-accidentals-melody` | melody | 0.985 | 0.985 | 0.892 | 1 → 1 | 1481 | 277 |
-| `pitch/pitch-cov-clef-changes-piano` | piano | 0.945 | 1.000 | 0.367 | 1 → 1 | 1462 | 282 |
-| `pitch/pitch-cov-clefs-all` | melody | 0.741 | 0.727 | 0.733 | 1 → 1 | 1426 | 274 |
-| `pitch/pitch-cov-clefs-quartet` | string-quartet | 0.964 | 0.955 | 0.948 | 4 → 4 | 1737 | 266 |
-| `pitch/pitch-cov-key-changes-organ` | organ | 0.989 | 0.978 | 0.813 | 1 → 1 | 1688 | 309 |
-| `pitch/pitch-cov-keys-major-flats` | piano | 1.000 | 1.000 | 0.683 | 1 → 1 | 1640 | 281 |
-| `pitch/pitch-cov-keys-major-sharps` | melody | 1.000 | 0.911 | 0.952 | 1 → 1 | 1480 | 283 |
-| `pitch/pitch-cov-keys-minor-flats` | melody | 0.981 | 0.994 | 0.972 | 1 → 1 | 1429 | 277 |
-| `pitch/pitch-cov-keys-minor-sharps` | melody | 0.994 | 0.994 | 0.589 | 1 → 1 | 1433 | 312 |
-| `pitch/pitch-cov-ottava-ledger-melody` | melody | 1.000 | 1.000 | 1.000 | 1 → 1 | 1305 | 298 |
-| `pitch/pitch-cov-ottava-piano` | piano | 1.000 | 0.958 | 0.925 | 1 → 1 | 1481 | 284 |
-| `rests/rst01-rest-values` | melody | 0.867 | 0.841 | 0.725 | 1 → 1 | 1489 | 283 |
-| `rests/rst02-dotted-rests` | melody | 0.934 | 0.948 | 0.798 | 1 → 1 | 1539 | 284 |
-| `rests/rst03-whole-bar-rests-simple` | melody | 0.904 | 0.904 | 0.768 | 1 → 1 | 1504 | 289 |
-| `rests/rst04-whole-bar-rests-compound` | melody | 0.989 | 1.000 | 0.940 | 1 → 1 | 1391 | 283 |
-| `rests/rst05-multibar-rests` | melody | 0.881 | 0.807 | 0.626 | 1 → 1 | 1515 | 280 |
-| `rests/rst06-two-voice-rests` | two-voices-one-staff-instrument | 0.856 | 0.863 | 0.840 | 1 → 1 | 1370 | 310 |
-| `rests/rst07-piano-rests` | piano | 0.954 | 0.959 | 0.943 | 1 → 1 | 1548 | 277 |
-| `rests/rst08-tuplet-beam-rests` | melody | 0.863 | 0.846 | 0.367 | 1 → 1 | 1653 | 303 |
-| `rests/rst09-quartet-rests` | string-quartet | 0.995 | 0.992 | 0.938 | 4 → 4 | 2961 | 347 |
-| `structure/str01-double-final-barlines` | melody | 1.000 | 1.000 | 0.944 | 1 → 1 | 1468 | 265 |
-| `structure/str02-repeat-signs-piano` | piano | 0.988 | 0.990 | 0.980 | 1 → 1 | 1539 | 289 |
-| `structure/str03-voltas-string-quartet` | string-quartet | 1.000 | 0.996 | 0.761 | 4 → 4 | 4191 | 393 |
-| `structure/str04-segno-coda-ds` | melody | 0.882 | 0.883 | 0.909 | 1 → 1 | 1581 | 266 |
-| `structure/str05-fine-dc-al-fine-piano` | piano | 1.000 | 1.000 | 0.487 | 1 → 1 | 1653 | 287 |
-| `structure/str06-breaks-two-pages-song` | voice-piano | 0.976 | 0.948 | 0.844 | 2 → 2 | 2902 | 519 |
-| `structure/str07-orchestral-five-pages` | orchestral | 0.985 | 0.980 | 0.960 | 7 → 7 | 3376 | 526 |
-| `structure/str08-variations-twelve-pages-piano` | piano | 0.997 | 0.984 | 0.967 | 1 → 1 | 1284 | 495 |
-| `time/t01-simple-meters` | melody | 0.962 | 0.961 | 0.869 | 1 → 1 | 1534 | 270 |
-| `time/t02-compound-irregular` | melody | 1.000 | 1.000 | 0.971 | 1 → 1 | 1609 | 287 |
-| `time/t03-common-cut-piano` | piano | 0.991 | 1.000 | 0.931 | 1 → 1 | 1713 | 300 |
-| `time/t04-pickup-song` | melody-lyrics | 0.953 | 0.966 | 0.955 | 1 → 1 | 1619 | 297 |
-| `time/t05-triplets-duplets` | melody | 0.848 | 0.875 | 0.841 | 1 → 1 | 1494 | 290 |
-| `time/t06-quint-sext-sept` | melody | 0.973 | 0.971 | 0.920 | 1 → 1 | 1254 | 293 |
-| `time/t07-nested-tuplets` | melody | 0.819 | 0.812 | 0.827 | 1 → 1 | 1334 | 286 |
-| `time/t08-ties-systems-pages` | piano | 1.000 | 0.997 | 0.972 | 1 → 1 | 1291 | 298 |
-| `time/t09-two-voices-guitar` | two-voices-one-staff-instrument | 0.933 | 0.933 | 0.790 | 1 → 1 | 1303 | 300 |
-| `time/t10-quartet-meters` | string-quartet | 0.987 | 0.978 | 0.884 | 4 → 4 | 1889 | 293 |
+| `layouts/choir-closed-satb-light-of-morning` | choir-closed-satb | 0.982 | 0.989 | 0.986 | 4 → 4 | 1675 | 281 |
+| `layouts/choir-open-satb-gloria` | choir-open-satb | 0.916 | 0.938 | 0.879 | 4 → 4 | 2223 | 299 |
+| `layouts/choir-piano-song-of-rejoicing` | choir-piano | 1.000 | 1.000 | 0.972 | 5 → 5 | 3285 | 364 |
+| `layouts/choir-sab-summer-song` | choir-sab | 0.984 | 0.996 | 0.328 | 3 → 3 | 2026 | 285 |
+| `layouts/choir-ssaa-winter-night` | choir-ssaa | 0.996 | 0.992 | 0.982 | 4 → 4 | 1602 | 285 |
+| `layouts/choir-ttbb-evening-bells` | choir-ttbb | 1.000 | 1.000 | 0.767 | 4 → 4 | 1722 | 285 |
+| `layouts/cross-staff-piano-arpeggio-study` | cross-staff | 0.884 | 0.889 | 0.794 | 1 → 1 | 1373 | 286 |
+| `layouts/divisi-choir-bright-new-day` | divisi | 0.988 | 0.988 | 0.942 | 4 → 4 | 3834 | 339 |
+| `layouts/divisi-strings-lament` | divisi | 0.993 | 0.988 | 0.956 | 4 → 4 | 1821 | 294 |
+| `layouts/hymnal-stanzas-light-of-ages` | hymnal-stanzas | 1.000 | 0.999 | 0.996 | 4 → 4 | 2249 | 295 |
+| `layouts/lead-sheet-long-road` | lead-sheet | 0.888 | 0.920 | 0.840 | 1 → 1 | 2033 | 271 |
+| `layouts/melody-cello-elegy-2page` | melody | 0.902 | 0.855 | 0.732 | 1 → 1 | 1199 | 332 |
+| `layouts/melody-flute-air` | melody | 0.967 | 0.977 | 0.972 | 1 → 1 | 1341 | 274 |
+| `layouts/melody-lyrics-morning-song` | melody-lyrics | 1.000 | 1.000 | 0.938 | 1 → 1 | 1611 | 289 |
+| `layouts/orchestral-festive-march-9-staves` | orchestral | 0.973 | 0.958 | 0.905 | 9 → 9 | 3721 | 517 |
+| `layouts/organ-three-staves-chorale-prelude` | organ | 0.998 | 0.973 | 0.768 | 1 → 1 | 1731 | 286 |
+| `layouts/piano-grand-staff-prelude` | piano | 0.902 | 0.954 | 0.952 | 1 → 1 | 1573 | 276 |
+| `layouts/string-quartet-minuet` | string-quartet | 0.777 | 0.988 | 0.775 | 4 → 4 | 3663 | 376 |
+| `layouts/two-voices-piano-song-without-words` | two-voices-one-staff-instrument | 0.996 | 0.996 | 0.723 | 1 → 1 | 1420 | 288 |
+| `layouts/voice-piano-night-song` | voice-piano | 0.979 | 0.949 | 0.542 | 2 → 2 | 1801 | 281 |
+| `lyrics/lyr01-elisions-three-languages` | melody-lyrics | 0.985 | 0.979 | 0.890 | 1 → 1 | 1780 | 294 |
+| `lyrics/lyr02-non-ascii-four-languages` | melody-lyrics | 0.975 | 0.975 | 0.943 | 1 → 1 | 2046 | 277 |
+| `marks/mk01-articulations-violin` | melody | 0.974 | 0.974 | 0.967 | 1 → 1 | 1350 | 287 |
+| `marks/mk02-ornaments-fermatas-flute` | melody | 0.951 | 0.958 | 0.959 | 1 → 1 | 1374 | 294 |
+| `marks/mk03-dynamics-hairpins-cello` | melody | 0.994 | 0.968 | 0.780 | 1 → 1 | 1530 | 277 |
+| `marks/mk04-piano-pedal-arpeggio-fingering` | piano | 0.955 | 0.951 | 0.829 | 1 → 1 | 1785 | 278 |
+| `marks/mk05-tempo-text-rehearsal-oboe` | melody | 0.982 | 0.956 | 0.723 | 1 → 1 | 1673 | 283 |
+| `marks/mk06-lead-sheet-chord-symbols` | lead-sheet | 1.000 | 1.000 | 0.836 | 1 → 1 | 1646 | 292 |
+| `marks/mk07-vocalise-voice-piano` | voice-piano | 0.988 | 0.993 | 0.904 | 2 → 2 | 1781 | 300 |
+| `marks/mk08-string-quartet-marks` | string-quartet | 0.983 | 0.977 | 0.928 | 4 → 4 | 2053 | 325 |
+| `marks/mk09-stacked-marks-viola` | melody | 0.935 | 0.947 | 0.902 | 1 → 1 | 1638 | 295 |
+| `marks/mk10-piano-pedal-brackets` | piano | 0.977 | 0.979 | 0.902 | 1 → 1 | 1515 | 287 |
+| `marks/mk11-violin-circled-rehearsal-numbers` | melody | 0.933 | 0.956 | 0.985 | 1 → 1 | 1364 | 288 |
+| `notes/nt01-note-values` | melody | 0.895 | 0.924 | 0.673 | 1 → 1 | 1528 | 303 |
+| `notes/nt02-dots` | melody | 0.963 | 0.936 | 0.879 | 1 → 1 | 1486 | 303 |
+| `notes/nt03-chords` | piano | 0.975 | 0.972 | 0.900 | 1 → 1 | 1446 | 285 |
+| `notes/nt04-beams` | melody | 0.985 | 0.971 | 0.978 | 1 → 1 | 1560 | 285 |
+| `notes/nt05-flags-stems` | melody | 0.847 | 0.850 | 0.759 | 1 → 1 | 1562 | 289 |
+| `notes/nt06-ledger-lines` | piano | 1.000 | 0.953 | 0.953 | 1 → 1 | 1494 | 295 |
+| `notes/nt07-grace-notes` | melody | 0.971 | 0.927 | 0.946 | 1 → 1 | 1504 | 282 |
+| `notes/nt08-cue-notes` | melody | 0.960 | 0.946 | 0.947 | 1 → 1 | 1412 | 285 |
+| `notes/nt09-tremolos` | piano | 0.719 | 0.751 | 0.635 | 1 → 1 | 1438 | 288 |
+| `notes/nt10-piano-etude` | piano | 0.989 | 0.988 | 0.959 | 1 → 1 | 1470 | 292 |
+| `percussion/perc01-parade-flute-snare-drumset` | percussion-none | 0.646 | 0.628 | 0.639 | 3 → 2 | 1746 | 297 |
+| `pitch/pitch-cov-accidentals-chords-piano` | piano | 1.000 | 0.997 | 0.879 | 1 → 1 | 1462 | 296 |
+| `pitch/pitch-cov-accidentals-melody` | melody | 0.985 | 0.985 | 0.892 | 1 → 1 | 1568 | 275 |
+| `pitch/pitch-cov-clef-changes-piano` | piano | 0.945 | 1.000 | 0.367 | 1 → 1 | 1524 | 284 |
+| `pitch/pitch-cov-clefs-all` | melody | 0.741 | 0.727 | 0.733 | 1 → 1 | 1519 | 282 |
+| `pitch/pitch-cov-clefs-quartet` | string-quartet | 0.964 | 0.955 | 0.948 | 4 → 4 | 1790 | 281 |
+| `pitch/pitch-cov-key-changes-organ` | organ | 0.989 | 0.978 | 0.813 | 1 → 1 | 1764 | 305 |
+| `pitch/pitch-cov-keys-major-flats` | piano | 1.000 | 1.000 | 0.683 | 1 → 1 | 1637 | 301 |
+| `pitch/pitch-cov-keys-major-sharps` | melody | 1.000 | 0.911 | 0.952 | 1 → 1 | 1556 | 283 |
+| `pitch/pitch-cov-keys-minor-flats` | melody | 0.981 | 0.994 | 0.972 | 1 → 1 | 1517 | 279 |
+| `pitch/pitch-cov-keys-minor-sharps` | melody | 0.994 | 0.994 | 0.589 | 1 → 1 | 1575 | 284 |
+| `pitch/pitch-cov-ottava-ledger-melody` | melody | 1.000 | 1.000 | 1.000 | 1 → 1 | 1369 | 289 |
+| `pitch/pitch-cov-ottava-piano` | piano | 1.000 | 0.958 | 0.925 | 1 → 1 | 1533 | 288 |
+| `rests/rst01-rest-values` | melody | 0.867 | 0.841 | 0.725 | 1 → 1 | 1594 | 295 |
+| `rests/rst02-dotted-rests` | melody | 0.934 | 0.948 | 0.798 | 1 → 1 | 1598 | 280 |
+| `rests/rst03-whole-bar-rests-simple` | melody | 0.904 | 0.904 | 0.768 | 1 → 1 | 1515 | 314 |
+| `rests/rst04-whole-bar-rests-compound` | melody | 0.989 | 1.000 | 0.940 | 1 → 1 | 1461 | 298 |
+| `rests/rst05-multibar-rests` | melody | 0.881 | 0.807 | 0.626 | 1 → 1 | 1708 | 287 |
+| `rests/rst06-two-voice-rests` | two-voices-one-staff-instrument | 0.856 | 0.863 | 0.840 | 1 → 1 | 1454 | 282 |
+| `rests/rst07-piano-rests` | piano | 0.954 | 0.959 | 0.943 | 1 → 1 | 1596 | 297 |
+| `rests/rst08-tuplet-beam-rests` | melody | 0.863 | 0.846 | 0.367 | 1 → 1 | 1840 | 296 |
+| `rests/rst09-quartet-rests` | string-quartet | 0.995 | 0.992 | 0.938 | 4 → 4 | 3036 | 357 |
+| `structure/str01-double-final-barlines` | melody | 1.000 | 1.000 | 0.944 | 1 → 1 | 1439 | 306 |
+| `structure/str02-repeat-signs-piano` | piano | 0.988 | 0.990 | 0.980 | 1 → 1 | 1570 | 296 |
+| `structure/str03-voltas-string-quartet` | string-quartet | 1.000 | 0.996 | 0.761 | 4 → 4 | 4286 | 387 |
+| `structure/str04-segno-coda-ds` | melody | 0.882 | 0.883 | 0.909 | 1 → 1 | 1635 | 288 |
+| `structure/str05-fine-dc-al-fine-piano` | piano | 1.000 | 1.000 | 0.487 | 1 → 1 | 1779 | 298 |
+| `structure/str06-breaks-two-pages-song` | voice-piano | 0.976 | 0.948 | 0.844 | 2 → 2 | 2856 | 497 |
+| `structure/str07-orchestral-five-pages` | orchestral | 0.985 | 0.980 | 0.960 | 7 → 7 | 3557 | 565 |
+| `structure/str08-variations-twelve-pages-piano` | piano | 0.997 | 0.984 | 0.967 | 1 → 1 | 1383 | 471 |
+| `time/t01-simple-meters` | melody | 0.962 | 0.961 | 0.869 | 1 → 1 | 1586 | 280 |
+| `time/t02-compound-irregular` | melody | 1.000 | 1.000 | 0.971 | 1 → 1 | 1624 | 292 |
+| `time/t03-common-cut-piano` | piano | 0.991 | 1.000 | 0.931 | 1 → 1 | 1628 | 290 |
+| `time/t04-pickup-song` | melody-lyrics | 0.953 | 0.966 | 0.955 | 1 → 1 | 1593 | 285 |
+| `time/t05-triplets-duplets` | melody | 0.848 | 0.875 | 0.841 | 1 → 1 | 1569 | 286 |
+| `time/t06-quint-sext-sept` | melody | 0.973 | 0.971 | 0.920 | 1 → 1 | 1310 | 295 |
+| `time/t07-nested-tuplets` | melody | 0.819 | 0.812 | 0.827 | 1 → 1 | 1390 | 282 |
+| `time/t08-ties-systems-pages` | piano | 1.000 | 0.997 | 0.972 | 1 → 1 | 1287 | 314 |
+| `time/t09-two-voices-guitar` | two-voices-one-staff-instrument | 0.933 | 0.933 | 0.790 | 1 → 1 | 1300 | 296 |
+| `time/t10-quartet-meters` | string-quartet | 0.987 | 0.978 | 0.884 | 4 → 4 | 1990 | 306 |
