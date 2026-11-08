@@ -145,7 +145,67 @@ function rotatePoint(x, y, w, h, angleRad) {
   return [cx + c * dx + s * dy, cy - s * dx + c * dy];
 }
 
+// --- bit-packed binaries (memory per page) -------------------------------------
+// A page keeps its staff-removed binary (fr.R) until the score is built from all
+// pages. keepPacked(obj, key) stores obj[key] at one bit per pixel and unpacks a
+// fresh copy when it is read; at most UNPACKED_MAX pages stay unpacked (the least
+// recently read is packed again from its current bytes, so writes are kept, and a
+// caller still holding that copy keeps reading it). A binary holding a value other
+// than 0/1 is left as it is.
+const UNPACKED_MAX = 3;
+const unpacked = []; // holders, most recently read last
+function packBits(d) {
+  const n = d.length, bits = new Uint8Array((n + 7) >> 3), m = n & ~7;
+  let j = 0;
+  for (let i = 0; i < m; i += 8, j++) {
+    bits[j] = d[i] | (d[i + 1] << 1) | (d[i + 2] << 2) | (d[i + 3] << 3) | (d[i + 4] << 4) | (d[i + 5] << 5) | (d[i + 6] << 6) | (d[i + 7] << 7);
+  }
+  for (let i = m; i < n; i++) if (d[i]) bits[j] |= 1 << (i & 7);
+  return bits;
+}
+function unpackBits(bits, n) {
+  const d = new Uint8Array(n), m = n & ~7;
+  for (let i = 0, j = 0; i < m; i += 8, j++) {
+    const b = bits[j];
+    if (!b) continue; // paper: most of a page
+    d[i] = b & 1; d[i + 1] = (b >> 1) & 1; d[i + 2] = (b >> 2) & 1; d[i + 3] = (b >> 3) & 1;
+    d[i + 4] = (b >> 4) & 1; d[i + 5] = (b >> 5) & 1; d[i + 6] = (b >> 6) & 1; d[i + 7] = b >> 7;
+  }
+  for (let i = m; i < n; i++) d[i] = (bits[i >> 3] >> (i & 7)) & 1;
+  return d;
+}
+function keepPacked(obj, key) {
+  const desc = Object.getOwnPropertyDescriptor(obj, key);
+  const b = desc && desc.value;
+  if (!b || !(b.data instanceof Uint8Array)) return false;
+  const d = b.data;
+  for (let i = 0; i < d.length; i++) if (d[i] > 1) return false;
+  const h = { shape: Object.assign({}, b, { data: null }), bits: packBits(d), n: d.length, cur: null };
+  h.pack = () => { h.bits = packBits(h.cur.data); h.cur = null; };
+  Object.defineProperty(obj, key, {
+    configurable: true, enumerable: true,
+    get() {
+      if (!h.cur) {
+        h.cur = Object.assign({}, h.shape, { data: unpackBits(h.bits, h.n) });
+        h.bits = null;
+        unpacked.push(h);
+        while (unpacked.length > UNPACKED_MAX) unpacked.shift().pack();
+      } else if (unpacked[unpacked.length - 1] !== h) {
+        unpacked.splice(unpacked.indexOf(h), 1);
+        unpacked.push(h);
+      }
+      return h.cur;
+    },
+    set(v) {
+      const k = unpacked.indexOf(h);
+      if (k >= 0) unpacked.splice(k, 1);
+      Object.defineProperty(obj, key, { configurable: true, enumerable: true, writable: true, value: v });
+    },
+  });
+  return true;
+}
+
 module.exports = {
   makeGray, makeBinary, cloneBinary, parsePNM, rgbToGray, readGray, readRGB,
-  writePGM, writePNGrgb, writePNGgray, binaryToGray, rotateGray, rotatePoint,
+  writePGM, writePNGrgb, writePNGgray, binaryToGray, rotateGray, rotatePoint, keepPacked,
 };

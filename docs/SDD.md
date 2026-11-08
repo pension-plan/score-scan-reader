@@ -123,6 +123,23 @@ Heavy work runs off the main thread in a same-origin Web Worker, so the UI stays
 one 300 dpi A4 page (about 8.7 Mpx) should stay below 300 MB: gray, binary and staff-removed copies are
 `Uint8Array`s, and the integral images are `Float64Array`s that are freed after binarisation.
 
+Memory per page of a long document stays small, so peak memory is nearly flat in page count. Pages are
+rendered one at a time (the page renders page i+1 while the worker reads page i; `tools/eval.mjs` reads
+each rasterised page from disk when its turn comes). After a page's step the converter's `releasePage`
+drops the page's gray, binary and lenient-binary copies and keeps only what `finish()` reads: the compact
+page data (staves, heads, barlines, components, overlay view) and the staff-removed binary `fr.R`, stored
+bit-packed (one bit per pixel, `image.js keepPacked`) and unpacked again when the score builder reads it,
+with at most three pages unpacked at once (score building reads the pages in order once per pass, about four
+passes, which costs about 0.1 s per page). The on-screen copy is a 1400 px wide JPEG blob per page, and pdf.js
+releases each page after rendering it. Staff objects use module-level `yAt`/`spaceAt` functions, not
+closures, because a closure keeps the whole staff finder's scope alive, which held each page's full binary
+for as long as its staves lived (L26). Retained memory went from about 33 MB to about 2 MB per 200 dpi A4
+page (8 Mpx working frame); measured peak RSS of the Node converter (OCR on, 200 dpi) for 1/10/40 pages went
+from 334/899/2124 MB to about 384/628/724 MB, and the browser OMR worker's heap peak from 145/283/695 MB to
+140/210/257 MB (`mvp/ui/test/multipage.js --pdf`). The remaining growth in Node is allocator high-water, not
+retained data: glibc keeps freed 8 MB page buffers in its heap (with `MALLOC_MMAP_THRESHOLD_=1048576` the
+40-page peak is 559 MB, about 3% slower).
+
 **Size budget.** Each supporting file ≤ 15 MB, the total ≤ 64 MB [WF]. Planned: phase 1 about 13–20 MB, phase
 2 with ONNX about 30–40 MB [OMR §9.3]. The build fails if a limit is exceeded (§9).
 

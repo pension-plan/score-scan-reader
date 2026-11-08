@@ -90,18 +90,29 @@ async function childMain(specPath) {
   const req = createRequire(path.join(spec.src, 'x.js'));
   const { readGray } = req(path.join(spec.src, 'image.js'));
   const omr = req(path.join(spec.src, 'omr.js'));
-  let convert = omr.convert;
+  // the app's path: pages read one at a time (each page file loaded only when its turn
+  // comes), each page's big buffers released after its step (converter releasePage, as
+  // the page worker does), then finish; --ml wraps the converter with ml.wrapConverter
+  let wrap = (c) => c;
   if (spec.ml) {
-    // the app's ML path: omr.createConverter wrapped by ml.wrapConverter, pages in order
     const ml = req(path.join(spec.src, 'ml.js'));
     const det = await ml.createNodeDetector({ assets: path.join(MVP, 'assets-src/ml'), ortPath: process.env.ORT_NODE || path.join(ROOT, 'spike/ml/node_modules/onnxruntime-node') });
-    convert = async (pgs, o) => {
-      const c = ml.wrapConverter(omr.createConverter(o), det.detect, {});
-      for (let i = 0; i < pgs.length; i++) await c.addPage(pgs[i], i, pgs.length);
-      return c.finish();
-    };
+    wrap = (c) => ml.wrapConverter(c, det.detect, {});
   }
-  const pages = spec.pages.map(p => readGray(p));
+  const pages = spec.pages.map(() => null); // [width, height] once read
+  const convert = async (files, o) => {
+    if (!omr.createConverter) return omr.convert(files.map((f, i) => { const g = readGray(f); pages[i] = [g.width, g.height]; return g; }), o);
+    const c = wrap(omr.createConverter(o));
+    for (let i = 0; i < files.length; i++) {
+      let g = readGray(files[i]);
+      pages[i] = [g.width, g.height];
+      const e = await c.addPage(g, i, files.length);
+      g = null;
+      if (e && c.releasePage) { c.releasePage(e); (e.spread || []).forEach((h) => c.releasePage(h)); }
+      await new Promise((r) => setTimeout(r, 0));
+    }
+    return c.finish();
+  };
   let ocr = null, worker = null, extraWorker = null;
   if (spec.ocr) {
     const { createWorker } = require(path.join(ROOT, 'spike/ocr/node_modules/tesseract.js'));
@@ -137,7 +148,7 @@ async function childMain(specPath) {
     else if (Number.isInteger(info.page) && pageStart[info.page] == null) pageStart[info.page] = now;
   };
   const t0 = Date.now(), p0 = performance.now();
-  const r = await convert(pages, { ocr, onProgress });
+  const r = await convert(spec.pages, { ocr, onProgress });
   const ms = Date.now() - t0, p1 = performance.now();
   if (worker) await worker.terminate();
   if (extraWorker) await extraWorker.terminate();
@@ -150,7 +161,7 @@ async function childMain(specPath) {
     measures: r.score && r.score.measures, fifths: r.score && r.score.fifths, time: r.score && r.score.time,
     perf: {
       page_ms, assemble_ms: perf.assembleAt == null ? null : Math.round((p1 - perf.assembleAt) * 10) / 10,
-      px: pages.map(p => [p.width, p.height]), load_ms: Math.round(p0 - tChild),
+      px: pages, load_ms: Math.round(p0 - tChild),
       max_rss_mb: Math.round(process.resourceUsage().maxRSS / 1024 * 10) / 10,
     },
   }));

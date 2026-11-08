@@ -12,7 +12,7 @@ const { readLyrics } = require('./lyrics');
 const { readPageText } = require('./text');
 const { pageMarks } = require('./symbols');
 const { buildScore } = require('./score');
-const { makeGray } = require('./image');
+const { makeGray, keepPacked } = require('./image');
 const { readHeaders, dewarpReading } = require('./cv');
 
 // gray page turned clockwise by quarter turns (1, 2 or 3)
@@ -150,13 +150,15 @@ function createConverter(opts = {}) {
       await readPageLyrics(entry, label, i, n);
       return entry;
     },
-    // big page buffers nothing after the page step reads (buildScore needs fr.R and asm.comps)
+    // big page buffers nothing after the page step reads (buildScore needs fr.R and
+    // asm.comps; fr.R is kept bit-packed and unpacked when read, image.js keepPacked)
     releasePage(entry) {
       if (!entry || !entry.fr) return;
       const fr = entry.fr;
       if (fr.gray) fr.gray = { width: fr.gray.width, height: fr.gray.height, data: null, released: true };
       fr.B = null;
       fr.L = null;
+      keepPacked(fr, 'R');
     },
     finish() {
       progress('Building parts', { stage: 'parts' });

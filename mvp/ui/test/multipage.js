@@ -1,5 +1,5 @@
 // Multi-page check of dist/index.html (L5a): long PDFs are read page by page.
-//   node ui/test/multipage.js [--html path] [--pages 24] [--width 1280] [--out file.json] [--shots prefix] [--no-stop]
+//   node ui/test/multipage.js [--html path] [--pages 24] [--pdf file] [--width 1280] [--out file.json] [--shots prefix] [--no-stop]
 // Builds an N-page PDF from corpus scans (pdfunite, cached in work/ui-fixtures),
 // serves the page under the simulated artifact CSP, waits for the sample, then
 // drops the long PDF and records: pages read and their states, the cap warning,
@@ -63,7 +63,8 @@ function fixture(n) {
   return out;
 }
 
-const fixPath = fixture(N);
+// --pdf: read this PDF (e.g. a coverage perf item) instead of the built book
+const fixPath = arg('--pdf', null) ? path.resolve(arg('--pdf')) : fixture(N);
 const srv = http.createServer((req, res) => {
   const p = decodeURIComponent(req.url.split('?')[0]);
   if (p === '/') {
@@ -102,6 +103,32 @@ srv.listen(0, async () => {
   const out = { html: path.relative(MVP, HTML), pages: N, width: WIDTH, sample: { secs: sample.secs, engine: sample.engine, longTasks: sample.lt.length, maxLongTaskMs: Math.max(0, ...sample.lt.map((x) => x[1])) } };
 
   // ---- the long document
+  // JS heap of each target (page, OMR session worker, pdf.js worker), through a browser CDP
+  // session: used heap plus array-buffer backing stores (Runtime.getHeapUsage), MB
+  const cdp = await browser.newBrowserCDPSession();
+  const pendingCdp = new Map();
+  let cdpSeq = 0;
+  cdp.on('Target.receivedMessageFromTarget', (e) => { const m = JSON.parse(e.message); const p = pendingCdp.get(m.id); if (p) { pendingCdp.delete(m.id); p(m.result || {}); } });
+  const attached = new Map();
+  const targetHeaps = async () => {
+    const { targetInfos } = await cdp.send('Target.getTargets');
+    const out = {};
+    for (const t of targetInfos.filter((x) => x.type === 'worker' || x.type === 'page')) {
+      const ask = (sessionId, method, params) => { const id = ++cdpSeq; return Promise.race([new Promise((res) => { pendingCdp.set(id, res); cdp.send('Target.sendMessageToTarget', { sessionId, message: JSON.stringify({ id, method, params }) }).catch(() => res({})); }), new Promise((res) => setTimeout(() => res({}), 2000))]); };
+      if (!attached.has(t.targetId)) {
+        const sessionId = (await cdp.send('Target.attachToTarget', { targetId: t.targetId, flatten: false })).sessionId;
+        // which worker: pdf.js, the OCR engine, or the OMR session (ui/session.js)
+        const v = t.type === 'page' ? 'page' : ((await ask(sessionId, 'Runtime.evaluate', { expression: "typeof pdfjsWorker !== 'undefined' || typeof WorkerMessageHandler !== 'undefined' ? 'pdfWorker' : typeof __omrSessionModule !== 'undefined' ? 'omrWorker' : typeof TesseractCore !== 'undefined' || typeof Tesseract !== 'undefined' ? 'ocrWorker' : 'omrWorker'", returnByValue: true })).result || {}).value || 'omrWorker';
+        attached.set(t.targetId, { sessionId, k: v });
+      }
+      const r = await ask(attached.get(t.targetId).sessionId, 'Runtime.getHeapUsage');
+      const k = attached.get(t.targetId).k;
+      out[k] = Math.max(out[k] || 0, Math.round(((r.usedSize || 0) + (r.backingStorageSize || 0)) / 1048576));
+      out[k + 'Total'] = Math.max(out[k + 'Total'] || 0, Math.round(((r.totalSize || 0) + (r.backingStorageSize || 0)) / 1048576));
+    }
+    return out;
+  };
+  const heapPeak = {};
   const samples = [];
   let rssPeak = 0;
   const rssBefore = treeRSS(process.pid) - Math.round(process.memoryUsage().rss / 1048576);
@@ -112,6 +139,7 @@ srv.listen(0, async () => {
     const s = await page.evaluate(() => ({ done: !!window.__omrResult, chips: [...document.querySelectorAll('#pageChips .chip')].map((c) => c.dataset.state).join(''), heap: performance.memory ? performance.memory.usedJSHeapSize : 0 }));
     s.rss = treeRSS(process.pid) - Math.round(process.memoryUsage().rss / 1048576);
     rssPeak = Math.max(rssPeak, s.rss);
+    try { const th = await targetHeaps(); for (const k in th) heapPeak[k] = Math.max(heapPeak[k] || 0, th[k]); } catch (e) {}
     samples.push([Math.round((Date.now() - t0) / 1000), s.chips.replace(/done/g, 'D').replace(/queued/g, '.').replace(/work/g, 'W').replace(/render/g, 'R').replace(/empty/g, 'E').replace(/failed/g, 'F'), Math.round(s.heap / 1048576)]);
     if (SHOTS && !shot && /D.*D.*D/.test(samples[samples.length - 1][1]) && !s.done) {
       shot = true;
@@ -138,7 +166,7 @@ srv.listen(0, async () => {
     pagesInfo: r.res && r.res.pages, parts: r.res && r.res.parts, measures: r.res && r.res.measures,
     capWarning: !!(r.res && (r.res.warnings || []).some((w) => /Only the first/.test(w))),
     longTasks: lt.length, longTaskMsTotal: lt.reduce((a, b) => a + b, 0), maxLongTaskMs: lt[0] || 0, top5: lt.slice(0, 5), longTasksBy: by,
-    heapMB: Math.round(r.heap / 1048576), peakHeapMB: Math.max(0, ...samples.map((s) => s[2])), rssBeforeMB: rssBefore, rssPeakMB: rssPeak,
+    heapMB: Math.round(r.heap / 1048576), peakHeapMB: Math.max(0, ...samples.map((s) => s[2])), rssBeforeMB: rssBefore, rssPeakMB: rssPeak, targetHeapPeakMB: heapPeak,
     hscroll: r.hscroll, osmd: r.osmd + ' svg; ' + r.osmdNote, timeline: samples.filter((_, i) => i % 3 === 0).map((s) => s.join(' ')),
   };
   // navigation: chip 5, then previous

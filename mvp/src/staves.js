@@ -213,8 +213,7 @@ function buildStaff(t, strips, line, bin, w, h, ss, lt) {
   const dense = [0, 1, 2, 3, 4].map(k => densify(xs, ys[k], w));
   const staff = {
     xs, ys, dense,
-    yAt(k, x) { const xi = Math.max(0, Math.min(w - 1, Math.round(x))); return this.dense[k][xi]; },
-    spaceAt(x) { return (this.yAt(4, x) - this.yAt(0, x)) / 4; },
+    yAt: staffYAt, spaceAt: staffSpaceAt,
   };
   // extents: walk left/right from the tracked range while >= 4 lines have ink.
   // The walk follows the staff with a vertical offset that is re-fitted every
@@ -375,6 +374,12 @@ function mergeStaffSets(sets, bin, lt, ss) {
   return keep;
 }
 
+// a staff's line k at column x (dense rows are one value per page column). Shared
+// module functions, not closures: a closure would keep the finder's whole scope,
+// page binaries included, alive for as long as the staff is.
+function staffYAt(k, x) { const d = this.dense[k]; return d[Math.max(0, Math.min(d.length - 1, Math.round(x)))]; }
+function staffSpaceAt(x) { return (this.yAt(4, x) - this.yAt(0, x)) / 4; }
+
 function densify(xs, ys, w) {
   const out = new Float32Array(w);
   let j = 0;
@@ -521,7 +526,7 @@ function detectDashedStaves(bin, lt, opts = {}) {
       if (bestSh) for (let j = 0; j < t.length; j++) { const g = (ys[4][j] - ys[0][j]) / 4; for (let k = 0; k < 5; k++) ys[k][j] += bestSh * g; }
     }
     const dense = [0, 1, 2, 3, 4].map(k => densify(xs, ys[k], w));
-    const staff = { xs, ys, dense, yAt(k, x) { const xi = Math.max(0, Math.min(w - 1, Math.round(x))); return this.dense[k][xi]; }, spaceAt(x) { return (this.yAt(4, x) - this.yAt(0, x)) / 4; } };
+    const staff = { xs, ys, dense, yAt: staffYAt, spaceAt: staffSpaceAt };
     // extents: from the first to the last tracked strip, trimmed to where a window of one space
     // still has ink on three of the five lines
     const inked = (x) => { let n = 0; for (let k = 0; k < 5; k++) { let any = 0; for (let xx = x; xx < Math.min(w, x + Math.round(ss)); xx++) { const y = Math.round(staff.yAt(k, xx)); if (y >= 0 && y < h && line[y * w + xx]) { any = 1; break; } } n += any; } return n >= 3; };
