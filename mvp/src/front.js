@@ -12,8 +12,8 @@ const { detectStems } = require('./stems');
 const { detectBarlines } = require('./barlines');
 const { rotateGray, makeGray } = require('./image');
 const { precleanPage, clefScore } = require('./cv');
-const { findOneLineStaves, percClefOnPage, findXHeads } = require('./percussion');
-const { inferStaves } = require('./staffinfer');
+const { percClefOnPage, findXHeads } = require('./percussion');
+const { inferStaves, oneLineStaves } = require('./staffinfer');
 
 function resample(g, f) {
   const w = Math.max(1, Math.round(g.width * f)), h = Math.max(1, Math.round(g.height * f));
@@ -353,10 +353,10 @@ function* frontSteps(gray0, opts = {}) {
       if (inf.added === inf.staves.length) ctx.sp = Object.assign({}, ctx.sp, { ss: inf.ss, lt: Math.max(1, Math.min(ctx.sp.lt, 0.15 * inf.ss)) });
     }
   }
-  // one-line percussion staves (percussion.js: a lone line with the percussion clef at its start;
-  // none on other pages), read with the page's staves
+  // one-line percussion staves (staffinfer.js oneLineStaves: a lone line next to the system's staves,
+  // confirmed by the percussion clef at its start, percussion.js; none on other pages)
   if (opts.oneLine !== false && ctx.staves.length) {
-    const one = findOneLineStaves(ctx.B, ctx.staves, ctx.sp.ss, ctx.sp.lt);
+    const one = oneLineStaves(ctx.B, ctx.staves, { ss: ctx.sp.ss, lt: ctx.sp.lt, confirm: percClefOnPage });
     if (one.length) {
       ctx.staves = ctx.staves.concat(one).sort((a, b) => a.yAt(2, (a.left + a.right) / 2) - b.yAt(2, (b.left + b.right) / 2));
       ctx.staves.forEach((s, i) => { s.index = i; });

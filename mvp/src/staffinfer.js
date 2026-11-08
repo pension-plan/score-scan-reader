@@ -144,4 +144,58 @@ function inferStaves(B, staves, opts = {}) {
   return { staves: out, added, extended, ss: sp2[sp2.length >> 1] };
 }
 
-module.exports = { inferStaves };
+// One-line staves (a percussion staff with a single line: a snare, a cymbal part): a lone thin
+// line (about the staff-line thickness) on a page that has five-line staves, inked along at least
+// 70% of the nearest staff's width (a scanned line breaks in places), next to the system's staves
+// (a five-line staff within 8 spaces) but none within 2 spaces, no other line within 1.5 spaces,
+// and confirmed by opts.confirm(B, left, right, y, ss) (the caller's clef test). Each becomes a
+// lineStaff with the line as its middle line, marked oneLine (not inferred: its heads keep the
+// stem rule). opts: {ss, lt, confirm}.
+function oneLineStaves(B, staves, opts = {}) {
+  const ss = opts.ss, lt = opts.lt || 1;
+  if (!staves.length || !(ss > 0) || typeof opts.confirm !== 'function') return [];
+  const { width: W, height: H, data } = B;
+  const left = Math.min(...staves.map(s => s.left)), right = Math.max(...staves.map(s => s.right));
+  if (right - left < 20 * ss) return [];
+  const mid = (s) => (s.left + s.right) / 2;
+  // gap from y to the nearest five-line staff (0 inside one)
+  const gapTo = (y) => Math.min(...staves.map(s => { const t = s.yAt(0, mid(s)), b = s.yAt(4, mid(s)); return y < t ? t - y : y > b ? y - b : 0; }));
+  const maxT = Math.max(2, Math.round(2 * lt + 1));
+  const x0s = Math.max(0, Math.round(left)), x1s = Math.min(W - 1, Math.round(right));
+  const cov = new Int32Array(H);
+  for (let y = 0; y < H; y++) { let n = 0; const o = y * W; for (let x = x0s; x <= x1s; x++) if (data[o + x]) n++; cov[y] = n; }
+  const out = [];
+  for (let y = 0; y < H;) {
+    const g0 = gapTo(y);
+    // (a cheap first test on the whole width; the line's own staff width is checked below)
+    if (g0 < 2 * ss || g0 > 8 * ss || cov[y] < 0.49 * (right - left)) { y++; continue; }
+    let y1 = y;
+    while (y1 + 1 < H && cov[y1 + 1] >= 0.49 * (right - left)) y1++;
+    const ya = y, yb = y1;
+    y = y1 + 1;
+    if (yb - ya + 1 > maxT) continue; // a thick bar (a beam), not a staff line
+    const yl = (ya + yb) / 2;
+    if (gapTo(yl) < 2 * ss) continue;
+    const nb = staves.slice().sort((u, v) => Math.abs(u.yAt(2, mid(u)) - yl) - Math.abs(v.yAt(2, mid(v)) - yl))[0];
+    const width = nb.right - nb.left;
+    let n = 0;
+    for (let x = Math.max(0, Math.round(nb.left)); x <= Math.min(W - 1, Math.round(nb.right)); x++) {
+      for (let r = ya; r <= yb; r++) if (data[r * W + x]) { n++; break; }
+    }
+    if (n < 0.7 * width) continue;
+    // thin: the rows just beyond it hold much less ink; alone: no other line within 1.5 spaces
+    const top = Math.max(...Array.from({ length: yb - ya + 1 }, (_, i) => cov[ya + i]));
+    if (ya - 2 < 0 || yb + 2 >= H || cov[ya - 2] > 0.6 * top || cov[yb + 2] > 0.6 * top) continue;
+    let alone = true;
+    for (let d = maxT + 2; d < 1.5 * ss && alone; d++) if ((ya - d >= 0 && cov[ya - d] >= 0.75 * top) || (yb + d < H && cov[yb + d] >= 0.75 * top)) alone = false;
+    if (!alone) continue;
+    if (!opts.confirm(B, nb.left, nb.right, yl, ss)) continue;
+    const st = lineStaff(W, yl - 2 * ss, ss, 0, nb.left, nb.right);
+    st.inferred = false;
+    st.oneLine = true;
+    out.push(st);
+  }
+  return out;
+}
+
+module.exports = { inferStaves, oneLineStaves };

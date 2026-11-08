@@ -594,9 +594,11 @@ changing between systems; labels misread. **Confidence.** Per part: the minimum 
    declares the kit as one `<score-instrument>`/`<midi-instrument>` per drum on channel 10 with its General
    MIDI key (`<midi-unpitched>`), and playback.js plays each note on its own drum. A part with no read name
    is called Drum Set (Percussion on a one-line staff), and a percussion staff is never split into voice parts.
-   The front end (front.js) does two percussion-only passes: a one-line staff (a lone thin line spanning
-   the system, clear of the five-line staves, with the percussion clef at its start; modelled as a five-line
-   staff with its line in the middle) is added to the page's staves before the heads are found, and on
+   The front end (front.js) does two percussion-only passes: a one-line staff (staffinfer.js
+   `oneLineStaves`: a lone thin line inked along at least 70% of its system's width, next to the system's
+   staves but no five-line staff within 2 spaces, confirmed by the percussion clef at its start; built like
+   an inferred staff, five lines with the real one in the middle, marked `oneLine`) is added to the page's
+   staves before the heads are found, and on
    staves with the percussion clef x heads are found by their two inked diagonals (in place of the head
    finder's partial readings of them, and kept at a snare's stem end). The clef test there runs on the page
    with its staff lines (columns inked from a space above to a space below the middle line, clear beyond),

@@ -135,55 +135,6 @@ function percClefOnPage(B, left, right, yMid, ss) {
   return null;
 }
 
-// a staff object with straight lines k = 0..4 at y0 + (k - 2) * ss over [left, right] (a one-line
-// staff: its line is line 2); yAt/spaceAt as module functions, as staves.js makes them
-function lineAt(k, x) { const d = this.dense[k]; return d[Math.max(0, Math.min(d.length - 1, Math.round(x)))]; }
-function spaceOf(x) { return (this.yAt(4, x) - this.yAt(0, x)) / 4; }
-function oneLineStaff(W, left, right, a, b, ss) {
-  // y of the line at x: a + b * x (fitted on its run)
-  const dense = [0, 1, 2, 3, 4].map((k) => { const d = new Float32Array(W); for (let x = 0; x < W; x++) d[x] = a + b * x + (k - 2) * ss; return d; });
-  const xs = [left, right], ys = [0, 1, 2, 3, 4].map((k) => xs.map((x) => a + b * x + (k - 2) * ss));
-  return { xs, ys, dense, yAt: lineAt, spaceAt: spaceOf, left, right, space: ss, oneLine: true };
-}
-
-// One-line percussion staves (a snare or other single drum): a lone thin horizontal line, clear
-// of every five-line staff, running most of the width the page's staves run, with the percussion
-// clef at its start. Returns the new staves (none on almost every page).
-function findOneLineStaves(B, staves, ss, lt) {
-  if (!staves.length || !(ss > 0)) return [];
-  const { width: W, height: H, data } = B;
-  const left = Math.min(...staves.map((s) => s.left)), right = Math.max(...staves.map((s) => s.right));
-  const span = right - left;
-  if (span < 20 * ss) return [];
-  const inStaff = (y) => staves.some((s) => { const xm = (s.left + s.right) / 2; return y > s.yAt(0, xm) - 1.2 * ss && y < s.yAt(4, xm) + 1.2 * ss; });
-  const maxT = Math.max(2, Math.round(2 * lt + 1));
-  // ink along each row over the staves' width (a scanned line is broken in places)
-  const x0s = Math.max(0, Math.round(left)), x1s = Math.min(W - 1, Math.round(right));
-  const cov = new Int32Array(H);
-  for (let y = 0; y < H; y++) { let n = 0; const o = y * W; for (let x = x0s; x <= x1s; x++) if (data[o + x]) n++; cov[y] = n; }
-  const out = [];
-  for (let y = 0; y < H;) {
-    if (cov[y] < 0.75 * span || inStaff(y)) { y++; continue; }
-    let y1 = y;
-    while (y1 + 1 < H && cov[y1 + 1] >= 0.75 * span) y1++;
-    const ya = y, yb = y1;
-    y = y1 + 1;
-    if (yb - ya + 1 > maxT) continue; // a thick bar, not a staff line
-    // a thin line: the rows just beyond it hold much less ink, and no other line within a space
-    const top = Math.max(...Array.from({ length: yb - ya + 1 }, (_, i) => cov[ya + i]));
-    if (ya - 2 < 0 || yb + 2 >= H || cov[ya - 2] > 0.6 * top || cov[yb + 2] > 0.6 * top) continue;
-    let alone = true;
-    for (let d = maxT + 2; d < 1.5 * ss && alone; d++) if ((ya - d >= 0 && cov[ya - d] >= 0.75 * span) || (yb + d < H && cov[yb + d] >= 0.75 * span)) alone = false;
-    if (!alone) continue;
-    const yl = (ya + yb) / 2;
-    // its extent: that of the nearest staff (one system's staves start and end together)
-    const nb = staves.slice().sort((u, v) => Math.abs(u.yAt(2, (u.left + u.right) / 2) - yl) - Math.abs(v.yAt(2, (v.left + v.right) / 2) - yl))[0];
-    if (!percClefOnPage(B, nb.left, nb.right, yl, ss)) continue;
-    out.push(oneLineStaff(W, nb.left, nb.right, yl, 0, ss));
-  }
-  return out;
-}
-
 // x heads (hi-hat, cymbals) on the percussion staves of a page (staff indices `perc`), on the
 // staff-removed image: at a staff position, both diagonals of a head-sized square inked (the arms
 // of the x; a staff line may cut them) and the middles of its sides mostly empty (not a solid
@@ -219,4 +170,4 @@ function findXHeads(R, staves, perc, ss) {
   return out;
 }
 
-module.exports = { percussionClef, markPercussion, KIT, kitAt, percClefOnPage, findOneLineStaves, findXHeads };
+module.exports = { percussionClef, markPercussion, KIT, kitAt, percClefOnPage, findXHeads };
