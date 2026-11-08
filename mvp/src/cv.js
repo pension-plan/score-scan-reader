@@ -90,15 +90,32 @@ function makeJsApi() {
         const xa = Math.max(0, Math.floor(cx - r)), xb = Math.min(P.W - t.w, Math.ceil(cx + r));
         const ya = Math.max(0, Math.floor(cy - r)), yb = Math.min(P.H - t.h, Math.ceil(cy + r));
         let mx = -1;
-        for (let y = ya; y <= yb; y++) for (let x = xa; x <= xb; x++) {
-          // binary image: sum == sum of squares
-          const s = P.S[(y + t.h) * W1 + x + t.w] - P.S[y * W1 + x + t.w] - P.S[(y + t.h) * W1 + x] + P.S[y * W1 + x];
-          const vI = s - s * s / n;
-          if (vI <= 1e-6 || t.ss <= 1e-6) continue;
-          let num = 0;
-          for (let v = 0; v < t.h; v++) { const o = (y + v) * P.W + x, to = v * t.w; for (let u = 0; u < t.w; u++) if (P.d[o + u]) num += t.z[to + u]; }
-          const r = num / Math.sqrt(t.ss * vI);
-          if (r > mx) mx = r;
+        // the correlation sums of all shifts at once, from the ink pixels only: each ink pixel
+        // adds its template weight to every shift whose window holds it. Pixels are visited in
+        // row-major order, so each shift's sum adds the same terms in the same order as a
+        // window scan would (identical floating-point results), without testing blank pixels.
+        const nx = xb - xa + 1, ny = yb - ya + 1;
+        if (nx > 0 && ny > 0 && t.ss > 1e-6) {
+          const num = new Float64Array(nx * ny), z = t.z, tw = t.w, th = t.h, d = P.d, PW = P.W;
+          for (let py = ya, pyEnd = Math.min(P.H, yb + th); py < pyEnd; py++) {
+            const sy0 = Math.max(ya, py - th + 1), sy1 = Math.min(yb, py), row = py * PW;
+            for (let px = xa, pxEnd = Math.min(PW, xb + tw); px < pxEnd; px++) {
+              if (!d[row + px]) continue;
+              const sx0 = Math.max(xa, px - tw + 1), sx1 = Math.min(xb, px);
+              for (let sy = sy0; sy <= sy1; sy++) {
+                const zo = (py - sy) * tw + px, no = (sy - ya) * nx - xa;
+                for (let sx = sx0; sx <= sx1; sx++) num[no + sx] += z[zo - sx];
+              }
+            }
+          }
+          for (let y = ya; y <= yb; y++) for (let x = xa; x <= xb; x++) {
+            // binary image: sum == sum of squares
+            const s = P.S[(y + t.h) * W1 + x + t.w] - P.S[y * W1 + x + t.w] - P.S[(y + t.h) * W1 + x] + P.S[y * W1 + x];
+            const vI = s - s * s / n;
+            if (vI <= 1e-6) continue;
+            const r = num[(y - ya) * nx + x - xa] / Math.sqrt(t.ss * vI);
+            if (r > mx) mx = r;
+          }
         }
         const sc = mx * Math.sqrt(Math.min(1, n / (img.w * img.h)));
         if (sc > best) best = sc;
@@ -193,9 +210,12 @@ function readRun(api, R, b, sp, minScore, run, minA) {
     if (h < 1.0 * sp || h > 2.8 * sp || w < 0.3 * sp || w > 2.3 * sp) return null;
     const d = glyphIn(R, { ...bb, inner: b.inner }, minA);
     if (!d) return null;
-    const sc = api.scores(heal(d.img, Math.max(2, Math.round(0.18 * sp))), sp, DIGITS.concat(NOT_DIGITS));
-    const dg = api.best(sc, DIGITS), nd = api.best(sc, NOT_DIGITS);
-    if (sc[dg] < minScore || sc[nd] > sc[dg] - 0.02) return null;
+    // the other shapes are scored only for a glyph that reads as a digit (most do not)
+    const img = heal(d.img, Math.max(2, Math.round(0.18 * sp)));
+    const sc = api.scores(img, sp, DIGITS), dg = api.best(sc, DIGITS);
+    if (sc[dg] < minScore) return null;
+    const so = api.scores(img, sp, NOT_DIGITS), nd = api.best(so, NOT_DIGITS);
+    if (so[nd] > sc[dg] - 0.02) return null;
     return { v: DIGITS.indexOf(dg), score: sc[dg] };
   };
   let best = null;

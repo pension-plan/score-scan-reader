@@ -10,25 +10,20 @@ function labelComponents(bin, opts = {}) {
   const find = (a) => { while (parent[a] !== a) { parent[a] = parent[parent[a]]; a = parent[a]; } return a; };
   const union = (a, b) => { a = find(a); b = find(b); if (a !== b) { if (a < b) parent[b] = a; else parent[a] = b; } };
   let next = 1;
+  const eight = opts.four !== true;
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
       const i = y * w + x;
       if (data[i] !== target) continue;
-      const n = [];
-      if (x > 0 && labels[i - 1]) n.push(labels[i - 1]);
-      if (y > 0) {
-        if (labels[i - w]) n.push(labels[i - w]);
-        if (opts.four !== true) {
-          if (x > 0 && labels[i - w - 1]) n.push(labels[i - w - 1]);
-          if (x < w - 1 && labels[i - w + 1]) n.push(labels[i - w + 1]);
-        }
-      }
-      if (!n.length) { labels[i] = next; parent.push(next); next++; }
-      else {
-        let m = n[0]; for (const v of n) if (v < m) m = v;
-        labels[i] = m;
-        for (const v of n) union(m, v);
-      }
+      // labelled neighbours (left, up, up-left, up-right; 0 = none): the smallest labels the
+      // pixel and the others are joined to it (no per-pixel array: this runs on every pixel)
+      const a = x > 0 ? labels[i - 1] : 0, b = y > 0 ? labels[i - w] : 0;
+      const c = eight && y > 0 && x > 0 ? labels[i - w - 1] : 0, d = eight && y > 0 && x < w - 1 ? labels[i - w + 1] : 0;
+      if (!a && !b && !c && !d) { labels[i] = next; parent.push(next); next++; continue; }
+      let m = 0x7fffffff;
+      if (a && a < m) m = a; if (b && b < m) m = b; if (c && c < m) m = c; if (d && d < m) m = d;
+      labels[i] = m;
+      if (a && a !== m) union(m, a); if (b && b !== m) union(m, b); if (c && c !== m) union(m, c); if (d && d !== m) union(m, d);
     }
   }
   // compact

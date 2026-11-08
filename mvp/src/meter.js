@@ -109,9 +109,13 @@ function bandNumber(R, x0, x1, ya, yb, sp) {
   const read = (xa, xb) => {
     const g = crop(R, { x0: xa, x1: xb, y0: Y0, y1: Y1 }, 2);
     if (!g || g.y1 - g.y0 + 1 < 1.0 * sp) return null;
-    const sc = matcher().scores(heal(g.img, Math.max(2, Math.round(0.18 * sp))), sp, DIGITS.concat(NOT_DIGITS));
-    const d = DIGITS.reduce((p, n) => (sc[n] > sc[p] ? n : p), DIGITS[0]), o = Math.max(...NOT_DIGITS.map(n => sc[n]));
-    return sc[d] >= 0.5 && sc[d] > o + 0.02 ? { v: DIGITS.indexOf(d), score: sc[d] } : null;
+    // the other shapes are scored only for a glyph that reads as a digit (most do not)
+    const img = heal(g.img, Math.max(2, Math.round(0.18 * sp)));
+    const sc = matcher().scores(img, sp, DIGITS);
+    const d = DIGITS.reduce((p, n) => (sc[n] > sc[p] ? n : p), DIGITS[0]);
+    if (!(sc[d] >= 0.5)) return null;
+    const so = matcher().scores(img, sp, NOT_DIGITS), o = Math.max(...NOT_DIGITS.map(n => so[n]));
+    return sc[d] > o + 0.02 ? { v: DIGITS.indexOf(d), score: sc[d] } : null;
   };
   // one digit, or two side by side (12): split at the emptiest column of the middle third
   let best = null;
