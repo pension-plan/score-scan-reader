@@ -1179,6 +1179,18 @@ leave the bar's count and become grace notes before the next note. Coverage grac
 0.9499 to 0.9509 and challenge 0.8278 to 0.8283, but per item it moves both ways (challenge: 38 items only
 better, 42 with some metric worse, e.g. trio-minuet scan-mild pitch -0.05), so it is off by default.
 
+**Metronome marks** ("Vivace ♩ = 144", "(♩. = 60)"): a small note glyph above a staff (a stem at
+least 1.4 staff spaces, a head 0.75-1.8 spaces wide at its foot; hollow = half, one or two flags = eighth
+/ 16th), an optional augmentation dot, "=" (two short thin bars, looked up among all components since
+staff-line clean-up leaves them out of the leftovers) and a number (bar-number digit templates matched
+by shape at any size; OCR on the number's box when that fails), brackets skipped. The tempo word just left
+of it joins the line, which is always a tempo mark; OCR reads the word alone. Written as one direction:
+`<words font-weight="bold">`, `<metronome>` (beat-unit, beat-unit-dot, per-minute) and `<sound tempo>` in
+quarter notes per minute (dotted quarter 60 gives 90). A tempo word without a mark gets `<sound tempo>`
+from playback.js `tempoFromWords`, so the file and the player agree. A tempo word, or a lone number, above
+the music is never a header, composer or lyricist. Coverage: metronome 0 to 88 / 88 / 78% (clean / scan /
+severe), tempo-mark 40 to 48%; no item metric changed.
+
 **Fermatas** (an arc with a dot inside its bow) go on the note or rest nearest by x on the staff they
 stand by, as `<fermata type="upright">` (or `inverted` below the staff). Coverage recall 62 / 37 / 27%
 (clean / scan / severe; 0 before), no item metric changed.

@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 23:09 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 23:14 AEDT.
 
 ## Events
 
@@ -117,6 +117,8 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 22:38 | Shipped d4757fc (opencv, release merged): double sharps/flats via templates; coverage 0.7818 to 0.7821 (35 up), challenge 0.8277 to 0.8278, benchmark unchanged; COVERAGE.md regenerated. opencv next: L23 (stacked whole notes, half-note hollow/filled, 32nd/64th flags, dots). |
 | 22:40 | User: tempo not picked up (Flight of the Bumblebee, 'Vivace ♩ = 144' read as Header + 'Lyricist: 144', metronome glyph unrecognised). textsym given priority: metronome-mark recognition, tempo-line classification, <metronome> + <sound tempo> in MusicXML, overlay label; also empty bar-number labels. |
 | 23:09 | Shipped 35b4034 (fermatas written) and 0cd2fc0 (grace heads from the head finder, opt-in; lifts benchmark 0.9499 to 0.9509 and coverage grace recall on scans 7 to 37%). Decision: enable it by default if regress.mjs passes (the project gate), after the tempo fix. |
+| 23:14 | Release 0.21.0 had all dynamics/text marks dropped (swept-in partial change). Fixed by 437afb3 (release 0.21.1 merged: also default velocity 72, staff-scoped dynamics, <sound dynamics>, dynamic badge in the transport). regress.mjs now fails when written notation elements drop (L27). |
+| 23:14 | opencv: 32nd/64th notes (713fbe7, in 0.21.0) kept; 4 coverage items down at most 0.029, within the gate. Next: stacked whole-note chords, half notes read as filled, dots. |
 
 ## Accuracy by round
 
@@ -166,10 +168,11 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | L20 | Ties never written (only 5 of 79), including ties across systems | Symbols + voices | Partial (2b560bc) | Coverage: tie 0%; tied pitches themselves read 95%. 2b560bc: ties (incl. across systems) and slurs written from curves matched to end heads; coverage tie 17/15/11% clean/scan/severe, slur 43/39/33%; Maple 9 of 14 ties written, no false slurs. |
 | L21 | Only 2/4, 3/4 and 4/4 written: C, cut time, 2/2, 3/2, 6/8, 9/8, 12/8, 5/4, 5/8, 7/8 and time changes missing | Symbols + voices | Partial (template reader) | Coverage: 110 occurrences never written; time-3-4 55%, time-4-4 71%. 9a124ee: template digit reader on by default; first time signature right 342 to 352 of 365 challenge items; Maple Leaf Rag 2/4 read on both staves (overlay 0 to 2). Mid-piece changes still not written. |
 | L22 | Beams, slurs, fermatas, dynamics, hairpins, articulations, repeats and endings never written to MusicXML | Voices (MusicXML) + symbols | Partial (text round) | Coverage: beam 703, slur 100, fermata 130 occurrences, all 0%. Text round (6ed273c): dynamics (27 of 40 benchmark marks, precision 0.84), hairpins (coverage 84-86% clean/scan) and tempo/expression words now written. Beams, slurs, fermatas, articulations, repeats and endings still not written. 2b560bc: slurs now written too. 35b4034: fermatas written (coverage 62/37/27% clean/scan/severe). |
-| L23 | Half and whole notes, dots, 32nd/64th notes partial | Noteheads + symbols | Queued for round 4 | Coverage: note-half 76%, note-whole 46%, dot 69% (adds false notes), note-32nd 11%. 2b560bc: grace notes written (coverage 21% clean, 2% severe); grace heads on scans are still taken as normal notes. |
+| L23 | Half and whole notes, dots, 32nd/64th notes partial | Noteheads + symbols | Partial (713fbe7) | Coverage: note-half 76%, note-whole 46%, dot 69% (adds false notes), note-32nd 11%. 2b560bc: grace notes written (coverage 21% clean, 2% severe); grace heads on scans are still taken as normal notes. 713fbe7: 32nd notes 40/42/21 to 394/403/370 of 709 (clean/scan/severe), 64th 0 to 69/66/33 of 123; divisions 1680; coverage 0.7821 to 0.7843. Stacked whole-note chords, half notes read as filled, and dots adding false notes remain. |
 | L24 | Key signatures of 4+ sharps or flats and courtesy accidentals weak | Symbols | Queued for round 4 | Coverage: key-s4 25%, key-s6/s7 0%, acc-courtesy 22%. Current matrix: keys with 4+ accidentals read 13-17 of 15-17 on clean/scan (the 25%/0% was an older matrix); severe scans and courtesy accidentals (16/39) remain. |
 | L25 | Lyrics: non-ASCII and elisions 0%, extenders 58%, multi-verse 73% | Lyrics | Queued for round 4 | Coverage: 4-language item lyrics 0.16. |
 | L26 | Memory grows about 46 MB per page (40-page book peaks at 2.2 GB) | UI + score | Queued for round 4 | Coverage perf: peak MB = 297 + 5.2 × total megapixels (R² 0.97); time per page flat at ~2.3–3 s. |
+| L27 | 0.21.0 shipped with every dynamic, wedge and text mark dropped (a whole-tree push swept in a call to a function not yet exported); graded metrics did not move, so the regression check passed | Integration (push hygiene) + regression check | Resolved (0.21.1) | 437afb3 restored the export (release 0.21.1); regress.mjs now counts written elements (dynamics, wedges, words, metronome, credits, ties, slurs, fermatas, grace, time, key, lyrics) and fails on a drop of more than 10%. Against 0.21.0 it shows dynamics 0 vs 32, ties 22 vs 99, slurs 10 vs 46. |
 
 ## Runs
 

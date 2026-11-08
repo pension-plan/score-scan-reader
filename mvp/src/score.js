@@ -4,7 +4,7 @@
 const { staffMeasureEvents, pitchOf, keyAlters, DIV } = require('./assemble');
 const { detectRests, mergeRests, restBars } = require('./rests');
 const { pageMarks } = require('./symbols');
-const { instrumentXML, soundDynamics } = require('./playback');
+const { instrumentXML, soundDynamics, tempoFromWords } = require('./playback');
 
 const COLORS = ['#d1495b', '#edae49', '#00798c', '#30638e', '#7b5ea7', '#3a7d44'];
 
@@ -1434,11 +1434,24 @@ function readMarks(pages, segs, units, parts, partMeasures) {
       if (ok) { place(w, w.box[2], (pl) => `<direction placement="${pl}"><direction-type><wedge type="stop" number="1"/></direction-type>`); nWedge++; }
     }
     for (const t of marks.text) {
-      if (!t.text) continue;
+      if (!t.text && !t.metro) continue;
+      if (t.role === 'tempo' && t.metro && t.sys >= 0) {
+        // a metronome mark, with its tempo word: words, metronome and the
+        // tempo in quarter notes per minute (<sound tempo>) for players
+        const mt = t.metro, bq = { quarter: 1, half: 2, eighth: 0.5, '16th': 0.25 }[mt.unit] || 1;
+        const word = t.text && (t.text.match(/\p{L}/gu) || []).length >= 3 ? `<direction-type><words font-weight="bold">${esc(t.text)}</words></direction-type>` : '';
+        const metro = mt.bpm ? `<direction-type><metronome><beat-unit>${mt.unit}</beat-unit>${mt.dotted ? '<beat-unit-dot/>' : ''}<per-minute>${mt.bpm}</per-minute></metronome></direction-type>` : '';
+        const q = mt.bpm ? mt.bpm * bq * (mt.dotted ? 1.5 : 1) : tempoFromWords(t.text || '');
+        if (!word && !metro) continue;
+        if (place(t, t.box[0], () => `<direction placement="above">${word}${metro}`, q ? `<sound tempo="${Math.round(q * 100) / 100}"/>` : '')) nWords++;
+        continue;
+      }
       if ((t.role === 'tempo' || t.role === 'expression') && t.sys >= 0) {
         if (!wordsOk(t)) continue;
         const bold = t.role === 'tempo' ? ' font-weight="bold"' : '';
-        if (place(t, t.box[0], (pl) => `<direction placement="${pl}"><direction-type><words${bold}>${esc(t.text)}</words></direction-type>`)) nWords++;
+        // a tempo word alone: its usual tempo for players (playback.js table)
+        const q = t.role === 'tempo' ? tempoFromWords(t.text) : 0;
+        if (place(t, t.box[0], (pl) => `<direction placement="${pl}"><direction-type><words${bold}>${esc(t.text)}</words></direction-type>`, q ? `<sound tempo="${q}"/>` : '')) nWords++;
       } else if ((pg.index || 0) < 1 && ['title', 'subtitle', 'composer', 'lyricist', 'arranger', 'copyright'].includes(t.role)) {
         // a credit is words: OCR of a smudge or a stray glyph is not
         const key = t.role === 'copyright' ? 'rights' : t.role;

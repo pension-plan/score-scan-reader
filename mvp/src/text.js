@@ -103,7 +103,7 @@ function corrGrid(g, t) {
 let DTPL = null;
 // a bar number read from its digit shapes: '17', or '' when a glyph is not
 // clearly a digit
-function readDigits(R, comps, sp, dbg) {
+function readDigits(R, comps, sp, dbg, anySize) {
   DTPL ||= DIGIT_GLYPHS.map(([text, w, h, rows]) => {
     const gh = rows.length, gw = rows[0].length, cells = new Uint8Array(gw * gh);
     rows.forEach((r, y) => { for (let x = 0; x < gw; x++) cells[y * gw + x] = r[x] === '#' ? 1 : 0; });
@@ -115,7 +115,8 @@ function readDigits(R, comps, sp, dbg) {
     let best = null, second = 0;
     const img = glyphImage(R, c);
     for (const t of DTPL) {
-      if (Math.abs(h - t.h) > 0.3 * t.h || Math.abs(w - t.w) > 0.45 * t.w + 0.1) continue;
+      // any size (metronome marks): the shape of the box only
+      if (anySize ? Math.abs(w / h - t.w / t.h) > 0.35 * t.w / t.h + 0.08 : Math.abs(h - t.h) > 0.3 * t.h || Math.abs(w - t.w) > 0.45 * t.w + 0.1) continue;
       const sc = corrGrid(gridOf(img, t.gh, t.gw), t);
       if (!best || sc > best.score) { if (best) second = Math.max(second, best.score); best = { text: t.text, score: sc }; } else second = Math.max(second, sc);
     }
@@ -231,6 +232,93 @@ function graceHeads(R, c, sp) {
     slash = best >= 1.5 * sp && ink >= 0.08 * sp * sp;
   }
   return { heads, slash };
+}
+
+// ---------------------------------------------------------------- metronome marks
+// The note of a metronome mark (a small note with a stem, as in "♩ = 144"):
+// {unit: 'quarter' | 'half' | 'eighth' | '16th'} or null
+function noteGlyph(R, c, sp) {
+  const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1;
+  if (h < 1.6 * sp || h > 4 * sp || w < 0.6 * sp || w > 2.4 * sp) return null;
+  const img = glyphImage(R, c), d = img.data;
+  // the stem: the longest vertical run
+  let sx = -1, best = 0, sy0 = 0;
+  for (let x = 0; x < w; x++) for (let y = 0; y < h;) { if (!d[y * w + x]) { y++; continue; } let e = y; while (e < h && d[e * w + x]) e++; if (e - y > best) { best = e - y; sx = x; sy0 = y; } y = e; }
+  if (best < 0.65 * h || best < 1.4 * sp) return null;
+  // the head at the stem's lower end, left of it (stem up): ink rows there
+  const hh = Math.round(0.95 * sp), y0 = h - hh;
+  let ink = 0, x0 = w, x1 = -1;
+  for (let y = y0; y < h; y++) for (let x = 0; x < w; x++) if (d[y * w + x]) { ink++; if (x < x0) x0 = x; if (x > x1) x1 = x; }
+  const hw = x1 - x0 + 1;
+  if (hw < 0.75 * sp || hw > 1.8 * sp || sx < x0 + 0.4 * sp) return null;
+  // nothing else beside the stem but a flag: no ink left of the stem above the head
+  let left = 0;
+  for (let y = 0; y < y0 - 0.2 * sp; y++) for (let x = 0; x < sx - 1; x++) left += d[y * w + x];
+  if (left > 0.1 * sp * sp) return null;
+  const fill = ink / (hw * hh);
+  let flag = 0;
+  for (let y = 0; y < y0 - 0.3 * sp; y++) for (let x = sx + 2; x < w; x++) flag += d[y * w + x];
+  const flags = flag > 0.25 * sp * sp ? (flag > 0.9 * sp * sp ? 2 : 1) : 0;
+  const unit = fill < 0.55 ? 'half' : flags === 2 ? '16th' : flags ? 'eighth' : 'quarter';
+  return { unit };
+}
+
+// Metronome marks among the letters and the unexplained ink: a note glyph,
+// an augmentation dot, "=" (two short bars) and a number, in brackets or not.
+// Takes the pieces it uses out of letters / rest.
+// [{box, unit, dotted, bpm, numBox}] (bpm 0 when the number did not read)
+function findMetronomes(R, letters, rest, nearest, ss, all) {
+  const out = [];
+  const pool = letters.concat(rest);
+  // the bars of "=" and a dot are thin or small: left out of the leftovers, so looked up in all components
+  const thin = (all || []).filter(d => d.y1 - d.y0 + 1 <= 0.6 * ss);
+  const used = new Set();
+  for (const c of pool) {
+    if (used.has(c)) continue;
+    const n = nearest((c.x0 + c.x1) / 2, (c.y0 + c.y1) / 2);
+    if (!n || n.inside || !n.above) continue;
+    const sp = n.s.sp;
+    const g = noteGlyph(R, c, sp);
+    if (!g) continue;
+    const headY = c.y1 - 0.5 * sp;
+    const near = (d) => !used.has(d) && d !== c;
+    // "=": two short thin bars, one over the other, right of the note
+    const bars = pool.concat(thin).filter(d => near(d) && d.y1 - d.y0 + 1 <= 0.4 * sp && d.x1 - d.x0 + 1 >= 0.35 * sp && d.x1 - d.x0 + 1 <= 1.6 * sp &&
+      d.x0 > c.x1 - 0.2 * sp && d.x0 < c.x1 + 2.5 * sp && Math.abs((d.y0 + d.y1) / 2 - headY) <= 1.2 * sp);
+    let eq = null;
+    for (const a of bars) for (const b of bars) {
+      if (a === b || b.y0 <= a.y1) continue;
+      const gap = (b.y0 + b.y1) / 2 - (a.y0 + a.y1) / 2;
+      if (gap >= 0.2 * sp && gap <= 0.9 * sp && Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0) >= 0.5 * Math.min(a.x1 - a.x0, b.x1 - b.x0)) { eq = [a, b]; break; }
+    }
+    if (!eq) continue;
+    const ex1 = Math.max(eq[0].x1, eq[1].x1), ey = (eq[0].y0 + eq[1].y1) / 2;
+    // a dot between the note and "="
+    const dot = pool.concat(thin).find(d => near(d) && !eq.includes(d) && d.x0 > c.x1 - 0.1 * sp && d.x1 < Math.min(eq[0].x0, eq[1].x0) && d.x1 - d.x0 + 1 <= 0.55 * sp && d.y1 - d.y0 + 1 <= 0.55 * sp && Math.abs((d.y0 + d.y1) / 2 - headY) <= 0.7 * sp);
+    // the number: glyphs in a row right of "=" (brackets left out)
+    const digits = [];
+    let x = ex1;
+    for (;;) {
+      const nx = pool.concat(all || []).filter(d => near(d) && !eq.includes(d) && !digits.includes(d) && d.x0 > x - 0.1 * sp && d.x0 - x <= (digits.length ? 0.6 : 1.6) * sp &&
+        d.y1 - d.y0 + 1 >= 0.6 * sp && d.y1 - d.y0 + 1 <= 2.4 * sp && Math.abs((d.y0 + d.y1) / 2 - ey) <= 1.2 * sp).sort((a, b) => a.x0 - b.x0)[0];
+      if (!nx) break;
+      const nw = nx.x1 - nx.x0 + 1, nh = nx.y1 - nx.y0 + 1;
+      if (nw < 0.4 * nh) { if (digits.length) { used.add(nx); break; } used.add(nx); x = nx.x1; continue; } // a bracket
+      digits.push(nx); x = nx.x1;
+      if (digits.length >= 3) break;
+    }
+    let bpm = digits.length ? +readDigits(R, digits, sp, null, true) || 0 : 0;
+    if (bpm && (bpm < 20 || bpm > 400)) bpm = 0;
+    // a bracket just before the note
+    const pre = pool.find(d => near(d) && d.x1 < c.x0 && c.x0 - d.x1 <= 0.8 * sp && (d.x1 - d.x0 + 1) < 0.45 * (d.y1 - d.y0 + 1) && Math.abs((d.y0 + d.y1) / 2 - headY) <= 1.5 * sp);
+    const parts = [c, ...eq, ...digits, ...(dot ? [dot] : []), ...(pre ? [pre] : [])];
+    parts.forEach(p => used.add(p));
+    const box = [Math.min(...parts.map(p => p.x0)), Math.min(...parts.map(p => p.y0)), Math.max(...parts.map(p => p.x1)), Math.max(...parts.map(p => p.y1))];
+    const numBox = digits.length ? [Math.min(...digits.map(p => p.x0)), Math.min(...digits.map(p => p.y0)), Math.max(...digits.map(p => p.x1)), Math.max(...digits.map(p => p.y1))] : null;
+    out.push({ box, unit: g.unit, dotted: !!dot, bpm, numBox, n });
+  }
+  for (const arr of [letters, rest]) for (let i = arr.length - 1; i >= 0; i--) if (used.has(arr[i])) arr.splice(i, 1);
+  return out;
 }
 
 // ---------------------------------------------------------------- lines of text
@@ -361,6 +449,7 @@ function classifyMarks(fr, asm, left) {
   }
   // dynamics: a run of letters that all read as dynamics letters and spell a
   // dynamic, off the staff (or in a margin between staves)
+  const metros = findMetronomes(R, letters, rest, nearest, ss, asm.comps || []);
   const lines = groupLines(letters.filter(c => !fermataDots.has(c)));
   const textLines = [];
   for (const ln of lines) {
@@ -386,6 +475,15 @@ function classifyMarks(fr, asm, left) {
     const host = textLines.find(l => l !== d && (l.mem.length >= 2 || l.x1 - l.x0 > 2 * ss) && d.x0 >= l.x0 - 2 && d.x1 <= l.x1 + 2 && d.y1 < l.y0 + 0.8 * l.h && d.y1 > l.y0 - 0.9 * l.h);
     if (host) { host.y0 = Math.min(host.y0, d.y0); host.mem.push(...d.mem); textLines.splice(i, 1); }
   }
+  // a tempo word just left of a metronome mark ("Vivace ♩ = 144") is one tempo line with it
+  const tempoItems = metros.map(m => {
+    const sp = m.n.s.sp;
+    const wi = textLines.findIndex(l => l.x1 < m.box[0] + 0.3 * sp && m.box[0] - l.x1 <= 4 * sp && Math.min(l.y1, m.box[3]) - Math.max(l.y0, m.box[1]) > 0.3 * (l.y1 - l.y0));
+    const word = wi >= 0 ? textLines.splice(wi, 1)[0] : null;
+    const box = word ? [Math.min(word.x0, m.box[0]), Math.min(word.y0, m.box[1]), Math.max(word.x1, m.box[2]), Math.max(word.y1, m.box[3])] : m.box;
+    return { box, role: 'tempo', text: '', h: word ? word.h : sp, words: word ? word.words : 0, sys: m.n.sys, k: m.n.k, si: m.n.s.si, x: box[0], comps: word ? word.mem : [],
+      ocrBox: word ? [word.x0, word.y0, word.x1, word.y1] : null, metro: { unit: m.unit, dotted: m.dotted, bpm: m.bpm, numBox: m.numBox } };
+  });
   // roles from where the lines stand
   const header = textLines.filter(l => l.y1 < firstTop - 0.5 * ss && !(l.x1 < L0 - 0.3 * ss));
   const maxH = Math.max(0, ...header.map(l => l.h));
@@ -398,7 +496,7 @@ function classifyMarks(fr, asm, left) {
     const sysTop = sts ? Math.min(...sts.map(s => s.top(s.left))) : 0, sysBot = sts ? Math.max(...sts.map(s => s.bot(s.left))) : 0;
     const sysLeft = sts ? Math.min(...sts.map(s => s.left)) : L0;
     if (sts && l.x1 < sysLeft - 0.2 * sp && cy > sysTop - 1.5 * sp && cy < sysBot + 1.5 * sp) role = sysOf === 0 ? 'instrument' : 'abbrev';
-    else if (l.y1 < 0.06 * H && l.h < 1.6 * ss && l.y1 < firstTop - 3 * ss) role = 'header';
+    else if (l.y1 < 0.06 * H && l.h < 1.6 * ss && l.y1 < firstTop - 7 * ss) role = 'header';
     else if (l.y0 > 0.92 * H && l.y0 > lastBot + 2 * ss) role = 'footer';
     else if (sts && l.y1 <= sysTop + 0.3 * sp && l.y1 >= sysTop - 3.2 * sp && l.x0 <= sysLeft + 2.5 * sp && l.x0 >= sysLeft - 3.5 * sp && l.h <= 1.3 * sp && l.mem.length <= 4 && l.words === 1 &&
       (l.y1 >= firstTop - 3.2 * sp || sysOf > 0)) role = 'measure';
@@ -421,9 +519,10 @@ function classifyMarks(fr, asm, left) {
     const digits = role === 'measure' ? readDigits(R, l.mem, sp) : '';
     out.text.push({ box: [l.x0, l.y0, l.x1, l.y1], role, text: digits, shape: !!digits, h: l.h, words: l.words, sys: sysOf, k: n ? n.k : -1, si: n ? n.s.si : -1, x: l.x0, comps: l.mem });
   }
+  out.text.push(...tempoItems);
   // lyrics: syllables spaced under the notes fall apart into many short
   // lines on one row; a row of three or more among the music is underlay
-  const inMusic = out.text.filter(t => ['expression', 'tempo', 'lyrics', 'text'].includes(t.role) && t.sys >= 0);
+  const inMusic = out.text.filter(t => ['expression', 'tempo', 'lyrics', 'text'].includes(t.role) && t.sys >= 0 && !t.metro);
   for (const t of inMusic) {
     if (t.role === 'lyrics') continue;
     const row = inMusic.filter(u => u.sys === t.sys && Math.min(u.box[3], t.box[3]) - Math.max(u.box[1], t.box[1]) > 0.5 * Math.min(u.box[3] - u.box[1], t.box[3] - t.box[1]));
@@ -522,7 +621,12 @@ function refineRole(t) {
   const s = t.text.trim();
   if (!s) return;
   if (/©|\(c\)|copyright|all rights|public domain|creative commons|cc0|cc-by/i.test(s)) { t.role = 'copyright'; return; }
+  if (t.metro) return;
+  // a tempo word is a tempo mark wherever it stands above the music
+  if (['header', 'lyricist', 'credit', 'composer', 'subtitle'].includes(t.role) && TEMPO_RE.test(s) && s.split(/\s+/).length <= 4) { t.role = 'tempo'; return; }
   if (t.role === 'header' || t.role === 'footer') { if (/^\d{1,3}$/.test(s)) t.role = 'page'; return; }
+  // a lone number above the music is not a name
+  if (['lyricist', 'credit', 'composer', 'subtitle'].includes(t.role) && /^[\d\s.,()=-]+$/.test(s)) { t.role = 'text'; return; }
   if (t.role === 'measure') { if (!/^\d{1,4}$/.test(s.replace(/\s/g, ''))) t.role = 'expression'; return; }
   if (t.role === 'composer' || t.role === 'lyricist' || t.role === 'credit' || t.role === 'subtitle') {
     if (/\barr(\.|anged)?\b|bearb|arrangement/i.test(s)) t.role = 'arranger';
@@ -545,7 +649,7 @@ function refineRole(t) {
 async function readPageText(fr, marks, ocr, opts = {}) {
   if (!ocr || !marks || !fr.gray || !fr.gray.data) return 0;
   const maxLines = opts.maxLines || 16;
-  const order = { title: 0, composer: 1, instrument: 2, abbrev: 3, subtitle: 4, lyricist: 5, arranger: 5, credit: 6, tempo: 7, expression: 8, measure: 9, copyright: 10, footer: 11, header: 12, page: 13, text: 14 };
+  const order = { title: 0, composer: 1, instrument: 2, tempo: 3, measure: 4, abbrev: 5, subtitle: 6, lyricist: 7, arranger: 7, credit: 8, expression: 9, copyright: 10, footer: 11, header: 12, page: 13, text: 14 };
   const todo = marks.text.filter(t => t.role !== 'lyrics').sort((a, b) => (order[a.role] ?? 20) - (order[b.role] ?? 20));
   // only one abbreviation line per staff is needed (they repeat on every system)
   const seenAbbr = new Set();
@@ -553,6 +657,28 @@ async function readPageText(fr, marks, ocr, opts = {}) {
   for (const t of todo) {
     if (n >= maxLines) break;
     if (t.shape) continue;
+    // a metronome mark: OCR reads the tempo word (the note glyph only confuses it),
+    // and the number when its shapes did not read
+    if (t.metro) {
+      if (t.ocrBox) {
+        const wi = lineCrop(fr, t.ocrBox, t.h);
+        let ws = [];
+        try { ws = wi ? await ocr(wi) : []; } catch (e) { ws = []; }
+        n++;
+        const ok = ws.filter(w => w.conf >= 30 && /\p{L}/u.test(w.text));
+        t.text = ok.map(w => w.text).join(' ').replace(/^[^\p{L}]+|[^\p{L}.]+$/gu, '').replace(/\s+/g, ' ').trim();
+        t.conf = ok.length ? Math.round(ok.reduce((a, w) => a + w.conf, 0) / ok.length) : 0;
+      }
+      if (!t.metro.bpm && t.metro.numBox) {
+        const ni = lineCrop(fr, t.metro.numBox, t.metro.numBox[3] - t.metro.numBox[1]);
+        let ws = [];
+        try { ws = ni ? await ocr(ni) : []; } catch (e) { ws = []; }
+        n++;
+        const num = +(ws.map(w => w.text).join('').replace(/[^0-9]/g, '')) || 0;
+        if (num >= 20 && num <= 400) t.metro.bpm = num;
+      }
+      continue;
+    }
     if (t.role === 'abbrev') { const key = t.k; if (seenAbbr.has(key)) continue; seenAbbr.add(key); }
     // the instrument names lyrics.js already read (fr.partLabels)
     if (t.role === 'instrument' && fr.partLabels) {

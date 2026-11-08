@@ -175,7 +175,9 @@ function pageSymbols(fr, asm) {
   const b4 = (b) => b.map(Math.round);
   out.text = marks.text.map(t => {
     const name = ROLE_LABEL[t.role] || 'Text';
-    const label = t.role === 'measure' ? (t.text ? `Bar ${t.text}` : 'Bar number') : t.text ? `${name}: ${t.text}` : name;
+    const mm = t.metro ? `${{ quarter: '♩', eighth: '♪', half: '𝅗𝅥', '16th': '𝅘𝅥𝅯' }[t.metro.unit] || '♩'}${t.metro.dotted ? '.' : ''} = ${t.metro.bpm || '?'}` : '';
+    const body = [t.text, mm].filter(Boolean).join(' ');
+    const label = t.role === 'measure' ? (t.text ? `Bar ${t.text}` : 'Bar ? (number not read)') : body ? `${name}: ${body}` : name;
     return [...b4(t.box), t.role, label];
   });
   out.dyns = marks.dyns.map(d => [...b4(d.box), d.value]);
