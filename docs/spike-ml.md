@@ -27,9 +27,10 @@ Code, data and raw logs are in `spike/ml/`, and every table can be regenerated (
    self-hosted ort-wasm-simd-threaded.wasm> }` (14,239,897 bytes, which fits under 15 MB). This passes an
    artifact-like strict CSP (no `'self'` in script-src). Fallback: **onnxruntime-web 1.18.0 UMD**
    (`ort.wasm.min.js` via `<script src>` or `importScripts` in a blob worker, `wasmPaths = 'assets/'`, self-host
-   `ort-wasm-simd.wasm`, 10.6 MB). It is about 10–20 % slower but uses the simplest loading path.
-   Things that **fail** under that CSP (measured): every ORT ≥ 1.19 UMD build, and an ESM bundle given a *string*
-   `wasmPaths`. Both try to `import()` `ort-wasm-simd-threaded.mjs` from the same origin. A *static*
+   `ort-wasm-simd.wasm`, 10.6 MB). Its warm speed is the same within noise (4.2–4.4 s vs 4.1–4.3 s), it uses the
+   simplest loading path, but it lacks some kernels (for example ConvInteger).
+   Things that **fail** under that CSP (measured): the ORT UMD builds of 1.20.1, 1.22.0 and 1.30.0, and an ESM bundle
+   given a *string* `wasmPaths`. Both try to `import()` `ort-wasm-simd-threaded.mjs` from the same origin. A *static*
    `import … from <CDN>` inside a blob module worker also fails.
 3. **Do not use** homr (AGPL-3.0; at least 75 MB of weights even after quantization; minutes per page in wasm; no
    voice separation, since closed score comes out as chords: voice accuracy 0.46). Do not use oemer (MIT but 109 MB

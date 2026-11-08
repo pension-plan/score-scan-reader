@@ -383,7 +383,9 @@ function headAccidental(R, comps, hd, minX = -Infinity) {
   const near = comps.filter(c => c.x1 <= hd.x - 0.5 * sp && c.x1 >= hd.x - 3.2 * sp && c.x0 > minX &&
     c.y0 < hd.y + 1.6 * sp && c.y1 > hd.y - 2.6 * sp && (c.x1 - c.x0) < 1.6 * sp && (c.y1 - c.y0) < 4 * sp).sort((a, b) => a.x0 - b.x0);
   let best = null, bd = Infinity;
-  for (const g of groupGlyphs(near, sp)) {
+  // single components first; merged groups only add flats cut in two
+  const cands = near.concat(groupGlyphs(near, sp).filter(g => g.parts.length > 1));
+  for (const g of cands) {
     const k = classifyAccidental(R, g, sp);
     if (!k) continue;
     // the sign's own height: a flat's bowl, the middle of a sharp / natural
