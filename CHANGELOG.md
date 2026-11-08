@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.24.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.23.0...score-scan-reader-v0.24.0) (2026-11-08)
+
+
+### Features
+
+* **heads:** split stacks of hollow heads (whole/half-note chords) ([5aa6a21](https://github.com/pension-plan/score-scan-reader/commit/5aa6a21b682fd1b092a2c4e87ca16706f040bb9c))
+
+
+### Bug Fixes
+
+* **heads:** hollow heads on ledger lines read as half/whole notes ([858beb7](https://github.com/pension-plan/score-scan-reader/commit/858beb7baade8a34cf0bf54f16ee8fcbec84ebab))
+* **lyrics:** credits never underlay, tall accented rows kept, elisions written ([40a5631](https://github.com/pension-plan/score-scan-reader/commit/40a5631282a7d4f4094d15e8249c52fcc1b83919))
+
 ## [0.23.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.22.0...score-scan-reader-v0.23.0) (2026-11-08)
 
 
