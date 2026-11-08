@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 17:33 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 17:36 AEDT.
 
 ## Events
 
@@ -58,6 +58,9 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 17:12 | Round 2 symbols owner finished: tuplets read and represented exactly (L3c resolved), key signatures right on every real scan but one (L2 resolved), mid-piece clef and key changes detected, slurs no longer mistaken for beams. Live tree 0.919, real scans 0.902. All five owners done; the round 2 integrator is running. |
 | 17:14 | Release 0.4.0 (17:13 AEDT) regression-tested against 0.3.0: no regression on the benchmark (0.918 → 0.919, real scans 0.900 → 0.902) or the challenge set (0.784, no item worse). |
 | 17:33 | User reported rests are not transcribed. Confirmed: 70 of 256 benchmark rests produced, the rest left as invisible gaps. A dedicated rests hotfix agent started (new src/rests.js: all rest values, multi-bar rests, rests on piano staves, visible rests instead of gaps). |
+| 17:36 | Round 2 integrated (0.925 overall, real scans 0.907) and shipped as v0.5.0 at 17:36 AEDT together with Maple Leaf Rag as the default sample. Regression test against 0.4.0 running. |
+| 17:36 | User asked for synthetic tests covering every symbol and layout plus performance: coverage suite workflow started (8 generators by symbol family and layout, per-symbol support matrix, speed and memory by dpi and page count). |
+| 17:36 | Round 3 started: 6 owners including the copista-2m ML integration, working on 24 tracked limits including the L19 regressions and beamed 16ths. |
 
 ## Accuracy by round
 
@@ -71,6 +74,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | Round 2 (interim) | 0.918 | – | – | 0.911 | – | 1.000 | 0.900 |
 | v0.3.0 released (benchmark, OCR) | 0.918 | 0.891 | 0.851 | 0.911 | 0.992 | 1.000 | 0.900 |
 | v0.4.0 released (benchmark, OCR) | 0.919 | 0.892 | 0.854 | 0.911 | 0.992 | 1.000 | 0.902 |
+| Round 2 integrated = v0.5.0 | 0.925 | 0.906 | 0.863 | 0.912 | 0.993 | 1.000 | 0.907 |
 
 ## Known limits
 
@@ -81,7 +85,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | L3a | Rests not detected | Symbols | Open, hotfix in progress | User reported no rests. Measured: 256 rests in the benchmark answers, 70 in the output; gaps written as invisible <forward> instead of rests; piano staves never searched; only 4 rest shapes recognised. Rests F1 0.436. |
 | L3b | Ties and slurs not detected; a stray slur can create a false 16th | Symbols | Partial (round 2) | Slurs no longer read as beams (Lindenbaum false 16ths 35 → 23); ties not yet detected. |
 | L3c | Triplets and other tuplets not detected | Symbols | Resolved (round 2) | Tuplet numbers read (3, 5, 6, 7, with or without brackets); divisions raised to 840 per quarter so every tuplet duration is exact. Tuplet étude duration +0.31 to +0.39. MusicXML <type> for tuplet notes still to add. |
-| L3d | Mid-piece clef and key changes not detected | Symbols | Partial (round 2) | Mid-piece clef and key changes detected on every staff (all six key changes in the challenge item read correctly); the voices owner must apply them in MusicXML. |
+| L3d | Mid-piece clef and key changes not detected | Symbols | Resolved (round 2) | Clef and key changes detected and written into the MusicXML; per-system keys gated. Clara pitch +0.123; keysig-odyssey +0.12. |
 | L3e | Part names not read from the labels at the start of each system | Lyrics (OCR) + voices (apply) | Resolved (round 2) | Part-name labels read by OCR and parsed against a multilingual lexicon (Sopran, Canto, Pianoforte, Tenor II…); labels also steer the layout. SAB item 4 → 3 parts. |
 | L4a | Lyric alignment drifts when the note count is off | Voices + lyrics | Resolved (round 2) | Each lyric line is assigned to one voice for the whole piece from syllable-to-onset evidence; alignment allows left-aligned melisma syllables and never uses rests. bwv3-6 +0.135, Beach +0.271 lyrics. |
 | L4b | No melisma or extender handling | Lyrics + voices | Resolved (round 2) | Words over several notes split into syllables (lyrics owner); melismas now carry <extend> start/stop bounded by the printed extender line; 189 extenders in the benchmark output, all schema-valid. |
@@ -109,9 +113,11 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | Run 1 | Vector-PDF design | stopped | 0 of 4 | Stopped at 14:56 AEDT when the input was clarified as scanned images. |
 | Run 2 | Scanned-PDF design | stopped | 0 of 4 | Stopped at 14:58 AEDT to restart with more agents in parallel. |
 | Run 4 | Fix-forward round 1 (shipped 0.884) | done | 7 of 7 |  |
-| Run 5 | Challenge test set (edge cases + scan damage) | running | 7 of 7 |  |
+| Run 5 | Challenge test set (edge cases + scan damage) | done | 7 of 7 |  |
 | Run 3 | Max-parallel main workflow (research) | stopped | 7 of 10 | Stopped at 16:30 AEDT once all 7 research items returned, as planned; its 3 design-proposal agents had just started and were stopped with it. The full rebuild was replaced by fix-forward rounds on v1. |
-| Run 6 | Fix-forward round 2 | running | 5 of 6 |  |
+| Run 6 | Fix-forward round 2 (shipped 0.925 as v0.5.0) | done | 6 of 6 |  |
+| Run 7 | Coverage suite (every symbol and layout + speed) | running | 0 of 9 |  |
+| Run 8 | Fix-forward round 3 (6 owners incl. ML) | running | 0 of 6 |  |
 | Side | Agents launched directly from the session | running | 3 of 4 |  |
 
 ## Agents
@@ -157,8 +163,23 @@ Every agent started for this build, including stopped runs. Outcomes are on the 
 | Run 6 | Fix | fix:r2:score | done | 16:21 | 17:00 | 39 | 170 |
 | Run 6 | Fix | fix:r2:lyrics | done | 16:21 | 16:41 | 20 | 109 |
 | Run 6 | Fix | fix:r2:ui | done | 16:21 | 16:45 | 24 | 87 |
-| Run 6 | Integrate | integrate:r2 | run | 17:12 |  | 21 | 86 |
+| Run 6 | Integrate | integrate:r2 | done | 17:12 | 17:34 | 22 | 93 |
+| Run 7 | Harness | harness:coverage | run | 17:34 |  | 2 | 30 |
+| Run 7 | Generate | gen:notes | run | 17:34 |  | 2 | 25 |
+| Run 7 | Generate | gen:rests | run | 17:34 |  | 2 | 29 |
+| Run 7 | Generate | gen:pitch | run | 17:34 |  | 1 | 17 |
+| Run 7 | Generate | gen:time | run | 17:34 |  | 1 | 15 |
+| Run 7 | Generate | gen:marks | run | 17:34 |  | 2 | 22 |
+| Run 7 | Generate | gen:structure | run | 17:34 |  | 2 | 22 |
+| Run 7 | Generate | gen:layouts | run | 17:34 |  | 2 | 24 |
+| Run 7 | Generate | gen:perf | run | 17:34 |  | 2 | 21 |
+| Run 8 | Fix | fix:r3:heads | run | 17:36 |  | 0 | 2 |
+| Run 8 | Fix | fix:r3:symbols | run | 17:36 |  | 0 | 2 |
+| Run 8 | Fix | fix:r3:score | run | 17:36 |  | 0 | 2 |
+| Run 8 | Fix | fix:r3:lyrics | run | 17:36 |  | 0 | 1 |
+| Run 8 | Fix | fix:r3:ui | run | 17:36 |  | 0 | 3 |
+| Run 8 | Fix | fix:r3:ml | run | 17:36 |  | 0 | 1 |
 | Side | ML demo | copista-2m demo page for GitHub Pages | done | 16:38 | 16:41 | 3 | 21 |
 | Side | Fast track | First version build (mvp/) | done | 15:19 | 15:29 | 10 | 69 |
-| Side | Hotfix | Rests fix (L3a, user-reported) | run | 17:33 |  | 0 | 3 |
+| Side | Hotfix | Rests fix (L3a, user-reported) | run | 17:33 |  | 3 | 47 |
 | Side | Fast track | Software design document | done | 15:20 | 15:22 | 2 | 16 |
