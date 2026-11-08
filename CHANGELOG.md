@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.41.1](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.41.0...score-scan-reader-v0.41.1) (2026-11-08)
+
+
+### Bug Fixes
+
+* **parts:** a staff splits into two parts only when two voices sound in most of its bars (divisi, SAB baritone) ([46a361a](https://github.com/pension-plan/score-scan-reader/commit/46a361a5905b2be243ca4f8311cd8113bc69cc3a))
+
 ## [0.41.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.40.0...score-scan-reader-v0.41.0) (2026-11-08)
 
 
