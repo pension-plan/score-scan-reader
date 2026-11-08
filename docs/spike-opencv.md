@@ -17,6 +17,13 @@ Two attempts, both neutral or worse:
   −0.021: real ledger heads on blurred pages also come out wide).
 Not pursued further; the upside-down noisy page (orientation under halftone noise) is the clearest single case left.
 
+Follow-up on that page (`lyr04-veni-latin-italic-en` severe): orientation is not the root cause. Under its diagonal
+halftone the staff finder keeps only 2 of the 6 staves, in every mode (default, raw, blur1, blur2), both as printed and
+turned, and the 2 it keeps run edge to edge with no clef read (clef score 0.00 both ways). The page-quality check plans
+only a flatten (no descreen). A clef-score fallback for the turn test (turn when no clef reads at the staff starts and
+the turned page reads them clearly better) has nothing to compare there, so it was not shipped. What the page needs
+first is a descreen the quality check triggers at this severity, then the turn test as it is.
+
 ## Not shipped: head template scan on degraded staves (time-boxed, one round)
 
 For heads the blob finder misses on degraded pages (faded heads broken into speckle, hollow heads whose thin outline
