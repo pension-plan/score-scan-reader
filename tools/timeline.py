@@ -16,8 +16,15 @@ def block(html, ident):
     return json.loads(m.group(1).replace('<\\/', '</')) if m else {}
 
 
+PAGES = 'https://pension-plan.github.io/score-scan-reader/'
+REWRITE = [('https://claude.ai/artifact/6LdzqJaeeVRkJiRPgn9ozv', PAGES + 'app/'), ('https://claude.ai/artifact/ETew3a3LisBiqZaMWpju7R', PAGES + 'status/')]
+
+
 def cell(s):
-    return str(s if s is not None else '').replace('|', '\\|').replace('\n', ' ')
+    s = str(s if s is not None else '')
+    for a, b in REWRITE:
+        s = s.replace(a, b)
+    return s.replace('|', '\\|').replace('\n', ' ')
 
 
 html = open(PAGE, encoding='utf-8').read()

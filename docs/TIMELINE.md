@@ -17,7 +17,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 15:21 | Research section added: one entry per research item with findings and decisions. |
 | 15:21 | Agent record added: every agent from all runs, generated from the workflow journals, with timings, tool-call counts and full outcomes. |
 | 15:22 | Software design document finished (docs/SDD.md, 14 sections) and added to this page. |
-| 15:30 | First version (v1) finished and published as its own artifact: https://claude.ai/artifact/6LdzqJaeeVRkJiRPgn9ozv. Sample converts in 6–9 s with lyrics; verified in headless Chromium under the artifact CSP. |
+| 15:30 | First version (v1) finished and published as its own artifact: https://pension-plan.github.io/score-scan-reader/app/. Sample converts in 6–9 s with lyrics; verified in headless Chromium under the artifact CSP. |
 | 15:33 | Generic UI mock-up drawn in Excalidraw and added to this page (redrawn with rough.js from the same scene). Three component patterns pulled from 21st.dev (dropzone, stepper, code block) and written to docs/ui-refs/ for the UI builder. |
 | 15:37 | Switched to fail fast, fix forward: the planned full rebuild is dropped. Fix-forward round 1 started on the live v1 (harness, then 5 parallel owners, then integrate and ship). The main workflow keeps running only until its research returns, then stops; its findings feed later rounds. |
 | 15:38 | Known-limits tracker added. Every v1 limit now has an owner; from round 2 the integrator must report each one as resolved, partial or open with evidence. Unassigned limits (tuplets, clef/key changes, part names, page cap, stanza text) added to the round script. |
