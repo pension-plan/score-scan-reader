@@ -1375,8 +1375,34 @@ function keyAlters(fifths) {
 }
 
 // Find an accidental left of a head; returns 'sharp'|'flat'|'natural'|null
+// An accidental joined to other ink (a slur or tie passing over its top, a beam above it): the
+// window left of the head is cut out of the page and its own components tried, with the window's
+// top lowered step by step until the passing stroke is cut away (pieces crossing the whole window
+// are that stroke, not a sign)
+function cutAccidental(R, comps, hd, minX = -Infinity, reach = 1.9) {
+  const sp = hd.sp;
+  // only where a long stroke passes through the sign's place (a slur, tie or beam)
+  const ya = hd.y - 2.6 * sp, yb = hd.y + 1.6 * sp, xa = hd.x - (reach + 0.4) * sp, xb = hd.x - 0.5 * sp;
+  // (thin ink across a wide box, starting left of the sign's place: a curve or a line, not a chord)
+  if (!comps.some(c => c.x1 - c.x0 >= 2.2 * sp && c.x0 < xa && c.x1 > xa + 0.5 * sp && c.y0 < yb && c.y1 > ya && c.x0 > minX &&
+    c.area <= 0.2 * (c.x1 - c.x0 + 1) * (c.y1 - c.y0 + 1))) return null;
+  const x0 = Math.max(0, Math.round(Math.max(minX, hd.x - (reach + 1.2) * sp))), x1 = Math.min(R.width - 1, Math.round(hd.x - 0.45 * sp));
+  if (x1 - x0 < 0.5 * sp) return null;
+  for (const top of [2.6, 2.0, 1.6, 1.25]) {
+    const y0 = Math.max(0, Math.round(hd.y - top * sp)), y1 = Math.min(R.height - 1, Math.round(hd.y + 1.6 * sp));
+    const w = x1 - x0 + 1, h = y1 - y0 + 1, img = { width: w, height: h, data: new Uint8Array(w * h) };
+    for (let y = 0; y < h; y++) img.data.set(R.data.subarray((y + y0) * R.width + x0, (y + y0) * R.width + x0 + w), y * w);
+    // (whole pieces only: none cut by the window's sides or bottom; its top cuts the passing stroke)
+    const cs = labelComponents(img).comps.filter(c => c.area >= 4 && c.x0 > 0 && c.x1 < w - 1 && c.y1 < h - 1 && (c.y0 > 0 || top < 2.0))
+      .map(c => ({ ...c, x0: c.x0 + x0, x1: c.x1 + x0, y0: c.y0 + y0, y1: c.y1 + y0 }));
+    const g = accidentalGlyph(R, cs, hd, minX, reach);
+    if (g) return g;
+  }
+  return null;
+}
+
 function headAccidental(R, comps, hd, minX = -Infinity, reach = 1.9) {
-  const g = accidentalGlyph(R, comps, hd, minX, reach) || fallbackAccidental(R, comps, hd, minX, reach);
+  const g = accidentalGlyph(R, comps, hd, minX, reach) || fallbackAccidental(R, comps, hd, minX, reach) || cutAccidental(R, comps, hd, minX, reach);
   if (g && parenthesised(comps, g, hd)) hd.accParen = true;
   return g ? g.kind : null;
 }
