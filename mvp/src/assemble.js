@@ -218,6 +218,7 @@ function analyseHeader(R, comps, st, limitX, trace) {
       grew = false;
       for (const c of near) {
         if (parts.includes(c) || c.x0 > cb.x1 - 0.1 * sp || c.x1 < cb.x0 + 0.1 * sp || (c.x1 - c.x0) > 3.5 * sp) continue;
+        if (c.y0 < yTop || c.y1 > yBot) continue; // brace, system barline, text lines
         if (c.y0 > cb.y1 + 0.6 * sp || c.y1 < cb.y0 - 0.6 * sp) continue;
         parts.push(c); cb = boxOf(parts); grew = true;
       }
