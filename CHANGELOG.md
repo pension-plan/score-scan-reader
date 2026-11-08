@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.5.0...score-scan-reader-v0.5.1) (2026-11-08)
+
+
+### Bug Fixes
+
+* **rests:** detect rest glyphs in every voice incl. piano (src/rests.js); rests F1 0.445 -&gt; 0.581 ([89f667d](https://github.com/pension-plan/score-scan-reader/commit/89f667d09310313b7fa86c1cb37a1553d44461b6))
+
 ## [0.5.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.4.0...score-scan-reader-v0.5.0) (2026-11-08)
 
 
