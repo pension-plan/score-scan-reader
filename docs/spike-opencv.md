@@ -2,6 +2,29 @@
 
 Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
 
+## Update: pre-clean moved to plain JS; OpenCV.js removed from the app
+
+The five pre-clean repairs (below) were ported to plain JS (separable Gaussian, running max / min,
+elliptical grey closing, area resize, bilinear resize, divide, all with OpenCV's border rules) and compared
+with the OpenCV build on the same pages (`spike/opencv/probe/js-vs-cv.js`, `results/preclean-js-vs-opencv-*.txt`):
+
+| page (plan) | OpenCV ms | JS ms | pixels, mean / max abs difference |
+|---|---:|---:|---|
+| andantino photocopy-thick scan (thin) | 19 | 219 | 0 / 0 |
+| agrace photocopy-thin severe (close) | 10 | 85 | 0 / 0 |
+| andantino blur severe (sharpen) | 194 | 313 | 0.44 / 2 |
+| andantino halftone scan (descreen) | 56 | 153 | 0.03 / 1 |
+| andantino combo severe (flatten) | 200 | 459 | 0.05 / 5 |
+| andantino yellowed severe (flatten) | 133 | 381 | 0.06 / 3 |
+
+End to end the JS port scores the same: challenge 0.8227 (OpenCV) → **0.8228** (JS), 8 of 365 items moved by
+less than 0.015 either way; benchmark with OCR 0.9499 = 0.9499, real scans 0.9295 =. OpenCV is faster per repair
+(by 0.1–0.26 s on a degraded page), but needs a 10.4 MB self-hosted file and ≈1.1 s (browser worker) / 0.17 s (node)
+to load before the first repair, and a patched third-party build. It does not clearly beat plain JS on quality
+or speed for a few degraded pages, so **the app now uses the JS port and no longer ships OpenCV.js** (the
+`assets-src/opencv` folder, the dist asset and its build.js entry are removed; `spike/opencv/tools/patch-noeval.js`
+keeps the CSP patch for the record). Clean pages are still returned untouched (same object).
+
 ## Update: plain-JS header reader (shipped, default on)
 
 `mvp/src/cv.js` `readHeaders(fr, asm)` now runs on every page, called from `omr.js` `analyse()` right after
@@ -24,7 +47,7 @@ A/B (same src, pre-clean on in both arms; `spike/opencv/results/header-*.txt`):
 | challenge (no OCR, 365) | 0.8212 → **0.8227** (pitch +0.0031, duration +0.0029) | 342 → **352** | 63; one drop −0.023 (`andantino-piano-photocopy-thin` severe, meter became right) |
 | benchmark with OCR (20) | 0.9496 → **0.9499**, real scans 0.9295 = | 19 = | 2, both up (`joplin-maple-leaf-piano` +0.001, `schumann-dichterliebe2` +0.005) |
 
-## Update: OpenCV pre-clean for degraded scans (shipped)
+## Update: pre-clean for degraded scans (shipped; first with OpenCV, now plain JS, see above)
 
 Scope extension: OpenCV now runs as a **pre-clean stage before binarisation**, only on pages a cheap
 quality check calls degraded. This supersedes the "do not add OpenCV.js" verdict below for this use; the

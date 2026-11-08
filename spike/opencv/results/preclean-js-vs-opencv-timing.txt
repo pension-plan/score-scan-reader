@@ -1,0 +1,7 @@
+opencv load ms 162
+andantino-piano-photocopy-thick__scan      thin opencv 19 ms  js 219 ms  mean|diff| 0.000 max 0
+agrace-satb-photocopy-thin__scan-severe    close opencv 10 ms  js 85 ms  mean|diff| 0.000 max 0
+andantino-piano-blur__scan-severe          sharpen opencv 194 ms  js 313 ms  mean|diff| 0.438 max 2
+andantino-piano-halftone__scan             descreen opencv 56 ms  js 153 ms  mean|diff| 0.025 max 1
+andantino-piano-combo__scan-severe         flatten opencv 200 ms  js 459 ms  mean|diff| 0.054 max 5
+andantino-piano-yellowed__scan-severe      flatten opencv 133 ms  js 381 ms  mean|diff| 0.063 max 3

@@ -1,0 +1,19 @@
+n 365 aggregate 0.8227 -> 0.8228 (+0.0001) | pitch 0.8993 -> 0.8995 (+0.0002) | duration 0.8664 -> 0.8664 (+0.0000) | rests 0.7713 -> 0.7713 (+0.0000) | parts 0.9351 -> 0.9351 (+0.0000) | lyrics 0.463 -> 0.463 (+0.0000) | xml_valid 1 -> 1 (+0.0000) | crashes 0 -> 0 (+0.0000) | runtime_ms_mean 2316 -> 2340 (+24)
+  by_variant scan           n=123 agg 0.8447 -> 0.8447 (+0.0000)  dur 0.9079->0.9079 pitch 0.9342->0.9343 rests 0.8212->0.8212
+  by_variant scan-mild      n=123 agg 0.8574 -> 0.8574 (+0.0000)  dur 0.9387->0.9387 pitch 0.9511->0.9511 rests 0.8864->0.8864
+  by_variant scan-severe    n=119 agg 0.764 -> 0.7643 (+0.0003)  dur 0.7489->0.749 pitch 0.8097->0.8103 rests 0.6006->0.6006
+  by_category degradation    n=251 agg 0.8672 -> 0.8673 (+0.0001)  dur 0.9201->0.9201 pitch 0.9471->0.9472 rests 0.8572->0.8572
+  by_category layout         n=21 agg 0.7103 -> 0.7103 (+0.0000)  dur 0.6696->0.6696 pitch 0.6789->0.6789 rests 0.3271->0.3271
+  by_category lyrics         n=24 agg 0.7188 -> 0.7194 (+0.0006)  dur 0.8375->0.8382 pitch 0.8968->0.8984 rests 0.6795->0.6795
+  by_category pitch          n=24 agg 0.7017 -> 0.7017 (+0.0000)  dur 0.7474->0.7474 pitch 0.7192->0.7192 rests 0.5697->0.5697
+  by_category rhythm         n=24 agg 0.8141 -> 0.8141 (+0.0000)  dur 0.6965->0.6965 pitch 0.8488->0.8488 rests 0.7403->0.7403
+  by_category voices         n=21 agg 0.6698 -> 0.6698 (+0.0000)  dur 0.7849->0.7849 pitch 0.8152->0.8152 rests 0.5595->0.5595
+items changed: 8/365; first time signature right: off 352/365, on 352/365
+  -0.0081 degradation/agrace-satb-halftone/scan-severe  agg 0.6702500413975824->0.6621670330680977 dur 0.6666666666666666->0.6229508196721312 time 3/4->3/4 (truth 3/4)
+  -0.0021 degradation/andantino-piano-blur/scan-severe  agg 0.9218585858585858->0.9197270235801699 dur 0.6981818181818182->0.6934306569343066 time 4/4->4/4 (truth 4/4)
+  +0.0016 degradation/agrace-satb-combo/scan-severe  agg 0.7504320078546882->0.7520032840722496 dur 0.9484536082474226->0.9517241379310345 time 3/4->3/4 (truth 3/4)
+  +0.0020 degradation/agrace-satb-halftone/scan  agg 0.7367656034578816->0.7387428138858344 dur 0.8441558441558441->0.8441558441558441 time 3/4->3/4 (truth 3/4)
+  +0.0028 degradation/twinkle-piano2p-yellowed/scan-severe  agg 0.9696111929615582->0.9724390140785523 dur 0.8995433789954338->0.9036697247706422 time 4/4->4/4 (truth 4/4)
+  +0.0084 degradation/agrace-satb-blur/scan-severe  agg 0.574040622923348->0.5824408616156603 dur 0.3373493975903614->0.36585365853658536 time 2/4->2/4 (truth 3/4)
+  +0.0090 degradation/twinkle-piano2p-halftone/scan-severe  agg 0.9685579196217494->0.977570093457944 dur 0.8888888888888888->0.9018691588785047 time 4/4->4/4 (truth 4/4)
+  +0.0148 lyrics/lyr04-veni-latin-italic-en/scan-severe  agg 0.40080285459411236->0.41557372122377834 dur 0.13559322033898305->0.15267175572519084 time 3/8->3/8 (truth 4/4)
