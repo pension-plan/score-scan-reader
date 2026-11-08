@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.21.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.20.0...score-scan-reader-v0.21.0) (2026-11-08)
+
+
+### Features
+
+* fermatas written to MusicXML ([35b4034](https://github.com/pension-plan/score-scan-reader/commit/35b4034f2337dc44dec743d67807481b65308485))
+* **notes:** read 32nd and 64th notes (beam stacks past 1.6 spaces, 1680 divisions) ([713fbe7](https://github.com/pension-plan/score-scan-reader/commit/713fbe786ed37abe89c3f7ba0deca56cdcd3bdcd))
+* optional grace notes from narrow detected heads (opts.graceHeads, off) ([0cd2fc0](https://github.com/pension-plan/score-scan-reader/commit/0cd2fc0bb46c6b03e5ef29b88aa5f45e183ce704))
+
 ## [0.20.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.19.0...score-scan-reader-v0.20.0) (2026-11-08)
 
 
