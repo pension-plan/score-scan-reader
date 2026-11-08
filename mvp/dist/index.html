@@ -33,7 +33,7 @@
   --ov-note:#d32f2f; --ov-stem:#757575; --ov-beam:#6d4c41; --ov-rest:#00897b; --ov-clef:#8e24aa; --ov-key:#ef6c00;
   --ov-time:#2e7d32; --ov-bar:#283593; --ov-staff:#546e7a; --ov-acc:#c2185b; --ov-dot:#1e88e5; --ov-tup:#827717;
   --ov-lyric:#00838f; --ov-unknown:rgba(255,222,0,.58); --ov-unknown-edge:#d4b000; --ov-label:#15171b; --ov-label-dur:#4f5761;
-  --ov-mark:var(--ov-acc);
+  --ov-mark:var(--ov-acc); --ov-text:#4527a0; --ov-dyn:#ad1457; --ov-curve:#607d8b;
   /* repair marks (the reader's own): a lime highlighter under a black dashed
      core, unlike every detection colour and the yellow of unrecognised ink */
   --rp-halo:rgba(118,255,3,.55); --rp-ink:#0b0c0e; --rp-badge-ink:#b2ff59;
@@ -204,8 +204,14 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 .ov-labels text{font-family:var(--sans);font-weight:600;fill:var(--ov-label);stroke:var(--paper);stroke-linejoin:round;paint-order:stroke}
 .ov-labels .ld{font-weight:500;font-style:italic;fill:var(--ov-label-dur)}
 .ov-labels .lr{fill:var(--ov-rest)} .ov-labels .lb{fill:var(--ov-bar)}
+/* text, dynamics and curves read off the page: tinted boxes, text and dynamics labelled above */
+.ov-text{stroke:var(--ov-text);fill:var(--ov-text)} .ov-dyns{stroke:var(--ov-dyn);fill:var(--ov-dyn)} .ov-curves{stroke:var(--ov-curve);fill:none}
+.ov-text rect,.ov-dyns rect{fill-opacity:.12;mix-blend-mode:multiply}
+.ov-text text,.ov-dyns text{font-family:var(--sans);font-weight:600;stroke:var(--paper);stroke-width:3px;stroke-linejoin:round;paint-order:stroke}
+.ov-dyns text{font-style:italic}
 .pages.hide-notes .ov-notes,.pages.hide-rests .ov-rests,.pages.hide-clefs .ov-clefs,.pages.hide-keys .ov-keys,.pages.hide-times .ov-times,
 .pages.hide-bars .ov-bars,.pages.hide-marks .ov-marks,.pages.hide-lyrics .ov-lyrics,.pages.hide-labels .ov-labels,.pages.hide-unknown .ov-unknown,
+.pages.hide-text .ov-text,.pages.hide-dyns .ov-dyns,.pages.hide-curves .ov-curves,
 .pages.lbl-small .ov-labels{display:none}
 .pages{overflow-x:auto}
 .pages>.pageframe{flex:none;width:calc(100% * var(--zoom, 1))}
@@ -225,6 +231,7 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 .ovk-lyrics{stroke:var(--ov-lyric)} .ovk-labels{color:var(--ov-label)}
 .ovk-notes,.ovk-rests,.ovk-clefs,.ovk-keys,.ovk-times,.ovk-acc,.ovk-dot,.ovk-tup{fill-opacity:.3}
 .ovk-unknown{stroke:var(--ov-unknown-edge);fill:var(--ov-unknown)}
+.ovk-text{color:var(--ov-text)} .ovk-dyns{color:var(--ov-dyn);stroke:var(--ov-dyn)} .ovk-curves{stroke:var(--ov-curve)}
 /* repair markup: the layer takes the pointer (and stops touch scrolling) only while drawing */
 .head-tools{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:4px 14px}
 .toggle:disabled{opacity:.45;cursor:not-allowed}
@@ -2883,121 +2890,187 @@ defs["dynglyphs"]=function(require,module,exports){
 // (do not edit by hand): [text, width, height (staff spaces), grid rows].
 module.exports = [
   ["f", 2.18, 2.62, [
-    '........##.',
-    '......#####',
-    '......##.##',
-    '.....###...',
-    '...######..',
-    '.....##....',
-    '....###....',
-    '....##.....',
-    '....##.....',
-    '...###.....',
-    '##.##......',
-    '##.##......',
-    '###........',
+    '.............####.',
+    '............######',
+    '..........####..##',
+    '..........###..###',
+    '.........####..##.',
+    '........#####.....',
+    '......########....',
+    '.....#########....',
+    '.......#####......',
+    '.......#####......',
+    '.......####.......',
+    '.......####.......',
+    '......#####.......',
+    '......#####.......',
+    '......####........',
+    '.....#####........',
+    '.....####.........',
+    '.##..####.........',
+    '###..###..........',
+    '###.###...........',
+    '##.####...........',
+    '.####.............',
   ]],
   ["p", 1.96, 1.82, [
-    '....#..##.',
-    '...#######',
-    '..#.##..##',
-    '....##..##',
-    '...###.###',
-    '...######.',
-    '...##.....',
-    '..###.....',
-    '#####.....',
+    '.......#....##..',
+    '.....####.#####.',
+    '....##.####..###',
+    '....#..####..###',
+    '...##..###...###',
+    '...#..####...###',
+    '.....####...####',
+    '.....####...###.',
+    '.....#####.####.',
+    '.....#########..',
+    '....####..###...',
+    '....####........',
+    '....####........',
+    '...####.........',
+    '#########.......',
   ]],
   ["m", 2.04, 1.24, [
-    '..#######.',
-    '.########.',
-    '.###.####.',
-    '..####.##.',
-    '..#.##.###',
-    '.##.#..##.',
+    '....###.###.###..',
+    '...#############.',
+    '..#####.########.',
+    '.##.###.###..###.',
+    '.#..###.###.####.',
+    '#..###..###.###..',
+    '...###.###..###..',
+    '...###.###..###.#',
+    '..###..###..####.',
+    '..##...##...###..',
   ]],
   ["s", 0.87, 1.16, [
-    '..##',
-    '.#.#',
-    '.##.',
-    '..##',
-    '#..#',
-    '###.',
+    '....##.',
+    '..###.#',
+    '..##.##',
+    '..##..#',
+    '..####.',
+    '...####',
+    '.#...##',
+    '.##..##',
+    '##...#.',
+    '.#####.',
   ]],
   ["z", 1.16, 1.24, [
-    '..##..',
-    '.####.',
-    '...#..',
-    '..#..#',
-    '.#####',
-    '..###.',
+    '...##.....',
+    '..########',
+    '.########.',
+    '......#...',
+    '.....#....',
+    '....#....#',
+    '...#.....#',
+    '..########',
+    '##########',
+    '.....####.',
   ]],
   ["ff", 3.27, 2.62, [
-    '........##...###',
-    '.......#.##.##.#',
-    '......##.####.##',
-    '.....###..###...',
-    '...###########..',
-    '....###...###...',
-    '....###...##....',
-    '....###..###....',
-    '....##...###....',
-    '...###...##.....',
-    '.#.##.#..##.....',
-    '##.#..#.##......',
-    '.##...###.......',
+    '.............####......###.',
+    '............######...######',
+    '...........###..##..###..##',
+    '..........####.###.####.###',
+    '.........####..########.###',
+    '........#####.....####.....',
+    '......########..#######....',
+    '......##################...',
+    '........####.....####......',
+    '.......#####.....####......',
+    '.......####.....#####......',
+    '.......####.....####.......',
+    '.......####.....####.......',
+    '.......####.....####.......',
+    '......####.....#####.......',
+    '......####.....####........',
+    '.....####......###.........',
+    '.##..####..#..####.........',
+    '###..###..###.###..........',
+    '###..###..##..###..........',
+    '###.###...##.###...........',
+    '.####......###.............',
   ]],
   ["fff", 4.44, 2.62, [
-    '........##...###...##.',
-    '......##.##.##.#.#####',
-    '.....###.#####.####.##',
-    '.....###..###...###...',
-    '...#################..',
-    '....###...###...##....',
-    '....###...##...###....',
-    '....##....##...###....',
-    '...###...###...##.....',
-    '...###...##....##.....',
-    '##.##.#..##.#.##......',
-    '##.#..#..#.##.##......',
-    '###...###...###.......',
+    '.............####......####.....####.',
+    '...........#######...######....######',
+    '..........####..##..####..##.####..##',
+    '..........###..###.####..###.###..###',
+    '.........####..###.####..#######..##.',
+    '.........####.....####.....#####.....',
+    '.......######...#######..########....',
+    '.....############################....',
+    '.......#####.....#####....#####......',
+    '.......#####.....####.....#####......',
+    '.......####.....#####.....####.......',
+    '.......####.....#####.....####.......',
+    '......#####.....#####....#####.......',
+    '......####......####.....#####.......',
+    '......####......####.....####........',
+    '......####.....####.....#####........',
+    '......###......####.....####.........',
+    '.##..####..#...###..##..####.........',
+    '####.###..###..###.###..###..........',
+    '###.###...###.###..###.###...........',
+    '##..##....##.###...##.####...........',
+    '.####......####.....####.............',
   ]],
   ["pp", 3.42, 1.82, [
-    '...##..##..#..##.',
-    '...##############',
-    '..#.##..##.###.##',
-    '...###.###.##..##',
-    '...###.######.###',
-    '...######.######.',
-    '..###.....##.....',
-    '..##.....###.....',
-    '#####..#####.....',
+    '......##....##....##....##..',
+    '.....####.######.####.#####.',
+    '....##.####..#####.####..###',
+    '....#..####..####..####..###',
+    '...##.####...####.####...###',
+    '...#..###...#####.###...####',
+    '.....####...####.####...####',
+    '.....####...####.####...###.',
+    '.....####..###...####..###..',
+    '....##########..##########..',
+    '....####.###....####.###....',
+    '....####........####........',
+    '....###.........###.........',
+    '...####........####.........',
+    '#########...#########.......',
   ]],
   ["ppp", 4.95, 1.75, [
-    '...###.##..##.###.##..##.',
-    '..#####.######.#######.##',
-    '..#.##..##.###.###.##..##',
-    '....##..##.##..##..##..##',
-    '...###.###.##..##.##..###',
-    '...######.######..######.',
-    '...##.....##......##.#...',
-    '..###.....##.....##......',
-    '.####...####....####.....',
+    '......###...###...###...###...###...###..',
+    '.....###########.###########.###########.',
+    '....##.####..#####.####..###########.####',
+    '....#..####..####..####..#####.####..####',
+    '...##.####...####.####...####..###...####',
+    '...#..####...####.####...####.####...####',
+    '......####..####..####..####..####...####',
+    '......####..####..####..####..####..####.',
+    '.....####..####..####..####...####..####.',
+    '.....#########...#########...##########..',
+    '....####..##....####..##.....###..###....',
+    '....####........####........####.........',
+    '....###.........###.........####.........',
+    '....###.........###.........####.........',
+    '#########....########....########........',
   ]],
   ["fp", 3.13, 2.62, [
-    '........###.....',
-    '.......##.#.....',
-    '......##.##.....',
-    '.....###........',
-    '...############.',
-    '.....##.#.###.##',
-    '....###.#.##..##',
-    '....###..###.###',
-    '....##...##..##.',
-    '....##...#####..',
-    '##.##...###.....',
-    '##.##...##......',
-    '####..#...#.....',
+    '..............###.........',
+    '............######........',
+    '...........###..###.......',
+    '..........###..####.......',
+    '.........####..###........',
+    '.........####.............',
+    '........#####...##....#...',
+    '......#############.#####.',
+    '.......#####..#######.####',
+    '.......#####.##.####..####',
+    '.......####..#..###...####',
+    '.......####.##.####...####',
+    '.......####....####...####',
+    '......#####....####..####.',
+    '......####.....####..####.',
+    '......####....##########..',
+    '......####....###..###....',
+    '.##...###....####.........',
+    '####.###.....####.........',
+    '####.###.....####.........',
+    '###.###...########........',
+    '.#####....#......#........',
   ]],
 ];
 
@@ -6137,6 +6210,8 @@ defs["omr"]=function(require,module,exports){
 const { front } = require('./front');
 const { assemblePage } = require('./assemble');
 const { readLyrics } = require('./lyrics');
+const { readPageText } = require('./text');
+const { pageMarks } = require('./symbols');
 const { buildScore } = require('./score');
 const { makeGray } = require('./image');
 
@@ -6225,6 +6300,9 @@ function createConverter(opts = {}) {
       const lyr = await readLyrics(entry.fr, opts.ocr, (d, m) => progress(`${label}: reading lyrics (${d}/${m} lines)`, { stage: 'lyrics', page: i, pages: n }));
       for (const k in lyr) lyricsBySystem[entry.index + ':' + k] = lyr[k];
     } catch (e) { warnings.push(`Lyrics OCR failed: ${e.message}`); }
+    // titles, credits, instrument names, tempo and expression text
+    progress(`${label}: reading titles and text`, { stage: 'lyrics', page: i, pages: n });
+    try { await readPageText(entry.fr, pageMarks(entry.fr, entry.asm), opts.ocr); } catch (e) { warnings.push(`Text OCR failed: ${e.message}`); }
   }
 
   return {
@@ -6748,6 +6826,7 @@ defs["score"]=function(require,module,exports){
 // signature inference, per-measure rhythm repair, lyrics alignment, MusicXML.
 const { staffMeasureEvents, pitchOf, keyAlters, DIV } = require('./assemble');
 const { detectRests, mergeRests, restBars } = require('./rests');
+const { pageMarks } = require('./symbols');
 
 const COLORS = ['#d1495b', '#edae49', '#00798c', '#30638e', '#7b5ea7', '#3a7d44'];
 
@@ -7718,7 +7797,12 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   }
   if (credits.length) warnings.push(`${credits.length} stanza${credits.length > 1 ? 's' : ''} printed below the music kept as text in the file (not set under notes).`);
   const unitSys = units.map(u => u.m.sy);
-  const xml = toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, measures, credits, unitSys });
+  // text and marks read on the page (symbols.js pageMarks -> text.js): title
+  // and credits, part abbreviations, dynamics, hairpins, tempo and expression text
+  let read = { dirs: parts.map(() => units.map(() => [])), head: {}, nDyn: 0, nWedge: 0, nWords: 0 };
+  try { read = readMarks(pages, segs, units, parts, partMeasures); } catch (e) { warnings.push(`Text and dynamics not placed (${e.message}).`); }
+  if (read.nDyn || read.nWedge || read.nWords) warnings.push(`Read from the page: ${[read.nDyn && `${read.nDyn} dynamic${read.nDyn > 1 ? 's' : ''}`, read.nWedge && `${read.nWedge} hairpin${read.nWedge > 1 ? 's' : ''}`, read.nWords && `${read.nWords} tempo / expression text${read.nWords > 1 ? 's' : ''}`].filter(Boolean).join(', ')}.`);
+  const xml = toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, measures, credits, unitSys, title: read.head.title, head: read.head, dirs: read.dirs });
   const nNotes = partMeasures.map(pm => pm.reduce((a, m) => a + m.reduce((b, s) => b + s.events.filter(e => !e.rest && !e.forward).length, 0), 0));
   const ranges = partMeasures.map(pm => {
     let lo = null, hi = null;
@@ -7750,7 +7834,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     }
   });
   // UI compares clefs with 'F'; 'G8' stays a treble clef there
-  return { parts, layout, fifths, time, timeRead, clefs, ranges, measures: units.length, nNotes, credits, warnings: warnings.concat(layout.notes), xml, measureMap };
+  return { parts, layout, fifths, time, timeRead, clefs, ranges, measures: units.length, nNotes, credits, title: read.head.title || null, composer: read.head.composer || null, warnings: warnings.concat(layout.notes), xml, measureMap };
 }
 
 // Horizontal extent of a syllable: lyrics.js may report x0/x1; otherwise it is
@@ -7885,7 +7969,123 @@ function clefXML(c, n) {
   return `<clef${num}><sign>G</sign><line>2</line></clef>`;
 }
 
-function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, credits, unitSys }) {
+// ------------------------------------------------------------ text and marks
+const DYN_XML = new Set(['p', 'pp', 'ppp', 'pppp', 'f', 'ff', 'fff', 'ffff', 'mp', 'mf', 'sf', 'sfp', 'sfpp', 'fp', 'rf', 'rfz', 'sfz', 'sffz', 'fz', 'n', 'pf', 'sfzp']);
+// Marks read on each page (symbols.js pageMarks) placed in the score:
+//  head: title, subtitle, composer, lyricist, arranger, rights (first page);
+//  part abbreviations (p.abbrev) from the names left of later systems;
+//  dirs[pi][mi]: [{t, staffNo, placement, xml}] per part and written measure,
+//  t the onset in quarters of the note the mark stands at (nearest by x).
+// a part abbreviation as read ("Pno.", "S.", "Vc."): short, letters, and
+// starting as the part's name does; else null
+function abbrevOf(text, name) {
+  const ab = String(text || '').replace(/[^\p{L}\p{N}. ]/gu, '').replace(/\s+/g, ' ').trim();
+  if (!ab || ab.length > 10 || !/^\p{L}/u.test(ab) || /\d/.test(ab)) return null;
+  // its letters in order within the name ("Pno." in Piano, "Vc." in Violoncello)
+  const a = ab.toLowerCase().replace(/[^\p{L}]/gu, ''), n = String(name || '').toLowerCase();
+  if (!a || a[0] !== n[0]) return null;
+  let i = 0;
+  for (const ch of n) if (ch === a[i]) i++;
+  return i === a.length ? ab : null;
+}
+// tempo / expression text worth writing: known terms, or confident words
+const TERMS = /^(tempo|a tempo|allegr|andant|adagi|larg|lent|prest|vivac|modera|grave|maestos|marcia|rubato|cresc|decresc|dim|rit|rall|accel|poco|più|piu|meno|molto|sempre|subito|dolce|espr|legato|leggiero|stacc|sost|smorz|morendo|cantabile|con |senza|simile|pizz|arco|fine|d\.\s?c|d\.\s?s|da capo|dal segno|to coda|not |slow|fast|lively|moderately|brightly|gently|with |langsam|schnell|mässig|ruhig|bewegt|lebhaft|sehr |nicht |innig|zart)/i;
+function wordsOk(t) {
+  const s = t.text.trim();
+  if (TERMS.test(s)) return true;
+  const ws = s.split(/\s+/);
+  return (t.conf || 0) >= 80 && ws.length >= 2 && ws.every(w => /^\p{L}{2,}[.,]?$/u.test(w));
+}
+
+function readMarks(pages, segs, units, parts, partMeasures) {
+  const dirs = parts.map(() => units.map(() => []));
+  const head = {};
+  let nDyn = 0, nWedge = 0, nWords = 0;
+  const unitsOfSeg = new Map();
+  units.forEach((u, mi) => u.m.segs.forEach(si => { if (!unitsOfSeg.has(si)) unitsOfSeg.set(si, []); unitsOfSeg.get(si).push(mi); }));
+  // parts reading staff k of a system, with the staff number inside the part
+  const partsOn = (k) => parts.map((p, pi) => ({ pi, n: p.src.findIndex(s => s.staff === k) })).filter(a => a.n >= 0).map(a => ({ pi: a.pi, staffNo: a.n + 1, multi: parts[a.pi].src.length > 1 }));
+  // (unit, onset) of the note nearest x on staff k of a page system
+  const locate = (fr, sysIndex, k, x, pi) => {
+    const ss = segs.map((sg, si) => ({ sg, si })).filter(({ sg }) => sg.sy.fr === fr && sg.sy.index === sysIndex);
+    if (!ss.length) return null;
+    let cand = ss.filter(({ sg }) => x >= sg.xa && x < sg.xb);
+    if (!cand.length) cand = [ss.reduce((a, b) => (Math.min(Math.abs(x - a.sg.xa), Math.abs(x - a.sg.xb)) <= Math.min(Math.abs(x - b.sg.xa), Math.abs(x - b.sg.xb)) ? a : b))];
+    let best = null;
+    for (const { si } of cand) for (const mi of unitsOfSeg.get(si) || []) {
+      const streams = (partMeasures[pi] && partMeasures[pi][mi]) || [];
+      for (const st of streams) {
+        if (!st || st.staff !== k) continue;
+        let t = 0;
+        for (const e of st.events) {
+          if (e.x != null && !e.forward) { const d = Math.abs(e.x - x); if (!best || d < best.d) best = { mi, t, d }; }
+          t += e.q;
+        }
+      }
+      if (!best) best = { mi, t: 0, d: Infinity };
+    }
+    return best;
+  };
+  const seenFr = new Set();
+  for (const pg of pages) {
+    const fr = pg.fr;
+    if (!fr || seenFr.has(fr) || !pg.asm) continue;
+    seenFr.add(fr);
+    const marks = pageMarks(fr, pg.asm);
+    if (!marks) continue;
+    const sysIdx = (k) => (pg.asm.systems[k] ? pg.asm.systems[k].index : -1);
+    const place = (m, x, entry) => {
+      if (m.sys < 0 || m.k < 0) return;
+      const st = pg.asm.systems[m.sys] && pg.asm.systems[m.sys].staves[m.k];
+      const placement = st && (m.box[1] + m.box[3]) / 2 < st.st.yAt(0, x) ? 'above' : 'below';
+      for (const { pi, staffNo, multi } of partsOn(m.k)) {
+        const at = locate(fr, sysIdx(m.sys), m.k, x, pi);
+        if (!at) continue;
+        const list = dirs[pi][at.mi];
+        const xml = entry(placement);
+        if (list.some(d => d.xml === xml && Math.abs(d.t - at.t) < 1e-6)) continue;
+        list.push({ t: at.t, staffNo: multi ? staffNo : 0, xml });
+      }
+      return true;
+    };
+    for (const d of marks.dyns) {
+      const tag = DYN_XML.has(d.value) ? `<${d.value}/>` : `<other-dynamics>${esc(d.value)}</other-dynamics>`;
+      if (place(d, d.x, (pl) => `<direction placement="${pl}"><direction-type><dynamics>${tag}</dynamics></direction-type>`)) nDyn++;
+    }
+    for (const w of marks.wedges) {
+      const ok = place(w, w.box[0] + 0.1 * (w.box[2] - w.box[0]), (pl) => `<direction placement="${pl}"><direction-type><wedge type="${w.type}" number="1"/></direction-type>`);
+      if (ok) { place(w, w.box[2], (pl) => `<direction placement="${pl}"><direction-type><wedge type="stop" number="1"/></direction-type>`); nWedge++; }
+    }
+    for (const t of marks.text) {
+      if (!t.text) continue;
+      if ((t.role === 'tempo' || t.role === 'expression') && t.sys >= 0) {
+        if (!wordsOk(t)) continue;
+        const bold = t.role === 'tempo' ? ' font-weight="bold"' : '';
+        if (place(t, t.box[0], (pl) => `<direction placement="${pl}"><direction-type><words${bold}>${esc(t.text)}</words></direction-type>`)) nWords++;
+      } else if ((pg.index || 0) < 1 && ['title', 'subtitle', 'composer', 'lyricist', 'arranger', 'copyright'].includes(t.role)) {
+        // a credit is words: OCR of a smudge or a stray glyph is not
+        const key = t.role === 'copyright' ? 'rights' : t.role;
+        if (!head[key] && (t.text.match(/\p{L}/gu) || []).length >= 3 && (t.conf || 0) >= 50) head[key] = t.text;
+      } else if (t.role === 'abbrev' && t.sys > 0 && t.k >= 0) {
+        // the abbreviation of the part(s) whose first staff it faces
+        for (const { pi, staffNo } of partsOn(t.k)) if (staffNo === 1 && !parts[pi].abbrev) parts[pi].abbrev = abbrevOf(t.text, parts[pi].name);
+      }
+    }
+  }
+  // a keyboard part's name is printed between its staves: the abbreviation
+  // stands on the staff nearest to it, which may be the lower one
+  for (const p of parts) if (!p.abbrev && p.src.length > 1) {
+    for (const pg of pages) {
+      const m = pg.fr && pg.fr._marks && pg.fr._marks.marks;
+      const t = m && m.text.find(t => t.role === 'abbrev' && t.text && p.src.some(s => s.staff === t.k));
+      if (t && abbrevOf(t.text, p.name)) { p.abbrev = abbrevOf(t.text, p.name); break; }
+    }
+  }
+  for (const pm of dirs) for (const l of pm) l.sort((a, b) => a.t - b.t);
+  return { dirs, head, nDyn, nWedge, nWords };
+}
+
+function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, credits, unitSys, head, dirs }) {
   // each system's own clef where it was read (a staff can change clef from
   // one system to the next), else the clef most systems show. A clef read on
   // one system only is more often a misread (or a header clef cancelled at
@@ -7994,8 +8194,14 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
   L.push('<?xml version="1.0" encoding="UTF-8" standalone="no"?>');
   L.push('<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">');
   L.push('<score-partwise version="4.0">');
+  head = head || {};
   L.push(`  <work><work-title>${esc(title || 'Scanned score')}</work-title></work>`);
-  L.push('  <identification><encoding><software>Score Scan Reader (classical OMR, browser)</software></encoding></identification>');
+  const creators = ['composer', 'lyricist', 'arranger'].filter(k => head[k]).map(k => `<creator type="${k}">${esc(head[k])}</creator>`).join('');
+  L.push(`  <identification>${creators}${head.rights ? `<rights>${esc(head.rights)}</rights>` : ''}<encoding><software>Score Scan Reader (classical OMR, browser)</software></encoding></identification>`);
+  // title and credits as printed on the first page
+  for (const k of ['title', 'subtitle', 'composer', 'lyricist', 'arranger', 'rights']) {
+    if (head[k]) L.push(`  <credit page="1"><credit-type>${k}</credit-type><credit-words>${esc(head[k])}</credit-words></credit>`);
+  }
   for (const c of credits || []) {
     L.push(`  <credit page="${c.page}"><credit-type>lyrics</credit-type>${c.label ? `<credit-words>${esc(c.label)} </credit-words>` : ''}<credit-words>${esc(c.text)}</credit-words></credit>`);
   }
@@ -8006,7 +8212,7 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
     parts.some(p => p.kind === 'vocal' && (p.src[0].voice === 1 || p.src[0].voice === 2));
   parts.forEach((p, i) => {
     if (groupChoir && i === vocalIdx[0]) L.push('    <part-group type="start" number="1"><group-name>Choir</group-name><group-symbol>bracket</group-symbol><group-barline>no</group-barline></part-group>');
-    L.push(`    <score-part id="${p.id}"><part-name>${esc(p.name)}</part-name></score-part>`);
+    L.push(`    <score-part id="${p.id}"><part-name>${esc(p.name)}</part-name>${p.abbrev ? `<part-abbreviation>${esc(p.abbrev)}</part-abbreviation>` : ''}</score-part>`);
     if (groupChoir && i === vocalIdx[vocalIdx.length - 1]) L.push('    <part-group type="stop" number="1"/>');
   });
   L.push('  </part-list>');
@@ -8046,16 +8252,26 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
       const order = streams.map((_, k) => k).filter(k => streams[k] && !(ps[k] && ps[k].optional && !streams[k].events.length))
         .sort((a, b) => (ps[a].staffNo - ps[b].staffNo) || (ps[a].vno - ps[b].vno));
       let pos = 0;
-      order.forEach((k) => {
+      // directions (dynamics, hairpins, words) go with the first voice written,
+      // before the note they stand at (an offset when they fall inside it)
+      const pend = ((dirs && dirs[pi] && dirs[pi][mi]) || []).slice();
+      const dirXML = (d, off) => `      ${d.xml}${off ? `<offset>${off}</offset>` : ''}${d.staffNo ? `<staff>${d.staffNo}</staff>` : ''}</direction>`;
+      order.forEach((k, oi) => {
         const s = streams[k], si = ps[k].staffNo - 1;
         if (pos > 0) L.push(`      <backup><duration>${pos}</duration></backup>`);
         pos = s.events.reduce((a, e) => a + Math.max(1, Math.round(e.q * DIV)), 0);
+        let dt = 0;
+        const flush = oi === 0 ? (e) => {
+          while (pend.length && pend[0].t < dt + e.q - 1e-6) { const d = pend.shift(); L.push(dirXML(d, Math.max(0, Math.round((d.t - dt) * DIV)))); }
+          dt += e.q;
+        } : null;
         const clef = clefAt(mi, s.staff);
         const line = accLine.get(mi + ':' + s.staff) || [];
         let et = 0;
         const voice = ps[k].vno;
         const staffTag = multi ? `<staff>${si + 1}</staff>` : '';
         for (const e of s.events) {
+          if (flush) flush(e);
           const t0 = et;
           et += e.q;
           const dur = Math.max(1, Math.round(e.q * DIV));
@@ -8108,6 +8324,11 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
           });
         }
       });
+      // marks past the first voice's last note (or a bar with no voice written)
+      if (pend.length) {
+        const cur = order.length ? pos / DIV : 0;
+        for (const d of pend) L.push(dirXML(d, Math.round((d.t - cur) * DIV)));
+      }
       if (mi === partMeasures[pi].length - 1) L.push('      <barline location="right"><bar-style>light-heavy</bar-style></barline>');
       L.push('    </measure>');
     });
@@ -8968,14 +9189,14 @@ function pageMarks(fr, asm) {
   if (fr._marks && fr._marks.asm === asm) return fr._marks.marks;
   const { out, left } = explain(fr, asm);
   let marks;
-  try { marks = classifyMarks(fr, asm, left); } catch (e) { marks = { text: [], dyns: [], wedges: [], slurs: [], braces: [], ledgers: [], rest: left }; }
+  try { marks = classifyMarks(fr, asm, left); } catch (e) { marks = { text: [], dyns: [], wedges: [], slurs: [], fermatas: [], braces: [], ledgers: [], rest: left }; }
   Object.defineProperty(marks, 'sym', { value: out, enumerable: false, configurable: true });
   Object.defineProperty(fr, '_marks', { value: { asm, marks }, enumerable: false, configurable: true, writable: true });
   return marks;
 }
 
 // Overlay layers. Beyond the note symbols: text [box, role, label],
-// dyns [box, value], wedges [box, type], slurs [box], braces [box, kind],
+// dyns [box, value], wedges [box, type], slurs [box], fermatas [box], braces [box, kind],
 // ledgers [box]; unknown is the ink none of these explain.
 function pageSymbols(fr, asm) {
   const marks = pageMarks(fr, asm);
@@ -8990,6 +9211,7 @@ function pageSymbols(fr, asm) {
   out.dyns = marks.dyns.map(d => [...b4(d.box), d.value]);
   out.wedges = marks.wedges.map(w => [...b4(w.box), w.type === 'crescendo' ? 'cresc.' : 'dim.']);
   out.slurs = marks.slurs.map(s => b4(s.box));
+  out.fermatas = marks.fermatas.map(s => b4(s.box));
   out.braces = marks.braces.map(s => [...b4(s.box), s.kind]);
   out.ledgers = marks.ledgers.map(s => b4(s.box));
   out.unknown = marks.rest.map(c => [c.x0, c.y0, c.x1, c.y1]);
@@ -9041,8 +9263,8 @@ function gridOf(img, gh, GW) {
   return g;
 }
 
-// tolerant overlap (Dice) of a glyph grid with a template: ink within one
-// cell of template ink counts
+// overlap (Dice) of a glyph grid with a template; ink one cell off counts
+// a little (NEAR)
 function matchGrid(g, t) {
   const gh = t.gh, GW = t.gw;
   let inter = 0, sa = 0, sb = 0;
@@ -9058,11 +9280,14 @@ function matchGrid(g, t) {
       if (xx < 0 || yy < 0 || xx >= GW || yy >= gh) continue;
       near = v ? t.cells[yy * GW + xx] === 1 : g[yy * GW + xx] >= 0.35;
     }
-    if (near) inter += 0.5;
+    if (near) inter += NEAR;
   }
   return sa + sb ? (2 * inter) / (sa + sb) : 0;
 }
 
+// a near miss (ink one cell off) counts this much: enough for print and
+// scan noise, too little for a text letter of the same size to pass
+const NEAR = 0.15;
 let TPL = null;
 function templates() {
   if (TPL) return TPL;
@@ -9184,7 +9409,7 @@ const ROLE_LABEL = {
 // Sort leftover components (symbols.js) into marks.
 // left: [{x0,y0,x1,y1,area}], fr / asm as front() and assemblePage() left them.
 function classifyMarks(fr, asm, left) {
-  const out = { text: [], dyns: [], wedges: [], slurs: [], braces: [], ledgers: [], rest: [] };
+  const out = { text: [], dyns: [], wedges: [], slurs: [], fermatas: [], braces: [], ledgers: [], rest: [] };
   const R = fr.R, ss = fr.ss, W = fr.gray.width, H = fr.gray.height;
   const systems = (asm && asm.systems) || [];
   if (!R || !systems.length) { out.rest = left.slice(); return out; }
@@ -9197,14 +9422,21 @@ function classifyMarks(fr, asm, left) {
   const firstTop = Math.min(...stv[0].map(s => s.top(s.left)));
   const lastSys = stv[stv.length - 1];
   const lastBot = Math.max(...lastSys.map(s => s.bot(s.left)));
-  // the staff nearest a point (vertical distance to its band) and its system
-  const nearest = (x, y) => {
+  // the staff nearest a point and its system: vertical distance to the
+  // staff's band widened by the note heads near x (ledger-line notes push
+  // their marks out); marks above a staff count a little farther (a mark
+  // between two staves is more often under the upper one)
+  const headsOf = new Map();
+  for (const hd of fr.heads || []) { if (!headsOf.has(hd.staff)) headsOf.set(hd.staff, []); headsOf.get(hd.staff).push(hd); }
+  const nearest = (x, y, up = 1.25) => {
     let best = null, bd = Infinity;
     stv.forEach((sts, k) => sts.forEach((s, j) => {
-      const xx = Math.max(s.left, Math.min(s.right, x)), t = s.top(xx), b = s.bot(xx);
-      const d = y < t ? t - y : y > b ? y - b : 0;
-      // a mark between two staves belongs to the upper one on a tie
-      if (d < bd - 1e-6 || (Math.abs(d - bd) <= 1e-6 && best && y > b)) { bd = d; best = { sys: k, k: j, s, d, above: y < t, inside: d === 0 }; }
+      const xx = Math.max(s.left, Math.min(s.right, x));
+      let t = s.top(xx), b = s.bot(xx);
+      const inside = y >= t && y <= b;
+      for (const hd of headsOf.get(s.si) || []) if (Math.abs(hd.x - x) <= 3 * s.sp) { t = Math.min(t, hd.y - 0.5 * s.sp); b = Math.max(b, hd.y + 0.5 * s.sp); }
+      const d = y < t ? up * (t - y) : y > b ? y - b : 0;
+      if (d < bd - 1e-6 || (Math.abs(d - bd) <= 1e-6 && best && y > b)) { bd = d; best = { sys: k, k: j, s, d, above: y < s.top(xx), inside }; }
     }));
     return best;
   };
@@ -9215,6 +9447,7 @@ function classifyMarks(fr, asm, left) {
   const heads = fr.heads || [];
   const rest = [];
   const letters = [];
+  const fermataDots = new Set();
   for (const c of left) {
     const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1, cx = (c.x0 + c.x1) / 2, cy = (c.y0 + c.y1) / 2;
     const n = nearest(cx, cy), sp = n ? n.s.sp : ss;
@@ -9226,25 +9459,46 @@ function classifyMarks(fr, asm, left) {
       out.ledgers.push({ box: [c.x0, c.y0, c.x1, c.y1] }); continue;
     }
     const hp = hairpin(R, c, sp);
-    if (hp) { out.wedges.push({ box: [c.x0, c.y0, c.x1, c.y1], type: hp, sys: n.sys, k: n.k, si: n.s.si }); continue; }
-    if (slurLike(R, c, sp)) { out.slurs.push({ box: [c.x0, c.y0, c.x1, c.y1] }); continue; }
+    // dynamics and hairpins stand below their staff unless clearly nearer the one below
+    if (hp) { const m = nearest(cx, cy, 1.6); out.wedges.push({ box: [c.x0, c.y0, c.x1, c.y1], type: hp, sys: m.sys, k: m.k, si: m.s.si }); continue; }
+    if (slurLike(R, c, sp)) {
+      // a short arc with a dot inside its bow: a fermata
+      const dot = w <= 3 * sp && left.find(d => d !== c && d.x1 - d.x0 <= 0.7 * sp && d.y1 - d.y0 <= 0.7 * sp && (d.x0 + d.x1) / 2 > c.x0 + 0.3 * w && (d.x0 + d.x1) / 2 < c.x1 - 0.3 * w &&
+        Math.abs((d.y0 + d.y1) / 2 - cy) <= 1.2 * sp);
+      if (dot) { out.fermatas.push({ box: [Math.min(c.x0, dot.x0), Math.min(c.y0, dot.y0), Math.max(c.x1, dot.x1), Math.max(c.y1, dot.y1)] }); fermataDots.add(dot); continue; }
+      out.slurs.push({ box: [c.x0, c.y0, c.x1, c.y1] });
+      continue;
+    }
     // letter-sized ink (text, dynamics)
     if (h >= 0.35 * sp && h <= 4.5 * sp && w <= 6 * sp && !(h < 0.6 * sp && w > 2.5 * h)) { letters.push(c); continue; }
     rest.push(c);
   }
   // dynamics: a run of letters that all read as dynamics letters and spell a
   // dynamic, off the staff (or in a margin between staves)
-  const lines = groupLines(letters);
+  const lines = groupLines(letters.filter(c => !fermataDots.has(c)));
   const textLines = [];
   for (const ln of lines) {
     const n = nearest((ln.x0 + ln.x1) / 2, (ln.y0 + ln.y1) / 2);
     const sp = n ? n.s.sp : ss;
-    const dyn = n && !n.inside && ln.h <= 3.2 * sp ? readDynamic(R, ln, sp) : null;
-    if (dyn) { out.dyns.push({ box: [ln.x0, ln.y0, ln.x1, ln.y1], value: dyn.text, score: +dyn.score.toFixed(2), sys: n.sys, k: n.k, si: n.s.si, x: (ln.x0 + ln.x1) / 2 }); continue; }
+    let dyn = n && !n.inside && ln.h <= 3.2 * sp ? readDynamic(R, ln, sp) : null;
+    if (dyn) dyn = extendDynamic(R, ln, dyn, sp, asm.comps || []);
+    if (dyn) {
+      const m = nearest((ln.x0 + ln.x1) / 2, (ln.y0 + ln.y1) / 2, 1.6);
+      out.dyns.push({ box: [ln.x0, ln.y0, ln.x1, ln.y1], value: dyn.text, score: +dyn.score.toFixed(2), sys: m.sys, k: m.k, si: m.s.si, x: (ln.x0 + ln.x1) / 2 });
+      continue;
+    }
     // text inside a staff band is rare (text over a staff is more often a
     // misread chord or a stray): left unknown
     if (n && n.inside && ln.x0 > n.s.left) { rest.push(...ln.mem); continue; }
     textLines.push({ ...ln, n });
+  }
+  // dots of i and j (and accents) stand alone over their letters: part of
+  // the text line under them
+  for (let i = textLines.length - 1; i >= 0; i--) {
+    const d = textLines[i];
+    if (d.mem.length !== 1 || Math.max(d.x1 - d.x0, d.y1 - d.y0) > 0.9 * ss) continue;
+    const host = textLines.find(l => l !== d && (l.mem.length >= 2 || l.x1 - l.x0 > 2 * ss) && d.x0 >= l.x0 - 2 && d.x1 <= l.x1 + 2 && d.y1 < l.y0 + 0.8 * l.h && d.y1 > l.y0 - 0.9 * l.h);
+    if (host) { host.y0 = Math.min(host.y0, d.y0); host.mem.push(...d.mem); textLines.splice(i, 1); }
   }
   // roles from where the lines stand
   const header = textLines.filter(l => l.y1 < firstTop - 0.5 * ss && !(l.x1 < L0 - 0.3 * ss));
@@ -9274,16 +9528,27 @@ function classifyMarks(fr, asm, left) {
     else if (n && !n.above && l.words >= 4 && l.y0 - n.s.bot(cx) < 5 * sp) role = 'lyrics';
     else if (n && n.above && n.k === 0 && l.y1 > sysTop - 5 * sp && ((sysOf === 0 && l.x0 <= sysLeft + 0.3 * wMusic && l.h >= 1.0 * sp) || l.words >= 2)) role = 'tempo';
     else role = 'expression';
+    // a lone glyph or specks among the music is more likely a symbol the
+    // reader missed (a rest, a flag) than text: left unknown
+    if ((role === 'expression' || role === 'text' || role === 'lyrics' || role === 'tempo') && (l.mem.length < 2 || l.h < 0.55 * sp)) { rest.push(...l.mem); continue; }
     out.text.push({ box: [l.x0, l.y0, l.x1, l.y1], role, text: '', h: l.h, words: l.words, sys: sysOf, k: n ? n.k : -1, si: n ? n.s.si : -1, x: l.x0, comps: l.mem });
   }
+  // lyrics: syllables spaced under the notes fall apart into many short
+  // lines on one row; a row of three or more among the music is underlay
+  const inMusic = out.text.filter(t => ['expression', 'tempo', 'lyrics', 'text'].includes(t.role) && t.sys >= 0);
+  for (const t of inMusic) {
+    if (t.role === 'lyrics') continue;
+    const row = inMusic.filter(u => u.sys === t.sys && Math.min(u.box[3], t.box[3]) - Math.max(u.box[1], t.box[1]) > 0.5 * Math.min(u.box[3] - u.box[1], t.box[3] - t.box[1]));
+    if (row.length >= 3 || (row.length >= 2 && row.reduce((a, u) => a + u.box[2] - u.box[0], 0) >= 12 * ss)) row.forEach(u => { u.role = 'lyrics'; });
+  }
   // two titles: the larger one wins, the other is a subtitle
-  const titles = out.text.filter(t => t.role === 'title').sort((a, b) => b.h - a.h || a.box[1] - b.box[1]);
+  const titles = out.text.filter(t => t.role === 'title').sort((a, b) => a.box[1] - b.box[1]);
   titles.slice(1).forEach(t => { t.role = 'subtitle'; });
   // several right-aligned credit lines: the first is the composer; a line
   // above the title is a dedication / header
   const comp = out.text.filter(t => t.role === 'composer').sort((a, b) => a.box[1] - b.box[1]);
   comp.slice(1).forEach(t => { t.role = 'credit'; });
-  out.rest = rest;
+  out.rest = rest.filter(c => !fermataDots.has(c));
   return out;
 }
 
@@ -9298,6 +9563,54 @@ function readDynamic(R, ln, sp) {
     sc = Math.min(sc, g.score);
   }
   return DYN_WORDS.has(text) ? { text, score: sc } : null;
+}
+
+// A dynamic whose letters the note reader took in part (an 'm' read as note
+// heads or touching a stem box, so not left over): neighbouring components
+// on its row that read as dynamics letters join it when the word stays a
+// dynamic ("f" + the 'm' before it -> "mf"). ln grows to the letters taken.
+function extendDynamic(R, ln, dyn, sp, comps) {
+  for (let grew = true, n = 0; grew && n < 3; n++) {
+    grew = false;
+    for (const side of [-1, 1]) {
+      const c = comps.find(c => !ln.mem.includes(c) && (side < 0 ? c.x0 < ln.x0 && c.x1 < ln.x0 + 0.5 * sp && ln.x0 - c.x1 <= 0.8 * sp : c.x1 > ln.x1 && c.x0 > ln.x1 - 0.5 * sp && c.x0 - ln.x1 <= 0.8 * sp) &&
+        Math.min(c.y1, ln.y1) - Math.max(c.y0, ln.y0) + 1 >= 0.5 * Math.min(c.y1 - c.y0 + 1, ln.y1 - ln.y0 + 1) && c.y1 - c.y0 + 1 <= 3 * sp);
+      if (!c) continue;
+      const g = dynGlyph(R, c, sp);
+      if (!g || g.score < 0.72) continue;
+      const text = side < 0 ? g.text + dyn.text : dyn.text + g.text;
+      if (!DYN_WORDS.has(text)) continue;
+      dyn = { text, score: Math.min(dyn.score, g.score) };
+      ln.mem = side < 0 ? [c, ...ln.mem] : [...ln.mem, c];
+      ln.x0 = Math.min(ln.x0, c.x0); ln.x1 = Math.max(ln.x1, c.x1); ln.y0 = Math.min(ln.y0, c.y0); ln.y1 = Math.max(ln.y1, c.y1);
+      grew = true;
+    }
+  }
+  // an 'm' or 's' fused with a stem or head before the word: the ink in a
+  // letter-sized window left of it, matched as it stands
+  if (/^[fp]/.test(dyn.text)) {
+    let best = null;
+    for (const t of templates()) {
+      if (t.text !== 'm' && t.text !== 's') continue;
+      const w = Math.round(t.w * sp), h = Math.round(t.h * sp);
+      for (let x = Math.round(ln.x0 - w - 0.3 * sp); x <= Math.round(ln.x0 - w + 0.5 * sp); x++) {
+        for (let y = Math.round(ln.y0); y + h <= ln.y1 + 0.3 * sp; y += 1) {
+          if (x < 0 || y < 0 || x + w > R.width || y + h > R.height) continue;
+          const img = { width: w, height: h, data: new Uint8Array(w * h) };
+          let ink = 0;
+          for (let yy = 0; yy < h; yy++) for (let xx = 0; xx < w; xx++) { const v = R.data[(y + yy) * R.width + x + xx]; img.data[yy * w + xx] = v; ink += v; }
+          if (ink < 0.2 * w * h) continue;
+          const sc = matchGrid(gridOf(img, t.gh, t.gw), t);
+          if (!best || sc > best.score) best = { text: t.text, score: sc, x, y, w, h };
+        }
+      }
+    }
+    if (best && best.score >= 0.8 && DYN_WORDS.has(best.text + dyn.text)) {
+      dyn = { text: best.text + dyn.text, score: Math.min(dyn.score, best.score) };
+      ln.x0 = best.x; ln.y0 = Math.min(ln.y0, best.y);
+    }
+  }
+  return dyn;
 }
 
 // ---------------------------------------------------------------- OCR
@@ -9317,6 +9630,8 @@ function refineRole(t) {
     else if (t.role !== 'subtitle' && TEMPO_RE.test(s)) t.role = 'tempo';
     return;
   }
+  // a name or two in capitals above the first staff, no tempo word: a credit
+  if (t.role === 'tempo' && t.sys === 0 && !TEMPO_RE.test(s) && !EXPR_RE.test(s) && /^(\p{Lu}[\p{L}.'’-]*\s*){2,4}$/u.test(s)) { t.role = 'lyricist'; return; }
   if (t.role === 'expression' || t.role === 'tempo' || t.role === 'text') {
     if (TEMPO_RE.test(s) && !EXPR_RE.test(s)) t.role = 'tempo';
     else if (EXPR_RE.test(s)) t.role = 'expression';
@@ -9328,7 +9643,7 @@ function refineRole(t) {
 // lyrics.js's to read; at most maxLines lines per page.
 async function readPageText(fr, marks, ocr, opts = {}) {
   if (!ocr || !marks || !fr.gray || !fr.gray.data) return 0;
-  const maxLines = opts.maxLines || 24;
+  const maxLines = opts.maxLines || 16;
   const order = { title: 0, composer: 1, instrument: 2, abbrev: 3, subtitle: 4, lyricist: 5, arranger: 5, credit: 6, tempo: 7, expression: 8, measure: 9, copyright: 10, footer: 11, header: 12, page: 13, text: 14 };
   const todo = marks.text.filter(t => t.role !== 'lyrics').sort((a, b) => (order[a.role] ?? 20) - (order[b.role] ?? 20));
   // only one abbreviation line per staff is needed (they repeat on every system)
@@ -9337,6 +9652,12 @@ async function readPageText(fr, marks, ocr, opts = {}) {
   for (const t of todo) {
     if (n >= maxLines) break;
     if (t.role === 'abbrev') { const key = t.k; if (seenAbbr.has(key)) continue; seenAbbr.add(key); }
+    // the instrument names lyrics.js already read (fr.partLabels)
+    if (t.role === 'instrument' && fr.partLabels) {
+      const cy = (t.box[1] + t.box[3]) / 2;
+      const pl = fr.partLabels.find(p => p.y != null && Math.abs(p.y - cy) <= t.h);
+      if (pl) { t.text = pl.text; t.conf = pl.conf; continue; }
+    }
     const img = lineCrop(fr, t.box, t.h);
     if (!img) continue;
     let words = [];
@@ -9346,6 +9667,14 @@ async function readPageText(fr, marks, ocr, opts = {}) {
     t.text = ok.map(w => w.text).join(' ').replace(/\s+/g, ' ').trim();
     t.conf = ok.length ? Math.round(ok.reduce((a, w) => a + w.conf, 0) / ok.length) : 0;
     refineRole(t);
+  }
+  // a dynamic whose letters did not all match the shapes (one fused with a
+  // stem, a worn letter) but reads as one: a dynamic after all
+  for (let i = marks.text.length - 1; i >= 0; i--) {
+    const t = marks.text[i], w = t.text.replace(/[^a-z]/gi, '');
+    if (t.role !== 'expression' || !t.text || !DYN_WORDS.has(w) || w === 'n' || t.text.length > w.length + 1 || (t.conf || 0) < 50) continue;
+    marks.dyns.push({ box: t.box, value: w, score: 0, ocr: true, sys: t.sys, k: t.k, si: t.si, x: (t.box[0] + t.box[2]) / 2 });
+    marks.text.splice(i, 1);
   }
   // the abbreviation read once stands for its staff on every later system
   for (const t of marks.text) if (t.role === 'abbrev' && !t.text) {
@@ -10347,6 +10676,13 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
       s += g('lyrics', lyr.map(([x0, y0, x1, y1]) => `<path d="M${f1(x0)},${f1(y1 - ss * 0.3)}V${f1(y1 + ss * 0.15)}H${f1(x1)}V${f1(y1 - ss * 0.3)}"/>`).join(''), ` fill="none" stroke-width="${f1(sw)}"`);
       // ink nothing explains: swiped with a yellow highlighter
       const unk = (sy.unknown || []).filter((b) => !lyr.some((l) => b[0] < l[2] && b[2] > l[0] && b[1] < l[3] && b[3] > l[1]));
+      // text read off the page (titles, credits, instrument names, bar
+      // numbers, tempo and expression), dynamics and hairpins, and the curves
+      // and lines around the notes: a box each, text and dynamics labelled
+      const named = (b, label) => `<g><title>${esc(label)}</title>${rect(b, ss * 0.12)}<text x="${f1(b[0])}" y="${f1(b[1] - ss * 0.3)}" font-size="${f1(ss * 0.75)}">${esc(label)}</text></g>`;
+      s += g('text', (sy.text || []).filter((t) => t[4] !== 'lyrics').map((t) => named(t, t[5])).join(''), ` stroke-width="${f1(sw)}"`);
+      s += g('dyns', (sy.dyns || []).concat(sy.wedges || []).map((d) => named(d, d[4])).join(''), ` stroke-width="${f1(sw)}"`);
+      s += g('curves', [].concat(sy.slurs || [], sy.fermatas || [], sy.braces || [], sy.ledgers || []).map((b) => rect(b, ss * 0.08)).join(''), ` stroke-width="${f1(sw * 0.8)}" stroke-dasharray="${f1(sw * 2)} ${f1(sw)}"`);
       s += g('unknown', unk.map((b) => rect(b, ss * 0.18, ` rx="${f1(ss * 0.25)}"`)).join(''));
       s += g('labels', this.labels(p));
       return s + '</svg>';
@@ -10458,7 +10794,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
   // Overlay layers the reader can switch off one by one (remembered).
   const LAYERS = [
     ['notes', 'Notes, stems, beams'], ['rests', 'Rests'], ['clefs', 'Clefs'], ['keys', 'Key signatures'], ['times', 'Time signatures'],
-    ['bars', 'Staves, barlines'], ['marks', 'Accidentals, dots, tuplets'], ['lyrics', 'Lyric syllables'], ['labels', 'Pitch and value labels'], ['unknown', 'Not recognised'],
+    ['bars', 'Staves, barlines'], ['marks', 'Accidentals, dots, tuplets'], ['lyrics', 'Lyric syllables'], ['labels', 'Pitch and value labels'],
+    ['text', 'Titles, names, text'], ['dyns', 'Dynamics, hairpins'], ['curves', 'Slurs, ties, fermatas, braces, ledger lines'], ['unknown', 'Not recognised'],
   ];
   const LAYER_ICON = {
     notes: '<path d="M9 2v8" stroke-width="1.4" class="ovk-stem"/><circle cx="6.5" cy="10" r="2.6" stroke-width="1.6"/>',
@@ -10470,6 +10807,9 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
     marks: '<rect x="1" y="3" width="4.5" height="8" stroke-width="1.4" class="ovk-acc"/><circle cx="8.6" cy="7" r="1.8" stroke-width="1.4" class="ovk-dot"/><rect x="11" y="4" width="2.4" height="6" stroke-width="1" class="ovk-tup"/>',
     lyrics: '<path d="M2 8v3h10V8" stroke-width="1.6"/>',
     labels: '<text x="7" y="10.5" font-size="9" text-anchor="middle" stroke="none" fill="currentColor">C5</text>',
+    text: '<text x="7" y="10.5" font-size="9.5" text-anchor="middle" stroke="none" fill="currentColor" font-family="serif">Aa</text>',
+    dyns: '<text x="5.5" y="10.5" font-size="9" text-anchor="middle" stroke="none" fill="currentColor" font-style="italic" font-weight="700" font-family="serif">f</text><path d="M8.5 7l4.5-2.5M8.5 7l4.5 2.5" stroke-width="1"/>',
+    curves: '<path d="M2 9c2-4 8-4 10 0" stroke-width="1.6"/>',
     unknown: '<rect x="1.5" y="3.5" width="11" height="7" rx="1.6" stroke-width=".8"/>',
   };
   const layerOff = new Set((() => { try { return JSON.parse(store.get('ssr.layers') || '[]'); } catch (e) { return []; } })());
@@ -10479,6 +10819,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
       notes: v ? v.heads.length : 0, rests: (sy.rests || []).length, clefs: (sy.clefs || []).length, keys: (sy.keys || []).length, times: (sy.times || []).length,
       bars: v ? (sy.bars || v.barlines).length : 0, marks: (sy.accs || []).length + (sy.dots || []).length + (sy.tuplets || []).length,
       lyrics: null, labels: null, unknown: (sy.unknown || []).length,
+      text: (sy.text || []).filter((t) => t[4] !== 'lyrics').length, dyns: (sy.dyns || []).length + (sy.wedges || []).length,
+      curves: (sy.slurs || []).length + (sy.fermatas || []).length + (sy.braces || []).length + (sy.ledgers || []).length,
     };
   }
   function renderLayers(v) {
@@ -11272,6 +11614,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
       dots: (sy.dots || []).filter(([x, y, r]) => hit(x - r, y - r, x + r, y + r)).map(([x, y]) => ({ x, y })),
       tuplets: pick(sy.tuplets, (c) => ({ box: bx(c), actual: c[4], normal: c[5] })),
       barlines: (sy.bars || []).filter((r) => hit(r[4], r[1], r[5], r[2])).map((r) => ({ x: r[0], top: r[1], bottom: r[2], type: r[3] })),
+      text: pick(sy.text, (t) => ({ box: bx(t), role: t[4], label: t[5] })),
+      dynamics: pick((sy.dyns || []).concat(sy.wedges || []), (d) => ({ box: bx(d), value: d[4] })),
       unrecognised: (sy.unknown || []).filter(boxHit),
     };
   }

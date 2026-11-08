@@ -185,7 +185,7 @@ const ROLE_LABEL = {
 // Sort leftover components (symbols.js) into marks.
 // left: [{x0,y0,x1,y1,area}], fr / asm as front() and assemblePage() left them.
 function classifyMarks(fr, asm, left) {
-  const out = { text: [], dyns: [], wedges: [], slurs: [], braces: [], ledgers: [], rest: [] };
+  const out = { text: [], dyns: [], wedges: [], slurs: [], fermatas: [], braces: [], ledgers: [], rest: [] };
   const R = fr.R, ss = fr.ss, W = fr.gray.width, H = fr.gray.height;
   const systems = (asm && asm.systems) || [];
   if (!R || !systems.length) { out.rest = left.slice(); return out; }
@@ -198,14 +198,21 @@ function classifyMarks(fr, asm, left) {
   const firstTop = Math.min(...stv[0].map(s => s.top(s.left)));
   const lastSys = stv[stv.length - 1];
   const lastBot = Math.max(...lastSys.map(s => s.bot(s.left)));
-  // the staff nearest a point (vertical distance to its band) and its system
-  const nearest = (x, y) => {
+  // the staff nearest a point and its system: vertical distance to the
+  // staff's band widened by the note heads near x (ledger-line notes push
+  // their marks out); marks above a staff count a little farther (a mark
+  // between two staves is more often under the upper one)
+  const headsOf = new Map();
+  for (const hd of fr.heads || []) { if (!headsOf.has(hd.staff)) headsOf.set(hd.staff, []); headsOf.get(hd.staff).push(hd); }
+  const nearest = (x, y, up = 1.25) => {
     let best = null, bd = Infinity;
     stv.forEach((sts, k) => sts.forEach((s, j) => {
-      const xx = Math.max(s.left, Math.min(s.right, x)), t = s.top(xx), b = s.bot(xx);
-      const d = y < t ? t - y : y > b ? y - b : 0;
-      // a mark between two staves belongs to the upper one on a tie
-      if (d < bd - 1e-6 || (Math.abs(d - bd) <= 1e-6 && best && y > b)) { bd = d; best = { sys: k, k: j, s, d, above: y < t, inside: d === 0 }; }
+      const xx = Math.max(s.left, Math.min(s.right, x));
+      let t = s.top(xx), b = s.bot(xx);
+      const inside = y >= t && y <= b;
+      for (const hd of headsOf.get(s.si) || []) if (Math.abs(hd.x - x) <= 3 * s.sp) { t = Math.min(t, hd.y - 0.5 * s.sp); b = Math.max(b, hd.y + 0.5 * s.sp); }
+      const d = y < t ? up * (t - y) : y > b ? y - b : 0;
+      if (d < bd - 1e-6 || (Math.abs(d - bd) <= 1e-6 && best && y > b)) { bd = d; best = { sys: k, k: j, s, d, above: y < s.top(xx), inside }; }
     }));
     return best;
   };
@@ -216,6 +223,7 @@ function classifyMarks(fr, asm, left) {
   const heads = fr.heads || [];
   const rest = [];
   const letters = [];
+  const fermataDots = new Set();
   for (const c of left) {
     const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1, cx = (c.x0 + c.x1) / 2, cy = (c.y0 + c.y1) / 2;
     const n = nearest(cx, cy), sp = n ? n.s.sp : ss;
@@ -227,25 +235,46 @@ function classifyMarks(fr, asm, left) {
       out.ledgers.push({ box: [c.x0, c.y0, c.x1, c.y1] }); continue;
     }
     const hp = hairpin(R, c, sp);
-    if (hp) { out.wedges.push({ box: [c.x0, c.y0, c.x1, c.y1], type: hp, sys: n.sys, k: n.k, si: n.s.si }); continue; }
-    if (slurLike(R, c, sp)) { out.slurs.push({ box: [c.x0, c.y0, c.x1, c.y1] }); continue; }
+    // dynamics and hairpins stand below their staff unless clearly nearer the one below
+    if (hp) { const m = nearest(cx, cy, 1.6); out.wedges.push({ box: [c.x0, c.y0, c.x1, c.y1], type: hp, sys: m.sys, k: m.k, si: m.s.si }); continue; }
+    if (slurLike(R, c, sp)) {
+      // a short arc with a dot inside its bow: a fermata
+      const dot = w <= 3 * sp && left.find(d => d !== c && d.x1 - d.x0 <= 0.7 * sp && d.y1 - d.y0 <= 0.7 * sp && (d.x0 + d.x1) / 2 > c.x0 + 0.3 * w && (d.x0 + d.x1) / 2 < c.x1 - 0.3 * w &&
+        Math.abs((d.y0 + d.y1) / 2 - cy) <= 1.2 * sp);
+      if (dot) { out.fermatas.push({ box: [Math.min(c.x0, dot.x0), Math.min(c.y0, dot.y0), Math.max(c.x1, dot.x1), Math.max(c.y1, dot.y1)] }); fermataDots.add(dot); continue; }
+      out.slurs.push({ box: [c.x0, c.y0, c.x1, c.y1] });
+      continue;
+    }
     // letter-sized ink (text, dynamics)
     if (h >= 0.35 * sp && h <= 4.5 * sp && w <= 6 * sp && !(h < 0.6 * sp && w > 2.5 * h)) { letters.push(c); continue; }
     rest.push(c);
   }
   // dynamics: a run of letters that all read as dynamics letters and spell a
   // dynamic, off the staff (or in a margin between staves)
-  const lines = groupLines(letters);
+  const lines = groupLines(letters.filter(c => !fermataDots.has(c)));
   const textLines = [];
   for (const ln of lines) {
     const n = nearest((ln.x0 + ln.x1) / 2, (ln.y0 + ln.y1) / 2);
     const sp = n ? n.s.sp : ss;
-    const dyn = n && !n.inside && ln.h <= 3.2 * sp ? readDynamic(R, ln, sp) : null;
-    if (dyn) { out.dyns.push({ box: [ln.x0, ln.y0, ln.x1, ln.y1], value: dyn.text, score: +dyn.score.toFixed(2), sys: n.sys, k: n.k, si: n.s.si, x: (ln.x0 + ln.x1) / 2 }); continue; }
+    let dyn = n && !n.inside && ln.h <= 3.2 * sp ? readDynamic(R, ln, sp) : null;
+    if (dyn) dyn = extendDynamic(R, ln, dyn, sp, asm.comps || []);
+    if (dyn) {
+      const m = nearest((ln.x0 + ln.x1) / 2, (ln.y0 + ln.y1) / 2, 1.6);
+      out.dyns.push({ box: [ln.x0, ln.y0, ln.x1, ln.y1], value: dyn.text, score: +dyn.score.toFixed(2), sys: m.sys, k: m.k, si: m.s.si, x: (ln.x0 + ln.x1) / 2 });
+      continue;
+    }
     // text inside a staff band is rare (text over a staff is more often a
     // misread chord or a stray): left unknown
     if (n && n.inside && ln.x0 > n.s.left) { rest.push(...ln.mem); continue; }
     textLines.push({ ...ln, n });
+  }
+  // dots of i and j (and accents) stand alone over their letters: part of
+  // the text line under them
+  for (let i = textLines.length - 1; i >= 0; i--) {
+    const d = textLines[i];
+    if (d.mem.length !== 1 || Math.max(d.x1 - d.x0, d.y1 - d.y0) > 0.9 * ss) continue;
+    const host = textLines.find(l => l !== d && (l.mem.length >= 2 || l.x1 - l.x0 > 2 * ss) && d.x0 >= l.x0 - 2 && d.x1 <= l.x1 + 2 && d.y1 < l.y0 + 0.8 * l.h && d.y1 > l.y0 - 0.9 * l.h);
+    if (host) { host.y0 = Math.min(host.y0, d.y0); host.mem.push(...d.mem); textLines.splice(i, 1); }
   }
   // roles from where the lines stand
   const header = textLines.filter(l => l.y1 < firstTop - 0.5 * ss && !(l.x1 < L0 - 0.3 * ss));
@@ -280,14 +309,22 @@ function classifyMarks(fr, asm, left) {
     if ((role === 'expression' || role === 'text' || role === 'lyrics' || role === 'tempo') && (l.mem.length < 2 || l.h < 0.55 * sp)) { rest.push(...l.mem); continue; }
     out.text.push({ box: [l.x0, l.y0, l.x1, l.y1], role, text: '', h: l.h, words: l.words, sys: sysOf, k: n ? n.k : -1, si: n ? n.s.si : -1, x: l.x0, comps: l.mem });
   }
+  // lyrics: syllables spaced under the notes fall apart into many short
+  // lines on one row; a row of three or more among the music is underlay
+  const inMusic = out.text.filter(t => ['expression', 'tempo', 'lyrics', 'text'].includes(t.role) && t.sys >= 0);
+  for (const t of inMusic) {
+    if (t.role === 'lyrics') continue;
+    const row = inMusic.filter(u => u.sys === t.sys && Math.min(u.box[3], t.box[3]) - Math.max(u.box[1], t.box[1]) > 0.5 * Math.min(u.box[3] - u.box[1], t.box[3] - t.box[1]));
+    if (row.length >= 3 || (row.length >= 2 && row.reduce((a, u) => a + u.box[2] - u.box[0], 0) >= 12 * ss)) row.forEach(u => { u.role = 'lyrics'; });
+  }
   // two titles: the larger one wins, the other is a subtitle
-  const titles = out.text.filter(t => t.role === 'title').sort((a, b) => b.h - a.h || a.box[1] - b.box[1]);
+  const titles = out.text.filter(t => t.role === 'title').sort((a, b) => a.box[1] - b.box[1]);
   titles.slice(1).forEach(t => { t.role = 'subtitle'; });
   // several right-aligned credit lines: the first is the composer; a line
   // above the title is a dedication / header
   const comp = out.text.filter(t => t.role === 'composer').sort((a, b) => a.box[1] - b.box[1]);
   comp.slice(1).forEach(t => { t.role = 'credit'; });
-  out.rest = rest;
+  out.rest = rest.filter(c => !fermataDots.has(c));
   return out;
 }
 
@@ -302,6 +339,54 @@ function readDynamic(R, ln, sp) {
     sc = Math.min(sc, g.score);
   }
   return DYN_WORDS.has(text) ? { text, score: sc } : null;
+}
+
+// A dynamic whose letters the note reader took in part (an 'm' read as note
+// heads or touching a stem box, so not left over): neighbouring components
+// on its row that read as dynamics letters join it when the word stays a
+// dynamic ("f" + the 'm' before it -> "mf"). ln grows to the letters taken.
+function extendDynamic(R, ln, dyn, sp, comps) {
+  for (let grew = true, n = 0; grew && n < 3; n++) {
+    grew = false;
+    for (const side of [-1, 1]) {
+      const c = comps.find(c => !ln.mem.includes(c) && (side < 0 ? c.x0 < ln.x0 && c.x1 < ln.x0 + 0.5 * sp && ln.x0 - c.x1 <= 0.8 * sp : c.x1 > ln.x1 && c.x0 > ln.x1 - 0.5 * sp && c.x0 - ln.x1 <= 0.8 * sp) &&
+        Math.min(c.y1, ln.y1) - Math.max(c.y0, ln.y0) + 1 >= 0.5 * Math.min(c.y1 - c.y0 + 1, ln.y1 - ln.y0 + 1) && c.y1 - c.y0 + 1 <= 3 * sp);
+      if (!c) continue;
+      const g = dynGlyph(R, c, sp);
+      if (!g || g.score < 0.72) continue;
+      const text = side < 0 ? g.text + dyn.text : dyn.text + g.text;
+      if (!DYN_WORDS.has(text)) continue;
+      dyn = { text, score: Math.min(dyn.score, g.score) };
+      ln.mem = side < 0 ? [c, ...ln.mem] : [...ln.mem, c];
+      ln.x0 = Math.min(ln.x0, c.x0); ln.x1 = Math.max(ln.x1, c.x1); ln.y0 = Math.min(ln.y0, c.y0); ln.y1 = Math.max(ln.y1, c.y1);
+      grew = true;
+    }
+  }
+  // an 'm' or 's' fused with a stem or head before the word: the ink in a
+  // letter-sized window left of it, matched as it stands
+  if (/^[fp]/.test(dyn.text)) {
+    let best = null;
+    for (const t of templates()) {
+      if (t.text !== 'm' && t.text !== 's') continue;
+      const w = Math.round(t.w * sp), h = Math.round(t.h * sp);
+      for (let x = Math.round(ln.x0 - w - 0.3 * sp); x <= Math.round(ln.x0 - w + 0.5 * sp); x++) {
+        for (let y = Math.round(ln.y0); y + h <= ln.y1 + 0.3 * sp; y += 1) {
+          if (x < 0 || y < 0 || x + w > R.width || y + h > R.height) continue;
+          const img = { width: w, height: h, data: new Uint8Array(w * h) };
+          let ink = 0;
+          for (let yy = 0; yy < h; yy++) for (let xx = 0; xx < w; xx++) { const v = R.data[(y + yy) * R.width + x + xx]; img.data[yy * w + xx] = v; ink += v; }
+          if (ink < 0.2 * w * h) continue;
+          const sc = matchGrid(gridOf(img, t.gh, t.gw), t);
+          if (!best || sc > best.score) best = { text: t.text, score: sc, x, y, w, h };
+        }
+      }
+    }
+    if (best && best.score >= 0.8 && DYN_WORDS.has(best.text + dyn.text)) {
+      dyn = { text: best.text + dyn.text, score: Math.min(dyn.score, best.score) };
+      ln.x0 = best.x; ln.y0 = Math.min(ln.y0, best.y);
+    }
+  }
+  return dyn;
 }
 
 // ---------------------------------------------------------------- OCR
@@ -321,6 +406,8 @@ function refineRole(t) {
     else if (t.role !== 'subtitle' && TEMPO_RE.test(s)) t.role = 'tempo';
     return;
   }
+  // a name or two in capitals above the first staff, no tempo word: a credit
+  if (t.role === 'tempo' && t.sys === 0 && !TEMPO_RE.test(s) && !EXPR_RE.test(s) && /^(\p{Lu}[\p{L}.'’-]*\s*){2,4}$/u.test(s)) { t.role = 'lyricist'; return; }
   if (t.role === 'expression' || t.role === 'tempo' || t.role === 'text') {
     if (TEMPO_RE.test(s) && !EXPR_RE.test(s)) t.role = 'tempo';
     else if (EXPR_RE.test(s)) t.role = 'expression';
@@ -356,6 +443,14 @@ async function readPageText(fr, marks, ocr, opts = {}) {
     t.text = ok.map(w => w.text).join(' ').replace(/\s+/g, ' ').trim();
     t.conf = ok.length ? Math.round(ok.reduce((a, w) => a + w.conf, 0) / ok.length) : 0;
     refineRole(t);
+  }
+  // a dynamic whose letters did not all match the shapes (one fused with a
+  // stem, a worn letter) but reads as one: a dynamic after all
+  for (let i = marks.text.length - 1; i >= 0; i--) {
+    const t = marks.text[i], w = t.text.replace(/[^a-z]/gi, '');
+    if (t.role !== 'expression' || !t.text || !DYN_WORDS.has(w) || w === 'n' || t.text.length > w.length + 1 || (t.conf || 0) < 50) continue;
+    marks.dyns.push({ box: t.box, value: w, score: 0, ocr: true, sys: t.sys, k: t.k, si: t.si, x: (t.box[0] + t.box[2]) / 2 });
+    marks.text.splice(i, 1);
   }
   // the abbreviation read once stands for its staff on every later system
   for (const t of marks.text) if (t.role === 'abbrev' && !t.text) {

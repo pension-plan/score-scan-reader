@@ -156,14 +156,14 @@ function pageMarks(fr, asm) {
   if (fr._marks && fr._marks.asm === asm) return fr._marks.marks;
   const { out, left } = explain(fr, asm);
   let marks;
-  try { marks = classifyMarks(fr, asm, left); } catch (e) { marks = { text: [], dyns: [], wedges: [], slurs: [], braces: [], ledgers: [], rest: left }; }
+  try { marks = classifyMarks(fr, asm, left); } catch (e) { marks = { text: [], dyns: [], wedges: [], slurs: [], fermatas: [], braces: [], ledgers: [], rest: left }; }
   Object.defineProperty(marks, 'sym', { value: out, enumerable: false, configurable: true });
   Object.defineProperty(fr, '_marks', { value: { asm, marks }, enumerable: false, configurable: true, writable: true });
   return marks;
 }
 
 // Overlay layers. Beyond the note symbols: text [box, role, label],
-// dyns [box, value], wedges [box, type], slurs [box], braces [box, kind],
+// dyns [box, value], wedges [box, type], slurs [box], fermatas [box], braces [box, kind],
 // ledgers [box]; unknown is the ink none of these explain.
 function pageSymbols(fr, asm) {
   const marks = pageMarks(fr, asm);
@@ -178,6 +178,7 @@ function pageSymbols(fr, asm) {
   out.dyns = marks.dyns.map(d => [...b4(d.box), d.value]);
   out.wedges = marks.wedges.map(w => [...b4(w.box), w.type === 'crescendo' ? 'cresc.' : 'dim.']);
   out.slurs = marks.slurs.map(s => b4(s.box));
+  out.fermatas = marks.fermatas.map(s => b4(s.box));
   out.braces = marks.braces.map(s => [...b4(s.box), s.kind]);
   out.ledgers = marks.ledgers.map(s => b4(s.box));
   out.unknown = marks.rest.map(c => [c.x0, c.y0, c.x1, c.y1]);

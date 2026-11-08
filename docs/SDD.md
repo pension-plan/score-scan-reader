@@ -1039,6 +1039,53 @@ JSON is the input for a later repair / re-recognition pass (shape; `[]` and `x0 
 spread, whose halves are measured in their own frames. `found` is `null` for a page not read in this
 session.
 
+### 8.7 Text, dynamics and other marks
+
+Ink the note reader leaves unexplained (`src/symbols.js` `explain()`: components touching no recognised
+symbol) is sorted by `src/text.js` `classifyMarks()`, once per page (`symbols.js` `pageMarks(fr, asm)`,
+cached on `fr`), into these classes. The overlay shows them as the layers "Titles, names, text",
+"Dynamics, hairpins" and "Slurs, ties, fermatas, braces, ledger lines"; only what is left stays "Not
+recognised" (Maple Leaf Rag: 70 unrecognised marks before, 6 after, at 200 dpi; 4 in the app).
+
+- **Braces and system brackets**: tall, narrow ink at the staves' left edge.
+- **Ledger lines**: short thin horizontal strokes off the staff beside a note head.
+- **Hairpins**: two thin lines meeting at one end, the gap growing steadily (crescendo opens right).
+- **Slurs and ties**: one thin bowed stroke; with a dot inside the bow of a short arc, a **fermata**.
+- **Dynamics** (ppp to fff, mp, mf, sf, sfz, sffz, sfp, fz, fp, rf, rfz): letters on one row that all match
+  the dynamics-font templates (`src/dynglyphs.js`, made by `mvp/tools/dynglyphs.js` from engraved pages of the
+  coverage corpus; grids of about 0.12 staff space, sized in staff spaces, Dice overlap with a small credit
+  for ink one cell off, threshold 0.72) and spell a dynamic. A letter the note reader took (an `m` read as
+  heads or fused with a stem) is recovered by matching neighbouring components, or a letter-sized window
+  left of an `f`/`p`, against `m`/`s`. With OCR on, an expression line that reads as a dynamic becomes one.
+  OCR alone is not used: Tesseract does not read the dynamics font.
+- **Text lines**: the remaining letter-sized ink grouped into lines, with a role from where it stands:
+  left of the first system = instrument name, left of later systems = abbreviation; small digits just
+  above a system's first staff = measure number; above the first system: the topmost large centred line =
+  title, other centred lines = subtitle, right-aligned = composer, left-aligned near the staff = tempo,
+  else lyricist / credit; page top / bottom margins = header / footer; rows of three or more lines (or
+  two wide ones) among the music = lyrics (lyrics.js reads those); other lines = expression. A lone glyph
+  among the music stays unknown (more often a missed rest or flag than text). With OCR, `readPageText()`
+  reads each line (PSM 7, the lyrics setup, at most 16 lines per page, instrument names reused from
+  `fr.partLabels`, one abbreviation per staff) and refines roles from the words (copyright, page number,
+  arranger "arr.", lyricist "words", tempo and expression vocabularies).
+
+**MusicXML.** `score.js` `readMarks()` writes: `<work-title>` and `<credit>` (title, subtitle, composer,
+lyricist, arranger, rights) from page 1, `<identification><creator type="composer|lyricist|arranger">` and
+`<rights>`; `<part-abbreviation>` when the abbreviation read fits the part name (its letters in order:
+"Pno." for Piano); `<direction>` with `<dynamics>` (`<other-dynamics>` outside the MusicXML set),
+`<wedge type="crescendo|diminuendo">` ... `<wedge type="stop">`, and `<words>` (tempo bold) for tempo and
+expression text that is a known term or confident words. A direction goes to the staff nearest it (the band
+widened by nearby heads; marks count 1.6x farther above a staff, so a dynamic between staves goes to the
+upper one unless clearly nearer the lower), in each part reading that staff, at the measure and onset of
+the nearest note by x, written before that note in the part's first voice (`<offset>` inside it).
+
+**Accuracy** (coverage suite, recall on clean / scan / scan-severe; all were 0 before): see the dynamics,
+hairpin, tempo and text rows of `docs/COVERAGE.md`. Not done: grace notes (small heads with slashed stems
+are still read, or missed, as notes), slurs and fermatas are drawn on the overlay but not written to
+MusicXML (attaching them needs the head each curve starts and ends at), measure numbers are labelled but not
+used to check the measure count, rehearsal marks and chord symbols stay text or unknown. Pedal marks and
+fingering are not classified.
+
 ## 9. Deployment and artifact constraints
 
 ### 9.1 Packaging

@@ -3,6 +3,7 @@
 // signature inference, per-measure rhythm repair, lyrics alignment, MusicXML.
 const { staffMeasureEvents, pitchOf, keyAlters, DIV } = require('./assemble');
 const { detectRests, mergeRests, restBars } = require('./rests');
+const { pageMarks } = require('./symbols');
 
 const COLORS = ['#d1495b', '#edae49', '#00798c', '#30638e', '#7b5ea7', '#3a7d44'];
 
@@ -973,7 +974,12 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   }
   if (credits.length) warnings.push(`${credits.length} stanza${credits.length > 1 ? 's' : ''} printed below the music kept as text in the file (not set under notes).`);
   const unitSys = units.map(u => u.m.sy);
-  const xml = toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, measures, credits, unitSys });
+  // text and marks read on the page (symbols.js pageMarks -> text.js): title
+  // and credits, part abbreviations, dynamics, hairpins, tempo and expression text
+  let read = { dirs: parts.map(() => units.map(() => [])), head: {}, nDyn: 0, nWedge: 0, nWords: 0 };
+  try { read = readMarks(pages, segs, units, parts, partMeasures); } catch (e) { warnings.push(`Text and dynamics not placed (${e.message}).`); }
+  if (read.nDyn || read.nWedge || read.nWords) warnings.push(`Read from the page: ${[read.nDyn && `${read.nDyn} dynamic${read.nDyn > 1 ? 's' : ''}`, read.nWedge && `${read.nWedge} hairpin${read.nWedge > 1 ? 's' : ''}`, read.nWords && `${read.nWords} tempo / expression text${read.nWords > 1 ? 's' : ''}`].filter(Boolean).join(', ')}.`);
+  const xml = toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, measures, credits, unitSys, title: read.head.title, head: read.head, dirs: read.dirs });
   const nNotes = partMeasures.map(pm => pm.reduce((a, m) => a + m.reduce((b, s) => b + s.events.filter(e => !e.rest && !e.forward).length, 0), 0));
   const ranges = partMeasures.map(pm => {
     let lo = null, hi = null;
@@ -1005,7 +1011,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     }
   });
   // UI compares clefs with 'F'; 'G8' stays a treble clef there
-  return { parts, layout, fifths, time, timeRead, clefs, ranges, measures: units.length, nNotes, credits, warnings: warnings.concat(layout.notes), xml, measureMap };
+  return { parts, layout, fifths, time, timeRead, clefs, ranges, measures: units.length, nNotes, credits, title: read.head.title || null, composer: read.head.composer || null, warnings: warnings.concat(layout.notes), xml, measureMap };
 }
 
 // Horizontal extent of a syllable: lyrics.js may report x0/x1; otherwise it is
@@ -1140,7 +1146,123 @@ function clefXML(c, n) {
   return `<clef${num}><sign>G</sign><line>2</line></clef>`;
 }
 
-function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, credits, unitSys }) {
+// ------------------------------------------------------------ text and marks
+const DYN_XML = new Set(['p', 'pp', 'ppp', 'pppp', 'f', 'ff', 'fff', 'ffff', 'mp', 'mf', 'sf', 'sfp', 'sfpp', 'fp', 'rf', 'rfz', 'sfz', 'sffz', 'fz', 'n', 'pf', 'sfzp']);
+// Marks read on each page (symbols.js pageMarks) placed in the score:
+//  head: title, subtitle, composer, lyricist, arranger, rights (first page);
+//  part abbreviations (p.abbrev) from the names left of later systems;
+//  dirs[pi][mi]: [{t, staffNo, placement, xml}] per part and written measure,
+//  t the onset in quarters of the note the mark stands at (nearest by x).
+// a part abbreviation as read ("Pno.", "S.", "Vc."): short, letters, and
+// starting as the part's name does; else null
+function abbrevOf(text, name) {
+  const ab = String(text || '').replace(/[^\p{L}\p{N}. ]/gu, '').replace(/\s+/g, ' ').trim();
+  if (!ab || ab.length > 10 || !/^\p{L}/u.test(ab) || /\d/.test(ab)) return null;
+  // its letters in order within the name ("Pno." in Piano, "Vc." in Violoncello)
+  const a = ab.toLowerCase().replace(/[^\p{L}]/gu, ''), n = String(name || '').toLowerCase();
+  if (!a || a[0] !== n[0]) return null;
+  let i = 0;
+  for (const ch of n) if (ch === a[i]) i++;
+  return i === a.length ? ab : null;
+}
+// tempo / expression text worth writing: known terms, or confident words
+const TERMS = /^(tempo|a tempo|allegr|andant|adagi|larg|lent|prest|vivac|modera|grave|maestos|marcia|rubato|cresc|decresc|dim|rit|rall|accel|poco|più|piu|meno|molto|sempre|subito|dolce|espr|legato|leggiero|stacc|sost|smorz|morendo|cantabile|con |senza|simile|pizz|arco|fine|d\.\s?c|d\.\s?s|da capo|dal segno|to coda|not |slow|fast|lively|moderately|brightly|gently|with |langsam|schnell|mässig|ruhig|bewegt|lebhaft|sehr |nicht |innig|zart)/i;
+function wordsOk(t) {
+  const s = t.text.trim();
+  if (TERMS.test(s)) return true;
+  const ws = s.split(/\s+/);
+  return (t.conf || 0) >= 80 && ws.length >= 2 && ws.every(w => /^\p{L}{2,}[.,]?$/u.test(w));
+}
+
+function readMarks(pages, segs, units, parts, partMeasures) {
+  const dirs = parts.map(() => units.map(() => []));
+  const head = {};
+  let nDyn = 0, nWedge = 0, nWords = 0;
+  const unitsOfSeg = new Map();
+  units.forEach((u, mi) => u.m.segs.forEach(si => { if (!unitsOfSeg.has(si)) unitsOfSeg.set(si, []); unitsOfSeg.get(si).push(mi); }));
+  // parts reading staff k of a system, with the staff number inside the part
+  const partsOn = (k) => parts.map((p, pi) => ({ pi, n: p.src.findIndex(s => s.staff === k) })).filter(a => a.n >= 0).map(a => ({ pi: a.pi, staffNo: a.n + 1, multi: parts[a.pi].src.length > 1 }));
+  // (unit, onset) of the note nearest x on staff k of a page system
+  const locate = (fr, sysIndex, k, x, pi) => {
+    const ss = segs.map((sg, si) => ({ sg, si })).filter(({ sg }) => sg.sy.fr === fr && sg.sy.index === sysIndex);
+    if (!ss.length) return null;
+    let cand = ss.filter(({ sg }) => x >= sg.xa && x < sg.xb);
+    if (!cand.length) cand = [ss.reduce((a, b) => (Math.min(Math.abs(x - a.sg.xa), Math.abs(x - a.sg.xb)) <= Math.min(Math.abs(x - b.sg.xa), Math.abs(x - b.sg.xb)) ? a : b))];
+    let best = null;
+    for (const { si } of cand) for (const mi of unitsOfSeg.get(si) || []) {
+      const streams = (partMeasures[pi] && partMeasures[pi][mi]) || [];
+      for (const st of streams) {
+        if (!st || st.staff !== k) continue;
+        let t = 0;
+        for (const e of st.events) {
+          if (e.x != null && !e.forward) { const d = Math.abs(e.x - x); if (!best || d < best.d) best = { mi, t, d }; }
+          t += e.q;
+        }
+      }
+      if (!best) best = { mi, t: 0, d: Infinity };
+    }
+    return best;
+  };
+  const seenFr = new Set();
+  for (const pg of pages) {
+    const fr = pg.fr;
+    if (!fr || seenFr.has(fr) || !pg.asm) continue;
+    seenFr.add(fr);
+    const marks = pageMarks(fr, pg.asm);
+    if (!marks) continue;
+    const sysIdx = (k) => (pg.asm.systems[k] ? pg.asm.systems[k].index : -1);
+    const place = (m, x, entry) => {
+      if (m.sys < 0 || m.k < 0) return;
+      const st = pg.asm.systems[m.sys] && pg.asm.systems[m.sys].staves[m.k];
+      const placement = st && (m.box[1] + m.box[3]) / 2 < st.st.yAt(0, x) ? 'above' : 'below';
+      for (const { pi, staffNo, multi } of partsOn(m.k)) {
+        const at = locate(fr, sysIdx(m.sys), m.k, x, pi);
+        if (!at) continue;
+        const list = dirs[pi][at.mi];
+        const xml = entry(placement);
+        if (list.some(d => d.xml === xml && Math.abs(d.t - at.t) < 1e-6)) continue;
+        list.push({ t: at.t, staffNo: multi ? staffNo : 0, xml });
+      }
+      return true;
+    };
+    for (const d of marks.dyns) {
+      const tag = DYN_XML.has(d.value) ? `<${d.value}/>` : `<other-dynamics>${esc(d.value)}</other-dynamics>`;
+      if (place(d, d.x, (pl) => `<direction placement="${pl}"><direction-type><dynamics>${tag}</dynamics></direction-type>`)) nDyn++;
+    }
+    for (const w of marks.wedges) {
+      const ok = place(w, w.box[0] + 0.1 * (w.box[2] - w.box[0]), (pl) => `<direction placement="${pl}"><direction-type><wedge type="${w.type}" number="1"/></direction-type>`);
+      if (ok) { place(w, w.box[2], (pl) => `<direction placement="${pl}"><direction-type><wedge type="stop" number="1"/></direction-type>`); nWedge++; }
+    }
+    for (const t of marks.text) {
+      if (!t.text) continue;
+      if ((t.role === 'tempo' || t.role === 'expression') && t.sys >= 0) {
+        if (!wordsOk(t)) continue;
+        const bold = t.role === 'tempo' ? ' font-weight="bold"' : '';
+        if (place(t, t.box[0], (pl) => `<direction placement="${pl}"><direction-type><words${bold}>${esc(t.text)}</words></direction-type>`)) nWords++;
+      } else if ((pg.index || 0) < 1 && ['title', 'subtitle', 'composer', 'lyricist', 'arranger', 'copyright'].includes(t.role)) {
+        // a credit is words: OCR of a smudge or a stray glyph is not
+        const key = t.role === 'copyright' ? 'rights' : t.role;
+        if (!head[key] && (t.text.match(/\p{L}/gu) || []).length >= 3 && (t.conf || 0) >= 50) head[key] = t.text;
+      } else if (t.role === 'abbrev' && t.sys > 0 && t.k >= 0) {
+        // the abbreviation of the part(s) whose first staff it faces
+        for (const { pi, staffNo } of partsOn(t.k)) if (staffNo === 1 && !parts[pi].abbrev) parts[pi].abbrev = abbrevOf(t.text, parts[pi].name);
+      }
+    }
+  }
+  // a keyboard part's name is printed between its staves: the abbreviation
+  // stands on the staff nearest to it, which may be the lower one
+  for (const p of parts) if (!p.abbrev && p.src.length > 1) {
+    for (const pg of pages) {
+      const m = pg.fr && pg.fr._marks && pg.fr._marks.marks;
+      const t = m && m.text.find(t => t.role === 'abbrev' && t.text && p.src.some(s => s.staff === t.k));
+      if (t && abbrevOf(t.text, p.name)) { p.abbrev = abbrevOf(t.text, p.name); break; }
+    }
+  }
+  for (const pm of dirs) for (const l of pm) l.sort((a, b) => a.t - b.t);
+  return { dirs, head, nDyn, nWedge, nWords };
+}
+
+function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, credits, unitSys, head, dirs }) {
   // each system's own clef where it was read (a staff can change clef from
   // one system to the next), else the clef most systems show. A clef read on
   // one system only is more often a misread (or a header clef cancelled at
@@ -1249,8 +1371,14 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
   L.push('<?xml version="1.0" encoding="UTF-8" standalone="no"?>');
   L.push('<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">');
   L.push('<score-partwise version="4.0">');
+  head = head || {};
   L.push(`  <work><work-title>${esc(title || 'Scanned score')}</work-title></work>`);
-  L.push('  <identification><encoding><software>Score Scan Reader (classical OMR, browser)</software></encoding></identification>');
+  const creators = ['composer', 'lyricist', 'arranger'].filter(k => head[k]).map(k => `<creator type="${k}">${esc(head[k])}</creator>`).join('');
+  L.push(`  <identification>${creators}${head.rights ? `<rights>${esc(head.rights)}</rights>` : ''}<encoding><software>Score Scan Reader (classical OMR, browser)</software></encoding></identification>`);
+  // title and credits as printed on the first page
+  for (const k of ['title', 'subtitle', 'composer', 'lyricist', 'arranger', 'rights']) {
+    if (head[k]) L.push(`  <credit page="1"><credit-type>${k}</credit-type><credit-words>${esc(head[k])}</credit-words></credit>`);
+  }
   for (const c of credits || []) {
     L.push(`  <credit page="${c.page}"><credit-type>lyrics</credit-type>${c.label ? `<credit-words>${esc(c.label)} </credit-words>` : ''}<credit-words>${esc(c.text)}</credit-words></credit>`);
   }
@@ -1261,7 +1389,7 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
     parts.some(p => p.kind === 'vocal' && (p.src[0].voice === 1 || p.src[0].voice === 2));
   parts.forEach((p, i) => {
     if (groupChoir && i === vocalIdx[0]) L.push('    <part-group type="start" number="1"><group-name>Choir</group-name><group-symbol>bracket</group-symbol><group-barline>no</group-barline></part-group>');
-    L.push(`    <score-part id="${p.id}"><part-name>${esc(p.name)}</part-name></score-part>`);
+    L.push(`    <score-part id="${p.id}"><part-name>${esc(p.name)}</part-name>${p.abbrev ? `<part-abbreviation>${esc(p.abbrev)}</part-abbreviation>` : ''}</score-part>`);
     if (groupChoir && i === vocalIdx[vocalIdx.length - 1]) L.push('    <part-group type="stop" number="1"/>');
   });
   L.push('  </part-list>');
@@ -1301,16 +1429,26 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
       const order = streams.map((_, k) => k).filter(k => streams[k] && !(ps[k] && ps[k].optional && !streams[k].events.length))
         .sort((a, b) => (ps[a].staffNo - ps[b].staffNo) || (ps[a].vno - ps[b].vno));
       let pos = 0;
-      order.forEach((k) => {
+      // directions (dynamics, hairpins, words) go with the first voice written,
+      // before the note they stand at (an offset when they fall inside it)
+      const pend = ((dirs && dirs[pi] && dirs[pi][mi]) || []).slice();
+      const dirXML = (d, off) => `      ${d.xml}${off ? `<offset>${off}</offset>` : ''}${d.staffNo ? `<staff>${d.staffNo}</staff>` : ''}</direction>`;
+      order.forEach((k, oi) => {
         const s = streams[k], si = ps[k].staffNo - 1;
         if (pos > 0) L.push(`      <backup><duration>${pos}</duration></backup>`);
         pos = s.events.reduce((a, e) => a + Math.max(1, Math.round(e.q * DIV)), 0);
+        let dt = 0;
+        const flush = oi === 0 ? (e) => {
+          while (pend.length && pend[0].t < dt + e.q - 1e-6) { const d = pend.shift(); L.push(dirXML(d, Math.max(0, Math.round((d.t - dt) * DIV)))); }
+          dt += e.q;
+        } : null;
         const clef = clefAt(mi, s.staff);
         const line = accLine.get(mi + ':' + s.staff) || [];
         let et = 0;
         const voice = ps[k].vno;
         const staffTag = multi ? `<staff>${si + 1}</staff>` : '';
         for (const e of s.events) {
+          if (flush) flush(e);
           const t0 = et;
           et += e.q;
           const dur = Math.max(1, Math.round(e.q * DIV));
@@ -1363,6 +1501,11 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
           });
         }
       });
+      // marks past the first voice's last note (or a bar with no voice written)
+      if (pend.length) {
+        const cur = order.length ? pos / DIV : 0;
+        for (const d of pend) L.push(dirXML(d, Math.round((d.t - cur) * DIV)));
+      }
       if (mi === partMeasures[pi].length - 1) L.push('      <barline location="right"><bar-style>light-heavy</bar-style></barline>');
       L.push('    </measure>');
     });

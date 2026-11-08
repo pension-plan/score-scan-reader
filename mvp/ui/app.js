@@ -628,6 +628,13 @@
       s += g('lyrics', lyr.map(([x0, y0, x1, y1]) => `<path d="M${f1(x0)},${f1(y1 - ss * 0.3)}V${f1(y1 + ss * 0.15)}H${f1(x1)}V${f1(y1 - ss * 0.3)}"/>`).join(''), ` fill="none" stroke-width="${f1(sw)}"`);
       // ink nothing explains: swiped with a yellow highlighter
       const unk = (sy.unknown || []).filter((b) => !lyr.some((l) => b[0] < l[2] && b[2] > l[0] && b[1] < l[3] && b[3] > l[1]));
+      // text read off the page (titles, credits, instrument names, bar
+      // numbers, tempo and expression), dynamics and hairpins, and the curves
+      // and lines around the notes: a box each, text and dynamics labelled
+      const named = (b, label) => `<g><title>${esc(label)}</title>${rect(b, ss * 0.12)}<text x="${f1(b[0])}" y="${f1(b[1] - ss * 0.3)}" font-size="${f1(ss * 0.75)}">${esc(label)}</text></g>`;
+      s += g('text', (sy.text || []).filter((t) => t[4] !== 'lyrics').map((t) => named(t, t[5])).join(''), ` stroke-width="${f1(sw)}"`);
+      s += g('dyns', (sy.dyns || []).concat(sy.wedges || []).map((d) => named(d, d[4])).join(''), ` stroke-width="${f1(sw)}"`);
+      s += g('curves', [].concat(sy.slurs || [], sy.fermatas || [], sy.braces || [], sy.ledgers || []).map((b) => rect(b, ss * 0.08)).join(''), ` stroke-width="${f1(sw * 0.8)}" stroke-dasharray="${f1(sw * 2)} ${f1(sw)}"`);
       s += g('unknown', unk.map((b) => rect(b, ss * 0.18, ` rx="${f1(ss * 0.25)}"`)).join(''));
       s += g('labels', this.labels(p));
       return s + '</svg>';
@@ -739,7 +746,8 @@
   // Overlay layers the reader can switch off one by one (remembered).
   const LAYERS = [
     ['notes', 'Notes, stems, beams'], ['rests', 'Rests'], ['clefs', 'Clefs'], ['keys', 'Key signatures'], ['times', 'Time signatures'],
-    ['bars', 'Staves, barlines'], ['marks', 'Accidentals, dots, tuplets'], ['lyrics', 'Lyric syllables'], ['labels', 'Pitch and value labels'], ['unknown', 'Not recognised'],
+    ['bars', 'Staves, barlines'], ['marks', 'Accidentals, dots, tuplets'], ['lyrics', 'Lyric syllables'], ['labels', 'Pitch and value labels'],
+    ['text', 'Titles, names, text'], ['dyns', 'Dynamics, hairpins'], ['curves', 'Slurs, ties, fermatas, braces, ledger lines'], ['unknown', 'Not recognised'],
   ];
   const LAYER_ICON = {
     notes: '<path d="M9 2v8" stroke-width="1.4" class="ovk-stem"/><circle cx="6.5" cy="10" r="2.6" stroke-width="1.6"/>',
@@ -751,6 +759,9 @@
     marks: '<rect x="1" y="3" width="4.5" height="8" stroke-width="1.4" class="ovk-acc"/><circle cx="8.6" cy="7" r="1.8" stroke-width="1.4" class="ovk-dot"/><rect x="11" y="4" width="2.4" height="6" stroke-width="1" class="ovk-tup"/>',
     lyrics: '<path d="M2 8v3h10V8" stroke-width="1.6"/>',
     labels: '<text x="7" y="10.5" font-size="9" text-anchor="middle" stroke="none" fill="currentColor">C5</text>',
+    text: '<text x="7" y="10.5" font-size="9.5" text-anchor="middle" stroke="none" fill="currentColor" font-family="serif">Aa</text>',
+    dyns: '<text x="5.5" y="10.5" font-size="9" text-anchor="middle" stroke="none" fill="currentColor" font-style="italic" font-weight="700" font-family="serif">f</text><path d="M8.5 7l4.5-2.5M8.5 7l4.5 2.5" stroke-width="1"/>',
+    curves: '<path d="M2 9c2-4 8-4 10 0" stroke-width="1.6"/>',
     unknown: '<rect x="1.5" y="3.5" width="11" height="7" rx="1.6" stroke-width=".8"/>',
   };
   const layerOff = new Set((() => { try { return JSON.parse(store.get('ssr.layers') || '[]'); } catch (e) { return []; } })());
@@ -760,6 +771,8 @@
       notes: v ? v.heads.length : 0, rests: (sy.rests || []).length, clefs: (sy.clefs || []).length, keys: (sy.keys || []).length, times: (sy.times || []).length,
       bars: v ? (sy.bars || v.barlines).length : 0, marks: (sy.accs || []).length + (sy.dots || []).length + (sy.tuplets || []).length,
       lyrics: null, labels: null, unknown: (sy.unknown || []).length,
+      text: (sy.text || []).filter((t) => t[4] !== 'lyrics').length, dyns: (sy.dyns || []).length + (sy.wedges || []).length,
+      curves: (sy.slurs || []).length + (sy.fermatas || []).length + (sy.braces || []).length + (sy.ledgers || []).length,
     };
   }
   function renderLayers(v) {
@@ -1553,6 +1566,8 @@
       dots: (sy.dots || []).filter(([x, y, r]) => hit(x - r, y - r, x + r, y + r)).map(([x, y]) => ({ x, y })),
       tuplets: pick(sy.tuplets, (c) => ({ box: bx(c), actual: c[4], normal: c[5] })),
       barlines: (sy.bars || []).filter((r) => hit(r[4], r[1], r[5], r[2])).map((r) => ({ x: r[0], top: r[1], bottom: r[2], type: r[3] })),
+      text: pick(sy.text, (t) => ({ box: bx(t), role: t[4], label: t[5] })),
+      dynamics: pick((sy.dyns || []).concat(sy.wedges || []), (d) => ({ box: bx(d), value: d[4] })),
       unrecognised: (sy.unknown || []).filter(boxHit),
     };
   }
