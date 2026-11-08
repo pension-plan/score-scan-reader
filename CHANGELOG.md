@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.36.1](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.36.0...score-scan-reader-v0.36.1) (2026-11-08)
+
+
+### Bug Fixes
+
+* **lyrics:** melismas from slurs, ties, beams and extender strokes; inferred extenders checked against the other verses (L4b) ([41648c5](https://github.com/pension-plan/score-scan-reader/commit/41648c55c08f699d23a1fc2ac251104b2d6ec636))
+
 ## [0.36.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.35.0...score-scan-reader-v0.36.0) (2026-11-08)
 
 
