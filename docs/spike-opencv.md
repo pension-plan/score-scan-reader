@@ -24,6 +24,14 @@ only a flatten (no descreen). A clef-score fallback for the turn test (turn when
 the turned page reads them clearly better) has nothing to compare there, so it was not shipped. What the page needs
 first is a descreen the quality check triggers at this severity, then the turn test as it is.
 
+Then tried (one round): a descreen trigger for this coarser screen. Its page-quality numbers sit with the halftone class
+(background std 20.4 against 20.6, ink mid-grey share 0.97 against 0.95) except the speck count (26 against
+30,000: the dots have merged into texture), so `bgStd > 19 && midShare > 0.93 && mid > 0.2` picks it out alone among
+the challenge pages. But the Gaussian low-pass does not rescue it: at the usual strength (σ = space / 14) the screen
+stays, and at σ = space / 5 … / 3 it takes the faint staff lines with it; the descreened page finds no staff, and
+front() falls back to the plain page (2 of 6 staves). Not shipped. It would need a screen-frequency notch (the screen
+is a regular diagonal grid) that leaves the horizontal staff lines alone, not a low-pass.
+
 ## Not shipped: head template scan on degraded staves (time-boxed, one round)
 
 For heads the blob finder misses on degraded pages (faded heads broken into speckle, hollow heads whose thin outline
