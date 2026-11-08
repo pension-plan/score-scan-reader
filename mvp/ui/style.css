@@ -449,6 +449,9 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 .plate:not([data-ready]) .presets,.plate:not([data-ready]) .unknav{display:none}
 
 /* L5b: stanzas below the music as verses (a checkbox under the lyrics) */
+.drop-opt{display:flex;align-items:flex-start;gap:8px;margin-top:14px;max-width:46ch;font-size:13px;color:var(--muted);cursor:pointer;text-align:left}
+.drop-opt input{margin:2px 0 0;width:16px;height:16px;flex:none;accent-color:var(--accent)}
+@media (max-width:640px){.drop-opt{min-height:44px;align-items:center}}
 .stanza-opt{display:flex;align-items:flex-start;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--rule);font-size:13px;cursor:pointer}
 .stanza-opt input{margin:2px 0 0;width:16px;height:16px;flex:none;accent-color:var(--accent)}
 @media (max-width:640px){.stanza-opt{min-height:44px;align-items:center}}

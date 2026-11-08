@@ -409,6 +409,10 @@
     }
     return workerSrcURL;
   }
+  // ML assist (the copista-2m detector, src/ml.js): off unless the box is ticked; its models and
+  // runtime (about 16 MB) are fetched on the first page that needs them, then kept for the session
+  let mlDet = null;
+  const mlDetector = () => (mlDet ||= omrRequire('./ml').createBrowserDetector());
   function workerEngine(ocrFn, onProgress) {
     return new Promise((resolveEngine, rejectEngine) => {
       let w;
@@ -429,7 +433,7 @@
           resolveEngine(Object.assign(eng, {
             // with OCR, a page's text is read after its step (deferText): a slow text reader holds
             // back only the text, and preview() gives the score from the notes meanwhile
-            init(useOcr) { const p = wait('ready', 60000); w.postMessage({ t: 'init', ocr: !!useOcr, ocrExtra: !!(useOcr && ocrFn && ocrFn.extra), deferText: !!useOcr }); return p; },
+            init(useOcr, useMl) { const p = wait('ready', 60000); w.postMessage({ t: 'init', ocr: !!useOcr, ocrExtra: !!(useOcr && ocrFn && ocrFn.extra), deferText: !!useOcr, ml: !!useMl }); return p; },
             preview(o) { const p = wait('preview', 300000); if (!eng.dead) w.postMessage({ t: 'preview', opts: o || {} }); return p.then((m2) => m2.result); },
             addPage(gray, i, n) { const p = wait('page-done', 300000); if (!eng.dead) w.postMessage({ t: 'page', i, n, gray, maxW: THUMB_W }, [gray.data.buffer]); return p; },
             finish(o) { const p = wait('done', 300000); if (!eng.dead) w.postMessage({ t: 'finish', opts: o || {} }); return p.then((m2) => m2.result); },
@@ -441,6 +445,10 @@
           Promise.resolve().then(() => (m.extra && ocrFn.extra ? ocrFn.extra(m.img) : ocrFn(m.img))).then(
             (words) => w.postMessage({ t: 'ocr-res', id: m.id, words }),
             (e) => w.postMessage({ t: 'ocr-res', id: m.id, error: (e && e.message) || String(e) }));
+        } else if (m.t === 'ml') {
+          mlDetector().detect(m.img).then(
+            (r) => w.postMessage({ t: 'ml-res', id: m.id, dets: r.dets }),
+            (e) => w.postMessage({ t: 'ml-res', id: m.id, error: (e && e.message) || String(e) }));
         } else if (m.t === 'error') settle(false, new Error(m.msg));
         else if (waiter && m.t === waiter.type) settle(true, m);
       };
@@ -455,7 +463,10 @@
     let session = null;
     return {
       kind: 'main', dead: false,
-      async init(useOcr) { session = Sess.createSession(omrRequire, { ocr: useOcr ? ocrFn : null, onProgress }); },
+      async init(useOcr, useMl) {
+        session = Sess.createSession(omrRequire, { ocr: useOcr ? ocrFn : null, onProgress });
+        if (useMl) session = omrRequire('./ml').wrapConverter(session, (g) => mlDetector().detect(g), { onProgress });
+      },
       async addPage(gray, i, n) {
         // the page analysis runs without a break here; paint its stage first
         onProgress(`Page ${i + 1}/${n}: finding staves and notes`, { stage: 'cleanup', page: i, pages: n });
@@ -1330,7 +1341,7 @@
       // a page's view again once its text is read (deferText): titles and text marks on the overlay
       engine.onPageView = (i, view) => { const p = book.pages[i]; if (!p || !p.view || !view) return; p.view = view; if (book.sel === i) book.show(i); };
       const engineKind = engine.kind;
-      await engine.init(!!ocr);
+      await engine.init(!!ocr, $('mlAssist').checked);
 
       // Render page i+1 here while the worker reads page i.
       const renderPage = (i) => {
@@ -1576,6 +1587,11 @@
   $('copy').addEventListener('click', copyXML);
   $('saveXml').addEventListener('click', saveXML);
   $('stanzaVerses').addEventListener('change', rebuildScore);
+  // ML assist is remembered per browser; ticking it starts the model download
+  $('mlAssist').checked = store.get('ssr.ml') === '1';
+  $('mlAssist').addEventListener('change', (e) => {
+    if (e.target.checked) { store.set('ssr.ml', '1'); mlDetector().warm(); } else store.del('ssr.ml');
+  });
   $('copy').disabled = true;
   $('stop').addEventListener('click', () => {
     stopAsked = true;

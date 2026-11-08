@@ -425,15 +425,36 @@ components handed to `lyrics.js`.
 8. **Ties and slurs.** Thin curved components whose ends lie near two heads. A curve between two heads at the
    same pitch is a tie, otherwise a slur [OMR §2.9]. Fermatas by template.
 9. **Optional ML assist** behind the same output contract: a tiny CNN on component crops, or a full-page
-   detector. **To be decided by the design phase**, candidates:
-   - classical only (NCC templates plus feature classifier);
-   - tiny CNN on 32×32 crops, 50–200k parameters, int8 ONNX about 0.1 MB, trained on LilyPond-rendered crops
-     and DeepScoresV2 (CC BY 4.0) [OMR §2.8, §9.4];
-   - copista-2m detector (Apache-2.0, 1.94M parameters, 7.8 MB fp32 .pt; needs ONNX export; predicts stem
-     direction including `both` and a voice slot per head) used as an extra vote [OMR §3.1, §9.4];
-   - oemer UNets (MIT; 70.8 MB and 38.4 MB fp32, need quantisation and chunking) [OMR §3.1].
-   The numbers that decide this will come from `docs/spike-ml.md` and `docs/spike-classical.md`, which have not
-   been written yet.
+   detector. **Decided: the copista-2m detector** (Apache-2.0; 2.06 MB int8 ONNX plus the 14.2 MB onnxruntime-web
+   wasm), as an optional correction pass over the classical reading (`src/ml.js wrapConverter`), not as a second
+   pipeline. In the app it is the **ML assist** box under the drop zone, off by default and remembered per
+   browser. Ticking it starts the download; the page worker hands each page image to the page, which runs the
+   detector in its own module worker (`createBrowserDetector`), so nothing is fetched while the box is off.
+   The pass corrects three things where the two readings agree on at least 75% of the heads:
+   - note values (one vote per stem). Two checks can veto a change: the beam or flag found at the stem tip,
+     and, for a black head the model reads as open, the ink at the head's centre (90% or more keeps it
+     black, against speckled severe scans);
+   - false heads covered by a rest, clef, signature, accidental or other non-note box;
+   - missed heads at 0.9 confidence or more. Cue and grace heads (narrower than 1.1 spaces) and heads on a
+     staff with a percussion clef are never added, because the model has no cue class and misses most grace
+     flags. These three filters (open centre, head width, percussion clef) were added after re-measuring:
+     without them, three coverage items fell by more than 0.05 (cue notes, percussion, a compound-meter
+     severe scan).
+   Re-measured on 0.40.0 (`eval.mjs --ml` against the same build without it; `--ml-opts` and `ML_CACHE`
+   switch the corrections one at a time over cached detections):
+
+   | Set | ML off | ML on | Items down > 0.05 |
+   |---|---|---|---|
+   | Benchmark, with OCR (14 items) | 0.951 | 0.963 | 0 |
+   | Benchmark real scans (3) | 0.936 | 0.955 | 0 |
+   | Challenge (111) | 0.784 | 0.796 | 0 |
+   | Coverage (312) | 0.855 | 0.868 | 0 |
+
+   The gains are mostly duration (+0.03 to +0.04), pitch (+0.013 to +0.015) and rests (+0.06), on
+   degraded scans most of all. Each correction helps on its own (values +0.004, false heads +0.002, missed
+   heads +0.004 to +0.010 aggregate), and together they add up. The cost is about 2.2 s more per page in Node
+   (single thread); in the browser the St. Anselm sample went from 11.9 to 16.4 s. That cost, and the 16 MB
+   download, are why it stays off by default.
 
 **Failure modes.** Heads touching each other (seconds, unisons offset sideways); stems broken by staff
 removal; beams merged with slurs; accidentals touching heads; lyric hyphens read as ledger lines or ties

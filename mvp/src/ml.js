@@ -230,6 +230,18 @@ function beamDepth(h, R, sp) {
 }
 
 // kind of a disagreement between two printed values (in quarters, undotted)
+// Ink share of a head's centre (the middle of its oval, half a space wide and
+// a third of a space high) on the page without staff lines: about 1 for a
+// black head, well under for an open one.  null when the page is gone.
+function centreInk(h, R, sp) {
+  if (!R || !R.data) return null;
+  const { width: w, height: H, data } = R;
+  const x0 = Math.round(h.x - 0.25 * sp), x1 = Math.round(h.x + 0.25 * sp), y0 = Math.round(h.y - 0.17 * sp), y1 = Math.round(h.y + 0.17 * sp);
+  let n = 0, k = 0;
+  for (let y = Math.max(0, y0); y <= Math.min(H - 1, y1); y++) for (let x = Math.max(0, x0); x <= Math.min(w - 1, x1); x++) { n++; if (data[y * w + x]) k++; }
+  return n ? k / n : null;
+}
+
 function changeKind(a, b) {
   const lo = Math.min(a, b), hi = Math.max(a, b);
   if (hi <= 0.5 + EPS) return 'flags';      // 8th / 16th / 32nd: beam or flag count
@@ -266,8 +278,12 @@ function refinePage(entry, dets, opts, stats) {
   const edit = agree >= (opts.minAgreeEdit != null ? opts.minAgreeEdit : 0.75);
   // vote per (chord, stem direction)
   const groups = new Map();
+  // cue-sized heads (see addMissedHeads) keep our value: the detector reads them as
+  // full notes of another kind as often as not
+  const minW = opts.minHeadW != null ? opts.minHeadW : 1.1;
   heads.forEach((h, i) => {
     if (!hm.has(i) || !h.dur || h.stemDir === 2) return;
+    if (notes[hm.get(i)].w < minW * (h.sp || fr.ss)) return;
     const key = h.chord || h;
     const k = groups.get(key) || new Map();
     groups.set(key, k);
@@ -298,6 +314,12 @@ function refinePage(entry, dets, opts, stats) {
         // a second beam gets lost for us)
         const tip = kind === 'stem' && opts.tipCheck !== false ? tipMark(h, marks, sp) : null;
         let veto = !!(tip && (q0 >= 1 - EPS ? tip !== 'none' : tip === 'none'));
+        // black to open: the page must show the open centre too (a speckled or
+        // blurred scan makes a black head look open to the detector)
+        if (!veto && kind === 'hollow' && q0 > ourBase && opts.fillCheck !== false) {
+          const ink = centreInk(h, fr.R, sp);
+          if (ink != null && ink >= (opts.fillMax != null ? opts.fillMax : 0.9)) veto = true;
+        }
         if (!veto && kind === 'flags' && opts.depthCheck !== false) {
           const d = beamDepth(h, fr.R, sp);
           if (d != null) veto = Math.round(Math.log2(0.5 / q0)) + 1 !== (d < 0.95 ? 1 : d < 1.75 ? 2 : d < 2.6 ? 3 : 4);
@@ -317,7 +339,7 @@ function refinePage(entry, dets, opts, stats) {
   // rests, clefs and signatures stay on the page for other readers
   if (opts.keepDets !== false) fr.mlDets = (dets || []).filter(d => /^(rest_|mRest|multiRest|clef_|keySig_|meterSig_)/.test(d.cls) && d.conf >= minConf);
   if (entry.asm && edit && opts.remove !== false) removeFalseHeads(entry, dets, hm, opts, stats);
-  if (entry.asm && edit && opts.add !== false) addMissedHeads(entry, notes, hm, opts, stats, heads);
+  if (entry.asm && edit && opts.add !== false) addMissedHeads(entry, notes, hm, opts, stats, heads, dets);
 }
 
 // The accidental the detector prints left of each head it also saw, as
@@ -374,8 +396,12 @@ function removeFalseHeads(entry, dets, hm, opts, stats) {
 // at their x (taking its stem and value) or as a new chord whose stem is read
 // from the page.  Grace notes, heads in the clef / key area and heads outside
 // every measure are left out.
-function addMissedHeads(entry, notes, hm, opts, stats, heads0) {
+function addMissedHeads(entry, notes, hm, opts, stats, heads0, dets) {
   const fr = entry.fr, asm = entry.asm;
+  // staves with a percussion clef: the detector reads their heads well, but
+  // their 'pitch' is an instrument and the classical reading leaves them out
+  const perc = (dets || []).filter(d => d.cls === 'clef_perc' && d.conf >= 0.5).map(d => (d.xyxy[1] + d.xyxy[3]) / 2);
+  const minW = opts.minHeadW != null ? opts.minHeadW : 1.1;
   const used = new Set(hm.values());
   const matched = new Set([...hm.keys()].map(i => heads0[i]));
   const minC = opts.addConf != null ? opts.addConf : 0.9;
@@ -401,6 +427,11 @@ function addMissedHeads(entry, notes, hm, opts, stats, heads0) {
       break;
     }
     if (!st) continue;
+    // cue and grace heads (narrower than a space and a tenth; a full head is
+    // about 1.3) are not added: the detector has no cue class and its grace
+    // flag misses most of them
+    if (n.w < minW * sp) continue;
+    if (perc.some(y0 => Math.abs(y0 - st.yAt(2, st.left)) < 2.5 * sp)) continue;
     // one of ours there already, or one of ours unmatched close by (the same
     // head, read at another height by one of the two)
     if (fr.heads.some(h => Math.abs(h.x - n.x) < 0.6 * sp && (Math.abs(h.y - y) < 0.45 * sp || (!matched.has(h) && Math.abs(h.y - y) < 1.2 * sp)))) continue;
@@ -470,8 +501,8 @@ function wrapConverter(conv, detect, opts = {}) {
       }
       return entry;
     },
-    finish() {
-      const r = conv.finish();
+    finish(...a) {
+      const r = conv.finish(...a);
       if (warnings.length) r.warnings = warnings.concat(r.warnings || []);
       r.ml = Object.assign({}, stats);
       return r;

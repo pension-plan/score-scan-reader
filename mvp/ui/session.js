@@ -256,6 +256,7 @@ function __omrSessionModule() {
       lyricsBySystem: plain(res.lyricsBySystem, 6) || {},
       warnings: (res.warnings || []).slice(),
       pages: pageParts(res.pages),
+      ml: res.ml ? plain(res.ml, 1) : null,
     };
   }
   // Parts of each drawn head, per page shown. The halves of a spread (index
@@ -293,12 +294,20 @@ function __omrSessionModule() {
       post({ t: 'ocr', id, extra, img: { width: img.width, height: img.height, data } }, [data.buffer]);
     });
     const ocr = ask(false);
+    // ML assist: the page runs the detector (its own worker, models loaded on first use) and
+    // answers each page's image with its detections
+    const detect = (img) => new Promise((resolve, reject) => {
+      const id = ++ocrSeq;
+      pending.set(id, { resolve, reject, ml: true });
+      const data = new Uint8ClampedArray(img.data);
+      post({ t: 'ml', id, img: { width: img.width, height: img.height, data } }, [data.buffer]);
+    });
     let queue = Promise.resolve();
     scope.onmessage = (ev) => {
       const m = ev.data || {};
-      if (m.t === 'ocr-res') {
+      if (m.t === 'ocr-res' || m.t === 'ml-res') {
         const p = pending.get(m.id);
-        if (p) { pending.delete(m.id); if (m.error) p.reject(new Error(m.error)); else p.resolve(m.words || []); }
+        if (p) { pending.delete(m.id); if (m.error) p.reject(new Error(m.error)); else p.resolve(p.ml ? { dets: m.dets || [] } : m.words || []); }
         return;
       }
       // page and finish messages run strictly in order
@@ -315,6 +324,7 @@ function __omrSessionModule() {
           deferText: !!m.deferText,
           onProgress: (msg, info) => post({ t: 'progress', msg, info: plain(info, 2) || null }),
         });
+        if (m.ml) session = req('./ml').wrapConverter(session, detect, { onProgress: (msg, info) => post({ t: 'progress', msg, info: plain(info, 2) || null }) });
         post({ t: 'ready' });
       } else if (m.t === 'page') {
         const t0 = Date.now();

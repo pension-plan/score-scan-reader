@@ -6,6 +6,7 @@
 //                       [--set synthetic|real|challenge|coverage] [--ml] [--ocr-lang eng|app|<langs>]
 //                       [--ocr-workers N] [--lang-path dir]
 //
+// --ml-opts '<json>' implies --ml and passes options to wrapConverter (kinds, add, remove...).
 // --ml wraps each conversion with the optional copista-2m detector (src/ml.js wrapConverter,
 // onnxruntime-node; ORT_NODE overrides its path), as the app does when the detector is on.
 // --ocr-lang picks the Tesseract languages: eng (default), app (lyrics.js OCR_CONFIG, what the
@@ -63,7 +64,7 @@ const require = createRequire(import.meta.url);
 
 // ---------------------------------------------------------------- args
 function parseArgs(argv) {
-  const a = { out: null, only: null, ocr: true, jobs: 0, src: path.join(MVP, 'src'), dpi: 200, timeout: 0, set: null, child: null, quiet: false, ml: false, ocrLang: 'eng', ocrWorkers: 2, langPath: path.join(MVP, 'dist/assets') };
+  const a = { out: null, only: null, ocr: true, jobs: 0, src: path.join(MVP, 'src'), dpi: 200, timeout: 0, set: null, child: null, quiet: false, ml: false, mlOpts: null, ocrLang: 'eng', ocrWorkers: 2, langPath: path.join(MVP, 'dist/assets') };
   for (let i = 0; i < argv.length; i++) {
     const k = argv[i];
     const v = () => argv[++i];
@@ -77,6 +78,7 @@ function parseArgs(argv) {
     else if (k === '--set') a.set = v();
     else if (k === '--quiet') a.quiet = true;
     else if (k === '--ml') a.ml = true;
+    else if (k === '--ml-opts') { a.ml = true; a.mlOpts = JSON.parse(v()); }
     else if (k === '--ocr-lang') a.ocrLang = v();
     else if (k === '--ocr-workers') a.ocrWorkers = Math.max(1, +v() || 1);
     else if (k === '--lang-path') a.langPath = path.resolve(v());
@@ -102,7 +104,22 @@ async function childMain(specPath) {
   if (spec.ml) {
     const ml = req(path.join(spec.src, 'ml.js'));
     const det = await ml.createNodeDetector({ assets: path.join(MVP, 'assets-src/ml'), ortPath: process.env.ORT_NODE || path.join(ROOT, 'spike/ml/node_modules/onnxruntime-node') });
-    wrap = (c) => ml.wrapConverter(c, det.detect, {});
+    // ML_CACHE=<dir> keeps each page's detections (keyed by the page pixels), so runs that
+    // only change how the corrections are applied skip the detector
+    let detect = det.detect;
+    if (process.env.ML_CACHE) {
+      const crypto = await import('node:crypto');
+      detect = async (g, o) => {
+        const f = path.join(process.env.ML_CACHE, crypto.createHash('sha1').update(g.data).digest('hex') + '.json');
+        if (fs.existsSync(f)) return JSON.parse(fs.readFileSync(f, 'utf8'));
+        const r = await det.detect(g, o);
+        fs.mkdirSync(process.env.ML_CACHE, { recursive: true });
+        fs.writeFileSync(f + '.' + process.pid, JSON.stringify({ dets: r.dets }));
+        fs.renameSync(f + '.' + process.pid, f);
+        return r;
+      };
+    }
+    wrap = (c) => ml.wrapConverter(c, detect, spec.mlOpts || {});
   }
   const pages = spec.pages.map(() => null); // [width, height] once read
   const convert = async (files, o) => {
@@ -180,7 +197,7 @@ async function childMain(specPath) {
   const page_ms = pages.map((_, i) => Math.round((ends[i] - (pageStart[i] ?? (i ? ends[i - 1] : p0))) * 10) / 10);
   fs.writeFileSync(spec.xmlOut, (r.score && r.score.xml) || '');
   fs.writeFileSync(spec.metaOut, JSON.stringify({
-    ms, warnings: r.warnings || [],
+    ms, warnings: r.warnings || [], ...(r.ml ? { ml: r.ml } : {}),
     parts: ((r.score && r.score.parts) || []).map((p, i) => ({ name: p.name, notes: r.score.nNotes ? r.score.nNotes[i] : null })),
     measures: r.score && r.score.measures, fifths: r.score && r.score.fifths, time: r.score && r.score.time,
     perf: {
@@ -626,7 +643,7 @@ async function main() {
       const metaOut = path.join(outDir, it.key + '.meta.json');
       const specPath = path.join(outDir, it.key + '.spec.json');
       for (const f of [xmlOut, metaOut]) fs.rmSync(f, { force: true });
-      fs.writeFileSync(specPath, JSON.stringify({ src: args.src, pages, ocr: args.ocr, ocrLang: args.ocrLang, ocrWorkers: args.ocrWorkers, langPath: args.langPath, ml: args.ml, xmlOut, metaOut }));
+      fs.writeFileSync(specPath, JSON.stringify({ src: args.src, pages, ocr: args.ocr, ocrLang: args.ocrLang, ocrWorkers: args.ocrWorkers, langPath: args.langPath, ml: args.ml, mlOpts: args.mlOpts, xmlOut, metaOut }));
       const tChild = Date.now();
       const r = await run(process.execPath, ['--max-old-space-size=8192', __filename, '--child', specPath], { timeoutMs: args.timeout * 1000, cwd: MVP, trackRss: true });
       res.child_ms = Date.now() - tChild;
@@ -639,6 +656,7 @@ async function main() {
       } else {
         const meta = JSON.parse(fs.readFileSync(metaOut, 'utf8'));
         res.runtime_ms = meta.ms; res.warnings = meta.warnings;
+        if (meta.ml) res.ml = meta.ml;
         const pf = meta.perf;
         if (pf) {
           res.page_ms = pf.page_ms; res.assemble_ms = pf.assemble_ms; res.load_ms = pf.load_ms; res.px = pf.px;
@@ -713,7 +731,7 @@ async function main() {
   }
   const report = {
     when: new Date().toISOString(), wall_s: Math.round((Date.now() - t0) / 100) / 10,
-    config: { ocr: args.ocr, ...(args.ocr ? { ocr_lang: args.ocrLang } : {}), ...(args.ml ? { ml: true } : {}), dpi: args.dpi, jobs, src: args.src, src_hash: srcHash(args.src), schema, weights: W, outputs: outDir, ...(chal.length ? { set: 'challenge' } : {}), ...(cov.length ? { set: 'coverage', coverage_dir: COVERAGE, cpus: os.cpus().length, loadavg: os.loadavg().map(x => +x.toFixed(1)) } : {}) },
+    config: { ocr: args.ocr, ...(args.ocr ? { ocr_lang: args.ocrLang } : {}), ...(args.ml ? { ml: args.mlOpts || true } : {}), dpi: args.dpi, jobs, src: args.src, src_hash: srcHash(args.src), schema, weights: W, outputs: outDir, ...(chal.length ? { set: 'challenge' } : {}), ...(cov.length ? { set: 'coverage', coverage_dir: COVERAGE, cpus: os.cpus().length, loadavg: os.loadavg().map(x => +x.toFixed(1)) } : {}) },
     summary, items: results, ...(skipped.length ? { skipped } : {}),
   };
   fs.writeFileSync(args.out, JSON.stringify(report, null, 1));
