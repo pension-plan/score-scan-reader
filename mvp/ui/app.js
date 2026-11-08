@@ -1032,7 +1032,8 @@
     }
   }
 
-  const INFO_RE = /^(Closed score|Grand staff|Staff \d+: two voices|Time signature inferred)|\bdetected\b/i;
+  // a note, not a problem: how the score was read, or stanzas set as verses on request
+  const INFO_RE = /^(Closed score|Grand staff|Staff \d+: two voices|Time signature inferred)|\bdetected\b|printed below the music set under the notes/i;
   const ICON_WARN = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5l7 13H1z" fill="currentColor"/><path d="M8 6v4" style="stroke:var(--warn-bg)" stroke-width="1.8" stroke-linecap="round"/><circle cx="8" cy="12.3" r="1" style="fill:var(--warn-bg)"/></svg>';
   const ICON_INFO = '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M8 7v4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="8" cy="4.8" r=".95" fill="currentColor"/></svg>';
   function renderWarnings(list) {
