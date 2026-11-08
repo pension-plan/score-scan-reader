@@ -23,6 +23,7 @@ const DEFAULTS = {
   minWordConf: 20,    // words below this confidence are dropped ...
   relaxLow: true,     // ... unless they look like clean words on a confident row
   minLineConf: 50,
+  secondPassSlack: 2,  // second OCR pass (ocr.extra, rows with accent marks): kept within this much of the first pass's confidence
   geomCheck: true,    // reject rows whose ink does not look like a text line (stems, fermatas, ties)
   goodFrac: 0.4,      // share of tokens that must be confident word-like tokens ...
   goodAbs: 6,         // ... or at least this many of them
@@ -515,6 +516,66 @@ const HY = /[-‐‑‒–—―~]/;
 const LETTER = /[A-Za-zÀ-ɏ]/;
 
 // Does an OCR token look like part of a lyric (word, syllable, hyphen, verse number)?
+// Two words joined by an elision slur (a small arc under the baseline across
+// the gap: "da‿il", one note) become one word with '‿' (score.js splits it
+// again around the mark). Words in page coordinates.
+function joinElisions(fr, ln, words) {
+  const R = fr.R, sp = ln.sp;
+  if (!R || !R.data || !sp || words.length < 2) return words;
+  const W = R.width, rowH = ln.y1 - ln.y0;
+  const y0 = Math.max(0, Math.round(ln.y0 + 0.7 * rowH)), y1 = Math.min(R.height - 1, Math.round(ln.y1 + 1.0 * sp));
+  const out = [words[0]];
+  for (let i = 1; i < words.length; i++) {
+    const a = out[out.length - 1], b = words[i];
+    const gap = b.x0 - a.x1;
+    if (gap > 1.5 * sp || gap < -0.2 * sp || /[-‐‑‒–—―~]$/.test(a.text) || /^[-‐‑‒–—―~]/.test(b.text)) { out.push(b); continue; }
+    // an arc spanning the gap: its own thin component under the baseline (not a
+    // descender, which reaches down from a letter above), wider than tall and
+    // sagging in the middle (not a straight extender line)
+    if (gap > 1.0 * sp) { out.push(b); continue; }
+    const cx0 = Math.max(0, Math.round(a.x1 - 0.8 * sp)), cx1 = Math.min(W - 1, Math.round(b.x0 + 0.8 * sp));
+    const cw = cx1 - cx0 + 1, ch = y1 - y0 + 1;
+    if (cw < 3 || ch < 3) { out.push(b); continue; }
+    const crop = { width: cw, height: ch, data: new Uint8Array(cw * ch) };
+    for (let y = 0; y < ch; y++) for (let x = 0; x < cw; x++) crop.data[y * cw + x] = R.data[(y0 + y) * W + cx0 + x] ? 1 : 0;
+    const mid = (a.x1 + b.x0) / 2 - cx0;
+    const arc = labelComponents(crop).comps.find(c => {
+      const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1;
+      return c.y0 > 0 && c.x0 > 0 && c.x1 < cw - 1 && w >= 0.6 * sp && h <= 0.45 * sp && w >= 2.5 * h && c.x0 <= mid && c.x1 >= mid;
+    });
+    let bowed = false;
+    if (arc) {
+      const ym = (x) => { let s = 0, n = 0; for (let y = arc.y0; y <= arc.y1; y++) if (crop.data[y * cw + x]) { s += y; n++; } return n ? s / n : null; };
+      const l = ym(arc.x0), r = ym(arc.x1), m = ym(Math.round((arc.x0 + arc.x1) / 2));
+      bowed = l != null && r != null && m != null && m - Math.min(l, r) >= 1;
+    }
+    if (bowed) out[out.length - 1] = { ...a, text: a.text.replace(/[,.;:!?]+$/, '') + '‿' + b.text, conf: Math.min(a.conf, b.conf), x1: b.x1, ok: true };
+    else out.push(b);
+  }
+  return out;
+}
+
+// Accent marks in a text row image (gray, dark ink): small marks just above a
+// letter wider than an i or j (whose dots are not accents): á é ü ñ č and so on.
+function accentMarks(img) {
+  const w = img.width, h = img.height, bin = { width: w, height: h, data: new Uint8Array(w * h) };
+  for (let i = 0; i < w * h; i++) bin.data[i] = img.data[i] < 128 ? 1 : 0;
+  const { comps } = labelComponents(bin);
+  const hs = comps.filter(c => c.area >= 6).map(c => c.y1 - c.y0 + 1).sort((a, b) => a - b);
+  if (hs.length < 4) return 0;
+  const med = hs[hs.length >> 1];
+  const letters = comps.filter(c => c.y1 - c.y0 + 1 >= 0.6 * med);
+  let n = 0;
+  for (const m of comps) {
+    const mw = m.x1 - m.x0 + 1, mh = m.y1 - m.y0 + 1;
+    if (m.area < 3 || mh > 0.45 * med || mw > 0.9 * med) continue;
+    const below = letters.find(c => c.y0 > m.y1 && c.y0 - m.y1 <= 0.5 * med && c.x0 <= (m.x0 + m.x1) / 2 && c.x1 >= (m.x0 + m.x1) / 2);
+    // a vowel-wide letter (an i or j with its serifs is narrower than 0.7 x-height)
+    if (below && below.x1 - below.x0 + 1 >= 0.7 * med && below.y1 - below.y0 + 1 <= 1.1 * med) n++;
+  }
+  return n;
+}
+
 function plausible(t) {
   if (/_/.test(t)) return t.split(/_+/).filter(Boolean).every(plausible);
   const s = t.replace(/^[|_.,;:!?'"“”‘’()]+|[|_.,;:!?'"“”‘’()]+$/g, '');
@@ -1199,6 +1260,30 @@ async function readLyrics(fr, ocr, onProgress, opts) {
     const crop = buildCrop(ln.strip || fr.gray, row, ln, o), img = crop.img, toPage = (x) => crop.toPage(x) + ox;
     let words = [];
     try { words = await ocr(img); } catch (e) { words = []; }
+    // second pass (ocr.extra: more languages, loaded on first use): a row with
+    // accent marks over its letters is read again
+    if (typeof ocr.extra === 'function' && o.secondPass !== false) {
+      const conf = (ws) => ws.reduce((a, w) => a + w.conf, 0) / Math.max(1, ws.length);
+      const c1 = conf(words);
+      // signs of accented text the first pass half-read: a letter outside ASCII, a
+      // word mixing letters and digits ("V6" for Vö)
+      // (German umlauts and ß the first pass reads itself)
+      const suspect = words.some(w => /[^\x00-\x7fäöüÄÖÜß’‘“”„–—]/.test(w.text) && /\p{L}/u.test(w.text)) || words.some(w => /\p{L}/u.test(w.text) && /\d/.test(w.text) && !/^\d+[.,]?$/.test(w.text));
+      // words of French, Spanish, Italian or Czech (the languages the second pass adds)
+      const toks = words.map(w => w.text.toLowerCase().replace(/[^\p{L}']/gu, '')).filter(Boolean);
+      const other = toks.filter(t => /^(le|les|du|des|au|aux|et|est|une|sur|dans|pour|qui|que|el|los|las|y|en|con|por|mi|del|il|di|che|per|nel|della|je|se|ze|na|nad|pod|jsem|ty)$/.test(t)).length;
+      const en = toks.filter(t => /^(the|and|of|to|my|thy|thee|with|is|that|for|our|all|thou|his|be|we|you|on|from|me|he)$/.test(t)).length;
+      // (umlauts the first pass already read are marks too: such rows are German)
+      const german = words.some(w => /[äöüÄÖÜß]/.test(w.text));
+      if (words.length && (suspect || (other >= 2 && other > en) || (!german && en <= 1 && accentMarks(img) >= 2))) {
+        let w2 = [];
+        try { w2 = await ocr.extra(img); } catch (e) { w2 = []; }
+        // kept only when it reads accented letters the first pass did not, at no loss of confidence
+        const acc = (ws) => ws.reduce((a, w) => a + (w.text.match(/[^\x00-\x7f\p{P}]/gu) || []).length, 0);
+        const good = (ws) => ws.filter(w => plausible(w.text)).length;
+        if (w2.length && conf(w2) >= c1 - o.secondPassSlack && acc(w2) > acc(words) && good(w2) >= good(words) - 1) { words = w2; if (dbg) dbg.second = true; }
+      }
+    }
     const mapped = splitMerged(words.map(w => ({ ...w, x0: toPage(w.x0), x1: toPage(Math.max(w.x0, w.x1 - 1)) + 1 }))).map(w => ({ ...w, ok: plausible(w.text) }));
     // line-level sanity: lyric rows are mostly clean words
     const nOk = mapped.filter(w => w.ok).length;
@@ -1229,7 +1314,7 @@ async function readLyrics(fr, ocr, onProgress, opts) {
       const t = w.text.replace(/[^\p{L}]/gu, '');
       return t.length >= 1 && t.length <= 3 && !/[aeiouyàâäéèêëîïôöùûüåæøœáíóúñ]/i.test(t);
     };
-    const { number, numberConf, syllables } = toSyllables(kept.filter(w => (w.ok || w.conf >= 60) && !junk(w)));
+    const { number, numberConf, syllables } = toSyllables(joinElisions(fr, ln, kept.filter(w => (w.ok || w.conf >= 60) && !junk(w))));
     const entry = { band: ln.band, last: ln.last, y: ln.y0, y1: ln.y1, printed: number, number, syllables, raw: mapped.map(w => w.text).join(' '), conf: meanConf };
     if (ln.above) entry.above = true;
     Object.defineProperty(entry, 'geo', { value: { bl: ln.baseline ?? ln.y1, numberConf, sp: ln.sp }, enumerable: false });
@@ -1289,9 +1374,12 @@ async function readLyrics(fr, ocr, onProgress, opts) {
 // eng+deu+lat +0.005 at 2.1x (the lat model is weak, spike 5a) -> eng+deu.
 const OCR_CONFIG = {
   langs: 'eng+deu',
+  // second pass for rows with accents or low confidence (readLyrics), loaded on first use
+  extraLangs: 'eng+deu+fra+spa+ita+ces',
+  extraFiles: ['fra.traineddata.gz', 'spa.traineddata.gz', 'ita.traineddata.gz', 'ces.traineddata.gz'],
   oem: 1,
   files: ['eng.traineddata.gz', 'deu.traineddata.gz'],
   params: { tessedit_pageseg_mode: '7', user_defined_dpi: '300' },
 };
 
-module.exports = { OCR_CONFIG, readLyrics, readPartLabels, readStanzas, syllabify, findTextLines, findTextLinesCC, toSyllables, splitSyllable, vowelGroups, detectLang, cropGray, DEFAULTS, _analyseRow: analyseRow };
+module.exports = { _accentMarks: accentMarks, OCR_CONFIG, readLyrics, readPartLabels, readStanzas, syllabify, findTextLines, findTextLinesCC, toSyllables, splitSyllable, vowelGroups, detectLang, cropGray, DEFAULTS, _analyseRow: analyseRow };

@@ -43,12 +43,14 @@
     const def = { langs: 'eng', oem: 1, params: { tessedit_pageseg_mode: '7', user_defined_dpi: '300' } };
     try {
       const c = omrRequire('./lyrics').OCR_CONFIG;
-      if (c && typeof c.langs === 'string' && /^[a-z_]+(\+[a-z_]+)*$/.test(c.langs)) return { langs: c.langs, oem: c.oem == null ? 1 : c.oem, params: Object.assign({}, def.params, c.params || {}) };
+      if (c && typeof c.langs === 'string' && /^[a-z_]+(\+[a-z_]+)*$/.test(c.langs)) return { langs: c.langs, oem: c.oem == null ? 1 : c.oem, params: Object.assign({}, def.params, c.params || {}), extraLangs: typeof c.extraLangs === 'string' && /^[a-z_]+(\+[a-z_]+)*$/.test(c.extraLangs) ? c.extraLangs : '' };
     } catch (e) { /* bundle without lyrics config */ }
     return def;
   }
   let ocrLangs = '';
   let ocrWorkerP = null;
+  // second-pass reader (OCR_CONFIG.extraLangs: rows with accents), made on first use
+  let ocrMake = null, ocrExtraP = null;
   function getOCR() {
     if (!ocrWorkerP) {
       const base = new URL('assets/', document.baseURI).href;
@@ -71,6 +73,7 @@
         });
         // the pipeline's language set (eng+deu: umlauts and German words), or
         // English alone if a language file is missing
+        ocrMake = async (l) => { const x = await make(l); await x.setParameters(cfg.params); return x; };
         let w, langs = cfg.langs;
         try { w = await make(langs); } catch (e) { if (langs === 'eng') throw e; langs = 'eng'; w = await make(langs); }
         await w.setParameters(cfg.params);
@@ -380,14 +383,14 @@
         if (m.t === 'alive') {
           alive = true; clearTimeout(timer);
           resolveEngine(Object.assign(eng, {
-            init(useOcr) { const p = wait('ready', 60000); w.postMessage({ t: 'init', ocr: !!useOcr }); return p; },
+            init(useOcr) { const p = wait('ready', 60000); w.postMessage({ t: 'init', ocr: !!useOcr, ocrExtra: !!(useOcr && ocrFn && ocrFn.extra) }); return p; },
             addPage(gray, i, n) { const p = wait('page-done', 300000); if (!eng.dead) w.postMessage({ t: 'page', i, n, gray, maxW: THUMB_W }, [gray.data.buffer]); return p; },
             finish() { const p = wait('done', 300000); if (!eng.dead) w.postMessage({ t: 'finish' }); return p.then((m2) => m2.result); },
             dispose() { eng.dead = true; w.terminate(); settle(false, new Error('stopped')); },
           }));
         } else if (m.t === 'progress') onProgress(m.msg, m.info);
         else if (m.t === 'ocr') {
-          Promise.resolve().then(() => ocrFn(m.img)).then(
+          Promise.resolve().then(() => (m.extra && ocrFn.extra ? ocrFn.extra(m.img) : ocrFn(m.img))).then(
             (words) => w.postMessage({ t: 'ocr-res', id: m.id, words }),
             (e) => w.postMessage({ t: 'ocr-res', id: m.id, error: (e && e.message) || String(e) }));
         } else if (m.t === 'error') settle(false, new Error(m.msg));
@@ -1170,13 +1173,17 @@
       try {
         status('Loading the text reader');
         const w = await withTimeout(ocrP, 45000);
-        ocr = async (img) => {
-          const { data } = await w.recognize(grayToCanvas(img), {}, { text: true, blocks: true });
+        const readWith = (wk) => async (img) => {
+          const { data } = await wk.recognize(grayToCanvas(img), {}, { text: true, blocks: true });
           const words = [];
           for (const b of data.blocks || []) for (const p of b.paragraphs) for (const l of p.lines) for (const wd of l.words)
             words.push({ text: wd.text, conf: wd.confidence, x0: wd.bbox.x0, x1: wd.bbox.x1 });
           return words;
         };
+        ocr = readWith(w);
+        // accented rows are read again with more languages (lyrics.js), loaded only then
+        const extraLangs = ocrConfig().extraLangs;
+        if (extraLangs && ocrMake) ocr.extra = async (img) => { ocrExtraP ||= ocrMake(extraLangs); return readWith(await ocrExtraP)(img); };
         ocrUsed = true;
       } catch (e) { ocrError = e.message || String(e); }
 

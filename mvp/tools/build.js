@@ -116,6 +116,9 @@ if (!/max\(16px,\s*env\(safe-area-inset-left/.test(css)) fail('side gutter does 
 // ---- assets
 // every language the pipeline's OCR config names (src/lyrics.js OCR_CONFIG) ships as traineddata
 const lyrSrc = fs.existsSync(path.join(SRC, 'lyrics.js')) ? fs.readFileSync(path.join(SRC, 'lyrics.js'), 'utf8') : '';
+// the second-pass languages (OCR_CONFIG.extraFiles: loaded only for accented lyric rows) and their notice
+const ocrExtra = ((lyrSrc.match(/extraFiles:\s*\[([^\]]*)\]/) || [])[1] || '').match(/[\w.]+\.traineddata\.gz/g) || [];
+for (const f of ocrExtra.concat(ocrExtra.length ? ['NOTICE.ocr-langs.txt'] : [])) if (!fs.existsSync(path.join(DIST, 'assets', f))) fail(`optional OCR asset dist/assets/${f} is missing`);
 const ocrLangs = ((lyrSrc.match(/OCR_CONFIG\s*=\s*{[\s\S]*?langs:\s*['"]([\w+]+)['"]/) || [])[1] || 'eng').split('+');
 for (const l of ocrLangs) if (!fs.existsSync(path.join(DIST, 'assets', `${l}.traineddata.gz`))) fail(`OCR_CONFIG names ${l}, but dist/assets/${l}.traineddata.gz is missing`);
 const rows = [];

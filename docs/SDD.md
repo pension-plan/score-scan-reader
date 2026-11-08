@@ -1209,7 +1209,22 @@ lyric row taller). An elision slur (a small arc under the baseline inside a syll
 syllable OCR read as one word ("ain" -> a‿in) into `<text>a</text><elision>‿</elision><syllabic>single
 </syllabic><text>in</text>`. Coverage (clean / scan / severe): lyrics-elision 0 to 63 / 50 / 63%,
 lyrics-multi-verse 85 to 91 / 90 / 75%, hyphen 82 to 87%, extender 79 to 84%; lyr02-non-ascii-four-languages
-lyrics 0.12 to 0.87; no item down. Non-ASCII letters stay at 0-5%: the eng+deu models drop most accents;
+lyrics 0.12 to 0.87; no item down. Two words joined by an elision slur across the gap ("da‿il", one note) are joined in lyrics.js
+(`joinElisions`: a thin, bowed component under the baseline spanning the gap, not a descender or a
+straight extender) and split again in score.js, so elision recall holds whichever OCR pass read the row.
+
+**Second OCR pass for accented rows.** `OCR_CONFIG.extraLangs` (eng+deu+fra+spa+ita+ces; the four extra
+best_int models, 6.7 MB, ship in dist/assets with NOTICE.ocr-langs.txt and are checked by the build as
+optional assets) is loaded only when a lyric row looks accented: the first pass read a letter outside
+ASCII other than German ones, or a word mixing letters and digits ("V6" for Vö), or two or more French /
+Spanish / Italian / Czech function words, or (in a row without German letters and with at most one English
+function word) two or more accent marks over vowel-wide letters. The second reading is kept when it reads
+more accented letters at no more than 2 points lower mean confidence and no fewer plausible words. The
+app proxies it through the worker (`ocr {extra}` messages); eval.mjs uses it with `--ocr-lang app`.
+Coverage lyrics family (app languages, clean / scan / severe): non-ASCII 5 / 5 / 5% to 11 / 21 / 21%,
+lyrics 52 / 48 / 46% to 58 / 54 / 52%, elision 63 / 50 / 63% to 88 / 50 / 63%. Benchmark with app OCR:
+aggregate 0.9528 to 0.9527 (aloha-oe-full-score lyrics -0.007), OCR time 4.48 to 5.14 s per page
+(the extra worker loads on pages whose rows trigger it, German rows included). Earlier note: the eng+deu models drop most accents;
 adding fra+spa+ita+ces (6.7 MB more, 1.6x the OCR time) raises non-ASCII to 16-32% and the lyric
 syllables of these two items, but lowers elision recall (63 to 25% clean) and costs every page, so the
 language set is unchanged for now.

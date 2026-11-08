@@ -279,19 +279,20 @@ function __omrSessionModule() {
   }
 
   // ------------------------------------------------------------ worker side
-  // Messages in: init {ocr}, page {i, n, gray}, finish. Out: ready, progress,
-  // ocr {id, img} (answered by ocr-res), page-done, done, error.
+  // Messages in: init {ocr, ocrExtra}, page {i, n, gray}, finish. Out: ready, progress,
+  // ocr {id, img, extra} (answered by ocr-res), page-done, done, error.
   function workerMain(scope, req) {
     let session = null;
     let ocrSeq = 0;
     const pending = new Map();
     const post = (m, tr) => scope.postMessage(m, tr || []);
-    const ocr = (img) => new Promise((resolve, reject) => {
+    const ask = (extra) => (img) => new Promise((resolve, reject) => {
       const id = ++ocrSeq;
       pending.set(id, { resolve, reject });
       const data = new Uint8ClampedArray(img.data); // own buffer, safe to transfer
-      post({ t: 'ocr', id, img: { width: img.width, height: img.height, data } }, [data.buffer]);
+      post({ t: 'ocr', id, extra, img: { width: img.width, height: img.height, data } }, [data.buffer]);
     });
+    const ocr = ask(false);
     let queue = Promise.resolve();
     scope.onmessage = (ev) => {
       const m = ev.data || {};
@@ -305,6 +306,8 @@ function __omrSessionModule() {
     };
     async function handle(m) {
       if (m.t === 'init') {
+        // the page's second-pass reader (more languages), when it has one
+        if (m.ocrExtra) ocr.extra = ask(true);
         session = createSession(req, {
           ocr: m.ocr ? ocr : null,
           onProgress: (msg, info) => post({ t: 'progress', msg, info: plain(info, 2) || null }),

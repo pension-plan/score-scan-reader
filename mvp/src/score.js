@@ -1305,6 +1305,8 @@ function wordy(syl) {
 // box. OCR reads such a syllable as one word ("ain"); it is cut at the arc.
 // [left, right] or null
 function elisionOf(s, verse, comps, sp) {
+  // joined in lyrics.js (an arc across the gap between two words)
+  if (s.text && /.‿./.test(s.text)) { const k = s.text.indexOf('‿'); return [s.text.slice(0, k), s.text.slice(k + 1)]; }
   if (!comps || s.x0 == null || s.x1 == null || verse.y == null || verse.y1 == null || !s.text || s.text.length < 2) return null;
   const w = s.x1 - s.x0, rowH = verse.y1 - verse.y;
   const arc = comps.find(c => {

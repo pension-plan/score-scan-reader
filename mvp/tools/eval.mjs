@@ -102,7 +102,7 @@ async function childMain(specPath) {
     };
   }
   const pages = spec.pages.map(p => readGray(p));
-  let ocr = null, worker = null;
+  let ocr = null, worker = null, extraWorker = null;
   if (spec.ocr) {
     const { createWorker } = require(path.join(ROOT, 'spike/ocr/node_modules/tesseract.js'));
     const { PNG } = require('pngjs');
@@ -110,14 +110,23 @@ async function childMain(specPath) {
     const cfg = lang === 'app' ? req(path.join(spec.src, 'lyrics.js')).OCR_CONFIG : null;
     worker = await createWorker(cfg ? cfg.langs : lang, cfg && cfg.oem != null ? cfg.oem : 1, { langPath: path.join(MVP, 'dist/assets'), gzip: true, cacheMethod: 'none' });
     await worker.setParameters(cfg && cfg.params ? cfg.params : { tessedit_pageseg_mode: '7', user_defined_dpi: '300' });
-    ocr = async (img) => {
+    const read = (wk) => async (img) => {
       const png = new PNG({ width: img.width, height: img.height });
       for (let i = 0; i < img.data.length; i++) { png.data[i * 4] = png.data[i * 4 + 1] = png.data[i * 4 + 2] = img.data[i]; png.data[i * 4 + 3] = 255; }
-      const { data } = await worker.recognize(PNG.sync.write(png), {}, { text: true, blocks: true });
+      const { data } = await wk.recognize(PNG.sync.write(png), {}, { text: true, blocks: true });
       const words = [];
       for (const b of data.blocks || []) for (const p of b.paragraphs) for (const l of p.lines) for (const w of l.words) words.push({ text: w.text, conf: w.confidence, x0: w.bbox.x0, x1: w.bbox.x1 });
       return words;
     };
+    ocr = read(worker);
+    // --ocr-lang app: the app's second pass (OCR_CONFIG.extraLangs), its worker made on first use
+    if (cfg && cfg.extraLangs) {
+      let w2 = null;
+      ocr.extra = async (img) => {
+        if (!w2) { w2 = await createWorker(cfg.extraLangs, cfg.oem != null ? cfg.oem : 1, { langPath: path.join(MVP, 'dist/assets'), gzip: true, cacheMethod: 'none' }); await w2.setParameters(cfg.params); extraWorker = w2; }
+        return read(w2)(img);
+      };
+    }
   }
   // timing only: page i starts at its first progress event, assembly at the 'parts' stage
   const pageStart = [], perf = { assembleAt: null };
@@ -131,6 +140,7 @@ async function childMain(specPath) {
   const r = await convert(pages, { ocr, onProgress });
   const ms = Date.now() - t0, p1 = performance.now();
   if (worker) await worker.terminate();
+  if (extraWorker) await extraWorker.terminate();
   const ends = pages.map((_, i) => { for (let k = i + 1; k < pages.length; k++) if (pageStart[k] != null) return pageStart[k]; return perf.assembleAt ?? p1; });
   const page_ms = pages.map((_, i) => Math.round((ends[i] - (pageStart[i] ?? (i ? ends[i - 1] : p0))) * 10) / 10);
   fs.writeFileSync(spec.xmlOut, (r.score && r.score.xml) || '');
