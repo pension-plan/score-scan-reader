@@ -1219,7 +1219,11 @@ keyboard. A printed keyboard name across the pair overrides all of this. On 740 
 coverage scans a brace over the pair is now found for 249 of 259 true grand staves (the rest are
 photocopy-severe pianos, which keep their link by texture), and the rules remove 86 of 98 false keyboard
 pairs (quartets, orchestral sections, flute + tuba, viola + cello) without losing any true one. Every
-pair's evidence is returned as `layout.evid` for debugging. A bottom treble/bass pair of a taller score
+pair's evidence is returned as `layout.evid` for debugging. A two-page book spread is read as two pages (`omr.js spreadGutter`) when the
+staves split into a left and a right group; a left-page staff traced up to one staff space into the gutter's
+shadow no longer hides the gutter (skewed photocopies: satb-open-divisi-midpiece severe 0.386 to 0.698,
+pitch-enharmonic-song-2page severe 0.171 to 0.525; before, the spread's staves were grouped into 7- and
+4-staff systems). A bottom treble/bass pair of a taller score
 with full chords (three heads on a stem) and no text is an accompaniment even when its joined barlines were
 not seen (voice + piano on a faded copy).
 
