@@ -1069,7 +1069,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     if (best.fit < L.minFit || !wordy(v.syllables)) { lyrNotes.add(`A text line under staff ${v.band + 1} does not follow the notes; not used as lyrics.`); continue; }
     const take = opts.copyLyrics || bandVoice[v.band] === 'all' ? cands.filter(c => c.fit >= L.minFit) : [best];
     if (opts.debug) opts.debug.push({ sys: L.sy.page + ':' + L.sy.index, band: v.band, n: v.number, nsyl: v.syllables.length, fits: cands.map(c => [c.p.name, +c.fit.toFixed(2), c.evs.length, +c.soft.toFixed(2)]), take: take.map(c => c.p.name) });
-    for (const c of take) alignSyllables(v, c.evs, sp, L.sy && L.sy.comps);
+    for (const c of take) alignSyllables(v, c.evs, sp, L.sy && L.sy.comps, L.sy && L.sy.fr && L.sy.fr.R);
     v.used = take.map(c => c.p.name).join(', ');
   }
   // a melisma inferred from notes left without a syllable (no extender line
@@ -1390,7 +1390,7 @@ function wordy(syl) {
 // a small thin arc in the lower part of the text row, inside the syllable's
 // box. OCR reads such a syllable as one word ("ain"); it is cut at the arc.
 // [left, right] or null
-function elisionOf(s, verse, comps, sp) {
+function elisionOf(s, verse, comps, sp, R) {
   // joined in lyrics.js (an arc across the gap between two words)
   if (s.text && /.‿./.test(s.text)) { const k = s.text.indexOf('‿'); return [s.text.slice(0, k), s.text.slice(k + 1)]; }
   if (!comps || s.x0 == null || s.x1 == null || verse.y == null || verse.y1 == null || !s.text || s.text.length < 2) return null;
@@ -1402,12 +1402,18 @@ function elisionOf(s, verse, comps, sp) {
       c.y0 >= verse.y + 0.75 * rowH && c.y1 <= verse.y1 + 1.0 * sp;
   });
   if (!arc) return null;
+  // it sags in the middle: a slur, not a flat stroke or a letter's tail
+  if (R && R.data) {
+    const ym = (x) => { let sy = 0, k = 0; for (let y = arc.y0; y <= arc.y1; y++) if (R.data[y * R.width + x]) { sy += y; k++; } return k ? sy / k : null; };
+    const l = ym(arc.x0 + 1), r = ym(arc.x1 - 1), m = ym(Math.round((arc.x0 + arc.x1) / 2));
+    if (l == null || r == null || m == null || m - Math.min(l, r) < 1) return null;
+  }
   const t = s.text.replace(/[‿_]/g, ''), cx = (arc.x0 + arc.x1) / 2;
   const k = Math.max(1, Math.min(t.length - 1, Math.round(t.length * (cx - s.x0) / Math.max(1, w))));
   return [t.slice(0, k), t.slice(k)];
 }
 
-function alignSyllables(verse, evs, sp, comps) {
+function alignSyllables(verse, evs, sp, comps, R) {
   const syl = verse.syllables, n = syl.length, m = evs.length;
   if (!n || !m) return;
   const SKIP_EV = 0.15, DROP_SYL = 2.2;
@@ -1439,7 +1445,7 @@ function alignSyllables(verse, evs, sp, comps) {
     ev.lyrics ||= {};
     if (ev.lyrics[num]) continue;
     ev.lyrics[num] = { text: s.text, syllabic: s.syllabic };
-    const el = elisionOf(s, verse, comps, sp);
+    const el = elisionOf(s, verse, comps, sp, R);
     if (el) ev.lyrics[num].elision = el;
     placed.push([a, b]);
   }
@@ -1653,11 +1659,12 @@ function readMarks(pages, segs, units, parts, partMeasures) {
       if (place(d, d.x, (pl) => `<direction placement="${pl}"><direction-type><dynamics>${tag}</dynamics></direction-type>`, sd != null ? `<sound dynamics="${sd}"/>` : '')) nDyn++;
     }
     for (const r of marks.rehearsals || []) {
-      if (place(r, r.box[0] + 0.5 * (r.box[2] - r.box[0]), () => `<direction placement="above"><direction-type><rehearsal enclosure="square">${esc(r.text)}</rehearsal></direction-type>`)) nRehearsal++;
+      if (place(r, r.box[0] + 0.5 * (r.box[2] - r.box[0]), () => `<direction placement="above"><direction-type><rehearsal enclosure="${r.enclosure || 'square'}">${esc(r.text)}</rehearsal></direction-type>`)) nRehearsal++;
     }
     // piano pedal: "Ped." press, star release (a star then "Ped." is a change: release, press)
     for (const pd of marks.pedals || []) {
-      if (place(pd, pd.box[0], (pl) => `<direction placement="below"><direction-type><pedal type="${pd.type}" line="no" sign="yes"/></direction-type>`) && pd.type === 'start') nPedal++;
+      const style = pd.line ? 'line="yes" sign="no"' : 'line="no" sign="yes"';
+      if (place(pd, pd.line ? pd.x : pd.box[0], (pl) => `<direction placement="below"><direction-type><pedal type="${pd.type}" ${style}/></direction-type>`) && pd.type === 'start') nPedal++;
     }
     for (const w of marks.wedges) {
       const ok = place(w, w.box[0] + 0.1 * (w.box[2] - w.box[0]), (pl) => `<direction placement="${pl}"><direction-type><wedge type="${w.type}" number="1"/></direction-type>`);

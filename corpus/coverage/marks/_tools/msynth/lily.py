@@ -121,8 +121,10 @@ class LilyWriter:
     def staff_music(self, st: Staff, master: bool):
         s = self.s
         out = ['\\autoBeamOff']
+        if s.pedal_style == 'bracket':
+            out.append("\\set Staff.pedalSustainStyle = #'bracket")
         if master:
-            out.append('\\set Score.rehearsalMarkFormatter = #format-mark-box-letters')
+            out.append(f'\\set Score.rehearsalMarkFormatter = #format-mark-{s.mark_format}')
             out.append('\\autoLineBreaksOff \\autoPageBreaksOff')
         for i, mi in enumerate(s.measures):
             line = []

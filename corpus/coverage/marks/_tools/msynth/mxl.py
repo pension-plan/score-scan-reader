@@ -212,7 +212,7 @@ def write_musicxml(score: Score, path: str, software='coverage/marks corpus buil
                 w('      </attributes>')
             if mi.mark and pi == 0:
                 w('      <direction placement="above"><direction-type>'
-                  f'<rehearsal enclosure="square">{escape(mi.mark)}</rehearsal></direction-type></direction>')
+                  f'<rehearsal enclosure="{"circle" if score.mark_format.startswith("circle") else "square"}">{escape(mi.mark)}</rehearsal></direction-type></direction>')
             pos = F(0)
             for si, st in enumerate(p.staves):
                 if si > 0 and pos > 0:
@@ -232,7 +232,7 @@ def write_musicxml(score: Score, path: str, software='coverage/marks corpus buil
                     if si == 0 and t_abs in chords_at:
                         w(harmony_xml(chords_at[t_abs], '      '))
                         used_chords.add(t_abs)
-                    _directions(w, ev, st.voice, stel)
+                    _directions(w, ev, st.voice, stel, score.pedal_style)
                     d = int(ev.dur * div)
                     if ev.kind == 'rest':
                         _note(w, ev, None, False, d, st.voice, staff_attr, [], True)
@@ -253,7 +253,7 @@ def write_musicxml(score: Score, path: str, software='coverage/marks corpus buil
         f.write('\n'.join(out) + '\n')
 
 
-def _directions(w, ev: Ev, voice, stel):
+def _directions(w, ev: Ev, voice, stel, pedal_style='text'):
     ind = '      '
     vel = f'<voice>{voice}</voice>'
     if ev.tempo:
@@ -269,6 +269,13 @@ def _directions(w, ev: Ev, voice, stel):
         typ = 'stop' if wd.startswith('stop') else wd
         w(f'{ind}<direction placement="below"><direction-type><wedge type="{typ}"/></direction-type>'
           f'{vel}{stel}</direction>')
+    if pedal_style == 'bracket':
+        # bracket style: a release and a press on one note is a notch in the line (change)
+        kinds = ['change'] if ev.pedal == ['stop', 'start'] else ev.pedal
+        for pd in kinds:
+            w(f'{ind}<direction placement="below"><direction-type><pedal type="{pd}" line="yes" sign="no"/>'
+              f'</direction-type>{vel}{stel}</direction>')
+        return
     for pd in ev.pedal:
         w(f'{ind}<direction placement="below"><direction-type><pedal type="{pd}" line="no" sign="yes"/>'
           f'</direction-type>{vel}{stel}</direction>')

@@ -105,7 +105,11 @@ def count_truth(path, pages=1):
                             elif x.tag == 'wedge' and x.get('type') in ('crescendo', 'diminuendo'):
                                 c['hairpin-cresc' if x.get('type') == 'crescendo' else 'hairpin-dim'] += 1
                             elif x.tag == 'pedal':
-                                c['pedal' if x.get('type') == 'start' else 'x-pedal-release'] += 1
+                                if x.get('type') == 'change':   # a release and a press (bracket notch)
+                                    c['pedal'] += 1
+                                    c['x-pedal-release'] += 1
+                                else:
+                                    c['pedal' if x.get('type') == 'start' else 'x-pedal-release'] += 1
                             elif x.tag == 'words':
                                 c['tempo-mark' if x.get('font-weight') == 'bold' else 'text-expression'] += 1
                             elif x.tag == 'metronome':

@@ -1333,6 +1333,25 @@ language set is unchanged for now.
 No item's pitch, duration, rests, lyrics or parts changed on coverage; regress.mjs on the committed head
 passes on benchmark (0.951) and challenge (0.831).
 
+**Pedal brackets, circled rehearsal numbers, digit thresholds, elision checks.**
+- Sustain-pedal bracket lines (LilyPond `pedalSustainStyle = #'bracket`): a long thin line under the lowest
+  staff on one row, a hook up at its start, a notch (a small ^) at each change and a hook at the end; read
+  column by column into `<pedal type="start|change|stop" line="yes" sign="no">` (a line running on from
+  the previous system has no start). New coverage item marks/mk10-piano-pedal-brackets: all 17 pedal
+  events (1 start, 15 changes, 1 stop) read on the clean page.
+- Rehearsal marks in a circle (round, ink at the four extremes of the middle lines, empty corners) besides
+  boxes; `enclosure="circle"`; unread circled marks are numbered 1, 2, 3 by order, unread boxed letters
+  A, B, C ... (LilyPond skips I). New item marks/mk11-violin-circled-rehearsal-numbers. Coverage
+  rehearsal-mark 87 / 83 / 61% to 92 / 88 / 66%.
+- Digit shapes read at correlation >= 0.45 and 0.04 clear of the next digit (was 0.55 / 0.06): bar numbers
+  read on challenge scans 298 to 308 of 332, agreement with the bars read 249 to 254 of the systems.
+- An elision arc inside a syllable must sag in the middle (the false "gn‿o", "r‿e" were flat strokes).
+- The coverage/marks generator (msynth) gained `pedal_style='bracket'` (truth: `change` for a release and
+  press on one note) and `mark_format` (box-letters, box-numbers, circle-numbers); count.py counts a
+  change as a press and a release.
+Not done: rehearsal letters by shape (only order-based letters without OCR), chord symbols by shape,
+words OCR merges without a hyphen ("lonssans").
+
 **Overlay colours.** Text `--ov-text` #5e35b1, bar numbers `--ov-barno` #263238, dynamics and hairpins
 `--ov-dyn` #0277bd, slurs / ties / fermatas `--ov-slur` #f06292, braces and brackets `--ov-brace`
 #8d6e63, grace notes `--ov-grace` #e040fb; ledger lines are drawn with the staff (`--ov-staff`). Each is a stroke plus a 0.26 multiplied

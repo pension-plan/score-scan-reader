@@ -142,6 +142,8 @@ class Score:
     measures: List[Measure] = field(default_factory=list)
     parts: List[Part] = field(default_factory=list)
     groups: List[dict] = field(default_factory=list)     # {'type': PianoStaff|StaffGroup, 'parts': [ids], 'name'}
+    pedal_style: str = 'text'           # 'text' (Ped. / *) or 'bracket' (line with notches at changes)
+    mark_format: str = 'box-letters'    # rehearsal marks: 'box-letters', 'box-numbers' or 'circle-numbers'
 
     def offsets(self):
         offs, t = [], F(0)
@@ -438,9 +440,9 @@ def parse_chords(text: str, score: Score):
 # ---------------------------------------------------------------- score building
 
 def build_score(title, composer, parts, time=(4, 4), key=(0, 'major'), time_symbol=None, subtitle='',
-                groups=None, chords=None, rights=''):
+                groups=None, chords=None, rights='', pedal_style='text', mark_format='box-letters'):
     """parts: [{'id','name','abbr','staves': [{'clef', 'music'}]}];  chords: {'part': id, 'text': ...}"""
-    sc = Score(title=title, composer=composer, subtitle=subtitle, rights=rights)
+    sc = Score(title=title, composer=composer, subtitle=subtitle, rights=rights, pedal_style=pedal_style, mark_format=mark_format)
     parsed = []
     for pd in parts:
         p = Part(pd['id'], pd['name'], pd.get('abbr', ''))
@@ -473,7 +475,7 @@ def build_score(title, composer, parts, time=(4, 4), key=(0, 'major'), time_symb
         if 'key' in cmds:
             mi.key = cmds['key']
         if cmds.get('mark'):
-            label = 'ABCDEFGHJKLMNOPQRSTUVWXYZ'[letter]   # LilyPond format-mark-box-letters skips I
+            label = str(letter + 1) if mark_format.endswith('numbers') else 'ABCDEFGHJKLMNOPQRSTUVWXYZ'[letter]   # LilyPond letters skip I
             letter += 1
             mi.mark = label
         mi.new_system = bool(cmds.get('new_system'))
