@@ -124,6 +124,9 @@ const ocrLangs = ((lyrSrc.match(/OCR_CONFIG\s*=\s*{[\s\S]*?langs:\s*['"]([\w+]+)
 for (const l of ocrLangs) if (!fs.existsSync(path.join(DIST, 'assets', `${l}.traineddata.gz`))) fail(`OCR_CONFIG names ${l}, but dist/assets/${l}.traineddata.gz is missing`);
 const rows = [];
 let total = 0;
+// word lists for lyric OCR post-correction (src/lexicon.js LANGS), fetched on first use, and their notice
+const lexLangs = ((fs.readFileSync(path.join(SRC, 'lexicon.js'), 'utf8').match(/const LANGS = \[([^\]]*)\]/) || [])[1] || '').match(/\w+/g) || [];
+for (const f of lexLangs.map(l => `lex-${l}.txt.gz`).concat(lexLangs.length ? ['NOTICE.lexicon.txt'] : [])) if (!fs.existsSync(path.join(DIST, 'assets', f))) fail(`lexicon asset dist/assets/${f} is missing (mvp/tools/lexicon.py)`);
 for (const a of REQUIRED_ASSETS) if (!fs.existsSync(path.join(DIST, 'assets', a))) fail(`missing asset dist/assets/${a}`);
 for (const f of fs.existsSync(path.join(DIST, 'assets')) ? fs.readdirSync(path.join(DIST, 'assets')) : []) {
   const n = fs.statSync(path.join(DIST, 'assets', f)).size;

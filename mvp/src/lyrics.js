@@ -48,6 +48,7 @@ const DEFAULTS = {
   verseGaps: true,    // verse numbers: count rows by line pitch and printed stanza numbers (rows OCR lost keep their number free)
   thinAt: 0.245,      // thin text strokes before OCR when the page's stroke width / letter height exceeds this (0 = off)
   lang: null,         // underlay language for syllable rules ('en' | 'de' | 'la'); null = detect
+  lexicon: true,      // correct OCR misreads against word-frequency lists (src/lexicon.js; lists load on first use)
 };
 
 // Returns [{band, sys, y0, y1, x0, x1}] text-line boxes in deskewed page coords.
@@ -1213,6 +1214,9 @@ async function readStanzas(fr, ocr, o, yStart) {
       cur.lines.push(ln.text);
     }
   }
+  if (o.lexicon) {
+    try { for (const s of stanzas) s.lines = (await require('./lexicon').correctLines(s.lines)).lines; } catch (e) { /* OCR text kept */ }
+  }
   for (const s of stanzas) s.text = s.lines.join('\n');
   return stanzas.filter(s => s.lines.length);
 }
@@ -1486,6 +1490,16 @@ async function readLyrics(fr, ocr, onProgress, opts) {
       v.syllables = v.syllables.flatMap(s => splitSyllable(s, voices, lang, r, g.hyphens, inkCol, y1 - y0 + 1));
     }
     Object.defineProperty(out, 'lang', { value: lang, enumerable: false });
+  }
+  // OCR misreads against word lists ("Iler-zens" -> "Her-zens"), syllable breaks kept
+  if (o.lexicon) {
+    try {
+      const rows = Object.values(out).flat().map(v => v.syllables);
+      if (rows.some(r => r.length)) {
+        const ch = await require('./lexicon').correctRows(rows, { lang: out.lang });
+        if (ch.length) Object.defineProperty(out, 'corrections', { value: ch, enumerable: false });
+      }
+    } catch (e) { /* lists unavailable: OCR text kept */ }
   }
   // verse numbers: per system and band, rows top-down are verses 1..n
   for (const k in out) out[k] = out[k].filter(v => v.syllables.length >= 2);

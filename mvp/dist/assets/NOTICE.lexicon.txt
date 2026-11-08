@@ -1,0 +1,12 @@
+Word lists for lyric OCR post-correction (English, German, French, Spanish, Italian, Czech)
+
+lex-en.txt.gz, lex-de.txt.gz, lex-fr.txt.gz, lex-es.txt.gz, lex-it.txt.gz and lex-cs.txt.gz hold the
+100,000 most frequent words (letters only) of each language with their frequency, taken from the data
+of wordfreq 3.1.1 by Robyn Speer (https://github.com/rspeer/wordfreq, data files
+wordfreq/data/large_<lang>.msgpack.gz), made by mvp/tools/lexicon.py.
+
+The wordfreq data is licensed under the Creative Commons Attribution-ShareAlike 4.0 International
+licence (https://creativecommons.org/licenses/by-sa/4.0/); so are these derived lists. wordfreq's data
+is built from Wikipedia, OpenSubtitles (via OPUS), SUBTLEX, Google Books Ngrams, the Leeds Internet
+Corpus, NewsCrawl, GlobalVoices, Twitter and Reddit; see the wordfreq README for the full credits.
+The lists are fetched only when a page has lyrics, one language at a time.

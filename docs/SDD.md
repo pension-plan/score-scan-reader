@@ -1573,6 +1573,34 @@ passes on benchmark (0.951) and challenge (0.831).
   words. For these word breaks a note near the token's right end counts (OCR boxes end at the last
   letter); syllable cuts keep the stricter test (melismas). golden1923-america "Andring" -> "And ring"
   (lyrics 0.797 to 0.805).
+- OCR misreads corrected against word-frequency lists (L36, `src/lexicon.js`). The lists hold the
+  100,000 most frequent words of English, German, French, Spanish, Italian and Czech: wordfreq 3.1.1
+  data, CC BY-SA 4.0, `dist/assets/lex-<lang>.txt.gz` (about 0.4 MB each), made by
+  `tools/lexicon.py`, with `NOTICE.lexicon.txt`. They are fetched when a page has lyrics: English and
+  German first, the other four only when a row fits both badly. Each row is matched against the list it
+  fits best, by the mean log frequency of its words; a row no list knows half of (Latin, noise) is left
+  alone. A hyphenated word is joined, corrected and cut again at its old syllable breaks, mapped through
+  the edits, so each syllable keeps its note; an empty piece joins its neighbour.
+  - The edits are a table of OCR confusions (I l / Il -> H, Ci / Cs -> G, T -> L, rn / nı -> m, eh -> ch,
+    ii / di -> ü, n <-> u, e <-> c, f -> s and others, cost 0.1-0.7) plus at most one other substitution,
+    insertion or deletion (cost 1). That edit is only allowed on words of 6-10 letters and never in the
+    last two letters: "templed" is not "temple".
+  - A word is replaced only when it is unknown or rare (log10 frequency under -5.6), has 4 or more
+    letters, is not known in any other loaded list (rows mix languages), and the new word is at least
+    2 orders of magnitude more likely after 2 orders per unit of edit cost. Accents OCR read are never
+    removed.
+  - Two neighbouring tokens become one word ("I ler-zens" -> "Her-zens", "dei nenı" -> "dei-nem") only
+    when one of them is unknown and neither is a common word of any loaded list.
+  - Stanza text printed below the music is corrected the same way.
+
+  haupt1867 verse 1 now reads "Aus … Her-zens Grun-de … vor dei-nem Thron … durch" (it read "Iler-zens
+  Csrun-de … dei nenı … dureh"). Benchmark with app OCR: lyrics 0.9338 to 0.9338 (text 0.924 to
+  0.924, syllabic 0.943 to 0.944). Coverage with app OCR: lyrics 0.9768 to 0.9770 (lyr02 scan +0.025,
+  clean +0.017, perf hymn 100 dpi severe +0.020; divisi-choir severe -0.014). No item down more than
+  0.05. A first version with no length limit and no cross-language check lost 0.003 on the benchmark:
+  short tokens are often syllables whose hyphen was lost ("Suf" read as "But"). Not fixed: words the
+  lists lack (archaic "erzürnet", compounds like "Lebenlang") and misreads that are real words ("Ans"
+  for "Aus").
 Not done: a missed hyphen placed one letter off ("nob-le" for "no-ble").
 
 **Overlay colours.** Text `--ov-text` #5e35b1, bar numbers `--ov-barno` #263238, dynamics and hairpins
