@@ -31,11 +31,15 @@ if [ ${#PATHS[@]} -gt 0 ]; then
   # (base -> your file, base -> current HEAD) and a conflict refuses the push. Editing in
   # place in this tree? Use PUSH_BASE=HEAD.
   for f in "${PATHS[@]}"; do
-    case "$f" in mvp/src/*.js|mvp/ui/*.js|mvp/ui/*.css|mvp/ui/*.html|mvp/tools/*.mjs|mvp/tools/*.js|tools/*) ;; *) continue ;; esac
+    case "$f" in
+      docs/COVERAGE.md|docs/coverage.json|docs/TIMELINE.md|docs/status/*|docs/regressions/*) continue ;;  # generated: replaced whole
+      mvp/src/*.js|mvp/ui/*.js|mvp/ui/*.css|mvp/ui/*.html|mvp/tools/*.mjs|mvp/tools/*.js|tools/*|docs/*.md|README.md) ;;
+      *) continue ;;
+    esac
     [ -f "$f" ] || continue
     git cat-file -e "HEAD:$f" 2>/dev/null || continue
     if [ -z "${PUSH_BASE:-}" ]; then
-      echo "refusing: $f is code; set PUSH_BASE=<commit your copy of it was based on> (PUSH_BASE=HEAD if you edited it in this tree) so it is merged, not overwritten" >&2
+      echo "refusing: $f is code or a hand-written doc; set PUSH_BASE=<commit your copy of it was based on> (PUSH_BASE=HEAD if you edited it in this tree) so it is merged, not overwritten" >&2
       exit 1
     fi
     if git cat-file -e "$PUSH_BASE:$f" 2>/dev/null && [ "$(git rev-parse "$PUSH_BASE")" != "$(git rev-parse HEAD)" ]; then

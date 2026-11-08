@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 03:42 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 03:45 AEDT.
 
 ## Events
 
@@ -159,6 +159,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 03:25 | voices: trio page 2 fixed (8be60f8); its f091328 briefly reverted the L20 block (restored). push.sh now three-way merges code files against PUSH_BASE (9e5c95a, L35). |
 | 03:30 | structure b978cf1 chord ties; opencv 4ad0d58 upside-down sharp-key page 0.589 to 0.911. Release merged. structure next: pickup/measure-number offsets. |
 | 03:42 | voices 7cd0530 (release merged): America stanzas read and set at the app raster; stanzas.verses for the Lyrics panel. voices next: melisma alignment and extenders (L4b). |
+| 03:45 | uiux ac87b5a (release 0.34.1 merged): Lyrics panel lists stanzas set as verses; live-checked Aus meines 3/3 and America 2/2. Screenshot shows lyric OCR errors on old print: L36 queued (lexicon post-correction). |
 
 ## Accuracy by round
 
@@ -221,6 +222,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | L33 | Two push.sh runs (and a manual rebase) interleaved in the shared tree and orphaned a commit (recovered as c03021c) | Integration (push tooling) | Resolved (b40e518) | push.sh holds a flock for its whole run; agents told to do manual git only in private worktrees. |
 | L34 | On a slow phone the first result takes ~49 s, bound by the ~7 MB the first conversion needs (OCR models ~4 MB) | Performance (load) | Partial (34dad95) | 34dad95: conversion starts while OCR loads, split Tesseract core, lazy OSMD; page 1 renders at 15.8 s instead of 48.9 s; result 54.5 to 48.8 s. Next: progressive result (notes before OCR). |
 | L35 | Whole-file copies from private worktrees based on an older main reverted newer work on main three times (411aade, f091328, d176663 sweep) | Integration (push tooling) | Resolved (9e5c95a) | push.sh requires PUSH_BASE for code paths and three-way merges (base->copy, base->HEAD), refusing on conflict; tested with a 15-commit-stale score.js: merge = HEAD + the new line. |
+| L36 | Lyric OCR on old print garbles words (haupt1867: I ler-zens Ci-ran-de for Herzens Grunde, T ob for Lob; demdithiglich for demuthiglich) | Lyrics (OCR) | Queued | Lexicon-based, hyphen-aware post-correction with OCR-confusion costs, queued for textsym after the ML task. |
 
 ## Runs
 
