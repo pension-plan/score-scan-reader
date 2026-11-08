@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.39.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.38.0...score-scan-reader-v0.39.0) (2026-11-08)
+
+
+### Features
+
+* **percussion:** percussion-clef staves written as unpitched drum notes with a GM drum kit; eval scores unpitched notes ([6e314c9](https://github.com/pension-plan/score-scan-reader/commit/6e314c95bb85b78c17f153c48081193ea32af186))
+
+
+### Bug Fixes
+
+* **assemble:** accidentals joined to a slur or tie passing over them ([13209be](https://github.com/pension-plan/score-scan-reader/commit/13209bebf9f42b740cbe92c3ad3126bb21baf962))
+* **cv:** key signatures on blurred scans read past a natural-looking flat ([b1d9821](https://github.com/pension-plan/score-scan-reader/commit/b1d9821b12cf2120012d55426c76e8b5f9af6db7))
+* **heads:** ledger heads on scans whose ledgers read thicker than the staff lines ([e7225c6](https://github.com/pension-plan/score-scan-reader/commit/e7225c637ae93ce93e0b6b842aea92be6822c120))
+
 ## [0.38.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.37.1...score-scan-reader-v0.38.0) (2026-11-08)
 
 
