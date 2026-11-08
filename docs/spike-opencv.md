@@ -2,6 +2,16 @@
 
 Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
 
+## Update: upside-down pages whose staves end in keys
+
+`pitch-cov-keys-minor-sharps` severe is printed upside down. The front end did not turn it: its staves end in sharp
+keys, so they are dense at both ends (`invertedShare` 0.25), and the clef-count test in `omr.js` does not catch it
+either (upside-down treble clefs read as bass clefs). `front.js` now also checks for a title block below the music
+with no ink at all above it (`titleBelow`, the mirror of `titleAbove`). When it finds one, it reads the page turned
+and keeps the turn only when the clefs at the staff starts match their templates better by 0.1 on average
+(`cv.js` `clefScore`). That item went 0.589 → 0.911 with all eight keys right. Nothing else moved: coverage, challenge
+(the rot90 / rot180 items included) and benchmark are otherwise unchanged.
+
 ## Update: hollow heads on ledger lines of scans (L1)
 
 `nt06-ledger-lines` lost 19 of its 37 half and whole notes on the plain scan. A hollow head on a ledger line is

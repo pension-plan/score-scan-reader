@@ -11,7 +11,7 @@ const { threshold } = require('./binarize');
 const { detectStems } = require('./stems');
 const { detectBarlines } = require('./barlines');
 const { rotateGray, makeGray } = require('./image');
-const { precleanPage } = require('./cv');
+const { precleanPage, clefScore } = require('./cv');
 
 function resample(g, f) {
   const w = Math.max(1, Math.round(g.width * f)), h = Math.max(1, Math.round(g.height * f));
@@ -281,12 +281,22 @@ function invertedShare(R, staves) {
 // Ink above the first staff and below the last (the page's binary): a title block above the music
 // and nothing like it below says the page is upright, whatever the staff ends look like (a staff
 // that ends in a seven-sharp courtesy key is denser at its end than its clef is at its start)
-function titleAbove(B, staves) {
+function inkAboveBelow(B, staves) {
   const { width: w, height: h, data } = B;
   const sp = staves[0].space, top = Math.min(...staves.map(st => st.yAt(0, (st.left + st.right) / 2))), bot = Math.max(...staves.map(st => st.yAt(4, (st.left + st.right) / 2)));
   const ink = (ya, yb) => { let n = 0; for (let y = Math.max(0, Math.round(ya)); y < Math.min(h, Math.round(yb)); y++) for (let x = 0; x < w; x++) n += data[y * w + x]; return n; };
-  const a = ink(0, top - 4 * sp), b = ink(bot + 4 * sp, h);
-  return a > 2 * b + 0.002 * w * h;
+  return { a: ink(0, top - 4 * sp), b: ink(bot + 4 * sp, h), wh: w * h };
+}
+function titleAbove(B, staves) {
+  const { a, b, wh } = inkAboveBelow(B, staves);
+  return a > 2 * b + 0.002 * wh;
+}
+// The mirror: a title block below the music and nothing at all above it is a page printed upside
+// down whose staff ends do not show it (staves that end in sharp keys are dense at both ends).
+// It is turned only when the clefs read clearly better turned (frontSteps).
+function titleBelow(B, staves) {
+  const { a, b, wh } = inkAboveBelow(B, staves);
+  return a <= 0.0002 * wh && b > 0.002 * wh;
 }
 
 // Staged front end.  Yields the stage about to run ('cleanup', 'staves',
@@ -343,6 +353,16 @@ function* frontSteps(gray0, opts = {}) {
     if (c.staves.length >= staves.length) {
       const R2 = removeStaffLines(c.B, c.staves, c.sp.lt).binary;
       if (invertedShare(R2, c.staves) < 0.4) {
+        ctx = c; quarter += 2; R = R2;
+        ({ gray, B, L0, sp, ltL, scale, skew, staves } = ctx);
+      }
+    }
+  } else if (opts.orient !== false && titleBelow(B, staves)) {
+    // title below, nothing above: turned when the clefs then match their templates clearly better
+    const c = prepare(turn(gray0, quarter + 2), MODES.find(m => m.name === ctx.mode));
+    if (c.staves.length >= staves.length) {
+      const R2 = removeStaffLines(c.B, c.staves, c.sp.lt).binary;
+      if (clefScore(R2, c.staves, c.sp.ss) > clefScore(R, staves, sp.ss) + 0.1) {
         ctx = c; quarter += 2; R = R2;
         ({ gray, B, L0, sp, ltL, scale, skew, staves } = ctx);
       }
