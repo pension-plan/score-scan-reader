@@ -1,4 +1,4 @@
-"""Helpers shared by the layouts-family pieces (coverage suite)."""
+"""Helpers shared by the lyrics-family pieces (coverage suite)."""
 from __future__ import annotations
 
 from fractions import Fraction as F
@@ -7,7 +7,7 @@ from csynth.dsl import mdur, parse_voice
 from csynth.model import MeasureInfo, Part, Score, VoiceDef, renumber
 
 CC0_NOTE = ('Composition, arrangement, engraving, rasterisation and damage simulation produced for the OMR '
-            'coverage suite (corpus/coverage/layouts/_tools, 2026). All files of this item are dedicated to the '
+            'coverage suite (corpus/coverage/lyrics/_tools, 2026). All files of this item are dedicated to the '
             'public domain (CC0 1.0 Universal).')
 COMPOSER = 'Coverage suite (2026)'
 RIGHTS = 'CC0 1.0 - dedicated to the public domain'

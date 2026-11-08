@@ -1,4 +1,4 @@
-"""Build one coverage item (layouts family).
+"""Build one coverage item (lyrics family; copy of corpus/coverage/layouts/_tools/build.py).
 
 model -> notation pre-pass (beams, stems, accidentals, printed staves)
       -> truth.musicxml (MusicXML 4.0) -> xmllint XSD -> music21 parse
@@ -37,10 +37,10 @@ from csynth.mxl import write_musicxml  # noqa: E402
 from csynth.notation import iter_staves, prepare, segments_of  # noqa: E402
 from csynth.verify import compare as grob_compare, parse_log  # noqa: E402
 
-ROOT = os.path.dirname(TOOLS)                       # corpus/coverage/layouts
+ROOT = os.path.dirname(TOOLS)                       # corpus/coverage/lyrics
 XSD = '/Users/d.sloane/music/mvp/work/schema/musicxml.xsd'
 PY = '/Users/d.sloane/music/.venv/bin/python'
-FAMILY = 'layouts'
+FAMILY = 'lyrics'
 CVLOG = os.path.join(TOOLS, 'csynth', 'cvlog.ly')
 
 
@@ -162,7 +162,7 @@ def build_item(item: dict, keep_work=False):
         prep = prepare(score, layout, opts)
         log['acc_truth_differs_from_print'] = prep['acc_truth_differs_from_print']
         truth = os.path.join(outdir, 'truth.musicxml')
-        write_musicxml(score, truth, software='coverage suite builder (layouts family)')
+        write_musicxml(score, truth, software='coverage suite builder (lyrics family)')
         rc, out, err = run(['xmllint', '--noout', '--schema', XSD, truth])
         log['xsd'] = {'rc': rc, 'msg': (out + err).strip()[-500:]}
         if rc != 0:
@@ -215,6 +215,11 @@ def build_item(item: dict, keep_work=False):
         if not grep['ok']:
             raise RuntimeError('grob log vs truth mismatch: ' + json.dumps(grep['mismatch'], default=str)[:3000])
         counts = count_all(truth)
+        # symbols printed by the engraving that MusicXML has no element for (stanza numbers): counted from the
+        # model/engraving, declared in meta.symbols/counts and listed in printed_not_in_truth
+        for k, v in item.get('engraving_only_counts', {}).items():
+            counts[k] = v
+        counts = dict(sorted(counts.items()))
         shutil.copy(ly, os.path.join(outdir, 'engraving.ly'))
         # ---------------- rasterise + damage
         cache = {}

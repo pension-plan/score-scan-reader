@@ -877,10 +877,11 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     const S = sums.length ? mode(sums) : 0;
     const k = Math.round(S / mLen);
     const agree = sums.filter(x => Math.abs(x - S) <= 0.25 * mLen).length;
-    // a missed barline lengthens every voice of the system alike: one voice
-    // that alone runs long has false notes in it (a tie end read as a half
-    // note), not a second bar
-    if (k >= 2 && Math.abs(S - k * mLen) <= 0.25 * mLen && agree >= (sums.length >= 2 ? Math.max(2, Math.ceil((2 / 3) * sums.length)) : 1)) {
+    // a missed barline lengthens every voice of the system alike: where as
+    // many voices fill exactly one bar as run long, the long ones have false
+    // notes in them (a tie end read as a half note), not a second bar
+    const one = sums.filter(x => Math.abs(x - mLen) <= 0.25 * mLen).length;
+    if (k >= 2 && Math.abs(S - k * mLen) <= 0.25 * mLen && agree >= Math.max(1, 0.5 * sums.length) && agree > one) {
       splitBars += k - 1;
       const chunks = Array.from({ length: k }, () => byPart.map(sts => sts.map(st => ({ staff: st.staff, events: [] }))));
       byPart.forEach((sts, pi) => sts.forEach((st, si) => {

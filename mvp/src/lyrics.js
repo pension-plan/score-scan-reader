@@ -5,6 +5,10 @@
 // and by what OCR reads (lyric rows are mostly confident lower-case words).
 // Verses are numbered top-down per staff; a stack under the bottom staff that
 // starts with a printed "2." is stanza text set after the music and dropped.
+// Rows are found by connected components and baselines (spike strips.js),
+// measured along the staff lines (curled / keystoned pages), cleaned of scan
+// specks and, on heavy-stroke pages, thinned before OCR. Text above a staff
+// is kept when it follows that staff's notes (row.above, band = that staff).
 const { makeGray } = require('./image');
 const { labelComponents } = require('./cc');
 
@@ -34,6 +38,14 @@ const DEFAULTS = {
   stanzas: true,      // OCR stanza text printed below the last system -> fr.stanzas
   targetCap: 28,      // OCR scale: cap height in px (component lines)
   splitByNotes: true, // split tokens that span several note onsets (unprinted hyphens, merged words)
+  gluedWords: true,   // component lines: whole words glued into one component vote as letters (bold type, thick copies)
+  despeck: true,      // component lines: drop isolated specks from the OCR strip
+  dropJunk: true,     // drop unsure short tokens without a vowel ("t", "CL": stems and specks read as letters)
+  followStaff: true,  // component lines: measure text baselines along the staff lines (curled / keystoned pages)
+  aboveLines: true,   // text rows above a staff (and the lower rows between staves) that follow that staff's notes
+  aboveSp: 7,         // ... searched up to this many staff spaces above the system's top staff
+  verseGaps: true,    // verse numbers: count rows by line pitch and printed stanza numbers (rows OCR lost keep their number free)
+  thinAt: 0.245,      // thin text strokes before OCR when the page's stroke width / letter height exceeds this (0 = off)
   lang: null,         // underlay language for syllable rules ('en' | 'de' | 'la'); null = detect
 };
 
@@ -107,18 +119,31 @@ function findTextLines(fr, sysIdx, nextTop, opts) {
 // masked out). Flat members are hyphens (mid height) or extenders (baseline).
 const median = (a) => { if (!a.length) return 0; const s = [...a].sort((x, y) => x - y); return s[s.length >> 1]; };
 
-function findTextLinesCC(fr, sysIdx, nextTop, o) {
+// prevBot: page y where the previous system's music ends (0 for the first):
+// with o.aboveLines the band above the system's top staff is searched too
+// (text printed above a staff: rows marked above, nearest the staff first).
+function findTextLinesCC(fr, sysIdx, nextTop, o, prevBot = 0) {
   const { B, gray, staves } = fr;
   const sys = fr.systems[sysIdx];
   const W = B.width, H = B.height;
   const out = [];
-  sys.forEach((si, k) => {
+  const specs = sys.map((si, k) => ({ k, above: false }));
+  if (o.aboveLines) specs.push({ k: 0, above: true });
+  specs.forEach(({ k, above }) => {
+    const si = sys[k];
     const st = staves[si], sp = st.space;
     const xs = [st.left, (st.left + st.right) / 2, st.right];
-    const last = k === sys.length - 1;
-    const y0 = Math.round(Math.max(...xs.map(x => st.yAt(4, x))) + 0.4 * sp);
-    const y1 = Math.round(last ? Math.min(nextTop - 1.0 * sp, y0 + o.ccLastStaffSp * sp, H - 1)
-      : Math.min(...xs.map(x => staves[sys[k + 1]].yAt(0, x))) - 0.4 * sp);
+    const last = !above && k === sys.length - 1;
+    let y0, y1;
+    if (above) {
+      const top = Math.min(...xs.map(x => st.yAt(0, x)));
+      y1 = Math.round(top - 0.4 * sp);
+      y0 = Math.round(Math.max(prevBot, top - o.aboveSp * sp, 0));
+    } else {
+      y0 = Math.round(Math.max(...xs.map(x => st.yAt(4, x))) + 0.4 * sp);
+      y1 = Math.round(last ? Math.min(nextTop - 1.0 * sp, y0 + o.ccLastStaffSp * sp, H - 1)
+        : Math.min(...xs.map(x => staves[sys[k + 1]].yAt(0, x))) - 0.4 * sp);
+    }
     if (y1 - y0 < 1.5 * sp) return;
     const x0 = Math.max(0, Math.round(st.left - 2 * sp)), x1 = Math.min(W - 1, Math.round(st.right + 1 * sp));
     const bw = x1 - x0 + 1, bh = y1 - y0 + 1;
@@ -127,10 +152,49 @@ function findTextLinesCC(fr, sysIdx, nextTop, o) {
     const { labels, comps } = labelComponents(band);
     const cand = comps.filter(c => c.y0 > 0 && c.y1 < bh - 1 && c.area >= 3 && c.y1 - c.y0 + 1 <= 4 * sp && c.x1 - c.x0 + 1 <= 30 * sp);
     const candSet = new Set(cand);
-    const letters = cand.filter(c => { const h = c.y1 - c.y0 + 1, w = c.x1 - c.x0 + 1; return h >= 0.45 * sp && h <= 3.2 * sp && w <= 4 * sp && w >= 0.12 * sp; });
+    // letter-sized components; in bold type or thick photocopies the letters
+    // of a word run together into one component: wide, but solid like text
+    // (slurs, ties and hairpins are thin strokes with little fill)
+    const letters = cand.filter(c => {
+      const h = c.y1 - c.y0 + 1, w = c.x1 - c.x0 + 1;
+      if (h < 0.45 * sp || h > 3.2 * sp || w < 0.12 * sp) return false;
+      return w <= 4 * sp || (o.gluedWords && w <= 9 * h && c.area >= 0.3 * w * h);
+    });
     if (letters.length < 4) return;
+    // a glued word's bottom is its lowest descender: its baseline is the
+    // bottom most of its columns share
+    for (const c of letters) {
+      c.base = c.y1;
+      if (!o.gluedWords || c.x1 - c.x0 + 1 <= 1.5 * (c.y1 - c.y0 + 1)) continue;
+      const cnt = new Map();
+      for (let x = c.x0; x <= c.x1; x++) {
+        for (let y = c.y1; y >= c.y0; y--) if (labels[y * bw + x] === c.id) { cnt.set(y, (cnt.get(y) || 0) + 1); break; }
+      }
+      let by = c.y1, bn = 0;
+      for (const [y, n] of cnt) if (n > bn || (n === bn && y > by)) { by = y; bn = n; }
+      c.base = by;
+    }
+    // text lines run parallel to the staves: on a curled or keystoned page
+    // the staff lines tilt differently from one staff to the next, so y is
+    // measured from a line that follows the staff above (and, between two
+    // staves, blends into the one below) instead of a horizontal
+    const xm = (st.left + st.right) / 2, nb = last || above ? null : staves[sys[k + 1]];
+    const refLine = above ? 0 : 4;
+    const yAm = st.yAt(refLine, xm), yBm = nb ? nb.yAt(0, xm) : 0;
+    const shiftAt = (xp, yp) => {
+      const a = st.yAt(refLine, xp) - yAm;
+      if (!nb || yBm <= yAm) return a;
+      const t = Math.max(0, Math.min(1, (yp - yAm) / (yBm - yAm)));
+      return (1 - t) * a + t * (nb.yAt(0, xp) - yBm);
+    };
+    let tilt = false;
+    if (o.followStaff) for (const xp of [x0, x1]) for (const yp of [y0, y1]) if (Math.abs(shiftAt(xp, yp)) > 0.5 * sp) tilt = true;
+    for (const c of cand) {
+      c.sh = tilt ? shiftAt(x0 + (c.x0 + c.x1) / 2, y0 + (c.base ?? c.y1)) : 0;
+      c.sy0 = c.y0 - c.sh; c.sy1 = c.y1 - c.sh; c.sb = (c.base ?? c.y1) - c.sh;
+    }
     const hist = new Float64Array(bh + 1);
-    for (const c of letters) hist[c.y1]++;
+    for (const c of letters) { const b = Math.round(c.sb); if (b >= 0 && b <= bh) hist[b]++; }
     const R = Math.max(1, Math.round(0.15 * sp)), sm = new Float64Array(bh + 1);
     for (let y = 0; y <= bh; y++) { let s = 0; for (let d = -R; d <= R; d++) { const yy = y + d; if (yy >= 0 && yy <= bh) s += hist[yy]; } sm[y] = s; }
     const peaks = [];
@@ -142,9 +206,9 @@ function findTextLinesCC(fr, sysIdx, nextTop, o) {
     peaks.sort((a, b) => a - b);
     const lines = [];
     for (const bl of peaks) {
-      const core = letters.filter(c => Math.abs(c.y1 - bl) <= 0.25 * sp + 1);
+      const core = letters.filter(c => Math.abs(c.sb - bl) <= 0.25 * sp + 1);
       if (core.length < 4) continue;
-      const hs = core.map(c => c.y1 - c.y0 + 1).sort((a, b) => a - b);
+      const hs = core.map(c => c.base - c.y0 + 1).sort((a, b) => a - b);
       const xh = median(hs.slice(0, Math.max(1, hs.length >> 1))), tall = median(hs.slice(hs.length >> 1));
       if (tall < 0.6 * sp || median(core.map(c => c.area)) < 0.15 * sp * sp) continue;   // rows of specks
       lines.push({ bl, xh, tall, core, mem: [] });
@@ -154,14 +218,30 @@ function findTextLinesCC(fr, sysIdx, nextTop, o) {
     for (const c of cand) {
       let best = null, bd = Infinity;
       for (const ln of lines) {
-        if (c.y0 < ln.bl - 1.9 * ln.tall || c.y1 > ln.bl + 0.6 * ln.tall || c.y1 - c.y0 + 1 > 2.2 * ln.tall) continue;
-        const d = Math.abs(c.y1 - ln.bl);
+        if (c.sy0 < ln.bl - 1.9 * ln.tall || c.sy1 > ln.bl + 0.6 * ln.tall || c.y1 - c.y0 + 1 > 2.2 * ln.tall) continue;
+        const d = Math.abs(c.sb - ln.bl);
         if (d < bd) { bd = d; best = ln; }
       }
       if (best) best.mem.push(c);
     }
+    // scan specks: tiny blobs that are neither a dot or accent over a letter
+    // (i, ä, é) nor punctuation on the baseline right after a letter; they
+    // make tesseract drop whole lines. Flat hyphens and extenders are kept.
+    if (o.despeck) for (const ln of lines) {
+      const T = ln.tall, bl = ln.bl, xh = ln.xh;
+      const big = ln.mem.filter(c => c.y1 - c.y0 + 1 >= 0.45 * T || c.x1 - c.x0 + 1 >= 0.45 * T);
+      ln.mem = ln.mem.filter(c => {
+        const ch = c.y1 - c.y0 + 1, cw = c.x1 - c.x0 + 1;
+        if (Math.max(ch, cw) >= 0.3 * T || cw >= 1.6 * ch) return true;
+        if (c.sy1 < bl - 0.55 * xh) return big.some(b => b.x0 - c.x1 <= 0.2 * T && c.x0 - b.x1 <= 0.2 * T);
+        if (Math.abs(c.sy1 - bl) <= 0.2 * xh + 1) return big.some(b => c.x0 - b.x1 >= -1 && c.x0 - b.x1 <= 0.3 * T);
+        return false;
+      });
+    }
     const stW = st.right - st.left;
     let prevBl = null;
+    // above a staff the rows are taken from the staff upwards
+    if (above) lines.reverse();
     for (const ln of lines) {
       const mem = ln.mem;
       if (!mem.length) continue;
@@ -169,10 +249,14 @@ function findTextLinesCC(fr, sysIdx, nextTop, o) {
       if (lx1 - lx0 < 0.2 * stW && ln.core.length < 8) continue;
       // under the last staff: the first line starts within 7 sp, later ones follow on
       if (last && (prevBl == null ? ln.bl > 7 * sp + ln.tall : ln.bl - prevBl > 3.2 * sp)) break;
+      // above the top staff: the first line ends within 6 sp of it, more follow upwards
+      if (above && (prevBl == null ? bh - ln.bl > 6 * sp : prevBl - ln.bl > 3.2 * sp)) break;
+      // text above a staff spans most of it (titles and tempo marks do not)
+      if (above && lx1 - lx0 < 0.5 * stW) continue;
       prevBl = ln.bl;
       const hyphens = [], extenders = [];
       for (const c of mem) {
-        const ch = c.y1 - c.y0 + 1, cw = c.x1 - c.x0 + 1, cy = (c.y0 + c.y1 + 1) / 2;
+        const ch = c.y1 - c.y0 + 1, cw = c.x1 - c.x0 + 1, cy = (c.sy0 + c.sy1 + 1) / 2;
         if (ch <= Math.max(2, 0.4 * ln.xh) && cw >= 1.6 * ch) {
           if (cy < ln.bl - 0.15 * ln.xh && cy > ln.bl - 0.95 * ln.xh && cw <= 3.5 * ln.xh) { hyphens.push({ x0: x0 + c.x0, x1: x0 + c.x1 + 1 }); c.hy = true; }
           else if (Math.abs(cy - ln.bl) <= 0.3 * ln.xh + 1 && cw >= 1.2 * ln.xh) { extenders.push({ x0: x0 + c.x0, x1: x0 + c.x1 + 1 }); c.ext = true; }
@@ -181,9 +265,13 @@ function findTextLinesCC(fr, sysIdx, nextTop, o) {
       // masked strip: member pixels (dilated by 1 px for the soft glyph edges) from the gray page
       const pad = Math.max(2, Math.round(0.4 * ln.xh));
       const sx0 = Math.max(0, lx0 - pad), sx1 = Math.min(bw - 1, lx1 + pad);
-      const sy0 = Math.max(0, Math.min(Math.round(ln.bl - 1.6 * ln.tall), ...mem.map(c => c.y0)) - 2);
-      const sy1 = Math.min(bh - 1, Math.max(Math.round(ln.bl + 0.5 * ln.tall), ...mem.map(c => c.y1)) + 2);
+      const sy0 = Math.max(0, Math.round(Math.min(ln.bl - 1.6 * ln.tall, ...mem.map(c => c.sy0))) - 2);
+      const sy1 = Math.min(bh - 1, Math.round(Math.max(ln.bl + 0.5 * ln.tall, ...mem.map(c => c.sy1))) + 2);
       const SW = sx1 - sx0 + 1, SH = sy1 - sy0 + 1;
+      // per band column: rows the (straightened) line is shifted by
+      const lsh = new Int32Array(bw);
+      if (tilt) for (let x = 0; x < bw; x++) lsh[x] = Math.round(shiftAt(x0 + x, y0 + ln.bl));
+      const lab = (x, y) => { const yy = y + lsh[x]; return yy >= 0 && yy < bh ? labels[yy * bw + x] : 0; };
       const keep = new Set(mem.filter(c => !c.ext).map(c => c.id));
       // letters touching a stem or note hang off the staff as one component:
       // keep such components' pixels inside the text zone, minus thin
@@ -191,12 +279,12 @@ function findTextLinesCC(fr, sysIdx, nextTop, o) {
       const zt = Math.round(ln.bl - 1.15 * ln.tall), zb = Math.round(ln.bl + 0.5 * ln.tall), zh = zb - zt + 1;
       const part = new Map();   // label -> Set of erased columns (band x)
       if (o.attachedLetters) for (const c of comps) {
-        if (candSet.has(c) || c.y1 < zt || c.y0 > zb || c.x1 < lx0 || c.x0 > lx1) continue;
-        const ya = Math.max(zt, c.y0), yb = Math.min(zb, c.y1);
+        if (candSet.has(c) || c.y1 < zt + lsh[c.x0] - 1 || c.y0 > zb + lsh[c.x0] + 1 || c.x1 < lx0 || c.x0 > lx1) continue;
+        if (c.y1 < zt + Math.min(lsh[c.x0], lsh[c.x1]) || c.y0 > zb + Math.max(lsh[c.x0], lsh[c.x1])) continue;
         const colFull = [];
         for (let x = c.x0; x <= c.x1; x++) {
           let run = 0, best = 0;
-          for (let y = ya; y <= yb; y++) { if (labels[y * bw + x] === c.id) { run++; if (run > best) best = run; } else run = 0; }
+          for (let y = zt; y <= zb; y++) { if (lab(x, y) === c.id) { run++; if (run > best) best = run; } else run = 0; }
           colFull.push(best >= 0.9 * zh);
         }
         const erase = new Set();
@@ -210,32 +298,51 @@ function findTextLinesCC(fr, sysIdx, nextTop, o) {
       }
       const mask = new Uint8Array(SW * SH);
       for (let y = 0; y < SH; y++) for (let x = 0; x < SW; x++) {
-        const lab = labels[(sy0 + y) * bw + sx0 + x];
-        if (!lab) continue;
-        if (keep.has(lab)) mask[y * SW + x] = 1;
-        else if (part.has(lab) && sy0 + y >= zt && sy0 + y <= zb && !part.get(lab).has(sx0 + x)) mask[y * SW + x] = 1;
+        const l = lab(sx0 + x, sy0 + y);
+        if (!l) continue;
+        if (keep.has(l)) mask[y * SW + x] = 1;
+        else if (part.has(l) && sy0 + y >= zt && sy0 + y <= zb && !part.get(l).has(sx0 + x)) mask[y * SW + x] = 1;
       }
       const data = new Uint8ClampedArray(SW * SH).fill(255);
       for (let y = 0; y < SH; y++) for (let x = 0; x < SW; x++) {
         let m = mask[y * SW + x];
         if (!m) {
-          const lab = labels[(sy0 + y) * bw + sx0 + x];
-          if (lab) continue;   // ink of another component
+          if (lab(sx0 + x, sy0 + y)) continue;   // ink of another component
           for (let dy = -1; dy <= 1 && !m; dy++) for (let dx = -1; dx <= 1 && !m; dx++) {
             const yy = y + dy, xx = x + dx;
             if (yy >= 0 && yy < SH && xx >= 0 && xx < SW && mask[yy * SW + xx]) m = 1;
           }
         }
-        if (m) data[y * SW + x] = gray.data[(y0 + sy0 + y) * W + x0 + sx0 + x];
+        const gy = y0 + sy0 + y + lsh[sx0 + x];
+        if (m && gy >= 0 && gy < H) data[y * SW + x] = gray.data[gy * W + x0 + sx0 + x];
       }
+      const sw = strokeWidth(mask, SW, SH);
       out.push({
-        band: k, sys: sysIdx, last, sp, x0: st.left, x1: st.right, y0: y0 + sy0, y1: y0 + sy1,
-        baseline: y0 + ln.bl, xh: ln.xh, tall: ln.tall, hyphens, extenders,
+        band: k, sys: sysIdx, last, above, sp, x0: st.left, x1: st.right, y0: y0 + sy0, y1: y0 + sy1,
+        baseline: y0 + ln.bl, xh: ln.xh, tall: ln.tall, hyphens, extenders, sw,
         strip: { width: SW, height: SH, data, x0: x0 + sx0, y0: y0 + sy0, mask },
       });
     }
   });
   return out;
+}
+
+// typical stroke width of the text in a mask: median length of the
+// horizontal ink runs (runs across vertical strokes dominate in text)
+function strokeWidth(mask, w, h) {
+  const hist = new Int32Array(64);
+  let n = 0;
+  for (let y = 0; y < h; y++) {
+    let run = 0;
+    for (let x = 0; x <= w; x++) {
+      if (x < w && mask[y * w + x]) { run++; continue; }
+      if (run) { hist[Math.min(63, run)]++; n++; run = 0; }
+    }
+  }
+  if (!n) return 0;
+  let acc = 0;
+  for (let i = 1; i < 64; i++) { acc += hist[i]; if (acc >= n / 2) return i; }
+  return 63;
 }
 
 // row analysis on a masked strip (same shape as analyseRow's result)
@@ -362,6 +469,9 @@ function buildCrop(g, row, ln, o) {
       img.data[y * W + x] = lut[g.data[sy * g.width + sx]];
     }
   }
+  // heavy strokes (bold type, thick photocopies, blur) make tesseract's
+  // line layout drop whole lines: thin them towards a normal weight
+  if (ln.thin) maxFilter(img, ln.thin);
   const toPage = (xc) => {
     const vi = Math.max(0, Math.min(srcW - 1, Math.floor(xc / scale)));
     // nearest real column
@@ -372,6 +482,22 @@ function buildCrop(g, row, ln, o) {
     return row.xa;
   };
   return { img, toPage, scale };
+}
+
+// gray max filter (white grows, dark strokes thin by r px a side), in place
+function maxFilter(img, r) {
+  const { width: w, height: h, data } = img;
+  const tmp = new Uint8ClampedArray(data.length);
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    let m = 0;
+    for (let d = -r; d <= r; d++) { const xx = x + d; if (xx >= 0 && xx < w) m = Math.max(m, data[y * w + xx]); }
+    tmp[y * w + x] = m;
+  }
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    let m = 0;
+    for (let d = -r; d <= r; d++) { const yy = y + d; if (yy >= 0 && yy < h) m = Math.max(m, tmp[yy * w + x]); }
+    data[y * w + x] = m;
+  }
 }
 
 function cropGray(g, x0, y0, x1, y1, scale) {
@@ -453,21 +579,24 @@ function toSyllables(words) {
 
   // drop leading verse number like "1." / "2" / "3.O" (number glued to the first word)
   // (scan noise such as a bracket read as "Wi" may precede it: drop that too)
-  let number = null;
+  let number = null, numberConf = 0;
   for (let i = 0; i < Math.min(3, toks.length); i++) {
     if (toks[i].hy) continue;
     const m = toks[i].text.match(/^([1-9][0-9]?)[.,:]\s*(.*)$/) || toks[i].text.match(/^([1-9][0-9]?)$/);
     const roman = /^[IVX]{1,3}[.,]$/.test(toks[i].text);
     if (!m && !roman) continue;
     if (i > 0 && !(m && /[.,:]/.test(toks[i].text)) && !roman) continue; // bare digit later in the row: not a verse number
-    if (m) number = parseInt(m[1], 10);
+    if (m) { number = parseInt(m[1], 10); numberConf = toks[i].conf; }
     const rest = m && m[2] && LETTER.test(m[2]) ? { ...toks[i], text: m[2] } : null;
     toks.splice(0, i + 1);
     if (rest) toks.unshift(rest);
     break;
   }
   // a language tag after the stanza number ("1. EN Fairest", multilingual hymnals)
-  if (number != null && toks[0] && !toks[0].hy && /^(EN|DE|DA|SV|NO|NL|FR|IT|LA|ES|FI|IS|CY|PL|CS|HU|PT)$/.test(toks[0].text)) toks.shift();
+  // (also after a misread number: "i. EN Fairest")
+  const TAG = /^(EN|DE|DA|SV|NO|NL|FR|IT|LA|ES|FI|IS|CY|PL|CS|HU|PT)$/;
+  if (number != null && toks[0] && !toks[0].hy && TAG.test(toks[0].text)) toks.shift();
+  else if (number == null && toks.length > 3 && !toks[1].hy && TAG.test(toks[1].text) && !toks[0].hy && !/\p{L}{2}/u.test(toks[0].text)) toks.splice(0, 2);
   // a lone "1" / "0" inside a line is the word I / O (verse numbers are handled above)
   for (const t of toks) if (!t.hy && /^[10][,.;:!?]?$/.test(t.text)) t.text = (t.text[0] === '1' ? 'I' : 'O') + t.text.slice(1);
   const syl = [];
@@ -480,7 +609,7 @@ function toSyllables(words) {
     const syllabic = hyBefore ? (hyAfter ? 'middle' : 'end') : (hyAfter ? 'begin' : 'single');
     syl.push({ text: t.text.replace(/^[^\p{L}'’]+|[^\p{L}'’!?,.;:]+$/gu, ''), x: t.x, x0: t.x0, x1: t.x1, syllabic, conf: t.conf });
   }
-  return { number, syllables: syl.filter(s => s.text) };
+  return { number, numberConf, syllables: syl.filter(s => s.text) };
 }
 
 // ---- unprinted hyphens and merged words --------------------------------
@@ -910,6 +1039,122 @@ function syllabify(word, lang = 'en') {
   return out;
 }
 
+// how far a row's syllables follow the notes of a staff: the share printed
+// under an onset (centred under the note, or starting at it: melisma) minus
+// the share a row of random x positions would reach (the part of the row's
+// width within reach of an onset: near 1 on a staff dense with notes)
+function rowFit(fr, staff, syl, x0, x1, sp) {
+  if (!syl.length) return -1;
+  const voices = staffVoices(fr, staff, x0, x1, sp);
+  let best = -1;
+  const xa = Math.min(...syl.map(s => s.x0 ?? s.x)), xb = Math.max(...syl.map(s => s.x1 ?? s.x));
+  for (const ons of voices) {
+    if (!ons.length || !syl.length) continue;
+    let hit = 0;
+    for (const s of syl) {
+      let d = Infinity;
+      for (const x of ons) d = Math.min(d, Math.abs(x - s.x), s.x0 != null ? Math.abs(x - (s.x0 + 0.55 * sp)) : Infinity);
+      if (d <= 1.0 * sp) hit++;
+    }
+    let cov = 0;
+    const n = Math.max(1, Math.round((xb - xa) / 2));
+    for (let i = 0; i < n; i++) { const x = xa + (i + 0.5) * (xb - xa) / n; if (ons.some(o => Math.abs(o - x) <= 1.0 * sp)) cov++; }
+    best = Math.max(best, hit / syl.length - cov / n);
+  }
+  return best;
+}
+
+// Rows above a staff stay only when they follow its notes (titles, tempo
+// and composer lines do not). Between two staves, a bottom row whose
+// syllables sit under the lower staff's notes and clearly not under the
+// upper staff's (each voice with its own words, e.g. the tenor's text above
+// the bass staff) belongs to the lower staff: band + 1, above.
+function placeRows(fr, out, geo) {
+  for (const k in out) {
+    for (const v of out[k].filter(v => v.above)) {
+      const g = geo.get(v);
+      if (!g || v.syllables.length < 5 || !wordyRow(v.syllables) || rowFit(fr, g.staff, v.syllables, g.x0, g.x1, g.sp) < 0.35) { out[k] = out[k].filter(u => u !== v); geo.delete(v); }
+    }
+  }
+  // the bottom row of each inter-staff band, judged over the whole page (a
+  // verse stack of a homophonic hymn may fit the lower staff by chance on
+  // one system; a line that belongs to the lower staff does so throughout)
+  const cands = {};
+  for (const k in out) {
+    const sys = fr.systems[k];
+    for (let b = 0; b + 1 < sys.length; b++) {
+      const rows = out[k].filter(v => v.band === b && !v.above).sort((a, c) => c.y - a.y);
+      const v = rows[0], g = v && geo.get(v);
+      if (rows.length < 2 || !g) continue;
+      const fa = rowFit(fr, sys[b], v.syllables, g.x0, g.x1, g.sp), fb = rowFit(fr, sys[b + 1], v.syllables, g.x0, g.x1, g.sp);
+      (cands[b] ||= []).push({ v, g, fa, fb, staff: sys[b + 1] });
+    }
+  }
+  for (const b in cands) {
+    const c = cands[b], n = c.length;
+    const mean = (f) => c.reduce((t, x) => t + f(x), 0) / n;
+    if (mean(x => x.fb - x.fa) < 0.2 || mean(x => x.fb) < 0.35 || c.filter(x => x.fb >= x.fa + 0.2).length < 0.5 * n) continue;
+    for (const { v, g, fa, fb, staff } of c) {
+      if (fb < fa + 0.1) continue;
+      v.band = +b + 1; v.above = true;
+      g.staff = staff;
+    }
+  }
+}
+
+// mostly real words: lower-case letter pairs or capitalised words
+function wordyRow(syl) {
+  return syl.filter(s => /\p{Ll}{2}/u.test(s.text) || /^\p{Lu}\p{Ll}/u.test(s.text)).length >= 0.5 * syl.length;
+}
+
+// Verse numbers of the text rows of one page ({system: [row]}): per system
+// and band the rows top-down are verses 1..n, except that
+// - a row missing inside a stack (OCR rejected it) leaves its number free:
+//   rows are counted in steps of the page's line pitch, not one by one;
+// - confidently printed stanza numbers ("3.") place the stack: a stack whose
+//   top verse was lost starts at 2 when its rows read "3.", "4." ...
+//   (a single printed number may only explain rows missing on this page);
+// - below the bottom staff, a stack whose top row is printed "2." (or later)
+//   is the remaining stanzas set as a poem after the music (v.stanza).
+function numberVerses(out, o) {
+  const stacks = [];
+  for (const k in out) {
+    const byBand = {};
+    out[k].forEach(v => (byBand[v.band + (v.above ? 'a' : '')] ||= []).push(v));
+    for (const b in byBand) stacks.push(byBand[b].sort((a, c) => a.y - c.y));
+  }
+  const blOf = (v) => (v.geo ? v.geo.bl : v.y1 ?? v.y);
+  const gaps = [];
+  for (const rows of stacks) for (let i = 1; i < rows.length; i++) gaps.push(blOf(rows[i]) - blOf(rows[i - 1]));
+  const pitch = median(gaps);
+  const maxRows = Math.max(0, ...stacks.map(r => r.length));
+  for (const rows of stacks) {
+    const conf = (v) => (v.geo ? v.geo.numberConf : 100);
+    if (rows[0].last && rows[0].printed >= 2 && conf(rows[0]) >= 60) { rows.forEach(v => { v.stanza = true; }); continue; }
+    // position in the stack, in line pitches (a double gap = one row lost)
+    const idx = [0];
+    for (let i = 1; i < rows.length; i++) {
+      const g = blOf(rows[i]) - blOf(rows[i - 1]);
+      const step = o.verseGaps && pitch > 0 && gaps.length >= 3 ? Math.max(1, Math.min(3, Math.round(g / pitch))) : 1;
+      idx.push(idx[i - 1] + step);
+    }
+    // offset from confident printed numbers
+    let off = 0;
+    if (o.verseGaps) {
+      const votes = new Map();
+      rows.forEach((v, i) => {
+        if (v.printed == null || v.printed > 12 || conf(v) < 70) return;
+        const d = v.printed - 1 - idx[i];
+        if (d >= 0) votes.set(d, (votes.get(d) || 0) + 1);
+      });
+      let best = null;
+      for (const [d, n] of votes) if (!best || n > best.n || (n === best.n && d < best.d)) best = { d, n };
+      if (best && best.d > 0 && (best.n >= 2 || (best.d <= 2 && rows.length + best.d <= maxRows + 1))) off = best.d;
+    }
+    rows.forEach((v, i) => { v.number = idx[i] + 1 + off; });
+  }
+}
+
 // ocr(grayImage) -> Promise<[{text, conf, x0, x1}]> in the given image's pixels
 async function readLyrics(fr, ocr, onProgress, opts) {
   const o = { ...DEFAULTS, ...(opts || {}) };
@@ -919,13 +1164,23 @@ async function readLyrics(fr, ocr, onProgress, opts) {
   const all = [];
   const geo = new Map();
   const finder = o.ccLines ? findTextLinesCC : findTextLines;
-  fr.systems.forEach((sys, si) => all.push(...finder(fr, si, sysTops[si + 1] ?? fr.gray.height, o)));
+  fr.systems.forEach((sys, si) => {
+    const prev = si > 0 ? fr.staves[fr.systems[si - 1][fr.systems[si - 1].length - 1]] : null;
+    const prevBot = prev ? Math.max(prev.yAt(4, prev.left), prev.yAt(4, prev.right)) + 1.0 * prev.space : 0;
+    const rows = finder(fr, si, sysTops[si + 1] ?? fr.gray.height, o, prevBot);
+    // a row above this system that the previous one already took (its lyrics)
+    all.push(...rows.filter(r => !r.above || !all.some(q => q.sys === si - 1 && Math.min(q.y1, r.y1) - Math.max(q.y0, r.y0) > 0.5 * (r.y1 - r.y0))));
+  });
   // part labels left of the first system (L3e); fr.partLabels for score.js
   if (o.partLabels) {
     try { fr.partLabels = await readPartLabels(fr, ocr, o); } catch (e) { fr.partLabels = []; }
   }
   const talls = all.filter(l => l.tall).map(l => l.tall).sort((a, b) => a - b);
   const tallMed = talls.length >= 3 ? talls[talls.length >> 1] : 0;
+  // stroke weight is a property of the page (type, copy, blur): decided
+  // once from the median stroke width / letter height of its text lines
+  const swr = median(all.filter(l => l.sw && l.tall && !l.above).map(l => l.sw / l.tall));
+  if (o.thinAt && swr > o.thinAt) for (const l of all) l.thin = 1;
   for (const ln of all) {
     const step = () => { done++; if (onProgress) onProgress(done, all.length); };
     const pad = Math.round(0.3 * ln.sp);
@@ -960,8 +1215,17 @@ async function readLyrics(fr, ocr, onProgress, opts) {
       const big = ln.tall && tallMed && ln.tall > 1.35 * tallMed;
       if ((wordsL.length >= 2 && caps >= 0.8 * wordsL.length && wordsL.length <= 8) || /^[(\[].*[)\]]$/.test(txt) || big) { if (dbg) dbg.reject = 'title'; step(); continue; }
     }
-    const { number, syllables } = toSyllables(kept.filter(w => w.ok || w.conf >= 60));
+    // unsure short tokens without a vowel ("t", "T", "CL", "gs") are stems,
+    // slurs and specks read as letters, not syllables
+    const junk = (w) => {
+      if (!o.dropJunk || w.conf >= 50) return false;
+      const t = w.text.replace(/[^\p{L}]/gu, '');
+      return t.length >= 1 && t.length <= 3 && !/[aeiouyàâäéèêëîïôöùûüåæøœáíóúñ]/i.test(t);
+    };
+    const { number, numberConf, syllables } = toSyllables(kept.filter(w => (w.ok || w.conf >= 60) && !junk(w)));
     const entry = { band: ln.band, last: ln.last, y: ln.y0, y1: ln.y1, printed: number, number, syllables, raw: mapped.map(w => w.text).join(' '), conf: meanConf };
+    if (ln.above) entry.above = true;
+    Object.defineProperty(entry, 'geo', { value: { bl: ln.baseline ?? ln.y1, numberConf, sp: ln.sp }, enumerable: false });
     (out[ln.sys] ||= []).push(entry);
     geo.set(entry, { sp: ln.sp, staff: fr.systems[ln.sys][ln.band], x0: ln.x0, x1: ln.x1, extenders: ln.extenders || [],
       hyphens: ln.hyphens ? ln.hyphens.map(h => (h.x0 + h.x1) / 2) : row.clusters.filter((c, i) => row.hy[i]).map(([a, b]) => row.xa + (a + b) / 2) });
@@ -970,6 +1234,9 @@ async function readLyrics(fr, ocr, onProgress, opts) {
   for (const [v, g] of geo) linkHyphens(v.syllables, g.hyphens);
   // melisma: an extender line after a syllable holds it over the following notes
   for (const [v, g] of geo) markExtenders(v.syllables, g.extenders, g.sp);
+  // text above a staff belongs to that staff only when it follows its notes;
+  // the lower rows between two staves may belong to the staff below
+  if (o.aboveLines) placeRows(fr, out, geo);
   // unprinted hyphens / merged words: split tokens spanning several onsets
   if (o.splitByNotes) {
     const lang = o.lang || detectLang(Object.values(out).flat().map(v => v.syllables.map(s => s.text).join(' ')));
@@ -981,19 +1248,9 @@ async function readLyrics(fr, ocr, onProgress, opts) {
     Object.defineProperty(out, 'lang', { value: lang, enumerable: false });
   }
   // verse numbers: per system and band, rows top-down are verses 1..n
-  for (const k in out) {
-    out[k] = out[k].filter(v => v.syllables.length >= 2);
-    const byBand = {};
-    out[k].forEach(v => (byBand[v.band] ||= []).push(v));
-    for (const b in byBand) {
-      const rows = byBand[b].sort((a, c) => a.y - c.y);
-      // below the bottom staff, a stack whose top row is printed "2." (or
-      // later) is the remaining stanzas set as a poem after the music
-      if (rows[0].last && rows[0].printed >= 2) { rows.forEach(v => { v.stanza = true; }); continue; }
-      rows.forEach((v, i) => { v.number = i + 1; });
-    }
-    out[k] = out[k].filter(v => !v.stanza);
-  }
+  for (const k in out) out[k] = out[k].filter(v => v.syllables.length >= 2);
+  numberVerses(out, o);
+  for (const k in out) out[k] = out[k].filter(v => !v.stanza);
   // stanza text printed after the music (L5b) -> fr.stanzas for score.js
   if (o.stanzas && fr.systems.length) {
     const ls = fr.systems.length - 1, lsys = fr.systems[ls], bot = fr.staves[lsys[lsys.length - 1]];

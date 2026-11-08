@@ -1,0 +1,275 @@
+{
+  "id": "lyr01-elisions-three-languages",
+  "family": "lyrics",
+  "title": "Canticle of Elisions - melody with three numbered verses and lyric elisions",
+  "layout": "melody-lyrics",
+  "symbols": [
+    "barline-final",
+    "clef-treble",
+    "dot",
+    "dyn-mp",
+    "hairpin-cresc",
+    "hairpin-dim",
+    "key-f1",
+    "ledger-below",
+    "lyrics",
+    "lyrics-elision",
+    "lyrics-extender",
+    "lyrics-hyphen",
+    "lyrics-melisma",
+    "lyrics-multi-verse",
+    "lyrics-non-ascii",
+    "metronome",
+    "note-half",
+    "note-quarter",
+    "pickup",
+    "slur",
+    "stanza-text",
+    "stem-down",
+    "stem-up",
+    "system-break",
+    "tempo-mark",
+    "time-3-4",
+    "x-measures",
+    "x-noteheads",
+    "x-parts",
+    "x-staves"
+  ],
+  "counts": {
+    "barline-final": 1,
+    "clef-treble": 1,
+    "dot": 1,
+    "dyn-mp": 1,
+    "hairpin-cresc": 1,
+    "hairpin-dim": 1,
+    "key-f1": 1,
+    "ledger-below": 1,
+    "lyrics": 66,
+    "lyrics-elision": 11,
+    "lyrics-extender": 4,
+    "lyrics-hyphen": 30,
+    "lyrics-melisma": 6,
+    "lyrics-multi-verse": 44,
+    "lyrics-non-ascii": 2,
+    "metronome": 1,
+    "note-half": 5,
+    "note-quarter": 19,
+    "pickup": 1,
+    "slur": 2,
+    "stanza-text": 3,
+    "stem-down": 8,
+    "stem-up": 16,
+    "system-break": 1,
+    "tempo-mark": 1,
+    "time-3-4": 1,
+    "x-measures": 11,
+    "x-noteheads": 24,
+    "x-parts": 1,
+    "x-staves": 1
+  },
+  "expected": {
+    "parts": [
+      "Voice"
+    ],
+    "must_not_split": false,
+    "shared_staves": [],
+    "staves_per_part": {
+      "Voice": 1
+    },
+    "lyrics": [
+      {
+        "part": "Voice",
+        "verses": 3
+      }
+    ],
+    "notes": "ONE part \"Voice\", one staff, pickup + 10 measures of 3/4 on 2 systems. THREE verses under the staff, numbered \"1.\"-\"3.\" (Latin, Italian, Spanish). 11 lyric elisions: two syllables sung on one note and joined by an undertie (a~in, et~in, ta~e, da~il, ta~an, ra~u, ce~e, ta~y, ba~al, ta~o, y~el); each must stay ONE lyric on ONE note (MusicXML <text>a</text><elision/><text>in</text>), not two notes or two lyrics. Two slurred melismas per verse (extender or hyphen), non-ASCII syllables in verse 3 (Se-ñor, co-ra-zón)."
+  },
+  "notes": [
+    "Elided syllables are one <lyric> with <syllabic>/<text> pairs separated by <elision>‿</elision>; the first part keeps the hyphen to the previous syllable, the last part the hyphen to the next.",
+    "Stanza numbers \"1.\"-\"3.\" are printed but MusicXML has no element for them (lyric number=\"1\"..\"3\" only): stanza-text is counted from the engraving, not the truth.",
+    "Printed but not representable in the MusicXML truth: stanza-text x3 (not in counts)."
+  ],
+  "printed_not_in_truth": {
+    "stanza-text": 3
+  },
+  "layout_description": "A4 portrait, staff size 20, pickup + 10 measures on 2 systems, 3 numbered verses",
+  "pages": 1,
+  "measures": 11,
+  "systems": 2,
+  "noteheads_in_truth": 24,
+  "hidden_staff_segments": [],
+  "dpi": 300,
+  "degradations": {
+    "clean.pdf": {
+      "seed": null,
+      "dpi": 300,
+      "format": "png (8-bit grey)",
+      "summary": "undamaged raster of the engraving",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "size_px": [
+            2481,
+            3508
+          ]
+        }
+      ],
+      "bytes": 96084
+    },
+    "scan.pdf": {
+      "seed": 7411,
+      "render_dpi": 300,
+      "dpi": 300,
+      "format": "jpeg q75",
+      "colour": "gray",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            2481,
+            3508
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              2
+            ],
+            [
+              "skew_rotation_deg",
+              0.6
+            ],
+            [
+              "focus_blur_sigma",
+              0.4
+            ],
+            [
+              "gaussian_noise_sigma",
+              3
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 300,
+        "mode": "gray",
+        "texture": 2,
+        "rotate": 0.6,
+        "blur": 0.4,
+        "noise": 3,
+        "jpeg": 75
+      },
+      "summary": "300 dpi grey flatbed scan, 0.6 deg skew, light paper texture and noise, JPEG q75",
+      "bytes": 512160
+    },
+    "scan-severe.pdf": {
+      "seed": 7412,
+      "render_dpi": 240,
+      "dpi": 120,
+      "format": "jpeg q20",
+      "colour": "gray",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            992,
+            1403
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              6
+            ],
+            [
+              "skew_rotation_deg",
+              -4.0
+            ],
+            [
+              "focus_blur_sigma",
+              1.3
+            ],
+            [
+              "gaussian_noise_sigma",
+              10
+            ],
+            [
+              "resampled_dpi",
+              [
+                240,
+                120
+              ]
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 240,
+        "out_dpi": 120,
+        "mode": "gray",
+        "texture": 6,
+        "rotate": -4.0,
+        "blur": 1.3,
+        "noise": 10,
+        "jpeg": 20
+      },
+      "summary": "low-resolution 120 dpi grey scan, -4 deg skew, heavy blur and noise, JPEG q20",
+      "bytes": 29479
+    }
+  },
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "scan-severe.pdf",
+    "scan.pdf",
+    "truth.musicxml"
+  ],
+  "license": "CC0",
+  "license_detail": "CC0-1.0: composition, arrangement, engraving and scans",
+  "source": "Melody and the Italian/Spanish verses composed for the coverage suite (2026); Latin text: Gloria (traditional liturgical text, public domain)",
+  "engraver": "internal model -> LilyPond 2.24 (coverage-suite writer: explicit beams and stems)",
+  "validation": {
+    "xsd_valid": true,
+    "music21_parse": "1 24",
+    "midi_attacks_match_truth": true,
+    "attacks": 24,
+    "grob_log_matches_truth": true,
+    "printed_summary": {
+      "noteheads": 24,
+      "stems_up": 16,
+      "stems_down": 8,
+      "accidentals": 0,
+      "rests": 0,
+      "beams": 0,
+      "flags": 0,
+      "slurs": 2,
+      "ties": 0,
+      "scripts": {},
+      "dynamics": {
+        "mp": 1
+      },
+      "lyric_syllables": 66,
+      "hyphens": 33,
+      "extenders": 4,
+      "hyphens_visible": 33,
+      "extenders_visible": 4,
+      "chord_names": 0,
+      "system_delimiters": {}
+    },
+    "lilypond_warnings": [],
+    "lyric_syllables_found_in_engraving": 1.0,
+    "lyric_syllables": 66,
+    "pages_planned": 1,
+    "image_only": {
+      "clean.pdf": true,
+      "scan.pdf": true,
+      "scan-severe.pdf": true
+    }
+  }
+}

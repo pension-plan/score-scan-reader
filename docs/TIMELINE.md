@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 18:08 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 18:14 AEDT.
 
 ## Events
 
@@ -73,6 +73,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 18:02 | Release 0.6.0 (18:01 AEDT): rests precision fix (key-signature sharps/naturals were read as quarter rests) plus round 3 UI work. CI and Pages green. Score owner removed all Node-only debug flags; keyboard two-voice split is now the default. |
 | 18:05 | Coverage suite: all 8 families generated (structure 8 items, layouts 20, perf 21 incl. 100–600 dpi, A4/Letter/A3 and 1–40 pages) and the harness built (--set coverage, per-symbol support matrix, per-page time and peak memory). First pass on 76 items: 20 symbol tags supported, 40 partial, 90 unsupported; 16 of 19 layouts supported. Validation and the full baseline are running. |
 | 18:08 | Round 3 voices owner finished: two voices inside piano parts (L17 resolved), small instrument staves above a piano kept as separate parts (L18 partial), key changes carried across systems, single-staff pieces no longer wrongly split. Live tree: benchmark 0.946 (pitch 0.940, duration 0.910, rests 0.800, real scans 0.922); challenge 0.898. |
+| 18:14 | Release 0.7.0 (18:09 AEDT) and regression test: benchmark no regression (0.925 → 0.946, rests 0.436 → 0.800, real scans 0.907 → 0.922); challenge 0.788 → 0.802 with 18 items better and 3 severe scans worse, added to L19. |
 
 ## Accuracy by round
 
@@ -117,7 +118,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | L16 | Key and time-signature changes mid-piece not written; C clefs (alto/tenor) | Symbols + voices | Partial (round 3) | Key changes carried across system breaks; keysig-odyssey +0.08/+0.09, ttbb-enharmonic +0.06. |
 | L17 | Two voices inside one part (piano right hand, divisi) merged into chords | Voices + MusicXML | Resolved (round 3) | Piano staves with two rhythms are written as voices 1/2 (5/6 lower) inside one part. Beach piano 0.881 → 0.955; benchmark +0.004. |
 | L18 | A bracketed instrument pair (violin + cello) read as a piano grand staff; organ pedal staff becomes a separate part | Voices (layout) | Partial (round 3) | A staff printed at ≤85% of the system’s largest staff size is its own instrument part. Trio-minuet 0.48 → 0.81 (3 parts, pitch 0.24 → 0.73). Names are still generic (Instrument 1/2). |
-| L19 | Regressions found after shipping 0.3.0: 4 challenge items dropped > 0.05 vs 0.2.0 (wind-melody thick-photocopy severe −0.067, satb-closed-lyrics-both-staves-de severe −0.061, lyr08 Scandinavian −0.056, hymn-descant mild −0.050) | Round 3 owners (heads, lyrics, score) | Queued for round 3 | docs/regressions/v0.3.0-vs-v0.2.0.md |
+| L19 | Regressions found after shipping: after 0.3.0, 4 challenge items (wind-melody thick photocopy severe, German SATB severe, lyr08 Scandinavian, hymn-descant mild); after 0.7.0, 3 severe challenge scans (German SATB −0.119, andantino phone −0.072, andantino skew −0.060) | Round 3 owners (heads, lyrics, score) | Queued for round 3 | docs/regressions/v0.3.0-vs-v0.2.0.md, docs/regressions/v0.7.0-vs-v0.5.0.md |
 
 ## Runs
 
@@ -129,7 +130,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | Run 5 | Challenge test set (edge cases + scan damage) | done | 7 of 7 |  |
 | Run 3 | Max-parallel main workflow (research) | stopped | 7 of 10 | Stopped at 16:30 AEDT once all 7 research items returned, as planned; its 3 design-proposal agents had just started and were stopped with it. The full rebuild was replaced by fix-forward rounds on v1. |
 | Run 6 | Fix-forward round 2 (shipped 0.925 as v0.5.0) | done | 6 of 6 |  |
-| Run 7 | Fix-forward round 3 (6 owners incl. ML) | running | 0 of 6 |  |
+| Run 7 | Fix-forward round 3 (6 owners incl. ML) | running | 1 of 6 |  |
 | Run 8 | Coverage suite (every symbol and layout + speed) | running | 9 of 10 |  |
 | Side | Agents launched directly from the session | running | 3 of 5 |  |
 
@@ -177,12 +178,12 @@ Every agent started for this build, including stopped runs. Outcomes are on the 
 | Run 6 | Fix | fix:r2:lyrics | done | 16:21 | 16:41 | 20 | 109 |
 | Run 6 | Fix | fix:r2:ui | done | 16:21 | 16:45 | 24 | 87 |
 | Run 6 | Integrate | integrate:r2 | done | 17:12 | 17:34 | 22 | 93 |
-| Run 7 | Fix | fix:r3:heads | run | 17:36 |  | 32 | 144 |
-| Run 7 | Fix | fix:r3:symbols | run | 17:36 |  | 32 | 124 |
+| Run 7 | Fix | fix:r3:heads | run | 17:36 |  | 38 | 187 |
+| Run 7 | Fix | fix:r3:symbols | run | 17:36 |  | 37 | 147 |
 | Run 7 | Fix | fix:r3:score | run | 17:36 |  | 31 | 134 |
-| Run 7 | Fix | fix:r3:lyrics | run | 17:36 |  | 32 | 124 |
+| Run 7 | Fix | fix:r3:lyrics | run | 17:36 |  | 38 | 140 |
 | Run 7 | Fix | fix:r3:ui | run | 17:36 |  | 23 | 91 |
-| Run 7 | Fix | fix:r3:ml | run | 17:36 |  | 32 | 188 |
+| Run 7 | Fix | fix:r3:ml | done | 17:36 | 18:08 | 32 | 192 |
 | Run 8 | Harness | harness:coverage | done | 17:34 | 17:50 | 16 | 98 |
 | Run 8 | Generate | gen:notes | done | 17:34 | 17:44 | 10 | 76 |
 | Run 8 | Generate | gen:rests | done | 17:34 | 17:45 | 11 | 84 |
@@ -192,8 +193,8 @@ Every agent started for this build, including stopped runs. Outcomes are on the 
 | Run 8 | Generate | gen:structure | done | 17:34 | 17:53 | 19 | 95 |
 | Run 8 | Generate | gen:layouts | done | 17:34 | 17:56 | 22 | 131 |
 | Run 8 | Generate | gen:perf | done | 17:34 | 18:05 | 31 | 92 |
-| Run 8 | Baseline | validate+baseline | run | 18:05 |  | 3 | 32 |
-| Side | Fast track | a5575cc38e20927a6 | run | 18:07 |  | 1 | 9 |
+| Run 8 | Baseline | validate+baseline | run | 18:05 |  | 9 | 68 |
+| Side | Fast track | a5575cc38e20927a6 | run | 18:07 |  | 7 | 17 |
 | Side | ML demo | copista-2m demo page for GitHub Pages | done | 16:38 | 16:41 | 3 | 21 |
 | Side | Fast track | First version build (mvp/) | done | 15:19 | 15:29 | 10 | 69 |
 | Side | Hotfix | Rests fix (L3a, user-reported) | run | 17:33 |  | 35 | 179 |

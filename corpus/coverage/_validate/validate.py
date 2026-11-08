@@ -11,6 +11,7 @@ clean.pdf pixel comparison are the same code). Coverage-specific changes:
     extract(), run through tagcount.mjs) must find the declared tags in truth.musicxml, and tags it
     finds in the truth but meta does not declare are reported as warnings
   * cue notes (<cue/>) take time but do not sound, so they are not expected in LilyPond's MIDI
+  * unpitched (percussion) notes are expected at their instrument's <midi-unpitched> key (drum channel)
   * the generator's own verification record (meta.validation) must not contain a false check
 
 Original description follows.
@@ -100,6 +101,9 @@ def truth_events(path):
     lyrics=Counter((tick,text)), n_notes, n_rests, measures)"""
     root = ET.parse(path).getroot()
     names = {sp.get('id'): (sp.findtext('part-name') or '').strip() for sp in root.iter('score-part')}
+    # unpitched (percussion) notes sound the <midi-unpitched> key of their <instrument> (MusicXML counts from 1)
+    unp = {mi.get('id'): int(mi.findtext('midi-unpitched')) - 1 for mi in root.iter('midi-instrument')
+           if mi.findtext('midi-unpitched')}
     parts = root.findall('part')
     per_part = []
     nmeas = max((len(p.findall('measure')) for p in parts), default=0)
@@ -125,6 +129,13 @@ def truth_events(path):
                 elif c.tag == 'note':
                     pitch = c.find('pitch')
                     midi = None
+                    upi = c.find('unpitched')
+                    if pitch is None and upi is not None:
+                        ins = c.find('instrument')
+                        if ins is not None and ins.get('id') in unp:
+                            midi = unp[ins.get('id')]
+                        elif upi.findtext('display-step'):
+                            midi = (int(upi.findtext('display-octave')) + 1) * 12 + 'C D EF G A B'.index(upi.findtext('display-step'))
                     if pitch is not None:
                         alter = float(pitch.findtext('alter') or 0)
                         midi = (int(pitch.findtext('octave')) + 1) * 12 + 'C D EF G A B'.index(pitch.findtext('step')) + round(alter)

@@ -1,4 +1,4 @@
-"""Layouts-family items: every module pNN_*.py in this folder defines ITEM (sorted by file name)."""
+"""Lyrics-family items: every module pNN_*.py in this folder defines ITEM (sorted by file name)."""
 import importlib
 import os
 import pkgutil

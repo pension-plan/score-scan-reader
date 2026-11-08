@@ -481,6 +481,9 @@ function chordStems(L, heads, opts = {}) {
     if (parts.length < 2) continue;
     const sub = parts.map(p => ({ heads: p, xs: p.map(hd => hd.x), staff: c.staff }));
     sub.forEach(stems);
+    // a group with no stem of its own and no glyph strokes is a head whose
+    // stem was lost (blur, faint print): it stays on the column's stem
+    if (sub.some(p => !p.up && !p.down && !p.accidental)) { stems(c); continue; }
     chords.splice(i, 1, ...sub);
     i += sub.length - 1;
   }

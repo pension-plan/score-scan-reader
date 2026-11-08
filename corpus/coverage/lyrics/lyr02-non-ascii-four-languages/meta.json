@@ -1,0 +1,333 @@
+{
+  "id": "lyr02-non-ascii-four-languages",
+  "family": "lyrics",
+  "title": "Morning in Four Tongues - melody with four numbered verses in four languages (non-ASCII lyrics)",
+  "layout": "melody-lyrics",
+  "symbols": [
+    "barline-final",
+    "beam",
+    "clef-treble",
+    "dyn-mf",
+    "hairpin-cresc",
+    "hairpin-dim",
+    "key-s1",
+    "lyrics",
+    "lyrics-extender",
+    "lyrics-hyphen",
+    "lyrics-melisma",
+    "lyrics-multi-verse",
+    "lyrics-non-ascii",
+    "metronome",
+    "note-8th",
+    "note-half",
+    "note-quarter",
+    "slur",
+    "stanza-text",
+    "stem-down",
+    "stem-up",
+    "system-break",
+    "tempo-mark",
+    "time-4-4",
+    "x-measures",
+    "x-noteheads",
+    "x-parts",
+    "x-staves"
+  ],
+  "counts": {
+    "barline-final": 1,
+    "beam": 2,
+    "clef-treble": 1,
+    "dyn-mf": 1,
+    "hairpin-cresc": 1,
+    "hairpin-dim": 1,
+    "key-s1": 1,
+    "lyrics": 120,
+    "lyrics-extender": 7,
+    "lyrics-hyphen": 42,
+    "lyrics-melisma": 8,
+    "lyrics-multi-verse": 90,
+    "lyrics-non-ascii": 28,
+    "metronome": 1,
+    "note-8th": 4,
+    "note-half": 2,
+    "note-quarter": 26,
+    "slur": 2,
+    "stanza-text": 4,
+    "stem-down": 16,
+    "stem-up": 16,
+    "system-break": 1,
+    "tempo-mark": 1,
+    "time-4-4": 1,
+    "x-measures": 8,
+    "x-noteheads": 32,
+    "x-parts": 1,
+    "x-staves": 1
+  },
+  "expected": {
+    "parts": [
+      "Voice"
+    ],
+    "must_not_split": false,
+    "shared_staves": [],
+    "staves_per_part": {
+      "Voice": 1
+    },
+    "lyrics": [
+      {
+        "part": "Voice",
+        "verses": 4
+      }
+    ],
+    "notes": "ONE part \"Voice\", one staff, 8 measures of 4/4 on 2 systems. FOUR verses under the staff, numbered \"1.\"-\"4.\": German (ä ö ü ß), French (è â œ), Spanish (ñ ó í ¡ ¿) and Czech (í á ř ů ě ...). Lyric text must keep its diacritics and inverted punctuation; hyphenated words and two slurred melismas per verse (extender after word ends, hyphen inside words)."
+  },
+  "notes": [
+    "Stanza numbers \"1.\"-\"4.\" are printed but MusicXML has no element for them (lyric number=\"1\"..\"4\" only): stanza-text is counted from the engraving, not the truth.",
+    "Punctuation is part of the syllable text (e.g. \"¡Can\", \"zón!\", \"gó.\").",
+    "Printed but not representable in the MusicXML truth: stanza-text x4 (not in counts)."
+  ],
+  "printed_not_in_truth": {
+    "stanza-text": 4
+  },
+  "layout_description": "A4 portrait, staff size 20, 8 measures on 2 systems, 4 numbered verses",
+  "pages": 1,
+  "measures": 8,
+  "systems": 2,
+  "noteheads_in_truth": 32,
+  "hidden_staff_segments": [],
+  "dpi": 200,
+  "degradations": {
+    "clean.pdf": {
+      "seed": null,
+      "dpi": 300,
+      "format": "png (8-bit grey)",
+      "summary": "undamaged raster of the engraving",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "size_px": [
+            2481,
+            3508
+          ]
+        }
+      ],
+      "bytes": 133483
+    },
+    "scan.pdf": {
+      "seed": 7421,
+      "render_dpi": 200,
+      "dpi": 200,
+      "format": "jpeg q70",
+      "colour": "gray",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1654,
+            2339
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              3
+            ],
+            [
+              "skew_rotation_deg",
+              -0.9
+            ],
+            [
+              "lighting_gradient",
+              {
+                "strength": 0.05,
+                "angle_deg": 164.1
+              }
+            ],
+            [
+              "focus_blur_sigma",
+              0.5
+            ],
+            [
+              "gaussian_noise_sigma",
+              4
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 200,
+        "mode": "gray",
+        "texture": 3,
+        "rotate": -0.9,
+        "gradient": 0.05,
+        "blur": 0.5,
+        "noise": 4,
+        "jpeg": 70
+      },
+      "summary": "200 dpi grey office scan, -0.9 deg skew, slight lighting gradient, noise, JPEG q70",
+      "bytes": 305895
+    },
+    "scan-severe.pdf": {
+      "seed": 7422,
+      "render_dpi": 150,
+      "dpi": 150,
+      "format": "jpeg q25",
+      "colour": "rgb",
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1389,
+            1902
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              6
+            ],
+            [
+              "paper_colour",
+              [
+                243,
+                236,
+                214
+              ]
+            ],
+            [
+              "skew_rotation_deg",
+              -2.5
+            ],
+            [
+              "perspective_phone",
+              {
+                "margin": 0.06,
+                "bg": 50,
+                "jitter": 0.035,
+                "keystone": 0.06,
+                "corners_src": [
+                  [
+                    -69,
+                    -21
+                  ],
+                  [
+                    1459,
+                    58
+                  ],
+                  [
+                    1384,
+                    1868
+                  ],
+                  [
+                    28,
+                    1941
+                  ]
+                ]
+              }
+            ],
+            [
+              "uneven_lighting",
+              0.25
+            ],
+            [
+              "vignette",
+              0.3
+            ],
+            [
+              "motion_blur",
+              {
+                "len": 5,
+                "angle": 25
+              }
+            ],
+            [
+              "gaussian_noise_sigma",
+              6
+            ]
+          ]
+        }
+      ],
+      "params": {
+        "dpi": 150,
+        "mode": "rgb",
+        "paper_rgb": [
+          243,
+          236,
+          214
+        ],
+        "texture": 6,
+        "rotate": -2.5,
+        "phone": {
+          "margin": 0.06,
+          "bg": 50,
+          "jitter": 0.035,
+          "keystone": 0.06
+        },
+        "blotch": 0.25,
+        "vignette": 0.3,
+        "motion_blur": {
+          "len": 5,
+          "angle": 25
+        },
+        "noise": 6,
+        "jpeg": 25
+      },
+      "summary": "phone photo of the page: perspective/keystone, uneven light, vignette, motion blur, 150 dpi, JPEG q25",
+      "bytes": 85236
+    }
+  },
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "scan-severe.pdf",
+    "scan.pdf",
+    "truth.musicxml"
+  ],
+  "license": "CC0",
+  "license_detail": "CC0-1.0: composition, arrangement, engraving and scans",
+  "source": "self-authored for the coverage suite (2026)",
+  "engraver": "internal model -> LilyPond 2.24 (coverage-suite writer: explicit beams and stems)",
+  "validation": {
+    "xsd_valid": true,
+    "music21_parse": "1 32",
+    "midi_attacks_match_truth": true,
+    "attacks": 32,
+    "grob_log_matches_truth": true,
+    "printed_summary": {
+      "noteheads": 32,
+      "stems_up": 16,
+      "stems_down": 16,
+      "accidentals": 0,
+      "rests": 0,
+      "beams": 2,
+      "flags": 0,
+      "slurs": 2,
+      "ties": 0,
+      "scripts": {},
+      "dynamics": {
+        "mf": 1
+      },
+      "lyric_syllables": 120,
+      "hyphens": 42,
+      "extenders": 7,
+      "hyphens_visible": 42,
+      "extenders_visible": 7,
+      "chord_names": 0,
+      "system_delimiters": {}
+    },
+    "lilypond_warnings": [],
+    "lyric_syllables_found_in_engraving": 1.0,
+    "lyric_syllables": 120,
+    "pages_planned": 1,
+    "image_only": {
+      "clean.pdf": true,
+      "scan.pdf": true,
+      "scan-severe.pdf": true
+    }
+  }
+}

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Build the layouts-family coverage items in parallel and write ../manifest.json.
+"""Build the lyrics-family coverage items in parallel and write ../manifest.json.
 
-usage: /Users/d.sloane/music/.venv/bin/python corpus/coverage/layouts/_tools/run_all.py [item-id ...] [--keep-work]
+usage: /Users/d.sloane/music/.venv/bin/python corpus/coverage/lyrics/_tools/run_all.py [item-id ...] [--keep-work]
 """
 import json
 import os
@@ -48,7 +48,7 @@ def main():
     for lg in logs:
         if lg.get('ok'):
             e = dict(lg['meta'])
-            e['path'] = f"coverage/layouts/{lg['id']}"
+            e['path'] = f"coverage/lyrics/{lg['id']}"
             e['scan_files'] = sorted(k for k in e['degradations'] if k.startswith('scan'))
             by_id[lg['id']] = e
         elif lg['id'] in by_id:
@@ -65,11 +65,11 @@ def write_manifest(entries):
     for e in entries:
         tot.update(e['counts'])
     man = {
-        'family': 'layouts',
-        'description': ('One clean exemplar per score-layout tag (plus variants): every item has an exact '
-                        'MusicXML 4.0 truth generated from the same model as its LilyPond engraving, an '
-                        'undamaged raster (clean.pdf), a typical scan (scan.pdf) and a heavily damaged scan '
-                        '(scan-severe.pdf).'),
+        'family': 'lyrics',
+        'description': ('Lyric-underlay coverage: elisions (two syllables on one note, MusicXML <elision>), non-ASCII '
+                        'syllables in several languages, multiple numbered verses, hyphens, extenders and melismas. Each '
+                        'item: exact MusicXML 4.0 truth from the same model as its LilyPond engraving, clean.pdf, scan.pdf, '
+                        'scan-severe.pdf.'),
         'count_rules': 'see _tools/count_symbols.py (module docstring); counts are computed from truth.musicxml',
         'generator': '_tools/run_all.py (python: /Users/d.sloane/music/.venv/bin/python)',
         'license': 'CC0',

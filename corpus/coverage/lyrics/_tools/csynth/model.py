@@ -301,7 +301,7 @@ def parse_lyric_text(text: str):
         if tk == '_':
             out.append(None)
             continue
-        tk = tk.replace('~', ' ')
+        # '~' joins two syllables sung on one note (lyric elision, LilyPond's tie glyph; MusicXML <elision>)
         ly = Lyric(tk, 'end' if hy_next else 'single')
         out.append(ly)
         hy_next = False

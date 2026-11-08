@@ -402,9 +402,27 @@ def _note(w, ev, pit, chord, d, voice, staff, role, acc, first, k=0):
         for num in sorted(ev.lyrics):
             ly = ev.lyrics[num]
             ext = '<extend/>' if ly.extend else ''
-            w(f'        <lyric number="{num}"><syllabic>{ly.syllabic}</syllabic>'
-              f'<text>{escape(ly.text)}</text>{ext}</lyric>')
+            w(f'        <lyric number="{num}">{lyric_body(ly)}{ext}</lyric>')
     w('      </note>')
+
+
+def lyric_body(ly):
+    """<syllabic>/<text>, with <elision> between the parts of an elided syllable ('a~in').
+    The first part keeps the hyphen to the previous syllable, the last part the hyphen to the next."""
+    parts = ly.text.split('~')
+    if len(parts) == 1:
+        return f'<syllabic>{ly.syllabic}</syllabic><text>{escape(ly.text)}</text>'
+    before = ly.syllabic in ('end', 'middle')
+    after = ly.syllabic in ('begin', 'middle')
+    out = []
+    for k, t in enumerate(parts):
+        b = before if k == 0 else False
+        a = after if k == len(parts) - 1 else False
+        syl = 'middle' if (b and a) else 'end' if b else 'begin' if a else 'single'
+        if k:
+            out.append('<elision>‿</elision>')
+        out.append(f'<syllabic>{syl}</syllabic><text>{escape(t)}</text>')
+    return ''.join(out)
 
 
 HKIND = {'': ('major', ''), 'm': ('minor', 'm'), '7': ('dominant', '7'), 'm7': ('minor-seventh', 'm7'),
