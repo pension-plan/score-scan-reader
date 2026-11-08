@@ -105,7 +105,10 @@ async function childMain(specPath) {
   const pages = spec.pages.map(() => null); // [width, height] once read
   const convert = async (files, o) => {
     if (!omr.createConverter) return omr.convert(files.map((f, i) => { const g = readGray(f); pages[i] = [g.width, g.height]; return g; }), o);
-    const c = wrap(omr.createConverter(o));
+    // as the page runs it with OCR (and without the ML detector): each page's text read after its
+    // step (deferText), a notes-only preview once the pages are analysed, then the full score
+    const defer = !!(o.ocr && !spec.ml);
+    const c = wrap(omr.createConverter(Object.assign({}, o, { deferText: defer })));
     for (let i = 0; i < files.length; i++) {
       let g = readGray(files[i]);
       pages[i] = [g.width, g.height];
@@ -114,6 +117,7 @@ async function childMain(specPath) {
       if (e && c.releasePage) { c.releasePage(e); (e.spread || []).forEach((h) => c.releasePage(h)); }
       await new Promise((r) => setTimeout(r, 0));
     }
+    if (defer && c.preview && c.settle) { c.preview(); await c.settle(); }
     return c.finish();
   };
   let ocr = null, worker = null, extraWorker = null, more = [];

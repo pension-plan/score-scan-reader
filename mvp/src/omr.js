@@ -105,6 +105,35 @@ function spreadGutter(fr) {
   return null;
 }
 
+// Run fn and then put every plain object and array reachable from roots back as it was (own data
+// properties, enumerable or not; typed arrays, functions and accessors are left alone). Score
+// assembly marks what it has used on the page data (a fingering set on a head, a tie counted),
+// so a preview build must not leave its marks for the full build.
+function leaveAsIs(roots, fn) {
+  const saved = new Map(), stack = [...roots];
+  while (stack.length) {
+    const o = stack.pop();
+    if (!o || typeof o !== 'object' || saved.has(o) || ArrayBuffer.isView(o) || o instanceof ArrayBuffer) continue;
+    const ds = Object.getOwnPropertyDescriptors(o), vals = new Map();
+    for (const k of Reflect.ownKeys(ds)) if ('value' in ds[k]) { vals.set(k, ds[k]); if (ds[k].value && typeof ds[k].value === 'object') stack.push(ds[k].value); }
+    saved.set(o, { vals, len: Array.isArray(o) ? o.length : -1 });
+  }
+  try { return fn(); } finally {
+    for (const [o, { vals, len }] of saved) {
+      if (len >= 0 && o.length !== len) o.length = len;
+      for (const k of Reflect.ownKeys(o)) {
+        const d = Object.getOwnPropertyDescriptor(o, k);
+        if (!('value' in d)) continue;
+        if (!vals.has(k)) { if (d.configurable) delete o[k]; }
+      }
+      for (const [k, d] of vals) {
+        const cur = Object.getOwnPropertyDescriptor(o, k);
+        if (!cur || cur.value !== d.value || cur.enumerable !== d.enumerable) Object.defineProperty(o, k, d);
+      }
+    }
+  }
+}
+
 function createConverter(opts = {}) {
   const progress = opts.onProgress || (() => {});
   const pages = [];
@@ -127,9 +156,34 @@ function createConverter(opts = {}) {
     try { await readPageText(entry.fr, pageMarks(entry.fr, entry.asm), opts.ocr); } catch (e) { warnings.push(`Text OCR failed: ${e.message}`); }
   }
 
+  // opts.deferText: a page's text (lyrics, titles, marks) is read after its step returns, so the
+  // next page's analysis, or a notes-only preview(), need not wait for the text reader (still
+  // loading in the page). Pages' text is read one page after another in page order, as without
+  // it; settle() waits for all of it, before finish(). At most two pages wait for their text.
+  let textChain = Promise.resolve();
+  const textOf = new Map(), pending = [];
+  const readText = (entry, label, i, n) => {
+    if (!opts.deferText) return readPageLyrics(entry, label, i, n);
+    const p = textChain.then(() => readPageLyrics(entry, label, i, n));
+    textChain = p.catch(() => {});
+    textOf.set(entry, p);
+    pending.push(p);
+    const done = () => { const k = pending.indexOf(p); if (k >= 0) pending.splice(k, 1); };
+    p.then(done, done);
+    return null;
+  };
+  const release = (entry) => {
+    const fr = entry.fr;
+    if (fr.gray) fr.gray = { width: fr.gray.width, height: fr.gray.height, data: null, released: true };
+    fr.B = null;
+    fr.L = null;
+    keepPacked(fr, 'R');
+  };
+
   return {
     // returns the page entry ({fr, asm, index}) to show, or null when the page has no staves
     async addPage(gray, i, n) {
+      if (pending.length >= 2) await pending[pending.length - 2].catch(() => {});
       const label = `Page ${i + 1}${n ? '/' + n : ''}`;
       progress(`${label}: finding staves and notes`, { stage: 'cleanup', page: i, pages: n });
       const frOpts = { onProgress: (m, info) => progress(`${label}: ${m}`, Object.assign({ page: i, pages: n }, info || {})) };
@@ -150,7 +204,7 @@ function createConverter(opts = {}) {
           const entry = { fr: h.fr, asm: h.asm, index: i + 0.5 * k };
           pages.push(entry);
           halves.push(entry);
-          await readPageLyrics(entry, `${label} (${k ? 'right' : 'left'} half)`, i, n);
+          await readText(entry, `${label} (${k ? 'right' : 'left'} half)`, i, n);
         }
         if (halves.length) {
           warnings.push(`Page ${i + 1}: two book pages side by side; read the left page, then the right.`);
@@ -159,18 +213,34 @@ function createConverter(opts = {}) {
       }
       const entry = { fr: a.fr, asm: a.asm, index: i };
       pages.push(entry);
-      await readPageLyrics(entry, label, i, n);
+      await readText(entry, label, i, n);
       return entry;
     },
     // big page buffers nothing after the page step reads (buildScore needs fr.R and
     // asm.comps; fr.R is kept bit-packed and unpacked when read, image.js keepPacked)
+    // (a page whose text is still to be read keeps them until it has been read)
     releasePage(entry) {
       if (!entry || !entry.fr) return;
-      const fr = entry.fr;
-      if (fr.gray) fr.gray = { width: fr.gray.width, height: fr.gray.height, data: null, released: true };
-      fr.B = null;
-      fr.L = null;
-      keepPacked(fr, 'R');
+      const p = textOf.get(entry);
+      if (p) { textOf.delete(entry); p.then(() => release(entry), () => release(entry)); return; }
+      release(entry);
+    },
+    // all pages' text read (deferText)
+    settle() { return textChain; },
+    // the page's text read (deferText; null when it was read in its step)
+    textRead(entry) { return (entry && textOf.get(entry)) || null; },
+    // the score from the notes alone, while the pages' text is still being read (deferText): no
+    // lyrics and no text OCR. take(result) turns it into what the caller keeps (a summary) while
+    // the pages still carry this build; then the pages are put back as they were, so finish()
+    // builds the same score as without a preview.
+    preview(fo = {}, take = (r) => r) {
+      return leaveAsIs([pages], () => {
+        let score;
+        try { score = buildScore(pages, {}, { ocr: false, copyLyrics: !!opts.copyLyrics, debug: opts.debug, stanzasAsVerses: !!(fo.stanzasAsVerses ?? opts.stanzasAsVerses) }); }
+        catch (e) { score = { parts: [], warnings: ['Assembly failed: ' + e.message], xml: '' }; }
+        const none = pages.length ? [] : ['No staves were detected. Try a cleaner or higher-resolution scan.'];
+        return take({ pages, score, lyricsBySystem: {}, warnings: warnings.concat(none, score.warnings || []), preview: true });
+      });
     },
     // fo: options for this build (stanzasAsVerses); finish() may be called
     // again with other options and rebuilds the score from the same pages

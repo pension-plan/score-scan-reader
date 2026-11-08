@@ -310,6 +310,9 @@ function __omrSessionModule() {
         if (m.ocrExtra) ocr.extra = ask(true);
         session = createSession(req, {
           ocr: m.ocr ? ocr : null,
+          // m.deferText: a page's text is read after its step (the page shows a notes-only
+          // preview while the text reader loads); its view is sent again once the text is read
+          deferText: !!m.deferText,
           onProgress: (msg, info) => post({ t: 'progress', msg, info: plain(info, 2) || null }),
         });
         post({ t: 'ready' });
@@ -320,11 +323,21 @@ function __omrSessionModule() {
         if (!entry) { post({ t: 'page-done', i: m.i, ms: Date.now() - t0, view: null }); return; }
         const view = pageView(entry, m.i, req);
         const thumb = shrink(entry.fr.gray, m.maxW || 1400);
+        // text still to be read (deferText): the page's view again once it is (before its
+        // buffers are freed: release waits for the same text)
+        const texts = session.textRead ? [entry, ...(entry.spread || [])].map((e) => session.textRead(e)).filter(Boolean) : [];
+        // (pages' text is read in order, so the last one is read last)
+        if (texts.length) texts[texts.length - 1].then(() => post({ t: 'page-view', i: m.i, view: pageView(entry, m.i, req) }), () => {});
         // only a session that says what it can spare frees page buffers
         if (session.releasePage) { session.releasePage(entry); (entry.spread || []).forEach((h) => session.releasePage(h)); }
         post({ t: 'page-done', i: m.i, ms: Date.now() - t0, view, thumb }, [thumb.data.buffer]);
+      } else if (m.t === 'preview') {
+        // the score from the notes alone, while the text is still being read (deferText)
+        if (session.preview) session.preview(m.opts || {}, (res) => post({ t: 'preview', result: resultSummary(res) }));
+        else post({ t: 'preview', result: null });
       } else if (m.t === 'finish') {
         // m.opts: build options (stanzasAsVerses); a later finish rebuilds the score
+        if (session.settle) await session.settle();
         const res = session.finish(m.opts || {});
         post({ t: 'done', result: resultSummary(res) });
       }
