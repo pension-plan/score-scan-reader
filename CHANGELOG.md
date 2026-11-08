@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.37.1](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.37.0...score-scan-reader-v0.37.1) (2026-11-08)
+
+
+### Bug Fixes
+
+* **text:** fermatas with a bold arc ([8c1f1e0](https://github.com/pension-plan/score-scan-reader/commit/8c1f1e057c4e781f3bbce6d2ab35b90749a19230))
+
 ## [0.37.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.36.2...score-scan-reader-v0.37.0) (2026-11-08)
 
 
