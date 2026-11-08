@@ -12,6 +12,7 @@ const { detectStems } = require('./stems');
 const { detectBarlines } = require('./barlines');
 const { rotateGray, makeGray } = require('./image');
 const { precleanPage, clefScore } = require('./cv');
+const { findOneLineStaves, percClefOnPage, findXHeads } = require('./percussion');
 const { inferStaves } = require('./staffinfer');
 
 function resample(g, f) {
@@ -352,6 +353,15 @@ function* frontSteps(gray0, opts = {}) {
       if (inf.added === inf.staves.length) ctx.sp = Object.assign({}, ctx.sp, { ss: inf.ss, lt: Math.max(1, Math.min(ctx.sp.lt, 0.15 * inf.ss)) });
     }
   }
+  // one-line percussion staves (percussion.js: a lone line with the percussion clef at its start;
+  // none on other pages), read with the page's staves
+  if (opts.oneLine !== false && ctx.staves.length) {
+    const one = findOneLineStaves(ctx.B, ctx.staves, ctx.sp.ss, ctx.sp.lt);
+    if (one.length) {
+      ctx.staves = ctx.staves.concat(one).sort((a, b) => a.yAt(2, (a.left + a.right) / 2) - b.yAt(2, (b.left + b.right) / 2));
+      ctx.staves.forEach((s, i) => { s.index = i; });
+    }
+  }
   let { gray, B, L0, sp, ltL, scale, skew, staves } = ctx;
   if (!staves.length) {
     warnings.push('No staves found on this page.');
@@ -386,6 +396,18 @@ function* frontSteps(gray0, opts = {}) {
   // thin, faint prints: hollow-head outlines break open in B but stay closed
   // on the lenient binary (heavy prints close unrelated gaps there instead)
   const { heads, beams, stacked } = detectHeads(B, R, staves, sp.ss, sp.lt, sp.lt < 0.16 * sp.ss ? { lenient: L0 } : {});
+  // percussion staves (percussion.js: the percussion clef at the start): x heads (hi-hat, cymbals),
+  // in place of the head finder's partial readings of them (none on other staves)
+  const perc = opts.xHeads === false ? [] : staves.map((s, k) => (percClefOnPage(B, s.left, s.right, s.yAt(2, s.left), s.space || sp.ss) ? k : -1)).filter(k => k >= 0);
+  if (perc.length) {
+    perc.forEach(k => { staves[k].perc = true; });
+    const xh = findXHeads(R, staves, perc, sp.ss);
+    for (let i = heads.length - 1; i >= 0; i--) {
+      const h = heads[i];
+      if (xh.some(x => x.staff === h.staff && Math.abs(x.x - h.x) < 0.6 * x.sp && Math.abs(x.y - h.y) < 0.8 * x.sp)) heads.splice(i, 1);
+    }
+    heads.push(...xh);
+  }
   const { binary: L } = removeStaffLines(L0, staves, ltL);
   // ledger evidence on the lenient binary, or on the main one: lenient
   // thresholds thicken a ledger fused with its head past the thin-stroke limit
@@ -410,7 +432,8 @@ function* frontSteps(gray0, opts = {}) {
   const chords = chordStems(L, hs, { minLen: 1.5, sides: true });
   // (on a staff inferred from washed-out music the stems faded with the lines: filled heads stay)
   hs = hs.filter(h => (h.stemDir !== 0 || h.kind === 'hollow' || staves[h.staff].inferred) && !(h.chord && h.chord.accidental));
-  hs = hs.filter(h => !atStemTip(h, hs, L, ltL));
+  // (an x head of a drum kit sits at a snare's stem end by design)
+  hs = hs.filter(h => h.xHead || !atStemTip(h, hs, L, ltL));
   hs = hs.filter(h => !accidentalBefore(h, chords, L, R));
   const barlines = detectBarlines(R, staves, hs, sp.ss);
   return { gray, B, R, L, scale, skew, ss: sp.ss, lt: sp.lt, staves, systems, heads: hs, chords, beams, barlines, warnings, stacked: stacked || [],

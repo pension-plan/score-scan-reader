@@ -572,7 +572,14 @@ changing between systems; labels misread. **Confidence.** Per part: the minimum 
    for x heads (a head on such a staff that is not solid, its position taken from the x's centre). The part
    declares the kit as one `<score-instrument>`/`<midi-instrument>` per drum on channel 10 with its General
    MIDI key (`<midi-unpitched>`), and playback.js plays each note on its own drum. A part with no read name
-   is called Drum Set. One-line percussion staves are not found yet (staves.js finds five-line staves).
+   is called Drum Set (Percussion on a one-line staff), and a percussion staff is never split into voice parts.
+   The front end (front.js) does two percussion-only passes: a one-line staff (a lone thin line spanning
+   the system, clear of the five-line staves, with the percussion clef at its start; modelled as a five-line
+   staff with its line in the middle) is added to the page's staves before the heads are found, and on
+   staves with the percussion clef x heads are found by their two inked diagonals (in place of the head
+   finder's partial readings of them, and kept at a snare's stem end). The clef test there runs on the page
+   with its staff lines (columns inked from a space above to a space below the middle line, clear beyond),
+   so a worn copy's broken bars still read. Pages without a percussion clef are read exactly as before.
 7. **Measures.** `number` sequential from 1 (0 for a pickup), `implicit="yes"` on pickups, `<barline>` for
    repeats, double and final bars. `<print new-system="yes">` and `new-page="yes"` mirror the scan's layout.
 8. **Escaping and identity.** XML-escape all text; `<identification><encoding>` with software name and date;

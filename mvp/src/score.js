@@ -340,7 +340,7 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
   // a piece on one staff splits only where stems up and down are seen
   // together (research-voices.md section 11): two heads on one stem there
   // are chords, double stops or blurred heads, not two singers
-  const vs = vocal.map(k => ({ staff: k, clef: clefs[k], small: small[k], split: !small[k] && stats[k].f2 > 0.35 && stats[k].f3 < 0.2 && (nSt > 1 || stats[k].mix >= 0.25) }));
+  const vs = vocal.map(k => ({ staff: k, clef: clefs[k], small: small[k], split: clefs[k] !== 'perc' && !small[k] && stats[k].f2 > 0.35 && stats[k].f3 < 0.2 && (nSt > 1 || stats[k].mix >= 0.25) }));
   // a two-staff closed score decides once for both staves
   if (vs.length === 2 && nSt === 2 && !small[0] && !small[1]) {
     const both = (stats[0].f2 + stats[1].f2) / 2 > 0.3 && (stats[0].f3 + stats[1].f3) / 2 < 0.2;
@@ -2289,6 +2289,9 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, unitTime, unitBar
   for (const c of credits || []) {
     L.push(`  <credit page="${c.page}"><credit-type>lyrics</credit-type>${c.label ? `<credit-words>${esc(c.label)} </credit-words>` : ''}<credit-words>${esc(c.text)}</credit-words></credit>`);
   }
+  // one-line (percussion) staves, by staff number
+  const oneLine = [];
+  for (const sy of unitSys || []) if (sy && sy.staves) sy.staves.forEach((s, k) => { if (s && s.st && s.st.oneLine) oneLine[k] = true; });
   L.push('  <part-list>');
   // vocal parts split from shared staves are bracketed as one choir group
   const vocalIdx = parts.map((p, i) => (p.kind === 'vocal' ? i : -1)).filter(i => i >= 0);
@@ -2299,7 +2302,8 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, unitTime, unitBar
     // General MIDI sound per part (playback.js), so exports and players carry it (OMR_NO_MIDI=1: left out)
     // a part on percussion staves (percussion.js): a drum kit, its notes unpitched
     const perc = p.src.every(s => clefs[s.staff] === 'perc');
-    if (perc && /^(Voice|Part|Staff) \d+/.test(p.name)) p.name = 'Drum Set';
+    // (one line: a single drum, most often the snare; five lines: a drum set)
+    if (perc && /^(Voice|Part|Staff|Soprano|Alto|Tenor|Bass)\b/.test(p.name)) p.name = p.src.every(s => oneLine[s.staff]) ? 'Percussion' : 'Drum Set';
     const midi = process.env.OMR_NO_MIDI ? '' : instrumentXML(p, i, parts.length, { vocalParts: parts.filter(q => q.kind === 'vocal').length, kit: perc ? KIT : null });
     L.push(`    <score-part id="${p.id}"><part-name>${esc(p.name)}</part-name>${p.abbrev ? `<part-abbreviation>${esc(p.abbrev)}</part-abbreviation>` : ''}${midi}</score-part>`);
     if (groupChoir && i === vocalIdx[vocalIdx.length - 1]) L.push('    <part-group type="stop" number="1"/>');
