@@ -51,6 +51,24 @@ function fillHoles(B, R, ss, lt = 2, opts = {}) {
     return best >= 0.75 * ss;
   };
   for (let i = 0; i < w * h; i++) inv.data[i] = src[i] ? 0 : 1;
+  // the inside of a hollow head is ringed by a thin outline on all four
+  // sides; the gap between a flag and its stem or a beam is not (a head or
+  // the beam is thick), and neither is a gap in a heavy glyph
+  const thinRing = (labels, c) => {
+    if (!(c.x1 - c.x0 + 1 >= 0.45 * ss && c.x1 - c.x0 + 1 <= 1.5 * ss && c.y1 - c.y0 + 1 <= 0.75 * ss && c.y1 - c.y0 + 1 >= 0.2 * ss)) return false;
+    const xm = Math.round((c.x0 + c.x1) / 2), ym = Math.round((c.y0 + c.y1) / 2);
+    const lim = 0.58 * ss;
+    const cap = 1.2 * ss;
+    const run = (x, y, dx, dy) => { let n = 0; while (x >= 0 && y >= 0 && x < w && y < h && src[y * w + x] && n <= cap) { n++; x += dx; y += dy; } return n; };
+    let top = -1, bot = -1;
+    for (let y = c.y0; y <= c.y1; y++) if (labels[y * w + xm] === c.id) { if (top < 0) top = y; bot = y; }
+    if (top < 0) return false;
+    let lft = -1, rgt = -1;
+    for (let x = c.x0; x <= c.x1; x++) if (labels[ym * w + x] === c.id) { if (lft < 0) lft = x; rgt = x; }
+    if (lft < 0) return false;
+    const up = run(xm, top - 1, 0, -1), dn = run(xm, bot + 1, 0, 1), l = run(lft - 1, ym, -1, 0), r = run(rgt + 1, ym, 1, 0);
+    return up >= 1 && dn >= 1 && l >= 1 && r >= 1 && up <= lim && dn <= lim && l <= 1.1 * ss && r <= 1.1 * ss;
+  };
   {
     const { labels, comps } = labelComponents(inv, { four: true });
     const maxW = 1.5 * ss, maxH = 1.0 * ss, maxA = 0.6 * ss * ss;
@@ -58,6 +76,7 @@ function fillHoles(B, R, ss, lt = 2, opts = {}) {
     for (const c of comps) {
       if (!inner(c)) continue;
       const cw = c.x1 - c.x0 + 1, ch = c.y1 - c.y0 + 1;
+      if (opts.thinRing && !thinRing(labels, c)) continue;
       // wide, flat insides: hollow heads of older engravings run up to ~1.9
       // spaces wide (taller regions that wide are gaps between lines and stems)
       if (!(ch <= maxH && c.area <= maxA && c.area >= 2)) continue;
@@ -212,7 +231,7 @@ function detectHeads(B, R, staves, ss, lt, opts = {}) {
   let F = fillHoles(B, R, ss, lt);
   // thin-walled hollow heads of old prints break open in B; their outline
   // stays closed on a lenient threshold: fill those insides too
-  if (opts.lenient) F = fillHoles(opts.lenient, F, ss, lt, { close: opts.lenientClose ?? false });
+  if (opts.lenient) F = fillHoles(opts.lenient, F, ss, lt, { close: false, thinRing: true });
   const O1 = openRuns(F, Math.max(3, Math.round(0.55 * ss)), true);
   const O = openRuns(O1, Math.max(3, Math.round(0.42 * ss)), false);
   const { labels, comps } = labelComponents(O);

@@ -1,10 +1,10 @@
 'use strict';
 // Front end: gray page -> staves, systems, heads (+stems), beams, barlines.
 // Works in the deskewed frame; everything downstream uses that frame.
-const { binarize, boxBlur } = require('./binarize');
+const { binarize, boxBlur, despeckle } = require('./binarize');
 const { estimateSkew } = require('./skew');
 const { estimateStaffSpace } = require('./staffspace');
-const { detectStaves, groupSystems, mergeStaffSets } = require('./staves');
+const { detectStaves, groupSystems, mergeStaffSets, lineCoverage } = require('./staves');
 const { removeStaffLines } = require('./staffremoval');
 const { detectHeads, chordStems, ledgerOK } = require('./heads');
 const { threshold } = require('./binarize');
@@ -95,7 +95,7 @@ function eraseStartLines(R, staves, ss) {
 //            heavy photocopies
 const MODES = [
   { name: 'default' },
-  { name: 'raw', denoise: false },
+  { name: 'raw', denoise: false, despeckle: true },
   { name: 'blur1', denoise: false, blur: 1 },
   { name: 'blur2', denoise: false, blur: 2 },
 ];
@@ -122,8 +122,10 @@ function prepare(gray, mode) {
   let bz = bin(gray);
   let sp = estimateStaffSpace(bz.binary);
   let scale = 1;
-  // normalise staff space to ~18 px (speed for big scans, detail for small ones)
-  if (sp.ss > 26 || (sp.ss < 13 && sp.ss >= 5)) {
+  // normalise staff space to ~18 px (speed for big scans, detail for small
+  // ones), when the estimate is trustworthy (a blank, text-only or sideways
+  // page has no clear line spacing)
+  if ((sp.ss > 26 || (sp.ss < 13 && sp.ss >= 5)) && sp.confidence >= 0.2) {
     scale = 18 / sp.ss;
     gray = resample(gray, scale);
     bz = bin(gray);
@@ -133,8 +135,9 @@ function prepare(gray, mode) {
     gray = rotateGray(gray, (-skew.angle * Math.PI) / 180);
     bz = bin(gray);
   }
-  const B = bz.binary;
+  let B = bz.binary;
   sp = estimateStaffSpace(B);
+  if (mode.despeckle && bz.info.noise > 12) { B = despeckle(B, Math.max(2, Math.round(0.02 * sp.ss * sp.ss))); sp = estimateStaffSpace(B); }
   // staves on the main binary and on a lenient one (faint / thin-ruled scans
   // lose staff lines in B); keep the better-supported staff where they clash
   const L0 = threshold(bz.gray, Math.min(235, (bz.info.threshold || 180) + 35));
@@ -146,6 +149,23 @@ function prepare(gray, mode) {
     sp = { ...sp, ss: spL.ss }; ltL = Math.max(sp.lt, spL.lt);
   }
   return { gray, bz, B, L0, sp, ltL, scale, skew, staves, mode: mode.name };
+}
+
+function transpose(b) {
+  const { width: w, height: h, data } = b;
+  const o = { width: h, height: w, data: new Uint8Array(w * h) };
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) o.data[x * h + y] = data[y * w + x];
+  return o;
+}
+
+// Staves found by a fallback binarization must look like staves.  Blurred
+// text rows make regularly spaced bands too, but they are thick for their
+// spacing AND broken at every word gap; real staff lines are thin or run on.
+function plausible(c) {
+  if (c.sp.lt <= 0.35 * c.sp.ss) return c.staves.length > 0;
+  c.staves = c.staves.filter(st => { const cv = lineCoverage(st, c.B, c.sp.lt); return cv.reduce((a, b) => a + b, 0) / 5 >= 0.8; });
+  c.staves.forEach((st, i) => { st.index = i; });
+  return c.staves.length > 0;
 }
 
 // Upside-down pages: a staff opens with clef / key / time signature (dense
@@ -178,16 +198,21 @@ function invertedShare(R, staves) {
 function* frontSteps(gray0, opts = {}) {
   const warnings = [];
   yield 'clean';
-  let ctx = prepare(gray0, MODES[0]);
+  let ctx = prepare(gray0, (opts.mode && MODES.find(m => m.name === opts.mode)) || MODES[0]);
   yield 'staves';
   let quarter = 0;
-  if (!ctx.staves.length) {
-    // fail over: other binarizations, then the page turned a quarter
+  if (!ctx.staves.length && !opts.mode) {
+    // fail over: other binarizations, then the page turned a quarter.  Only
+    // pages with straight-line structure are worth it (projection sharpness
+    // along rows, or along columns for a page lying on its side); a blank or
+    // text-only page stops here.
+    const rowConf = estimateSkew(ctx.B).confidence, colConf = estimateSkew(transpose(ctx.B)).confidence;
     const tries = [];
-    for (const m of MODES.slice(1)) tries.push([0, m]);
-    for (const q of [1, 3]) for (const m of [MODES[0], MODES[2]]) tries.push([q, m]);
+    if (rowConf >= 1.5) for (const m of MODES.slice(1)) tries.push([0, m]);
+    if (colConf >= 1.5) for (const q of [1, 3]) for (const m of [MODES[0], MODES[2]]) tries.push([q, m]);
     for (const [q, m] of tries) {
       const c = prepare(turn(gray0, q), m);
+      if (!plausible(c)) continue;
       if (c.staves.length > ctx.staves.length) { ctx = c; quarter = q; }
       if (ctx.staves.length && q === 0 && m === MODES[MODES.length - 1]) break;
       if (ctx.staves.length && q !== 0) break;
@@ -213,7 +238,9 @@ function* frontSteps(gray0, opts = {}) {
   const systems = groupSystems(B, staves, sp.ss, L0);
   eraseStartLines(R, staves, sp.ss);
   yield 'notes';
-  const { heads, beams } = detectHeads(B, R, staves, sp.ss, sp.lt);
+  // thin, faint prints: hollow-head outlines break open in B but stay closed
+  // on the lenient binary (heavy prints close unrelated gaps there instead)
+  const { heads, beams } = detectHeads(B, R, staves, sp.ss, sp.lt, sp.lt < 0.16 * sp.ss ? { lenient: L0 } : {});
   const { binary: L } = removeStaffLines(L0, staves, ltL);
   // ledger evidence on the lenient binary, or on the main one: lenient
   // thresholds thicken a ledger fused with its head past the thin-stroke limit
@@ -250,4 +277,4 @@ function front(gray, opts = {}) {
   return r.value;
 }
 
-module.exports = { front, frontSteps, resample, turn };
+module.exports = { front, frontSteps, resample, turn, prepare };

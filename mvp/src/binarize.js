@@ -34,7 +34,7 @@ function threshold(gray, t) {
 
 // Estimate the paper level per block (high percentile), smooth, interpolate,
 // and divide it out.  Removes vignetting / lamp gradients / yellowed paper.
-function backgroundNormalize(gray, block) {
+function backgroundNormalize(gray, block, bgOut) {
   const { width: w, height: h, data } = gray;
   block = block || Math.max(16, Math.round(Math.min(w, h) / 48));
   const bw = Math.ceil(w / block), bh = Math.ceil(h / block);
@@ -78,6 +78,7 @@ function backgroundNormalize(gray, block) {
       const b = (bg2[y0 * bw + x0] * (1 - tx) + bg2[y0 * bw + x1] * tx) * (1 - ty) +
                 (bg2[y1 * bw + x0] * (1 - tx) + bg2[y1 * bw + x1] * tx) * ty;
       out.data[y * w + x] = Math.min(255, (255 * data[y * w + x]) / Math.max(1, b));
+      if (bgOut) bgOut[y * w + x] = b;
     }
   }
   return out;
@@ -173,8 +174,11 @@ function binarize(gray, opts = {}) {
   const noise = estimateNoise(g);
   info.noise = noise;
   if (opts.denoise !== false) {
-    if (noise > 30) { g = median3(g); g = boxBlur(g, 1); info.denoise = 'median3+box1'; }
-    else if (noise > 12) { g = median3(g); info.denoise = 'median3'; }
+    // a 3x3 median erases 1-px staff lines (and halftone screens read as
+    // noise turn into texture under it); a box blur keeps thin lines
+    // connected
+    if (noise > 30) { g = boxBlur(g, 2); info.denoise = 'box2'; }
+    else if (noise > 12) { g = boxBlur(g, 1); info.denoise = 'box1'; }
   }
   if (method === 'otsu') {
     const t = otsuFromHist(histogram(g), g.data.length);
@@ -187,11 +191,31 @@ function binarize(gray, opts = {}) {
     return { binary: sauvola(g, win, opts.k ?? 0.25), gray: g, info };
   }
   // bgotsu
-  const n = backgroundNormalize(g, opts.block);
+  const bgMap = new Uint8Array(g.data.length);
+  const n = backgroundNormalize(g, opts.block, bgMap);
   const t = otsuFromHist(histogram(n), n.data.length);
-  // Otsu on a page that is >90% paper sits a bit high; bias slightly towards paper
   info.threshold = t;
-  return { binary: threshold(n, t), gray: n, info };
+  // absolute contrast guard: ink lies at least max(12, 2.5 sigma) grey levels
+  // below its local paper level.  Otsu splits even a blank or noise-only page
+  // in two, and dividing out a dark corner (vignetting, book gutter) blows its
+  // noise up to ink-like values; neither passes this test.
+  const sig = info.denoise === 'box2' ? noise / 5 : info.denoise === 'box1' ? noise / 3 : noise;
+  const minC = opts.minContrast ?? Math.max(12, 2.5 * sig);
+  info.minContrast = minC;
+  const b = makeBinary(g.width, g.height), nd = n.data, bd = b.data;
+  for (let i = 0; i < nd.length; i++) bd[i] = nd[i] <= t && bgMap[i] * (255 - nd[i]) >= 255 * minC ? 1 : 0;
+  return { binary: b, gray: n, info };
 }
 
-module.exports = { binarize, backgroundNormalize, otsuFromHist, histogram, threshold, sauvola, estimateNoise, boxBlur, median3 };
+// Remove 8-connected ink components of at most maxArea pixels (speckle).
+function despeckle(bin, maxArea) {
+  const { labelComponents } = require('./cc');
+  const { labels, comps } = labelComponents(bin);
+  const kill = new Uint8Array(comps.length + 1);
+  for (const c of comps) if (c.id && c.area <= maxArea) kill[c.id] = 1;
+  const out = makeBinary(bin.width, bin.height);
+  for (let i = 0; i < bin.data.length; i++) out.data[i] = bin.data[i] && !kill[labels[i]] ? 1 : 0;
+  return out;
+}
+
+module.exports = { despeckle, binarize, backgroundNormalize, otsuFromHist, histogram, threshold, sauvola, estimateNoise, boxBlur, median3 };

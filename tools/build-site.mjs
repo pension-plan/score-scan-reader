@@ -117,34 +117,49 @@ ${docLinks}
 `);
 console.log(`site/ built: app, status, ${docs.length} docs`);
 
-// ---- release footer on every page: version, release age and build age --------
-// Ages are computed in the viewer's browser and tick every minute. The latest
-// release is also re-fetched from the GitHub API on load, so the footer stays
-// current between rebuilds; the values baked in here are the fallback.
+// ---- version bar (top) and release footer (bottom) on every page ------------------
+// Says exactly which code the page runs: the latest release, and how many commits
+// the build is ahead of it (Pages rebuilds on every push, so it can run unreleased
+// code). Ages are computed in the viewer's browser in Sydney time and tick every
+// minute; the latest release is re-checked from the GitHub API on load.
 {
   const { execSync } = await import('node:child_process');
   const sh = (c) => { try { return execSync(c, { cwd: ROOT, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(); } catch { return ''; } };
+  const API = 'https://api.github.com/repos/pension-plan/score-scan-reader';
+  const hdrs = { 'user-agent': 'score-scan-reader-site', ...(process.env.GITHUB_TOKEN ? { authorization: `Bearer ${process.env.GITHUB_TOKEN}` } : {}) };
+  const getJSON = async (u) => { try { const r = await fetch(u, { signal: AbortSignal.timeout(8000), headers: hdrs }); return r.ok ? await r.json() : null; } catch { return null; } };
   const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
-  let rel = null;
-  try {
-    const r = await fetch('https://api.github.com/repos/pension-plan/score-scan-reader/releases/latest', { signal: AbortSignal.timeout(8000), headers: { 'user-agent': 'score-scan-reader-site' } });
-    if (r.ok) { const j = await r.json(); rel = { tag: j.tag_name, at: j.published_at, url: j.html_url }; }
-  } catch { /* offline build: footer falls back to package.json */ }
+  const sha = process.env.GITHUB_SHA || sh('git rev-parse HEAD');
+  const rel = await getJSON(`${API}/releases/latest`);
+  let ahead = null;
+  if (rel && rel.tag_name && sha) {
+    const cmp = await getJSON(`${API}/compare/${encodeURIComponent(rel.tag_name)}...${sha}`);
+    if (cmp && typeof cmp.ahead_by === 'number') ahead = cmp.ahead_by;
+  }
   const info = {
-    version: (rel && rel.tag ? rel.tag.replace(/^.*-v/, '') : pkg.version),
-    releasedAt: rel ? rel.at : null,
-    releaseUrl: rel ? rel.url : `${REPO}/releases`,
-    commit: (process.env.GITHUB_SHA || sh('git rev-parse HEAD')).slice(0, 7),
+    version: rel && rel.tag_name ? rel.tag_name.replace(/^.*-v/, '') : pkg.version,
+    tag: rel ? rel.tag_name : null,
+    releasedAt: rel ? rel.published_at : null,
+    releaseUrl: rel ? rel.html_url : `${REPO}/releases`,
+    ahead,
+    commit: sha.slice(0, 7),
     builtAt: new Date().toISOString(),
   };
+  const bar = `
+<div class="ssr-verbar" role="note" aria-label="Version" style="font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:6px max(16px,env(safe-area-inset-right,0px)) 6px max(16px,env(safe-area-inset-left,0px));border-bottom:1px solid rgba(127,127,127,.35);display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline;overflow-wrap:anywhere">
+<span>Version <a class="ssr-rel-link" href="${info.releaseUrl}" style="color:inherit"><b class="ssr-rel-ver">v${info.version}</b></a><span class="ssr-ahead"></span></span>
+<span class="ssr-rel-age" style="opacity:.8"></span>
+<span style="opacity:.8">build <a href="${REPO}/commit/${info.commit}" style="color:inherit">${info.commit}</a> <span class="ssr-build-age"></span></span>
+<span class="ssr-newer"></span>
+</div>`;
   const footer = `
-<div id="ssr-release" style="font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));border-top:1px solid rgba(127,127,127,.35);color:inherit;opacity:.85;text-align:center;overflow-wrap:anywhere">
-<a id="ssr-rel-link" href="${info.releaseUrl}" style="color:inherit"><b id="ssr-rel-ver">v${info.version}</b></a> · <span id="ssr-rel-age">release date unknown</span> · page built from <a href="${REPO}/commit/${info.commit}" style="color:inherit">${info.commit}</a> <span id="ssr-build-age"></span>
+<div id="ssr-release" style="font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));border-top:1px solid rgba(127,127,127,.35);opacity:.85;text-align:center;overflow-wrap:anywhere">
+<a class="ssr-rel-link" href="${info.releaseUrl}" style="color:inherit"><b class="ssr-rel-ver">v${info.version}</b></a><span class="ssr-ahead"></span> · <span class="ssr-rel-age"></span> · page built from <a href="${REPO}/commit/${info.commit}" style="color:inherit">${info.commit}</a> <span class="ssr-build-age"></span><span class="ssr-newer"></span>
 </div>
 <script>
 (function () {
-  var BUILT = ${JSON.stringify(info)};
-  var rel = { ver: BUILT.version, at: BUILT.releasedAt, url: BUILT.releaseUrl };
+  var B = ${JSON.stringify(info)};
+  var rel = { ver: B.version, tag: B.tag, at: B.releasedAt, url: B.releaseUrl }, newer = null;
   function ago(iso) {
     var s = Math.max(0, (Date.now() - Date.parse(iso)) / 1000);
     if (s < 60) return 'just now';
@@ -153,19 +168,23 @@ console.log(`site/ built: app, status, ${docs.length} docs`);
     if (h >= 1) return h + ' h ' + (m % 60) + ' min ago';
     return m + ' min ago';
   }
+  function syd(iso) { return new Date(iso).toLocaleString('en-AU', { timeZone: 'Australia/Sydney', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false, timeZoneName: 'short' }); }
+  function all(c, f) { var n = document.getElementsByClassName(c); for (var i = 0; i < n.length; i++) f(n[i]); }
   function paint() {
-    var v = document.getElementById('ssr-rel-ver'), a = document.getElementById('ssr-rel-age'), l = document.getElementById('ssr-rel-link'), b = document.getElementById('ssr-build-age');
-    if (!v) return;
-    v.textContent = 'v' + rel.ver;
-    l.href = rel.url;
-    a.textContent = rel.at ? 'released ' + ago(rel.at) + ' (' + new Date(rel.at).toLocaleString('en-AU', { timeZone: 'Australia/Sydney', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false, timeZoneName: 'short' }) + ')' : 'not released yet';
-    b.textContent = ago(BUILT.builtAt);
+    all('ssr-rel-ver', function (e) { e.textContent = 'v' + rel.ver; });
+    all('ssr-rel-link', function (e) { e.href = rel.url; });
+    all('ssr-ahead', function (e) { e.textContent = B.ahead > 0 ? ' + ' + B.ahead + ' commit' + (B.ahead === 1 ? '' : 's') + ' (unreleased build)' : (B.ahead === 0 ? ' (exact release)' : ''); });
+    all('ssr-rel-age', function (e) { e.textContent = rel.at ? 'released ' + ago(rel.at) + ' (' + syd(rel.at) + ')' : 'not released yet'; });
+    all('ssr-build-age', function (e) { e.textContent = ago(B.builtAt); });
+    all('ssr-newer', function (e) { e.textContent = newer ? ' · newer release v' + newer + ' is out' : ''; });
   }
   paint();
   setInterval(paint, 60000);
   try {
     fetch('https://api.github.com/repos/pension-plan/score-scan-reader/releases/latest').then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
-      if (j && j.tag_name) { rel = { ver: j.tag_name.replace(/^.*-v/, ''), at: j.published_at, url: j.html_url }; paint(); }
+      if (!j || !j.tag_name) return;
+      if (j.tag_name === B.tag) { rel.at = j.published_at; } else { newer = j.tag_name.replace(/^.*-v/, ''); }
+      paint();
     }).catch(function () {});
   } catch (e) {}
 })();
@@ -175,9 +194,10 @@ console.log(`site/ built: app, status, ${docs.length} docs`);
   let n = 0;
   for (const f of walk(OUT).filter((f) => f.endsWith('.html'))) {
     let s = fs.readFileSync(f, 'utf8');
-    if (s.includes('id="ssr-release"')) continue;
+    if (s.includes('ssr-verbar')) continue;
+    s = /<body[^>]*>/i.test(s) ? s.replace(/<body[^>]*>/i, (m) => m + bar) : bar + s;
     s = /<\/body>/i.test(s) ? s.replace(/<\/body>(?![\s\S]*<\/body>)/i, footer + '</body>') : s + footer;
     fs.writeFileSync(f, s); n++;
   }
-  console.log(`release footer: v${info.version}${info.releasedAt ? ' released ' + info.releasedAt : ''} on ${n} pages`);
+  console.log(`version bar: v${info.version}${info.ahead != null ? ' + ' + info.ahead + ' commits' : ''} (build ${info.commit}) on ${n} pages`);
 }

@@ -1376,7 +1376,7 @@ function threshold(gray, t) {
 
 // Estimate the paper level per block (high percentile), smooth, interpolate,
 // and divide it out.  Removes vignetting / lamp gradients / yellowed paper.
-function backgroundNormalize(gray, block) {
+function backgroundNormalize(gray, block, bgOut) {
   const { width: w, height: h, data } = gray;
   block = block || Math.max(16, Math.round(Math.min(w, h) / 48));
   const bw = Math.ceil(w / block), bh = Math.ceil(h / block);
@@ -1420,6 +1420,7 @@ function backgroundNormalize(gray, block) {
       const b = (bg2[y0 * bw + x0] * (1 - tx) + bg2[y0 * bw + x1] * tx) * (1 - ty) +
                 (bg2[y1 * bw + x0] * (1 - tx) + bg2[y1 * bw + x1] * tx) * ty;
       out.data[y * w + x] = Math.min(255, (255 * data[y * w + x]) / Math.max(1, b));
+      if (bgOut) bgOut[y * w + x] = b;
     }
   }
   return out;
@@ -1515,8 +1516,11 @@ function binarize(gray, opts = {}) {
   const noise = estimateNoise(g);
   info.noise = noise;
   if (opts.denoise !== false) {
-    if (noise > 30) { g = median3(g); g = boxBlur(g, 1); info.denoise = 'median3+box1'; }
-    else if (noise > 12) { g = median3(g); info.denoise = 'median3'; }
+    // a 3x3 median erases 1-px staff lines (and halftone screens read as
+    // noise turn into texture under it); a box blur keeps thin lines
+    // connected
+    if (noise > 30) { g = boxBlur(g, 2); info.denoise = 'box2'; }
+    else if (noise > 12) { g = boxBlur(g, 1); info.denoise = 'box1'; }
   }
   if (method === 'otsu') {
     const t = otsuFromHist(histogram(g), g.data.length);
@@ -1529,14 +1533,34 @@ function binarize(gray, opts = {}) {
     return { binary: sauvola(g, win, opts.k ?? 0.25), gray: g, info };
   }
   // bgotsu
-  const n = backgroundNormalize(g, opts.block);
+  const bgMap = new Uint8Array(g.data.length);
+  const n = backgroundNormalize(g, opts.block, bgMap);
   const t = otsuFromHist(histogram(n), n.data.length);
-  // Otsu on a page that is >90% paper sits a bit high; bias slightly towards paper
   info.threshold = t;
-  return { binary: threshold(n, t), gray: n, info };
+  // absolute contrast guard: ink lies at least max(12, 2.5 sigma) grey levels
+  // below its local paper level.  Otsu splits even a blank or noise-only page
+  // in two, and dividing out a dark corner (vignetting, book gutter) blows its
+  // noise up to ink-like values; neither passes this test.
+  const sig = info.denoise === 'box2' ? noise / 5 : info.denoise === 'box1' ? noise / 3 : noise;
+  const minC = opts.minContrast ?? Math.max(12, 2.5 * sig);
+  info.minContrast = minC;
+  const b = makeBinary(g.width, g.height), nd = n.data, bd = b.data;
+  for (let i = 0; i < nd.length; i++) bd[i] = nd[i] <= t && bgMap[i] * (255 - nd[i]) >= 255 * minC ? 1 : 0;
+  return { binary: b, gray: n, info };
 }
 
-module.exports = { binarize, backgroundNormalize, otsuFromHist, histogram, threshold, sauvola, estimateNoise, boxBlur, median3 };
+// Remove 8-connected ink components of at most maxArea pixels (speckle).
+function despeckle(bin, maxArea) {
+  const { labelComponents } = require('./cc');
+  const { labels, comps } = labelComponents(bin);
+  const kill = new Uint8Array(comps.length + 1);
+  for (const c of comps) if (c.id && c.area <= maxArea) kill[c.id] = 1;
+  const out = makeBinary(bin.width, bin.height);
+  for (let i = 0; i < bin.data.length; i++) out.data[i] = bin.data[i] && !kill[labels[i]] ? 1 : 0;
+  return out;
+}
+
+module.exports = { despeckle, binarize, backgroundNormalize, otsuFromHist, histogram, threshold, sauvola, estimateNoise, boxBlur, median3 };
 
 };
 defs["cc"]=function(require,module,exports){
@@ -1625,10 +1649,10 @@ defs["front"]=function(require,module,exports){
 'use strict';
 // Front end: gray page -> staves, systems, heads (+stems), beams, barlines.
 // Works in the deskewed frame; everything downstream uses that frame.
-const { binarize, boxBlur } = require('./binarize');
+const { binarize, boxBlur, despeckle } = require('./binarize');
 const { estimateSkew } = require('./skew');
 const { estimateStaffSpace } = require('./staffspace');
-const { detectStaves, groupSystems, mergeStaffSets } = require('./staves');
+const { detectStaves, groupSystems, mergeStaffSets, lineCoverage } = require('./staves');
 const { removeStaffLines } = require('./staffremoval');
 const { detectHeads, chordStems, ledgerOK } = require('./heads');
 const { threshold } = require('./binarize');
@@ -1719,7 +1743,7 @@ function eraseStartLines(R, staves, ss) {
 //            heavy photocopies
 const MODES = [
   { name: 'default' },
-  { name: 'raw', denoise: false },
+  { name: 'raw', denoise: false, despeckle: true },
   { name: 'blur1', denoise: false, blur: 1 },
   { name: 'blur2', denoise: false, blur: 2 },
 ];
@@ -1746,8 +1770,10 @@ function prepare(gray, mode) {
   let bz = bin(gray);
   let sp = estimateStaffSpace(bz.binary);
   let scale = 1;
-  // normalise staff space to ~18 px (speed for big scans, detail for small ones)
-  if (sp.ss > 26 || (sp.ss < 13 && sp.ss >= 5)) {
+  // normalise staff space to ~18 px (speed for big scans, detail for small
+  // ones), when the estimate is trustworthy (a blank, text-only or sideways
+  // page has no clear line spacing)
+  if ((sp.ss > 26 || (sp.ss < 13 && sp.ss >= 5)) && sp.confidence >= 0.2) {
     scale = 18 / sp.ss;
     gray = resample(gray, scale);
     bz = bin(gray);
@@ -1757,8 +1783,9 @@ function prepare(gray, mode) {
     gray = rotateGray(gray, (-skew.angle * Math.PI) / 180);
     bz = bin(gray);
   }
-  const B = bz.binary;
+  let B = bz.binary;
   sp = estimateStaffSpace(B);
+  if (mode.despeckle && bz.info.noise > 12) { B = despeckle(B, Math.max(2, Math.round(0.02 * sp.ss * sp.ss))); sp = estimateStaffSpace(B); }
   // staves on the main binary and on a lenient one (faint / thin-ruled scans
   // lose staff lines in B); keep the better-supported staff where they clash
   const L0 = threshold(bz.gray, Math.min(235, (bz.info.threshold || 180) + 35));
@@ -1770,6 +1797,23 @@ function prepare(gray, mode) {
     sp = { ...sp, ss: spL.ss }; ltL = Math.max(sp.lt, spL.lt);
   }
   return { gray, bz, B, L0, sp, ltL, scale, skew, staves, mode: mode.name };
+}
+
+function transpose(b) {
+  const { width: w, height: h, data } = b;
+  const o = { width: h, height: w, data: new Uint8Array(w * h) };
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) o.data[x * h + y] = data[y * w + x];
+  return o;
+}
+
+// Staves found by a fallback binarization must look like staves.  Blurred
+// text rows make regularly spaced bands too, but they are thick for their
+// spacing AND broken at every word gap; real staff lines are thin or run on.
+function plausible(c) {
+  if (c.sp.lt <= 0.35 * c.sp.ss) return c.staves.length > 0;
+  c.staves = c.staves.filter(st => { const cv = lineCoverage(st, c.B, c.sp.lt); return cv.reduce((a, b) => a + b, 0) / 5 >= 0.8; });
+  c.staves.forEach((st, i) => { st.index = i; });
+  return c.staves.length > 0;
 }
 
 // Upside-down pages: a staff opens with clef / key / time signature (dense
@@ -1802,16 +1846,21 @@ function invertedShare(R, staves) {
 function* frontSteps(gray0, opts = {}) {
   const warnings = [];
   yield 'clean';
-  let ctx = prepare(gray0, MODES[0]);
+  let ctx = prepare(gray0, (opts.mode && MODES.find(m => m.name === opts.mode)) || MODES[0]);
   yield 'staves';
   let quarter = 0;
-  if (!ctx.staves.length) {
-    // fail over: other binarizations, then the page turned a quarter
+  if (!ctx.staves.length && !opts.mode) {
+    // fail over: other binarizations, then the page turned a quarter.  Only
+    // pages with straight-line structure are worth it (projection sharpness
+    // along rows, or along columns for a page lying on its side); a blank or
+    // text-only page stops here.
+    const rowConf = estimateSkew(ctx.B).confidence, colConf = estimateSkew(transpose(ctx.B)).confidence;
     const tries = [];
-    for (const m of MODES.slice(1)) tries.push([0, m]);
-    for (const q of [1, 3]) for (const m of [MODES[0], MODES[2]]) tries.push([q, m]);
+    if (rowConf >= 1.5) for (const m of MODES.slice(1)) tries.push([0, m]);
+    if (colConf >= 1.5) for (const q of [1, 3]) for (const m of [MODES[0], MODES[2]]) tries.push([q, m]);
     for (const [q, m] of tries) {
       const c = prepare(turn(gray0, q), m);
+      if (!plausible(c)) continue;
       if (c.staves.length > ctx.staves.length) { ctx = c; quarter = q; }
       if (ctx.staves.length && q === 0 && m === MODES[MODES.length - 1]) break;
       if (ctx.staves.length && q !== 0) break;
@@ -1837,7 +1886,9 @@ function* frontSteps(gray0, opts = {}) {
   const systems = groupSystems(B, staves, sp.ss, L0);
   eraseStartLines(R, staves, sp.ss);
   yield 'notes';
-  const { heads, beams } = detectHeads(B, R, staves, sp.ss, sp.lt);
+  // thin, faint prints: hollow-head outlines break open in B but stay closed
+  // on the lenient binary (heavy prints close unrelated gaps there instead)
+  const { heads, beams } = detectHeads(B, R, staves, sp.ss, sp.lt, sp.lt < 0.16 * sp.ss ? { lenient: L0 } : {});
   const { binary: L } = removeStaffLines(L0, staves, ltL);
   // ledger evidence on the lenient binary, or on the main one: lenient
   // thresholds thicken a ledger fused with its head past the thin-stroke limit
@@ -1874,7 +1925,7 @@ function front(gray, opts = {}) {
   return r.value;
 }
 
-module.exports = { front, frontSteps, resample, turn };
+module.exports = { front, frontSteps, resample, turn, prepare };
 
 };
 defs["heads"]=function(require,module,exports){
@@ -1931,6 +1982,24 @@ function fillHoles(B, R, ss, lt = 2, opts = {}) {
     return best >= 0.75 * ss;
   };
   for (let i = 0; i < w * h; i++) inv.data[i] = src[i] ? 0 : 1;
+  // the inside of a hollow head is ringed by a thin outline on all four
+  // sides; the gap between a flag and its stem or a beam is not (a head or
+  // the beam is thick), and neither is a gap in a heavy glyph
+  const thinRing = (labels, c) => {
+    if (!(c.x1 - c.x0 + 1 >= 0.45 * ss && c.x1 - c.x0 + 1 <= 1.5 * ss && c.y1 - c.y0 + 1 <= 0.75 * ss && c.y1 - c.y0 + 1 >= 0.2 * ss)) return false;
+    const xm = Math.round((c.x0 + c.x1) / 2), ym = Math.round((c.y0 + c.y1) / 2);
+    const lim = 0.58 * ss;
+    const cap = 1.2 * ss;
+    const run = (x, y, dx, dy) => { let n = 0; while (x >= 0 && y >= 0 && x < w && y < h && src[y * w + x] && n <= cap) { n++; x += dx; y += dy; } return n; };
+    let top = -1, bot = -1;
+    for (let y = c.y0; y <= c.y1; y++) if (labels[y * w + xm] === c.id) { if (top < 0) top = y; bot = y; }
+    if (top < 0) return false;
+    let lft = -1, rgt = -1;
+    for (let x = c.x0; x <= c.x1; x++) if (labels[ym * w + x] === c.id) { if (lft < 0) lft = x; rgt = x; }
+    if (lft < 0) return false;
+    const up = run(xm, top - 1, 0, -1), dn = run(xm, bot + 1, 0, 1), l = run(lft - 1, ym, -1, 0), r = run(rgt + 1, ym, 1, 0);
+    return up >= 1 && dn >= 1 && l >= 1 && r >= 1 && up <= lim && dn <= lim && l <= 1.1 * ss && r <= 1.1 * ss;
+  };
   {
     const { labels, comps } = labelComponents(inv, { four: true });
     const maxW = 1.5 * ss, maxH = 1.0 * ss, maxA = 0.6 * ss * ss;
@@ -1938,6 +2007,7 @@ function fillHoles(B, R, ss, lt = 2, opts = {}) {
     for (const c of comps) {
       if (!inner(c)) continue;
       const cw = c.x1 - c.x0 + 1, ch = c.y1 - c.y0 + 1;
+      if (opts.thinRing && !thinRing(labels, c)) continue;
       // wide, flat insides: hollow heads of older engravings run up to ~1.9
       // spaces wide (taller regions that wide are gaps between lines and stems)
       if (!(ch <= maxH && c.area <= maxA && c.area >= 2)) continue;
@@ -2092,7 +2162,7 @@ function detectHeads(B, R, staves, ss, lt, opts = {}) {
   let F = fillHoles(B, R, ss, lt);
   // thin-walled hollow heads of old prints break open in B; their outline
   // stays closed on a lenient threshold: fill those insides too
-  if (opts.lenient) F = fillHoles(opts.lenient, F, ss, lt, { close: opts.lenientClose ?? false });
+  if (opts.lenient) F = fillHoles(opts.lenient, F, ss, lt, { close: false, thinRing: true });
   const O1 = openRuns(F, Math.max(3, Math.round(0.55 * ss)), true);
   const O = openRuns(O1, Math.max(3, Math.round(0.42 * ss)), false);
   const { labels, comps } = labelComponents(O);
@@ -4989,6 +5059,8 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
         const voice = multi ? 1 + 4 * si : 1;
         const staffTag = multi ? `<staff>${si + 1}</staff>` : '';
         for (const e of s.events) {
+          const t0 = et;
+          et += e.q;
           const dur = Math.max(1, Math.round(e.q * DIV));
           const tt = qToType(e.q);
           const typeXML = tt ? `<type>${tt.type}</type>${'<dot/>'.repeat(tt.dots)}` : '';
@@ -5003,9 +5075,10 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
           }
           e.heads.forEach((h, hi) => {
             const pos = h.p;
-            const pk = pitchOf(clef, pos, kAlt, {});
-            if (h.acc) measAcc[pk.step + pk.octave] = h.acc === 'sharp' ? 1 : h.acc === 'flat' ? -1 : 0;
-            const pt = pitchOf(clef, pos, kAlt, measAcc);
+            const pk = pitchOf(clef, pos, kAlt, {}), kk = pk.step + pk.octave;
+            let alt = null;
+            for (const a of line) { if (a.t > t0 + 1e-6) break; if (a.k === kk) alt = a.a; }
+            const pt = pitchOf(clef, pos, kAlt, alt == null ? {} : { [kk]: alt });
             h.pitch = pt;
             const acc = h.acc && !e.tieStop ? `<accidental>${h.acc}</accidental>` : '';
             const tie = (e.tieStop ? '<tie type="stop"/>' : '') + (e.tieStart ? '<tie type="start"/>' : '');

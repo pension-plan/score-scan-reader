@@ -1032,10 +1032,18 @@ function clefXML(c, n) {
 
 function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, credits, unitSys }) {
   // each system's own clef where it was read (a staff can change clef from
-  // one system to the next), else the clef most systems show
+  // one system to the next), else the clef most systems show. A clef read on
+  // one system only is more often a misread (or a header clef cancelled at
+  // once by a change the reader does not see) than a real change, so a
+  // system's clef counts only when that staff shows it on two systems or more.
+  const seenClef = {};
+  for (const sy of new Set(unitSys || [])) if (sy) sy.staves.forEach((st, k) => {
+    if (!st.hdr.clefGuessed && st.hdr.clef) { const key = k + ':' + st.hdr.clef; seenClef[key] = (seenClef[key] || 0) + 1; }
+  });
   const clefAt = (mi, staff) => {
     const sy = unitSys && unitSys[mi], st = sy && sy.staves[staff];
-    return (st && !st.hdr.clefGuessed && st.hdr.clef) || clefs[staff] || 'G';
+    if (st && !st.hdr.clefGuessed && st.hdr.clef && (seenClef[staff + ':' + st.hdr.clef] || 0) >= 2) return st.hdr.clef;
+    return clefs[staff] || 'G';
   };
   // Accidentals on a shared staff bind every voice on it for the rest of the
   // bar (a split Alto keeps the natural the Soprano printed): per measure and
