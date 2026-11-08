@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 01:28 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 01:33 AEDT.
 
 ## Events
 
@@ -131,6 +131,8 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 01:08 | perf: L26 resolved (8b5d595, in 0.26.0): 40-page node 2124 to 724 MB, browser worker 695 to 257 MB, byte-identical outputs. Next: browser renderer growth and the 3.2 to 4.9 s/page slowdown (L29). |
 | 01:12 | Isolated regression of release 0.26.0 vs 0.25.0 (committed head): benchmark+OCR 0.951 to 0.951 (real scans 0.929), challenge 0.831 to 0.831, written elements steady (ties 3973, time 781); no regression. Reports in docs/regressions/v0.26.0-*.md. |
 | 01:28 | c7607e2: regress.mjs per-run output paths (L30), reported by structure; all agents told to pull. |
+| 01:32 | Shipped 04e1879 (opencv): rests via templates; 32nd rests on scans 40 to 80 of 102, 64th 4 to 11 of 30; challenge 0.831 to 0.832; regress clean. opencv next: courtesy accidentals and keys (L24, L2), hollow heads on scans (L1). |
+| 01:33 | Release 0.27.0 merged (rests 04e1879, faster template scoring 2851d4d, accents/marcato/15ma 8060286, structure f2e4a8b key changes/volta numbers/implausible meters, textsym 411aade pedal/fingering/rehearsal/chord symbols). 411aade reverted f2e4a8b's score.js hunks; restored by 1b60f3b; textsym told to diff against origin/main before pushing shared files. Isolated regress of 0.27.0 running. |
 
 ## Accuracy by round
 
@@ -154,7 +156,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 |---|---|---|---|---|
 | L1 | Hollow noteheads sometimes missed (main source of rhythm errors) | Noteheads and staves | Partial (round 3) | Benchmark duration 0.863 (r2) to 0.915. Challenge rhythm-category duration 0.562 to 0.689; all challenge items 0.804 to 0.846. The heads accidental-strip fix gave bwv5-7 0.934 to 0.967. With the ML detector on (opt-in, not shipped in the UI), benchmark duration rises to 0.955. |
 | L2 | Key signatures unreliable on old engraving | Symbols | Partial (round 3) | Symbols: challenge scans with the wrong overall key went from 34 to 23. Auld Lang Syne A-flat section 0 to -4, sharp1911 0 to -1. Pitch category, pitch metric: 0.709 to 0.768. Still open: severe scans read key 0, and signs filled into solid rectangles are missed. |
-| L3a | Rests not detected | Symbols | Partial (round 3) | Rests F1 on the benchmark 0.436 (r2) to 0.802; on the challenge 0.647 to 0.757. Layout category is still 0.327, voices 0.515. |
+| L3a | Rests not detected | Symbols | Partial (round 3) | Rests F1 on the benchmark 0.436 (r2) to 0.802; on the challenge 0.647 to 0.757. Layout category is still 0.327, voices 0.515. 04e1879: Bravura rest templates for tall glyphs carrying a false head and for unclassified glyphs; rest-32nd 97/40/21 to 102/80/57 of 102 (clean/scan/severe), rest-64th 12/4/0 to 24/11/4 of 30; challenge rests +0.007. |
 | L3b | Ties and slurs not detected; a stray slur can create a false 16th | Symbols | Open | No tie or slur detection. The 264 tie starts in the outputs all come from notes split at barlines. The ties edge-case group improved only through other fixes (0.901 to 0.926). |
 | L3c | Triplets and other tuplets not detected | Symbols | Resolved (round 3) | Clara output has 32 time-modification elements (+20 triplet notes in r3). Tuplet edge-case group 0.873 to 0.909. rh01 +0.01 to +0.02, rh08 +0.03 to +0.04. |
 | L3d | Mid-piece clef and key changes not detected | Symbols | Resolved (round 3) | pitch-keysig-odyssey scan 0.772 to 0.884; its output writes 8 key elements, matching the 8 in the truth. Clef changes carry across system breaks (rag bars 10-13 left hand in treble). |

@@ -77,7 +77,7 @@ function readOttavas(fr, asm, stats = {}) {
       const st = s.st, sp = st.space || fr.ss, xm = (st.left + st.right) / 2;
       const top = st.yAt(0, xm), bot = st.yAt(4, xm);
       const prevBot = si > 0 ? sy.staves[si - 1].st.yAt(4, xm) : -Infinity, nextTop = si + 1 < sy.staves.length ? sy.staves[si + 1].st.yAt(0, xm) : Infinity;
-      const near = comps.filter(c => c.x0 >= st.left - sp && c.x1 <= st.right + sp && ((c.y1 < top - 0.3 * sp && c.y0 > top - 7 * sp) || (c.y0 > bot + 0.3 * sp && c.y1 < bot + 7 * sp)));
+      const near = comps.filter(c => c.x0 >= st.left - sp && c.x1 <= st.right + sp && ((c.y1 < top - 0.3 * sp && c.y0 > top - 10 * sp) || (c.y0 > bot + 0.3 * sp && c.y1 < bot + 10 * sp)));
       for (const row of dashRows(near, sp)) {
         const above = row.y < top;
         // a row between two staves belongs to the nearer one
