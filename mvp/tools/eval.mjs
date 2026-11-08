@@ -124,7 +124,9 @@ async function childMain(specPath) {
   };
   let ocr = null, worker = null, extraWorker = null, more = [];
   if (spec.ocr) {
-    const { createWorker } = require(path.join(ROOT, 'spike/ocr/node_modules/tesseract.js'));
+    // tesseract.js: the OCR spike's copy where it is installed, else the repository's dependency (CI)
+    const spikeTess = path.join(ROOT, 'spike/ocr/node_modules/tesseract.js');
+    const { createWorker } = require(fs.existsSync(spikeTess) ? spikeTess : createRequire(path.join(ROOT, 'package.json')).resolve('tesseract.js'));
     const lang = spec.ocrLang || 'eng';
     const cfg = lang === 'app' ? req(path.join(spec.src, 'lyrics.js')).OCR_CONFIG : null;
     worker = await createWorker(cfg ? cfg.langs : lang, cfg && cfg.oem != null ? cfg.oem : 1, { langPath: spec.langPath || path.join(MVP, 'dist/assets'), gzip: true, cacheMethod: 'none' });

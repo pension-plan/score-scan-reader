@@ -27,8 +27,21 @@ jobs:
         run: npm run build
       - name: Score against the test corpus (no OCR)
         run: npm test
-      - name: Regression check against the last release (ship first, then test)
-        run: node tools/regress.mjs --jobs 4
+      # Regression gates against the last release (ship first, then test): the benchmark read with
+      # OCR as the page reads (eng+deu and the second pass, each side with its own OCR models) and
+      # the challenge set without OCR. Either fails the job on a regression (aggregate, any item,
+      # crashes, or notation elements no longer written); both reports go to the job summary.
+      - name: Regression gate - benchmark with OCR
+        run: |
+          s=0; node tools/regress.mjs --ocr --jobs 4 --out mvp/work/regress-ci-ocr.md || s=$?
+          [ -f mvp/work/regress-ci-ocr.md ] && cat mvp/work/regress-ci-ocr.md >> "$GITHUB_STEP_SUMMARY"
+          exit $s
+      - name: Regression gate - challenge set
+        if: ${{ !cancelled() }}
+        run: |
+          s=0; node tools/regress.mjs --set challenge --jobs 4 --out mvp/work/regress-ci-challenge.md || s=$?
+          [ -f mvp/work/regress-ci-challenge.md ] && cat mvp/work/regress-ci-challenge.md >> "$GITHUB_STEP_SUMMARY"
+          exit $s
       - name: Browser test (Chromium)
         run: |
           npx playwright install --with-deps chromium
@@ -40,3 +53,4 @@ jobs:
           path: |
             mvp/dist/
             mvp/work/eval-ci.json
+            mvp/work/regress-ci-*.md
