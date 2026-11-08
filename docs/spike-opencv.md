@@ -2,6 +2,21 @@
 
 Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
 
+## Update: stacked hollow chords (L23, part 2)
+
+A stack of hollow heads (a whole- or half-note chord in thirds) is one tall blob; `heads.js` cut it into equal steps
+whose centres fell on the outlines between the heads, so only the top head survived. Now, for a tall blob about a
+head wide, `heads.js` also lists the staff positions down it whose inside is empty and closed on both sides (a ledger
+line through the middle is tolerated) as `stacked` candidates; `assemble.js` adds a candidate to the chord found at
+that x only right of the staff's header and only next to the chord's own heads (clef loops and "6" / "8" digits of a
+time signature, and text above a lead sheet, pass the hollow test too: adding them straight into the head list
+cost up to 0.13 on severe scans). The added head shares the found head's stem.
+
+Coverage per tag (no OCR, clean / scan / severe): `note-whole` 136 / 112 / 83 → 139 / 129 / 91 of 537, `note-half`
+3351 / 3050 / 1769 → 3360 / 3071 / 1832, `chord` +54 / +79 / +140, stems and dots up a little; `ledger-below` clean
+−1. Aggregates: coverage 0.7843 → 0.7845 (73 items changed, the largest drop −0.019); challenge 0.8282 = 0.8282
+(21 changed, drops ≤ 0.005); benchmark with OCR unchanged.
+
 ## Update: 32nd and 64th notes (L23, part 1)
 
 `assemble.js`: `countBeams` searched beams over 1.6 spaces from the stem tip and capped the count at 3, and the

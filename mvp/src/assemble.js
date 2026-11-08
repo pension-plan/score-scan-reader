@@ -1379,6 +1379,18 @@ function assemblePage(fr, pageIndex = 0) {
       const hdr = analyseHeader(R, comps, st, st.left + 18 * st.space);
       // heads found on clef / key / time-signature glyphs are not notes
       const music = chords.filter(c => c.x > hdr.end);
+      // heads lower down a stack of hollow heads (heads.js: only the top one of a whole- or
+      // half-note chord survives as a head): added to the chord standing there, right of the header
+      for (const h of fr.stacked || []) {
+        if (h.staff !== si || h.x <= hdr.end + 0.5 * st.space) continue;
+        const c = music.find(c => Math.abs(c.x - h.x) < 0.6 * h.sp && c.heads.some(o => o.kind === 'hollow' && Math.abs(o.x - h.x) < 0.6 * h.sp));
+        // next to the chord's heads (a stack runs on from them), never on top of one
+        if (!c || c.heads.some(o => Math.abs(o.p - h.p) < 2) || !c.heads.some(o => Math.abs(o.p - h.p) <= 3)) continue;
+        // it shares the found head's stem (or its lack of one), so the chord's value
+        const ref = c.heads.find(o => o.kind === 'hollow');
+        c.heads.push(Object.assign({}, h, { stemDir: ref.stemDir, stem: ref.stem }));
+        c.heads.sort((p, q) => p.y - q.y);
+      }
       const s = { st, si, chords: music, hdr };
       // durations read once here: tuplets rescale whole groups
       const spS = st.space || fr.ss;

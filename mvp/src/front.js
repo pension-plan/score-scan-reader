@@ -282,7 +282,7 @@ function* frontSteps(gray0, opts = {}) {
   yield 'notes';
   // thin, faint prints: hollow-head outlines break open in B but stay closed
   // on the lenient binary (heavy prints close unrelated gaps there instead)
-  const { heads, beams } = detectHeads(B, R, staves, sp.ss, sp.lt, sp.lt < 0.16 * sp.ss ? { lenient: L0 } : {});
+  const { heads, beams, stacked } = detectHeads(B, R, staves, sp.ss, sp.lt, sp.lt < 0.16 * sp.ss ? { lenient: L0 } : {});
   const { binary: L } = removeStaffLines(L0, staves, ltL);
   // ledger evidence on the lenient binary, or on the main one: lenient
   // thresholds thicken a ledger fused with its head past the thin-stroke limit
@@ -308,7 +308,7 @@ function* frontSteps(gray0, opts = {}) {
   hs = hs.filter(h => (h.stemDir !== 0 || h.kind === 'hollow') && !(h.chord && h.chord.accidental));
   hs = hs.filter(h => !atStemTip(h, hs, L));
   const barlines = detectBarlines(R, staves, hs, sp.ss);
-  return { gray, B, R, L, scale, skew, ss: sp.ss, lt: sp.lt, staves, systems, heads: hs, chords, beams, barlines, warnings,
+  return { gray, B, R, L, scale, skew, ss: sp.ss, lt: sp.lt, staves, systems, heads: hs, chords, beams, barlines, warnings, stacked: stacked || [],
     orientation: (quarter % 4) * 90, mode: ctx.mode };
 }
 

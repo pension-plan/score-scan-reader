@@ -230,6 +230,15 @@ function twoTallWalls(R, xa, xb, y, sp) {
   return !unison;
 }
 
+// A head's inside is empty when its core is mostly paper; a ledger line (left in R) can run
+// straight through the middle of a hollow head, so thin windows just above and below count too.
+function hollowCore(IR, IB, xm, yc, sp) {
+  const at = IR.frac(xm - 0.18 * sp, yc - 0.12 * sp, xm + 0.18 * sp, yc + 0.12 * sp) < 0.5;
+  if (at && IB.frac(xm - 0.3 * sp, yc - 0.2 * sp, xm + 0.3 * sp, yc + 0.2 * sp) < 0.75) return true;
+  const thin = (dy) => IR.frac(xm - 0.18 * sp, yc + dy - 0.06 * sp, xm + 0.18 * sp, yc + dy + 0.06 * sp) < 0.35;
+  return thin(-0.22 * sp) && thin(0.22 * sp);
+}
+
 function detectHeads(B, R, staves, ss, lt, opts = {}) {
   let F = fillHoles(B, R, ss, lt);
   // thin-walled hollow heads of old prints break open in B; their outline
@@ -239,7 +248,7 @@ function detectHeads(B, R, staves, ss, lt, opts = {}) {
   const O = openRuns(O1, Math.max(3, Math.round(0.42 * ss)), false);
   const { labels, comps } = labelComponents(O);
   const IR = integral(R), IB = integral(B);
-  const heads = [], beams = [];
+  const heads = [], beams = [], stacked = [];
   for (const c of comps) {
     const bw = c.x1 - c.x0 + 1, bh = c.y1 - c.y0 + 1;
     if (bw < 0.8 * ss || bh < 0.5 * ss) continue;
@@ -278,6 +287,23 @@ function detectHeads(B, R, staves, ss, lt, opts = {}) {
       const k = Math.max(1, Math.round(hh / (0.95 * sp)));
       if (k > 4) continue;
       const step = hh / k;
+      // a stack of hollow heads (whole- / half-note chord): equal steps put centres on the
+      // outlines between the heads and only the top head survives. The heads sit where the inside
+      // is empty and closed on both sides: those positions are returned separately (stacked), for
+      // assemble.js to add to a chord found there, right of the staff's header
+      const wcol = (xb - xa) / sp;
+      if (k >= 2 && wcol >= 1.1 && wcol <= 1.9) {
+        const pa = staffPos(staves, xm, ya + 0.4 * sp), pb = staffPos(staves, xm, yb - 0.4 * sp);
+        const ring = (yc) => IR.frac(xa, yc - 0.15 * sp, xa + 0.22 * sp, yc + 0.15 * sp) > 0.25 && IR.frac(xb - 0.22 * sp, yc - 0.15 * sp, xb, yc + 0.15 * sp) > 0.25;
+        if (pa && pb && pa.st === pb.st) {
+          const hits = [];
+          for (let p = Math.round(pa.p); p >= Math.round(pb.p); p--) {
+            const yc = pa.st.yAt(2, xm) - (p * pa.sp) / 2;
+            if (hollowCore(IR, IB, xm, yc, sp) && ring(yc) && !hits.some(q => Math.abs(q.y - yc) < 0.9 * sp)) hits.push({ y: yc, p });
+          }
+          if (hits.length >= 2) for (const q of hits) stacked.push({ x: xm, y: q.y, staff: pa.st.index, p: q.p, sp: pa.sp, kind: 'hollow', score: 1, w: xb - xa, blob: c.id, x0: Math.round(xa), x1: Math.round(xb), stacked: true });
+        }
+      }
       for (let i = 0; i < k; i++) {
         const y = ya + step * (i + 0.5);
         const ps = staffPos(staves, xm, y);
@@ -310,7 +336,7 @@ function detectHeads(B, R, staves, ss, lt, opts = {}) {
     if (h.w < minW * h.sp) continue;
     if (!out.some(o => o.staff === h.staff && o.p === h.p && Math.abs(o.x - h.x) < 0.6 * h.sp)) out.push(h);
   }
-  return { heads: out, beams, opened: O, headW };
+  return { heads: out, beams, opened: O, headW, stacked };
 }
 
 // Ledger-line evidence.  A head more than half a space outside its staff

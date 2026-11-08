@@ -1,0 +1,2 @@
+n 20 aggregate 0.95 -> 0.95 (+0.0000) | pitch 0.9443 -> 0.9443 (+0.0000) | duration 0.9189 -> 0.9189 (+0.0000) | rests 0.8015 -> 0.8015 (+0.0000) | parts 0.9941 -> 0.9941 (+0.0000) | lyrics 0.9203 -> 0.9203 (+0.0000) | xml_valid 1 -> 1 (+0.0000) | crashes 0 -> 0 (+0.0000) | runtime_ms_mean 3913 -> 3973 (+60)
+items changed: 0/20; first time signature right: off 19/20, on 19/20
