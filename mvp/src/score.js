@@ -2291,7 +2291,14 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, unitTime, unitBar
       // two systems or more
       if (cur == null) k = r != null && (keyOk(r) || (multi && (!drop(r, fifths) || (seenKey[fifths] || 0) < 2))) ? r : fifths;
       else if (r == null || r === cur) k = cur;
-      else if (drop(r, cur)) k = seenKey[r] >= 3 && seenKey[r] > 0.5 * allSys.size ? r : cur;
+      // (a dropout that every staff of every later system reads too, three systems or more of two
+      // staves or more, the old key never coming back, is a key change: a new section in fewer
+      // accidentals, as a trio after a minuet. One faded staff a system loses it alone)
+      else if (drop(r, cur)) {
+        const later = order.slice(i);
+        const tail = later.length >= 3 && later.every(o => sysKeyOf.get(o) === r && o.staves.length >= 2);
+        k = (seenKey[r] >= 3 && seenKey[r] > 0.5 * allSys.size) || tail ? r : cur;
+      }
       else if (keyOk(r) || sy.staves.length >= 2 || next === r || Math.sign(r) !== Math.sign(cur) || Math.abs(r) >= Math.abs(cur) + 2) k = r;
       else k = cur;
       seqKey.set(sy, k);
