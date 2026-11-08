@@ -3,7 +3,7 @@
 // signature inference, per-measure rhythm repair, lyrics alignment, MusicXML.
 const { staffMeasureEvents, pitchOf, keyAlters, DIV } = require('./assemble');
 const { detectRests, mergeRests, restBars } = require('./rests');
-const { readMeters } = require('./meter');
+const { readMeters, plausibleMeter } = require('./meter');
 const { readStructure } = require('./structure');
 const { readArticulations, readDoubleDots } = require('./artic');
 const { readOttavas } = require('./ottava');
@@ -788,7 +788,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   // fair support
   let timeRead = false;
   {
-    const hs = systems.flatMap(sy => sy.staves.map(s => s.hdr && s.hdr.time)).filter(t => t && t.beats > 0 && t.type > 0);
+    const hs = systems.flatMap(sy => sy.staves.map(s => s.hdr && s.hdr.time)).filter(t => t && plausibleMeter(t));
     if (hs.length >= Math.max(1, 0.3 * systems.filter(sy => sy.index === 0).reduce((a, sy) => a + sy.staves.length, 0))) {
       const key = mode(hs.map(t => `${t.beats}/${t.type}/${t.symbol || ''}`)), [b, ty] = key.split('/').map(Number), sym = key.split('/')[2], hq = (b * 4) / ty;
       const qNow = (time.beats * 4) / time.type;
@@ -1161,13 +1161,16 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
       const prev = vs[vs.length - 1];
       if (v.cont && prev && prev.open && prev.k === k - 1) { prev.b = idx[idx.length - 1]; prev.open = v.open; prev.k = k; return; }
       if (v.cont) return;
-      vs.push({ a: idx[0], b: idx[idx.length - 1], open: v.open, k });
+      vs.push({ a: idx[0], b: idx[idx.length - 1], open: v.open, k, nums: v.nums });
     }));
+    // the numbers printed under the bracket (structure.js), else 1, 2, 3 ... along the run
     let n = 0;
     vs.forEach((v, j) => {
       n = j > 0 && vs[j - 1].b === v.a - 1 ? n + 1 : 1;
-      (unitBars[v.a].left ||= {}).ending = { n, type: 'start' };
-      (unitBars[v.b].right ||= {}).ending = { n, type: v.open ? 'discontinue' : 'stop' };
+      if (v.nums && v.nums.length) n = v.nums[v.nums.length - 1];
+      const num = v.nums && v.nums.length ? v.nums.join(', ') : String(n);
+      (unitBars[v.a].left ||= {}).ending = { n: num, type: 'start' };
+      (unitBars[v.b].right ||= {}).ending = { n: num, type: v.open ? 'discontinue' : 'stop' };
     });
     // segno and coda signs: a direction at the start of the bar they stand over (the first part)
     if (read.dirs && read.dirs[0]) sysOrder.forEach(sy => (sy.signs || []).forEach(g => {
