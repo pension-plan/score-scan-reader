@@ -476,6 +476,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
         Math.abs(segSum[i] + segSum[i + 1] - mLen) < 1e-6) { measures.push({ segs: [i, i + 1] }); i++; }
     else measures.push({ segs: [i] });
   }
+  if (opts.debug) segs.forEach((sg, i) => opts.debug.push(`seg ${i} sys ${sg.sy.page}:${sg.sy.index} x ${Math.round(sg.xa)}-${Math.round(sg.xb)} sum ${segSum[i]} streams ${segEv[i].map(ps => ps.map(evs => evs.map(e => (e.rest ? 'r' : '') + e.q).join(',')).join('/')).join(' | ')}`));
   const perPart = parts.map((p, pi) => measures.map(m => p.src.map((src, k) => ({
     staff: src.staff, events: m.segs.flatMap(si => segEv[si][pi][k]),
   }))));
@@ -485,47 +486,68 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     (h.parts ||= []); if (!h.parts.includes(pi)) h.parts.push(pi);
   })))));
 
-  // lyrics: each underlay line belongs to the staff above it; on a staff split
-  // into two voices it goes to the voice whose onsets it follows (the upper one
-  // when both fit). Keyboard staves never take underlay.
+  // lyrics: each underlay line belongs to the staff above it. On a staff split
+  // into two voices the line goes to ONE voice, chosen once per text band for
+  // the whole piece from how well the syllables sit under each voice's onsets
+  // (summed over every system and verse). With no clear winner a line between
+  // staves goes to the upper voice (the melody) and a line under the lowest
+  // split staff to its lower voice (the nearer one). A line whose local fit is
+  // clearly better in the other voice (a divisi passage) follows that voice.
+  // opts.copyLyrics copies every line to all fitting voices of its staff
+  // (research-voices.md section 7.2). Keyboard staves never take underlay.
   const lyrNotes = new Set();
   const vocalStaves = parts.filter(p => p.kind !== 'keyboard').map(p => p.src[0].staff);
   const topVocal = vocalStaves.length ? Math.min(...vocalStaves) : -1;
   const splitStaves = parts.filter(p => p.kind !== 'keyboard' && p.src[0].voice === 2).map(p => p.src[0].staff);
   const lowestSplit = splitStaves.length ? Math.max(...splitStaves) : -1;
+  const lines = [];
   for (const sy of systems) {
     const lyr = lyricsBySystem[sy.page + ':' + sy.index];
     if (!lyr || !lyr.length) continue;
     const sp = sy.staves[0] ? sy.staves[0].st.space : 16;
-    const evOf = (pi) => {
-      const evs = [];
-      segs.forEach((sg, si) => { if (sg.sy === sy) for (const e of segEv[si][pi][0]) evs.push(e); });
-      return evs;
-    };
+    const evCache = {};
+    // sung notes of a part in this system (rests never take a syllable)
+    const evOf = (pi) => (evCache[pi] ||= segs.flatMap((sg, si) => (sg.sy === sy ? segEv[si][pi][0] : [])).filter(e => !e.rest && !e.forward && e.heads && e.heads.length));
+    const fitOf = (v) => parts.map((p, pi) => ({ p, pi })).filter(({ p }) => p.kind !== 'keyboard' && p.src[0].staff === v.band)
+      .map(c => { const evs = evOf(c.pi); return { ...c, evs, fit: lyricFit(v.syllables, evs, sp), soft: softFit(v.syllables, evs, sp) }; });
+    const sysLines = lyr.filter(v => v.syllables && v.syllables.length && !v.stanza).map(v => ({ sy, v, sp, cands: fitOf(v) })).filter(L => L.cands.length);
     // verses stack under the same staff: once one line of a band clearly
     // follows the notes, its sibling lines (same band, same system) are
     // underlay too and need only a looser fit (unhyphenated multi-note words
     // and OCR-merged words pull a line's syllables off the onsets)
-    const fitOf = (v) => parts.map((p, pi) => ({ p, pi })).filter(({ p }) => p.kind !== 'keyboard' && p.src[0].staff === v.band)
-      .map(c => { const evs = evOf(c.pi); return { ...c, evs, fit: lyricFit(v.syllables, evs, sp) }; });
-    const fits = new Map(lyr.map(v => [v, fitOf(v)]));
-    const bandOK = new Set(lyr.filter(v => wordy(v.syllables) && fits.get(v).some(c => c.fit >= 0.5)).map(v => v.band));
-    for (const v of lyr) {
-      const scored = fits.get(v);
-      if (!scored.length) continue;
-      const minFit = bandOK.has(v.band) ? 0.3 : 0.5;
-      // a line between staves serves the upper voice of the staff above it
-      // (the melody) unless another voice follows it clearly better; a further
-      // line under the lowest staff of a split vocal group is sung by both
-      // voices of that staff (research-voices.md section 7.2).
-      const lowest = scored.length === 2 && v.band === lowestSplit && v.band !== topVocal;
-      let best = scored[0];
-      for (const c of scored) if (c.fit >= best.fit + 0.15) best = c;
-      if (best.fit < minFit || !wordy(v.syllables)) { lyrNotes.add(`A text line under staff ${v.band + 1} does not follow the notes; not used as lyrics.`); continue; }
-      const take = opts.copyLyrics || lowest ? scored.filter(c => c.fit >= minFit) : [best];
-      for (const c of take) alignSyllables(v, c.evs, sp);
-      v.used = take.map(c => c.p.name).join(', ');
-    }
+    const bandOK = new Set(sysLines.filter(L => wordy(L.v.syllables) && L.cands.some(c => c.fit >= 0.5)).map(L => L.v.band));
+    sysLines.forEach(L => { L.minFit = bandOK.has(L.v.band) ? 0.3 : 0.5; });
+    lines.push(...sysLines);
+  }
+  // piece-wide evidence per text band: summed soft fit of each candidate part
+  const bandEv = {};
+  for (const L of lines) {
+    if (L.cands.length < 2 || !wordy(L.v.syllables)) continue;
+    const b = (bandEv[L.v.band] ||= {});
+    for (const c of L.cands) b[c.pi] = (b[c.pi] || 0) + c.soft;
+  }
+  const bandVoice = {};
+  for (const band in bandEv) {
+    const e = bandEv[band], pis = Object.keys(e).map(Number).sort((a, b) => a - b);
+    const lowest = +band === lowestSplit && +band !== topVocal;
+    const prior = lowest ? pis[pis.length - 1] : pis[0];
+    // a syllable under an onset that only one voice has adds about 1 to that
+    // voice's total; voices that share every onset tie
+    let best = prior;
+    for (const pi of pis) if (e[pi] > e[best] + 0.6) best = pi;
+    bandVoice[band] = best;
+    if (pis.length > 1) lyrNotes.add(`Lyrics under staff ${+band + 1} attached to ${parts[best].name} (${best === prior ? (lowest ? 'nearest voice' : 'upper voice') : 'its rhythm fits the syllables best'}).`);
+  }
+  for (const L of lines) {
+    const { v, cands, sp } = L;
+    let best = cands.find(c => c.pi === bandVoice[v.band]) || cands[0];
+    // a clearly better local fit wins (a passage where the other voice sings the text)
+    for (const c of cands) if (c.soft >= best.soft + Math.max(1.5, 0.15 * v.syllables.length) && c.fit >= best.fit + 0.1) best = c;
+    if (best.fit < L.minFit || !wordy(v.syllables)) { lyrNotes.add(`A text line under staff ${v.band + 1} does not follow the notes; not used as lyrics.`); continue; }
+    const take = opts.copyLyrics ? cands.filter(c => c.fit >= L.minFit) : [best];
+    if (opts.debug) opts.debug.push({ sys: L.sy.page + ':' + L.sy.index, band: v.band, n: v.number, nsyl: v.syllables.length, fits: cands.map(c => [c.p.name, +c.fit.toFixed(2), c.evs.length, +c.soft.toFixed(2)]), take: take.map(c => c.p.name) });
+    for (const c of take) alignSyllables(v, c.evs, sp);
+    v.used = take.map(c => c.p.name).join(', ');
   }
   lyrNotes.forEach(n => warnings.push(n));
 
@@ -643,34 +665,67 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   return { parts, layout, fifths, time, clefs, ranges, measures: units.length, nNotes, warnings: warnings.concat(layout.notes), xml };
 }
 
+// Horizontal extent of a syllable: lyrics.js may report x0/x1; otherwise it is
+// estimated from the letter count (about 1.1 staff spaces per letter).
+function sylBox(s, sp) {
+  if (s.x0 != null && s.x1 != null && s.x1 > s.x0) return [s.x0, s.x1];
+  const w = Math.max(1, String(s.text || '').length) * 1.1 * sp;
+  return [s.x - w / 2, s.x + w / 2];
+}
+
+// Distance from a syllable to a notehead centre at x. A syllable is printed
+// centred under its note, except one that starts a melisma (a word held over
+// several notes, drawn with an extender line), which is left-aligned with the
+// notehead; so a long syllable may also sit with its left edge at the head.
+function sylDist(s, x, sp) {
+  const x0 = sylBox(s, sp)[0];
+  return Math.min(Math.abs(x - s.x), Math.abs(x - (x0 + 0.55 * sp)) + 0.15 * sp);
+}
+
 // share of syllables that sit under an onset of the stream
 function lyricFit(syl, evs, sp) {
   if (!syl.length || !evs.length) return 0;
-  const xs = evs.map(e => e.x).sort((a, b) => a - b);
   let hit = 0;
   for (const s of syl) {
     let d = 1e9;
-    for (const x of xs) { const t = Math.abs(x - s.x); if (t < d) d = t; }
+    for (const e of evs) { const t = sylDist(s, e.x, sp); if (t < d) d = t; }
     if (d <= 1.2 * sp) hit++;
   }
   return hit / syl.length;
 }
 
+// graded version of lyricFit: 1 for a syllable right under an onset, falling
+// to 0 at `tol` staff spaces away (separates two voices of one staff that
+// share most onsets)
+function softFit(syl, evs, sp, tol = 0.8) {
+  let s = 0;
+  for (const y of syl) {
+    let d = 1e9;
+    for (const e of evs) if (!e.rest && e.x != null) d = Math.min(d, sylDist(y, e.x, sp));
+    s += Math.max(0, 1 - d / (tol * sp));
+  }
+  return s;
+}
+
 // OCR junk (dynamics, stray marks read as letters) rather than words
 function wordy(syl) {
   if (syl.length < 3) return false;
-  const good = syl.filter(s => /[a-z\u00e0-\u024f]{2}/.test(s.text) || /^[A-Z\u00c0-\u00de][a-z\u00e0-\u024f]/.test(s.text)).length;
+  const good = syl.filter(s => /[a-zà-ɏ]{2}/.test(s.text) || /^[A-ZÀ-Þ][a-zà-ɏ]/.test(s.text)).length;
   return good >= 0.4 * syl.length;
 }
 
 // Monotonic alignment of the syllables of one verse line to the onsets of one
 // voice (both left to right): each syllable takes one onset, onsets without a
 // syllable are melisma continuations, syllables far from any onset are dropped.
+// Tied continuation notes never take a syllable. A word-final syllable held
+// over the following notes of its voice gets an extender (<extend/> start on
+// its note, stop on the last note of the melisma); hyphenated syllables do not
+// (their hyphen spans the melisma).
 function alignSyllables(verse, evs, sp) {
   const syl = verse.syllables, n = syl.length, m = evs.length;
   if (!n || !m) return;
   const SKIP_EV = 0.15, DROP_SYL = 2.2;
-  const cost = (i, j) => Math.min(3, Math.abs(evs[j].x - syl[i].x) / sp);
+  const cost = (i, j) => (evs[j].tieStop ? Infinity : Math.min(3, sylDist(syl[i], evs[j].x, sp) / sp));
   // D[i][j]: best cost using syllables < i and onsets < j
   const W = m + 1;
   const D = new Float64Array((n + 1) * W).fill(Infinity), T = new Uint8Array((n + 1) * W);
@@ -690,11 +745,28 @@ function alignSyllables(verse, evs, sp) {
     else if (t === 2) j--;
     else i--;
   }
+  pairs.reverse();
+  const num = verse.number;
+  const placed = [];
   for (const [a, b] of pairs) {
     const ev = evs[b], s = syl[a];
     ev.lyrics ||= {};
-    if (!ev.lyrics[verse.number]) ev.lyrics[verse.number] = { text: s.text, syllabic: s.syllabic };
+    if (ev.lyrics[num]) continue;
+    ev.lyrics[num] = { text: s.text, syllabic: s.syllabic };
+    placed.push([a, b]);
   }
+  // melismas between placed syllables
+  placed.forEach(([a, b], k) => {
+    const s = syl[a];
+    if (s.syllabic !== 'single' && s.syllabic !== 'end') return;
+    const next = k + 1 < placed.length ? placed[k + 1][1] : null;
+    // after the last syllable of the line only with an extender seen in print
+    const last = next != null ? next - 1 : (s.ext ? m - 1 : b);
+    if (last <= b || (last - b > 6 && !s.ext)) return;
+    for (let t = b + 1; t <= last; t++) if (evs[t].lyrics && evs[t].lyrics[num]) return;
+    evs[b].lyrics[num].extend = true;
+    (evs[last].lyrExt ||= {})[num] = true;
+  });
 }
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -772,9 +844,12 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title }) {
             const tied = e.tieStop || e.tieStart ? `<notations>${e.tieStop ? '<tied type="stop"/>' : ''}${e.tieStart ? '<tied type="start"/>' : ''}</notations>` : '';
             const stem = h.stemDir === 1 ? '<stem>up</stem>' : h.stemDir === -1 ? '<stem>down</stem>' : '';
             let lyr = '';
-            if (hi === 0 && e.lyrics) {
-              for (const [n, l] of Object.entries(e.lyrics).sort((a, b) => a[0] - b[0])) {
-                lyr += `<lyric number="${n}"><syllabic>${l.syllabic}</syllabic><text>${esc(l.text)}</text></lyric>`;
+            if (hi === 0 && (e.lyrics || e.lyrExt)) {
+              const nums = new Set([...Object.keys(e.lyrics || {}), ...Object.keys(e.lyrExt || {})]);
+              for (const n of [...nums].sort((a, b) => a - b)) {
+                const l = e.lyrics && e.lyrics[n];
+                if (l) lyr += `<lyric number="${n}"><syllabic>${l.syllabic}</syllabic><text>${esc(l.text)}</text>${l.extend ? '<extend type="start"/>' : ''}</lyric>`;
+                else lyr += `<lyric number="${n}"><extend type="stop"/></lyric>`;
               }
             }
             L.push(`      <note>${hi > 0 ? '<chord/>' : ''}<pitch><step>${pt.step}</step>${pt.alter ? `<alter>${pt.alter}</alter>` : ''}<octave>${pt.octave}</octave></pitch>` +

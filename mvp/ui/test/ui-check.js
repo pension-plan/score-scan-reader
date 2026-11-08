@@ -120,9 +120,9 @@ srv.listen(0, async () => {
       // overlay toggle
       const tg = await page.$('#overlayToggle');
       if (tg) {
-        const before = await page.evaluate(() => ({ p: document.getElementById('overlayToggle').getAttribute('aria-pressed'), v: getComputedStyle(document.querySelector('#pages canvas.ov')).visibility }));
+        const before = await page.evaluate(() => ({ p: document.getElementById('overlayToggle').getAttribute('aria-pressed'), v: getComputedStyle(document.querySelector('#pages .ov')).visibility }));
         await tg.click();
-        const after = await page.evaluate(() => ({ p: document.getElementById('overlayToggle').getAttribute('aria-pressed'), v: getComputedStyle(document.querySelector('#pages canvas.ov')).visibility }));
+        const after = await page.evaluate(() => ({ p: document.getElementById('overlayToggle').getAttribute('aria-pressed'), v: getComputedStyle(document.querySelector('#pages .ov')).visibility }));
         await tg.click();
         ok('overlay: toggle button (aria-pressed) hides and shows the markup', before.p === 'true' && before.v === 'visible' && after.p === 'false' && after.v === 'hidden', { before, after });
       } else ok('overlay: toggle button (aria-pressed) hides and shows the markup', false, 'no toggle');

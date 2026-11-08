@@ -70,6 +70,8 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 .btn.primary:hover{background:var(--accent);filter:brightness(1.08)}
 .btn:disabled{opacity:.45;cursor:default}
 .btn svg{width:16px;height:16px;flex:none}
+.btn.small{padding:5px 10px;font-size:13px}
+.btn.icon{width:32px;height:32px;padding:0;justify-content:center}
 
 /* ---- dropzone ---- */
 .drop{border:1.5px dashed var(--rule-strong);border-radius:3px;background:var(--panel);padding:16px 18px;
@@ -90,6 +92,8 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 .meter{grid-column:2;height:3px;background:var(--rule);overflow:hidden}
 .meter span{display:block;height:100%;width:0;background:var(--accent);transition:width .25s}
 .filerow[data-done] .meter span{background:var(--ok)}
+.filerow-eta{grid-column:2;margin:0;font:12px var(--mono);font-variant-numeric:tabular-nums;color:var(--muted)}
+.filerow .stop{grid-column:2;justify-self:start;margin-top:2px}
 
 /* ---- stepper: seven noteheads on one staff line ---- */
 .stepper{margin:20px 0 4px}
@@ -154,9 +158,32 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 .legend .aux{color:var(--muted)}
 .pages{display:flex;flex-direction:column;gap:22px;padding:6px}
 .pageframe{position:relative;background:var(--paper);outline:1px solid var(--rule-strong);outline-offset:5px;line-height:0}
-.pageframe canvas{display:block;width:100%;height:auto}
-.pageframe canvas.ov{position:absolute;inset:0;height:100%}
-.pages.ov-off canvas.ov{visibility:hidden}
+.pageframe img{display:block;width:100%;height:auto}
+.pageframe .ov{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.pages.ov-off .ov{visibility:hidden}
+.pageframe.placeholder{aspect-ratio:1 / 1.29;display:grid;place-items:center;line-height:1.5;
+  background:repeating-linear-gradient(to bottom,transparent 0 46px,#d6d9dd 46px 47px,transparent 47px 52px,#d6d9dd 52px 53px,transparent 53px 58px,#d6d9dd 58px 59px,transparent 59px 64px,#d6d9dd 64px 65px,transparent 65px 70px,#d6d9dd 70px 71px,transparent 71px 120px) var(--paper)}
+.pageframe.placeholder p{margin:0;padding:10px 14px;max-width:30ch;text-align:center;font:italic 15px/1.4 var(--display);color:#3f454d;background:var(--paper)}
+.pageframe.placeholder[data-state="work"] p,.pageframe.placeholder[data-state="render"] p{color:#2b37b0}
+
+/* page strip: one rehearsal-mark box per page; filled when read */
+.pagenav{margin:0 0 14px}
+.pagenav-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-bottom:8px}
+.pagenav-label{margin:0;font:italic 600 16px/1.2 var(--display);font-variant-numeric:lining-nums;min-width:8.5em}
+.pagenav-sum{margin:0 0 0 auto;font:12px var(--mono);font-variant-numeric:tabular-nums;color:var(--muted)}
+.pagechips{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:5px}
+.chip{appearance:none;min-width:30px;height:30px;padding:0 5px;border:1.5px solid var(--rule-strong);border-radius:0;background:var(--panel);
+  color:var(--muted);font:600 14px/1 var(--display);font-variant-numeric:lining-nums tabular-nums;cursor:pointer;position:relative;
+  transition:background-color .15s,border-color .15s,color .15s}
+.chip:hover{border-color:var(--ink)}
+.chip[data-state="render"],.chip[data-state="work"]{border:2px solid var(--accent);color:var(--accent);animation:breathe 1.6s ease-in-out infinite}
+.chip[data-state="done"]{background:var(--ink);border-color:var(--ink);color:var(--panel)}
+.chip[data-state="empty"]{border-style:dashed;background:linear-gradient(to top right,transparent calc(50% - 1px),var(--rule-strong) calc(50% - 1px) calc(50% + 1px),transparent calc(50% + 1px)) var(--panel)}
+.chip[data-state="failed"]{border-color:var(--warn-mark);color:var(--warn-ink);background:var(--warn-bg)}
+.chip[data-state="skipped"]{border-style:dotted;opacity:.7}
+.chip[aria-current="page"]{outline:2px solid var(--accent);outline-offset:2px}
+.chip[aria-current="page"]::after{content:"";position:absolute;left:50%;bottom:-9px;width:0;height:0;margin-left:-4px;
+  border:4px solid transparent;border-top-color:var(--accent);border-bottom:0}
 .pagelabel{font:12px var(--mono);color:var(--muted);margin:0 0 -14px}
 
 /* parts */
@@ -225,6 +252,7 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 .sheet{background:var(--paper);outline:1px solid var(--rule-strong);outline-offset:4px;margin:6px;overflow-x:auto;min-height:60px}
 #osmd{min-width:0}
 #osmdNote:not(:empty){margin-top:10px}
+#osmdAll{margin-top:8px}
 
 .colophon{margin-top:28px;padding-top:12px;border-top:1px solid var(--rule);color:var(--muted);font-size:13px}
 .colophon p{margin:0;max-width:72ch}
@@ -246,12 +274,12 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
   <section class="drop" id="drop" aria-labelledby="dropTitle" data-state="idle">
     <div class="drop-main">
       <h2 class="drop-title" id="dropTitle">Drop a scanned PDF or image</h2>
-      <p class="drop-hint" id="dropHint">PDF, PNG or JPG. The first 8 pages are read.</p>
+      <p class="drop-hint" id="dropHint">A PDF, or one or more PNG or JPG pages.</p>
       <div class="drop-actions">
         <button class="btn primary" id="choose" type="button">Choose PDF or image</button>
         <button class="btn" id="sample" type="button">Load sample</button>
       </div>
-      <input id="file" class="sr-only" type="file" accept="application/pdf,image/png,image/jpeg" tabindex="-1" aria-hidden="true">
+      <input id="file" class="sr-only" type="file" accept="application/pdf,image/png,image/jpeg" multiple tabindex="-1" aria-hidden="true">
       <p class="sr-only" id="dropLive" aria-live="polite"></p>
     </div>
     <div class="filerow" id="fileRow" hidden>
@@ -262,6 +290,8 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
       </div>
       <div class="meter" id="fileMeter" role="progressbar" aria-labelledby="fileName" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="fileMeterBar"></span></div>
       <svg class="filerow-done" id="fileDone" viewBox="0 0 20 20" aria-hidden="true" hidden><path d="M4 10.5l4 4 8-9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <p class="filerow-eta" id="fileEta" hidden></p>
+      <button class="btn small stop" id="stop" type="button" hidden>Stop after this page</button>
     </div>
   </section>
 
@@ -281,6 +311,15 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
         </button>
       </div>
       <ul class="legend" id="legend" aria-label="Overlay key"></ul>
+      <div class="pagenav" id="pageNav" hidden>
+        <div class="pagenav-row">
+          <button class="btn icon" id="pgPrev" type="button" aria-label="Previous page" aria-controls="pages"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <p class="pagenav-label" id="pgLabel">Page 1</p>
+          <button class="btn icon" id="pgNext" type="button" aria-label="Next page" aria-controls="pages"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <p class="pagenav-sum" id="pgSum"></p>
+        </div>
+        <ol class="pagechips" id="pageChips" aria-label="Pages of the scan"></ol>
+      </div>
       <div id="pages" class="pages"></div>
     </section>
 
@@ -329,6 +368,7 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
       <div class="panel-head"><h2 id="prevH">Notation preview</h2></div>
       <div class="sheet"><div id="osmd"></div></div>
       <p class="muted" id="osmdNote"></p>
+      <button class="btn small" id="osmdAll" type="button" hidden>Draw every measure</button>
     </section>
   </div>
 
@@ -342,7 +382,7 @@ h1{font-family:var(--display);font-optical-sizing:auto;font-weight:600;font-size
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/7.0.0/tesseract.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.8.9/build/opensheetmusicdisplay.min.js"></script>
 <script>
-(function(){
+function __omrBundle(){
 const defs={},cache={};
 function req(n){n=n.replace(/^\.\//,"").replace(/\.js$/,"");if(cache[n])return cache[n].exports;if(!defs[n])return {};const m={exports:{}};cache[n]=m;defs[n](req,m,m.exports);return m.exports;}
 defs["assemble"]=function(require,module,exports){
@@ -2330,7 +2370,7 @@ async function convert(grayPages, opts = {}) {
   }
   progress('Building parts');
   let score;
-  try { score = buildScore(pages, lyricsBySystem, { ocr: !!opts.ocr, copyLyrics: !!opts.copyLyrics }); }
+  try { score = buildScore(pages, lyricsBySystem, { ocr: !!opts.ocr, copyLyrics: !!opts.copyLyrics, debug: opts.debug }); }
   catch (e) { score = { parts: [], warnings: ['Assembly failed: ' + e.message], xml: '' }; }
   // show only the text lines that were attached to notes (stanza text printed
   // below the music, titles and dynamics are not underlay)
@@ -2912,6 +2952,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
         Math.abs(segSum[i] + segSum[i + 1] - mLen) < 1e-6) { measures.push({ segs: [i, i + 1] }); i++; }
     else measures.push({ segs: [i] });
   }
+  if (opts.debug) segs.forEach((sg, i) => opts.debug.push(`seg ${i} sys ${sg.sy.page}:${sg.sy.index} x ${Math.round(sg.xa)}-${Math.round(sg.xb)} sum ${segSum[i]} streams ${segEv[i].map(ps => ps.map(evs => evs.map(e => (e.rest ? 'r' : '') + e.q).join(',')).join('/')).join(' | ')}`));
   const perPart = parts.map((p, pi) => measures.map(m => p.src.map((src, k) => ({
     staff: src.staff, events: m.segs.flatMap(si => segEv[si][pi][k]),
   }))));
@@ -2921,47 +2962,68 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     (h.parts ||= []); if (!h.parts.includes(pi)) h.parts.push(pi);
   })))));
 
-  // lyrics: each underlay line belongs to the staff above it; on a staff split
-  // into two voices it goes to the voice whose onsets it follows (the upper one
-  // when both fit). Keyboard staves never take underlay.
+  // lyrics: each underlay line belongs to the staff above it. On a staff split
+  // into two voices the line goes to ONE voice, chosen once per text band for
+  // the whole piece from how well the syllables sit under each voice's onsets
+  // (summed over every system and verse). With no clear winner a line between
+  // staves goes to the upper voice (the melody) and a line under the lowest
+  // split staff to its lower voice (the nearer one). A line whose local fit is
+  // clearly better in the other voice (a divisi passage) follows that voice.
+  // opts.copyLyrics copies every line to all fitting voices of its staff
+  // (research-voices.md section 7.2). Keyboard staves never take underlay.
   const lyrNotes = new Set();
   const vocalStaves = parts.filter(p => p.kind !== 'keyboard').map(p => p.src[0].staff);
   const topVocal = vocalStaves.length ? Math.min(...vocalStaves) : -1;
   const splitStaves = parts.filter(p => p.kind !== 'keyboard' && p.src[0].voice === 2).map(p => p.src[0].staff);
   const lowestSplit = splitStaves.length ? Math.max(...splitStaves) : -1;
+  const lines = [];
   for (const sy of systems) {
     const lyr = lyricsBySystem[sy.page + ':' + sy.index];
     if (!lyr || !lyr.length) continue;
     const sp = sy.staves[0] ? sy.staves[0].st.space : 16;
-    const evOf = (pi) => {
-      const evs = [];
-      segs.forEach((sg, si) => { if (sg.sy === sy) for (const e of segEv[si][pi][0]) evs.push(e); });
-      return evs;
-    };
+    const evCache = {};
+    // sung notes of a part in this system (rests never take a syllable)
+    const evOf = (pi) => (evCache[pi] ||= segs.flatMap((sg, si) => (sg.sy === sy ? segEv[si][pi][0] : [])).filter(e => !e.rest && !e.forward && e.heads && e.heads.length));
+    const fitOf = (v) => parts.map((p, pi) => ({ p, pi })).filter(({ p }) => p.kind !== 'keyboard' && p.src[0].staff === v.band)
+      .map(c => { const evs = evOf(c.pi); return { ...c, evs, fit: lyricFit(v.syllables, evs, sp), soft: softFit(v.syllables, evs, sp) }; });
+    const sysLines = lyr.filter(v => v.syllables && v.syllables.length && !v.stanza).map(v => ({ sy, v, sp, cands: fitOf(v) })).filter(L => L.cands.length);
     // verses stack under the same staff: once one line of a band clearly
     // follows the notes, its sibling lines (same band, same system) are
     // underlay too and need only a looser fit (unhyphenated multi-note words
     // and OCR-merged words pull a line's syllables off the onsets)
-    const fitOf = (v) => parts.map((p, pi) => ({ p, pi })).filter(({ p }) => p.kind !== 'keyboard' && p.src[0].staff === v.band)
-      .map(c => { const evs = evOf(c.pi); return { ...c, evs, fit: lyricFit(v.syllables, evs, sp) }; });
-    const fits = new Map(lyr.map(v => [v, fitOf(v)]));
-    const bandOK = new Set(lyr.filter(v => wordy(v.syllables) && fits.get(v).some(c => c.fit >= 0.5)).map(v => v.band));
-    for (const v of lyr) {
-      const scored = fits.get(v);
-      if (!scored.length) continue;
-      const minFit = bandOK.has(v.band) ? 0.3 : 0.5;
-      // a line between staves serves the upper voice of the staff above it
-      // (the melody) unless another voice follows it clearly better; a further
-      // line under the lowest staff of a split vocal group is sung by both
-      // voices of that staff (research-voices.md section 7.2).
-      const lowest = scored.length === 2 && v.band === lowestSplit && v.band !== topVocal;
-      let best = scored[0];
-      for (const c of scored) if (c.fit >= best.fit + 0.15) best = c;
-      if (best.fit < minFit || !wordy(v.syllables)) { lyrNotes.add(`A text line under staff ${v.band + 1} does not follow the notes; not used as lyrics.`); continue; }
-      const take = opts.copyLyrics || lowest ? scored.filter(c => c.fit >= minFit) : [best];
-      for (const c of take) alignSyllables(v, c.evs, sp);
-      v.used = take.map(c => c.p.name).join(', ');
-    }
+    const bandOK = new Set(sysLines.filter(L => wordy(L.v.syllables) && L.cands.some(c => c.fit >= 0.5)).map(L => L.v.band));
+    sysLines.forEach(L => { L.minFit = bandOK.has(L.v.band) ? 0.3 : 0.5; });
+    lines.push(...sysLines);
+  }
+  // piece-wide evidence per text band: summed soft fit of each candidate part
+  const bandEv = {};
+  for (const L of lines) {
+    if (L.cands.length < 2 || !wordy(L.v.syllables)) continue;
+    const b = (bandEv[L.v.band] ||= {});
+    for (const c of L.cands) b[c.pi] = (b[c.pi] || 0) + c.soft;
+  }
+  const bandVoice = {};
+  for (const band in bandEv) {
+    const e = bandEv[band], pis = Object.keys(e).map(Number).sort((a, b) => a - b);
+    const lowest = +band === lowestSplit && +band !== topVocal;
+    const prior = lowest ? pis[pis.length - 1] : pis[0];
+    // a syllable under an onset that only one voice has adds about 1 to that
+    // voice's total; voices that share every onset tie
+    let best = prior;
+    for (const pi of pis) if (e[pi] > e[best] + 0.6) best = pi;
+    bandVoice[band] = best;
+    if (pis.length > 1) lyrNotes.add(`Lyrics under staff ${+band + 1} attached to ${parts[best].name} (${best === prior ? (lowest ? 'nearest voice' : 'upper voice') : 'its rhythm fits the syllables best'}).`);
+  }
+  for (const L of lines) {
+    const { v, cands, sp } = L;
+    let best = cands.find(c => c.pi === bandVoice[v.band]) || cands[0];
+    // a clearly better local fit wins (a passage where the other voice sings the text)
+    for (const c of cands) if (c.soft >= best.soft + Math.max(1.5, 0.15 * v.syllables.length) && c.fit >= best.fit + 0.1) best = c;
+    if (best.fit < L.minFit || !wordy(v.syllables)) { lyrNotes.add(`A text line under staff ${v.band + 1} does not follow the notes; not used as lyrics.`); continue; }
+    const take = opts.copyLyrics ? cands.filter(c => c.fit >= L.minFit) : [best];
+    if (opts.debug) opts.debug.push({ sys: L.sy.page + ':' + L.sy.index, band: v.band, n: v.number, nsyl: v.syllables.length, fits: cands.map(c => [c.p.name, +c.fit.toFixed(2), c.evs.length, +c.soft.toFixed(2)]), take: take.map(c => c.p.name) });
+    for (const c of take) alignSyllables(v, c.evs, sp);
+    v.used = take.map(c => c.p.name).join(', ');
   }
   lyrNotes.forEach(n => warnings.push(n));
 
@@ -3079,34 +3141,67 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   return { parts, layout, fifths, time, clefs, ranges, measures: units.length, nNotes, warnings: warnings.concat(layout.notes), xml };
 }
 
+// Horizontal extent of a syllable: lyrics.js may report x0/x1; otherwise it is
+// estimated from the letter count (about 1.1 staff spaces per letter).
+function sylBox(s, sp) {
+  if (s.x0 != null && s.x1 != null && s.x1 > s.x0) return [s.x0, s.x1];
+  const w = Math.max(1, String(s.text || '').length) * 1.1 * sp;
+  return [s.x - w / 2, s.x + w / 2];
+}
+
+// Distance from a syllable to a notehead centre at x. A syllable is printed
+// centred under its note, except one that starts a melisma (a word held over
+// several notes, drawn with an extender line), which is left-aligned with the
+// notehead; so a long syllable may also sit with its left edge at the head.
+function sylDist(s, x, sp) {
+  const x0 = sylBox(s, sp)[0];
+  return Math.min(Math.abs(x - s.x), Math.abs(x - (x0 + 0.55 * sp)) + 0.15 * sp);
+}
+
 // share of syllables that sit under an onset of the stream
 function lyricFit(syl, evs, sp) {
   if (!syl.length || !evs.length) return 0;
-  const xs = evs.map(e => e.x).sort((a, b) => a - b);
   let hit = 0;
   for (const s of syl) {
     let d = 1e9;
-    for (const x of xs) { const t = Math.abs(x - s.x); if (t < d) d = t; }
+    for (const e of evs) { const t = sylDist(s, e.x, sp); if (t < d) d = t; }
     if (d <= 1.2 * sp) hit++;
   }
   return hit / syl.length;
 }
 
+// graded version of lyricFit: 1 for a syllable right under an onset, falling
+// to 0 at `tol` staff spaces away (separates two voices of one staff that
+// share most onsets)
+function softFit(syl, evs, sp, tol = 0.8) {
+  let s = 0;
+  for (const y of syl) {
+    let d = 1e9;
+    for (const e of evs) if (!e.rest && e.x != null) d = Math.min(d, sylDist(y, e.x, sp));
+    s += Math.max(0, 1 - d / (tol * sp));
+  }
+  return s;
+}
+
 // OCR junk (dynamics, stray marks read as letters) rather than words
 function wordy(syl) {
   if (syl.length < 3) return false;
-  const good = syl.filter(s => /[a-z\u00e0-\u024f]{2}/.test(s.text) || /^[A-Z\u00c0-\u00de][a-z\u00e0-\u024f]/.test(s.text)).length;
+  const good = syl.filter(s => /[a-zà-ɏ]{2}/.test(s.text) || /^[A-ZÀ-Þ][a-zà-ɏ]/.test(s.text)).length;
   return good >= 0.4 * syl.length;
 }
 
 // Monotonic alignment of the syllables of one verse line to the onsets of one
 // voice (both left to right): each syllable takes one onset, onsets without a
 // syllable are melisma continuations, syllables far from any onset are dropped.
+// Tied continuation notes never take a syllable. A word-final syllable held
+// over the following notes of its voice gets an extender (<extend/> start on
+// its note, stop on the last note of the melisma); hyphenated syllables do not
+// (their hyphen spans the melisma).
 function alignSyllables(verse, evs, sp) {
   const syl = verse.syllables, n = syl.length, m = evs.length;
   if (!n || !m) return;
   const SKIP_EV = 0.15, DROP_SYL = 2.2;
-  const cost = (i, j) => Math.min(3, Math.abs(evs[j].x - syl[i].x) / sp);
+  const cost = (i, j) => (evs[j].tieStop ? Infinity : Math.min(3, sylDist(syl[i], evs[j].x, sp) / sp));
   // D[i][j]: best cost using syllables < i and onsets < j
   const W = m + 1;
   const D = new Float64Array((n + 1) * W).fill(Infinity), T = new Uint8Array((n + 1) * W);
@@ -3126,11 +3221,28 @@ function alignSyllables(verse, evs, sp) {
     else if (t === 2) j--;
     else i--;
   }
+  pairs.reverse();
+  const num = verse.number;
+  const placed = [];
   for (const [a, b] of pairs) {
     const ev = evs[b], s = syl[a];
     ev.lyrics ||= {};
-    if (!ev.lyrics[verse.number]) ev.lyrics[verse.number] = { text: s.text, syllabic: s.syllabic };
+    if (ev.lyrics[num]) continue;
+    ev.lyrics[num] = { text: s.text, syllabic: s.syllabic };
+    placed.push([a, b]);
   }
+  // melismas between placed syllables
+  placed.forEach(([a, b], k) => {
+    const s = syl[a];
+    if (s.syllabic !== 'single' && s.syllabic !== 'end') return;
+    const next = k + 1 < placed.length ? placed[k + 1][1] : null;
+    // after the last syllable of the line only with an extender seen in print
+    const last = next != null ? next - 1 : (s.ext ? m - 1 : b);
+    if (last <= b || (last - b > 6 && !s.ext)) return;
+    for (let t = b + 1; t <= last; t++) if (evs[t].lyrics && evs[t].lyrics[num]) return;
+    evs[b].lyrics[num].extend = true;
+    (evs[last].lyrExt ||= {})[num] = true;
+  });
 }
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -3208,9 +3320,12 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title }) {
             const tied = e.tieStop || e.tieStart ? `<notations>${e.tieStop ? '<tied type="stop"/>' : ''}${e.tieStart ? '<tied type="start"/>' : ''}</notations>` : '';
             const stem = h.stemDir === 1 ? '<stem>up</stem>' : h.stemDir === -1 ? '<stem>down</stem>' : '';
             let lyr = '';
-            if (hi === 0 && e.lyrics) {
-              for (const [n, l] of Object.entries(e.lyrics).sort((a, b) => a[0] - b[0])) {
-                lyr += `<lyric number="${n}"><syllabic>${l.syllabic}</syllabic><text>${esc(l.text)}</text></lyric>`;
+            if (hi === 0 && (e.lyrics || e.lyrExt)) {
+              const nums = new Set([...Object.keys(e.lyrics || {}), ...Object.keys(e.lyrExt || {})]);
+              for (const n of [...nums].sort((a, b) => a - b)) {
+                const l = e.lyrics && e.lyrics[n];
+                if (l) lyr += `<lyric number="${n}"><syllabic>${l.syllabic}</syllabic><text>${esc(l.text)}</text>${l.extend ? '<extend type="start"/>' : ''}</lyric>`;
+                else lyr += `<lyric number="${n}"><extend type="stop"/></lyric>`;
               }
             }
             L.push(`      <note>${hi > 0 ? '<chord/>' : ''}<pitch><step>${pt.step}</step>${pt.alter ? `<alter>${pt.alter}</alter>` : ''}<octave>${pt.octave}</octave></pitch>` +
@@ -3885,19 +4000,239 @@ function applyStemRule(heads, opts = {}) {
 module.exports = { detectStems, applyStemRule, runExtent };
 
 };
-window.omrRequire=req;
-})();
+(typeof self!=="undefined"?self:window).omrRequire=req;
+}
+__omrBundle();
 </script>
 <script>
-/* global pdfjsLib, Tesseract, opensheetmusicdisplay, omrRequire */
+// Incremental conversion session: one page at a time, then the score.
+// Runs in three places with the same code: a Web Worker (the normal path in
+// the page), the main thread (fallback when a worker cannot start), and Node
+// (ui/test/parity.js, which proves the result equals omr.convert()).
+// The page bundles this file as one function so the worker can be built from
+// its source text (Function.prototype.toString) without a second copy.
+function __omrSessionModule() {
+  'use strict';
+
+  // Per-page work mirrors omr.convert() step for step: front, assemblePage,
+  // readLyrics; finish() mirrors its buildScore and lyric filtering. When the
+  // pipeline exports createConverter() with the same addPage/finish shape,
+  // that is used instead and this copy is never run.
+  function createSession(req, opts) {
+    opts = opts || {};
+    const progress = opts.onProgress || function () {};
+    const omr = req('./omr');
+    if (typeof omr.createConverter === 'function') {
+      const c = omr.createConverter(opts);
+      if (c && typeof c.addPage === 'function' && typeof c.finish === 'function') return c;
+    }
+    const { front } = req('./front');
+    const { assemblePage } = req('./assemble');
+    const { readLyrics } = req('./lyrics');
+    const { buildScore } = req('./score');
+    const pages = [];
+    const lyricsBySystem = {};
+    const warnings = [];
+    return {
+      // returns the page entry ({fr, asm, index}) or null when the page has no staves
+      async addPage(gray, i, n) {
+        progress(`Page ${i + 1}/${n}: finding staves and notes`, { stage: 'cleanup', page: i, pages: n });
+        let fr;
+        try {
+          fr = front(gray, { onProgress: (m, info) => progress(`Page ${i + 1}/${n}: ${m}`, Object.assign({ page: i, pages: n }, info || {})) });
+        } catch (e) { warnings.push(`Page ${i + 1}: image analysis failed (${e.message}).`); return null; }
+        fr.warnings.forEach((w) => warnings.push(`Page ${i + 1}: ${w}`));
+        if (!fr.staves.length) return null;
+        progress(`Page ${i + 1}/${n}: reading note symbols`, { stage: 'notes', page: i, pages: n });
+        const asm = assemblePage(fr, i);
+        const entry = { fr, asm, index: i };
+        pages.push(entry);
+        if (opts.ocr) {
+          progress(`Page ${i + 1}/${n}: reading lyrics`, { stage: 'lyrics', page: i, pages: n });
+          try {
+            const lyr = await readLyrics(fr, opts.ocr, (d, m) => progress(`Page ${i + 1}/${n}: reading lyrics (${d}/${m} lines)`, { stage: 'lyrics', page: i, pages: n }));
+            for (const k in lyr) lyricsBySystem[i + ':' + k] = lyr[k];
+          } catch (e) { warnings.push(`Lyrics OCR failed: ${e.message}`); }
+        }
+        return entry;
+      },
+      finish() {
+        progress('Building parts', { stage: 'parts' });
+        let score;
+        try { score = buildScore(pages, lyricsBySystem, { ocr: !!opts.ocr, copyLyrics: !!opts.copyLyrics }); }
+        catch (e) { score = { parts: [], warnings: ['Assembly failed: ' + e.message], xml: '' }; }
+        if (score.layout && Object.values(lyricsBySystem).some((l) => l.some((v) => v.used))) {
+          for (const k in lyricsBySystem) lyricsBySystem[k] = lyricsBySystem[k].filter((v) => v.used);
+        }
+        if (!pages.length) warnings.push('No staves were detected. Try a cleaner or higher-resolution scan.');
+        return { pages, score, lyricsBySystem, warnings: warnings.concat(score.warnings || []) };
+      },
+    };
+  }
+
+  // Large page buffers that nothing after the page step reads. buildScore
+  // reads fr.R (bar contents) and asm.comps, so those stay. parity.js checks
+  // that releasing these leaves the MusicXML unchanged.
+  function release(entry) {
+    if (!entry || !entry.fr) return;
+    const fr = entry.fr;
+    if (fr.gray) fr.gray = { width: fr.gray.width, height: fr.gray.height, data: null, released: true };
+    fr.B = null;
+    fr.L = null;
+  }
+
+  // Area-average downscale of a gray page (for the on-screen copy).
+  function shrink(g, maxW) {
+    const f = Math.min(1, maxW / g.width);
+    if (f >= 1) return { width: g.width, height: g.height, data: new Uint8ClampedArray(g.data) };
+    const w = Math.max(1, Math.round(g.width * f)), h = Math.max(1, Math.round(g.height * f));
+    const out = new Uint8ClampedArray(w * h);
+    const sx = g.width / w, sy = g.height / h;
+    for (let y = 0; y < h; y++) {
+      const y0 = Math.floor(y * sy), y1 = Math.max(y0 + 1, Math.floor((y + 1) * sy));
+      for (let x = 0; x < w; x++) {
+        const x0 = Math.floor(x * sx), x1 = Math.max(x0 + 1, Math.floor((x + 1) * sx));
+        let s = 0, c = 0;
+        for (let yy = y0; yy < y1 && yy < g.height; yy++) {
+          const row = yy * g.width;
+          for (let xx = x0; xx < x1 && xx < g.width; xx++) { s += g.data[row + xx]; c++; }
+        }
+        out[y * w + x] = c ? s / c : 255;
+      }
+    }
+    return { width: w, height: h, data: out };
+  }
+
+  // Plain, cloneable overlay data for one page, in the deskewed frame.
+  function pageView(entry, index) {
+    const fr = entry.fr;
+    const W = fr.gray.width, H = fr.gray.height;
+    const r1 = (v) => Math.round(v * 10) / 10;
+    const staves = fr.staves.map((st) => {
+      const edge = (k) => {
+        const pts = [];
+        const step = Math.max(10, (st.right - st.left) / 60);
+        for (let x = st.left; x < st.right + step / 2; x += step) { const xx = Math.min(x, st.right); pts.push([r1(xx), r1(st.yAt(k, xx))]); }
+        return pts;
+      };
+      return { top: edge(0), bot: edge(4) };
+    });
+    return {
+      index, width: W, height: H, ss: fr.ss,
+      skew: (fr.skew && fr.skew.angle) || 0,
+      staves,
+      barlines: (fr.barlines || []).map((b) => [r1(b.x), r1(b.top), r1(b.bot)]),
+      heads: (fr.heads || []).map((h) => [r1(h.x), r1(h.y), r1((h.sp || fr.ss) * 0.62)]),
+      nStaves: fr.staves.length,
+      nSystems: (entry.asm && entry.asm.systems && entry.asm.systems.length) || (fr.systems || []).length,
+    };
+  }
+
+  // Cloneable copy: plain objects and arrays to a depth, no functions or
+  // typed arrays (score objects may point back at page data).
+  function plain(v, depth) {
+    if (v == null || typeof v !== 'object') return typeof v === 'function' ? undefined : v;
+    if (depth <= 0 || ArrayBuffer.isView(v)) return undefined;
+    if (Array.isArray(v)) return v.map((x) => plain(x, depth - 1));
+    const o = {};
+    for (const k of Object.keys(v)) { const x = plain(v[k], depth - 1); if (x !== undefined) o[k] = x; }
+    return o;
+  }
+  function scoreSummary(score) {
+    const s = score || {};
+    const out = {};
+    for (const k of Object.keys(s)) {
+      if (k === 'layout') continue;
+      const x = plain(s[k], 4);
+      if (x !== undefined) out[k] = x;
+    }
+    if (s.layout) {
+      const l = {};
+      for (const k of Object.keys(s.layout)) if (k !== 'parts') { const x = plain(s.layout[k], 3); if (x !== undefined) l[k] = x; }
+      out.layout = l;
+    }
+    return out;
+  }
+  function resultSummary(res) {
+    return {
+      score: scoreSummary(res.score),
+      lyricsBySystem: plain(res.lyricsBySystem, 6) || {},
+      warnings: (res.warnings || []).slice(),
+      pages: res.pages.map((p) => ({
+        index: p.index,
+        parts: (p.fr.heads || []).map((h) => (h.parts ? h.parts.slice() : [])),
+      })),
+    };
+  }
+
+  // ------------------------------------------------------------ worker side
+  // Messages in: init {ocr}, page {i, n, gray}, finish. Out: ready, progress,
+  // ocr {id, img} (answered by ocr-res), page-done, done, error.
+  function workerMain(scope, req) {
+    let session = null;
+    let ocrSeq = 0;
+    const pending = new Map();
+    const post = (m, tr) => scope.postMessage(m, tr || []);
+    const ocr = (img) => new Promise((resolve, reject) => {
+      const id = ++ocrSeq;
+      pending.set(id, { resolve, reject });
+      const data = new Uint8ClampedArray(img.data); // own buffer, safe to transfer
+      post({ t: 'ocr', id, img: { width: img.width, height: img.height, data } }, [data.buffer]);
+    });
+    let queue = Promise.resolve();
+    scope.onmessage = (ev) => {
+      const m = ev.data || {};
+      if (m.t === 'ocr-res') {
+        const p = pending.get(m.id);
+        if (p) { pending.delete(m.id); if (m.error) p.reject(new Error(m.error)); else p.resolve(m.words || []); }
+        return;
+      }
+      // page and finish messages run strictly in order
+      queue = queue.then(() => handle(m)).catch((e) => post({ t: 'error', msg: (e && e.message) || String(e) }));
+    };
+    async function handle(m) {
+      if (m.t === 'init') {
+        session = createSession(req, {
+          ocr: m.ocr ? ocr : null,
+          onProgress: (msg, info) => post({ t: 'progress', msg, info: plain(info, 2) || null }),
+        });
+        post({ t: 'ready' });
+      } else if (m.t === 'page') {
+        const t0 = Date.now();
+        const entry = await session.addPage(m.gray, m.i, m.n);
+        m.gray = null;
+        if (!entry) { post({ t: 'page-done', i: m.i, ms: Date.now() - t0, view: null }); return; }
+        const view = pageView(entry, m.i);
+        const thumb = shrink(entry.fr.gray, m.maxW || 1400);
+        release(entry);
+        post({ t: 'page-done', i: m.i, ms: Date.now() - t0, view, thumb }, [thumb.data.buffer]);
+      } else if (m.t === 'finish') {
+        const res = session.finish();
+        post({ t: 'done', result: resultSummary(res) });
+      }
+    }
+    post({ t: 'alive' });
+  }
+
+  return { createSession, release, shrink, pageView, plain, scoreSummary, resultSummary, workerMain };
+}
+if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessionModule;
+</script>
+<script>
+/* global pdfjsLib, Tesseract, opensheetmusicdisplay, omrRequire, __omrBundle, __omrSessionModule */
 (function () {
   'use strict';
-  const { convert } = omrRequire('./omr');
   const $ = (id) => document.getElementById(id);
-  const MAX_PAGES = 8;
+  const Sess = __omrSessionModule();
+  // Pages are read one at a time (render, recognise, show, release), so the
+  // cap is set by patience rather than memory: ~2-5 s per page.
+  const MAX_PAGES = 40;
   const MAX_CODE_LINES = 3000;
+  const PREVIEW_MEASURES = 48; // a longer score previews this many measures first
+  const THUMB_W = 1400; // on-screen copy of each page (overlay keeps full-res coordinates)
   const SAMPLE = { url: 'assets/sample-st-anselm.pdf', name: 'sample-st-anselm.pdf', label: 'St. Anselm (J. Barnby), Methodist Hymnal 1905' };
   let busy = false;
+  let stopAsked = false;
   let lastXML = '';
   let lastRes = null;
 
@@ -3910,6 +4245,7 @@ window.omrRequire=req;
   const fmtBytes = (n) => n < 1024 ? n + ' B' : n < 1048576 ? (n / 1024).toFixed(n < 10240 ? 1 : 0) + ' KB' : (n / 1048576).toFixed(1) + ' MB';
   const plural = (n, one, many) => `${n.toLocaleString('en')} ${n === 1 ? one : (many || one + 's')}`;
   const nextPaint = () => new Promise((r) => { let done = false; const go = () => { if (!done) { done = true; setTimeout(r, 0); } }; requestAnimationFrame(go); setTimeout(go, 60); });
+  const fmtSecs = (s) => s < 60 ? `${Math.max(1, Math.round(s))} s` : `${Math.floor(s / 60)} min ${String(Math.round(s % 60)).padStart(2, '0')} s`;
 
   // ---------------------------------------------------------------- OCR ---
   let ocrWorkerP = null;
@@ -3954,8 +4290,8 @@ window.omrRequire=req;
 
   // ------------------------------------------------------------ stepper ---
   // Seven stages, each a notehead on one staff line. State comes from real
-  // events: page rendering here, then convert()'s onProgress messages (or a
-  // structured {stage} second argument when the pipeline provides one).
+  // events: page rendering here, then the session's progress messages (each
+  // carries {stage}). For several pages the first five stages repeat per page.
   const STEPS = [
     { id: 'render', title: 'Render' },
     { id: 'cleanup', title: 'Clean up' },
@@ -3997,6 +4333,7 @@ window.omrRequire=req;
     go(id, detail) {
       const i = this.index(id);
       if (i < 0) return;
+      if (i === this.cur && (detail == null || detail === this.detail[i])) return;
       for (let k = 0; k < STEPS.length; k++) {
         if (k < i) { if (this.state[k] !== 'skipped') this.state[k] = 'complete'; }
         else if (k === i) this.state[k] = 'current';
@@ -4025,11 +4362,6 @@ window.omrRequire=req;
       this.detail[i] = detail || 'failed';
       this.paint();
     },
-    progress() {
-      // share of the seven stages that are done, for the file row meter
-      const done = this.state.filter((s) => s === 'complete' || s === 'skipped').length;
-      return Math.min(1, (done + (this.cur >= 0 ? 0.5 : 0)) / STEPS.length);
-    },
     paint() {
       this.els.forEach((li, i) => {
         const st = this.state[i];
@@ -4044,15 +4376,19 @@ window.omrRequire=req;
         const word = this.cur >= 0 ? 'Step' : this.state[ci] === 'failed' ? 'Stopped at step' : this.state.every((s) => s === 'upcoming') ? 'Step' : 'Finished step';
         cap.innerHTML = `${word} ${ci + 1} of ${STEPS.length}: <b>${esc(STEPS[ci].title)}</b>` + (this.detail[ci] ? ` <span>${esc(this.detail[ci])}</span>` : '');
       }
-      const meter = $('fileMeter');
-      if (meter) {
-        const pct = Math.round(this.progress() * 100);
-        meter.setAttribute('aria-valuenow', String(pct));
-        $('fileMeterBar').style.width = pct + '%';
-      }
     },
     snapshot() { return STEPS.map((s, i) => ({ id: s.id, state: this.state[i], detail: this.detail[i] })); },
   };
+
+  // Overall progress for the file row meter: pages share 92%, then parts and XML.
+  const meter = {
+    set(frac) {
+      const pct = Math.max(0, Math.min(100, Math.round(frac * 100)));
+      $('fileMeter').setAttribute('aria-valuenow', String(pct));
+      $('fileMeterBar').style.width = pct + '%';
+    },
+  };
+  const STAGE_FRAC = { render: 0.02, cleanup: 0.08, staves: 0.35, notes: 0.6, lyrics: 0.7 };
 
   // Map a progress message from the pipeline to a stage.
   function stageOf(msg, info) {
@@ -4067,47 +4403,10 @@ window.omrRequire=req;
     if (/musicxml|xml|writ/i.test(m)) return 'xml';
     return null;
   }
-  function detailOf(msg) {
-    const m = String(msg || '');
-    let r = m.match(/\((\d+)\/(\d+) lines?\)/);
-    if (r) return `line ${r[1]} of ${r[2]}`;
-    r = m.match(/page (\d+)\s*(?:\/|of)\s*(\d+)/i);
-    if (r) return `page ${r[1]} of ${r[2]}`;
-    r = m.match(/page (\d+)/i);
-    if (r) return `page ${r[1]}`;
-    return null;
-  }
-  function onPipelineProgress(msg, info) {
-    status(msg);
-    const id = stageOf(msg, info);
-    if (id) stepper.go(id, detailOf(msg));
-  }
-
-  // Facts for each completed stage, read from the result.
-  function stepFacts(res, nPages, ocrUsed) {
-    const pages = res.pages || [];
-    const sum = (f) => pages.reduce((a, p) => a + (f(p) || 0), 0);
-    const skews = pages.map((p) => Math.abs((p.fr && p.fr.skew && p.fr.skew.angle) || 0));
-    const maxSkew = skews.length ? Math.max(...skews) : 0;
-    stepper.set('render', null, plural(nPages, 'page'));
-    stepper.set('cleanup', null, maxSkew >= 0.05 ? `deskewed ${maxSkew.toFixed(1)}°` : 'no skew');
-    const nStaves = sum((p) => p.fr && p.fr.staves && p.fr.staves.length);
-    const nSys = sum((p) => (p.asm && p.asm.systems && p.asm.systems.length) || (p.fr && p.fr.systems && p.fr.systems.length));
-    stepper.set('staves', null, `${plural(nStaves, 'staff', 'staves')} · ${plural(nSys, 'system')}`);
-    stepper.set('notes', null, plural(sum((p) => p.fr && p.fr.heads && p.fr.heads.length), 'head'));
-    const verses = Object.values(res.lyricsBySystem || {}).flat();
-    const syl = verses.reduce((a, v) => a + ((v.syllables && v.syllables.length) || 0), 0);
-    if (!ocrUsed) stepper.set('lyrics', 'skipped', 'text reader off');
-    else stepper.set('lyrics', null, verses.length ? `${plural(verses.length, 'line')} · ${syl} syl.` : 'no lyric lines');
-    const sc = res.score || {};
-    stepper.set('parts', null, `${plural((sc.parts || []).length, 'part')} · ${plural(sc.measures || 0, 'bar')}`);
-    const nLines = (sc.xml || '').split('\n').length;
-    stepper.set('xml', null, plural(nLines, 'line'));
-  }
 
   // ----------------------------------------------------------- dropzone ---
   const drop = {
-    state: 'idle', name: '', prose: false,
+    state: 'idle', name: '', prose: false, nPages: 1,
     set(state, name, prose) {
       if (name != null) { this.name = name; this.prose = !!prose; }
       this.state = state;
@@ -4119,13 +4418,15 @@ window.omrRequire=req;
         over: 'Drop it here',
         busy: `Converting ${n}`,
         done: `${n} converted`,
+        stopped: `${n} partly converted`,
         error: `Could not convert ${n}`,
       };
       const hints = {
-        idle: `PDF, PNG or JPG. The first ${MAX_PAGES} pages are read.`,
+        idle: `A PDF, or one or more PNG or JPG pages. Up to ${MAX_PAGES} pages are read, one at a time.`,
         over: 'Release to convert. The file stays in this browser.',
-        busy: 'Reading the scan. This takes a few seconds per page.',
+        busy: this.nPages > 1 ? `Reading ${this.nPages} pages one at a time. Each page appears below when it is done; you can stop early and keep them.` : 'Reading the scan. This takes a few seconds per page.',
         done: 'Drop another scan here, or choose a file.',
+        stopped: 'Stopped early: the result covers the pages read so far.',
         error: 'Try a sharper scan (200 dpi or more), or a PDF, PNG or JPG file.',
       };
       const t = titles[state] || titles.idle;
@@ -4141,16 +4442,20 @@ window.omrRequire=req;
     $('fileName').title = name;
     $('fileSize').textContent = size != null ? fmtBytes(size) : '';
     $('fileDone').toggleAttribute('hidden', true);
+    $('fileEta').hidden = true;
     delete $('fileRow').dataset.done;
+    meter.set(0);
   }
   function fileFinished(ok) {
     $('fileDone').toggleAttribute('hidden', !ok);
-    if (ok) $('fileRow').dataset.done = '';
-    $('fileMeter').setAttribute('aria-valuenow', ok ? '100' : $('fileMeter').getAttribute('aria-valuenow'));
-    if (ok) $('fileMeterBar').style.width = '100%';
+    $('fileEta').hidden = true;
+    $('stop').hidden = true;
+    if (ok) { $('fileRow').dataset.done = ''; meter.set(1); }
   }
 
-  // -------------------------------------------------------------- input ---
+  // ------------------------------------------------------- page sources ---
+  // A document is a list of page sources, each rendered to gray only when its
+  // turn comes, so a long PDF never sits in memory as images.
   function canvasToGray(c) {
     const ctx = c.getContext('2d');
     const d = ctx.getImageData(0, 0, c.width, c.height).data;
@@ -4158,43 +4463,132 @@ window.omrRequire=req;
     for (let i = 0, j = 0; i < g.length; i++, j += 4) g[i] = (d[j] * 299 + d[j + 1] * 587 + d[j + 2] * 114) / 1000;
     return { width: c.width, height: c.height, data: g };
   }
-  async function pdfToGray(buf) {
+  async function pdfSource(buf, name) {
     if (typeof pdfjsLib === 'undefined') throw new Error('the PDF reader did not load; try a PNG or JPG instead');
     const pdf = await pdfjsLib.getDocument({ data: buf, isEvalSupported: false }).promise;
-    const out = [];
-    const n = Math.min(pdf.numPages, MAX_PAGES);
-    for (let i = 1; i <= n; i++) {
-      status(`Rendering page ${i} of ${n}`);
-      stepper.go('render', `page ${i} of ${n}`);
-      await nextPaint();
-      const page = await pdf.getPage(i);
-      const v1 = page.getViewport({ scale: 1 });
-      const scale = Math.max(1.5, Math.min(5, 2300 / v1.width));
-      const vp = page.getViewport({ scale });
-      const c = document.createElement('canvas');
-      c.width = Math.round(vp.width); c.height = Math.round(vp.height);
-      const ctx = c.getContext('2d');
-      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
-      await page.render({ canvasContext: ctx, viewport: vp }).promise;
-      out.push(canvasToGray(c));
+    const pages = [];
+    for (let k = 1; k <= pdf.numPages; k++) {
+      pages.push({
+        label: pdf.numPages > 1 ? `${name}, page ${k}` : name,
+        async render() {
+          const page = await pdf.getPage(k);
+          const v1 = page.getViewport({ scale: 1 });
+          const scale = Math.max(1.5, Math.min(5, 2300 / v1.width));
+          const vp = page.getViewport({ scale });
+          const c = document.createElement('canvas');
+          c.width = Math.round(vp.width); c.height = Math.round(vp.height);
+          const ctx = c.getContext('2d');
+          ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+          await page.render({ canvasContext: ctx, viewport: vp }).promise;
+          const g = canvasToGray(c);
+          c.width = c.height = 0; // free the canvas backing store now
+          page.cleanup();
+          return g;
+        },
+      });
     }
-    return { pages: out, total: pdf.numPages };
+    return { pages, close: () => pdf.destroy() };
   }
-  async function imageToGray(file) {
-    stepper.go('render', 'page 1 of 1');
-    const bmp = await createImageBitmap(file);
-    const s = bmp.width > 3200 ? 3200 / bmp.width : 1;
-    const c = document.createElement('canvas');
-    c.width = Math.round(bmp.width * s); c.height = Math.round(bmp.height * s);
-    const ctx = c.getContext('2d');
-    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
-    ctx.drawImage(bmp, 0, 0, c.width, c.height);
-    return { pages: [canvasToGray(c)], total: 1 };
+  function imageSource(file) {
+    return {
+      pages: [{
+        label: file.name,
+        async render() {
+          const bmp = await createImageBitmap(file);
+          const s = bmp.width > 3200 ? 3200 / bmp.width : 1;
+          const c = document.createElement('canvas');
+          c.width = Math.round(bmp.width * s); c.height = Math.round(bmp.height * s);
+          const ctx = c.getContext('2d');
+          ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+          ctx.drawImage(bmp, 0, 0, c.width, c.height);
+          if (bmp.close) bmp.close();
+          const g = canvasToGray(c);
+          c.width = c.height = 0;
+          return g;
+        },
+      }],
+      close() {},
+    };
+  }
+  const isPDF = (f) => f.type === 'application/pdf' || /\.pdf$/i.test(f.name);
+  const isImg = (f) => /^image\/(png|jpe?g)$/.test(f.type) || /\.(png|jpe?g)$/i.test(f.name);
+
+  // ------------------------------------------------------------ engines ---
+  // The session runs in a Web Worker built from the page's own code (the
+  // pipeline bundle and ui/session.js as source text, started from a blob:
+  // URL like the OCR worker), so the page stays responsive while a page is
+  // recognised. If the worker cannot start, the same session runs here.
+  let workerSrcURL = null;
+  function workerURL() {
+    if (!workerSrcURL) {
+      const src = `${__omrBundle.toString()}\n__omrBundle();\nconst Sess=(${__omrSessionModule.toString()})();\nSess.workerMain(self, self.omrRequire);\n`;
+      workerSrcURL = URL.createObjectURL(new Blob([src], { type: 'text/javascript' }));
+    }
+    return workerSrcURL;
+  }
+  function workerEngine(ocrFn, onProgress) {
+    return new Promise((resolveEngine, rejectEngine) => {
+      let w;
+      try { w = new Worker(workerURL()); } catch (e) { rejectEngine(e); return; }
+      let alive = false;
+      let waiter = null;
+      const settle = (ok, v) => { const x = waiter; waiter = null; if (x) (ok ? x.resolve : x.reject)(v); };
+      const wait = (type) => new Promise((resolve, reject) => { waiter = { type, resolve, reject }; });
+      const timer = setTimeout(() => { if (!alive) { w.terminate(); rejectEngine(new Error('the recognition worker did not start')); } }, 5000);
+      w.onmessage = (ev) => {
+        const m = ev.data || {};
+        if (m.t === 'alive') {
+          alive = true; clearTimeout(timer);
+          resolveEngine({
+            kind: 'worker',
+            init(useOcr) { const p = wait('ready'); w.postMessage({ t: 'init', ocr: !!useOcr }); return p; },
+            addPage(gray, i, n) { const p = wait('page-done'); w.postMessage({ t: 'page', i, n, gray, maxW: THUMB_W }, [gray.data.buffer]); return p; },
+            finish() { const p = wait('done'); w.postMessage({ t: 'finish' }); return p.then((m2) => m2.result); },
+            dispose() { w.terminate(); settle(false, new Error('stopped')); },
+          });
+        } else if (m.t === 'progress') onProgress(m.msg, m.info);
+        else if (m.t === 'ocr') {
+          Promise.resolve().then(() => ocrFn(m.img)).then(
+            (words) => w.postMessage({ t: 'ocr-res', id: m.id, words }),
+            (e) => w.postMessage({ t: 'ocr-res', id: m.id, error: (e && e.message) || String(e) }));
+        } else if (m.t === 'error') settle(false, new Error(m.msg));
+        else if (waiter && m.t === waiter.type) settle(true, m);
+      };
+      w.onerror = (e) => {
+        if (e && e.preventDefault) e.preventDefault();
+        const err = new Error((e && e.message) || 'the recognition worker stopped');
+        if (!alive) { clearTimeout(timer); w.terminate(); rejectEngine(err); } else settle(false, err);
+      };
+    });
+  }
+  function mainEngine(ocrFn, onProgress) {
+    let session = null;
+    return {
+      kind: 'main',
+      async init(useOcr) { session = Sess.createSession(omrRequire, { ocr: useOcr ? ocrFn : null, onProgress }); },
+      async addPage(gray, i, n) {
+        // the page analysis runs without a break here; paint its stage first
+        onProgress(`Page ${i + 1}/${n}: finding staves and notes`, { stage: 'cleanup', page: i, pages: n });
+        await nextPaint();
+        const t0 = performance.now();
+        const entry = await session.addPage(gray, i, n);
+        if (!entry) return { view: null, ms: performance.now() - t0 };
+        const view = Sess.pageView(entry, i);
+        const thumb = Sess.shrink(entry.fr.gray, THUMB_W);
+        Sess.release(entry);
+        return { view, thumb, ms: performance.now() - t0 };
+      },
+      async finish() { await nextPaint(); return Sess.resultSummary(session.finish()); },
+      dispose() { session = null; },
+    };
+  }
+  async function startEngine(ocrFn, onProgress) {
+    try { return await workerEngine(ocrFn, onProgress); } catch (e) { return mainEngine(ocrFn, onProgress); }
   }
 
-  // ------------------------------------------------------------- render ---
+  // ----------------------------------------------------- pages and marks ---
   // Each part gets a colour and a marker shape, so the overlay does not rely
-  // on colour alone. Shapes are drawn the same way on the canvas and in SVG.
+  // on colour alone. Shapes are drawn the same way in the overlay and legend.
   const SHAPES = ['circle', 'triangle-down', 'square', 'diamond', 'triangle-up', 'hexagon'];
   function shapePoints(shape, r) {
     const pts = (n, rot) => Array.from({ length: n }, (_, i) => [Math.cos(rot + (i * 2 * Math.PI) / n) * r, Math.sin(rot + (i * 2 * Math.PI) / n) * r]);
@@ -4207,93 +4601,174 @@ window.omrRequire=req;
       default: return null;
     }
   }
-  function traceShape(ctx, shape, x, y, r) {
-    ctx.beginPath();
-    const p = shapePoints(shape, r);
-    if (!p) { ctx.arc(x, y, r, 0, Math.PI * 2); return; }
-    p.forEach(([dx, dy], i) => (i ? ctx.lineTo(x + dx, y + dy) : ctx.moveTo(x + dx, y + dy)));
-    ctx.closePath();
-  }
   function shapeSVG(shape, color, cls) {
     const p = shapePoints(shape, 5.2);
     const body = p ? `<polygon points="${p.map(([x, y]) => `${(7 + x).toFixed(2)},${(7 + y).toFixed(2)}`).join(' ')}"` : '<circle cx="7" cy="7" r="5.2"';
     return `<svg class="${cls || 'mark'}" viewBox="0 0 14 14" aria-hidden="true">${body} fill="${esc(color)}" stroke="${esc(color)}" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
   }
   const partShape = (i) => SHAPES[i % SHAPES.length];
-  const OV = { staff: 'rgba(30,140,90,.6)', bar: 'rgba(43,55,176,.7)', none: '#8a8f96' };
+  const OV = { staff: 'rgba(30,140,90,.6)', bar: 'rgba(43,55,176,.7)', none: '#8a8f96', found: '#2b37b0' };
+  function markPath(shape, x, y, r) {
+    const p = shapePoints(shape, r);
+    if (!p) return `M${(x - r).toFixed(1)},${y.toFixed(1)}a${r.toFixed(1)},${r.toFixed(1)} 0 1,0 ${(2 * r).toFixed(1)},0a${r.toFixed(1)},${r.toFixed(1)} 0 1,0 ${(-2 * r).toFixed(1)},0z`;
+    return 'M' + p.map(([dx, dy]) => `${(x + dx).toFixed(1)},${(y + dy).toFixed(1)}`).join('L') + 'z';
+  }
 
-  function drawOverlay(res) {
-    const host = $('pages');
-    host.textContent = '';
-    const parts = res.score.parts || [];
-    const legend = $('legend');
-    legend.innerHTML = parts.map((p, i) => `<li>${shapeSVG(partShape(i), p.color)}<span>${esc(p.name)}</span></li>`).join('') +
-      '<li class="aux"><svg class="mark" viewBox="0 0 14 14" aria-hidden="true"><path d="M1 4h12M1 10h12" stroke="' + OV.staff + '" stroke-width="2"/></svg><span>Staff edges</span></li>' +
-      '<li class="aux"><svg class="mark" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1v12" stroke="' + OV.bar + '" stroke-width="2.4"/></svg><span>Barline</span></li>' +
-      '<li class="aux"><svg class="mark" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="' + OV.none + '" stroke-width="1.6" stroke-dasharray="2 2"/></svg><span>Head in no part</span></li>';
-    const multi = res.pages.length > 1;
-    for (const pg of res.pages) {
-      const fr = pg.fr;
-      if (multi) {
-        const lab = document.createElement('p');
-        lab.className = 'pagelabel';
-        lab.textContent = `Page ${pg.index + 1}`;
-        host.appendChild(lab);
+  // Per-page state for the page strip and the plate. One page is shown at a
+  // time; while converting, the plate follows the newest finished page until
+  // the reader picks one.
+  const PAGE_STATE = { queued: 'queued', render: 'rendering', work: 'reading', done: 'done', empty: 'no staves found', failed: 'could not be read', skipped: 'not read' };
+  const book = {
+    n: 0, total: 0, pages: [], sel: 0, follow: true, parts: null, headParts: null, urls: [],
+    reset(n, total, labels) {
+      this.urls.forEach((u) => URL.revokeObjectURL(u));
+      this.urls = [];
+      this.n = n; this.total = total; this.sel = 0; this.follow = true; this.parts = null; this.headParts = null;
+      this.pages = Array.from({ length: n }, (_, i) => ({ i, state: 'queued', label: labels[i] || `Page ${i + 1}`, view: null, url: null, ms: 0 }));
+      $('pageNav').hidden = n <= 1;
+      const ol = $('pageChips');
+      ol.textContent = '';
+      this.pages.forEach((p) => {
+        const li = document.createElement('li');
+        const b = document.createElement('button');
+        b.type = 'button'; b.className = 'chip'; b.textContent = String(p.i + 1);
+        b.addEventListener('click', () => { this.follow = false; this.show(p.i); });
+        li.appendChild(b);
+        ol.appendChild(li);
+        p.el = b;
+      });
+      this.paintChips();
+      this.show(0);
+    },
+    setState(i, state, extra) {
+      const p = this.pages[i];
+      if (!p) return;
+      p.state = state;
+      if (extra) Object.assign(p, extra);
+      this.paintChips();
+      if (state === 'done' || state === 'empty' || state === 'failed') { if (this.follow) this.show(i); else if (i === this.sel) this.show(i); }
+      else if (i === this.sel) this.show(i);
+    },
+    counts() {
+      const c = {};
+      this.pages.forEach((p) => { c[p.state] = (c[p.state] || 0) + 1; });
+      return c;
+    },
+    paintChips() {
+      this.pages.forEach((p) => {
+        const b = p.el;
+        if (!b) return;
+        b.dataset.state = p.state;
+        const facts = p.view ? `, ${plural(p.view.nStaves, 'staff', 'staves')}, ${plural(p.view.heads.length, 'note head')}` : '';
+        b.setAttribute('aria-label', `Page ${p.i + 1}: ${PAGE_STATE[p.state]}${facts}`);
+        if (p.i === this.sel) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+      });
+      const c = this.counts();
+      const bits = [];
+      if (c.done) bits.push(`${c.done} read`);
+      if (c.work || c.render) bits.push('1 reading');
+      if (c.queued) bits.push(`${c.queued} to go`);
+      if (c.empty) bits.push(`${c.empty} without staves`);
+      if (c.failed) bits.push(`${c.failed} failed`);
+      if (c.skipped) bits.push(`${c.skipped} not read`);
+      $('pgSum').textContent = bits.join(' · ');
+    },
+    show(i) {
+      if (!this.pages.length) return;
+      i = Math.max(0, Math.min(this.n - 1, i));
+      this.sel = i;
+      const p = this.pages[i];
+      $('pgLabel').textContent = `Page ${i + 1} of ${this.n}` + (this.total > this.n ? ` (of ${this.total})` : '');
+      $('pgPrev').disabled = i === 0;
+      $('pgNext').disabled = i >= this.n - 1;
+      this.paintChips();
+      const host = $('pages');
+      host.textContent = '';
+      if (!p.view || !p.url) {
+        const ph = document.createElement('div');
+        ph.className = 'pageframe placeholder';
+        ph.dataset.state = p.state;
+        const msg = {
+          queued: `Page ${i + 1} is waiting its turn.`, render: `Rendering page ${i + 1}.`, work: `Reading page ${i + 1}.`,
+          empty: `No staves were found on page ${i + 1}, so nothing on it is in the result.`,
+          failed: `Page ${i + 1} could not be read.`, skipped: `Page ${i + 1} was not read.`, done: `Page ${i + 1} is done.`,
+        }[p.state] || '';
+        ph.innerHTML = `<p>${esc(msg)}</p>`;
+        host.appendChild(ph);
+        return;
       }
-      const frame = document.createElement('div');
-      frame.className = 'pageframe';
-      const base = grayToCanvas(fr.gray);
-      base.setAttribute('role', 'img');
-      base.setAttribute('aria-label', `Page ${pg.index + 1} of the scan, straightened`);
-      const ov = document.createElement('canvas');
-      ov.className = 'ov';
-      ov.width = base.width; ov.height = base.height;
-      ov.setAttribute('aria-hidden', 'true');
-      const ctx = ov.getContext('2d');
-      const lw = Math.max(1.5, fr.ss / 8);
-      ctx.lineWidth = lw;
-      ctx.strokeStyle = OV.staff;
-      for (const st of fr.staves) {
-        for (let k = 0; k < 5; k += 4) {
-          ctx.beginPath();
-          for (let x = st.left; x <= st.right; x += 20) ctx.lineTo(x, st.yAt(k, x));
-          ctx.stroke();
-        }
-      }
-      ctx.strokeStyle = OV.bar;
-      for (const b of fr.barlines) { ctx.beginPath(); ctx.moveTo(b.x, b.top); ctx.lineTo(b.x, b.bot); ctx.stroke(); }
-      ctx.lineWidth = Math.max(2, fr.ss / 7);
-      for (const h of fr.heads) {
-        const idx = h.parts || [];
-        const r = (h.sp || fr.ss) * 0.62;
-        if (!idx.length) {
-          ctx.strokeStyle = OV.none;
-          ctx.setLineDash([3, 3]);
-          traceShape(ctx, 'circle', h.x, h.y, r); ctx.stroke();
-          ctx.setLineDash([]);
-          continue;
-        }
-        // a head shared by several parts (unison) gets one ring per part
-        idx.forEach((pi, k) => {
-          ctx.strokeStyle = parts[pi] ? parts[pi].color : OV.none;
-          traceShape(ctx, partShape(pi), h.x, h.y, r * (1 + 0.38 * k));
-          ctx.stroke();
+      host.appendChild(this.frame(p));
+    },
+    frame(p) {
+      const v = p.view;
+      const fig = document.createElement('div');
+      fig.className = 'pageframe';
+      const img = document.createElement('img');
+      img.src = p.url;
+      img.width = v.width; img.height = v.height;
+      img.decoding = 'async';
+      img.alt = `Page ${p.i + 1} of the scan, straightened: ${plural(v.nStaves, 'staff', 'staves')}, ${plural(v.heads.length, 'note head')} found.`;
+      fig.appendChild(img);
+      fig.insertAdjacentHTML('beforeend', this.overlay(p));
+      return fig;
+    },
+    overlay(p) {
+      const v = p.view;
+      const sw = Math.max(1.5, v.ss / 8);
+      const pts = (a) => a.map(([x, y]) => `${x},${y}`).join(' ');
+      let s = `<svg class="ov" viewBox="0 0 ${v.width} ${v.height}" preserveAspectRatio="none" aria-hidden="true" focusable="false">`;
+      s += `<g fill="none" stroke="${OV.staff}" stroke-width="${sw.toFixed(1)}">` + v.staves.map((st) => `<polyline points="${pts(st.top)}"/><polyline points="${pts(st.bot)}"/>`).join('') + '</g>';
+      s += `<g stroke="${OV.bar}" stroke-width="${sw.toFixed(1)}">` + v.barlines.map(([x, t, b]) => `<line x1="${x}" y1="${t}" x2="${x}" y2="${b}"/>`).join('') + '</g>';
+      const hp = this.headParts && this.headParts.get(p.i);
+      const parts = this.parts || [];
+      const hw = Math.max(2, v.ss / 7).toFixed(1);
+      if (!hp) {
+        // still converting: heads are found but not yet assigned to parts
+        s += `<path class="ov-found" fill="none" stroke="${OV.found}" stroke-width="${hw}" d="${v.heads.map(([x, y, r]) => markPath('circle', x, y, r)).join('')}"/>`;
+      } else {
+        const byPart = new Map();
+        const none = [];
+        v.heads.forEach(([x, y, r], k) => {
+          const idx = hp[k] || [];
+          if (!idx.length) { none.push(markPath('circle', x, y, r)); return; }
+          idx.forEach((pi, j) => { if (!byPart.has(pi)) byPart.set(pi, []); byPart.get(pi).push(markPath(partShape(pi), x, y, r * (1 + 0.38 * j))); });
         });
+        for (const [pi, d] of byPart) s += `<path fill="none" stroke="${esc(parts[pi] ? parts[pi].color : OV.none)}" stroke-width="${hw}" stroke-linejoin="round" d="${d.join('')}"/>`;
+        if (none.length) s += `<path fill="none" stroke="${OV.none}" stroke-width="${hw}" stroke-dasharray="3 3" d="${none.join('')}"/>`;
       }
-      frame.appendChild(base);
-      frame.appendChild(ov);
-      host.appendChild(frame);
+      return s + '</svg>';
+    },
+    applyResult(res) {
+      this.parts = (res.score && res.score.parts) || [];
+      this.headParts = new Map((res.pages || []).map((p) => [p.index, p.parts]));
+      this.show(this.sel);
+    },
+  };
+  function legend(parts) {
+    const aux = '<li class="aux"><svg class="mark" viewBox="0 0 14 14" aria-hidden="true"><path d="M1 4h12M1 10h12" stroke="' + OV.staff + '" stroke-width="2"/></svg><span>Staff edges</span></li>' +
+      '<li class="aux"><svg class="mark" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1v12" stroke="' + OV.bar + '" stroke-width="2.4"/></svg><span>Barline</span></li>';
+    if (!parts) {
+      $('legend').innerHTML = '<li class="aux"><svg class="mark" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="' + OV.found + '" stroke-width="1.6"/></svg><span>Note head found</span></li>' + aux;
+      return;
     }
-    if (!res.pages.length) host.innerHTML = '<p class="muted">No staves were found, so there is nothing to mark up.</p>';
-    applyOverlay();
+    $('legend').innerHTML = parts.map((p, i) => `<li>${shapeSVG(partShape(i), p.color)}<span>${esc(p.name)}</span></li>`).join('') + aux +
+      '<li class="aux"><svg class="mark" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="' + OV.none + '" stroke-width="1.6" stroke-dasharray="2 2"/></svg><span>Head in no part</span></li>';
   }
   function applyOverlay() {
     const on = $('overlayToggle').getAttribute('aria-pressed') === 'true';
     $('pages').classList.toggle('ov-off', !on);
   }
+  function thumbURL(t) {
+    const c = grayToCanvas(t);
+    return new Promise((resolve) => {
+      const viaData = () => resolve(c.toDataURL('image/jpeg', 0.82));
+      try { c.toBlob((b) => { if (b) resolve(URL.createObjectURL(b)); else viaData(); c.width = c.height = 0; }, 'image/jpeg', 0.82); } catch (e) { viaData(); }
+    });
+  }
 
+  // ------------------------------------------------------------ results ---
   const CLEF = { G: 'treble', F: 'bass', C: 'C clef' };
-  const clefName = (c) => CLEF[c] || (c ? c + ' clef' : 'clef unknown');
+  const clefName = (c) => CLEF[String(c).charAt(0)] || (c ? c + ' clef' : 'clef unknown');
   // Where each part's notes came from, in the user's terms.
   function provenance(p, sc) {
     const src = p.src || [];
@@ -4330,6 +4805,7 @@ window.omrRequire=req;
     const bits = [`${plural(parts.length, 'part')} from ${plural(nSt || 1, 'staff', 'staves')} per system`, keyText(sc.fifths)];
     if (sc.time && sc.time.beats) bits.push(`${sc.time.beats}/${sc.time.type}`);
     bits.push(plural(sc.measures || 0, 'measure'));
+    if (res.pagesRead > 1) bits.push(`${res.pagesRead} pages`);
     $('partsSummary').innerHTML = bits.map(esc).join('<span class="sep-dot" aria-hidden="true">·</span><span class="sr-only">, </span>');
     parts.forEach((p, i) => {
       const li = document.createElement('li');
@@ -4405,6 +4881,26 @@ window.omrRequire=req;
     $('warnCount').textContent = list.length ? `${nWarn} to check · ${list.length - nWarn} notes` : '';
   }
 
+  // Facts for each completed stage, read from the pages and the result.
+  function stepFacts(res, ocrUsed) {
+    const views = book.pages.map((p) => p.view).filter(Boolean);
+    const sum = (f) => views.reduce((a, v) => a + (f(v) || 0), 0);
+    const maxSkew = views.length ? Math.max(...views.map((v) => Math.abs(v.skew || 0))) : 0;
+    const read = book.pages.filter((p) => p.state === 'done' || p.state === 'empty').length;
+    stepper.set('render', null, read < book.total ? `${read} of ${plural(book.total, 'page')}` : plural(read, 'page'));
+    stepper.set('cleanup', null, maxSkew >= 0.05 ? `deskewed ${maxSkew.toFixed(1)}°` : 'no skew');
+    stepper.set('staves', null, `${plural(sum((v) => v.nStaves), 'staff', 'staves')} · ${plural(sum((v) => v.nSystems), 'system')}`);
+    stepper.set('notes', null, plural(sum((v) => v.heads.length), 'head'));
+    const verses = Object.values(res.lyricsBySystem || {}).flat();
+    const syl = verses.reduce((a, v) => a + ((v.syllables && v.syllables.length) || 0), 0);
+    if (!ocrUsed) stepper.set('lyrics', 'skipped', 'text reader off');
+    else stepper.set('lyrics', null, verses.length ? `${plural(verses.length, 'line')} · ${syl} syl.` : 'no lyric lines');
+    const sc = res.score || {};
+    stepper.set('parts', null, `${plural((sc.parts || []).length, 'part')} · ${plural(sc.measures || 0, 'bar')}`);
+    const nLines = (sc.xml || '').split('\n').length;
+    stepper.set('xml', null, plural(nLines, 'line'));
+  }
+
   // ---------------------------------------------------------- code block ---
   function hlTag(tok) {
     if (/^<[?!]/.test(tok)) return `<span class="t-meta">${esc(tok)}</span>`;
@@ -4462,18 +4958,28 @@ window.omrRequire=req;
     } catch (e) { fallback(); }
   }
 
+  // ------------------------------------------------------------ preview ---
   let osmd = null;
-  async function renderNotation(xml) {
+  async function renderNotation(xml, measures, all) {
     const host = $('osmd');
-    $('osmdNote').textContent = '';
-    if (!xml || typeof opensheetmusicdisplay === 'undefined') { $('osmdNote').textContent = 'The notation preview is unavailable because its library did not load.'; return; }
+    const note = $('osmdNote');
+    note.textContent = '';
+    $('osmdAll').hidden = true;
+    if (!xml || typeof opensheetmusicdisplay === 'undefined') { note.textContent = 'The notation preview is unavailable because its library did not load.'; return; }
+    // a long score draws its first measures; drawing all of it can hold the page for a while
+    const capped = !all && measures > PREVIEW_MEASURES;
     try {
       host.textContent = '';
       osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay(host, { autoResize: true, drawTitle: false, backend: 'svg', drawPartNames: true });
+      if (capped) osmd.setOptions({ drawUpToMeasureNumber: PREVIEW_MEASURES });
       await osmd.load(xml);
       osmd.render();
+      if (capped) {
+        note.textContent = `The preview shows the first ${PREVIEW_MEASURES} of ${measures} measures; the MusicXML has them all.`;
+        $('osmdAll').hidden = false;
+      }
     } catch (e) {
-      $('osmdNote').textContent = 'The preview could not draw this MusicXML: ' + e.message;
+      note.textContent = 'The preview could not draw this MusicXML: ' + e.message;
     }
   }
 
@@ -4483,21 +4989,38 @@ window.omrRequire=req;
     $('sample').disabled = b;
     $('choose').disabled = b;
   }
-  async function run(getPages, file) {
+  // doc: async () => ({ pages: [{label, render}], total, size, close }); file: {name, size, title, label}
+  async function run(openDoc, file) {
     if (busy) { status('Wait for the current conversion to finish.'); return; }
     setBusy(true);
+    stopAsked = false;
     const t0 = performance.now();
     $('alert').hidden = true;
     stepper.reset();
+    drop.nPages = 1;
     drop.set('busy', file.title || file.name, !!file.title);
     showFile(file.name, file.size);
+    legend(null);
     let ocrUsed = false;
+    let engine = null;
+    let doc = null;
     try {
       status(`Reading ${file.label || file.name}`);
+      stepper.go('render', null);
       const ocrP = getOCR();
-      const { pages, total, size } = await getPages();
-      if (size != null) $('fileSize').textContent = fmtBytes(size);
-      $('fileSize').textContent += ($('fileSize').textContent ? ' · ' : '') + (total > pages.length ? `${pages.length} of ${total} pages` : plural(total, 'page'));
+      doc = await openDoc();
+      const total = doc.pages.length;
+      const n = Math.min(total, MAX_PAGES);
+      const pages = doc.pages.slice(0, n);
+      if (doc.size != null) $('fileSize').textContent = fmtBytes(doc.size);
+      $('fileSize').textContent += ($('fileSize').textContent ? ' · ' : '') + (total > n ? `${n} of ${total} pages` : plural(total, 'page'));
+      drop.nPages = n;
+      drop.set('busy');
+      book.reset(n, total, pages.map((p) => p.label));
+      $('stop').hidden = n <= 1;
+      $('stop').disabled = false;
+      $('stop').textContent = 'Stop after this page';
+
       let ocr = null, ocrError = null;
       try {
         status('Loading the text reader');
@@ -4511,34 +5034,115 @@ window.omrRequire=req;
         };
         ocrUsed = true;
       } catch (e) { ocrError = e.message || String(e); }
-      // convert() starts with page 1's image analysis, which runs without a
-      // break; paint that stage first so the stepper does not skip it.
-      stepper.go('cleanup', pages.length > 1 ? `page 1 of ${pages.length}` : null);
-      status(`Page 1 of ${pages.length}: cleaning up and finding staves and notes`);
-      await nextPaint();
-      const res = await convert(pages, { ocr, onProgress: onPipelineProgress });
+
+      // progress from the session: stage, page and lyric line
+      let curPage = 0;
+      let lastStatusKey = '';
+      const pageDur = [];
+      const eta = () => {
+        if (n <= 1 || !pageDur.length) return '';
+        const mean = pageDur.reduce((a, b) => a + b, 0) / pageDur.length;
+        const left = (n - curPage - 0.5) * mean / 1000;
+        return left > 2 ? `about ${fmtSecs(left)} left` : '';
+      };
+      const onProgress = (msg, info) => {
+        const id = stageOf(msg, info);
+        const m = String(msg || '');
+        const lines = m.match(/\((\d+)\/(\d+) lines?\)/);
+        if (id) {
+          const detail = lines ? `line ${lines[1]} of ${lines[2]}` + (n > 1 ? ` · p.${curPage + 1}` : '') : n > 1 && STAGE_FRAC[id] != null ? `page ${curPage + 1} of ${n}` : null;
+          stepper.go(id, detail);
+          if (STAGE_FRAC[id] != null) {
+            const within = id === 'lyrics' && lines ? 0.7 + 0.3 * (+lines[1] / +lines[2]) : STAGE_FRAC[id];
+            meter.set(((curPage + within) / n) * 0.92);
+          } else if (id === 'parts') meter.set(0.94);
+        }
+        // the status line (announced politely) changes per page and stage, not per lyric line
+        const key = (id || '') + ':' + curPage;
+        if (key !== lastStatusKey) { lastStatusKey = key; status(m.replace(/\s*\(\d+\/\d+ lines?\)/, '')); }
+      };
+      engine = await startEngine(ocr, onProgress);
+      const engineKind = engine.kind;
+      await engine.init(!!ocr);
+
+      // Render page i+1 here while the worker reads page i.
+      const renderPage = (i) => {
+        book.setState(i, 'render');
+        const p = pages[i].render();
+        p.catch(() => {});
+        return p;
+      };
+      const extraWarn = [];
+      let nextGray = renderPage(0);
+      let read = 0;
+      for (let i = 0; i < n; i++) {
+        curPage = i;
+        if (stopAsked) { for (let k = i; k < n; k++) book.setState(k, 'skipped'); break; }
+        const tp = performance.now();
+        stepper.go('render', n > 1 ? `page ${i + 1} of ${n}` : null);
+        meter.set((i / n) * 0.92);
+        let gray;
+        try { gray = await nextGray; } catch (e) {
+          extraWarn.push(`Page ${i + 1} could not be rendered (${(e && e.message) || e}).`);
+          book.setState(i, 'failed');
+          nextGray = i + 1 < n ? renderPage(i + 1) : null;
+          continue;
+        }
+        book.setState(i, 'work');
+        const done = engine.addPage(gray, i, n);
+        gray = null;
+        nextGray = null;
+        if (engine.kind === 'worker' && i + 1 < n && !stopAsked) nextGray = renderPage(i + 1);
+        const r = await done;
+        if (!nextGray && i + 1 < n && !stopAsked) nextGray = renderPage(i + 1);
+        if (r.view && r.thumb) {
+          const url = await thumbURL(r.thumb);
+          if (/^blob:/.test(url)) book.urls.push(url);
+          book.setState(i, 'done', { view: r.view, url, ms: r.ms });
+        } else book.setState(i, 'empty');
+        read++;
+        pageDur.push(performance.now() - tp);
+        if (n > 1) {
+          const e = eta();
+          $('fileEta').hidden = !e && !stopAsked;
+          $('fileEta').textContent = stopAsked ? `Stopping after page ${i + 1}` : `${read} of ${n} pages read${e ? ' · ' + e : ''}`;
+        }
+        if (n > 1) status(`Page ${i + 1} of ${n} done.`);
+      }
+      $('stop').hidden = true;
+      $('fileEta').hidden = true;
+      const res = await engine.finish();
+      engine.dispose();
+      engine = null;
       res.ocrError = ocrError;
+      res.pagesRead = read;
       if (ocrError) res.warnings.unshift('Lyrics were not read: the text reader is unavailable (' + ocrError + ').');
-      if (total > pages.length) res.warnings.unshift(`Only the first ${pages.length} of ${total} pages were read.`);
+      if (stopAsked && read < n) res.warnings.unshift(`Stopped at your request after page ${read} of ${n}; the MusicXML covers pages 1 to ${read}.`);
+      if (total > n) res.warnings.unshift(`Only the first ${n} of ${total} pages were read (the page reads at most ${MAX_PAGES}).`);
+      res.warnings.unshift(...extraWarn);
       stepper.go('xml');
+      meter.set(0.97);
       status('Writing MusicXML and drawing the preview');
       lastRes = res;
-      drawOverlay(res);
+      legend((res.score && res.score.parts) || []);
+      book.applyResult(res);
       renderParts(res);
       renderLyrics(res);
       renderWarnings(res.warnings || []);
       renderCode(res.score.xml);
-      stepFacts(res, pages.length, ocrUsed);
+      stepFacts(res, ocrUsed);
       await nextPaint();
-      await renderNotation(res.score.xml);
+      await renderNotation(res.score.xml, res.score.measures || 0, false);
       stepper.finish();
       fileFinished(true);
-      drop.set('done');
-      status(`Done in ${((performance.now() - t0) / 1000).toFixed(1)} s: ${file.label || file.name}`);
+      const partial = stopAsked && read < n;
+      drop.set(partial ? 'stopped' : 'done');
+      status(`Done in ${((performance.now() - t0) / 1000).toFixed(1)} s: ${file.label || file.name}` + (n > 1 ? ` (${plural(read, 'page')})` : ''));
       window.__omrResult = {
         parts: res.score.parts.map((p) => p.name), nNotes: res.score.nNotes, measures: res.score.measures,
         lyrics: Object.values(res.lyricsBySystem).flat().length, warnings: res.warnings, xmlLength: (res.score.xml || '').length,
-        steps: stepper.snapshot(),
+        steps: stepper.snapshot(), engine: engineKind, pages: { total, n, read, states: book.pages.map((p) => p.state) },
+        secs: +((performance.now() - t0) / 1000).toFixed(2),
       };
     } catch (e) {
       const msg = (e && e.message) || String(e);
@@ -4551,22 +5155,33 @@ window.omrRequire=req;
       al.textContent = `Could not convert ${file.name}: ${msg}. ` + (lastRes ? 'The previous result is still shown below.' : '');
       window.__omrResult = { error: msg, steps: stepper.snapshot() };
     } finally {
+      if (engine) engine.dispose();
+      if (doc && doc.close) { try { doc.close(); } catch (e) { /* already closed */ } }
+      $('stop').hidden = true;
       setBusy(false);
     }
   }
 
-  function handleFile(file) {
-    if (!file) return;
-    const isPDF = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
-    const isImg = /^image\/(png|jpe?g)$/.test(file.type) || /\.(png|jpe?g)$/i.test(file.name);
-    if (!isPDF && !isImg) {
-      drop.set('error', file.name, false);
-      status(`${file.name} is not a PDF, PNG or JPG file.`);
+  // Several files: PDFs and images in name order, as one document.
+  function handleFiles(list) {
+    const files = Array.prototype.slice.call(list || []).filter(Boolean);
+    if (!files.length) return;
+    const ok = files.filter((f) => isPDF(f) || isImg(f)).sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+    const bad = files.filter((f) => !(isPDF(f) || isImg(f)));
+    if (!ok.length) {
+      drop.set('error', files[0].name, false);
+      status(`${files[0].name} is not a PDF, PNG or JPG file.`);
       return;
     }
-    const f = { name: file.name, size: file.size };
-    if (isPDF) run(async () => pdfToGray(new Uint8Array(await file.arrayBuffer())), f);
-    else run(() => imageToGray(file), f);
+    const size = ok.reduce((a, f) => a + f.size, 0);
+    const name = ok.length === 1 ? ok[0].name : `${ok.length} files`;
+    run(async () => {
+      const parts = [];
+      for (const f of ok) parts.push(isPDF(f) ? await pdfSource(new Uint8Array(await f.arrayBuffer()), f.name) : imageSource(f));
+      const pages = parts.flatMap((p) => p.pages);
+      if (bad.length) status(`Skipped ${bad.map((f) => f.name).join(', ')}: not a PDF, PNG or JPG file.`);
+      return { pages, size, close: () => parts.forEach((p) => p.close()) };
+    }, { name, size, title: ok.length > 1 ? `${ok.length} files` : null });
   }
 
   function loadSample() {
@@ -4575,19 +5190,38 @@ window.omrRequire=req;
       if (!r.ok) throw new Error('the sample file was not found (' + r.status + ')');
       const buf = new Uint8Array(await r.arrayBuffer());
       const size = buf.length; // read before pdf.js transfers (detaches) the buffer
-      const out = await pdfToGray(buf);
-      out.size = size;
-      return out;
+      const src = await pdfSource(buf, SAMPLE.name);
+      return { pages: src.pages, size, close: src.close };
     }, { name: SAMPLE.name, title: 'the sample hymn', label: 'sample: ' + SAMPLE.label, size: null });
   }
 
   // ---------------------------------------------------------------- wire ---
   stepper.build();
   $('choose').addEventListener('click', () => $('file').click());
-  $('file').addEventListener('change', (e) => { const f = e.target.files[0]; e.target.value = ''; handleFile(f); });
+  $('file').addEventListener('change', (e) => { const fs = Array.prototype.slice.call(e.target.files || []); e.target.value = ''; handleFiles(fs); });
   $('sample').addEventListener('click', loadSample);
   $('copy').addEventListener('click', copyXML);
   $('copy').disabled = true;
+  $('stop').addEventListener('click', () => {
+    stopAsked = true;
+    $('stop').disabled = true;
+    $('stop').textContent = 'Stopping…';
+    $('fileEta').hidden = false;
+    $('fileEta').textContent = 'Stopping after the page being read';
+  });
+  $('pgPrev').addEventListener('click', () => { book.follow = false; book.show(book.sel - 1); });
+  $('pgNext').addEventListener('click', () => { book.follow = false; book.show(book.sel + 1); });
+  $('pageChips').addEventListener('keydown', (e) => {
+    // arrow keys move between page chips
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    const i = book.sel + (e.key === 'ArrowRight' ? 1 : -1);
+    if (i < 0 || i >= book.n) return;
+    e.preventDefault();
+    book.follow = false;
+    book.show(i);
+    if (book.pages[i].el) book.pages[i].el.focus();
+  });
+  $('osmdAll').addEventListener('click', () => { if (lastRes) renderNotation(lastRes.score.xml, lastRes.score.measures || 0, true); });
   const ovSaved = store.get('ssr.overlay');
   if (ovSaved === 'off') $('overlayToggle').setAttribute('aria-pressed', 'false');
   $('overlayToggle').addEventListener('click', () => {
@@ -4596,6 +5230,7 @@ window.omrRequire=req;
     store.set('ssr.overlay', on ? 'on' : 'off');
     applyOverlay();
   });
+  applyOverlay();
 
   // Drag and drop anywhere on the page. dragenter/dragleave fire for every
   // child crossed, so count depth and leave the "over" state only at zero.
@@ -4621,12 +5256,13 @@ window.omrRequire=req;
     e.preventDefault();
     depth = 0;
     drop.set(restState);
-    const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
-    if (f) handleFile(f);
+    const fs = e.dataTransfer && e.dataTransfer.files;
+    if (fs && fs.length) handleFiles(fs);
   });
   window.__dropDepth = () => depth;
 
   drop.set('idle');
+  legend(null);
   renderWarnings([]);
   if (typeof pdfjsLib === 'undefined') status('The PDF reader did not load; PNG and JPG files still work.');
   loadSample();

@@ -29,7 +29,10 @@ const fail = (m) => errors.push(m);
 // ---- bundle: every src/*.js module (definitions are lazy, so unused ones cost bytes only)
 const mods = fs.readdirSync(SRC).filter((f) => f.endsWith('.js')).map((f) => f.slice(0, -3)).sort();
 if (!mods.includes('omr')) fail('src/omr.js is missing');
-let bundle = '(function(){\nconst defs={},cache={};\nfunction req(n){n=n.replace(/^\\.\\//,"").replace(/\\.js$/,"");if(cache[n])return cache[n].exports;if(!defs[n])return {};const m={exports:{}};cache[n]=m;defs[n](req,m,m.exports);return m.exports;}\n';
+// The bundle is one named function, called once on the page; the page also
+// starts a Web Worker from its source text (with ui/session.js), so recognition
+// runs off the main thread without a second copy of the code.
+let bundle = 'function __omrBundle(){\nconst defs={},cache={};\nfunction req(n){n=n.replace(/^\\.\\//,"").replace(/\\.js$/,"");if(cache[n])return cache[n].exports;if(!defs[n])return {};const m={exports:{}};cache[n]=m;defs[n](req,m,m.exports);return m.exports;}\n';
 for (const m of mods) {
   const code = fs.readFileSync(path.join(SRC, m + '.js'), 'utf8');
   for (const r of code.matchAll(/require\(\s*['"]\.\/([\w.-]+?)(?:\.js)?['"]\s*\)/g)) {
@@ -37,12 +40,16 @@ for (const m of mods) {
   }
   bundle += `defs[${JSON.stringify(m)}]=function(require,module,exports){\n${code}\n};\n`;
 }
-bundle += 'window.omrRequire=req;\n})();\n';
+bundle += '(typeof self!=="undefined"?self:window).omrRequire=req;\n}\n__omrBundle();\n';
 
 const css = fs.readFileSync(path.join(UI, 'style.css'), 'utf8');
 const body = fs.readFileSync(path.join(UI, 'body.html'), 'utf8');
 const app = fs.readFileSync(path.join(UI, 'app.js'), 'utf8');
-if (/<\/script/i.test(bundle + app)) fail('a script terminator (</script) appears inside the bundle or app');
+const sessionPath = path.join(UI, 'session.js');
+const session = fs.existsSync(sessionPath) ? fs.readFileSync(sessionPath, 'utf8') : '';
+if (!session) fail('ui/session.js is missing (incremental per-page conversion)');
+else if (!/function __omrSessionModule\(/.test(session)) fail('ui/session.js does not define __omrSessionModule()');
+if (/<\/script/i.test(bundle + app + session)) fail('a script terminator (</script) appears inside the bundle or app');
 if (/<\/style/i.test(css)) fail('a </style> appears inside style.css');
 
 const html = `<title>Score Scan Reader</title>
@@ -56,6 +63,8 @@ ${body}
 ${SCRIPTS.map((s) => `<script src="${s}"></script>`).join('\n')}
 <script>
 ${bundle}</script>
+<script>
+${session}</script>
 <script>
 ${app}</script>
 `;
@@ -74,7 +83,7 @@ for (const m of shell.matchAll(/<script\b[^>]*\bsrc="([^"]+)"/g)) {
 for (const m of shell.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*>/g)) {
   if (!/href="https:\/\/fonts\.googleapis\.com\//.test(m[0])) fail(`stylesheet outside Google Fonts: ${m[0]}`);
 }
-const code = bundle + '\n' + app;
+const code = bundle + '\n' + session + '\n' + app;
 const banned = code.match(/(^|[^.\w$])(alert|confirm|prompt|print)\s*\(|window\.(alert|confirm|prompt|print)\b/m);
 if (banned) fail(`banned dialog/print call in page code: "${banned[0].trim()}"`);
 if (/\sdownload(=|\s|>)/i.test(shell) || /\.download\s*=|setAttribute\(\s*['"]download/.test(code)) fail('download link in page');

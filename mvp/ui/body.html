@@ -7,12 +7,12 @@
   <section class="drop" id="drop" aria-labelledby="dropTitle" data-state="idle">
     <div class="drop-main">
       <h2 class="drop-title" id="dropTitle">Drop a scanned PDF or image</h2>
-      <p class="drop-hint" id="dropHint">PDF, PNG or JPG. The first 8 pages are read.</p>
+      <p class="drop-hint" id="dropHint">A PDF, or one or more PNG or JPG pages.</p>
       <div class="drop-actions">
         <button class="btn primary" id="choose" type="button">Choose PDF or image</button>
         <button class="btn" id="sample" type="button">Load sample</button>
       </div>
-      <input id="file" class="sr-only" type="file" accept="application/pdf,image/png,image/jpeg" tabindex="-1" aria-hidden="true">
+      <input id="file" class="sr-only" type="file" accept="application/pdf,image/png,image/jpeg" multiple tabindex="-1" aria-hidden="true">
       <p class="sr-only" id="dropLive" aria-live="polite"></p>
     </div>
     <div class="filerow" id="fileRow" hidden>
@@ -23,6 +23,8 @@
       </div>
       <div class="meter" id="fileMeter" role="progressbar" aria-labelledby="fileName" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="fileMeterBar"></span></div>
       <svg class="filerow-done" id="fileDone" viewBox="0 0 20 20" aria-hidden="true" hidden><path d="M4 10.5l4 4 8-9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <p class="filerow-eta" id="fileEta" hidden></p>
+      <button class="btn small stop" id="stop" type="button" hidden>Stop after this page</button>
     </div>
   </section>
 
@@ -42,6 +44,15 @@
         </button>
       </div>
       <ul class="legend" id="legend" aria-label="Overlay key"></ul>
+      <div class="pagenav" id="pageNav" hidden>
+        <div class="pagenav-row">
+          <button class="btn icon" id="pgPrev" type="button" aria-label="Previous page" aria-controls="pages"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <p class="pagenav-label" id="pgLabel">Page 1</p>
+          <button class="btn icon" id="pgNext" type="button" aria-label="Next page" aria-controls="pages"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <p class="pagenav-sum" id="pgSum"></p>
+        </div>
+        <ol class="pagechips" id="pageChips" aria-label="Pages of the scan"></ol>
+      </div>
       <div id="pages" class="pages"></div>
     </section>
 
@@ -90,6 +101,7 @@
       <div class="panel-head"><h2 id="prevH">Notation preview</h2></div>
       <div class="sheet"><div id="osmd"></div></div>
       <p class="muted" id="osmdNote"></p>
+      <button class="btn small" id="osmdAll" type="button" hidden>Draw every measure</button>
     </section>
   </div>
 

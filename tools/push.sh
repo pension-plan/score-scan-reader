@@ -12,6 +12,7 @@ grep -rl -i -E "used by permission|greentree" corpus --include=ATTRIBUTION.txt 2
 grep -rl -i -E "used by permission|greentree" corpus --include='*.py' 2>/dev/null >/dev/null || true
 # mirror docs, status page and orchestration scripts
 cp "$SCRATCH/omr-build.html" docs/status/omr-build.html 2>/dev/null || true
+python3 -I tools/timeline.py >/dev/null || echo 'timeline not written'
 cp /Users/d.sloane/.claude/projects/-Users-d-sloane-music/69a237da-a02e-40d9-a1a9-90390e5b5eb2/workflows/scripts/*.js orchestration/ 2>/dev/null || true
 git add -A
 # refuse oversize files and anything that looks like a credential

@@ -29,7 +29,7 @@ async function convert(grayPages, opts = {}) {
   }
   progress('Building parts');
   let score;
-  try { score = buildScore(pages, lyricsBySystem, { ocr: !!opts.ocr, copyLyrics: !!opts.copyLyrics }); }
+  try { score = buildScore(pages, lyricsBySystem, { ocr: !!opts.ocr, copyLyrics: !!opts.copyLyrics, debug: opts.debug }); }
   catch (e) { score = { parts: [], warnings: ['Assembly failed: ' + e.message], xml: '' }; }
   // show only the text lines that were attached to notes (stanza text printed
   // below the music, titles and dynamics are not underlay)

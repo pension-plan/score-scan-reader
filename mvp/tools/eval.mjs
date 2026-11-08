@@ -2,9 +2,13 @@
 // OMR evaluation harness: scan.pdf -> v1 pipeline -> MusicXML, scored against truth.musicxml.
 //
 //   node tools/eval.mjs --out work/eval-r1-<key>.json [--only id,...] [--no-ocr] [--jobs N]
-//                       [--src dir] [--dpi 200] [--timeout sec] [--set synthetic|real]
+//                       [--src dir] [--dpi 200] [--timeout sec] [--set synthetic|real|challenge]
 //
-// Items: every corpus/{synthetic,real}/<id>/ holding scan.pdf + truth.musicxml.
+// Items: every corpus/{synthetic,real}/<id>/ holding scan.pdf + truth.musicxml (the default
+// benchmark). --set challenge instead scores corpus/challenge/<category>/<id>/: every scan*.pdf
+// (scan, scan-mild, scan-severe) is a separate item with id <category>/<id>/<variant>, scored
+// against that folder's truth.musicxml; --only takes ids or prefixes (category, category/id).
+// Challenge reports add summary.by_category and summary.by_variant.
 // Pages are rasterised once (pdftoppm -gray -r DPI) into work/cache/ (atomic, shared
 // between concurrent runs). Each item runs in its own child process (parallel pool).
 // Produced MusicXML lands in <out minus .json>.out/<set>__<id>.musicxml.
@@ -54,7 +58,7 @@ function parseArgs(argv) {
     else if (k === '--set') a.set = v();
     else if (k === '--quiet') a.quiet = true;
     else if (k === '--child') a.child = v();
-    else if (k === '-h' || k === '--help') { console.log(fs.readFileSync(__filename, 'utf8').split('\n').slice(1, 24).join('\n')); process.exit(0); }
+    else if (k === '-h' || k === '--help') { const L = fs.readFileSync(__filename, 'utf8').split('\n'); let e = 1; while (e < L.length && L[e].startsWith('//')) e++; console.log(L.slice(1, e).join('\n')); process.exit(0); }
     else throw new Error('unknown arg ' + k);
   }
   if (!a.timeout) a.timeout = a.ocr ? 900 : 300;
@@ -96,7 +100,33 @@ async function childMain(specPath) {
 }
 
 // ---------------------------------------------------------------- items + raster cache
+const CHALLENGE = path.join(CORPUS, 'challenge');
+const VARIANT_RANK = { scan: 0, 'scan-mild': 1, 'scan-severe': 2 };
+function listChallengeItems(args) {
+  const items = [];
+  if (!fs.existsSync(CHALLENGE)) return items;
+  const only = args.only && args.only.map(o => o.replace(/^challenge\//, '').replace(/\/+$/, ''));
+  const rank = v => VARIANT_RANK[v] ?? 9;
+  for (const cat of fs.readdirSync(CHALLENGE).sort()) {
+    const cdir = path.join(CHALLENGE, cat);
+    if (cat.startsWith('_') || cat.startsWith('.') || !fs.statSync(cdir).isDirectory()) continue;
+    for (const id of fs.readdirSync(cdir).sort()) {
+      const d = path.join(cdir, id), truth = path.join(d, 'truth.musicxml');
+      if (id.startsWith('_') || id.startsWith('.') || !fs.statSync(d).isDirectory() || !fs.existsSync(truth)) continue;
+      const variants = fs.readdirSync(d).filter(f => /^scan[^/]*\.pdf$/.test(f)).map(f => f.slice(0, -4))
+        .sort((a, b) => rank(a) - rank(b) || a.localeCompare(b));
+      for (const variant of variants) {
+        const cid = `${cat}/${id}/${variant}`;
+        if (only && !only.some(o => cid === o || cid.startsWith(o + '/'))) continue;
+        items.push({ set: 'challenge', id: cid, category: cat, item: id, variant, pdf: path.join(d, variant + '.pdf'), truth, key: `challenge__${cat}__${id}__${variant}` });
+      }
+    }
+  }
+  return items;
+}
+
 function listItems(args) {
+  if (args.set === 'challenge') return listChallengeItems(args);
   const items = [];
   for (const set of ['synthetic', 'real']) {
     if (args.set && args.set !== set) continue;
@@ -424,6 +454,7 @@ async function main() {
 
   const results = await pool(items, jobs, async (it) => {
     const res = { id: it.id, set: it.set, crash: 0 };
+    if (it.set === 'challenge') Object.assign(res, { category: it.category, item: it.item, variant: it.variant });
     const tStart = Date.now();
     try {
       const pages = await rasterize(it, args.dpi);
@@ -476,9 +507,17 @@ async function main() {
     all: summarize(results), synthetic: summarize(syn), real: summarize(real),
     aggregate: summarize(results).aggregate, synthetic_aggregate: summarize(syn).aggregate, real_scan_aggregate: summarize(real).aggregate,
   };
+  const chal = results.filter(r => r.set === 'challenge');
+  if (chal.length) {
+    const groupBy = (rs, k) => { const g = {}; for (const r of rs) (g[r[k]] ||= []).push(r); return Object.fromEntries(Object.keys(g).sort().map(x => [x, summarize(g[x])])); };
+    summary.challenge = summarize(chal);
+    summary.challenge_aggregate = summary.challenge.aggregate;
+    summary.by_category = groupBy(chal, 'category');
+    summary.by_variant = groupBy(chal, 'variant');
+  }
   const report = {
     when: new Date().toISOString(), wall_s: Math.round((Date.now() - t0) / 100) / 10,
-    config: { ocr: args.ocr, dpi: args.dpi, jobs, src: args.src, src_hash: srcHash(args.src), schema, weights: W, outputs: outDir },
+    config: { ocr: args.ocr, dpi: args.dpi, jobs, src: args.src, src_hash: srcHash(args.src), schema, weights: W, outputs: outDir, ...(chal.length ? { set: 'challenge' } : {}) },
     summary, items: results,
   };
   fs.writeFileSync(args.out, JSON.stringify(report, null, 1));
@@ -486,18 +525,22 @@ async function main() {
   // compact table
   const pad = (s, n) => String(s).padEnd(n).slice(0, n);
   const f = x => x == null ? '  -  ' : x.toFixed(3);
-  const rows = [`${pad('item', 38)} ${pad('set', 4)}  agg   pitch  dur   rests lyric parts xml   parts(T/P) notes(T/P)  sec  crash`];
+  const IW = chal.length ? Math.max(38, ...results.map(r => r.id.length)) : 38;
+  const rows = [`${pad('item', IW)} ${pad('set', 4)}  agg   pitch  dur   rests lyric parts xml   parts(T/P) notes(T/P)  sec  crash`];
   for (const r of results) {
     const pd = r.parts_detail || {}, c = r.counts || {};
-    rows.push(`${pad(r.id, 38)} ${pad(r.set.slice(0, 4), 4)}  ${f(r.aggregate)} ${f(r.pitch)} ${f(r.duration)} ${f(r.rests)} ${f(r.lyrics)} ${f(r.parts)} ${f(r.xml_valid)} ${pad(`${pd.truth ?? '-'}/${pd.ours ?? '-'}`, 10)} ${pad(`${c.tp ?? '-'}/${c.pp ?? '-'}`, 11)} ${pad(((r.runtime_ms || 0) / 1000).toFixed(1), 5)} ${r.crash ? 'X' : ''}`);
+    rows.push(`${pad(r.id, IW)} ${pad(r.set.slice(0, 4), 4)}  ${f(r.aggregate)} ${f(r.pitch)} ${f(r.duration)} ${f(r.rests)} ${f(r.lyrics)} ${f(r.parts)} ${f(r.xml_valid)} ${pad(`${pd.truth ?? '-'}/${pd.ours ?? '-'}`, 10)} ${pad(`${c.tp ?? '-'}/${c.pp ?? '-'}`, 11)} ${pad(((r.runtime_ms || 0) / 1000).toFixed(1), 5)} ${r.crash ? 'X' : ''}`);
   }
-  rows.push('-'.repeat(120));
-  for (const [name, s] of [['ALL', summary.all], ['synthetic', summary.synthetic], ['real', summary.real]]) {
+  rows.push('-'.repeat(IW + 82));
+  const groups = [['ALL', summary.all], ['synthetic', summary.synthetic], ['real', summary.real]];
+  if (chal.length) for (const k of ['by_category', 'by_variant']) for (const [g, s] of Object.entries(summary[k])) groups.push([g, s]);
+  for (const [name, s] of groups) {
     if (!s.n) continue;
-    rows.push(`${pad(`${name} (n=${s.n})`, 38)} ${pad('', 4)}  ${f(s.aggregate)} ${f(s.pitch)} ${f(s.duration)} ${f(s.rests)} ${f(s.lyrics)} ${f(s.parts)} ${f(s.xml_valid)} crashes=${s.crashes} mean_runtime=${(s.runtime_ms_mean / 1000).toFixed(1)}s`);
+    rows.push(`${pad(`${name} (n=${s.n})`, IW)} ${pad('', 4)}  ${f(s.aggregate)} ${f(s.pitch)} ${f(s.duration)} ${f(s.rests)} ${f(s.lyrics)} ${f(s.parts)} ${f(s.xml_valid)} crashes=${s.crashes} mean_runtime=${(s.runtime_ms_mean / 1000).toFixed(1)}s`);
   }
   console.log(rows.join('\n'));
-  console.log(`aggregate=${f(summary.aggregate)} synthetic=${f(summary.synthetic_aggregate)} real_scan_aggregate=${f(summary.real_scan_aggregate)}  -> ${args.out}  (${report.wall_s}s)`);
+  if (chal.length) console.log(`challenge_aggregate=${f(summary.challenge_aggregate)} ${Object.entries(summary.by_category).map(([k, s]) => `${k}=${f(s.aggregate)}`).join(' ')} crashes=${summary.challenge.crashes}  -> ${args.out}  (${report.wall_s}s)`);
+  else console.log(`aggregate=${f(summary.aggregate)} synthetic=${f(summary.synthetic_aggregate)} real_scan_aggregate=${f(summary.real_scan_aggregate)}  -> ${args.out}  (${report.wall_s}s)`);
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === __filename) main().catch(e => { console.error(e.stack || e); process.exit(1); });

@@ -8,6 +8,7 @@ Converts **scanned sheet music** (image-only PDFs, PNG or JPG) into **MusicXML 4
 
 - **Live app:** https://pension-plan.github.io/score-scan-reader/app/
 - **Build log, plan, research and accuracy tracker:** https://pension-plan.github.io/score-scan-reader/status/
+- **Build timeline (AEDT):** [docs/TIMELINE.md](docs/TIMELINE.md), also at https://pension-plan.github.io/score-scan-reader/docs/TIMELINE.html
 - **Software design document:** https://pension-plan.github.io/score-scan-reader/docs/SDD.html (source: [docs/SDD.md](docs/SDD.md))
 
 All three are deployed to GitHub Pages from this repository on every push to `main` (`.github/workflows/pages.yml`).
