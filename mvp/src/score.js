@@ -4,6 +4,9 @@
 const { staffMeasureEvents, pitchOf, keyAlters, DIV } = require('./assemble');
 const { detectRests, mergeRests, restBars } = require('./rests');
 const { readMeters } = require('./meter');
+const { readStructure } = require('./structure');
+const { readArticulations, readDoubleDots } = require('./artic');
+const { readOttavas } = require('./ottava');
 const { pageMarks } = require('./symbols');
 const { instrumentXML, soundDynamics, tempoFromWords } = require('./playback');
 
@@ -651,7 +654,15 @@ function restsFor(q) {
 function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   const warnings = [];
   // time signatures on every system, after barlines and at system ends (meter.js; once per page)
-  for (const p of pages) if (p.asm && !p.asm.metersRead) { try { readMeters(p.fr, p.asm); } catch (e) { /* the piece's one meter */ } p.asm.metersRead = true; }
+  // and barline kinds, repeats and volta brackets (structure.js)
+  for (const p of pages) if (p.asm && !p.asm.metersRead) {
+    try { readMeters(p.fr, p.asm); } catch (e) { /* the piece's one meter */ }
+    try { readStructure(p.fr, p.asm); } catch (e) { /* plain barlines */ }
+    try { readArticulations(p.fr, p.asm); } catch (e) { /* no articulations */ }
+    try { readDoubleDots(p.fr, p.asm); } catch (e) { /* single dots */ }
+    try { readOttavas(p.fr, p.asm); } catch (e) { /* no octave lines */ }
+    p.asm.metersRead = true;
+  }
   const systems = pages.flatMap(p => p.asm.systems.map(s => ({ ...s, fr: p.fr, comps: p.asm.comps })));
   if (!systems.length) return { parts: [], measures: 0, warnings: ['No music systems found.'], xml: emptyXML() };
   // marks first (text.js via symbols.js): braces inform the layout
@@ -1052,6 +1063,8 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     const barRests = byPart.flatMap(sts => sts.flatMap(st => st.events));
     if (barRests.length && barRests.every(e => e.bar)) {
       const n = Math.max(...barRests.map(e => restBars(e, mLen)));
+      // written as one multi-bar rest (<multiple-rest>) over the n bars
+      if (n > 1) units[units.length - 1].multi = n;
       for (let k = 1; k < n; k++) units.push({ m, streams: byPart.map(sts => sts.map(st => ({ staff: st.staff, events: [] }))), split: false, time: uTime });
     }
   });
@@ -1115,8 +1128,62 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   let read = { dirs: parts.map(() => units.map(() => [])), head: {}, nDyn: 0, nWedge: 0, nWords: 0 };
   try { read = readMarks(pages, segs, units, parts, partMeasures); } catch (e) { warnings.push(`Text and dynamics not placed (${e.message}).`); }
   if (read.nDyn || read.nWedge || read.nWords || read.nTie || read.nSlur || read.nGrace || read.nFermata) warnings.push(`Read from the page: ${[read.nDyn && `${read.nDyn} dynamic${read.nDyn > 1 ? 's' : ''}`, read.nWedge && `${read.nWedge} hairpin${read.nWedge > 1 ? 's' : ''}`, read.nWords && `${read.nWords} tempo / expression text${read.nWords > 1 ? 's' : ''}`, read.nTie && `${read.nTie} tie${read.nTie > 1 ? 's' : ''}`, read.nSlur && `${read.nSlur} slur${read.nSlur > 1 ? 's' : ''}`, read.nGrace && `${read.nGrace} grace note${read.nGrace > 1 ? 's' : ''}`, read.nFermata && `${read.nFermata} fermata${read.nFermata > 1 ? 's' : ''}`].filter(Boolean).join(', ')}.`);
-  const unitTime = units.map(u => u.time);
-  const xml = toMusicXML({ parts, partMeasures, fifths, kAlt, time, unitTime, clefs, measures, credits, unitSys, title: read.head.title, head: read.head, dirs: read.dirs });
+  const unitTime = units.map(u => u.time), unitMulti = units.map(u => u.multi || 0);
+  // barlines, repeats and voltas read on the page (structure.js: sy.bars, sy.voltas) at the ends of
+  // each bar: {left, right} with {style, repeat, ending: {n, type}}
+  const unitBars = units.map(() => ({}));
+  try {
+    const spOf = (sy) => (sy.staves[0] && sy.staves[0].st.space) || 16;
+    const barAt = (sy, x, tol) => (sy.bars || []).filter(b => Math.abs(b.x - x) <= tol).sort((a, b) => Math.abs(a.x - x) - Math.abs(b.x - x))[0];
+    const sysEnd = (si) => si + 1 >= segs.length || segs[si + 1].sy !== segs[si].sy;
+    const firstOf = (i) => i === 0 || units[i - 1].m !== units[i].m, lastOf = (i) => i === units.length - 1 || units[i + 1].m !== units[i].m;
+    units.forEach((u, i) => {
+      if (firstOf(i)) {
+        const sg = segs[u.m.segs[0]], b = barAt(sg.sy, sg.xa, spOf(sg.sy));
+        if (b && (b.kind === 'repeat-start' || b.kind === 'repeat-both')) unitBars[i].left = { style: 'heavy-light', repeat: 'forward' };
+      }
+      if (lastOf(i)) {
+        const li = u.m.segs[u.m.segs.length - 1], sg = segs[li], b = barAt(sg.sy, sg.xb, (sysEnd(li) ? 1.5 : 1) * spOf(sg.sy));
+        if (b && (b.kind === 'repeat-end' || b.kind === 'repeat-both')) unitBars[i].right = { style: 'light-heavy', repeat: 'backward' };
+        else if (b && b.kind === 'final') unitBars[i].right = { style: 'light-heavy' };
+        else if (b && b.kind === 'double') unitBars[i].right = { style: 'light-light' };
+      }
+    });
+    // voltas: the bars under each bracket; a bracket left open at a system end runs on in the
+    // next system's bracket that starts without a hook. Numbered 1, 2, 3 ... along a run of
+    // brackets that follow on from each other
+    const sysOrder = [...new Set(segs.map(sg => sg.sy))];
+    const vs = [];
+    sysOrder.forEach((sy, k) => (sy.voltas || []).forEach(v => {
+      const sp = spOf(sy);
+      const idx = units.map((u, i) => i).filter(i => units[i].m.segs.some(si => segs[si].sy === sy && segs[si].xa >= v.x0 - 1.5 * sp && segs[si].xb <= v.x1 + 1.5 * sp));
+      if (!idx.length) return;
+      const prev = vs[vs.length - 1];
+      if (v.cont && prev && prev.open && prev.k === k - 1) { prev.b = idx[idx.length - 1]; prev.open = v.open; prev.k = k; return; }
+      if (v.cont) return;
+      vs.push({ a: idx[0], b: idx[idx.length - 1], open: v.open, k });
+    }));
+    let n = 0;
+    vs.forEach((v, j) => {
+      n = j > 0 && vs[j - 1].b === v.a - 1 ? n + 1 : 1;
+      (unitBars[v.a].left ||= {}).ending = { n, type: 'start' };
+      (unitBars[v.b].right ||= {}).ending = { n, type: v.open ? 'discontinue' : 'stop' };
+    });
+    // segno and coda signs: a direction at the start of the bar they stand over (the first part)
+    if (read.dirs && read.dirs[0]) sysOrder.forEach(sy => (sy.signs || []).forEach(g => {
+      // (a sign over a barline belongs to the bar after it)
+      const sp = spOf(sy), si = segs.findIndex(sg => sg.sy === sy && g.x >= sg.xa - 1.5 * sp && g.x < sg.xb - 1.5 * sp);
+      const sj = si >= 0 ? si : segs.map((sg, i) => (sg.sy === sy ? i : -1)).filter(i => i >= 0).pop();
+      const ui = sj == null ? -1 : units.findIndex(u => u.m.segs.includes(sj));
+      if (ui < 0 || !read.dirs[0][ui]) return;
+      read.dirs[0][ui].unshift({ t: 0, staffNo: 0, xml: `<direction placement="above"><direction-type><${g.kind}/></direction-type>`, tail: `<sound ${g.kind}="${g.kind}"/>` });
+    }));
+  } catch (e) { warnings.push(`Repeats and voltas not placed (${e.message}).`); }
+  {
+    const nRep = unitBars.filter(b => b.right && b.right.repeat).length, nVol = unitBars.filter(b => b.left && b.left.ending).length;
+    if (nRep || nVol) warnings.push(`Read from the page: ${[nRep && `${nRep} repeat sign${nRep > 1 ? 's' : ''}`, nVol && `${nVol} volta bracket${nVol > 1 ? 's' : ''}`].filter(Boolean).join(', ')}.`);
+  }
+  const xml = toMusicXML({ parts, partMeasures, fifths, kAlt, time, unitTime, unitBars, unitMulti, clefs, measures, credits, unitSys, title: read.head.title, head: read.head, dirs: read.dirs });
   const nNotes = partMeasures.map(pm => pm.reduce((a, m) => a + m.reduce((b, s) => b + s.events.filter(e => !e.rest && !e.forward).length, 0), 0));
   const ranges = partMeasures.map(pm => {
     let lo = null, hi = null;
@@ -1422,6 +1489,16 @@ function abbrevOf(text, name) {
 }
 // tempo / expression text worth writing: known terms, or confident words
 const TERMS = /^(tempo|a tempo|allegr|andant|adagi|larg|lent|prest|vivac|modera|grave|maestos|marcia|rubato|cresc|decresc|dim|rit|rall|accel|poco|più|piu|meno|molto|sempre|subito|dolce|espr|legato|leggiero|stacc|sost|smorz|morendo|cantabile|con |senza|simile|pizz|arco|fine|d\.\s?c|d\.\s?s|da capo|dal segno|to coda|not |slow|fast|lively|moderately|brightly|gently|with |langsam|schnell|mässig|ruhig|bewegt|lebhaft|sehr |nicht |innig|zart)/i;
+// the <sound> of a jump word: D.C. / D.S. (al Fine / al Coda), Fine, To Coda
+function jumpSound(text) {
+  const w = String(text || '').trim();
+  if (/^d\.?\s*c\.?(\s|$|al)/i.test(w) || /da capo/i.test(w)) return '<sound dacapo="yes"/>';
+  if (/^d\.?\s*s\.?(\s|$|al)/i.test(w) || /dal segno/i.test(w)) return '<sound dalsegno="segno"/>';
+  if (/^fine\.?$/i.test(w)) return '<sound fine="yes"/>';
+  if (/^to\s+coda/i.test(w)) return '<sound tocoda="coda"/>';
+  return '';
+}
+
 function wordsOk(t) {
   const s = t.text.trim();
   if (TERMS.test(s)) return true;
@@ -1508,7 +1585,9 @@ function readMarks(pages, segs, units, parts, partMeasures) {
         const bold = t.role === 'tempo' ? ' font-weight="bold"' : '';
         // a tempo word alone: its usual tempo for players (playback.js table)
         const q = t.role === 'tempo' ? tempoFromWords(t.text) : 0;
-        if (place(t, t.box[0], (pl) => `<direction placement="${pl}"><direction-type><words${bold}>${esc(t.text)}</words></direction-type>`, q ? `<sound tempo="${q}"/>` : '')) nWords++;
+        // jumps (D.C., D.S., Fine, To Coda) also as <sound> for players
+        const jump = jumpSound(t.text);
+        if (place(t, t.box[0], (pl) => `<direction placement="${pl}"><direction-type><words${bold}>${esc(t.text)}</words></direction-type>`, q ? `<sound tempo="${q}"/>` : jump)) nWords++;
       } else if ((pg.index || 0) < 1 && ['title', 'subtitle', 'composer', 'lyricist', 'arranger', 'copyright'].includes(t.role)) {
         // a credit is words: OCR of a smudge or a stray glyph is not
         const key = t.role === 'copyright' ? 'rights' : t.role;
@@ -1690,7 +1769,13 @@ function readMarks(pages, segs, units, parts, partMeasures) {
   return { dirs, head, nDyn, nWedge, nWords, nTie, nSlur, nGrace, nFermata };
 }
 
-function toMusicXML({ parts, partMeasures, fifths, kAlt, time, unitTime, clefs, title, credits, unitSys, head, dirs }) {
+// a <barline> at one end of a bar (buildScore: unitBars)
+function barlineXML(loc, b) {
+  if (!b || (!b.style && !b.repeat && !b.ending)) return '';
+  return `      <barline location="${loc}">${b.style ? `<bar-style>${b.style}</bar-style>` : ''}${b.ending ? `<ending number="${b.ending.n}" type="${b.ending.type}"/>` : ''}${b.repeat ? `<repeat direction="${b.repeat}"/>` : ''}</barline>`;
+}
+
+function toMusicXML({ parts, partMeasures, fifths, kAlt, time, unitTime, unitBars, unitMulti, clefs, title, credits, unitSys, head, dirs }) {
   // each system's own clef where it was read (a staff can change clef from
   // one system to the next), else the clef most systems show. A clef read on
   // one system only is more often a misread (or a header clef cancelled at
@@ -1829,6 +1914,9 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, unitTime, clefs, 
     const nStaves = p.src.length;
     const multi = nStaves > 1;
     const curClef = [];
+    // octave line in force per staff of the part (ottava.js), written by the first voice on it
+    const ottCur = [];
+    const ottXML = (k, si, stop) => `      <direction placement="${k > 0 ? 'above' : 'below'}"><direction-type><octave-shift type="${stop ? 'stop' : k > 0 ? 'down' : 'up'}" size="${Math.abs(k) === 2 ? 15 : 8}" number="1"/></direction-type>${multi ? `<staff>${si + 1}</staff>` : ''}</direction>`;
     let curKey = fifths, curTime = null;
     // clef / key in force at a stream's first note: a change read inside a
     // staff (h.clef / h.fifths from assemble.js) carries on into later bars
@@ -1839,12 +1927,14 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, unitTime, clefs, 
       // the meter of each bar (buildScore: read changes of time signature), written where it changes
       const tm = (unitTime && unitTime[mi]) || time;
       const timeXML = `<time${tm.symbol ? ` symbol="${tm.symbol}"` : ''}><beats>${tm.beats}</beats><beat-type>${tm.type}</beat-type></time>`;
+      // a multi-bar rest starting here (its bars follow as bars of rest)
+      const mrest = unitMulti && unitMulti[mi] > 1 ? `<measure-style><multiple-rest>${unitMulti[mi]}</multiple-rest></measure-style>` : '';
       if (mi === 0) {
         const fh0 = streams.map(firstHead).find(Boolean);
         curKey = fh0 && fh0.fifths != null ? fh0.fifths : keyAt(0);
         curTime = timeXML;
         L.push(`      <attributes><divisions>${DIV}</divisions><key><fifths>${curKey}</fifths></key>${timeXML}` +
-          (multi ? `<staves>${nStaves}</staves>${p.src.map((s, k) => clefXML(clefAt(0, s.staff), k + 1)).join('')}` : clefXML(clefAt(0, p.src[0].staff))) + '</attributes>');
+          (multi ? `<staves>${nStaves}</staves>${p.src.map((s, k) => clefXML(clefAt(0, s.staff), k + 1)).join('')}` : clefXML(clefAt(0, p.src[0].staff))) + mrest + '</attributes>');
         p.src.forEach((s, k) => { curClef[k] = clefAt(0, s.staff); });
       } else {
         const ch = [];
@@ -1857,8 +1947,11 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, unitTime, clefs, 
           const c = (h0 && h0.clef) || clefAt(mi, s.staff);
           if (c !== curClef[k]) { ch.push(clefXML(c, multi ? k + 1 : 0)); curClef[k] = c; }
         });
+        if (mrest) ch.push(mrest);
         if (ch.length) L.push(`      <attributes>${ch.join('')}</attributes>`);
       }
+      const ub = (unitBars && unitBars[mi]) || {};
+      if (ub.left) L.push(barlineXML('left', ub.left));
       // streams in staff then voice order; an empty optional voice is left
       // out; <backup> returns to the bar start after each written voice
       const ps = p.streams || p.src.map((s, k) => ({ ...s, staffNo: k + 1, vno: multi ? 1 + 4 * k : 1 }));
@@ -1869,8 +1962,11 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, unitTime, clefs, 
       // before the note they stand at (an offset when they fall inside it)
       const pend = ((dirs && dirs[pi] && dirs[pi][mi]) || []).slice();
       const dirXML = (d, off) => `      ${d.xml}${off ? `<offset>${off}</offset>` : ''}${d.staffNo ? `<staff>${d.staffNo}</staff>` : ''}${d.tail || ''}</direction>`;
+      const ottSeen = new Set();
       order.forEach((k, oi) => {
         const s = streams[k], si = ps[k].staffNo - 1;
+        const ottFirst = !ottSeen.has(si);
+        ottSeen.add(si);
         if (pos > 0) L.push(`      <backup><duration>${pos}</duration></backup>`);
         pos = s.events.reduce((a, e) => a + Math.max(1, Math.round(e.q * DIV)), 0);
         let dt = 0;
@@ -1883,8 +1979,26 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, unitTime, clefs, 
         let et = 0;
         const voice = ps[k].vno;
         const staffTag = multi ? `<staff>${si + 1}</staff>` : '';
+        // beams read on the page (assemble.js: h.beam, one id per beam group): begin / continue /
+        // end along the notes of this voice that share a group
+        const bid = s.events.map(e => (!e.rest && !e.forward && e.heads && e.heads[0].beam && e.q < 1 - 1e-6 ? e.heads[0].beam : 0));
+        const beamOf = bid.map((b, i) => {
+          if (!b) return '';
+          const p = i > 0 && bid[i - 1] === b, n = i + 1 < bid.length && bid[i + 1] === b;
+          return p && n ? 'continue' : n ? 'begin' : p ? 'end' : '';
+        });
+        let ei = -1;
         for (const e of s.events) {
+          ei++;
           if (flush) flush(e);
+          if (ottFirst && !e.rest && !e.forward && e.heads && e.heads.length) {
+            const ko = e.heads[0].ott || 0;
+            if (ko !== (ottCur[si] || 0)) {
+              if (ottCur[si]) L.push(ottXML(ottCur[si], si, true));
+              if (ko) L.push(ottXML(ko, si, false));
+              ottCur[si] = ko;
+            }
+          }
           const t0 = et;
           et += e.q;
           const dur = Math.max(1, Math.round(e.q * DIV));
@@ -1919,7 +2033,9 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, unitTime, clefs, 
             const pk = pitchOf(hClef, pos, hAlt, {}), kk = pk.step + pk.octave;
             let alt = null;
             for (const a of line) { if (a.t > t0 + 1e-6) break; if (a.k === kk) alt = a.a; }
-            const pt = pitchOf(hClef, pos, hAlt, alt == null ? {} : { [kk]: alt });
+            const pw = pitchOf(hClef, pos, hAlt, alt == null ? {} : { [kk]: alt });
+            // under an octave line (ottava.js: h.ott) the note sounds 1 or 2 octaves away
+            const pt = h.ott && pw.octave + h.ott >= 0 && pw.octave + h.ott <= 9 ? { ...pw, octave: pw.octave + h.ott, d: pw.d + 7 * h.ott } : pw;
             h.pitch = pt;
             // (overlay only: the value written for this head, first part that writes it)
             h.shown ||= { q: e.q, type: tt ? tt.type : null, dots: tt ? tt.dots : 0, tuplet: tmod ? tu.actual : 0 };
@@ -1931,7 +2047,11 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, unitTime, clefs, 
             const tie = (tStop ? '<tie type="stop"/>' : '') + (tStart ? '<tie type="start"/>' : '');
             const slurs = hi === 0 ? (e.heads.some(x => x.slurOff) ? '<slur type="stop" number="1"/>' : '') + (e.heads.some(x => x.slurOn) ? '<slur type="start" number="1"/>' : '') : '';
             const ferm = hi === 0 && e.fermata ? `<fermata type="${e.fermata}"/>` : '';
-            const tied = tStop || tStart || slurs || ferm ? `<notations>${tStop ? '<tied type="stop"/>' : ''}${tStart ? '<tied type="start"/>' : ''}${slurs}${ferm}</notations>` : '';
+            // articulations read over / under the chord (artic.js: h.artic), on the first note of a
+            // chord and not again on the continuation of a note tied over a barline
+            const ar = hi === 0 && !e.tieStop ? (e.heads.find(x => x.artic) || {}).artic : null;
+            const artic = ar && ar.length ? `<articulations>${ar.map(k => (k === 'marcato' ? '<strong-accent type="up"/>' : `<${k}/>`)).join('')}</articulations>` : '';
+            const tied = tStop || tStart || slurs || ferm || artic ? `<notations>${tStop ? '<tied type="stop"/>' : ''}${tStart ? '<tied type="start"/>' : ''}${slurs}${artic}${ferm}</notations>` : '';
             // a head with both stems: up in the upper voice, down in the lower
             const sd = h.stemDir === 2 ? (e.low ? -1 : 1) : h.stemDir;
             const stem = sd === 1 ? '<stem>up</stem>' : sd === -1 ? '<stem>down</stem>' : '';
@@ -1947,7 +2067,7 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, unitTime, clefs, 
               }
             }
             L.push(`      <note>${hi > 0 ? '<chord/>' : ''}<pitch><step>${pt.step}</step>${pt.alter ? `<alter>${pt.alter}</alter>` : ''}<octave>${pt.octave}</octave></pitch>` +
-              `<duration>${dur}</duration>${tie}<voice>${voice}</voice>${typeXML}${acc}${tmod}${stem}${staffTag}${tied}${lyr}</note>`);
+              `<duration>${dur}</duration>${tie}<voice>${voice}</voice>${typeXML}${acc}${tmod}${stem}${staffTag}${beamOf[ei] ? `<beam number="1">${beamOf[ei]}</beam>` : ''}${tied}${lyr}</note>`);
           });
         }
       });
@@ -1956,7 +2076,9 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, unitTime, clefs, 
         const cur = order.length ? pos / DIV : 0;
         for (const d of pend) L.push(dirXML(d, Math.round((d.t - cur) * DIV)));
       }
-      if (mi === partMeasures[pi].length - 1) L.push('      <barline location="right"><bar-style>light-heavy</bar-style></barline>');
+      if (mi === partMeasures[pi].length - 1) ottCur.forEach((k, si) => { if (k) L.push(ottXML(k, si, true)); });
+      if (mi === partMeasures[pi].length - 1) L.push(barlineXML('right', { ...ub.right, style: 'light-heavy' }));
+      else if (ub.right) L.push(barlineXML('right', ub.right));
       L.push('    </measure>');
     });
     L.push('  </part>');

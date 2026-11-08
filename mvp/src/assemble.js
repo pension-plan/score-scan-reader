@@ -1070,6 +1070,7 @@ function stemsUnder(R, beamY, dir, xa, xb, sp) {
 // Beamed groups of a staff: stems whose tips touch one component (the beam).
 // A stem inside a group's span that ends at its beam but read no beam (cut
 // stem, faint beam) is a beamed note too: its value is read again at the beam.
+let BEAM_ID = 0;
 function beamGroups(R, labels, s, sp, cap, compById) {
   const W = R.width;
   const items = [];
@@ -1118,6 +1119,8 @@ function beamGroups(R, labels, s, sp, cap, compById) {
     g.forEach(it => inGroup.add(it));
     groups.push(g);
   }
+  // each beamed head carries its group's id (toMusicXML writes <beam> from it)
+  for (const g of groups) { const id = ++BEAM_ID; for (const it of g) for (const h of it.heads) h.beam = id; }
   for (const g of groups) {
     // the beam's edge through the stem tips (extended along the end slopes)
     g.beamY = (x) => {
