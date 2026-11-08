@@ -1,7 +1,7 @@
 // Summarise data/classical/*.jsonl: per family and variant, micro precision / recall of the classical reading.
 'use strict';
 const fs = require('fs'), path = require('path');
-const D = path.join(__dirname, '../data/classical');
+const D = process.env.CDIR || path.join(__dirname, '../data/classical');
 const rows = [];
 for (const f of fs.readdirSync(D)) for (const l of fs.readFileSync(path.join(D, f), 'utf8').split('\n')) if (l) rows.push({ ...JSON.parse(l), key: f });
 const res = {};

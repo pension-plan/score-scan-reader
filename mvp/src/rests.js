@@ -1,4 +1,5 @@
 'use strict';
+const { readRestGlyph } = require('./cv');
 // Rest glyphs on a staff, read from the staff-removed page R and its
 // connected components (the note detector does not report rests).
 //
@@ -215,7 +216,14 @@ function detectRests({ R, comps, s, xa, xb, debug }) {
     const on = heads.filter(hd => hd.x + 0.6 * sp >= c.x0 && hd.x - 0.6 * sp <= c.x1 && hd.y + 0.5 * sp >= c.y0 && hd.y - 0.5 * sp <= c.y1);
     let onHead = null;
     // (a whole / half rest is a solid rectangle; a notehead an oval)
+    let tpl = null;
     if (on.length && block && on.length === 1 && f.fill >= 0.92 && f.h <= 0.85) onHead = on[0];
+    // a 16th / 32nd / 64th rest's hooks also pass for a head: a tall glyph with one head on it is a
+    // rest when its template says so clearly (src/cv.js); the head is then dropped (mergeRests)
+    else if (on.length === 1 && f.h > 2.6 && f.h <= 5.4 && f.w <= 1.9) {
+      tpl = readRestGlyph(R, c, sp);
+      if (tpl && /^flag[234]$/.test(tpl.kind)) onHead = on[0]; else continue;
+    }
     else if (on.length) {
       if (on.length > 1 || f.h < 1.4 || f.h > 2.6 || f.w > 1.5 || on[0].y > c.y0 + 0.9 * sp) continue;
       const sh = strokeShape(rowProfile(R, c), sp);
@@ -256,6 +264,13 @@ function detectRests({ R, comps, s, xa, xb, debug }) {
       }
     }
     if (debug) debug('cand', Math.round(f.xc), Math.round(c.y0), 'w', f.w.toFixed(2), 'h', f.h.toFixed(2), 'top', f.top.toFixed(2), 'fill', f.fill.toFixed(2), '->', kind);
+    // the template reader (src/cv.js) for a glyph left unclassified on the staff, not on a head
+    if (!kind && (!on.length || tpl) && f.h >= 1.0 && f.h <= 5.4 && f.w >= 0.4 && f.w <= 1.9) {
+      // (an arpeggio's wavy line, tall and thin, stands just left of its chord: not a rest)
+      const besideChord = heads.some(hd => hd.x - c.x1 >= -0.2 * sp && hd.x - c.x1 <= 2 * sp && hd.y >= c.y0 - 0.3 * sp && hd.y <= c.y1 + 0.3 * sp);
+      const t = tpl || (besideChord ? null : readRestGlyph(R, c, sp));
+      if (t) { kind = t.kind; q = t.q; }
+    }
     if (!kind) continue;
     // a block rest stands clear of other symbols (a detached flag, a clef or
     // a beam fragment does not); dots aside

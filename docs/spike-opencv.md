@@ -2,6 +2,26 @@
 
 Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
 
+## Update: rests from templates (L3a)
+
+Glyph-level (truth rest boxes, current code): 32nd rests were found 22 / 15 / 3 times of 22 / 22 / 17 (clean / scan /
+severe), 64th 7 / 1 / 0 of 10, quarter rests on severe scans 76 of 129: misses, not confusions. Two causes:
+- a 16th / 32nd / 64th rest's hooks pass for a notehead, so the tall glyph had a "head" on it and was skipped as part
+  of a note (and the head became a false note);
+- glyphs the shape rules could not classify were dropped.
+`rests.js` now asks `cv.js` `readRestGlyph` (Bravura quarter–64th rest templates against heads, flags, single
+accidentals, digits, dynamics letters and an F clef; score ≥ 0.62 and 0.08 above every other glyph) in both cases: a
+tall glyph with one head on it becomes a 16th–64th rest when the template says so (the head is dropped by
+`mergeRests`), and an unclassified glyph becomes a rest unless it stands just left of a chord (an arpeggio's wavy
+line matched a quarter rest: `mk04` lost 0.048 before that rule). Glyph-level after: 32nd 22 / 18 / 7 of 22 / 22 / 17,
+64th 10 / 5 / 3 of 10, 16th severe 81 → 94 %, quarter severe 60 → 67 %.
+
+Coverage per tag (no OCR, clean / scan / severe): `rest-32nd` 97 / 40 / 21 → **102 / 80 / 57** of 102, `rest-64th`
+12 / 4 / 0 → **24 / 11 / 4** of 30, `rest-quarter` +3 / +2 / +11, `rest-16th` +1 / +2 / +7, `note-32nd` +22 / +47 / +15,
+`note-quarter` −8 / −11 / +63; false notes in bars with 32nd / 64th rests 88 → 78 / 63 → 56 (clean). Aggregates: coverage
+0.8032 → 0.8036 (rests +0.0078; largest drop −0.0012), challenge 0.8313 → 0.8314 (rests +0.0071; largest drop
+−0.0006), benchmark with OCR 0.951 = 0.951 (one item −0.0003).
+
 ## Update: beam pieces taken for heads (L23, part 4)
 
 The false notes in bars with dotted rhythms (`dot` "confused" in the matrix) were not dots: on `nt02-dots` the extra

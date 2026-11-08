@@ -9,7 +9,7 @@
 // time: header time signature; digits are never read (only C / cut set beats)
 'use strict';
 const fs = require('fs'), path = require('path');
-const SRC = path.join(__dirname, '../src-snap');
+const SRC = process.env.SRC || path.join(__dirname, '../src-snap');
 const { readGray } = require(path.join(SRC, 'image.js'));
 const { front } = require(path.join(SRC, 'front.js'));
 const { assemblePage, _classifyAccidental } = require(path.join(SRC, 'assemble.js'));
@@ -73,6 +73,6 @@ for (const variant of ['clean', 'scan', 'scan-severe']) for (const p of pages) {
     out.push({ variant, page: p, fam: 'time', lab: m ? `${m[1]}/${m[2]}` : '?', style: o.attrs.style || '', found, pred: read });
   }
 }
-fs.mkdirSync(path.join(__dirname, '../data/classical'), { recursive: true });
-fs.writeFileSync(path.join(__dirname, '../data/classical', key + '.jsonl'), out.map(o => JSON.stringify(o)).join('\n') + '\n');
+const OUT = process.env.CDIR || path.join(__dirname, '../data/classical'); fs.mkdirSync(OUT, { recursive: true });
+fs.writeFileSync(path.join(OUT, key + '.jsonl'), out.map(o => JSON.stringify(o)).join('\n') + '\n');
 console.log(key, out.length);
