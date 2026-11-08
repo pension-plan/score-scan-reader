@@ -1175,12 +1175,15 @@ staff, its pitch from its staff position. Coverage recall (clean / scan / severe
 notes on scans are mostly missed: the head detector takes their heads as normal notes (they are then
 explained ink); see `opts.graceHeads` below.
 
-**Grace heads the head finder took as notes** (`opts.graceHeads`, off): filled heads clearly narrower
+**Grace heads the head finder took as notes** (`opts.graceHeads`, on by default since it passes `tools/regress.mjs`): filled heads clearly narrower
 than the page's heads (width / staff space at most min(1.0, 0.8 x the upper quartile), short values)
 leave the bar's count and become grace notes before the next note. Coverage grace recall rises to
 17 / 37 / 49% (clean / scan / severe) and nt07-grace-notes scan pitch 0.57 to 0.92, benchmark aggregate
 0.9499 to 0.9509 and challenge 0.8278 to 0.8283, but per item it moves both ways (challenge: 38 items only
-better, 42 with some metric worse, e.g. trio-minuet scan-mild pitch -0.05), so it is off by default.
+better, 42 with some metric worse, e.g. trio-minuet scan-mild pitch -0.05). Regress gate (latest tag):
+benchmark 0.950 -> 0.951, challenge 0.829 -> 0.831, no item down more than 0.05; coverage 0.8961 -> 0.8982
+(71 items up, 10 down, the largest pitch-cov-keys-minor-sharps scan-severe -0.025). Limit: rst01-rest-values
+clean loses rests 0.092 and duration 0.055 (a small rest glyph or short note read as a grace head).
 
 **Metronome marks** ("Vivace ♩ = 144", "(♩. = 60)"): a small note glyph above a staff (a stem at
 least 1.4 staff spaces, a head 0.75-1.8 spaces wide at its foot; hollow = half, one or two flags = eighth

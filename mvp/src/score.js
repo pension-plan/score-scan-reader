@@ -703,9 +703,9 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   // grace notes the head finder took as notes: filled heads clearly narrower
   // than the page's heads (upper quartile; about 0.9 staff space against 1.2-1.3), short
   // values, leave the bar's count and go before the next note (e.graces)
-  // Off unless opts.graceHeads: per item it moves pitch and duration both
-  // ways (coverage nt07 scan pitch +0.35, trio-minuet scan-mild -0.05)
-  if (opts.graceHeads) {
+  // On unless opts.graceHeads === false (it passes regress.mjs: benchmark 0.950 ->
+  // 0.951, challenge 0.829 -> 0.831; a few items dip, e.g. rst01 rests)
+  if (opts.graceHeads !== false) {
     const ratio = new Map();
     const pageRatio = (fr) => {
       if (!ratio.has(fr)) {
