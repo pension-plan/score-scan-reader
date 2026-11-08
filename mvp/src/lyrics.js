@@ -899,7 +899,8 @@ function labelLines(fr, sysIdx) {
   const { labels, comps } = labelComponents(band);
   const cs = comps.filter(c => {
     const h = c.y1 - c.y0 + 1, w = c.x1 - c.x0 + 1;
-    return h >= 0.35 * sp && h <= 2.5 * sp && w <= 4 * sp && c.area >= 4 && c.x1 < bw - 1 && c.y0 > 0 && c.y1 < bh - 1;
+    // (a whole word can be one component: letters touch in bold type and on scans)
+    return h >= 0.35 * sp && h <= 2.5 * sp && w <= 16 * sp && w <= 8 * h && c.area >= 4 && c.x1 < bw - 1 && c.y0 > 0 && c.y1 < bh - 1;
   }).sort((a, b) => (a.y0 + a.y1) - (b.y0 + b.y1));
   // single-linkage grouping: same text row (vertical overlap) and close (word gaps)
   const par = cs.map((_, i) => i);
@@ -1393,4 +1394,4 @@ const OCR_CONFIG = {
   params: { tessedit_pageseg_mode: '7', user_defined_dpi: '300' },
 };
 
-module.exports = { _accentMarks: accentMarks, OCR_CONFIG, readLyrics, readPartLabels, readStanzas, syllabify, findTextLines, findTextLinesCC, toSyllables, splitSyllable, vowelGroups, detectLang, cropGray, DEFAULTS, _analyseRow: analyseRow };
+module.exports = { _labelLines: labelLines, _accentMarks: accentMarks, OCR_CONFIG, readLyrics, readPartLabels, readStanzas, syllabify, findTextLines, findTextLinesCC, toSyllables, splitSyllable, vowelGroups, detectLang, cropGray, DEFAULTS, _analyseRow: analyseRow };

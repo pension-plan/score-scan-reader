@@ -1359,8 +1359,15 @@ passes on benchmark (0.951) and challenge (0.831).
 - The coverage/marks generator (msynth) gained `pedal_style='bracket'` (truth: `change` for a release and
   press on one note) and `mark_format` (box-letters, box-numbers, circle-numbers); count.py counts a
   change as a press and a release.
+- "D.S. al Coda" / "D.C. al Fine" whose D.S. / D.C. was taken for other ink (the S as a segno) and left
+  out of the line: a line reading "al Coda" / "al Fine" is read again with five letter-heights of room to
+  its left, and written as "D.S. al Coda" (structure's `<sound dalsegno>` follows from the words).
+- Part labels left of the first system: a whole word may be one component (bold type, scans), so label
+  components up to 16 staff spaces wide are kept (the trio items' "Violin", "Violoncello", "Piano" read).
+- The text OCR of a page plans its reads in order, starts them together on the reader pool and applies
+  them in order (perf's patch; output identical).
 Not done: rehearsal letters by shape (only order-based letters without OCR), chord symbols by shape,
-words OCR merges without a hyphen ("lonssans").
+words OCR merges without a hyphen ("lonssans", "noble", "Andring").
 
 **Overlay colours.** Text `--ov-text` #5e35b1, bar numbers `--ov-barno` #263238, dynamics and hairpins
 `--ov-dyn` #0277bd, slurs / ties / fermatas `--ov-slur` #f06292, braces and brackets `--ov-brace`

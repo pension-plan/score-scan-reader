@@ -833,6 +833,11 @@ async function readPageText(fr, marks, ocr, opts = {}) {
   const seenAbbr = new Set();
   // chord symbols are many short words: their own budget
   let n = 0, nc = 0;
+  // the reads are planned in order (the line budget counts reads, not their results), started
+  // together (a pool of OCR workers reads them side by side; results do not depend on the order
+  // of reads) and applied in order
+  const jobs = [];
+  const read = (img) => { let p; try { p = img ? Promise.resolve(ocr(img)).catch(() => []) : Promise.resolve([]); } catch (e) { p = Promise.resolve([]); } return p; };
   for (const t of todo) {
     if (t.chordCand ? nc >= (opts.maxChords || 48) : n >= maxLines) continue;
     if (t.chordCand) nc++;
@@ -841,21 +846,21 @@ async function readPageText(fr, marks, ocr, opts = {}) {
     // and the number when its shapes did not read
     if (t.metro) {
       if (t.ocrBox) {
-        const wi = lineCrop(fr, t.ocrBox, t.h);
-        let ws = [];
-        try { ws = wi ? await ocr(wi) : []; } catch (e) { ws = []; }
+        const ws = read(lineCrop(fr, t.ocrBox, t.h));
         n++;
-        const ok = ws.filter(w => w.conf >= 30 && /\p{L}/u.test(w.text));
-        t.text = ok.map(w => w.text).join(' ').replace(/^[^\p{L}]+|[^\p{L}.]+$/gu, '').replace(/\s+/g, ' ').trim();
-        t.conf = ok.length ? Math.round(ok.reduce((a, w) => a + w.conf, 0) / ok.length) : 0;
+        jobs.push(async () => {
+          const ok = (await ws).filter(w => w.conf >= 30 && /\p{L}/u.test(w.text));
+          t.text = ok.map(w => w.text).join(' ').replace(/^[^\p{L}]+|[^\p{L}.]+$/gu, '').replace(/\s+/g, ' ').trim();
+          t.conf = ok.length ? Math.round(ok.reduce((a, w) => a + w.conf, 0) / ok.length) : 0;
+        });
       }
       if (!t.metro.bpm && t.metro.numBox) {
-        const ni = lineCrop(fr, t.metro.numBox, t.metro.numBox[3] - t.metro.numBox[1]);
-        let ws = [];
-        try { ws = ni ? await ocr(ni) : []; } catch (e) { ws = []; }
+        const ws = read(lineCrop(fr, t.metro.numBox, t.metro.numBox[3] - t.metro.numBox[1]));
         n++;
-        const num = +(ws.map(w => w.text).join('').replace(/[^0-9]/g, '')) || 0;
-        if (num >= 20 && num <= 400) t.metro.bpm = num;
+        jobs.push(async () => {
+          const num = +((await ws).map(w => w.text).join('').replace(/[^0-9]/g, '')) || 0;
+          if (num >= 20 && num <= 400) t.metro.bpm = num;
+        });
       }
       continue;
     }
@@ -868,13 +873,24 @@ async function readPageText(fr, marks, ocr, opts = {}) {
     }
     const img = lineCrop(fr, t.box, t.h);
     if (!img) continue;
-    let words = [];
-    try { words = await ocr(img); } catch (e) { words = []; }
+    const words = read(img);
     n++;
-    const ok = words.filter(w => w.conf >= 30 && /[\p{L}\p{N}]/u.test(w.text));
-    t.text = ok.map(w => w.text).join(' ').replace(/\s+/g, ' ').trim();
-    t.conf = ok.length ? Math.round(ok.reduce((a, w) => a + w.conf, 0) / ok.length) : 0;
-    refineRole(t);
+    jobs.push(async () => {
+      const ok = (await words).filter(w => w.conf >= 30 && /[\p{L}\p{N}]/u.test(w.text));
+      t.text = ok.map(w => w.text).join(' ').replace(/\s+/g, ' ').trim();
+      t.conf = ok.length ? Math.round(ok.reduce((a, w) => a + w.conf, 0) / ok.length) : 0;
+      refineRole(t);
+    });
+  }
+  for (const job of jobs) await job();
+  // "D.S. al Coda" / "D.C. al Fine" whose D.S. / D.C. was taken for other ink (a segno, a
+  // letter-like sign) and left out of the line: read again with the room to its left
+  for (const t of marks.text) {
+    if (!/^al\s+(coda|fine)\b/i.test(t.text || '')) continue;
+    const ws = await read(lineCrop(fr, [t.box[0] - 5 * t.h, t.box[1], t.box[2], t.box[3]], t.h));
+    const txt = ws.filter(w => w.conf >= 30).map(w => w.text).join(' ').replace(/\s+/g, ' ').trim();
+    const m = txt.match(/\b(d\.?\s*[sc]\.?)\s*al\s+(coda|fine)\b/i);
+    if (m) { t.text = `D.${/s/i.test(m[1].replace(/^d/i, '')) ? 'S' : 'C'}. al ${m[2].charAt(0).toUpperCase() + m[2].slice(1).toLowerCase()}`; t.role = 'expression'; }
   }
   // a dynamic whose letters did not all match the shapes (one fused with a
   // stem, a worn letter) but reads as one: a dynamic after all
