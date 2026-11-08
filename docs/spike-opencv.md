@@ -17,8 +17,11 @@ Courtesy accidentals were not misread signs: the notes they stand before were lo
   apart, and reading the "2" as a head turned 12/8 into 2/8 in `rst04`).
 - `front.js` `accidentalBefore`: a parenthesised sign or a natural's box filled solid reads as a lone head with a short
   "stem" (the sign's stroke). A single-head chord whose stroke is under 2.6 spaces, does not end in a beam (beamed
-  notes under a low beam have short stems: Twinkle piano lost 0.025 without this check), and stands 0.8–3.6 spaces
-  left of a chord level with it (±1 position) is dropped.
+  notes under a low beam have short stems: Twinkle piano lost 0.025 without this check), has two strokes 1.6 spaces
+  or taller through its row (a sharp's or natural's pair; a grace note has one stem: the first version, 6b891a8, cost
+  `grace` 117 → 95 of 252 on severe coverage scans, now 116) and stands 0.8–3.6 spaces left of a chord level with it
+  (±1 position) is dropped. The regress check still counts fewer `<grace>` elements (benchmark 36 → 29, challenge
+  288 → 264): the ones that went were sharps read as small heads (the benchmark truth has no grace notes at all).
 
 Coverage (OCR, clean / scan / severe): `acc-courtesy` 2 / 5 / 5 → **9 / 9 / 8** of 9, `acc-sharp` 53 / 62 / 37 →
 **77 / 75 / 49** of 82, `acc-flat` 21 / 24 / 26 → 27 / 27 / 23 of 28, `acc-natural` 43 / 45 / 34 → 49 / 49 / 40 of 53.
