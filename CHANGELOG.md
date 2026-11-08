@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.40.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.39.0...score-scan-reader-v0.40.0) (2026-11-08)
+
+
+### Features
+
+* **percussion:** one-line percussion staves and x heads (hi-hat, cymbals); worn percussion clefs read ([3200bd1](https://github.com/pension-plan/score-scan-reader/commit/3200bd1e275934b98d5a29956b0d77e7c586efb5))
+
+
+### Bug Fixes
+
+* **heads:** thick heads on heavy scans are not split in two ([69071d2](https://github.com/pension-plan/score-scan-reader/commit/69071d2016b909d2af53cc6e3984d9556f751913))
+* **rests,meter:** multi-bar rests on worn scans get their own bars ([3127654](https://github.com/pension-plan/score-scan-reader/commit/31276545e1cc4068e383802e841bde919201af27))
+
 ## [0.39.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.38.0...score-scan-reader-v0.39.0) (2026-11-08)
 
 
