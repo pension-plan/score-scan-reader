@@ -132,9 +132,9 @@ function readVoltas(fr, asm, sy) {
   const out = [];
   for (const c of comps) {
     const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1;
-    if (w < 3 * sp) continue;
+    if (w < 4.5 * sp) continue;
     const top = lineY(st, 0, c.x0);
-    if (c.y0 < top - 6 * sp || c.y0 > top - 1.2 * sp) continue;
+    if (c.y0 < top - 9 * sp || c.y0 > top - 1.2 * sp) continue;
     // the line: a thin row of ink along the top of the box
     const W = fr.R.width, R = fr.R.data;
     const yl = c.y0;

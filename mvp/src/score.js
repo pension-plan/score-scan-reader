@@ -1236,7 +1236,10 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     const vs = [];
     sysOrder.forEach((sy, k) => (sy.voltas || []).forEach(v => {
       const sp = spOf(sy);
-      const idx = units.map((u, i) => i).filter(i => units[i].m.segs.some(si => segs[si].sy === sy && segs[si].xa >= v.x0 - 1.5 * sp && segs[si].xb <= v.x1 + 1.5 * sp));
+      // the bars the bracket covers (most of each bar's width: the first bar of a system starts at
+      // the staff start, left of a bracket that begins after the clef)
+      const idx = units.map((u, i) => i).filter(i => units[i].m.segs.some(si => segs[si].sy === sy &&
+        Math.min(segs[si].xb, v.x1) - Math.max(segs[si].xa, v.x0) >= 0.6 * (segs[si].xb - segs[si].xa) - 1.5 * sp));
       if (!idx.length) return;
       const prev = vs[vs.length - 1];
       if (v.cont && prev && prev.open && prev.k === k - 1) { prev.b = idx[idx.length - 1]; prev.open = v.open; prev.k = k; return; }
