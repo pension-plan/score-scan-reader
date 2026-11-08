@@ -30,6 +30,8 @@ const DEFAULTS = {
   maxGapFont: 0,      // close up word gaps wider than this share of the font size (0 = off; hurt here)
   wordGapFont: 0,     // ... separate cap for gaps not next to a hyphen (0 = same)
   titleCheck: true,   // reject captions: title-case or bracketed lines, oversized type
+  partLabels: true,   // OCR the part names left of the first system -> fr.partLabels
+  stanzas: true,      // OCR stanza text printed below the last system -> fr.stanzas
   targetCap: 28,      // OCR scale: cap height in px (component lines)
   splitByNotes: true, // split tokens that span several note onsets (unprinted hyphens, merged words)
   lang: null,         // underlay language for syllable rules ('en' | 'de' | 'la'); null = detect
@@ -684,6 +686,230 @@ function noteOffset(syl, voices) {
   return Math.max(0.15, Math.min(0.5, rs[rs.length >> 1]));
 }
 
+// ---- part labels at the start of the first system (L3e) -----------------
+// "Soprano", "Alto I / Alto II", "Piano", "S. A." are printed left of the
+// bracket / brace, centred on their staff (or between the two staves of a
+// grand staff). Text-sized components there are grouped into lines, each line
+// is OCR'd from a masked crop and assigned to the staff (or staves) it faces.
+function labelLines(fr, sysIdx) {
+  const { B, staves } = fr;
+  const sys = fr.systems[sysIdx];
+  const W = B.width;
+  const sts = sys.map(i => staves[i]);
+  const sp = sts[0].space;
+  const left = Math.min(...sts.map(s => s.left));
+  const xr = Math.round(left - 0.3 * sp);
+  const yTop = Math.max(0, Math.round(sts[0].yAt(0, left) - 1.5 * sp));
+  const yBot = Math.min(B.height - 1, Math.round(sts[sts.length - 1].yAt(4, left) + 1.5 * sp));
+  if (xr < 2 * sp || yBot - yTop < 2 * sp) return [];
+  const bw = xr, bh = yBot - yTop + 1;
+  const band = { width: bw, height: bh, data: new Uint8Array(bw * bh) };
+  for (let y = 0; y < bh; y++) band.data.set(B.data.subarray((yTop + y) * W, (yTop + y) * W + bw), y * bw);
+  const { labels, comps } = labelComponents(band);
+  const cs = comps.filter(c => {
+    const h = c.y1 - c.y0 + 1, w = c.x1 - c.x0 + 1;
+    return h >= 0.35 * sp && h <= 2.5 * sp && w <= 4 * sp && c.area >= 4 && c.x1 < bw - 1 && c.y0 > 0 && c.y1 < bh - 1;
+  }).sort((a, b) => (a.y0 + a.y1) - (b.y0 + b.y1));
+  // single-linkage grouping: same text row (vertical overlap) and close (word gaps)
+  const par = cs.map((_, i) => i);
+  const find = (i) => { while (par[i] !== i) { par[i] = par[par[i]]; i = par[i]; } return i; };
+  for (let i = 0; i < cs.length; i++) for (let j = i + 1; j < cs.length; j++) {
+    const a = cs[i], b = cs[j];
+    const ov = Math.min(a.y1, b.y1) - Math.max(a.y0, b.y0) + 1;
+    const gap = Math.max(a.x0 - b.x1, b.x0 - a.x1);
+    if (ov >= 0.4 * Math.min(a.y1 - a.y0 + 1, b.y1 - b.y0 + 1) && gap <= 1.5 * sp) par[find(i)] = find(j);
+  }
+  const groups = new Map();
+  cs.forEach((c, i) => { const r = find(i); if (!groups.has(r)) groups.set(r, []); groups.get(r).push(c); });
+  const lines = [...groups.values()].map(mem => ({ mem, x0: Math.min(...mem.map(c => c.x0)), x1: Math.max(...mem.map(c => c.x1)), y0: Math.min(...mem.map(c => c.y0)), y1: Math.max(...mem.map(c => c.y1)) }));
+  const out = [];
+  for (const ln of lines) {
+    const big = ln.mem.filter(c => c.y1 - c.y0 + 1 >= 0.6 * sp);
+    if (!big.length || ln.x1 - ln.x0 + 1 < 0.5 * sp) continue;
+    const tall = Math.max(...big.map(c => c.y1 - c.y0 + 1));
+    const pad = Math.round(0.4 * tall);
+    const sx0 = Math.max(0, ln.x0 - pad), sx1 = Math.min(bw - 1, ln.x1 + pad), sy0 = Math.max(0, ln.y0 - pad), sy1 = Math.min(bh - 1, ln.y1 + pad);
+    const keep = new Set(ln.mem.map(c => c.id));
+    const SW = sx1 - sx0 + 1, SH = sy1 - sy0 + 1;
+    const data = new Uint8ClampedArray(SW * SH).fill(255);
+    for (let y = 0; y < SH; y++) for (let x = 0; x < SW; x++) {
+      const lab = labels[(sy0 + y) * bw + sx0 + x];
+      if (lab && keep.has(lab)) data[y * SW + x] = fr.gray.data[(yTop + sy0 + y) * W + sx0 + x];
+    }
+    const cy = yTop + (ln.y0 + ln.y1) / 2;
+    // the staff it faces, or the two staves it sits between (grand staff)
+    let on = sys.filter(i => cy >= staves[i].yAt(0, left) - 0.8 * sp && cy <= staves[i].yAt(4, left) + 0.8 * sp);
+    if (!on.length) for (let k = 0; k + 1 < sys.length; k++) if (cy > staves[sys[k]].yAt(4, left) && cy < staves[sys[k + 1]].yAt(0, left)) on = [sys[k], sys[k + 1]];
+    if (!on.length) continue;
+    out.push({ system: sysIdx, staves: on, y: Math.round(cy), x0: sx0, tall, strip: { width: SW, height: SH, data } });
+  }
+  return out;
+}
+
+async function readPartLabels(fr, ocr, o, onLine) {
+  const res = [];
+  if (!fr.systems.length) return res;
+  for (const ln of labelLines(fr, 0)) {
+    const scale = Math.min(3, Math.max(0.5, o.targetCap / ln.tall));
+    // white margin around the word helps tesseract on very short crops
+    const m = Math.round(0.6 * ln.tall);
+    const W = Math.round((ln.strip.width + 2 * m) * scale), H = Math.round((ln.strip.height + 2 * m) * scale);
+    const img = makeGray(W, H, 255);
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const sx = Math.floor(x / scale) - m, sy = Math.floor(y / scale) - m;
+      if (sx >= 0 && sy >= 0 && sx < ln.strip.width && sy < ln.strip.height) img.data[y * W + x] = ln.strip.data[sy * ln.strip.width + sx];
+    }
+    let words = [];
+    try { words = await ocr(img); } catch (e) { words = []; }
+    if (onLine) onLine();
+    // words (letters, abbreviation dot) or a voice number; mixed letter/digit tokens are junk
+    const toks = words.filter(w => w.conf >= 40).map(w => w.text.replace(/[^\p{L}\p{N}.'’]/gu, '')).filter(t => /^[\p{L}'’]+\.?$/u.test(t) || /^\d\.?$/.test(t));
+    if (!toks.length) continue;
+    // roman voice numbers misread: "Alto IT" / "Tenor Il" -> II
+    const text = toks.map((t, i) => i > 0 && /^[Il|T]{1,3}$/.test(t) && /[Il|]/.test(t + (t.length > 1 ? 'I' : '')) ? 'I'.repeat(t.length) : t).join(' ').replace(/\s+/g, ' ').trim();
+    if (!/\p{L}/u.test(text)) continue;
+    const conf = Math.round(words.reduce((a, w) => a + w.conf, 0) / words.length);
+    res.push({ system: ln.system, staff: ln.staves[0], staves: ln.staves, text, conf, y: ln.y });
+  }
+  // several labels on one staff (e.g. "Soprano I" / "Soprano II"): top-down = voice 1, 2
+  const by = {};
+  res.forEach(r => (by[r.staves.join('+')] ||= []).push(r));
+  for (const k in by) by[k].sort((a, b) => a.y - b.y).forEach((r, i, a) => { r.voice = a.length > 1 ? i + 1 : 0; });
+  return res;
+}
+
+// ---- stanza text below the music (L5b) -----------------------------------
+// Verses printed as a poem after the last system (often in two columns, each
+// stanza starting "4.", "5." ...) are read line by line: text lines are found
+// by baseline voting over the whole page width, split into column chunks at
+// wide gaps, OCR'd, and grouped into stanzas by their leading number.
+function stanzaChunks(fr, yStart) {
+  const { B, gray } = fr;
+  const W = B.width, H = B.height;
+  const sp = fr.staves.length ? fr.staves[fr.systems[fr.systems.length - 1][0]].space : 16;
+  const y0 = Math.max(0, Math.round(yStart)), y1 = H - 1;
+  if (y1 - y0 < 2 * sp) return [];
+  const bw = W, bh = y1 - y0 + 1;
+  const band = { width: bw, height: bh, data: B.data.subarray(y0 * W, (y1 + 1) * W) };
+  const { labels, comps } = labelComponents(band);
+  const cand = comps.filter(c => c.y0 > 0 && c.area >= 3 && c.y1 - c.y0 + 1 <= 3 * sp && c.x1 - c.x0 + 1 <= 6 * sp);
+  const letters = cand.filter(c => { const h = c.y1 - c.y0 + 1, w = c.x1 - c.x0 + 1; return h >= 0.45 * sp && h <= 2.5 * sp && w >= 0.12 * sp && w <= 3 * sp; });
+  if (letters.length < 6) return [];
+  const hist = new Float64Array(bh + 1);
+  for (const c of letters) hist[c.y1]++;
+  const R = Math.max(1, Math.round(0.15 * sp)), sm = new Float64Array(bh + 1);
+  for (let y = 0; y <= bh; y++) { let s = 0; for (let d = -R; d <= R; d++) { const yy = y + d; if (yy >= 0 && yy <= bh) s += hist[yy]; } sm[y] = s; }
+  const peaks = [];
+  for (const y of [...sm.keys()].sort((a, b) => sm[b] - sm[a])) {
+    if (sm[y] < 4) break;
+    if (peaks.some(p => Math.abs(p - y) < 1.2 * sp)) continue;
+    peaks.push(y);
+  }
+  peaks.sort((a, b) => a - b);
+  const chunks = [];
+  for (const bl of peaks) {
+    const core = letters.filter(c => Math.abs(c.y1 - bl) <= 0.25 * sp + 1);
+    if (core.length < 4) continue;
+    const hs = core.map(c => c.y1 - c.y0 + 1).sort((a, b) => a - b);
+    const tall = median(hs.slice(hs.length >> 1));
+    if (tall < 0.5 * sp) continue;
+    const mem = cand.filter(c => c.y0 >= bl - 1.6 * tall && c.y1 <= bl + 0.6 * tall).sort((a, b) => a.x0 - b.x0);
+    // split at column gaps
+    let cur = null;
+    const gapMax = Math.max(3 * sp, 2.5 * tall);
+    for (const c of mem) {
+      if (cur && c.x0 - cur.x1 <= gapMax) { cur.mem.push(c); cur.x1 = Math.max(cur.x1, c.x1); continue; }
+      cur = { mem: [c], x0: c.x0, x1: c.x1, bl, tall };
+      chunks.push(cur);
+    }
+  }
+  const out = [];
+  for (const ch of chunks) {
+    const nCore = ch.mem.filter(c => Math.abs(c.y1 - ch.bl) <= 0.25 * sp + 1 && c.y1 - c.y0 + 1 >= 0.45 * sp).length;
+    if (nCore < 3) continue;
+    const pad = Math.round(0.4 * ch.tall);
+    const sx0 = Math.max(0, ch.x0 - pad), sx1 = Math.min(bw - 1, ch.x1 + pad);
+    const sy0 = Math.max(0, Math.min(...ch.mem.map(c => c.y0)) - pad), sy1 = Math.min(bh - 1, Math.max(...ch.mem.map(c => c.y1)) + pad);
+    const keep = new Set(ch.mem.map(c => c.id));
+    const SW = sx1 - sx0 + 1, SH = sy1 - sy0 + 1;
+    const data = new Uint8ClampedArray(SW * SH).fill(255);
+    for (let y = 0; y < SH; y++) for (let x = 0; x < SW; x++) {
+      const lab = labels[(sy0 + y) * bw + sx0 + x];
+      if (lab && keep.has(lab)) data[y * SW + x] = gray.data[(y0 + sy0 + y) * W + sx0 + x];
+    }
+    out.push({ x0: sx0, y: y0 + ch.bl, tall: ch.tall, sp, strip: { width: SW, height: SH, data } });
+  }
+  return out;
+}
+
+async function readStanzas(fr, ocr, o, yStart) {
+  const lines = [];
+  for (const ch of stanzaChunks(fr, yStart)) {
+    const scale = Math.min(3, Math.max(0.5, o.targetCap / ch.tall));
+    const m = Math.round(0.3 * ch.tall);
+    const W = Math.round((ch.strip.width + 2 * m) * scale), H = Math.round((ch.strip.height + 2 * m) * scale);
+    const img = makeGray(W, H, 255);
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const sx = Math.floor(x / scale) - m, sy = Math.floor(y / scale) - m;
+      if (sx >= 0 && sy >= 0 && sx < ch.strip.width && sy < ch.strip.height) img.data[y * W + x] = ch.strip.data[sy * ch.strip.width + sx];
+    }
+    let words = [];
+    try { words = await ocr(img); } catch (e) { words = []; }
+    if (!words.length) continue;
+    const conf = words.reduce((a, w) => a + w.conf, 0) / words.length;
+    const text = words.filter(w => w.conf >= 30).map(w => w.text).join(' ').replace(/[|_]+/g, ' ').replace(/\s+/g, ' ').trim();
+    const nWords = (text.match(/\p{L}{2,}/gu) || []).length;
+    if (conf < 55 || nWords < 2) continue;
+    lines.push({ x0: ch.x0, y: ch.y, sp: ch.sp, text, conf: Math.round(conf) });
+  }
+  if (!lines.length) return [];
+  // columns: left edges more than 10 staff spaces apart
+  lines.sort((a, b) => a.x0 - b.x0);
+  const cols = [];
+  for (const ln of lines) {
+    const c = cols.find(c => Math.abs(ln.x0 - c.x0) <= 10 * ln.sp);
+    if (c) c.lines.push(ln); else cols.push({ x0: ln.x0, lines: [ln] });
+  }
+  const stanzas = [];
+  for (const c of cols) {
+    const ls = c.lines.sort((a, b) => a.y - b.y);
+    const pitches = ls.slice(1).map((l, i) => l.y - ls[i].y).sort((a, b) => a - b);
+    const pitch = pitches.length ? pitches[pitches.length >> 1] : 3 * ls[0].sp;
+    const widths = ls.map(l => l.text.length).sort((a, b) => a - b), wMed = widths[widths.length >> 1];
+    let cur = null, prevY = null;
+    for (const ln of ls) {
+      // a wide vertical gap ends a stanza (prose, a credit or another piece follows)
+      if (prevY != null && ln.y - prevY > Math.max(1.8 * pitch, 4 * ln.sp)) cur = null;
+      prevY = ln.y;
+      const m = ln.text.match(/^([1-9][0-9]?)\s*[.,)]\s*(.*)$/);
+      if (m) { cur = { number: +m[1], label: m[1] + '.', lines: [] }; stanzas.push(cur); if (m[2]) cur.lines.push(m[2]); continue; }
+      if (!cur) continue;
+      // credits / captions / prose inside the block: all caps, bracketed, title case, much longer lines
+      const ws = ln.text.replace(/[^\p{L}\s]/gu, ' ').split(/\s+/).filter(w => w.length >= 2);
+      const caps = ws.filter(w => /^\p{Lu}/u.test(w)).length;
+      if (!/\p{Ll}/u.test(ln.text) || /^[(\[].*[)\]]$/.test(ln.text) || (ws.length >= 3 && caps === ws.length) || ln.text.length > 1.8 * wMed) { cur = null; continue; }
+      cur.lines.push(ln.text);
+    }
+  }
+  for (const s of stanzas) s.text = s.lines.join('\n');
+  return stanzas.filter(s => s.lines.length);
+}
+
+// split a word into sung syllables by the same rules as the note-aware split
+// ("promised" -> pro-mised): for fitting stanza text to the melody
+function syllabify(word, lang = 'en') {
+  const idx = []; let low = '';
+  for (let i = 0; i < word.length; i++) if (/\p{L}/u.test(word[i])) { idx.push(i); low += word[i].toLowerCase(); }
+  const g = vowelGroups(low, lang);
+  if (g.length < 2) return [word];
+  const cuts = [];
+  for (let j = 0; j + 1 < g.length; j++) cuts.push(idx[preferredBreak(low, g[j].b, g[j + 1].a, lang)]);
+  const out = []; let from = 0;
+  for (const c of cuts) { if (c > from) { out.push(word.slice(from, c)); from = c; } }
+  out.push(word.slice(from));
+  return out;
+}
+
 // ocr(grayImage) -> Promise<[{text, conf, x0, x1}]> in the given image's pixels
 async function readLyrics(fr, ocr, onProgress, opts) {
   const o = { ...DEFAULTS, ...(opts || {}) };
@@ -694,6 +920,10 @@ async function readLyrics(fr, ocr, onProgress, opts) {
   const geo = new Map();
   const finder = o.ccLines ? findTextLinesCC : findTextLines;
   fr.systems.forEach((sys, si) => all.push(...finder(fr, si, sysTops[si + 1] ?? fr.gray.height, o)));
+  // part labels left of the first system (L3e); fr.partLabels for score.js
+  if (o.partLabels) {
+    try { fr.partLabels = await readPartLabels(fr, ocr, o); } catch (e) { fr.partLabels = []; }
+  }
   const talls = all.filter(l => l.tall).map(l => l.tall).sort((a, b) => a - b);
   const tallMed = talls.length >= 3 ? talls[talls.length >> 1] : 0;
   for (const ln of all) {
@@ -731,7 +961,7 @@ async function readLyrics(fr, ocr, onProgress, opts) {
       if ((wordsL.length >= 2 && caps >= 0.8 * wordsL.length && wordsL.length <= 8) || /^[(\[].*[)\]]$/.test(txt) || big) { if (dbg) dbg.reject = 'title'; step(); continue; }
     }
     const { number, syllables } = toSyllables(kept.filter(w => w.ok || w.conf >= 60));
-    const entry = { band: ln.band, last: ln.last, y: ln.y0, printed: number, number, syllables, raw: mapped.map(w => w.text).join(' '), conf: meanConf };
+    const entry = { band: ln.band, last: ln.last, y: ln.y0, y1: ln.y1, printed: number, number, syllables, raw: mapped.map(w => w.text).join(' '), conf: meanConf };
     (out[ln.sys] ||= []).push(entry);
     geo.set(entry, { sp: ln.sp, staff: fr.systems[ln.sys][ln.band], x0: ln.x0, x1: ln.x1, extenders: ln.extenders || [],
       hyphens: ln.hyphens ? ln.hyphens.map(h => (h.x0 + h.x1) / 2) : row.clusters.filter((c, i) => row.hy[i]).map(([a, b]) => row.xa + (a + b) / 2) });
@@ -764,6 +994,13 @@ async function readLyrics(fr, ocr, onProgress, opts) {
     }
     out[k] = out[k].filter(v => !v.stanza);
   }
+  // stanza text printed after the music (L5b) -> fr.stanzas for score.js
+  if (o.stanzas && fr.systems.length) {
+    const ls = fr.systems.length - 1, lsys = fr.systems[ls], bot = fr.staves[lsys[lsys.length - 1]];
+    let yStart = Math.max(bot.yAt(4, bot.left), bot.yAt(4, bot.right)) + 1.0 * bot.space;
+    for (const v of out[ls] || []) if (v.band === lsys.length - 1 && v.y1 != null) yStart = Math.max(yStart, v.y1 + 0.3 * bot.space);
+    try { fr.stanzas = await readStanzas(fr, ocr, o, yStart); } catch (e) { fr.stanzas = []; }
+  }
   // a word hyphenated across a system break: the first syllable of the next
   // system's matching verse continues it ("o-" | "cean" -> end, not single)
   const keys = Object.keys(out).map(Number).sort((a, b) => a - b);
@@ -781,4 +1018,4 @@ async function readLyrics(fr, ocr, onProgress, opts) {
   return out;
 }
 
-module.exports = { readLyrics, findTextLines, toSyllables, cropGray, DEFAULTS, _analyseRow: analyseRow };
+module.exports = { readLyrics, readPartLabels, readStanzas, syllabify, findTextLines, findTextLinesCC, toSyllables, splitSyllable, vowelGroups, detectLang, cropGray, DEFAULTS, _analyseRow: analyseRow };

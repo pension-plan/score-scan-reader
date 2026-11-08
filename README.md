@@ -1,17 +1,22 @@
 # Score Scan Reader
 
+### ▶ Start here: **https://pension-plan.github.io/score-scan-reader/**
+
+The site links to the converter, the build log and accuracy tracker, the design document, the research, and the ML detector demo.
+
 Converts **scanned sheet music** (image-only PDFs, PNG or JPG) into **MusicXML 4.0**, entirely in the browser.
 
 - Lyrics are read with OCR and kept as MusicXML lyrics (syllables, verses).
 - When one staff carries two voices, as in closed-score SATB hymns, the voices are split into separate parts (Soprano, Alto, Tenor, Bass).
 - Piano grand staves are kept as one part.
 
+- **Home (start here):** https://pension-plan.github.io/score-scan-reader/
 - **Live app:** https://pension-plan.github.io/score-scan-reader/app/
 - **Build log, plan, research and accuracy tracker:** https://pension-plan.github.io/score-scan-reader/status/
 - **Build timeline (AEDT):** [docs/TIMELINE.md](docs/TIMELINE.md), also at https://pension-plan.github.io/score-scan-reader/docs/TIMELINE.html
 - **Software design document:** https://pension-plan.github.io/score-scan-reader/docs/SDD.html (source: [docs/SDD.md](docs/SDD.md))
 
-All three are deployed to GitHub Pages from this repository on every push to `main` (`.github/workflows/pages.yml`).
+All of these are deployed to GitHub Pages from this repository on every push to `main` (`.github/workflows/pages.yml`).
 
 ## Quick start
 
