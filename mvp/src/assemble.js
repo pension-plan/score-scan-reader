@@ -254,7 +254,7 @@ function splitSigns(R, g, sp) {
   };
   // flats: a cut before every stem
   const st = strokes(img, { x0: 0, y0: 0, x1: wid - 1, y1: hgt - 1 }, 1.5 * sp);
-  if (st.length >= 2 && st.every(s => s.x1 - s.x0 + 1 <= Math.max(3, 0.3 * sp))) {
+  if (st.length >= 2 && st.every(s => s.x1 - s.x0 + 1 <= Math.max(3, 0.4 * sp))) {
     const starts = [0].concat(st.slice(1).map(s => Math.max(0, s.x0 - 1)));
     const r = read(starts.map((x, i) => [x, i + 1 < starts.length ? starts[i + 1] - 1 : wid - 1]));
     if (r && r.every(p => p.kind === 'flat')) return r;
@@ -694,7 +694,7 @@ function clefChangeAt(R, near, c0, st, sp, heads) {
 
 // a key signature right after a barline: cancelling naturals and / or the
 // new signs in key-signature order, spread out left to right
-function keyChangeAt(R, comps, st, xStart, xLimit, clef, sp, heads, lone = false) {
+function keyChangeAt(R, comps, st, xStart, xLimit, clef, sp, heads, lone = false, prev = null) {
   const lineY = (k) => st.yAt(k, xStart + 2 * sp);
   const cand = comps.filter(c => c.x0 > xStart && c.x0 < xLimit && c.area >= 0.04 * sp * sp &&
     (c.y0 + c.y1) / 2 > lineY(0) - 1.6 * sp && (c.y0 + c.y1) / 2 < lineY(4) + 1.6 * sp).sort((a, b) => a.x0 - b.x0);
@@ -703,7 +703,7 @@ function keyChangeAt(R, comps, st, xStart, xLimit, clef, sp, heads, lone = false
   // 'heads' found on the signs themselves are no notes beside them
   const onGlyph = (h) => glyphs.some(g => h.x >= g.x0 - 0.2 * sp && h.x <= g.x1 + 0.2 * sp && h.y >= g.y0 - 0.2 * sp && h.y <= g.y1 + 0.2 * sp);
   heads = heads.filter(h => h.x > xStart && h.x < xLimit + 2 * sp && !onGlyph(h));
-  let nat = 0, kind = null, n = 0, end = xStart, lastX = -Infinity, near = 0;
+  let nat = 0, kind = null, n = 0, end = xStart, lastX = -Infinity, near = 0, more = false;
   const signs = [];
   for (let gi = 0; gi < glyphs.length; gi++) {
     let g = glyphs[gi];
@@ -717,6 +717,11 @@ function keyChangeAt(R, comps, st, xStart, xLimit, clef, sp, heads, lone = false
       const pieces = splitSharps(R, g, sp);
       if (pieces) { glyphs.splice(gi, 1, ...pieces); g = glyphs[gi]; k = g.kind; }
     }
+    if (!k) {
+      // signs run together (a worn or heavy scan): cut apart as in a header's signature
+      const pieces = splitSigns(R, g, sp);
+      if (pieces && pieces.every(p => p.kind === kind || (kind === null && p.kind !== 'natural'))) { glyphs.splice(gi, 1, ...pieces); g = glyphs[gi]; k = g.kind; }
+    }
     if (!k || g.x0 - lastX < 0.45 * sp) break; // stacked signs: a chord's accidentals
     const yc = k === 'flat' ? g.y1 - 0.55 * sp : (g.y0 + g.y1) / 2;
     if (heads.some(h => h.x > g.x1 && h.x - g.x1 < 1.6 * sp && Math.abs(h.y - yc) < 0.6 * sp)) near++;
@@ -724,13 +729,17 @@ function keyChangeAt(R, comps, st, xStart, xLimit, clef, sp, heads, lone = false
     if ((k === 'sharp' || k === 'flat') && (kind === null || kind === k) && n < 7 && Math.abs(accPos(st, g, k, sp) - kc[k][n]) <= 1.0) {
       kind = k; n++; end = g.x1; lastX = g.x0; signs.push(g); continue;
     }
+    // (another sign right after that does not fit the signature: notes' accidentals)
+    more = !!k && g.x0 - end < 1.0 * sp;
     break;
   }
   if (near > 1) return null;
+  // fewer signs of the same kind with no natural cancelling the rest is a signature read in part
+  if (!nat && n && prev != null && Math.sign(prev) === (kind === 'flat' ? -1 : 1) && n <= Math.abs(prev)) return null;
   // box: the signs ('heads' found on them are not notes)
   // a lone sign is a key of one sharp or flat after a double barline (where keys change) when no
   // note stands right after it (a note's own accidental is followed by its head)
-  if (n >= 2 || (nat >= 1 && n >= 1) || (nat >= 2 && n === 0) || (lone && n === 1 && nat === 0 && near === 0)) return { fifths: kind === 'flat' ? -n : n, end, box: boxOf(signs) };
+  if (n >= 2 || (nat >= 1 && n >= 1) || (nat >= 2 && n === 0) || (lone && n === 1 && nat === 0 && near === 0 && !more)) return { fifths: kind === 'flat' ? -n : n, end, box: boxOf(signs) };
   return null;
 }
 
@@ -789,7 +798,7 @@ function staffChanges(R, comps, s, sp, barX) {
     // (a lone sign only from no key: from a key of signs it needs cancelling naturals, and a lone
     // sign read there is a damaged signature)
     const prev = changes.filter(ch => ch.fifths != null && ch.x < bx).reduce((a, ch) => ch.fifths, s.hdr.fifths);
-    const k = keyChangeAt(R, comps, st, bx + 0.2 * sp, Math.min(xb, bx + 16 * sp), clefAt(bx), sp, heads, prev === 0 && doubleBar(R, st, bx, sp));
+    const k = keyChangeAt(R, comps, st, bx + 0.2 * sp, Math.min(xb, bx + 16 * sp), clefAt(bx), sp, heads, prev === 0 && doubleBar(R, st, bx, sp), prev);
     if (k) changes.push({ x: k.end, fifths: k.fifths, box: k.box });
   }
   changes.sort((a, b) => a.x - b.x);
