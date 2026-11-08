@@ -672,7 +672,10 @@ function classifyMarks(fr, asm, left) {
       heads.some(hd => Math.abs(hd.x - cx) <= 1.5 * sp && Math.abs(hd.y - cy) <= 1.3 * sp + (n.above ? Math.max(0, cy - hd.y) : Math.max(0, hd.y - cy)))) {
       out.ledgers.push({ box: [c.x0, c.y0, c.x1, c.y1] }); continue;
     }
-    const hp = hairpin(R, c, sp);
+    // a hairpin stands off the staff: one whose box lies between a staff's
+    // top and bottom lines is staff-line remnants and accidentals, not a wedge
+    const inStaff = n && c.y0 >= n.s.top(cx) - 0.3 * sp && c.y1 <= n.s.bot(cx) + 0.3 * sp;
+    const hp = !inStaff && hairpin(R, c, sp);
     // dynamics and hairpins stand below their staff unless clearly nearer the one below
     if (hp) { const m = nearest(cx, cy, 1.6); out.wedges.push({ box: [c.x0, c.y0, c.x1, c.y1], type: hp, sys: m.sys, k: m.k, si: m.s.si }); continue; }
     // letter-sized ink (text, dynamics)
