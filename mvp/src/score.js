@@ -1910,6 +1910,17 @@ function readMarks(pages, segs, units, parts, partMeasures) {
           for (const e of st.events) {
             if (e.rest || e.forward || !e.heads || !e.heads.length) continue;
             const sy = sysOf(mi);
+            // a chord tied to the same chord: when its outer notes are tied, the inner ones are too
+            // (an inner tie lying along a staff line goes with the line when lines are removed)
+            if (last && last.heads.length >= 3) {
+              const ps = (ev) => ev.heads.map(h => h.p).sort((a, b) => a - b).join(',');
+              // (tied pairs seen: a start on the chord before or a stop on this one, per pitch)
+              const tied = last.heads.filter(g => g.tieOn || e.heads.some(h => h.p === g.p && h.tieOff)).length;
+              if (ps(last) === ps(e) && tied >= 2) {
+                for (const g of last.heads) { if (!g.tieOn) { g.tieOn = true; nTie++; } }
+                for (const h of e.heads) h.tieOff = true;
+              }
+            }
             if (last && lastSy && sy && lastSy !== sy) {
               for (const h of e.heads) {
                 const g = last.heads.find(o => o.p === h.p && (o.clef || '') === (h.clef || ''));
