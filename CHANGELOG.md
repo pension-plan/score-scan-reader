@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.19.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.18.1...score-scan-reader-v0.19.0) (2026-11-08)
+
+
+### Features
+
+* slurs, ties and grace notes written to MusicXML ([2b560bc](https://github.com/pension-plan/score-scan-reader/commit/2b560bc36a6c4099b4e31f7b981505636b74c65b))
+
 ## [0.18.1](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.18.0...score-scan-reader-v0.18.1) (2026-11-08)
 
 
