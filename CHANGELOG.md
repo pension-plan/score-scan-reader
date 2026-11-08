@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.32.1](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.32.0...score-scan-reader-v0.32.1) (2026-11-08)
+
+
+### Bug Fixes
+
+* **meter:** a C or cut C after a missed barline splits the bar ([c619261](https://github.com/pension-plan/score-scan-reader/commit/c619261789133541538f04dc26f534dd769277a5))
+* **score:** cautionary only for reminders across the barline or parenthesised ([128382c](https://github.com/pension-plan/score-scan-reader/commit/128382c704a95332c21411ec16fae74e046c0146))
+
 ## [0.32.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.31.0...score-scan-reader-v0.32.0) (2026-11-08)
 
 
