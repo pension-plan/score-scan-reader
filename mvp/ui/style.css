@@ -60,8 +60,9 @@ button,input,textarea{font:inherit;color:inherit}
 .wrap{margin:0 auto;padding-block:24px 48px;
   padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
 
-/* one column edge for everything; reading text keeps its own measure (.lede) */
-.wrap > *{max-width:1440px;margin-left:auto;margin-right:auto}
+/* one column edge for the header, drop zone and result bar; the results grid (scan,
+   preview, panels) uses the full page width, as asked; reading text keeps its own measure (.lede) */
+.wrap > :not(.grid){max-width:1440px;margin-left:auto;margin-right:auto}
 
 /* ---- masthead with a five-line staff rule ending in a final barline ---- */
 .masthead{position:relative;padding-bottom:30px;margin-bottom:18px}
