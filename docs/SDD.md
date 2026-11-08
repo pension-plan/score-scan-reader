@@ -1252,11 +1252,7 @@ staff count and is at least the largest group) where every link already found st
 smallest gap between blocks is more than 1.08 times the largest gap inside one; the page is then assembled
 again. It runs after the dewarp decision because unequal systems are what sends a curled page to be
 dewarped (regrouping first cost nocturne-cross-staff 0.057). anthem-satb-closed-piano-4-pages severe 0.211
-to 0.593, scan 0.646 to 0.720; nothing dropped. Gaps are measured in the page's median staff space. Small staves (a solo or cue part
-printed over a piano score at about three quarters of the page's staff space) fall outside the spacing the
-staff finder follows on low-resolution copies: `front.js findStaves` searches the main binary again at 0.75
-of the staff space and keeps staves of 0.55-0.85 of it spanning at least 40 % of the page (trio-minuet
-severe 0.700 to 0.830, parts 0.54 to 0.95; about +5 % time per page). A bottom treble/bass pair of a taller score
+to 0.593, scan 0.646 to 0.720; nothing dropped. A bottom treble/bass pair of a taller score
 with full chords (three heads on a stem) and no text is an accompaniment even when its joined barlines were
 not seen (voice + piano on a faded copy).
 
@@ -1389,8 +1385,16 @@ passes on benchmark (0.951) and challenge (0.831).
   components up to 16 staff spaces wide are kept (the trio items' "Violin", "Violoncello", "Piano" read).
 - The text OCR of a page plans its reads in order, starts them together on the reader pool and applies
   them in order (perf's patch; output identical).
-Not done: rehearsal letters by shape (only order-based letters without OCR), chord symbols by shape,
-words OCR merges without a hyphen ("lonssans", "noble", "Andring").
+- Rehearsal letters and digits and chord symbols by shape (no OCR needed): templates in
+  `src/textglyphs.js`, made by `mvp/tools/textglyphs.js` from synthetic LilyPond pages
+  (`mvp/tools/glyphsynth.py`: A-Z boxed and circled, digits boxed, a 46-chord set) in C059, Nimbus Roman
+  and Nimbus Sans; grids 10 x 12 of ink share matched by correlation among templates of similar aspect
+  (and, for chord glyphs, similar height). A circle's ring is stripped row by row (first and last ink
+  runs). Held-out fonts Liberation Serif and DejaVu Sans: boxed letters 26 / 26 each, circled 23 / 24
+  (two circles, M and W, not detected). A chord-symbol candidate whose glyphs all read (C ... B, m, 2-9,
+  sus, Δ, °, ø, +, ♯, ♭, /) and parse as a chord is a chord without OCR; OCR reads the rest.
+  Coverage chord-symbol without OCR 0 to 84 / 85 / 48% (with OCR it was 56 / 52 / 46%).
+Not done: words OCR merges without a hyphen ("lonssans", "noble", "Andring").
 
 **Overlay colours.** Text `--ov-text` #5e35b1, bar numbers `--ov-barno` #263238, dynamics and hairpins
 `--ov-dyn` #0277bd, slurs / ties / fermatas `--ov-slur` #f06292, braces and brackets `--ov-brace`

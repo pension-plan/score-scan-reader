@@ -105,6 +105,90 @@ function corrGrid(g, t) {
 // a digit reads when its best match correlates at least DIGIT_MIN and DIGIT_GAP
 // better than the next digit (0.45 / 0.04: 10% more bar numbers read on scans)
 const DIGIT_MIN = 0.45, DIGIT_GAP = 0.04;
+// ------------------------------------------------------------ letters and chord glyphs by shape
+// Templates (src/textglyphs.js, made by tools/textglyphs.js from synthetic LilyPond pages in
+// several text fonts): {marks: [[char, aspect, grid]], chords: [[char, aspect, grid, height]]},
+// each grid 10 x 12 cells of ink share 0-9. A glyph is matched by correlation, among the
+// templates of similar aspect ratio.
+const TEXT_GLYPHS = require('./textglyphs');
+const TG = 10, TGH = 12;
+let TGT = null;
+function textTemplates() {
+  if (TGT) return TGT;
+  const conv = (rows) => rows.map(([ch, asp, g, h]) => ({ ch, asp, h, cells: Float32Array.from(g, c => +c / 9), gw: TG, gh: TGH }));
+  TGT = { marks: conv(TEXT_GLYPHS.marks || []), chords: conv(TEXT_GLYPHS.chords || []) };
+  return TGT;
+}
+// a binary image cropped to its ink -> {g: grid, asp: width / height, w, h}
+function inkGrid(img) {
+  const { width: w, height: h, data: d } = img;
+  let x0 = w, y0 = h, x1 = -1, y1 = -1;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (d[y * w + x]) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  if (x1 < 0) return null;
+  const cw = x1 - x0 + 1, ch = y1 - y0 + 1, crop = { width: cw, height: ch, data: new Uint8Array(cw * ch) };
+  for (let y = 0; y < ch; y++) for (let x = 0; x < cw; x++) crop.data[y * cw + x] = d[(y0 + y) * w + x0 + x];
+  return { g: gridOf(crop, TGH, TG), asp: cw / ch, h: ch, w: cw };
+}
+// best template of a set for an ink grid: {ch, score, second (best other character)}
+function matchText(set, ig, ok = () => true) {
+  const byCh = new Map();
+  for (const t of set) {
+    if (!ok(t) || Math.abs(Math.log(ig.asp / t.asp)) > 0.45) continue;
+    const sc = corrGrid(ig.g, t);
+    if (!byCh.has(t.ch) || sc > byCh.get(t.ch)) byCh.set(t.ch, sc);
+  }
+  let best = null;
+  for (const [ch, sc] of byCh) if (!best || sc > best.score) best = { ch, score: sc };
+  if (!best) return null;
+  let second = -1;
+  for (const [ch, sc] of byCh) if (ch !== best.ch) second = Math.max(second, sc);
+  return { ...best, second };
+}
+// the ink inside a rehearsal frame (all ink in its box: the letter is often its own component)
+function markInterior(R, c, round) {
+  const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1, d = new Uint8Array(w * h);
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) d[y * w + x] = R.data[(c.y0 + y) * R.width + c.x0 + x] ? 1 : 0;
+  const out = { width: w, height: h, data: new Uint8Array(w * h) };
+  if (round) {
+    // a circle: in each row the first and last runs of ink are the ring; what lies between is the letter
+    for (let y = 0; y < h; y++) {
+      const runs = [];
+      for (let x = 0; x < w;) { if (!d[y * w + x]) { x++; continue; } let e = x; while (e < w && d[y * w + e]) e++; runs.push([x, e]); x = e; }
+      for (let r = 1; r < runs.length - 1; r++) for (let x = runs[r][0]; x < runs[r][1]; x++) out.data[y * w + x] = 1;
+    }
+    return out;
+  }
+  // a box: inside its stroke
+  let t = 0; while (t < w && d[(h >> 1) * w + t]) t++;
+  const inset = t + 2;
+  for (let y = inset; y < h - inset; y++) for (let x = inset; x < w - inset; x++) out.data[y * w + x] = d[y * w + x];
+  return out;
+}
+// a rehearsal letter or number by shape: '' when unsure
+function readMarkByShape(R, c, round) {
+  const ig = inkGrid(markInterior(R, c, round));
+  if (!ig) return '';
+  const m = matchText(textTemplates().marks, ig);
+  return m && m.score >= 0.6 && m.score - m.second >= 0.04 ? m.ch : '';
+}
+
+// a chord symbol read glyph by glyph ("C", "A", "m", "7", "Δ", "°", "ø", "♭", "/" ...):
+// {text} parsed by parseChord, or null when a glyph is unsure or the word is not a chord
+function chordByShape(R, comps, sp) {
+  const set = textTemplates().chords;
+  if (!set.length || !comps.length || comps.length > 8) return null;
+  let text = '';
+  for (const c of comps.slice().sort((a, b) => a.x0 - b.x0)) {
+    const ig = inkGrid(glyphImage(R, c));
+    if (!ig) return null;
+    const hs = ig.h / sp;
+    const m = matchText(set, ig, t => Math.abs(hs - t.h) <= 0.35 * t.h + 0.25);
+    if (!m || m.score < 0.6 || m.score - m.second < 0.03) return null;
+    text += m.ch;
+  }
+  return parseChord(text) ? { text } : null;
+}
+
 let DTPL = null;
 // a bar number read from its digit shapes: '17', or '' when a glyph is not
 // clearly a digit
@@ -483,7 +567,10 @@ function classifyMarks(fr, asm, left) {
     for (let y = 3; y < h - 3; y++) for (let x = 3; x < w - 3; x++) interior += d[y * w + x];
     if (!inner.length && interior < 0.08 * (w - 6) * (h - 6)) continue;
     inner.forEach(q => inBox.add(q)); inBox.add(c);
-    const num = readDigits(R, inner, sp, null, true);
+    // the letter or number inside, by shape: one glyph against the letter and digit
+    // templates; several glyphs side by side are a number read by the digit shapes
+    const several = inner.filter(q => q.y1 - q.y0 + 1 >= 0.4 * (c.y1 - c.y0 + 1)).length >= 2;
+    const num = several ? readDigits(R, inner, sp, null, true) : readMarkByShape(R, c, !boxed);
     out.rehearsals.push({ box: [c.x0, c.y0, c.x1, c.y1], text: num, inner, sys: n.sys, k: n.k, si: n.s.si, x: c.x0, enclosure: boxed ? 'square' : 'circle' });
   }
   // unread letters: the marks run A, B, C ... down the page
@@ -640,6 +727,9 @@ function classifyMarks(fr, asm, left) {
     const chordCand = !!n && n.above && l.words === 1 && l.mem.length <= 7 && l.h >= 0.8 * sp && l.y1 <= top + 0.3 * sp && l.y1 >= top - 4.5 * sp &&
       ['expression', 'tempo', 'credit', 'subtitle', 'lyricist', 'lyrics', 'text'].includes(role) && !(sysOf === 0 && l.y1 < firstTop - 5 * ss);
     if (chordCand && l.mem.length < 2) role = 'chordcand';
+    // read by shape first (works without OCR); OCR reads the candidates this leaves
+    const byShape = chordCand ? chordByShape(R, l.mem, sp) : null;
+    if (byShape) { out.text.push({ box: [l.x0, l.y0, l.x1, l.y1], role: 'chord', chordCand, chord: parseChord(byShape.text), text: byShape.text, shape: true, h: l.h, words: l.words, sys: sysOf, k: n ? n.k : -1, si: n ? n.s.si : -1, x: l.x0, comps: l.mem }); continue; }
     // a lone glyph or specks among the music is more likely a symbol the
     // reader missed (a rest, a flag) than text: left unknown
     if ((role === 'expression' || role === 'text' || role === 'lyrics' || role === 'tempo') && (l.mem.length < 2 || l.h < 0.55 * sp)) { rest.push(...l.mem); continue; }
@@ -927,4 +1017,4 @@ function lineCrop(fr, b, h) {
   return img;
 }
 
-module.exports = { snapTerms, parseChord, _readDigits: readDigits, classifyMarks, readPageText, refineRole, ROLE_LABEL, DYN_WORDS, _dynGlyph: dynGlyph, _gridOf: gridOf, _lineCrop: lineCrop, _hairpin: hairpin, _slurLike: slurLike, _groupLines: groupLines };
+module.exports = { _chordByShape: chordByShape, _readMarkByShape: readMarkByShape, _inkGrid: inkGrid, _markInterior: markInterior, _matchText: matchText, snapTerms, parseChord, _readDigits: readDigits, classifyMarks, readPageText, refineRole, ROLE_LABEL, DYN_WORDS, _dynGlyph: dynGlyph, _gridOf: gridOf, _lineCrop: lineCrop, _hairpin: hairpin, _slurLike: slurLike, _groupLines: groupLines };
