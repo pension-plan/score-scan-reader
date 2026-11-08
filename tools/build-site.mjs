@@ -57,6 +57,13 @@ if (fs.existsSync(statusSrc)) {
   fs.writeFileSync(path.join(OUT, 'status/index.html'), wrap(fs.readFileSync(statusSrc, 'utf8'), 'Scan-to-MusicXML Build'));
 }
 
+// copista-2m browser demo (screenshots stay out of the site)
+const mlDemo = path.join(ROOT, 'demo/ml');
+if (fs.existsSync(mlDemo)) {
+  copyDir(mlDemo, path.join(OUT, 'ml-demo'));
+  fs.rmSync(path.join(OUT, 'ml-demo/shots'), { recursive: true, force: true });
+}
+
 // docs
 const DOC_CSS = `<style>
 :root { --bg: #fbfbfa; --fg: #1b1e24; --muted: #5a6170; --rule: #dde1e7; --accent: #2456a6; --code: #f0f2f5; }
@@ -97,6 +104,7 @@ fs.writeFileSync(path.join(OUT, 'index.html'), head('Score Scan Reader', DOC_CSS
 <ul>
 <li><a href="app/"><strong>Open the converter</strong></a></li>
 <li><a href="status/">Build log, plan, research findings and accuracy tracker</a></li>
+<li><a href="ml-demo/">copista-2m in the browser: the ML symbol detector on a sample scan or your own page</a></li>
 <li><a href="${REPO}">Source code</a> · <a href="${REPO}/releases">Releases and downloads</a> · <a href="${REPO}/actions">CI</a></li>
 </ul>
 <h2>Documents</h2>

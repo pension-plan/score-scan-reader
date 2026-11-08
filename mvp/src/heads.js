@@ -177,8 +177,42 @@ function headWindows(c, labels, w, sp) {
   return { cols: cols.map(([a, b]) => [c.x0 + a, c.x0 + b]).sort((p, q) => p[0] - q[0]), peak: m.mean, rest };
 }
 
-function detectHeads(B, R, staves, ss, lt) {
-  const F = fillHoles(B, R, ss, lt);
+// Longest vertical ink run through row y (+-0.3 sp) in columns [xa, xb]:
+// { len, up, down } in px (up / down = reach above / below y).
+function wallRun(R, xa, xb, y, sp) {
+  const { width: w, height: h, data } = R;
+  const yc = Math.round(y);
+  let best = { len: 0, up: 0, down: 0 };
+  for (let x = Math.max(0, Math.round(xa)); x <= Math.min(w - 1, Math.round(xb)); x++) {
+    let y0 = -1;
+    for (let d = 0; d <= Math.round(0.3 * sp) && y0 < 0; d++) {
+      if (yc - d >= 0 && data[(yc - d) * w + x]) y0 = yc - d; else if (yc + d < h && data[(yc + d) * w + x]) y0 = yc + d;
+    }
+    if (y0 < 0) continue;
+    let a = y0, b = y0;
+    while (a > 0 && data[(a - 1) * w + x]) a--;
+    while (b < h - 1 && data[(b + 1) * w + x]) b++;
+    if (b - a + 1 > best.len) best = { len: b - a + 1, up: y - a, down: b - y };
+  }
+  return best;
+}
+
+// A hole walled by two long verticals (barline + stem, two stems) and closed
+// by staff lines is not a head.  The one exception is a unison of two voices:
+// one head with the up stem on its right and the down stem on its left.
+function twoTallWalls(R, xa, xb, y, sp) {
+  const wid = xb - xa, lim = 1.8 * sp;
+  const L = wallRun(R, xa, xa + 0.3 * wid, y, sp), Rt = wallRun(R, xb - 0.3 * wid, xb, y, sp);
+  if (L.len <= lim || Rt.len <= lim) return false;
+  const unison = Rt.up > 1.5 * sp && Rt.down < 0.9 * sp && L.down > 1.5 * sp && L.up < 0.9 * sp;
+  return !unison;
+}
+
+function detectHeads(B, R, staves, ss, lt, opts = {}) {
+  let F = fillHoles(B, R, ss, lt);
+  // thin-walled hollow heads of old prints break open in B; their outline
+  // stays closed on a lenient threshold: fill those insides too
+  if (opts.lenient) F = fillHoles(opts.lenient, F, ss, lt, { close: opts.lenientClose ?? false });
   const O1 = openRuns(F, Math.max(3, Math.round(0.55 * ss)), true);
   const O = openRuns(O1, Math.max(3, Math.round(0.42 * ss)), false);
   const { labels, comps } = labelComponents(O);
@@ -189,7 +223,7 @@ function detectHeads(B, R, staves, ss, lt) {
     if (bw < 0.8 * ss || bh < 0.5 * ss) continue;
     const cx = (c.x0 + c.x1) / 2, cy = (c.y0 + c.y1) / 2;
     const sp0 = staffPos(staves, cx, cy);
-    if (!sp0 || Math.abs(sp0.p) > 12) continue;
+    if (!sp0 || Math.abs(sp0.p) > 16) continue;
     const sp = sp0.sp;
     const fillRatio = c.area / (bw * bh);
     // wide blobs: a head fused with its accidental (filled flat / natural bowl)
@@ -232,17 +266,29 @@ function detectHeads(B, R, staves, ss, lt) {
         const coreB = IB.frac(xm - 0.3 * sp, ycen - 0.2 * sp, xm + 0.3 * sp, ycen + 0.2 * sp);
         const hollow = core < 0.5 && coreB < 0.75;
         const wid = xb - xa;
-        if (wid < 0.9 * sp) continue;
+        if (wid < 0.75 * sp) continue;
+        // a hole walled by two long verticals (barline + stem, two stems) and
+        // closed by staff lines is not a head: a head has at most one stem
+        if (hollow && twoTallWalls(R, xa, xb, ycen, sp)) continue;
         heads.push({ x: xm, y: ycen, staff: ps.st.index, p, sp, kind: hollow ? 'hollow' : 'filled', score: 1, w: wid, blob: c.id,
           x0: Math.round(xa), x1: Math.round(xb) });
       }
     }
   }
+  // self-calibrated width floor: engravings differ in head proportions
+  // (LilyPond ~1.3 spaces, some 1900s hymnals ~1.0), so the floor follows the
+  // page's median head width, within [0.78, 0.9] spaces
+  const rel = heads.map(h => h.w / h.sp).sort((a, b) => a - b);
+  const headW = rel.length >= 8 ? rel[rel.length >> 1] : 1.3;
+  const minW = Math.min(0.9, Math.max(0.78, 0.8 * headW));
   // dedupe
   heads.sort((a, b) => a.x - b.x);
   const out = [];
-  for (const h of heads) if (!out.some(o => o.staff === h.staff && o.p === h.p && Math.abs(o.x - h.x) < 0.6 * h.sp)) out.push(h);
-  return { heads: out, beams, opened: O };
+  for (const h of heads) {
+    if (h.w < minW * h.sp) continue;
+    if (!out.some(o => o.staff === h.staff && o.p === h.p && Math.abs(o.x - h.x) < 0.6 * h.sp)) out.push(h);
+  }
+  return { heads: out, beams, opened: O, headW };
 }
 
 // Ledger-line evidence.  A head more than half a space outside its staff

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>copista-2m in the browser</title>
+<meta name="description" content="The copista-2m music-symbol detector running in your browser on scanned SATB hymn pages.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="css/demo.css">
+</head>
+<body data-state="idle">
+<header class="masthead">
+  <p class="kicker">Score Scan Reader &middot; model trial</p>
+  <h1>copista-2m in the browser</h1>
+  <p class="lede">A 1.9-million-parameter music-symbol detector by <a href="https://huggingface.co/kobimusic/copista-2m">KobiMusic</a>, running entirely on this page: it finds noteheads, rests, accidentals, clefs and barlines on a scanned page and tells each notehead which voice it belongs to. Nothing you open here is uploaded.</p>
+  <nav class="links" aria-label="Project links">
+    <a href="../app/">Converter app</a>
+    <a href="../status/">Build status</a>
+    <a href="../docs/spike-ml.html">Trial write-up</a>
+    <a href="https://github.com/pension-plan/score-scan-reader">Source</a>
+  </nav>
+</header>
+
+<section class="controls" aria-label="Choose a page">
+  <div class="samples" role="group" aria-label="Sample scans">
+    <span class="label">Samples</span>
+    <button type="button" class="sample" data-src="samples/old-hundredth.pdf" data-name="Old Hundredth (CC0, scanned-look PDF)" aria-pressed="true">Old Hundredth</button>
+    <button type="button" class="sample" data-src="samples/st-anselm-1905.jpg" data-name="St. Anselm, Methodist Hymnal 1905 (public domain scan)" aria-pressed="false">St. Anselm, 1905</button>
+  </div>
+  <label class="drop" id="drop">
+    <input type="file" id="file" accept="application/pdf,image/png,image/jpeg,.pdf,.png,.jpg,.jpeg">
+    <span><strong>Open your own scan</strong> &mdash; PDF, PNG or JPG, or drop it here</span>
+  </label>
+  <label class="pagepick" id="pagepick" hidden>Page <select id="page"></select></label>
+</section>
+
+<p class="status" id="status" role="status" aria-live="polite">Starting&hellip;</p>
+
+<main class="layout">
+  <figure class="sheet" id="sheet">
+    <div class="stage" id="stage">
+      <canvas id="canvas" aria-label="Scanned page"></canvas>
+      <svg id="overlay" aria-hidden="true"></svg>
+    </div>
+    <figcaption id="caption"></figcaption>
+  </figure>
+
+  <aside class="panel">
+    <section aria-labelledby="h-legend">
+      <h2 id="h-legend">Symbols</h2>
+      <ul class="legend" id="legend"></ul>
+    </section>
+
+    <section aria-labelledby="h-pick" class="pick">
+      <h2 id="h-pick">Selected box</h2>
+      <div id="pick" class="pickbody"><p class="muted">Hover or click a box on the page.</p></div>
+    </section>
+
+    <section aria-labelledby="h-sum">
+      <h2 id="h-sum">This page</h2>
+      <dl class="facts" id="facts"></dl>
+      <h3>Noteheads by staff and voice slot</h3>
+      <div class="tablewrap"><table class="staves" id="staves"></table></div>
+      <p class="note warn" id="voicewarn" hidden>On this page nearly every notehead landed in one voice slot. The model reads stem direction poorly where two voices share a stem (common in older hymnals); the app will need its own voice logic for such pages.</p>
+      <p class="note">Voice slot 1 is the stems-up voice on a staff (soprano on the treble, tenor on the bass); slot 2 is stems down (alto, bass). Staves are found from the detected clefs.</p>
+      <h3>Families</h3>
+      <div class="tablewrap"><table class="fam" id="fam"></table></div>
+    </section>
+
+    <p class="note">This is the raw detector output: boxes, classes, confidences and note attributes straight from the model, with no music logic applied. The converter app will build on it in a later round to read pitches, rhythms and SATB parts.</p>
+  </aside>
+</main>
+
+<footer class="credits">
+  <p>Model: <a href="https://huggingface.co/kobimusic/copista-2m">copista-2m</a> and <a href="https://github.com/kobimusic/copisteria">copisteria</a> by <a href="https://kobi.music">KobiMusic</a>, Apache License 2.0 (<a href="models/LICENSE.copista-Apache-2.0.txt">licence</a>, <a href="models/NOTICE.copista-2m">NOTICE</a>, <a href="models/NOTICE.copisteria">NOTICE</a>). Modified: converted to ONNX, split into two graphs, weights stored as int8 (<a href="models/PROVENANCE.md">provenance</a>). Runtime: <a href="https://onnxruntime.ai/">ONNX Runtime Web</a> 1.30.0 (MIT), PDF rendering: <a href="https://mozilla.github.io/pdf.js/">pdf.js</a> 3.11.174 (Apache-2.0).</p>
+  <p>Samples: Old Hundredth, engraved and scan-degraded for this project, CC0 (<a href="samples/old-hundredth.ATTRIBUTION.txt">attribution</a>); St. Anselm from The Methodist Hymnal (1905), Internet Archive scan, public domain (<a href="samples/st-anselm-1905.ATTRIBUTION.txt">attribution</a>).</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

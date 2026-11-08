@@ -1,0 +1,910 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Build timeline</title>
+<style>
+:root { --bg: #fbfbfa; --fg: #1b1e24; --muted: #5a6170; --rule: #dde1e7; --accent: #2456a6; --code: #f0f2f5; }
+@media (prefers-color-scheme: dark) { :root { --bg: #13161b; --fg: #e5e8ed; --muted: #a2aab7; --rule: #2b313b; --accent: #82a8ea; --code: #1c2028; color-scheme: dark; } }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.65 "Source Serif 4", Georgia, serif; padding: 32px max(16px, env(safe-area-inset-right, 0px)) 64px max(16px, env(safe-area-inset-left, 0px)); }
+main { max-width: 820px; margin: 0 auto; }
+h1, h2, h3, h4 { font-family: system-ui, sans-serif; line-height: 1.25; text-wrap: balance; }
+a { color: var(--accent); }
+code, pre { font-family: ui-monospace, Menlo, monospace; font-size: 0.86em; background: var(--code); border-radius: 4px; }
+code { padding: 1px 4px; } pre { padding: 12px 14px; overflow-x: auto; } pre code { padding: 0; background: none; }
+table { border-collapse: collapse; display: block; overflow-x: auto; font-size: 0.92em; }
+th, td { border: 1px solid var(--rule); padding: 6px 10px; text-align: left; vertical-align: top; }
+nav.crumbs { font: 0.85rem system-ui, sans-serif; color: var(--muted); margin-bottom: 24px; }
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+</head>
+<body>
+<main><nav class="crumbs"><a href="../">Score Scan Reader</a> / docs / TIMELINE.md · <a href="https://github.com/pension-plan/score-scan-reader/blob/main/docs/TIMELINE.md">source</a></nav>
+<h1>Build timeline</h1>
+<p>All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 16:38 AEDT.</p>
+<h2>Events</h2>
+<table>
+<thead>
+<tr>
+<th>Time</th>
+<th>Event</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>14:47</td>
+<td>Environment checked. LilyPond 2.24 installed to make test scans.</td>
+</tr>
+<tr>
+<td>14:52</td>
+<td>First workflow started, built around born-digital vector PDFs.</td>
+</tr>
+<tr>
+<td>14:56</td>
+<td>Restarted with scanned (image) PDFs as the main input.</td>
+</tr>
+<tr>
+<td>14:58</td>
+<td>Restarted again with more agents in parallel: 7 research, 3 design, 9 build, 5 per improvement round, 6 review, 7 fix.</td>
+</tr>
+<tr>
+<td>15:12</td>
+<td>Web research on OMR methods finished: docs/research-omr.md.</td>
+</tr>
+<tr>
+<td>15:16</td>
+<td>Web research on voice and part splitting finished: docs/research-voices.md.</td>
+</tr>
+<tr>
+<td>15:19</td>
+<td>Asked to deliver as soon as possible. Fast-track first version started. Main workflow will restart from its research results with a single design step and at most 2 improvement rounds.</td>
+</tr>
+<tr>
+<td>15:20</td>
+<td>Software design document started; it will appear on this page.</td>
+</tr>
+<tr>
+<td>15:21</td>
+<td>Research section added: one entry per research item with findings and decisions.</td>
+</tr>
+<tr>
+<td>15:21</td>
+<td>Agent record added: every agent from all runs, generated from the workflow journals, with timings, tool-call counts and full outcomes.</td>
+</tr>
+<tr>
+<td>15:22</td>
+<td>Software design document finished (docs/SDD.md, 14 sections) and added to this page.</td>
+</tr>
+<tr>
+<td>15:30</td>
+<td>First version (v1) finished and published as its own artifact: <a href="https://pension-plan.github.io/score-scan-reader/app/">https://pension-plan.github.io/score-scan-reader/app/</a>. Sample converts in 6–9 s with lyrics; verified in headless Chromium under the artifact CSP.</td>
+</tr>
+<tr>
+<td>15:33</td>
+<td>Generic UI mock-up drawn in Excalidraw and added to this page (redrawn with rough.js from the same scene). Three component patterns pulled from 21st.dev (dropzone, stepper, code block) and written to docs/ui-refs/ for the UI builder.</td>
+</tr>
+<tr>
+<td>15:37</td>
+<td>Switched to fail fast, fix forward: the planned full rebuild is dropped. Fix-forward round 1 started on the live v1 (harness, then 5 parallel owners, then integrate and ship). The main workflow keeps running only until its research returns, then stops; its findings feed later rounds.</td>
+</tr>
+<tr>
+<td>15:38</td>
+<td>Known-limits tracker added. Every v1 limit now has an owner; from round 2 the integrator must report each one as resolved, partial or open with evidence. Unassigned limits (tuplets, clef/key changes, part names, page cap, stanza text) added to the round script.</td>
+</tr>
+<tr>
+<td>15:42</td>
+<td>Synthetic test set finished: 17 scored items, 20 pages, 293 measures, all checks passed. It is the benchmark for fix-forward rounds.</td>
+</tr>
+<tr>
+<td>15:50</td>
+<td>Plain-JS image trial finished: geometry near perfect, noteheads F1 98.5 on synthetic scans, but about 65–70% recall on real 1906 engraving. Its fixes feed round 2 (limit L1).</td>
+</tr>
+<tr>
+<td>15:51</td>
+<td>Round 1 baseline measured on 19 scored items (17 synthetic, 2 real): aggregate 0.589, pitch 0.49, duration 0.54, lyrics 0.44, parts 0.73, schema-valid 19/19, no crashes. Four new problems added to the tracker (L6–L9), the most serious being piano split into SATB.</td>
+</tr>
+<tr>
+<td>15:55</td>
+<td>Challenge test set started: 6 parallel generators (voices and parts, rhythm, pitch and notation, lyrics, layout and structure, scan damage extremes), then validation and a baseline score. Kept in corpus/challenge/ so the 19-item benchmark stays comparable across rounds.</td>
+</tr>
+<tr>
+<td>15:58</td>
+<td>Real-scan test set finished: 8 public-domain scans, 3 hand-transcribed (America, St. Anselm, a Schumann piano piece). The benchmark grows to 20 items.</td>
+</tr>
+<tr>
+<td>15:59</td>
+<td>Lyric OCR trial finished: lyric lines found 100% of the time, about 1.5% character error. Round 2 will switch to tesseract best_int eng/deu/lat models and port the line detector.</td>
+</tr>
+<tr>
+<td>16:02</td>
+<td>Round 1 UI owner finished: wireframe layout with the three 21st.dev patterns ported (drag-depth dropzone, accessible 7-step stepper driven by real progress, line-numbered MusicXML block with Copy). Passes 33 of 33 UI checks under the artifact CSP, up from 14. The build now refuses to write a page that breaks artifact rules. Interim score with other owners’ in-progress changes: 0.664, up from 0.589. Not shipped yet; the integrator verifies first.</td>
+</tr>
+<tr>
+<td>16:05</td>
+<td>Code published to GitHub: pension-plan/score-scan-reader (private), 573 files: app, harness, corpora (test-only Bach items excluded), design docs, status page, orchestration scripts, CI and release-please workflows. Every update from now on is committed and pushed.</td>
+</tr>
+<tr>
+<td>16:10</td>
+<td>Challenge set, lyrics: 8 items (Latin melismas, 6 German stanzas, French refrain and elisions, Latin + italic English, Welsh SATB with four separate lyric lines, hymnal text block, Italian triple elisions, Scandinavian multilingual), each with mild, standard and severe scans. All truths verified syllable by syllable against the engraving.</td>
+</tr>
+<tr>
+<td>16:10</td>
+<td>GitHub Pages live: app, status page and all docs now deploy from the repo on every push (pension-plan.github.io/score-scan-reader). Repo made public, which free-plan Pages requires.</td>
+</tr>
+<tr>
+<td>16:11</td>
+<td>Round 1 lyrics owner finished: lyric OCR syllable F 0.71 → 0.88; benchmark lyrics 0.71 → 0.81. Interim aggregate with all round-1 changes so far: 0.862 (baseline 0.589). Not yet integrated or shipped.</td>
+</tr>
+<tr>
+<td>16:12</td>
+<td>Round 1 voices owner finished: correct part count on 20 of 20 items (was 13), piano never split, rhythm repaired per measure instead of padding with rests (over-full voice-measures 259 → 0), printed rests detected. Interim aggregate 0.877. L6, L7 and L9 resolved.</td>
+</tr>
+<tr>
+<td>16:12</td>
+<td>Challenge set, rhythm: 8 items (tuplet etude, ties and double dots across system and page breaks, meter changes on piano, a rest zoo with multi-bar rests, grace notes and fermatas, closed SATB cross-rhythms and more), each with mild, standard and severe scans.</td>
+</tr>
+<tr>
+<td>16:12</td>
+<td>GitHub Pages first deploy succeeded; CI green on main.</td>
+</tr>
+<tr>
+<td>16:12</td>
+<td>Challenge set, scan damage: 85 items from 4 pieces (Amazing Grace SATB, a melody with 2 verses, two piano pieces that must not split) × 21 damage types, each mild/standard/severe: skew up to 10°, 90° and 180° pages (mixed orientation across pages), phone photo, book curl, yellowed paper, bleed-through, stains and pencil, punch holes and staple, cropped staff ends, halftone moiré, JPEG 15, thin and thick photocopy, 100–600 dpi, blur, noise, 2-up spreads, page scale mismatch, and everything combined. 336 image-only PDFs.</td>
+</tr>
+<tr>
+<td>16:12</td>
+<td>Challenge set, pitch and notation: 8 items (key-signature odyssey through 7 sharps and 7 flats, clef carousel with alto and tenor clefs changing mid-bar, accidental storm with double sharps and courtesy signs, extreme ledger lines and 8va/8vb across line breaks, chromatic closed SATB, enharmonic TTBB, a 2-page song with a key change at the page turn), each with mild, standard and severe scans.</td>
+</tr>
+<tr>
+<td>16:16</td>
+<td>Round 1 symbols owner finished: key signatures now right on every synthetic item (most read 0 before), treble-8vb clef recognised, accidentals judged on their own pixels. Pitch 0.74 → 0.86 on the same code snapshot. Interim aggregate 0.882.</td>
+</tr>
+<tr>
+<td>16:17</td>
+<td>Round 1 noteheads owner finished: missed quarter notes 609 → 250, false notes cut by two thirds, faint staff lines now detected (Haupt 1867: 1 → 6 staves). Pitch 0.65 → 0.86 on its own. All five round-1 owners done; the integrator is now measuring, reverting regressions and preparing the ship.</td>
+</tr>
+<tr>
+<td>16:18</td>
+<td>Challenge set, layout and structure: 7 items (12-page piano variations with repeats and endings, SATB anthem in closed score over piano with D.S. al Coda, 3-staff organ chorale scanned sideways, cross-staff piano nocturne, hymn with a small descant staff and a small Amen, piano trio reduction with bracket vs brace, and more), each with mild, standard and severe scans.</td>
+</tr>
+<tr>
+<td>16:19</td>
+<td>Challenge set, voices and parts: 7 items (closed SATB with voice crossing and every kind of unison, German labels with lyric lines that switch voice mid-line, SAB with the alto crossing to the bass staff, and more), each with mild, standard and severe scans. All six generators done (about 123 items); the validator is now checking every item and scoring the app against them.</td>
+</tr>
+<tr>
+<td>16:21</td>
+<td>Round 1 shipped: aggregate 0.589 → 0.884, real scans 0.618 → 0.865, 0 crashes, all 20 outputs schema-valid, browser check passed at 1280 and 400 px in light and dark. Nothing reverted: removing any owner’s change lowered the score. App republished and pushed (GitHub Pages redeploys).</td>
+</tr>
+<tr>
+<td>16:21</td>
+<td>Round 2 started: 5 owners in parallel working on beamed 8ths/16ths and dense chords, broken bass-staff clefs, tuplets and mid-staff clef changes, missing dots and flags, barline reconciliation, lyric voice assignment, merged OCR words, part-name labels, the 8-page cap and the stanza verses below the music; then integrate and ship.</td>
+</tr>
+<tr>
+<td>16:28</td>
+<td>All times on this page and in the repo timeline are now Sydney daylight time (AEDT, UTC+11).</td>
+</tr>
+<tr>
+<td>16:28</td>
+<td>Challenge set validated: 123 items, 365 image-only scans, all truths verified against LilyPond. Baseline with round 1 code: 0.747 (OCR), 0 crashes, but 35 files produce no notes. Worst: 90° pages, halftone screens, heavy noise, 2-up spreads, tuplets (8 divisions per quarter cannot represent them), double dots, multi-bar rests, double accidentals, 8va, mid-piece key/time changes, C clefs, two voices inside one part, bracketed instrument pairs read as piano. Nine new limits (L10–L18) queued for round 3. Committed to the repo except the 300 MB of scan-damage PDFs, which rebuild in about 40 s.</td>
+</tr>
+<tr>
+<td>16:30</td>
+<td>ML model trial finished: copista-2m (Apache-2.0, 2 MB ONNX) scores notehead F1 0.996 and voice-slot 0.991 on the trial scans and runs in the browser under artifact rules at about 4–5 s per page. All 7 research items are now done; the old main workflow was stopped as planned. Round 3 will add the model as a second detector and ship it only if it scores better.</td>
+</tr>
+<tr>
+<td>16:38</td>
+<td>Release 0.2.0 published on GitHub (round 1 code) with downloads: web app zip, source zip, design document. Release PRs will be merged after each round ships.</td>
+</tr>
+<tr>
+<td>16:38</td>
+<td>copista-2m ML demo page started, for GitHub Pages at /ml-demo/.</td>
+</tr>
+</tbody></table>
+<h2>Accuracy by round</h2>
+<p>Scores are against the benchmark of synthetic and real scans with exact answers (1.00 is perfect).</p>
+<table>
+<thead>
+<tr>
+<th>Run</th>
+<th>Overall</th>
+<th>Pitch</th>
+<th>Duration</th>
+<th>Lyrics</th>
+<th>Parts</th>
+<th>Schema-valid</th>
+<th>Real scans</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>v1 baseline</td>
+<td>0.589</td>
+<td>0.493</td>
+<td>0.542</td>
+<td>0.439</td>
+<td>0.727</td>
+<td>1.000</td>
+<td>0.618</td>
+</tr>
+<tr>
+<td>Round 1 (shipped)</td>
+<td>0.884</td>
+<td>0.863</td>
+<td>0.822</td>
+<td>0.817</td>
+<td>0.987</td>
+<td>1.000</td>
+<td>0.865</td>
+</tr>
+<tr>
+<td>Challenge set baseline (round 1 code, OCR)</td>
+<td>0.747</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+<td>–</td>
+</tr>
+</tbody></table>
+<h2>Known limits</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Limit</th>
+<th>Owner</th>
+<th>Status</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>L1</td>
+<td>Hollow noteheads sometimes missed (main source of rhythm errors)</td>
+<td>Noteheads and staves</td>
+<td>Partial (round 1)</td>
+<td>Hollow heads: wider insides filled, broken outlines closed, outline eaten by staff removal restored. Missed half notes 81 → 28, false whole notes 156 → 3. On the faint 1867 Haupt scan heads found 54 → 105. Beamed 8ths/16ths are now the largest miss source (598) — round 2.</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>Key signatures unreliable on old engraving</td>
+<td>Symbols</td>
+<td>Resolved on synthetic, partial on real (round 1)</td>
+<td>Header read left to right (clef, key, time); accidentals checked against where each sharp or flat should sit for the clef. Correct on every synthetic item; America 1 sharp and St. Anselm 4 sharps correct. Some broken bass staves on St. Anselm still guess the clef.</td>
+</tr>
+<tr>
+<td>L3a</td>
+<td>Rests not detected</td>
+<td>Symbols</td>
+<td>Partial (round 1)</td>
+<td>Printed rests now detected (whole, half, quarter, eighth) and placed; rests F1 0.14 → 0.41. Over-full voice-measures 259 → 0.</td>
+</tr>
+<tr>
+<td>L3b</td>
+<td>Ties and slurs not detected; a stray slur can create a false 16th</td>
+<td>Symbols</td>
+<td>In progress (round 1)</td>
+<td></td>
+</tr>
+<tr>
+<td>L3c</td>
+<td>Triplets and other tuplets not detected</td>
+<td>Symbols</td>
+<td>Queued for round 2</td>
+<td></td>
+</tr>
+<tr>
+<td>L3d</td>
+<td>Mid-piece clef and key changes not detected</td>
+<td>Symbols</td>
+<td>Partial (round 1)</td>
+<td>Treble-8vb clef detected; broken clefs re-joined; two treble clefs in a piano system kept as read. Per-system clef changes are read but not yet applied by score.js (round 2).</td>
+</tr>
+<tr>
+<td>L3e</td>
+<td>Part names not read from the labels at the start of each system</td>
+<td>Lyrics (OCR) + voices (apply)</td>
+<td>Queued for round 2</td>
+<td></td>
+</tr>
+<tr>
+<td>L4a</td>
+<td>Lyric alignment drifts when the note count is off</td>
+<td>Voices + lyrics</td>
+<td>Partial (round 1)</td>
+<td>Syllables now matched to notes by left-to-right alignment instead of nearest note; a lyric line goes to the staff above it.</td>
+</tr>
+<tr>
+<td>L4b</td>
+<td>No melisma or extender handling</td>
+<td>Lyrics + voices</td>
+<td>Partial (round 1)</td>
+<td>Hyphens carried across system breaks; extender underscores handled. Splitting unhyphenated words over several notes still open.</td>
+</tr>
+<tr>
+<td>L5a</td>
+<td>At most 8 PDF pages processed</td>
+<td>UI</td>
+<td>Queued for round 2</td>
+<td></td>
+</tr>
+<tr>
+<td>L5b</td>
+<td>Stanza text printed below the last system dropped for SATB</td>
+<td>Lyrics + voices</td>
+<td>Partial (round 1)</td>
+<td>Stanza blocks below the music are now detected and kept out of the underlay (no more poem text as lyrics). Attaching them as extra verses still open.</td>
+</tr>
+<tr>
+<td>L6</td>
+<td>Piano wrongly split: grand staves become S/A/T/B, voice+piano gets 4 parts instead of 2 (breaks the never-split-piano rule)</td>
+<td>Voices (score.js)</td>
+<td>Resolved (round 1)</td>
+<td>All 20 benchmark items now get the right part count (was 13 of 20). Piano grand staves are recognised by barlines running through both staves and are never split; Bach bwv67, Clara Schumann, Lindenbaum, Dichterliebe, Beach and Aloha fixed.</td>
+</tr>
+<tr>
+<td>L7</td>
+<td>Lyrics attached to every part in closed score (3–4× too many syllables)</td>
+<td>Voices + lyrics</td>
+<td>Resolved (round 1)</td>
+<td>Lyrics between staves go to the upper voice only; lines under the lowest split staff go to both its voices; copying to every voice is opt-in. Lyrics 0.60 → 0.82.</td>
+</tr>
+<tr>
+<td>L8</td>
+<td>Lyric text or other glyphs read as noteheads on single-melody pages</td>
+<td>Noteheads and staves</td>
+<td>Resolved (round 1)</td>
+<td>A notehead outside the staff must sit on or next to ledger lines, which removes lyric letters, tuplet numbers and dynamics. Jeanie 0.48 → 0.88, Silent Night 0.56 → 0.96.</td>
+</tr>
+<tr>
+<td>L9</td>
+<td>Part names generic or wrong (open score shows Staff N; TTBB named SATB, with an octave error)</td>
+<td>Voices + lyrics</td>
+<td>Resolved (round 1)</td>
+<td>Part names from the clef pattern: SATB, TTBB (new treble-8vb clef), SSAA, SAB, solo above SATB, Voice. Reading printed name labels is still tracked under L3e.</td>
+</tr>
+<tr>
+<td>L10</td>
+<td>Pages rotated 90° produce nothing; 180° pages read badly (pitch 0.21)</td>
+<td>Noteheads and staves (page orientation)</td>
+<td>Queued for round 3</td>
+<td>Challenge baseline: rot90 0.15 (all 12 files empty), rot180 0.50.</td>
+</tr>
+<tr>
+<td>L11</td>
+<td>Halftone screens and heavy noise blank the page</td>
+<td>Noteheads and staves (binarisation)</td>
+<td>Queued for round 3</td>
+<td>Challenge: halftone 0.37 (6 of 12 empty), noise 0.50; 35 of 365 files produce no notes.</td>
+</tr>
+<tr>
+<td>L12</td>
+<td>Two-page spreads read as one wide system (8–13 parts)</td>
+<td>Noteheads and staves (page split)</td>
+<td>Queued for round 3</td>
+<td>Challenge: 2-up spread 0.56.</td>
+</tr>
+<tr>
+<td>L13</td>
+<td>Tuplets cannot be represented: 8 divisions per quarter</td>
+<td>Symbols + voices + MusicXML</td>
+<td>Queued for round 3</td>
+<td>Challenge: 0.2% of 461 tuplet notes have the right duration. Needs divisions 24+ and tuplet markup.</td>
+</tr>
+<tr>
+<td>L14</td>
+<td>Double dots, multi-bar rests and whole-bar rests</td>
+<td>Symbols + voices</td>
+<td>Queued for round 3</td>
+<td>Challenge: double-dotted 0%; rh04 26 bars instead of 40; whole-bar rests 17%.</td>
+</tr>
+<tr>
+<td>L15</td>
+<td>Double sharps/flats and 8va/8vb brackets</td>
+<td>Symbols</td>
+<td>Queued for round 3</td>
+<td>Challenge: double accidentals 1 of 9 pitches; 9% under 8va.</td>
+</tr>
+<tr>
+<td>L16</td>
+<td>Key and time-signature changes mid-piece not written; C clefs (alto/tenor)</td>
+<td>Symbols + voices</td>
+<td>Queued for round 3</td>
+<td>Challenge: later keys 31%, time changes 35%, C clefs 29%. (Overlaps L3d.)</td>
+</tr>
+<tr>
+<td>L17</td>
+<td>Two voices inside one part (piano right hand, divisi) merged into chords</td>
+<td>Voices + MusicXML</td>
+<td>Queued for round 3</td>
+<td>Challenge: always merged in 9 pieces.</td>
+</tr>
+<tr>
+<td>L18</td>
+<td>A bracketed instrument pair (violin + cello) read as a piano grand staff; organ pedal staff becomes a separate part</td>
+<td>Voices (layout)</td>
+<td>Queued for round 3</td>
+<td>Challenge: trio and clef-carousel read as Piano; organ comes out Piano + Voice.</td>
+</tr>
+</tbody></table>
+<h2>Runs</h2>
+<table>
+<thead>
+<tr>
+<th>Run</th>
+<th>What</th>
+<th>Status</th>
+<th>Agents returned</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Run 1</td>
+<td>Vector-PDF design</td>
+<td>stopped</td>
+<td>0 of 4</td>
+<td>Stopped at 14:56 AEDT when the input was clarified as scanned images.</td>
+</tr>
+<tr>
+<td>Run 2</td>
+<td>Scanned-PDF design</td>
+<td>stopped</td>
+<td>0 of 4</td>
+<td>Stopped at 14:58 AEDT to restart with more agents in parallel.</td>
+</tr>
+<tr>
+<td>Run 4</td>
+<td>Fix-forward round 1 (shipped 0.884)</td>
+<td>done</td>
+<td>7 of 7</td>
+<td></td>
+</tr>
+<tr>
+<td>Run 5</td>
+<td>Challenge test set (edge cases + scan damage)</td>
+<td>running</td>
+<td>7 of 7</td>
+<td></td>
+</tr>
+<tr>
+<td>Run 6</td>
+<td>Fix-forward round 2</td>
+<td>running</td>
+<td>0 of 5</td>
+<td></td>
+</tr>
+<tr>
+<td>Run 3</td>
+<td>Max-parallel main workflow (research)</td>
+<td>stopped</td>
+<td>7 of 10</td>
+<td>Stopped at 16:30 AEDT once all 7 research items returned, as planned; its 3 design-proposal agents had just started and were stopped with it. The full rebuild was replaced by fix-forward rounds on v1.</td>
+</tr>
+<tr>
+<td>Side</td>
+<td>Agents launched directly from the session</td>
+<td>running</td>
+<td>2 of 3</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2>Agents</h2>
+<p>Every agent started for this build, including stopped runs. Outcomes are on the status page.</p>
+<table>
+<thead>
+<tr>
+<th>Run</th>
+<th>Phase</th>
+<th>Agent</th>
+<th>Status</th>
+<th>Started</th>
+<th>Finished</th>
+<th>Minutes</th>
+<th>Tool calls</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Run 1</td>
+<td>Research</td>
+<td>research:omr</td>
+<td>stopped</td>
+<td>14:52</td>
+<td>14:55</td>
+<td>3</td>
+<td>35</td>
+</tr>
+<tr>
+<td>Run 1</td>
+<td>Research</td>
+<td>research:voices</td>
+<td>stopped</td>
+<td>14:52</td>
+<td>14:55</td>
+<td>3</td>
+<td>55</td>
+</tr>
+<tr>
+<td>Run 1</td>
+<td>Research</td>
+<td>research:pdfjs-probe</td>
+<td>stopped</td>
+<td>14:52</td>
+<td>14:55</td>
+<td>3</td>
+<td>14</td>
+</tr>
+<tr>
+<td>Run 1</td>
+<td>Research</td>
+<td>research:corpus</td>
+<td>stopped</td>
+<td>14:52</td>
+<td>14:55</td>
+<td>3</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Run 2</td>
+<td>Research</td>
+<td>research:omr</td>
+<td>stopped</td>
+<td>14:57</td>
+<td>14:57</td>
+<td>0</td>
+<td>6</td>
+</tr>
+<tr>
+<td>Run 2</td>
+<td>Research</td>
+<td>research:voices</td>
+<td>stopped</td>
+<td>14:57</td>
+<td>14:57</td>
+<td>0</td>
+<td>6</td>
+</tr>
+<tr>
+<td>Run 2</td>
+<td>Research</td>
+<td>research:spike</td>
+<td>stopped</td>
+<td>14:57</td>
+<td>14:57</td>
+<td>0</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Run 2</td>
+<td>Research</td>
+<td>research:corpus</td>
+<td>stopped</td>
+<td>14:57</td>
+<td>14:57</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Run 4</td>
+<td>Harness</td>
+<td>harness</td>
+<td>done</td>
+<td>15:36</td>
+<td>15:51</td>
+<td>15</td>
+<td>22</td>
+</tr>
+<tr>
+<td>Run 4</td>
+<td>Fix</td>
+<td>fix:r1:heads</td>
+<td>done</td>
+<td>15:51</td>
+<td>16:16</td>
+<td>25</td>
+<td>185</td>
+</tr>
+<tr>
+<td>Run 4</td>
+<td>Fix</td>
+<td>fix:r1:symbols</td>
+<td>done</td>
+<td>15:51</td>
+<td>16:16</td>
+<td>25</td>
+<td>173</td>
+</tr>
+<tr>
+<td>Run 4</td>
+<td>Fix</td>
+<td>fix:r1:score</td>
+<td>done</td>
+<td>15:51</td>
+<td>16:11</td>
+<td>20</td>
+<td>130</td>
+</tr>
+<tr>
+<td>Run 4</td>
+<td>Fix</td>
+<td>fix:r1:lyrics</td>
+<td>done</td>
+<td>15:51</td>
+<td>16:11</td>
+<td>20</td>
+<td>129</td>
+</tr>
+<tr>
+<td>Run 4</td>
+<td>Fix</td>
+<td>fix:r1:ui</td>
+<td>done</td>
+<td>15:51</td>
+<td>16:01</td>
+<td>10</td>
+<td>47</td>
+</tr>
+<tr>
+<td>Run 4</td>
+<td>Integrate</td>
+<td>integrate:r1</td>
+<td>done</td>
+<td>16:16</td>
+<td>16:21</td>
+<td>5</td>
+<td>45</td>
+</tr>
+<tr>
+<td>Run 5</td>
+<td>Generate</td>
+<td>gen:voices</td>
+<td>done</td>
+<td>15:55</td>
+<td>16:18</td>
+<td>23</td>
+<td>128</td>
+</tr>
+<tr>
+<td>Run 5</td>
+<td>Generate</td>
+<td>gen:rhythm</td>
+<td>done</td>
+<td>15:55</td>
+<td>16:11</td>
+<td>16</td>
+<td>97</td>
+</tr>
+<tr>
+<td>Run 5</td>
+<td>Generate</td>
+<td>gen:pitch</td>
+<td>done</td>
+<td>15:55</td>
+<td>16:12</td>
+<td>17</td>
+<td>82</td>
+</tr>
+<tr>
+<td>Run 5</td>
+<td>Generate</td>
+<td>gen:lyrics</td>
+<td>done</td>
+<td>15:55</td>
+<td>16:10</td>
+<td>15</td>
+<td>83</td>
+</tr>
+<tr>
+<td>Run 5</td>
+<td>Generate</td>
+<td>gen:layout</td>
+<td>done</td>
+<td>15:55</td>
+<td>16:18</td>
+<td>23</td>
+<td>120</td>
+</tr>
+<tr>
+<td>Run 5</td>
+<td>Generate</td>
+<td>gen:degradation</td>
+<td>done</td>
+<td>15:55</td>
+<td>16:12</td>
+<td>17</td>
+<td>87</td>
+</tr>
+<tr>
+<td>Run 5</td>
+<td>Validate</td>
+<td>validate+baseline</td>
+<td>done</td>
+<td>16:18</td>
+<td>16:28</td>
+<td>10</td>
+<td>70</td>
+</tr>
+<tr>
+<td>Run 6</td>
+<td>Fix</td>
+<td>fix:r2:heads</td>
+<td>run</td>
+<td>16:21</td>
+<td></td>
+<td>17</td>
+<td>150</td>
+</tr>
+<tr>
+<td>Run 6</td>
+<td>Fix</td>
+<td>fix:r2:symbols</td>
+<td>run</td>
+<td>16:21</td>
+<td></td>
+<td>17</td>
+<td>124</td>
+</tr>
+<tr>
+<td>Run 6</td>
+<td>Fix</td>
+<td>fix:r2:score</td>
+<td>run</td>
+<td>16:21</td>
+<td></td>
+<td>12</td>
+<td>90</td>
+</tr>
+<tr>
+<td>Run 6</td>
+<td>Fix</td>
+<td>fix:r2:lyrics</td>
+<td>run</td>
+<td>16:21</td>
+<td></td>
+<td>17</td>
+<td>98</td>
+</tr>
+<tr>
+<td>Run 6</td>
+<td>Fix</td>
+<td>fix:r2:ui</td>
+<td>run</td>
+<td>16:21</td>
+<td></td>
+<td>15</td>
+<td>74</td>
+</tr>
+<tr>
+<td>Run 3</td>
+<td>Research</td>
+<td>web:omr</td>
+<td>done</td>
+<td>14:58</td>
+<td>15:11</td>
+<td>13</td>
+<td>77</td>
+</tr>
+<tr>
+<td>Run 3</td>
+<td>Research</td>
+<td>web:voices</td>
+<td>done</td>
+<td>14:58</td>
+<td>15:15</td>
+<td>17</td>
+<td>120</td>
+</tr>
+<tr>
+<td>Run 3</td>
+<td>Research</td>
+<td>spike:ml</td>
+<td>done</td>
+<td>14:58</td>
+<td>16:30</td>
+<td>92</td>
+<td>193</td>
+</tr>
+<tr>
+<td>Run 3</td>
+<td>Research</td>
+<td>spike:classical</td>
+<td>done</td>
+<td>14:58</td>
+<td>15:50</td>
+<td>52</td>
+<td>120</td>
+</tr>
+<tr>
+<td>Run 3</td>
+<td>Research</td>
+<td>spike:ocr</td>
+<td>done</td>
+<td>14:58</td>
+<td>15:58</td>
+<td>60</td>
+<td>129</td>
+</tr>
+<tr>
+<td>Run 3</td>
+<td>Research</td>
+<td>corpus:synthetic</td>
+<td>done</td>
+<td>14:58</td>
+<td>15:42</td>
+<td>44</td>
+<td>82</td>
+</tr>
+<tr>
+<td>Run 3</td>
+<td>Research</td>
+<td>corpus:real</td>
+<td>done</td>
+<td>14:58</td>
+<td>15:57</td>
+<td>59</td>
+<td>189</td>
+</tr>
+<tr>
+<td>Run 3</td>
+<td>Design</td>
+<td>design:proposal-1</td>
+<td>stopped</td>
+<td>16:30</td>
+<td>16:30</td>
+<td>0</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Run 3</td>
+<td>Design</td>
+<td>design:proposal-2</td>
+<td>stopped</td>
+<td>16:30</td>
+<td>16:30</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Run 3</td>
+<td>Design</td>
+<td>design:proposal-3</td>
+<td>stopped</td>
+<td>16:30</td>
+<td>16:30</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Side</td>
+<td>ML demo</td>
+<td>copista-2m demo page for GitHub Pages</td>
+<td>run</td>
+<td>16:38</td>
+<td></td>
+<td>0</td>
+<td>5</td>
+</tr>
+<tr>
+<td>Side</td>
+<td>Fast track</td>
+<td>First version build (mvp/)</td>
+<td>done</td>
+<td>15:19</td>
+<td>15:29</td>
+<td>10</td>
+<td>69</td>
+</tr>
+<tr>
+<td>Side</td>
+<td>Fast track</td>
+<td>Software design document</td>
+<td>done</td>
+<td>15:20</td>
+<td>15:22</td>
+<td>2</td>
+<td>16</td>
+</tr>
+</tbody></table>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+<script>window.mermaid && mermaid.initialize({ startOnLoad: true, theme: matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default' });</script>
+</body>
+</html>

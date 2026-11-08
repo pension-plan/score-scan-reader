@@ -1,0 +1,3 @@
+7d7d30e4f377182b46c335673ebe62dcface780dec32ca3c1eb6e31d8a43f008  copista2m-dense.int8w.onnx
+67414baf54ab824baec9a27dbd796244a3242f5ee81ddf706cec90b28c02f10a  copista2m-rel.int8w.onnx
+7e715f6421f92acb647d5c9e5678a33ae42737deb94d386f2d4394637e0f7dd6  copista2m-classes.json

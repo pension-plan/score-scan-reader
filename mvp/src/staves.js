@@ -52,9 +52,12 @@ function fivePatterns(peaks, ss) {
   const used = new Uint8Array(peaks.length);
   for (let i = 0; i < peaks.length; i++) {
     if (used[i]) continue;
-    const seq = [i];
+    let seq = [i];
     let last = i, gap = ss;
-    for (let k = 1; k < 5; k++) {
+    // follow the chain past five lines: ledger lines above / below a staff
+    // continue its spacing, and the five strongest consecutive peaks (full
+    // staff lines, not the short ledgers) are the staff
+    for (let k = 1; k < 9; k++) {
       let best = -1, bd = 1e9;
       for (let j = last + 1; j < peaks.length; j++) {
         const d = peaks[j].y - peaks[last].y;
@@ -67,11 +70,20 @@ function fivePatterns(peaks, ss) {
       if (k === 1) gap = peaks[best].y - peaks[last].y;
       seq.push(best); last = best;
     }
+    if (seq.length > 5) {
+      // the window whose weakest line is clearly the strongest (a ledger is
+      // the weakest "line" of a window that includes it)
+      const minOf = (a) => Math.min(...seq.slice(a, a + 5).map(j => peaks[j].strength));
+      let ba = 0, bm = minOf(0);
+      for (let a = 1; a + 5 <= seq.length; a++) { const m = minOf(a); if (m > 1.25 * bm) { bm = m; ba = a; } }
+      seq = seq.slice(ba, ba + 5);
+    }
     if (seq.length === 5) {
       const ys = seq.map(j => peaks[j].y);
       const gaps = ys.slice(1).map((y, k) => y - ys[k]);
       const mg = (ys[4] - ys[0]) / 4;
-      if (Math.max(...gaps) - Math.min(...gaps) <= 0.4 * mg) {
+      // two chains can settle on the same five lines: keep one
+      if (Math.max(...gaps) - Math.min(...gaps) <= 0.4 * mg && !out.some(o => Math.abs(o.ys[0] - ys[0]) < 0.3 * ss && Math.abs(o.ys[4] - ys[4]) < 0.3 * ss)) {
         out.push({ ys, space: mg });
         seq.forEach(j => { used[j] = 1; });
       }

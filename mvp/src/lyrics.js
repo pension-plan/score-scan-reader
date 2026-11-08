@@ -1018,4 +1018,16 @@ async function readLyrics(fr, ocr, onProgress, opts) {
   return out;
 }
 
-module.exports = { readLyrics, readPartLabels, readStanzas, syllabify, findTextLines, findTextLinesCC, toSyllables, splitSyllable, vowelGroups, detectLang, cropGray, DEFAULTS, _analyseRow: analyseRow };
+// Recommended tesseract.js setup for the injected ocr() (docs/spike-ocr.md):
+// tesseract.js 7 LSTM core, best_int models (NOT tessdata_best float: it
+// aborts in tesseract.js 7), one masked text line per call (PSM 7).
+// Round 2 benchmark, lyrics vs eng alone: eng+deu +0.005 at 1.4x OCR time,
+// eng+deu+lat +0.005 at 2.1x (the lat model is weak, spike 5a) -> eng+deu.
+const OCR_CONFIG = {
+  langs: 'eng+deu',
+  oem: 1,
+  files: ['eng.traineddata.gz', 'deu.traineddata.gz'],
+  params: { tessedit_pageseg_mode: '7', user_defined_dpi: '300' },
+};
+
+module.exports = { OCR_CONFIG, readLyrics, readPartLabels, readStanzas, syllabify, findTextLines, findTextLinesCC, toSyllables, splitSyllable, vowelGroups, detectLang, cropGray, DEFAULTS, _analyseRow: analyseRow };

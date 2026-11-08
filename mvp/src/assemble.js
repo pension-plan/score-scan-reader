@@ -397,25 +397,40 @@ function analyseHeader(R, comps, st, limitX, trace) {
 }
 
 // --------------------------------------------------------------- duration ---
-function countBeams(R, x, tip, dir, sp) {
-  // count horizontal bars crossing columns beside the stem tip
+// Runs of ink down column cx from just beyond a stem tip toward the head:
+// [{a, b, len, linked}] in pixels from the tip; linked when the run touches
+// the stem (column nx).
+function tipRuns(R, cx, nx, tip, dir, sp, spanSp = 1.6) {
   const { width: w, height: h, data } = R;
+  const out = [];
+  if (cx < 0 || cx >= w) return out;
+  const span = Math.round(spanSp * sp);
+  let run = 0, linked = false, a = 0;
+  for (let i = -2; i <= span + 1; i++) {
+    const y = Math.round(tip + dir * i);
+    const on = i <= span && y >= 0 && y < h && data[y * w + cx];
+    if (on) {
+      if (!run) a = i;
+      run++;
+      if (data[y * w + nx] || data[y * w + nx + Math.sign(cx - nx)]) linked = true;
+    } else if (run) { out.push({ a, b: a + run - 1, len: run, linked }); run = 0; linked = false; }
+  }
+  return out;
+}
+
+// Beams (or flags) on a stem: bars touching the stem beside its tip, all of
+// about one thickness (a slur or tie ending at the tip is much thinner than
+// the beams there, so it does not add a beam).
+function countBeams(R, x, tip, dir, sp) {
   let best = 0;
-  for (const off of [-0.7, -0.45, 0.45, 0.7]) {
-    const cx = Math.round(x + off * sp);
-    if (cx < 0 || cx >= w) continue;
-    let n = 0, run = 0, linked = false;
-    const span = Math.round(1.6 * sp);
-    // the bar must touch the stem (text near a stem tip does not)
-    const nx = Math.round(x + Math.sign(off) * 0.15 * sp);
-    for (let i = -2; i <= span; i++) {
-      const y = Math.round(tip + dir * i);
-      const on = y >= 0 && y < h && data[y * w + cx];
-      if (on) { run++; if (data[y * w + nx] || data[y * w + nx + Math.sign(off)]) linked = true; }
-      else { if (run >= 0.22 * sp && run <= 0.9 * sp && linked) n++; run = 0; linked = false; }
+  for (const side of [-1, 1]) {
+    const nx = Math.round(x + side * 0.15 * sp);
+    for (const off of [0.45, 0.7]) {
+      const bars = tipRuns(R, Math.round(x + side * off * sp), nx, tip, dir, sp).filter(r => r.linked && r.len >= 0.22 * sp && r.len <= 0.9 * sp);
+      if (!bars.length) continue;
+      const thick = Math.max(...bars.map(r => r.len));
+      best = Math.max(best, bars.filter(r => r.len >= 0.5 * thick).length);
     }
-    if (run >= 0.22 * sp && run <= 0.9 * sp && linked) n++;
-    best = Math.max(best, n);
   }
   return Math.min(3, best);
 }
