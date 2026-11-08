@@ -1481,7 +1481,7 @@
           3540
         ],
         "image_mode": "RGB",
-        "bytes": 651787,
+        "bytes": 649760,
         "image_only_check": {
           "image_only": true,
           "fonts": [],
@@ -1541,7 +1541,7 @@
           3508
         ],
         "image_mode": "RGB",
-        "bytes": 482871,
+        "bytes": 479966,
         "image_only_check": {
           "image_only": true,
           "fonts": [],
@@ -1625,7 +1625,7 @@
           3568
         ],
         "image_mode": "RGB",
-        "bytes": 256355,
+        "bytes": 255239,
         "image_only_check": {
           "image_only": true,
           "fonts": [],

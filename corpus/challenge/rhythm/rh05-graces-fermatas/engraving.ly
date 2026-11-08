@@ -30,7 +30,7 @@
       \new Staff = "stP2s1" { \clef "treble"
           \new Voice = "vP2x1" {
     \autoBeamOff
-    \key d \major <fis' a'>4 <fis' a'>4 <g' b'>4 <e' a'>4 |
+    \key d \major \grace { s8 } <fis' a'>4 <fis' a'>4 <g' b'>4 <e' a'>4 |
     <a' d''>2\fermata r4 <a' d''>4 |
     <b' e''>4 <g' b'>4 <fis' a'>4 <a' d''>4 |
     <b' d''>4.\fermata <a' d''>8 <g' cis''>4 <e' a'>4 |
@@ -43,7 +43,7 @@
       \new Staff = "stP2s2" { \clef "bass"
           \new Voice = "vP2x5" {
     \autoBeamOff
-    \key d \major d4 d4 g,4 a,4 |
+    \key d \major \grace { s8 } d4 d4 g,4 a,4 |
     d2\fermata r4 d4 |
     e,8[ e8] g,8[ g8] a,8[ a8] fis,8[ fis8] |
     g,4.\fermata g8 a,4 a,4 |

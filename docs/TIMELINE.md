@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 09:19 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 09:36 AEDT.
 
 ## Events
 
@@ -190,6 +190,8 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 09:01 | Wedge 14 to 12 accepted: one false crescendo (staff-line remnants + flats inside a staff) removed by opencv 0739024 (staves extended to margins); real crescendo never found before or after. opencv: 9ba5604 dotted stems, 0739024 staves to margins (missing notes 2571 to 2497), 4273614 solid keys (andantino 0.854 to 0.917), 244e8d5 beamed cue heads; structure 572d4d2/f59ce5f/3b65d04 key context; voices ff375e0 names from titles, eb287a1 cue limit. Next: opencv gray template scan (time-boxed), structure same-key carry errors, voices hairpin-in-staff guard. |
 | 09:08 | opencv gray-level head template scan: no net gain (challenge -0.0038, extras 1508 to 2166), written up (be55817), stopped. Last time-boxed target: fake stacked chords from fused accidental blobs on severe scans. |
 | 09:19 | opencv closed its queue: surplus-notes round and halftone descreen trigger not shipped (written up); L39 recorded (needs a notch filter). opencv standing by. |
+| 09:35 | structure adb78b4: ties over barlines keep their tied alteration; cutAccidental refuses notehead squares (false sharps challenge 240 to 231, variations-12 10 to 1; clara recovered). Remaining ~45 not carry logic; St Anselm m20 truth to be checked against the scan. |
+| 09:36 | structure 740f203: accidentals touching their heads cut apart and read (St Anselm truth verified correct by eye; real-scan 0.818 to 0.822; accidentals toward truth on all sets). rh05 'grace sharp' is a generator defect (two clefs, key over time digits): fix the test data, not the app. |
 
 ## Accuracy by round
 

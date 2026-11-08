@@ -218,7 +218,11 @@ ITEMS = [
         id='rh05-graces-fermatas', title='Air with Graces (violin and piano)', make=I.mk_rh05, pages=1,
         source='Composed for this corpus (CC0).', license=LIC,
         attribution='Air with Graces for violin and piano - composed for the OMR rhythm challenge corpus.\n\n'
-                    + CC0_ATT,
+                    + CC0_ATT + '\n\nRevision 2026-11-08: regenerated (same seeds) after a generator fix. The violin\'s grace '
+                    'note before the very first note had no matching grace time in the piano staves, so LilyPond '
+                    'printed each piano staff\'s clef a second time with the key signature over the time digits '
+                    '(an engraving defect, not an edge case). lily.py now adds a grace skip there; truth.musicxml is '
+                    'unchanged. Checked by eye on the regenerated clean.pdf / scan.pdf: one clef, key and time per staff.',
         edge_cases=['acciaccatura', 'appoggiatura', 'grace_group_16ths', 'grace_group_32nds', 'grace_at_bar_start',
                     'grace_before_first_note', 'unslashed_single_grace', 'fermata_on_note', 'fermata_on_rest',
                     'fermata_on_chord', 'simultaneous_fermatas_all_staves', 'sixteenth_beamed_groups',

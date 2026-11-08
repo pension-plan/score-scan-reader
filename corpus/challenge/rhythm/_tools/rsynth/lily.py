@@ -6,6 +6,7 @@ rehearsal marks / tempo words, forced system/page breaks and named Lyrics contex
 (used by the event-dump verification)."""
 from __future__ import annotations
 
+import re
 from fractions import Fraction as F
 
 from .model import Score, lyric_verses, staff_roles
@@ -213,6 +214,8 @@ class LilyWriter:
             tot = sum((x.dur for x in evs), F(0))
             nm_ = len(s.measures)
             self._allow_R = e['reset'] is None and (i + 1 >= nm_ or plan[i + 1]['reset'] is None)
+            if i == 0:
+                line.extend(self.lead_grace_skip(evs))
             line.extend(self.events_ly(evs))
             if tot < mi.dur:
                 line.append('s' + frac_whole(mi.dur - tot))
@@ -231,6 +234,27 @@ class LilyWriter:
                     line.append('\\break')
             out.append(' '.join(line))
         return '\n    '.join(out)
+
+    def lead_grace_skip(self, evs):
+        # Grace notes before the very first note of one voice need the same grace time in every other
+        # voice (LilyPond's grace synchronisation); without it the other staves print their clef,
+        # key and time a second time at the grace moment, the key overprinting the time digits.
+        if evs and evs[0].grace:
+            return []
+        lead = []
+        for p_ in self.s.parts:
+            for vevs in p_.measures[0].values():
+                g = []
+                for x in vevs:
+                    if not x.grace:
+                        break
+                    g.append(x)
+                lead.append(g)
+        g = max(lead, key=len, default=[])
+        if not g:
+            return []
+        durs = [re.sub(r'^[a-g](?:is|es)*[,\']*', '', self.event_ly(x).split()[-1].split('[')[0].split('(')[0]) for x in g]
+        return ['\\grace { ' + ' '.join('s' + d for d in durs) + ' }']
 
     def events_ly(self, evs):
         out = []
