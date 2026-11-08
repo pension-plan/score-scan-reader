@@ -218,4 +218,75 @@ function despeckle(bin, maxArea) {
   return out;
 }
 
-module.exports = { despeckle, binarize, backgroundNormalize, otsuFromHist, histogram, threshold, sauvola, estimateNoise, boxBlur, median3 };
+// Dark scanner borders, paper edges and edge shadows binarize to bands of
+// ink along the page edges; staves walk on into them and they join every
+// staff to the next.  In the outer 12% of the width, a group of adjacent
+// columns holding vertical ink runs of a third of the page height or more
+// (gaps of a few px bridged), at least 6 px wide, with no staff lines running
+// off its inner side (a system's opening line and bracket have them) is
+// cleared, with the columns next to it that still hold runs of a tenth.
+function clearEdgeBands(bin, opts = {}) {
+  const { width: w, height: h, data } = bin;
+  const zone = Math.round(0.12 * w);
+  // vertical ink runs of column x at least min long (gaps of <= 3 px bridged)
+  const longest = (x, min) => {
+    const runs = [];
+    for (let y = 0; y < h;) {
+      if (!data[y * w + x]) { y++; continue; }
+      let y1 = y + 1, last = y;
+      while (y1 < h && y1 - last <= 4) { if (data[y1 * w + x]) last = y1; y1++; }
+      if (last + 1 - y >= min) runs.push([y, last + 1]);
+      y = last + 1;
+    }
+    return runs;
+  };
+  const isLong = new Uint8Array(w);
+  for (let x = 0; x < w; x++) if ((x < zone || x >= w - zone) && longest(x, Math.round(h / 3)).length) isLong[x] = 1;
+  const groups = [];
+  for (let x = 0; x < w; x++) {
+    if (!isLong[x]) continue;
+    let x1 = x; while (x1 + 1 < w && isLong[x1 + 1]) x1++;
+    groups.push([x, x1]); x = x1;
+  }
+  let out = null, cleared = 0;
+  const bands = [];
+  const clear = (x) => {
+    for (const [a, b] of longest(x, Math.round(h / 10))) { for (let y = a; y < b; y++) out.data[y * w + x] = 0; cleared += b - a; }
+  };
+  if (opts.bands) {
+    // bands found on another binary of the page (a lenient threshold widens
+    // them into the staff ends): long vertical runs there go, lines stay
+    for (const [x0, x1] of opts.bands) {
+      if (!out) out = { width: w, height: h, data: new Uint8Array(data) };
+      for (let x = Math.max(0, x0 - 30); x <= Math.min(w - 1, x1 + 30); x++) clear(x);
+    }
+    return { binary: out || bin, cleared, bands: opts.bands };
+  }
+  for (const [x0, x1] of groups) {
+    if (x1 - x0 + 1 < 6) continue;
+    // staff lines leaving the inner side: long horizontal runs from the edge
+    const dir = x0 < w / 2 ? 1 : -1, xe = dir === 1 ? x1 + 1 : x0 - 1;
+    // (thin ones: a dark border along the top or bottom edge is thick)
+    let attached = 0;
+    const xt = xe + dir * 15;
+    for (let y = 5; y < h - 5 && attached < 10; y++) {
+      if (xt < 0 || xt >= w || data[(y - 5) * w + xt] || data[(y + 5) * w + xt]) continue;
+      let n = 0;
+      for (let x = xe; x >= 0 && x < w && Math.abs(x - xe) < 40 && data[y * w + x]; x += dir) n++;
+      if (n >= 30) attached++;
+    }
+    if (attached >= 10) continue;
+    if (!out) out = { width: w, height: h, data: new Uint8Array(data) };
+    bands.push([x0, x1]);
+    for (let x = x0; x <= x1; x++) clear(x);
+    for (const [xs, d] of [[x0 - 1, -1], [x1 + 1, 1]]) {
+      for (let k = 0, xx = xs; k < 8 && xx >= 0 && xx < w; k++, xx += d) {
+        if (!longest(xx, Math.round(h / 10)).length) break;
+        clear(xx);
+      }
+    }
+  }
+  return { binary: out || bin, cleared, bands };
+}
+
+module.exports = { clearEdgeBands, despeckle, binarize, backgroundNormalize, otsuFromHist, histogram, threshold, sauvola, estimateNoise, boxBlur, median3 };

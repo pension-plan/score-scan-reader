@@ -1,7 +1,7 @@
 'use strict';
 // Front end: gray page -> staves, systems, heads (+stems), beams, barlines.
 // Works in the deskewed frame; everything downstream uses that frame.
-const { binarize, boxBlur, despeckle } = require('./binarize');
+const { binarize, boxBlur, despeckle, clearEdgeBands } = require('./binarize');
 const { estimateSkew } = require('./skew');
 const { estimateStaffSpace } = require('./staffspace');
 const { detectStaves, groupSystems, mergeStaffSets, lineCoverage, bridgeRows } = require('./staves');
@@ -145,11 +145,12 @@ function clean(gray, mode) {
     gray = rotateGray(gray, (-skew.angle * Math.PI) / 180);
     bz = bin(gray);
   }
-  let B = mode.bridge ? threshold(bz.gray, BRIDGE_T) : bz.binary;
+  const eb = clearEdgeBands(mode.bridge ? threshold(bz.gray, BRIDGE_T) : bz.binary);
+  let B = eb.binary;
   const SB = mode.bridge ? staffBinary(bz, mode) : null;
   sp = estimateStaffSpace(SB || B);
   if (mode.despeckle && bz.info.noise > 12) { B = despeckle(B, Math.max(2, Math.round(0.02 * sp.ss * sp.ss))); sp = estimateStaffSpace(B); }
-  return { gray, bz, B, SB, sp, scale, skew, mode: mode.name };
+  return { gray, bz, B, SB, sp, scale, skew, mode: mode.name, bands: eb.bands };
 }
 
 // Staves on the main binary and on a lenient one (faint / thin-ruled scans
@@ -157,7 +158,7 @@ function clean(gray, mode) {
 function findStaves(c) {
   const { bz, B, SB } = c;
   let { sp } = c;
-  const L0 = threshold(bz.gray, Math.min(235, (bz.info.threshold || 180) + 35));
+  const L0 = clearEdgeBands(threshold(bz.gray, Math.min(235, (bz.info.threshold || 180) + 35)), c.bands && c.bands.length ? { bands: c.bands } : {}).binary;
   if (SB) {
     c.staves = mergeStaffSets([detectStaves(SB, sp.ss, sp.lt)], SB, sp.lt, sp.ss);
     return Object.assign(c, { L0, ltL: sp.lt });

@@ -265,8 +265,9 @@ function findTextLinesCC(fr, sysIdx, nextTop, o, prevBot = 0) {
       // masked strip: member pixels (dilated by 1 px for the soft glyph edges) from the gray page
       const pad = Math.max(2, Math.round(0.4 * ln.xh));
       const sx0 = Math.max(0, lx0 - pad), sx1 = Math.min(bw - 1, lx1 + pad);
-      const sy0 = Math.max(0, Math.round(Math.min(ln.bl - 1.6 * ln.tall, ...mem.map(c => c.sy0))) - 2);
-      const sy1 = Math.min(bh - 1, Math.round(Math.max(ln.bl + 0.5 * ln.tall, ...mem.map(c => c.sy1))) + 2);
+      // (straightened rows may reach past the band's edges where it tilts)
+      const sy0 = Math.max(tilt ? -bh : 0, Math.round(Math.min(ln.bl - 1.6 * ln.tall, ...mem.map(c => c.sy0))) - 2);
+      const sy1 = Math.min(tilt ? 2 * bh : bh - 1, Math.round(Math.max(ln.bl + 0.5 * ln.tall, ...mem.map(c => c.sy1))) + 2);
       const SW = sx1 - sx0 + 1, SH = sy1 - sy0 + 1;
       // per band column: rows the (straightened) line is shifted by
       const lsh = new Int32Array(bw);
