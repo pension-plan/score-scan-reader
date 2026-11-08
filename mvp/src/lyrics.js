@@ -1072,20 +1072,35 @@ function stanzaChunks(fr, yStart) {
   }
   peaks.sort((a, b) => a - b);
   const chunks = [];
+  const gapOf = (tall) => Math.max(3 * sp, 2.5 * tall);
   for (const bl of peaks) {
-    const core = letters.filter(c => Math.abs(c.y1 - bl) <= 0.25 * sp + 1);
-    if (core.length < 4) continue;
-    const hs = core.map(c => c.y1 - c.y0 + 1).sort((a, b) => a - b);
-    const tall = median(hs.slice(hs.length >> 1));
-    if (tall < 0.5 * sp) continue;
-    const mem = cand.filter(c => c.y0 >= bl - 1.6 * tall && c.y1 <= bl + 0.6 * tall).sort((a, b) => a.x0 - b.x0);
-    // split at column gaps
-    let cur = null;
-    const gapMax = Math.max(3 * sp, 2.5 * tall);
-    for (const c of mem) {
-      if (cur && c.x0 - cur.x1 <= gapMax) { cur.mem.push(c); cur.x1 = Math.max(cur.x1, c.x1); continue; }
-      cur = { mem: [c], x0: c.x0, x1: c.x1, bl, tall };
-      chunks.push(cur);
+    // the letters near this row, split into columns at wide gaps: each column
+    // keeps its own baseline (two columns of a stanza block on a skewed or
+    // curled page do not share one row: the page-wide peak cut the other
+    // column's line off at its descenders)
+    const near = letters.filter(c => Math.abs(c.y1 - bl) <= 0.6 * sp).sort((a, b) => a.x0 - b.x0);
+    const cols = [];
+    for (const c of near) {
+      const last = cols[cols.length - 1];
+      if (last && c.x0 - last.x1 <= gapOf(sp)) { last.cs.push(c); last.x1 = Math.max(last.x1, c.x1); } else cols.push({ cs: [c], x0: c.x0, x1: c.x1 });
+    }
+    for (const col of cols) {
+      const ys = col.cs.map(c => c.y1).sort((a, b) => a - b);
+      const cbl = ys[ys.length >> 1];
+      const core = letters.filter(c => c.x1 >= col.x0 && c.x0 <= col.x1 && Math.abs(c.y1 - cbl) <= 0.25 * sp + 1);
+      if (core.length < 4) continue;
+      const hs = core.map(c => c.y1 - c.y0 + 1).sort((a, b) => a - b);
+      const tall = median(hs.slice(hs.length >> 1));
+      if (tall < 0.5 * sp) continue;
+      const mem = cand.filter(c => c.x1 >= col.x0 - gapOf(tall) && c.x0 <= col.x1 + gapOf(tall) && c.y0 >= cbl - 1.6 * tall && c.y1 <= cbl + 0.6 * tall).sort((a, b) => a.x0 - b.x0);
+      // split at column gaps
+      let cur = null;
+      for (const c of mem) {
+        if (cur && c.x0 - cur.x1 <= gapOf(tall)) { cur.mem.push(c); cur.x1 = Math.max(cur.x1, c.x1); continue; }
+        cur = { mem: [c], x0: c.x0, x1: c.x1, bl: cbl, tall };
+        // the same chunk from a neighbouring peak is read once
+        if (!chunks.some(o => Math.abs(o.bl - cbl) < 0.5 * sp && o.x0 <= c.x1 && c.x0 <= o.x1)) chunks.push(cur);
+      }
     }
   }
   const out = [];
@@ -1128,12 +1143,14 @@ async function readStanzas(fr, ocr, o, yStart) {
     lines.push({ x0: ch.x0, y: ch.y, sp: ch.sp, text, conf: Math.round(conf) });
   }
   if (!lines.length) return [];
-  // columns: left edges more than 10 staff spaces apart
+  // columns: left edges more than 10 staff spaces apart, chained from line
+  // to line (indented lines and a block's first line can be further from
+  // each other than that, but never with no line between them)
   lines.sort((a, b) => a.x0 - b.x0);
   const cols = [];
   for (const ln of lines) {
-    const c = cols.find(c => Math.abs(ln.x0 - c.x0) <= 10 * ln.sp);
-    if (c) c.lines.push(ln); else cols.push({ x0: ln.x0, lines: [ln] });
+    const c = cols.find(c => ln.x0 - c.xr <= 10 * ln.sp);
+    if (c) { c.lines.push(ln); c.xr = Math.max(c.xr, ln.x0); } else cols.push({ x0: ln.x0, xr: ln.x0, lines: [ln] });
   }
   const stanzas = [];
   for (const c of cols) {

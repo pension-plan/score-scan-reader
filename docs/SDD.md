@@ -982,7 +982,13 @@ once per printed line, each pass under its own lyric number (line counts smoothe
 syllable does not cut the passage); the walk whose length is nearer the syllable count is used. Syllables are
 placed by dynamic programming that keeps word starts on the printed verses' word starts (skipping a note costs
 1, dropping a syllable 1.5). A stanza whose syllable count is off by more than max(3, 20 %) of the walk stays a
-credit. Bundled examples with OCR: haupt1867 3 of 3 stanzas set (52 syllables on 37 notes + the 15-note
+credit. Reading the block (`lyrics.js stanzaChunks / readStanzas`): rows are found by page-wide baseline voting,
+then the letters near each row are split into columns and each column keeps its own baseline (on a skewed copy
+the two columns of a block do not share one row: the page-wide row cut the other column's line at its
+descenders); columns are chained from left edge to left edge, so indented lines stay in their stanza.
+`score.stanzas.verses = [{ number, numbers, text, part }]` lists the stanzas set (one lyric number per pass of
+a repeat) for the page's lyrics list. At the app's raster (2300 px wide, app OCR languages) golden1923-america
+now reads both stanzas whole and sets 2 of 2 (it read 1, partly, before). Bundled examples with OCR: haupt1867 3 of 3 stanzas set (52 syllables on 37 notes + the 15-note
 repeat), each line under its own note row; golden1923-america 1 of 2 (the other block was read as 12 of its
 39 syllables). lyr06-amazing-grace
 against truth-underlaid.musicxml: lyrics 0.667 → 0.979 (scan), 0.664 → 0.931 (scan-mild); severe reads no

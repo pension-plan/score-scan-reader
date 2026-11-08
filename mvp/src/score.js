@@ -1226,7 +1226,9 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   // number. Syllables are matched to the notes by dynamic programming that
   // keeps word starts on the printed verses' word starts; a stanza whose
   // syllable count is off by more than max(3, 20 %) of the notes stays a credit
-  const stanzas = { printed: credits.length, set: 0 };
+  // stanzas.verses: the stanzas set as verses, for the page's lyrics list:
+  // { number: first lyric number, numbers: one per pass of a repeat, text, part }
+  const stanzas = { printed: credits.length, set: 0, verses: [] };
   if (opts.stanzasAsVerses && credits.length) {
     let pi = -1, best = 0;
     partMeasures.forEach((pm, i) => { let n = 0; pm.forEach(m => m && m[0] && m[0].events.forEach(e => { if (!e.rest && e.lyrics && Object.keys(e.lyrics).length) n++; })); if (n > best) { best = n; pi = i; } });
@@ -1280,6 +1282,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
         else if (t === 2) j--;
         else i--;
       }
+      stanzas.verses.push({ number: base, numbers: Array.from({ length: passes }, (_, t) => base + t), text: c.text, part: parts[pi].name });
       credits.splice(credits.indexOf(c), 1);
       set++;
     }
