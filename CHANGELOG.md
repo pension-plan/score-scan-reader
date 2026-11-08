@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.16.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.15.0...score-scan-reader-v0.16.0) (2026-11-08)
+
+
+### Features
+
+* **ui:** unrecognised marks first: views, larger highlights, say what a mark is, user corrections ([f0cb830](https://github.com/pension-plan/score-scan-reader/commit/f0cb8303e45169893e3a1c7deb954911753015c6))
+
 ## [0.15.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.14.0...score-scan-reader-v0.15.0) (2026-11-08)
 
 
