@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.7.0...score-scan-reader-v0.8.0) (2026-11-08)
+
+
+### Features
+
+* **heads:** broken-staff-line recovery for thin photocopies, fewer false heads next to accidentals, chord tops above ledgers (round 3) ([0a92fc6](https://github.com/pension-plan/score-scan-reader/commit/0a92fc65f0ceda620a81941b9fe5e052002e3577))
+* **ml:** copista-2m correction pass (note values, false/missed heads, safety gate), available as an option (round 3) ([151a209](https://github.com/pension-plan/score-scan-reader/commit/151a20947b1369cfb2ab7405f7110ea3d6e9071a))
+
 ## [0.7.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.6.0...score-scan-reader-v0.7.0) (2026-11-08)
 
 
