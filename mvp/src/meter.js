@@ -240,6 +240,17 @@ function readMeters(fr, asm, stats = {}) {
           if (!t || Math.abs(t.x0 - c.x0) > 0.5 * sp) continue;
           found.push({ x: t.x0 - 0.6 * sp, staff: s, m: { beats: t.beats, type: t.type, symbol: '', x0: t.x0, x1: t.x1, score: t.score }, split: true });
         }
+        // a C or cut C after a missed barline: its back, about two spaces high on the middle line
+        const backs = (asm.comps || []).filter(c => {
+          const xm = (c.x0 + c.x1) / 2, w = (c.x1 - c.x0 + 1) / sp, hh = (c.y1 - c.y0 + 1) / sp, l2 = st.yAt(2, xm);
+          return c.x0 > h.end + 2 * sp && c.x1 < st.right - 2 * sp && w >= 0.3 && w <= 1.0 && hh >= 1.6 && hh <= 3.2 && Math.abs((c.y0 + c.y1) / 2 - l2) < 0.4 * sp &&
+            !bars.some(b => c.x0 > b - sp && c.x0 < b + 3.5 * sp);
+        });
+        for (const c of backs) {
+          if (found.some(f => f.staff === s && !f.header && f.m.x0 != null && Math.abs(f.m.x0 - c.x0) < 2 * sp)) continue;
+          const m = readCommon(R, st, c.x0 - 0.2 * sp, c.x0 + 0.3 * sp, sp, 0.55);
+          if (m) found.push({ x: m.x0 - 0.6 * sp, staff: s, m: { ...m, score: Math.min(m.score, 0.59) }, split: true });
+        }
       } catch (e) { stats.errors = (stats.errors || 0) + 1; }
       if (drop.length) {
         const n = s.chords.length;

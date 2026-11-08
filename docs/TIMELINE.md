@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 02:56 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 02:57 AEDT.
 
 ## Events
 
@@ -150,6 +150,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 02:44 | structure round 3 (c03021c, b51ba25): worn meters by bar contents, bar drift causes fixed (perf-pages-10 205 to 199 bars, truth 196), anthem-satb-4-pages severe +0.38; challenge 0.8391 to 0.8407. Next: cautionary accidentals, perf-pages-10 page-1 clef pitch errors, scan drift, rh03 final C. |
 | 02:50 | opencv 7246b54 (release merged): key-signature reader by staff position; L2 resolved at system starts; challenge key elements 764 to 768, no item down. Orientation fallback for an upside-down sharp-key page approved; then L1. |
 | 02:56 | voices round 2 (959bcac, 5dc261f, 190c27d; release merged): stanzas-as-verses engine, anthem severe 0.211 to 0.593, trio severe 0.700 to 0.830; challenge 0.841 to 0.842, benchmark 0.955. Next: stanza fit on America/Aus meines, trio page 2. |
+| 02:57 | textsym c5c0e1c (in 0.32.0): rehearsal letters and chord symbols by shape (chords without OCR 0 to 84/85/48%); COVERAGE 86/42/26. Team rule: develop in private worktrees, copy files in only to push (uncommitted shared-tree edits were overwritten twice). |
 
 ## Accuracy by round
 
