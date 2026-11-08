@@ -519,7 +519,13 @@ function classifyAccidental(R, g, sp) {
 function classifyAccidentalImg(R, g, sp, heal) {
   const hgt = g.y1 - g.y0 + 1, wid = g.x1 - g.x0 + 1;
   if (hgt < 1.3 * sp || hgt > 3.8 * sp || wid < 0.3 * sp || wid > 1.5 * sp) return null;
-  const img = glyphImage(R, g, heal);
+  return classifyBin(glyphImage(R, g, heal), sp);
+}
+
+// the same test on a binary image holding the glyph alone (cropped to it)
+function classifyBin(img, sp) {
+  const hgt = img.height, wid = img.width;
+  if (hgt < 1.3 * sp || hgt > 3.8 * sp || wid < 0.3 * sp || wid > 1.5 * sp) return null;
   const b = { x0: 0, y0: 0, x1: wid - 1, y1: hgt - 1 };
   const st = strokes(img, b);
   // a flat's bowl side can pass for a second stroke: much shorter than the
@@ -566,6 +572,131 @@ function splitSharps(R, g, sp) {
     out.push({ kind: 'sharp', x0: g.x0 + a.x0, x1: g.x0 + b.x1, y0: g.y0 + Math.min(a.top, b.top), y1: g.y0 + Math.max(a.bot, b.bot) });
   }
   return out;
+}
+
+// ------------------------------------------- degraded key-signature signs ---
+// Heavy ink, blur or a thick photocopy fill a sign in (its strokes and bars
+// one black blob) or run neighbouring signs together; noise breaks one into
+// pieces.  These readers are lenient, so they are used only inside a key
+// signature, where the sign must also sit at the slot its order gives it.
+
+// image x range [a, b] of img, trimmed to its ink (null when empty)
+function subImage(img, a, b) {
+  let x0 = Infinity, x1 = -1, y0 = Infinity, y1 = -1;
+  for (let y = 0; y < img.height; y++) for (let x = a; x <= b; x++) if (img.data[y * img.width + x]) {
+    if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+  }
+  if (x1 < 0) return null;
+  const w = x1 - x0 + 1, h = y1 - y0 + 1, out = { width: w, height: h, data: new Uint8Array(w * h), x0, y0 };
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) out.data[y * w + x] = img.data[(y + y0) * img.width + x + x0];
+  return out;
+}
+
+// Silhouette of a filled-in sign: a sharp's right stroke stands above its
+// left one and the left one hangs below (a natural the other way round); a
+// flat is a lone stem over a wide bowl.  Ink-weighted mean x of the top and
+// bottom rows tells them apart once the inside is solid.
+function blobSign(img, sp) {
+  const w = img.width, h = img.height;
+  if (h < 1.6 * sp || h > 3.7 * sp || w < 0.55 * sp || w > 1.6 * sp) return null;
+  let area = 0;
+  for (let i = 0; i < w * h; i++) area += img.data[i];
+  if (area < 0.5 * w * h) return null; // an outline still reads by its strokes
+  // ink extent of a band of rows, and the first / last row with ink in a
+  // band of columns
+  const band = (ya, yb) => {
+    let l = w, r = -1;
+    for (let y = Math.max(0, Math.round(ya)); y <= Math.min(h - 1, Math.round(yb)); y++) for (let x = 0; x < w; x++) if (img.data[y * w + x]) { if (x < l) l = x; if (x > r) r = x; }
+    return r < 0 ? null : { l, r, wd: (r - l + 1) / w };
+  };
+  const edge = (xa, xb, fromTop) => {
+    for (let k = 0; k < h; k++) {
+      const y = fromTop ? k : h - 1 - k;
+      for (let x = xa; x <= xb; x++) if (img.data[y * w + x]) return y;
+    }
+    return fromTop ? h : -1;
+  };
+  const mid = band(0.35 * h, 0.65 * h);
+  if (!mid || mid.wd < 0.75) return null;
+  const hw = Math.floor(w / 2), d = Math.max(1, 0.1 * sp);
+  const topL = edge(0, hw - 1, true), topR = edge(w - hw, w - 1, true);
+  const botL = edge(0, hw - 1, false), botR = edge(w - hw, w - 1, false);
+  // runs of ink across row y
+  const runs = (y) => {
+    let n = 0, on = false;
+    for (let x = 0; x < w; x++) { const v = img.data[y * w + x]; if (v && !on) n++; on = !!v; }
+    return n;
+  };
+  if (h >= 2.3 * sp && w >= 0.7 * sp) {
+    const sh = (a, b) => a >= 1 && b >= 1 && a + b >= 2 * d;
+    if (sh(topL - topR, botL - botR)) return 'sharp';
+    // both strokes still stand clear of the bars above and below
+    const yt = Math.round(0.1 * h), yb = h - 1 - yt;
+    if (runs(yt) === 2 && runs(yb) === 2 && runs(Math.round(0.05 * h)) <= 2 && runs(h - 1 - Math.round(0.05 * h)) <= 2) return 'sharp';
+    if (sh(topR - topL, botR - botL)) return 'natural';
+  }
+  // flat: the upper part a thin stem on the left, the lower part wide
+  const up = band(0, 0.3 * h), low = band(0.7 * h, 0.92 * h);
+  if (h <= 3.2 * sp && w <= 1.2 * sp && up && low && up.r < 0.5 * w && low.wd >= 0.7) return 'flat';
+  return null;
+}
+
+// Signs of one glyph run together, cut apart two ways: before each thin
+// vertical stroke (flats: one stem each), or where the glyph's top and bottom
+// edges both step a good half space the same way (signs of a key signature
+// alternate in height; filled-in sharps have no strokes left).  A cut is kept
+// only when every piece then reads as a sign, by its strokes or silhouette.
+// Returns [{kind, x0, y0, x1, y1}] (page coordinates) or null.
+function splitSigns(R, g, sp) {
+  const wid = g.x1 - g.x0 + 1, hgt = g.y1 - g.y0 + 1;
+  if (wid < 1.3 * sp || wid > 7 * sp || hgt > 6 * sp) return null;
+  const img = glyphImage(R, g, Math.max(2, Math.round(0.18 * sp)));
+  // segs: [a, b] column ranges, one per sign
+  const read = (segs) => {
+    segs = segs.filter(([a, b]) => b - a + 1 >= 0.3 * sp);
+    if (segs.length < 2) return null;
+    const out = [];
+    for (const [a, b] of segs) {
+      const s = subImage(img, a, b);
+      if (!s) continue;
+      if (s.width < 0.3 * sp && s.height < 0.6 * sp) continue; // a speck
+      const k = classifyBin(s, sp) || blobSign(s, sp);
+      if (!k) return null;
+      out.push({ kind: k, lenient: true, x0: g.x0 + s.x0, x1: g.x0 + s.x0 + s.width - 1, y0: g.y0 + s.y0, y1: g.y0 + s.y0 + s.height - 1 });
+    }
+    return out.length >= 2 ? out : null;
+  };
+  // flats: a cut before every stem
+  const st = strokes(img, { x0: 0, y0: 0, x1: wid - 1, y1: hgt - 1 }, 1.5 * sp);
+  if (st.length >= 2 && st.every(s => s.x1 - s.x0 + 1 <= Math.max(3, 0.3 * sp))) {
+    const starts = [0].concat(st.slice(1).map(s => Math.max(0, s.x0 - 1)));
+    const r = read(starts.map((x, i) => [x, i + 1 < starts.length ? starts[i + 1] - 1 : wid - 1]));
+    if (r && r.every(p => p.kind === 'flat')) return r;
+  }
+  // filled-in signs: steps of the outline
+  const top = [], bot = [];
+  for (let x = 0; x < wid; x++) {
+    let a = -1, b = -1;
+    for (let y = 0; y < hgt; y++) if (img.data[y * wid + x]) { if (a < 0) a = y; b = y; }
+    top.push(a); bot.push(b);
+  }
+  const k = Math.max(1, Math.round(0.15 * sp));
+  // a run of stepping columns is the junction: it belongs to neither sign
+  const segs = [];
+  let from = 0, run = null;
+  for (let x = 0; x < wid; x++) {
+    let step = false;
+    if (top[x] < 0) step = true; // an empty column
+    else if (x - k >= 0 && x + k < wid && top[x - k] >= 0 && top[x + k] >= 0) {
+      const dt = top[x + k] - top[x - k], db = bot[x + k] - bot[x - k];
+      step = Math.sign(dt) === Math.sign(db) && Math.min(Math.abs(dt), Math.abs(db)) >= 0.6 * sp;
+    }
+    if (step) { if (run) run.b = x; else run = { a: x, b: x }; }
+    else if (run) { if (run.a > from) segs.push([from, run.a - 1]); from = run.b + 1; run = null; }
+  }
+  if (run) { if (run.a > from) segs.push([from, run.a - 1]); from = wid; }
+  if (from < wid) segs.push([from, wid - 1]);
+  return read(segs);
 }
 
 const boxOf = (cs) => cs.reduce((b, c) => ({ x0: Math.min(b.x0, c.x0), y0: Math.min(b.y0, c.y0), x1: Math.max(b.x1, c.x1), y1: Math.max(b.y1, c.y1) }),
@@ -806,15 +937,38 @@ function analyseHeader(R, comps, st, limitX, trace) {
     let g = glyphs[gi];
     if ((g.x1 - g.x0) < 0.25 * sp && (g.y1 - g.y0) < 0.4 * sp) continue; // specks
     if (g.x0 - end > 2.2 * sp) break;
+    // signs of a key signature stand close together (a quarter rest or a
+    // note further on is no sign of it; a time signature may stand apart)
+    const far = n > 0 && g.x0 - end > 1.2 * sp;
     let k = g.kind || classifyAccidental(R, g, sp);
     if (!k && kind !== 'flat') {
       const pieces = splitSharps(R, g, sp);
       if (pieces) { glyphs.splice(gi, 1, ...pieces); g = glyphs[gi]; k = g.kind; }
     }
+    // a damaged sign read leniently counts only in the next slot of the key
+    // (the glyph is left as it was otherwise: it may be the time signature)
+    const fits = (c, tol) => !far && (c.kind === 'sharp' || c.kind === 'flat') && (kind === null || kind === c.kind) && n < 7 &&
+      kcs.some(kc => Math.abs(accPos(st, c, c.kind, sp) - kc[c.kind][n]) <= tol);
+    if (!k && (g.y1 - g.y0) < 4 * sp) {
+      // a sign broken in two by noise: this piece and the next together
+      const nx = glyphs[gi + 1];
+      if (nx && !nx.kind && nx.x0 - g.x1 <= 0.3 * sp && Math.max(g.x1, nx.x1) - g.x0 <= 1.5 * sp) {
+        const u = { parts: (g.parts || [g]).concat(nx.parts || [nx]) };
+        Object.assign(u, boxOf(u.parts));
+        u.kind = classifyAccidental(R, u, sp);
+        if (u.kind && fits(u, 1.2)) { glyphs.splice(gi, 2, u); g = u; k = u.kind; }
+      }
+    }
+    if (!k) {
+      // filled in by heavy ink or blur: one sign, or several run together
+      let cand = splitSigns(R, g, sp);
+      if (!cand) { const kb = blobSign(glyphImage(R, g), sp); if (kb) cand = [{ ...g, kind: kb, lenient: true }]; }
+      if (cand && fits(cand[0], 0.8)) { glyphs.splice(gi, 1, ...cand); g = glyphs[gi]; k = g.kind; }
+    }
     if (trace) trace.push({ x: +((g.x0 - left) / sp).toFixed(2), x1: +((g.x1 - left) / sp).toFixed(2), y: +((g.y0 - lineY(0)) / sp).toFixed(2), y1: +((g.y1 - lineY(0)) / sp).toFixed(2), parts: g.parts ? g.parts.length : 0, k, p: k ? +accPos(st, g, k, sp).toFixed(2) : null, t: isTimeSig(R, st, g, sp) });
-    if ((k === 'sharp' || k === 'flat') && (kind === null || kind === k) && n < 7) {
+    if ((k === 'sharp' || k === 'flat') && (kind === null || kind === k) && n < 7 && !far) {
       const p = accPos(st, g, k, sp);
-      const ok = kcs.filter(kc => Math.abs(p - kc[k][n]) <= 1.2);
+      const ok = kcs.filter(kc => Math.abs(p - kc[k][n]) <= (g.lenient ? 0.8 : 1.2));
       if (ok.length) { kcs = ok; kind = k; n++; end = g.x1; continue; }
       break;
     }
@@ -1024,6 +1178,71 @@ function countBeams(R, x, tip, dir, sp, cap = 0.9 * sp) {
   return Math.min(3, best);
 }
 
+// A beam at a stem tip runs on sideways (a space and more beside the stem, at
+// the tip's height); a flag curls away within about a space.
+function beamBeside(R, x, tip, sp) {
+  const { width: w, height: h, data } = R;
+  for (const side of [-1, 1]) {
+    const cx = Math.round(x + side * 1.35 * sp);
+    if (cx < 0 || cx >= w) continue;
+    for (let y = Math.round(tip - 0.7 * sp); y <= Math.round(tip + 0.7 * sp); y++) if (y >= 0 && y < h && data[y * w + cx]) return true;
+  }
+  return false;
+}
+
+// Flags on an unbeamed stem: they hang from the tip on the right of the stem
+// (up and down stems alike), one under another 0.5 - 1.3 spaces apart, and
+// each starts further from the tip than a beam would, so the second of a
+// 16th's two flags lies beyond the beam search.  Counted down a column right
+// of the stem over the stem's free length (reach, px: short of its heads);
+// only bars joined to the stem by unbroken ink count (a slur crossing the
+// stem, an accidental or the tail of an eighth flag curling back do not form
+// a stack from the tip).
+function countFlags(R, x, tip, dir, sp, reach, cap) {
+  const { width: w, height: h, data } = R;
+  if (reach < 0.8 * sp || beamBeside(R, x, tip, sp)) return 0;
+  const sx = Math.round(x + 0.15 * sp), lx = Math.round(x - 0.45 * sp);
+  let best = 0;
+  for (const off of [0.45, 0.6]) {
+    const cx = Math.round(x + off * sp);
+    if (cx >= w || lx < 0) continue;
+    const runs = tipRuns(R, cx, sx, tip, dir, sp, reach / sp).filter(r => r.len >= 0.22 * sp && r.len <= cap);
+    // joined to the stem, and on its right only (the bars of a sharp read
+    // as a stemmed head cross its stroke)
+    const attached = (r) => {
+      let joined = false;
+      for (let i = r.a; i <= r.b; i++) {
+        const y = Math.round(tip + dir * i);
+        if (y < 0 || y >= h) continue;
+        if (data[y * w + lx]) return false;
+        let ok = true;
+        for (let xx = sx; xx <= cx && ok; xx++) if (!data[y * w + xx]) ok = false;
+        if (ok) joined = true;
+      }
+      return joined;
+    };
+    let n = 0, last = null;
+    for (const r of runs) {
+      if (!attached(r)) continue;
+      if (!last) { if (r.a > 1.4 * sp) break; n = 1; last = r; continue; }
+      const step = r.a - last.a;
+      if (step < 0.45 * sp) continue;
+      if (step > 1.3 * sp) break;
+      n++; last = r;
+    }
+    best = Math.max(best, n);
+  }
+  return Math.min(4, best);
+}
+
+// px from a stem tip to the nearest head on that stem (dir 1: up stem)
+function stemFree(chord, dir, tip, sp) {
+  const hs = chord.heads.filter(h => (dir === 1 ? h.stemDir === 1 || h.stemDir === 2 : h.stemDir === -1 || h.stemDir === 2));
+  if (!hs.length || tip == null) return 0;
+  const d = Math.min(...hs.map(h => dir * (h.y - tip)));
+  return d - 0.9 * sp;
+}
+
 function hasDot(R, hd) {
   const { width: w, height: h, data } = R;
   const sp = hd.sp;
@@ -1078,7 +1297,13 @@ function headDuration(R, hd, chord, ctx) {
     const x = useUp ? chord.upX : chord.downX;
     const tip = useUp ? chord.upEnd : chord.downEnd;
     if (x >= 0 && tip != null) {
-      const nb = countBeams(R, x, tip, useUp ? 1 : -1, sp, ctx && ctx.beamCap);
+      const cap = (ctx && ctx.beamCap) || 0.9 * sp;
+      let nb = countBeams(R, x, tip, useUp ? 1 : -1, sp, cap);
+      // an unbeamed stem: its flags may hang further down than a beam search looks
+      // (a stem much longer than usual ran on into a dynamic or a word: its
+      // letters are no flags)
+      const len = useUp ? chord.up : chord.down;
+      if (nb <= 2 && !(len > 4.5)) nb = Math.max(nb, countFlags(R, x, tip, useUp ? 1 : -1, sp, Math.min(3.2 * sp, stemFree(chord, useUp ? 1 : -1, tip, sp)), cap));
       q = q / Math.pow(2, nb);
     }
   }
@@ -1501,7 +1726,7 @@ function staffMeasureEvents(fr, R, comps, s, xa, xb) {
   return v;
 }
 
-module.exports = { assemblePage, staffMeasureEvents, pitchOf, keyAlters, attrsAt, DIV, median, headDuration, _analyseHeader: analyseHeader, _compIndex: compIndex, _strokes: strokes, _classifyAccidental: classifyAccidental, _crossBands: crossBands, _glyphImage: glyphImage, _splitSharps: splitSharps, _detachedNear: detachedNear, _readClef: readClef, _beamCap: beamCap };
+module.exports = { assemblePage, staffMeasureEvents, pitchOf, keyAlters, attrsAt, DIV, median, headDuration, _analyseHeader: analyseHeader, _compIndex: compIndex, _strokes: strokes, _classifyAccidental: classifyAccidental, _crossBands: crossBands, _glyphImage: glyphImage, _splitSharps: splitSharps, _detachedNear: detachedNear, _readClef: readClef, _beamCap: beamCap, _blobSign: blobSign, _splitSigns: splitSigns };
 
 };
 defs["barlines"]=function(require,module,exports){
@@ -5581,7 +5806,7 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
   // grand staff, whose two staves have one size (L18)
   const small = Array.from({ length: nSt }, (_, k) => {
     const r = sel.map(sy => (sy.staves[k] ? sy.staves[k].st.space / Math.max(...sy.staves.map(s => s.st.space)) : 1)).sort((a, b) => a - b);
-    return !process.env.NOSMALL && r.length > 0 && r[r.length >> 1] <= 0.85;
+    return r.length > 0 && r[r.length >> 1] <= 0.85;
   });
   // keyboard links between adjacent staves
   const link = [];
@@ -5626,7 +5851,7 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
   // a piece on one staff splits only where stems up and down are seen
   // together (research-voices.md section 11): two heads on one stem there
   // are chords, double stops or blurred heads, not two singers
-  const vs = vocal.map(k => ({ staff: k, clef: clefs[k], small: small[k], split: !small[k] && stats[k].f2 > 0.35 && stats[k].f3 < 0.2 && (nSt > 1 || stats[k].mix >= 0.25 || !!process.env.OLDSOLO) }));
+  const vs = vocal.map(k => ({ staff: k, clef: clefs[k], small: small[k], split: !small[k] && stats[k].f2 > 0.35 && stats[k].f3 < 0.2 && (nSt > 1 || stats[k].mix >= 0.25) }));
   // a two-staff closed score decides once for both staves
   if (vs.length === 2 && nSt === 2 && !small[0] && !small[1]) {
     const both = (stats[0].f2 + stats[1].f2) / 2 > 0.3 && (stats[0].f3 + stats[1].f3) / 2 < 0.2;
@@ -5921,9 +6146,8 @@ function keyboardVoices(chordal, rests, sp) {
       dn.push({ x: ev.x, heads: d, q, dots: qd(h0).dots, low: true });
     }
   }
-  if (process.env.KBDEBUG && evidence && up.length && dn.length) console.error('KB', evidence, 'v2notes', dn.length, 'both', chordal.filter(e => e.heads.some(h => h.stemDir === 2)).map(e => e.heads.filter(h => h.stemDir === 2).map(h => h.dur.q + '/' + (h.dur.down ? h.dur.down.q : '-')).join(',')).join(' '), 'mixed', chordal.filter(e => e.heads.some(h => h.stemDir === 1) && e.heads.some(h => h.stemDir === -1)).length);
   // one sign and one lone lower note is as likely a stray stem or flag
-  if (!evidence || !up.length || !dn.length || (evidence < 2 && dn.length < 2 && !process.env.KBWEAK)) return null;
+  if (!evidence || !up.length || !dn.length || (evidence < 2 && dn.length < 2)) return null;
   const v1 = mergeRests(up, rests, 1, sp);
   const anchors = [];
   let t = 0;
@@ -6009,7 +6233,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
       if (!s) return [];
       const c = (cache[src.staff] ||= staffMeasureEvents(m.sy.fr, m.sy.fr.R, m.sy.comps, s, m.xa, m.xb));
       const rs = (restCache[src.staff] ||= m.sy.fr.R ? detectRests({ R: m.sy.fr.R, comps: m.sy.comps || [], s, xa: m.xa, xb: m.xb }) : []);
-      if (p.kind === 'keyboard' && !process.env.NOKB2) {
+      if (p.kind === 'keyboard') {
         if (c.kb === undefined) { c.kb = keyboardVoices(c.chordal, rs, s.st.space); if (c.kb) kbSplit++; }
         if (src.voice === 'kb2') return c.kb ? c.kb[2] : [];
         if (c.kb) return c.kb[1];
@@ -6048,7 +6272,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   const single = +((Object.entries(votes).filter(([k]) => +k >= 1.5 && PRIOR[+k]).map(([k, v]) => [k, v * PRIOR[+k]]).sort((a, b) => b[1] - a[1])[0] || [0])[0]);
   segSum.forEach((v, i) => {
     if (i + 1 >= segSum.length) return;
-    if (!process.env.OLDPAIRS && single && rnd(v) === single && rnd(segSum[i + 1]) === single) return;
+    if (single && rnd(v) === single && rnd(segSum[i + 1]) === single) return;
     vote(v + segSum[i + 1], 0.6);
   });
   let mq = +(Object.entries(votes).filter(([k]) => +k >= 1.5 && PRIOR[+k]).map(([k, v]) => [k, v * PRIOR[+k]]).sort((a, b) => b[1] - a[1])[0] || [4])[0];
@@ -6239,7 +6463,10 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     const S = sums.length ? mode(sums) : 0;
     const k = Math.round(S / mLen);
     const agree = sums.filter(x => Math.abs(x - S) <= 0.25 * mLen).length;
-    if (k >= 2 && Math.abs(S - k * mLen) <= 0.25 * mLen && agree >= Math.max(1, 0.5 * sums.length)) {
+    // a missed barline lengthens every voice of the system alike: one voice
+    // that alone runs long has false notes in it (a tie end read as a half
+    // note), not a second bar
+    if (k >= 2 && Math.abs(S - k * mLen) <= 0.25 * mLen && agree >= (sums.length >= 2 ? Math.max(2, Math.ceil((2 / 3) * sums.length)) : 1)) {
       splitBars += k - 1;
       const chunks = Array.from({ length: k }, () => byPart.map(sts => sts.map(st => ({ staff: st.staff, events: [] }))));
       byPart.forEach((sts, pi) => sts.forEach((st, si) => {
@@ -6530,14 +6757,28 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
   }
   const keyAt = (mi) => {
     const sy = unitSys && unitSys[mi], k = sy != null ? sysKeyOf.get(sy) : undefined;
-    if (!process.env.OLDKEYS && sy != null && seqKey.has(sy)) return seqKey.get(sy);
+    if (sy != null && seqKey.has(sy)) return seqKey.get(sy);
     return k != null && keyOk(k) ? k : fifths;
   };
   const altsOf = new Map();
   const altsFor = (f) => { if (!altsOf.has(f)) altsOf.set(f, keyAlters(f)); return altsOf.get(f); };
+  // A clef read on one system only is also kept when it carries on a clef
+  // change read inside that staff on the system before (the new clef is
+  // printed again at the head of the next system)
+  const carried = new Set();
+  {
+    const order = [...allSys];
+    for (let i = 1; i < order.length; i++) order[i].staves.forEach((st, k) => {
+      const prev = order[i - 1].staves[k];
+      if (!prev || st.hdr.clefGuessed || !st.hdr.clef) return;
+      let last = null;
+      for (const ch of prev.chords) for (const h of ch.heads) if (!last || h.x > last.x) last = h;
+      if (last && last.clef && last.clef === st.hdr.clef) carried.add(order[i].staves[k]);
+    });
+  }
   const clefAt = (mi, staff) => {
     const sy = unitSys && unitSys[mi], st = sy && sy.staves[staff];
-    if (st && !st.hdr.clefGuessed && st.hdr.clef && (seenClef[staff + ':' + st.hdr.clef] || 0) >= 2) return st.hdr.clef;
+    if (st && !st.hdr.clefGuessed && st.hdr.clef && ((seenClef[staff + ':' + st.hdr.clef] || 0) >= 2 || carried.has(st))) return st.hdr.clef;
     return clefs[staff] || 'G';
   };
   // Accidentals on a shared staff bind every voice on it for the rest of the
