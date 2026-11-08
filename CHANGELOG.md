@@ -1,6 +1,11 @@
 # Changelog
 
-## [0.34.1](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.34.0...score-scan-reader-v0.34.1) (2026-11-08)
+## [0.35.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.34.0...score-scan-reader-v0.35.0) (2026-11-08)
+
+
+### Features
+
+* **text:** chord symbols by shape in serif fonts, superscripts and + joined, chords near the first staff ([06fc092](https://github.com/pension-plan/score-scan-reader/commit/06fc092d51fbcf29f6cddb65736ea48426f30965))
 
 
 ### Performance Improvements
