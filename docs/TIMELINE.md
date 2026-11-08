@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 23:49 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 00:15 AEDT.
 
 ## Events
 
@@ -121,6 +121,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 23:14 | opencv: 32nd/64th notes (713fbe7, in 0.21.0) kept; 4 coverage items down at most 0.029, within the gate. Next: stacked whole-note chords, half notes read as filled, dots. |
 | 23:29 | Shipped 3ae56fa (textsym, release merged): metronome marks ('Vivace ♩ = 144') read as one tempo line; <words>+<metronome>+<sound tempo> written; coverage metronome 0 to 88/88/78%; bar numbers not read now labelled 'Bar ? (number not read)'. No item moved; regressions clean. |
 | 23:49 | Shipped b357ba7 (ties 17 to 33% clean) and a4638e7 (COVERAGE.md: 38 supported / 52 partial / 64 unsupported); release merged. textsym told explicitly to enable graceHeads if regress.mjs passes, before L25 lyrics. |
+| 00:15 | /goal set: continue all outstanding tasks and keep the easygo Estate Status #needs section updated. Added a 'Score Scan Reader' group there (SSR-1 downloads on Pages, SSR-2 repair-mark colour). Started three more Opus xhigh agents: perf (L26 memory), structure (L14, L15 ottava, L16/L21 mid-piece key/time changes, L22 repeats/endings/articulations/beams), voices (L4b, L5b, L6, L7, L9, L18). |
 
 ## Accuracy by round
 

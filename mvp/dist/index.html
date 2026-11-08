@@ -4446,6 +4446,22 @@ function hollowCore(IR, IB, xm, yc, sp) {
   return thin(-0.22 * sp) && thin(0.22 * sp);
 }
 
+// A head on a ledger line (|p| >= 6, even): the ledger, left in R, runs through its middle and
+// fills the core test. Ink over the head's box with the ledger's rows left out: about 0.9 for a
+// filled head, 0.5-0.65 for a hollow one on clean pages (coverage notes family); on a degraded
+// page the values run together, so detectHeads only calls a head hollow when it is clearly lighter
+// than the page's filled ledger heads.
+function ledgerInkOf(R, xm, yc, sp, lt) {
+  const { width: w, height: h, data } = R, skip = Math.ceil(lt / 2) + 1;
+  let ink = 0, n = 0;
+  for (let dy = -Math.round(0.35 * sp); dy <= Math.round(0.35 * sp); dy++) {
+    if (Math.abs(dy) <= skip) continue;
+    const y = Math.round(yc + dy); if (y < 0 || y >= h) continue;
+    for (let dx = -Math.round(0.4 * sp); dx <= Math.round(0.4 * sp); dx++) { const x = Math.round(xm + dx); if (x < 0 || x >= w) continue; n++; ink += data[y * w + x]; }
+  }
+  return n ? ink / n : null;
+}
+
 function detectHeads(B, R, staves, ss, lt, opts = {}) {
   let F = fillHoles(B, R, ss, lt);
   // thin-walled hollow heads of old prints break open in B; their outline
@@ -4519,17 +4535,26 @@ function detectHeads(B, R, staves, ss, lt, opts = {}) {
         const ycen = ps.st.yAt(2, xm) - (p * ps.sp) / 2;
         const core = IR.frac(xm - 0.18 * sp, ycen - 0.12 * sp, xm + 0.18 * sp, ycen + 0.12 * sp);
         const coreB = IB.frac(xm - 0.3 * sp, ycen - 0.2 * sp, xm + 0.3 * sp, ycen + 0.2 * sp);
+        // a hollow head on a ledger line (|p| >= 6, even) has the ledger (left in R) through its
+        // middle: its inside is then read just above and below the line
         const hollow = core < 0.5 && coreB < 0.75;
+        // on a ledger line the core test cannot see the inside: decided for the page below
+        const ledgerInk = !hollow && Math.abs(p) >= 6 && p % 2 === 0 ? ledgerInkOf(R, xm, ycen, sp, lt) : null;
         const wid = xb - xa;
         if (wid < 0.75 * sp) continue;
         // a hole walled by two long verticals (barline + stem, two stems) and
         // closed by staff lines is not a head: a head has at most one stem
         if (hollow && twoTallWalls(R, xa, xb, ycen, sp)) continue;
-        heads.push({ x: xm, y: ycen, staff: ps.st.index, p, sp, kind: hollow ? 'hollow' : 'filled', score: 1, w: wid, blob: c.id,
+        heads.push({ x: xm, y: ycen, staff: ps.st.index, p, sp, kind: hollow ? 'hollow' : 'filled', ledgerInk, score: 1, w: wid, blob: c.id,
           x0: Math.round(xa), x1: Math.round(xb) });
       }
     }
   }
+  // hollow heads on ledger lines: under 0.66, and 0.15 under the lightest filled-looking one (a
+  // degraded page whose values run together keeps them filled)
+  const darkL = heads.filter(h => h.ledgerInk != null && h.ledgerInk >= 0.66).map(h => h.ledgerInk);
+  const lim = Math.min(0.66, darkL.length ? Math.min(...darkL) - 0.15 : 0.66);
+  for (const h of heads) { if (h.ledgerInk != null && h.ledgerInk < lim) h.kind = 'hollow'; delete h.ledgerInk; }
   // self-calibrated width floor: engravings differ in head proportions
   // (LilyPond ~1.3 spaces, some 1900s hymnals ~1.0), so the floor follows the
   // page's median head width, within [0.78, 0.9] spaces

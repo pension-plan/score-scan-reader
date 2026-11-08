@@ -2,6 +2,20 @@
 
 Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
 
+## Update: hollow heads on ledger lines (L23, part 3)
+
+Half and whole notes on a ledger line came out filled (24 of 73 half-note chords on the clean pages checked; all
+at |p| ≥ 6, even): the ledger is left in R and runs through the head's middle, where the hollow test looks. For
+such heads `heads.js` now measures the ink over the head's box with the ledger's rows left out: 0.52–0.64 for
+hollow heads and ≥ 0.85 for filled ones on clean pages; on degraded scans the values run together (0.63–0.95), so a
+head is called hollow only under 0.66 and 0.15 under the page's lightest filled-looking ledger head (a fixed 0.72
+cost `rh03-meter-changes-piano` severe 0.051). Filled half-note chords 24 → 2.
+
+Coverage per tag (no OCR, clean / scan / severe): `note-whole` 139 / 129 / 91 → **216 / 192 / 120** of 537, `note-half`
+3360 / 3071 / 1832 → **3692 / 3148 / 1838** of 4977, `ledger-below` +53 / +43 / +23, `dot` +12 / +6 / −1, `ledger-above`
+severe −8. Aggregates: coverage 0.7845 → 0.7870 (duration +0.0075; largest drop −0.018), challenge 0.8282 → 0.8288
+(largest drop −0.018), benchmark with OCR 0.9500 → 0.9502.
+
 ## Update: stacked hollow chords (L23, part 2)
 
 A stack of hollow heads (a whole- or half-note chord in thirds) is one tall blob; `heads.js` cut it into equal steps
