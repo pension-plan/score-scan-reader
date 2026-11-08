@@ -157,11 +157,34 @@ function staffPos(staves, x, y) {
 // the densest window (column ink counts) is a head; a second, nearly as dense
 // window beside it is the other head of a second.  Returns the windows, the
 // mean column height of the best one and of the columns outside it.
-function headWindows(c, labels, w, sp) {
+function headWindows(c, labels, w, sp, R, B) {
   const n = c.x1 - c.x0 + 1;
   const ext = new Float64Array(n), ysum = new Float64Array(n);
   for (let y = c.y0; y <= c.y1; y++) for (let x = c.x0; x <= c.x1; x++) if (labels[y * w + x] === c.id) { ext[x - c.x0]++; ysum[x - c.x0] += y; }
   const cyOf = (a, b) => { let s = 0, k = 0; for (let i = a; i < b; i++) { s += ysum[i]; k += ext[i]; } return k ? s / k : 0; };
+  // an accidental fused with its head through the paper between them, closed above and below
+  // by staff lines and filled with the holes: columns with (almost) no ink of their own there.
+  // The head is the part right of such a gap (accidentals stand left of their heads) when that
+  // part is head-wide, the part left of it holds an accidental's stroke (taller than a time-signature
+  // digit, shorter than a stem or barline) and the gap is wider than the one between two digits
+  // (1 and 2 of 12/8); the part left of it is left out
+  let cut = 0;
+  if (R) {
+    const own = new Float64Array(n);
+    for (let i = 0; i < n; i++) for (let y = c.y0; y <= c.y1; y++) if (labels[y * w + c.x0 + i] === c.id && R.data[y * w + c.x0 + i]) own[i]++;
+    for (let i = n - 1; i > 0; i--) {
+      if (own[i] > 0.1 * sp) continue;
+      let j = i; while (j > 0 && own[j - 1] <= 0.1 * sp) j--;
+      if (j > 0 && n - 1 - i >= 0.8 * sp) {
+        const tall = wallRun(B, c.x0 - 0.6 * sp, c.x0 + j - 1, (c.y0 + c.y1) / 2, sp).len;
+        if (tall < 2.2 * sp || tall > 3.3 * sp || i - j + 1 < 0.2 * sp) break;
+        for (let k = 0; k <= i; k++) { ext[k] = 0; ysum[k] = 0; }
+        cut = i + 1;
+        break;
+      }
+      i = j;
+    }
+  }
   // a sharp / natural fused with its head: a narrow run of columns much taller
   // than a head next to head-high columns -> leave those columns out
   let headCols = 0;
@@ -184,19 +207,19 @@ function headWindows(c, labels, w, sp) {
     return { a: ba, b: ba + ww, mean: bs / ww };
   };
   const m = best(0, n);
-  if (m.mean < 0.6 * sp) return { cols: [], peak: m.mean, rest: 0 };
+  if (m.mean < 0.6 * sp) return { cols: [], peak: m.mean, rest: 0, cut };
   const cols = [[m.a, m.b]];
   let rs = 0;
-  for (let i = 0; i < n; i++) if (i < m.a || i >= m.b) rs += ext[i];
-  const rest = n > m.b - m.a ? rs / (n - (m.b - m.a)) : 0;
-  for (const [a, b] of [[0, m.a], [m.b, n]]) {
+  for (let i = cut; i < n; i++) if (i < m.a || i >= m.b) rs += ext[i];
+  const rest = n - cut > m.b - m.a ? rs / (n - cut - (m.b - m.a)) : 0;
+  for (const [a, b] of [[cut, m.a], [m.b, n]]) {
     if (b - a < 0.9 * sp) continue;
     // the two heads of a second sit a staff position apart; an accidental
     // fused with its head sits level with it
     const t = best(a, b);
     if (t.mean >= 0.75 * m.mean && t.b - t.a >= 0.9 * sp && Math.abs(cyOf(t.a, t.b) - cyOf(m.a, m.b)) >= 0.25 * sp) cols.push([t.a, t.b]);
   }
-  return { cols: cols.map(([a, b]) => [c.x0 + a, c.x0 + b]).sort((p, q) => p[0] - q[0]), peak: m.mean, rest };
+  return { cols: cols.map(([a, b]) => [c.x0 + a, c.x0 + b]).sort((p, q) => p[0] - q[0]), peak: m.mean, rest, cut };
 }
 
 // Longest vertical ink run through row y (+-0.3 sp) in columns [xa, xb]:
@@ -278,8 +301,10 @@ function detectHeads(B, R, staves, ss, lt, opts = {}) {
     // with the most ink; a flat band with no head-shaped bump is a beam
     let cols = null;
     if (bw > 1.75 * sp && bh >= 0.6 * sp && bh <= 5.5 * sp) {
-      const win = headWindows(c, labels, O.width, sp);
-      if (win.cols.length && (bw <= 2.4 * sp || (bw <= 3.6 * sp && win.peak >= 1.25 * win.rest))) cols = win.cols;
+      const win = headWindows(c, labels, O.width, sp, R, B);
+      // (an accidental cut off at its gap no longer counts towards the width)
+      const bw1 = bw - win.cut;
+      if (win.cols.length && (bw1 <= 2.4 * sp || (bw1 <= 3.6 * sp && win.peak >= 1.25 * win.rest))) cols = win.cols;
     }
     if (!cols) {
       if (bw > 2.4 * sp) {

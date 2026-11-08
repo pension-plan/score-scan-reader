@@ -2,6 +2,31 @@
 
 Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
 
+## Update: heads beside accidentals, courtesy accidentals (L24)
+
+Courtesy accidentals were not misread signs: the notes they stand before were lost. On `pitch-cov-accidentals-melody`
+(clean) 13 of 49 heads were missing, almost all right of an accidental. Two front-end causes (plain JS, no templates):
+- `heads.js`: `fillHoles` fills the paper between an accidental and its head where staff lines close it above and
+  below, so the two fuse into one blob. `headWindows` then centred the head window too far left (up to 0.4 space),
+  so the stem search missed the stem and the head was dropped. When the blob was over 2.4 spaces wide (a sharp, or a
+  parenthesised sign) it was thrown away as a beam. Now columns with almost no ink of their own in R inside such a blob
+  are treated as paper. The part left of the gap is dropped, and so no longer counts towards the blob width, when three
+  things hold: the part right of the gap is head-wide; the left part has an accidental's stroke (2.2–3.3 spaces in B,
+  taller than a time-signature digit and shorter than a stem or barline; a stem of a fused neighbour cost
+  `klauser1867` 0.021 before the upper limit); and the gap is at least 0.2 space wide (the digits of 12/8 sit 0.14
+  apart, and reading the "2" as a head turned 12/8 into 2/8 in `rst04`).
+- `front.js` `accidentalBefore`: a parenthesised sign or a natural's box filled solid reads as a lone head with a short
+  "stem" (the sign's stroke). A single-head chord whose stroke is under 2.6 spaces, does not end in a beam (beamed
+  notes under a low beam have short stems: Twinkle piano lost 0.025 without this check), and stands 0.8–3.6 spaces
+  left of a chord level with it (±1 position) is dropped.
+
+Coverage (OCR, clean / scan / severe): `acc-courtesy` 2 / 5 / 5 → **9 / 9 / 8** of 9, `acc-sharp` 53 / 62 / 37 →
+**77 / 75 / 49** of 82, `acc-flat` 21 / 24 / 26 → 27 / 27 / 23 of 28, `acc-natural` 43 / 45 / 34 → 49 / 49 / 40 of 53.
+A/B on the same source (no OCR): coverage mean +0.0024 per item (`accidentals-melody` clean 0.810 → 0.918,
+`chords-piano` clean 0.976 → 1.000), worst `perf-piano-a4-200dpi` severe −0.015; challenge +0.0008, worst −0.007;
+benchmark +0.0026, real scans 0.811 → 0.810. `<accidental cautionary="yes">` is still never written (score.js), so
+the matrix caps the tag at partial.
+
 ## Update: rests from templates (L3a)
 
 Glyph-level (truth rest boxes, current code): 32nd rests were found 22 / 15 / 3 times of 22 / 22 / 17 (clean / scan /

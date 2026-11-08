@@ -74,6 +74,28 @@ function atStemTip(h, heads, L, lt = 2) {
   return false;
 }
 
+// A lone "head" with a short stroke just left of a chord, level with it, is an accidental
+// glyph whose inside was filled (a parenthesised courtesy sign, a natural's box): note stems
+// run 3 spaces or more past the head, or end in a beam (short stems under a low beam)
+function accidentalBefore(h, chords, L) {
+  const c = h.chord;
+  if (!c || c.heads.length !== 1 || !(c.up || c.down) || Math.max(c.up || 0, c.down || 0) >= 2.6) return false;
+  // a beam at the stroke's end: a run of ink a space long or more crossing it
+  const { width: w, height: H, data } = L, sp = h.sp;
+  const sx = c.up ? c.upX : c.downX, tip = c.up ? c.upEnd : c.downEnd;
+  for (let y = Math.max(0, Math.round(tip - 0.2 * sp)); y <= Math.min(H - 1, Math.round(tip + 0.6 * sp)); y++) {
+    const yy = c.up ? y : 2 * tip - y;
+    if (yy < 0 || yy >= H || !data[yy * w + sx]) continue;
+    let a = sx, b = sx;
+    while (a > 0 && data[yy * w + a - 1]) a--;
+    while (b < w - 1 && data[yy * w + b + 1]) b++;
+    if (b - a + 1 >= sp) return false;
+  }
+  return chords.some(d => d !== c && d.staff === c.staff && d.x - c.x >= 0.8 * sp && d.x - c.x <= 3.6 * sp &&
+    (d.up >= 2.6 || d.down >= 2.6 || d.heads.some(o => o.kind === 'hollow')) &&
+    h.p >= Math.min(...d.heads.map(o => o.p)) - 1 && h.p <= Math.max(...d.heads.map(o => o.p)) + 1);
+}
+
 // The line that opens a system (and a bracket's spine) runs down the staff's
 // left edge.  A clef printed against it fuses with it into one tall component
 // that no longer reads as a clef, so it is erased from R (barlines and heads
@@ -335,6 +357,7 @@ function* frontSteps(gray0, opts = {}) {
   const chords = chordStems(L, hs, { minLen: 1.5, sides: true });
   hs = hs.filter(h => (h.stemDir !== 0 || h.kind === 'hollow') && !(h.chord && h.chord.accidental));
   hs = hs.filter(h => !atStemTip(h, hs, L, ltL));
+  hs = hs.filter(h => !accidentalBefore(h, chords, L));
   const barlines = detectBarlines(R, staves, hs, sp.ss);
   return { gray, B, R, L, scale, skew, ss: sp.ss, lt: sp.lt, staves, systems, heads: hs, chords, beams, barlines, warnings, stacked: stacked || [],
     orientation: (quarter % 4) * 90, mode: ctx.mode };
