@@ -1338,6 +1338,118 @@ whole part), unpitched notes all sound as one drum, the OSMD cursor follows only
 has drawn (48 until "Draw every measure"), and after user corrections that insert lines the head -> note
 link can point one note off.
 
+### 8.9 Score structure: meters, form, articulations, octave lines
+
+Five modules read the structure of the page and `buildScore` (`src/score.js`) writes it. Each runs once
+per page at the start of `buildScore` (`asm.metersRead` guards a second build), after `assemblePage` and
+`readHeaders`, in this order: `meter.js`, `structure.js`, `artic.js` (with double dots), `ottava.js`.
+They only add fields to the assembly (`sy.meters`, `sy.bars`, `sy.voltas`, `sy.signs`, `h.artic`,
+`h.ott`), drop the "heads" found on time-signature digits, and split or drop bars where a meter shows
+the barlines were wrong; a failure in one leaves the score as it was without it.
+
+- **Time signatures (L16/L21, `src/meter.js`).** Every system's header (the first system's numbers are
+  read by `cv.js` `readHeaders`; the others here, with the same Bravura digit templates), a signature
+  after each barline (after a key change standing there), and the courtesy signature after a system's
+  last barline. C and cut C are matched against the `time-C` / `time-cut` templates (the cut stroke
+  reaches past the C). Numbers broken by staff-line removal, or the two numbers run together across the
+  middle line, are read again from all the ink in each half of the staff (`bandTime`). A signature
+  standing where no barline was found (stacked digits filling the upper half of the staff) is read too
+  and splits the bar there. Per barline the value most staves read wins (two staves needed on systems of
+  three or more). A courtesy signature is no bar: its digit heads and the bar they made are dropped, and
+  it stands for the next system's header when that header was not read. `buildScore` takes the meter in
+  force at each segment when the page shows a change of meter (otherwise the piece's single meter, chosen
+  as before), groups segments into bars, splits over-full bars and repairs rhythm with each bar's own
+  length, and `toMusicXML` writes `<time>` (with `symbol="common"` / `"cut"`) where it changes.
+- **Barlines and repeats (L22, `src/structure.js`).** Each barline cluster of a system, the closing one
+  included, is classified from the widths of its strokes through the staff (thin-thick final,
+  thin-thin double, thick-thin) and two repeat dots in the second and third spaces on either side
+  (repeat start / end / both); the kind most staves show wins, repeat signs first. Written as
+  `<barline location="left|right">` with `<bar-style>` and `<repeat direction>`; the piece's last bar
+  keeps light-heavy.
+- **Voltas.** A long thin flat line two to seven spaces over the top staff with a hook down at its start
+  (none at its end: an open bracket; none at its start at the staff start: carried over from the system
+  before). Brackets that follow on from each other are numbered 1, 2, 3 (no OCR of the number);
+  written as `<ending number type="start|stop|discontinue">` on the bars under them.
+- **Segno and coda.** Over the top staff: a coda is an oval crossed by a cross (four enclosed holes); a
+  segno a tall slashed S with no holes, its middle column crossing ink three times or more, standing
+  alone (not a letter of "D.S."). Written as `<segno/>` / `<coda/>` directions with `<sound>` at the
+  start of the bar they stand over (a sign over a barline belongs to the bar after it). Jump words read
+  by `text.js` (D.C., D.S., Fine, To Coda) get `<sound dacapo / dalsegno / fine / tocoda>` too.
+  `playback.js` plays repeats, voltas and jumps from these.
+- **Beams.** `assemble.js` `beamGroups` tags each beamed head with its group (`h.beam`); per voice,
+  notes of one group get `<beam number="1">` begin / continue / end.
+- **Articulations (`src/artic.js`).** Beyond the chord's outermost head on the side away from the stem
+  (both sides of a stemless note, or of a head read with two stems), within half a space of the head's
+  x: a round dot (staccato, 0.28-0.65 space), a thin upright wedge (staccatissimo), a flat dash about a
+  head wide (tenuto), a '>' wider than tall (accent: two strokes at the left columns, one in the middle
+  at the right), a '^' / 'v' (marcato: one run at the point, two at the open end). Pieces cut by
+  staff-line removal are joined; up to two marks stack (portato, accent + staccato). Not a mark: the dot
+  of a fermata (an arc over it), a letter of a lyric or text word (ink of its size right beside it),
+  dust. Written as `<articulations>` on the chord's first note (`<strong-accent type="up"/>` for
+  marcato).
+- **Double dots (L14).** A head read with one dot whose dot has a second one just right of it at the
+  same height: 1.75 times the plain value, two `<dot/>`.
+- **Multi-bar rests (L14).** The bars a multi-bar rest stands for were already written as bars of rest;
+  the first now carries `<measure-style><multiple-rest>n`.
+- **Octave lines (L15, `src/ottava.js`).** A dashed row (four or more small flat dashes at one height and
+  an even spacing) above or below a staff, with a number at its start read by shape: an 8 is one glyph
+  with two holes, 15 a narrow 1 and a 5 ("va", "vb", "ma" letters after it allowed); a row between two
+  staves belongs to the nearer one; a row with no number at the staff start continues an open line from
+  the system before. Heads under the line get `h.ott` = +1 / -1 / +2; `toMusicXML` writes their sounding
+  pitch (kept within octaves 0-9) and `<octave-shift type="down|up|stop" size="8|15">` at the line's
+  ends, from the first voice on the staff.
+
+**Measured** (coverage suite, 81 items; per-symbol accuracy clean / scan, before -> after):
+Same 81 items (243 PDFs) before (13:18, before 3d15815) and after (03ada96); totals over all tags 41 supported / 50 partial / 63 unsupported -> 75 / 47 / 32. Regression gate (`tools/regress.mjs --base v0.24.0 --head 0155e68`): benchmark with OCR 0.950 -> 0.951, challenge 0.829 -> 0.831, no item down by more than 0.05; `<tie>` 4043 -> 3973 on the challenge set because bars in changed meters are no longer cut into tied pieces.
+
+| Tag | clean before | clean after | scan before | scan after | scan-severe before | scan-severe after | status before -> after |
+|---|---:|---:|---:|---:|---:|---:|---|
+| `time-2-4` | 45% (5/11) | 91% (10/11) | 36% (4/11) | 73% (8/11) | 36% (4/11) | 64% (7/11) | partial -> partial |
+| `time-3-4` | 55% (16/29) | 93% (27/29) | 55% (16/29) | 100% (29/29) | 55% (16/29) | 72% (21/29) | partial -> supported |
+| `time-4-4` | 73% (45/62) | 95% (59/62) | 71% (44/62) | 94% (58/62) | 66% (41/62) | 84% (52/62) | partial -> supported |
+| `time-2-2` | 0% (0/4) | 100% (4/4) | 0% (0/4) | 100% (4/4) | 0% (0/4) | 50% (2/4) | unsupported -> supported |
+| `time-3-2` | 25% (1/4) | 100% (4/4) | 25% (1/4) | 100% (4/4) | 0% (0/4) | 25% (1/4) | partial -> supported |
+| `time-6-8` | 11% (2/18) | 89% (16/18) | 17% (3/18) | 94% (17/18) | 6% (1/18) | 56% (10/18) | unsupported -> supported |
+| `time-9-8` | 0% (0/5) | 100% (5/5) | 0% (0/5) | 100% (5/5) | 0% (0/5) | 100% (5/5) | unsupported -> supported |
+| `time-12-8` | 0% (0/5) | 100% (5/5) | 0% (0/5) | 100% (5/5) | 0% (0/5) | 80% (4/5) | unsupported -> supported |
+| `time-5-4` | 0% (0/3) | 100% (3/3) | 0% (0/3) | 100% (3/3) | 0% (0/3) | 33% (1/3) | unsupported -> supported |
+| `time-5-8` | 0% (0/4) | 100% (4/4) | 0% (0/4) | 100% (4/4) | 0% (0/4) | 75% (3/4) | unsupported -> supported |
+| `time-7-8` | 0% (0/4) | 100% (4/4) | 0% (0/4) | 100% (4/4) | 0% (0/4) | 100% (4/4) | unsupported -> supported |
+| `time-common` | 0% (0/8) | 88% (7/8) | 0% (0/8) | 88% (7/8) | 0% (0/8) | 75% (6/8) | unsupported -> supported |
+| `time-cut` | 0% (0/7) | 86% (6/7) | 0% (0/7) | 86% (6/7) | 0% (0/7) | 43% (3/7) | unsupported -> supported |
+| `time-change` | 0% (0/89) | 94% (84/89) | 0% (0/89) | 96% (85/89) | 0% (0/89) | 63% (56/89) | unsupported -> supported |
+| `key-change` | 79% (27/34) | 79% (27/34) | 68% (23/34) | 68% (23/34) | 41% (14/34) | 41% (14/34) | partial -> partial |
+| `barline-double` | 0% (0/42) | 88% (37/42) | 0% (0/42) | 90% (38/42) | 0% (0/42) | 67% (28/42) | unsupported -> supported |
+| `barline-final` | 95% (77/81) | 100% (81/81) | 94% (76/81) | 99% (80/81) | 88% (71/81) | 90% (73/81) | supported -> supported |
+| `repeat-start` | 0% (0/25) | 100% (25/25) | 0% (0/25) | 96% (24/25) | 0% (0/25) | 68% (17/25) | unsupported -> supported |
+| `repeat-end` | 0% (0/32) | 100% (32/32) | 0% (0/32) | 100% (32/32) | 0% (0/32) | 78% (25/32) | unsupported -> supported |
+| `volta-1` | 0% (0/8) | 88% (7/8) | 0% (0/8) | 88% (7/8) | 0% (0/8) | 75% (6/8) | unsupported -> supported |
+| `volta-2` | 0% (0/8) | 75% (6/8) | 0% (0/8) | 75% (6/8) | 0% (0/8) | 25% (2/8) | unsupported -> partial |
+| `segno` | 0% (0/2) | 100% (2/2) | 0% (0/2) | 100% (2/2) | 0% (0/2) | 0% (0/2) | unsupported -> supported |
+| `coda` | 0% (0/4) | 100% (4/4) | 0% (0/4) | 100% (4/4) | 0% (0/4) | 100% (4/4) | unsupported -> supported |
+| `dc` | 50% (1/2) | 50% (1/2) | 50% (1/2) | 50% (1/2) | 50% (1/2) | 50% (1/2) | partial -> partial |
+| `ds` | 100% (2/2) | 100% (2/2) | 100% (2/2) | 100% (2/2) | 50% (1/2) | 50% (1/2) | supported -> supported |
+| `fine` | 100% (2/2) | 100% (2/2) | 50% (1/2) | 50% (1/2) | 50% (1/2) | 50% (1/2) | partial -> partial |
+| `beam` | 0% (0/2064) | 82% (1700/2064) | 0% (0/2064) | 77% (1591/2064) | 0% (0/2064) | 63% (1305/2064) | unsupported -> partial |
+| `staccato` | 0% (0/78) | 95% (74/78) | 0% (0/78) | 94% (73/78) | 0% (0/78) | 81% (63/78) | unsupported -> supported |
+| `staccatissimo` | 0% (0/9) | 100% (9/9) | 0% (0/9) | 89% (8/9) | 0% (0/9) | 78% (7/9) | unsupported -> supported |
+| `accent` | 0% (0/43) | 63% (27/43) | 0% (0/43) | 63% (27/43) | 0% (0/43) | 53% (23/43) | unsupported -> partial |
+| `tenuto` | 0% (0/37) | 89% (33/37) | 0% (0/37) | 92% (34/37) | 0% (0/37) | 73% (27/37) | unsupported -> supported |
+| `marcato` | 0% (0/23) | 61% (14/23) | 0% (0/23) | 48% (11/23) | 0% (0/23) | 48% (11/23) | unsupported -> partial |
+| `double-dot` | 27% (4/15) | 93% (14/15) | 27% (4/15) | 93% (14/15) | 7% (1/15) | 40% (6/15) | partial -> supported |
+| `rest-multibar` | 67% (6/9) | 67% (6/9) | 44% (4/9) | 67% (6/9) | 0% (0/9) | 0% (0/9) | partial -> partial |
+| `ottava-8va` | 0% (0/28) | 100% (28/28) | 0% (0/28) | 96% (27/28) | 0% (0/28) | 71% (20/28) | unsupported -> supported |
+| `ottava-8vb` | 0% (0/22) | 100% (22/22) | 0% (0/22) | 100% (22/22) | 0% (0/22) | 100% (22/22) | unsupported -> supported |
+| `ottava-15ma` | 0% (0/12) | 58% (7/12) | 0% (0/12) | 58% (7/12) | 0% (0/12) | 58% (7/12) | unsupported -> partial |
+
+**Limits.** Meter: a signature on degraded digits that neither reader reads keeps the meter before it;
+additive and changing meters inside one bar are not modelled. Volta numbers are inferred by order, not
+read (a "1.-3." bracket is numbered 1). Segno / coda are read over the top staff only; "D.S." text that
+OCR truncates still carries its `<sound>` only when the words start "D.S." / "D.C.". Articulations next
+to the stem (as some engravers place a marcato) are not read; fermatas are read separately (`text.js`).
+Beams are written at one level (no secondary-beam numbers). Octave lines need their dashes: a line
+continued onto the next system with only "(8)" and a hook is not read; 22ma is not read.
+
 ## 9. Deployment and artifact constraints
 
 ### 9.1 Packaging
