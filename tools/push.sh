@@ -5,6 +5,7 @@
 # and .gitignore) are committed, so one agent's push does not sweep in another agent's
 # work in progress; other changes stay in the working tree (autostashed over the rebase).
 # Without paths it refuses, unless PUSH_ALL=1 is set (commits the whole tree).
+# Code paths need PUSH_BASE=<base commit> (HEAD when edited in place): see below.
 set -euo pipefail
 ROOT=/Users/d.sloane/music
 SCRATCH=/tmp/claude-501/-Users-d-sloane-music/69a237da-a02e-40d9-a1a9-90390e5b5eb2/scratchpad
@@ -24,6 +25,30 @@ cp "$SCRATCH/omr-build.html" docs/status/omr-build.html 2>/dev/null || true
 python3 -I tools/timeline.py >/dev/null || echo 'timeline not written'
 cp /Users/d.sloane/.claude/projects/-Users-d-sloane-music/69a237da-a02e-40d9-a1a9-90390e5b5eb2/workflows/scripts/*.js orchestration/ 2>/dev/null || true
 if [ ${#PATHS[@]} -gt 0 ]; then
+  # Code files copied in from a private worktree may be based on an older main; writing
+  # them whole would revert whatever landed since (it happened three times). For code,
+  # PUSH_BASE=<commit the file was edited from> is required: the file is three-way merged
+  # (base -> your file, base -> current HEAD) and a conflict refuses the push. Editing in
+  # place in this tree? Use PUSH_BASE=HEAD.
+  for f in "${PATHS[@]}"; do
+    case "$f" in mvp/src/*.js|mvp/ui/*.js|mvp/ui/*.css|mvp/ui/*.html|mvp/tools/*.mjs|mvp/tools/*.js|tools/*) ;; *) continue ;; esac
+    [ -f "$f" ] || continue
+    git cat-file -e "HEAD:$f" 2>/dev/null || continue
+    if [ -z "${PUSH_BASE:-}" ]; then
+      echo "refusing: $f is code; set PUSH_BASE=<commit your copy of it was based on> (PUSH_BASE=HEAD if you edited it in this tree) so it is merged, not overwritten" >&2
+      exit 1
+    fi
+    if git cat-file -e "$PUSH_BASE:$f" 2>/dev/null && [ "$(git rev-parse "$PUSH_BASE")" != "$(git rev-parse HEAD)" ]; then
+      tb=$(mktemp); th=$(mktemp)
+      git show "$PUSH_BASE:$f" > "$tb"; git show "HEAD:$f" > "$th"
+      if ! git merge-file -q "$f" "$tb" "$th"; then
+        rm -f "$tb" "$th"
+        echo "refusing: $f conflicts with changes made on main since $PUSH_BASE (conflict markers left in the file; resolve against HEAD and retry)" >&2
+        exit 1
+      fi
+      rm -f "$tb" "$th"
+    fi
+  done
   git add -A -- "${PATHS[@]}" docs/status docs/TIMELINE.md orchestration .gitignore
 elif [ "${PUSH_ALL:-}" = 1 ]; then
   git add -A
