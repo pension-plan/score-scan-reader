@@ -31,7 +31,7 @@
     \break \stemDown ees''2\mf( d''2 |
     c''2 b'2) |
     c''4 \change Staff = "lh" g4( \change Staff = "rh" c''2) |
-    <ees' g' c''>1\fermata |
+    <ees' g' c''>1\fermata \bar "|." |
           }
       }
       \new Staff = "lh" { \clef "bass"

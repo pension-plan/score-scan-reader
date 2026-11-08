@@ -336,6 +336,7 @@
         <notations><fermata type="upright"/></notations>
         <lyric number="1"><syllabic>single</syllabic><text>thee.</text></lyric>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
   <part id="P">
@@ -1195,6 +1196,7 @@
         <staff>2</staff>
         <notations><fermata type="upright"/></notations>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
 </score-partwise>

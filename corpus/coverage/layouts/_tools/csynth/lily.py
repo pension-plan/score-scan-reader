@@ -397,7 +397,12 @@ class LilyWriter:
         toks = []
         for m in part.measures[seg['start']:seg['end']]:
             for ev in m.get(vkey, []):
-                if ev.kind != 'note' or ev.is_tie_continuation():
+                if ev.kind != 'note':
+                    continue
+                if ev.is_tie_continuation():
+                    # melismaBusyProperties is '() (slurs/beams/ties do not make melismas automatically),
+                    # so a tied continuation note consumes a lyric event: give it a skip
+                    toks.append('_')
                     continue
                 ly = ev.lyrics.get(verse)
                 if ly is None:

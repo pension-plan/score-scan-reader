@@ -36,7 +36,7 @@
     \break g''4\p^\markup { \italic "dolce" } a''8[( g''8] f''8[ e''8]) |
     d''4( g''2) |
     <c'' e''>4\< <b' d''>4 <b' f''>4\! |
-    \stemUp <e' c''>2.\fermata |
+    \stemUp <e' c''>2.\fermata \bar "|." |
           }
       }
       \new Staff = "v2" \with { instrumentName = "Violin II" shortInstrumentName = "Vn. II" } { \clef "treble"

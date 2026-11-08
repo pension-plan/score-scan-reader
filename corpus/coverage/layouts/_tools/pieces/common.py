@@ -53,6 +53,7 @@ def assemble(time, key, parts_voices, time_symbol=None):
     for part, pv in parsed:
         part.measures = [{k: pv[k][i] for k in pv} for i in range(nm)]
         sc.parts.append(part)
+    sc.measures[-1].right_bar = 'final'
     renumber(sc)
     return sc
 

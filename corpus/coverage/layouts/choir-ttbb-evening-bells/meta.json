@@ -4,6 +4,7 @@
   "title": "Evening Bells - TTBB male choir in closed score",
   "layout": "choir-ttbb",
   "symbols": [
+    "barline-final",
     "clef-bass",
     "clef-treble-8vb",
     "dyn-mf",
@@ -24,10 +25,12 @@
     "time-4-4",
     "x-group-bracket",
     "x-measures",
+    "x-noteheads",
     "x-parts",
     "x-staves"
   ],
   "counts": {
+    "barline-final": 1,
     "clef-bass": 2,
     "clef-treble-8vb": 2,
     "dyn-mf": 2,
@@ -48,6 +51,7 @@
     "time-4-4": 1,
     "x-group-bracket": 1,
     "x-measures": 8,
+    "x-noteheads": 112,
     "x-parts": 4,
     "x-staves": 4
   },
@@ -86,6 +90,7 @@
   "notes": [
     "Lyrics are encoded on Tenor I only."
   ],
+  "printed_not_in_truth": {},
   "layout_description": "A4 portrait, staff size 20, 2 systems of 4 measures, bracketed two-staff closed score",
   "pages": 1,
   "measures": 8,
@@ -108,7 +113,7 @@
           ]
         }
       ],
-      "bytes": 117931
+      "bytes": 116547
     },
     "scan.pdf": {
       "seed": 7081,
@@ -169,7 +174,7 @@
         "jpeg": 80
       },
       "summary": "300 dpi colour scan on cream paper, 0.4 deg skew, noise, JPEG q80",
-      "bytes": 785674
+      "bytes": 786174
     },
     "scan-severe.pdf": {
       "seed": 7082,
@@ -264,7 +269,7 @@
         "format": "png1"
       },
       "summary": "thick dark binarised photocopy at 200 dpi: ink spread, 2.5 deg skew, staple, two punch holes, salt & pepper",
-      "bytes": 144607
+      "bytes": 144758
     }
   },
   "files": [

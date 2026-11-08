@@ -4,6 +4,7 @@
   "title": "Bright New Day - open SATB with soprano divisi (two voices) and bass octave divisi (chords)",
   "layout": "divisi",
   "symbols": [
+    "barline-final",
     "chord",
     "clef-bass",
     "clef-treble",
@@ -26,11 +27,13 @@
     "time-4-4",
     "x-group-bracket",
     "x-measures",
+    "x-noteheads",
     "x-parts",
     "x-staves",
     "x-two-voice-staff-measure"
   ],
   "counts": {
+    "barline-final": 1,
     "chord": 7,
     "clef-bass": 1,
     "clef-treble": 2,
@@ -53,6 +56,7 @@
     "time-4-4": 1,
     "x-group-bracket": 1,
     "x-measures": 8,
+    "x-noteheads": 126,
     "x-parts": 4,
     "x-staves": 4,
     "x-two-voice-staff-measure": 2
@@ -95,6 +99,7 @@
   "notes": [
     "Soprano voice 2 exists only in mm.5-6 (elsewhere <forward>); it carries no lyrics."
   ],
+  "printed_not_in_truth": {},
   "layout_description": "A4 portrait, staff size 18, 2 systems of 4 measures on 4 bracketed staves",
   "pages": 1,
   "measures": 8,
@@ -117,7 +122,7 @@
           ]
         }
       ],
-      "bytes": 180902
+      "bytes": 185913
     },
     "scan.pdf": {
       "seed": 7171,
@@ -170,7 +175,7 @@
         "jpeg": 65
       },
       "summary": "250 dpi grey scan, 1.2 deg skew, soft focus, toner specks, JPEG q65",
-      "bytes": 472297
+      "bytes": 471663
     },
     "scan-severe.pdf": {
       "seed": 7172,
@@ -244,7 +249,7 @@
         "format": "png1"
       },
       "summary": "thin, faded binarised photocopy at 150 dpi (rendered 300): ink dropout, 3 deg skew, broken lines, salt & pepper, toner specks",
-      "bytes": 37836
+      "bytes": 37798
     }
   },
   "files": [

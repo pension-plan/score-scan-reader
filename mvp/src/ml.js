@@ -284,11 +284,19 @@ function refinePage(entry, dets, opts, stats) {
       let base = ourBase;
       const kind = changeKind(q0, ourBase);
       if (Math.abs(q0 - ourBase) > EPS && conf >= overConf && kinds.has(kind)) {
-        // a quarter (or longer) against a beam or flag the detector itself
-        // found at the stem tip, or a shorter value with nothing there, is
-        // not taken
+        // vetoes: a quarter (or longer) against a beam or flag the detector
+        // itself found at the stem tip, or a shorter value with nothing
+        // there; and between beamed values the beam stack we measure at our
+        // stem tip has the final say on how many beams there are (blur
+        // thickens one beam into the look of two for the model; a sliver of
+        // a second beam gets lost for us)
         const tip = kind === 'stem' && opts.tipCheck !== false ? tipMark(h, marks, sp) : null;
-        if (!(tip && (q0 >= 1 - EPS ? tip !== 'none' : tip === 'none'))) base = q0;
+        let veto = !!(tip && (q0 >= 1 - EPS ? tip !== 'none' : tip === 'none'));
+        if (!veto && kind === 'flags' && opts.depthCheck !== false) {
+          const d = beamDepth(h, fr.R, sp);
+          if (d != null) veto = Math.round(Math.log2(0.5 / q0)) + 1 !== (d < 0.95 ? 1 : d < 1.75 ? 2 : d < 2.6 ? 3 : 4);
+        }
+        if (!veto) base = q0;
         else stats.vetoed = (stats.vetoed || 0) + 1;
       }
       const q = base * (2 - Math.pow(0.5, dots));
@@ -296,7 +304,6 @@ function refinePage(entry, dets, opts, stats) {
       h.dur = { q: tup ? q * tup.normal / tup.actual : q, dots };
       if (tup) h.dur.tuplet = tup;
       h.mlDur = { from: printed, to: q, conf: +conf.toFixed(3), kind };
-      if (opts.debugDepth && kind === 'flags') h.mlDur.depth = beamDepth(h, fr.R, sp);
       stats.durations++;
     }
   }

@@ -5,6 +5,7 @@
   "layout": "divisi",
   "symbols": [
     "acc-sharp",
+    "barline-final",
     "beam",
     "chord",
     "clef-alto",
@@ -30,12 +31,14 @@
     "time-4-4",
     "x-group-bracket",
     "x-measures",
+    "x-noteheads",
     "x-parts",
     "x-staves",
     "x-two-voice-staff-measure"
   ],
   "counts": {
     "acc-sharp": 6,
+    "barline-final": 1,
     "beam": 4,
     "chord": 11,
     "clef-alto": 1,
@@ -61,6 +64,7 @@
     "time-4-4": 1,
     "x-group-bracket": 1,
     "x-measures": 8,
+    "x-noteheads": 126,
     "x-parts": 4,
     "x-staves": 4,
     "x-two-voice-staff-measure": 4
@@ -86,6 +90,7 @@
   "notes": [
     "Violin I voice 2 exists only in the divisi measures; elsewhere it is empty (<forward>)."
   ],
+  "printed_not_in_truth": {},
   "layout_description": "A4 portrait, staff size 19, 2 systems of 4 measures on 4 bracketed staves",
   "pages": 1,
   "measures": 8,
@@ -108,7 +113,7 @@
           ]
         }
       ],
-      "bytes": 111857
+      "bytes": 112977
     },
     "scan.pdf": {
       "seed": 7161,
@@ -164,7 +169,7 @@
         "jpeg": 70
       },
       "summary": "200 dpi grey office scan, -0.9 deg skew, slight lighting gradient, noise, JPEG q70",
-      "bytes": 337162
+      "bytes": 338029
     },
     "scan-severe.pdf": {
       "seed": 7162,
@@ -311,7 +316,7 @@
         "jpeg": 30
       },
       "summary": "old yellowed copy: bleed-through, foxing, coffee ring, pencil annotations, 150 dpi colour, 2 deg skew, JPEG q30",
-      "bytes": 120035
+      "bytes": 120620
     }
   },
   "files": [

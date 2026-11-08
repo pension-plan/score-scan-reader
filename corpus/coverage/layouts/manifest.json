@@ -33,6 +33,7 @@
     "accent": 16,
     "arpeggio": 2,
     "barline-double": 2,
+    "barline-final": 20,
     "beam": 142,
     "breath": 2,
     "chord": 100,
@@ -109,6 +110,7 @@
     "x-group-square": 1,
     "x-measures": 210,
     "x-multi-staff-part": 6,
+    "x-noteheads": 2160,
     "x-parts": 59,
     "x-staves": 66,
     "x-two-voice-staff-measure": 30
@@ -123,6 +125,7 @@
         "acc-natural",
         "acc-sharp",
         "accent",
+        "barline-final",
         "beam",
         "breath",
         "clef-treble",
@@ -158,6 +161,7 @@
         "trill",
         "tuplet-3",
         "x-measures",
+        "x-noteheads",
         "x-parts",
         "x-staves"
       ],
@@ -165,6 +169,7 @@
         "acc-natural": 2,
         "acc-sharp": 1,
         "accent": 1,
+        "barline-final": 1,
         "beam": 23,
         "breath": 1,
         "clef-treble": 1,
@@ -200,6 +205,7 @@
         "trill": 1,
         "tuplet-3": 1,
         "x-measures": 16,
+        "x-noteheads": 55,
         "x-parts": 1,
         "x-staves": 1
       },
@@ -216,6 +222,7 @@
         "notes": "ONE part \"Flute\", one treble staff, one voice. 16 measures of 2/4 on 4 systems; triplet in m.7, trill in m.4, breath mark in m.8, tie across the system break m.12-13, rehearsal mark A at m.9."
       },
       "notes": [],
+      "printed_not_in_truth": {},
       "layout_description": "A4 portrait, staff size 20, 4 systems of 4 measures, instrument name on the first system",
       "pages": 1,
       "measures": 16,
@@ -238,7 +245,7 @@
               ]
             }
           ],
-          "bytes": 80292
+          "bytes": 80288
         },
         "scan.pdf": {
           "seed": 7011,
@@ -294,7 +301,7 @@
             "jpeg": 70
           },
           "summary": "200 dpi grey office scan, -0.9 deg skew, slight lighting gradient, noise, JPEG q70",
-          "bytes": 281172
+          "bytes": 281413
         },
         "scan-severe.pdf": {
           "seed": 7012,
@@ -404,7 +411,7 @@
             "jpeg": 25
           },
           "summary": "phone photo of the page: perspective/keystone, uneven light, vignette, motion blur, 150 dpi, JPEG q25",
-          "bytes": 77100
+          "bytes": 77150
         }
       },
       "files": [
@@ -479,6 +486,7 @@
       "title": "Morning Song - vocal melody with one verse of lyrics",
       "layout": "melody-lyrics",
       "symbols": [
+        "barline-final",
         "beam",
         "breath",
         "clef-treble",
@@ -509,10 +517,12 @@
         "tie",
         "time-3-4",
         "x-measures",
+        "x-noteheads",
         "x-parts",
         "x-staves"
       ],
       "counts": {
+        "barline-final": 1,
         "beam": 4,
         "breath": 1,
         "clef-treble": 1,
@@ -543,6 +553,7 @@
         "tie": 3,
         "time-3-4": 1,
         "x-measures": 17,
+        "x-noteheads": 39,
         "x-parts": 1,
         "x-staves": 1
       },
@@ -566,6 +577,7 @@
       "notes": [
         "Lyrics are encoded as <lyric number=\"1\"> on the voice; melisma extenders as <extend/>."
       ],
+      "printed_not_in_truth": {},
       "layout_description": "A4 portrait, staff size 20, pickup + 16 measures on 4 systems, no instrument name",
       "pages": 1,
       "measures": 17,
@@ -588,7 +600,7 @@
               ]
             }
           ],
-          "bytes": 92444
+          "bytes": 93716
         },
         "scan.pdf": {
           "seed": 7021,
@@ -649,7 +661,7 @@
             "jpeg": 80
           },
           "summary": "300 dpi colour scan on cream paper, 0.4 deg skew, noise, JPEG q80",
-          "bytes": 755040
+          "bytes": 755459
         },
         "scan-severe.pdf": {
           "seed": 7022,
@@ -705,7 +717,7 @@
             "jpeg": 20
           },
           "summary": "low-resolution 120 dpi grey scan, -4 deg skew, heavy blur and noise, JPEG q20",
-          "bytes": 33844
+          "bytes": 34087
         }
       },
       "files": [
@@ -778,6 +790,7 @@
         "acc-sharp",
         "arpeggio",
         "barline-double",
+        "barline-final",
         "beam",
         "chord",
         "clef-bass",
@@ -810,6 +823,7 @@
         "time-4-4",
         "x-measures",
         "x-multi-staff-part",
+        "x-noteheads",
         "x-parts",
         "x-staves"
       ],
@@ -819,6 +833,7 @@
         "acc-sharp": 2,
         "arpeggio": 2,
         "barline-double": 1,
+        "barline-final": 1,
         "beam": 31,
         "chord": 10,
         "clef-bass": 1,
@@ -851,6 +866,7 @@
         "time-4-4": 1,
         "x-measures": 12,
         "x-multi-staff-part": 1,
+        "x-noteheads": 131,
         "x-parts": 1,
         "x-staves": 2
       },
@@ -869,6 +885,7 @@
       "notes": [
         "Sustain-pedal marks are <pedal type=\"start\"/\"stop\" sign=\"yes\" line=\"no\">."
       ],
+      "printed_not_in_truth": {},
       "layout_description": "A4 portrait, staff size 20, 3 systems of 4 measures, instrument name on the first system only",
       "pages": 1,
       "measures": 12,
@@ -891,7 +908,7 @@
               ]
             }
           ],
-          "bytes": 110005
+          "bytes": 110134
         },
         "scan.pdf": {
           "seed": 7031,
@@ -939,7 +956,7 @@
             "jpeg": 75
           },
           "summary": "300 dpi grey flatbed scan, 0.6 deg skew, light paper texture and noise, JPEG q75",
-          "bytes": 593833
+          "bytes": 594408
         },
         "scan-severe.pdf": {
           "seed": 7032,
@@ -1013,7 +1030,7 @@
             "format": "png1"
           },
           "summary": "thin, faded binarised photocopy at 150 dpi (rendered 300): ink dropout, 3 deg skew, broken lines, salt & pepper, toner specks",
-          "bytes": 28349
+          "bytes": 28314
         }
       },
       "files": [
@@ -1086,6 +1103,7 @@
       "title": "Night Song - voice with lyrics above a piano grand staff",
       "layout": "voice-piano",
       "symbols": [
+        "barline-final",
         "beam",
         "chord",
         "clef-bass",
@@ -1122,10 +1140,12 @@
         "time-4-4",
         "x-measures",
         "x-multi-staff-part",
+        "x-noteheads",
         "x-parts",
         "x-staves"
       ],
       "counts": {
+        "barline-final": 1,
         "beam": 8,
         "chord": 23,
         "clef-bass": 1,
@@ -1162,6 +1182,7 @@
         "time-4-4": 1,
         "x-measures": 11,
         "x-multi-staff-part": 1,
+        "x-noteheads": 122,
         "x-parts": 2,
         "x-staves": 3
       },
@@ -1187,6 +1208,7 @@
       "notes": [
         "Lyrics belong to the Voice part only."
       ],
+      "printed_not_in_truth": {},
       "layout_description": "A4 portrait, staff size 19, 3 systems (4+4+3 measures) of voice staff + piano grand staff",
       "pages": 1,
       "measures": 11,
@@ -1209,7 +1231,7 @@
               ]
             }
           ],
-          "bytes": 136695
+          "bytes": 136555
         },
         "scan.pdf": {
           "seed": 7041,
@@ -1262,7 +1284,7 @@
             "jpeg": 65
           },
           "summary": "250 dpi grey scan, 1.2 deg skew, soft focus, toner specks, JPEG q65",
-          "bytes": 450452
+          "bytes": 450995
         },
         "scan-severe.pdf": {
           "seed": 7042,
@@ -1357,7 +1379,7 @@
             "format": "png1"
           },
           "summary": "thick dark binarised photocopy at 200 dpi: ink spread, 2.5 deg skew, staple, two punch holes, salt & pepper",
-          "bytes": 151984
+          "bytes": 152003
         }
       },
       "files": [
@@ -1429,6 +1451,7 @@
       "title": "Light of Morning - SATB choir in closed score (two staves)",
       "layout": "choir-closed-satb",
       "symbols": [
+        "barline-final",
         "beam",
         "clef-bass",
         "clef-treble",
@@ -1455,10 +1478,12 @@
         "time-4-4",
         "x-group-bracket",
         "x-measures",
+        "x-noteheads",
         "x-parts",
         "x-staves"
       ],
       "counts": {
+        "barline-final": 1,
         "beam": 4,
         "clef-bass": 2,
         "clef-treble": 2,
@@ -1485,6 +1510,7 @@
         "time-4-4": 1,
         "x-group-bracket": 1,
         "x-measures": 8,
+        "x-noteheads": 116,
         "x-parts": 4,
         "x-staves": 4
       },
@@ -1523,6 +1549,7 @@
       "notes": [
         "Lyrics are encoded on the Soprano only (they are printed once between the staves)."
       ],
+      "printed_not_in_truth": {},
       "layout_description": "A4 portrait, staff size 20, 2 systems of 4 measures, bracketed choir staves with two-line names",
       "pages": 1,
       "measures": 8,
@@ -1545,7 +1572,7 @@
               ]
             }
           ],
-          "bytes": 114090
+          "bytes": 115062
         },
         "scan.pdf": {
           "seed": 7051,
@@ -1593,7 +1620,7 @@
             "jpeg": 75
           },
           "summary": "300 dpi grey flatbed scan, 0.6 deg skew, light paper texture and noise, JPEG q75",
-          "bytes": 565607
+          "bytes": 566120
         },
         "scan-severe.pdf": {
           "seed": 7052,
@@ -1649,7 +1676,7 @@
             "jpeg": 20
           },
           "summary": "low-resolution 120 dpi grey scan, -4 deg skew, heavy blur and noise, JPEG q20",
-          "bytes": 39205
+          "bytes": 39282
         }
       },
       "files": [
@@ -1720,6 +1747,7 @@
       "title": "Gloria - SATB choir in open score with imitative entries",
       "layout": "choir-open-satb",
       "symbols": [
+        "barline-final",
         "beam",
         "clef-bass",
         "clef-treble",
@@ -1748,10 +1776,12 @@
         "time-4-4",
         "x-group-bracket",
         "x-measures",
+        "x-noteheads",
         "x-parts",
         "x-staves"
       ],
       "counts": {
+        "barline-final": 1,
         "beam": 3,
         "clef-bass": 1,
         "clef-treble": 2,
@@ -1780,6 +1810,7 @@
         "time-4-4": 1,
         "x-group-bracket": 1,
         "x-measures": 7,
+        "x-noteheads": 75,
         "x-parts": 4,
         "x-staves": 4
       },
@@ -1821,6 +1852,7 @@
       "notes": [
         "The tenor clef is <clef><sign>G</sign><line>2</line><clef-octave-change>-1</clef-octave-change>; its pitches are written at sounding pitch as usual for vocal tenor parts."
       ],
+      "printed_not_in_truth": {},
       "layout_description": "A4 portrait, staff size 19, 2 systems (4 + 3 measures) on 4 bracketed staves, full then short names",
       "pages": 1,
       "measures": 7,
@@ -1843,7 +1875,7 @@
               ]
             }
           ],
-          "bytes": 150762
+          "bytes": 151121
         },
         "scan.pdf": {
           "seed": 7061,
@@ -1899,7 +1931,7 @@
             "jpeg": 70
           },
           "summary": "200 dpi grey office scan, -0.9 deg skew, slight lighting gradient, noise, JPEG q70",
-          "bytes": 355441
+          "bytes": 356360
         },
         "scan-severe.pdf": {
           "seed": 7062,
@@ -1973,7 +2005,7 @@
             "format": "png1"
           },
           "summary": "thin, faded binarised photocopy at 150 dpi (rendered 300): ink dropout, 3 deg skew, broken lines, salt & pepper, toner specks",
-          "bytes": 34526
+          "bytes": 34525
         }
       },
       "files": [
@@ -2044,6 +2076,7 @@
       "title": "Summer Song - SAB choir on three bracketed staves",
       "layout": "choir-sab",
       "symbols": [
+        "barline-final",
         "clef-bass",
         "clef-treble",
         "dyn-f",
@@ -2064,10 +2097,12 @@
         "time-common",
         "x-group-bracket",
         "x-measures",
+        "x-noteheads",
         "x-parts",
         "x-staves"
       ],
       "counts": {
+        "barline-final": 1,
         "clef-bass": 1,
         "clef-treble": 2,
         "dyn-f": 3,
@@ -2088,6 +2123,7 @@
         "time-common": 1,
         "x-group-bracket": 1,
         "x-measures": 8,
+        "x-noteheads": 84,
         "x-parts": 3,
         "x-staves": 3
       },
@@ -2121,6 +2157,7 @@
         "notes": "THREE parts, one staff each: Soprano, Alto (both treble clef) and Baritone (bass clef). The two treble staves are separate parts, not a piano right hand. Each staff has its own copy of the lyrics (same text, same rhythm). Common-time signature symbol."
       },
       "notes": [],
+      "printed_not_in_truth": {},
       "layout_description": "A4 portrait, staff size 19, 2 systems of 4 measures on 3 bracketed staves, full then short names",
       "pages": 1,
       "measures": 8,
@@ -2143,7 +2180,7 @@
               ]
             }
           ],
-          "bytes": 155796
+          "bytes": 153487
         },
         "scan.pdf": {
           "seed": 7071,
@@ -2199,7 +2236,7 @@
             "jpeg": 72
           },
           "summary": "240 dpi grey scan, -0.5 deg skew, faint bleed-through, JPEG q72",
-          "bytes": 404972
+          "bytes": 405593
         },
         "scan-severe.pdf": {
           "seed": 7072,
@@ -2309,7 +2346,7 @@
             "jpeg": 25
           },
           "summary": "phone photo of the page: perspective/keystone, uneven light, vignette, motion blur, 150 dpi, JPEG q25",
-          "bytes": 107850
+          "bytes": 107887
         }
       },
       "files": [
@@ -2380,6 +2417,7 @@
       "title": "Evening Bells - TTBB male choir in closed score",
       "layout": "choir-ttbb",
       "symbols": [
+        "barline-final",
         "clef-bass",
         "clef-treble-8vb",
         "dyn-mf",
@@ -2400,10 +2438,12 @@
         "time-4-4",
         "x-group-bracket",
         "x-measures",
+        "x-noteheads",
         "x-parts",
         "x-staves"
       ],
       "counts": {
+        "barline-final": 1,
         "clef-bass": 2,
         "clef-treble-8vb": 2,
         "dyn-mf": 2,
@@ -2424,6 +2464,7 @@
         "time-4-4": 1,
         "x-group-bracket": 1,
         "x-measures": 8,
+        "x-noteheads": 112,
         "x-parts": 4,
         "x-staves": 4
       },
@@ -2462,6 +2503,7 @@
       "notes": [
         "Lyrics are encoded on Tenor I only."
       ],
+      "printed_not_in_truth": {},
       "layout_description": "A4 portrait, staff size 20, 2 systems of 4 measures, bracketed two-staff closed score",
       "pages": 1,
       "measures": 8,
@@ -2484,7 +2526,7 @@
               ]
             }
           ],
-          "bytes": 117931
+          "bytes": 116547
         },
         "scan.pdf": {
           "seed": 7081,
@@ -2545,7 +2587,7 @@
             "jpeg": 80
           },
           "summary": "300 dpi colour scan on cream paper, 0.4 deg skew, noise, JPEG q80",
-          "bytes": 785674
+          "bytes": 786174
         },
         "scan-severe.pdf": {
           "seed": 7082,
@@ -2640,7 +2682,7 @@
             "format": "png1"
           },
           "summary": "thick dark binarised photocopy at 200 dpi: ink spread, 2.5 deg skew, staple, two punch holes, salt & pepper",
-          "bytes": 144607
+          "bytes": 144758
         }
       },
       "files": [
@@ -2712,6 +2754,7 @@
       "title": "Winter Night - SSAA choir in closed score on two treble staves",
       "layout": "choir-ssaa",
       "symbols": [
+        "barline-final",
         "beam",
         "clef-treble",
         "dot",
@@ -2738,10 +2781,12 @@
         "time-3-4",
         "x-group-bracket",
         "x-measures",
+        "x-noteheads",
         "x-parts",
         "x-staves"
       ],
       "counts": {
+        "barline-final": 1,
         "beam": 2,
         "clef-treble": 4,
         "dot": 15,
@@ -2768,6 +2813,7 @@
         "time-3-4": 1,
         "x-group-bracket": 1,
         "x-measures": 12,
+        "x-noteheads": 116,
         "x-parts": 4,
         "x-staves": 4
       },
@@ -2806,6 +2852,7 @@
       "notes": [
         "Lyrics are encoded on Soprano I only."
       ],
+      "printed_not_in_truth": {},
       "layout_description": "A4 portrait, staff size 20, 2 systems of 6 measures, bracketed two-staff closed score",
       "pages": 1,
       "measures": 12,
@@ -2828,7 +2875,7 @@
               ]
             }
           ],
-          "bytes": 121760
+          "bytes": 122041
         },
         "scan.pdf": {
           "seed": 7091,
@@ -2881,7 +2928,7 @@
             "jpeg": 65
           },
           "summary": "250 dpi grey scan, 1.2 deg skew, soft focus, toner specks, JPEG q65",
-          "bytes": 391165
+          "bytes": 391348
         },
         "scan-severe.pdf": {
           "seed": 7092,
@@ -2909,39 +2956,39 @@
                         272
                       ],
                       [
-                        722,
-                        596
+                        193,
+                        756
                       ]
                     ],
                     "marks": [
                       [
-                        442,
-                        405
+                        422,
+                        364
                       ],
                       [
-                        688,
-                        394
+                        648,
+                        283
                       ],
                       [
-                        506,
-                        405
+                        813,
+                        757
                       ]
                     ],
                     "texts": [
                       [
                         "rit.",
-                        373,
-                        361
+                        544,
+                        229
                       ],
                       [
                         "breathe",
-                        802,
-                        582
+                        731,
+                        367
                       ],
                       [
                         "p!",
-                        700,
-                        754
+                        923,
+                        279
                       ]
                     ],
                     "lines": 1
@@ -2951,7 +2998,7 @@
                   "bleed_through",
                   {
                     "strength": 0.12,
-                    "shift_px": 4
+                    "shift_px": -2
                   }
                 ],
                 [
@@ -2971,8 +3018,8 @@
                   {
                     "coffee": [
                       [
-                        964,
-                        1271,
+                        966,
+                        981,
                         124
                       ]
                     ],
@@ -3028,7 +3075,7 @@
             "jpeg": 30
           },
           "summary": "old yellowed copy: bleed-through, foxing, coffee ring, pencil annotations, 150 dpi colour, 2 deg skew, JPEG q30",
-          "bytes": 105705
+          "bytes": 105786
         }
       },
       "files": [
@@ -3100,6 +3147,7 @@
       "title": "Song of Rejoicing - closed SATB choir with piano accompaniment",
       "layout": "choir-piano",
       "symbols": [
+        "barline-final",
         "chord",
         "clef-bass",
         "clef-treble",
@@ -3125,10 +3173,12 @@
         "x-group-bracket",
         "x-measures",
         "x-multi-staff-part",
+        "x-noteheads",
         "x-parts",
         "x-staves"
       ],
       "counts": {
+        "barline-final": 1,
         "chord": 24,
         "clef-bass": 3,
         "clef-treble": 3,
@@ -3154,6 +3204,7 @@
         "x-group-bracket": 1,
         "x-measures": 10,
         "x-multi-staff-part": 1,
+        "x-noteheads": 215,
         "x-parts": 5,
         "x-staves": 6
       },
@@ -3194,6 +3245,7 @@
       "notes": [
         "Lyrics are encoded on the Soprano only."
       ],
+      "printed_not_in_truth": {},
       "layout_description": "A4 portrait, staff size 18, 2 systems (5 + 5 measures) of 4 staves: bracketed choir + braced piano",
       "pages": 1,
       "measures": 10,
@@ -3216,7 +3268,7 @@
               ]
             }
           ],
-          "bytes": 132088
+          "bytes": 132437
         },
         "scan.pdf": {
           "seed": 7101,
@@ -3264,7 +3316,7 @@
             "jpeg": 75
           },
           "summary": "300 dpi grey flatbed scan, 0.6 deg skew, light paper texture and noise, JPEG q75",
-          "bytes": 650991
+          "bytes": 651589
         },
         "scan-severe.pdf": {
           "seed": 7102,
@@ -3374,7 +3426,7 @@
             "jpeg": 25
           },
           "summary": "phone photo of the page: perspective/keystone, uneven light, vignette, motion blur, 150 dpi, JPEG q25",
-          "bytes": 110104
+          "bytes": 110216
         }
       },
       "files": [
@@ -3447,6 +3499,7 @@
       "layout": "organ",
       "symbols": [
         "acc-sharp",
+        "barline-final",
         "beam",
         "clef-bass",
         "clef-treble",
@@ -3469,12 +3522,14 @@
         "time-4-4",
         "x-measures",
         "x-multi-staff-part",
+        "x-noteheads",
         "x-parts",
         "x-staves",
         "x-two-voice-staff-measure"
       ],
       "counts": {
         "acc-sharp": 8,
+        "barline-final": 1,
         "beam": 4,
         "clef-bass": 2,
         "clef-treble": 1,
@@ -3497,6 +3552,7 @@
         "time-4-4": 1,
         "x-measures": 8,
         "x-multi-staff-part": 1,
+        "x-noteheads": 104,
         "x-parts": 1,
         "x-staves": 3,
         "x-two-voice-staff-measure": 8
@@ -3516,6 +3572,7 @@
       "notes": [
         "Organ = one part with <staves>3</staves> and <part-symbol top-staff=\"1\" bottom-staff=\"2\">brace</part-symbol>; voices 1+2 on staff 1, voice 5 on staff 2, voice 9 on staff 3."
       ],
+      "printed_not_in_truth": {},
       "layout_description": "A4 portrait, staff size 19, 2 systems of 4 measures, braced manuals + separate pedal staff",
       "pages": 1,
       "measures": 8,
@@ -3538,7 +3595,7 @@
               ]
             }
           ],
-          "bytes": 108132
+          "bytes": 108210
         },
         "scan.pdf": {
           "seed": 7111,
@@ -3594,7 +3651,7 @@
             "jpeg": 70
           },
           "summary": "200 dpi grey office scan, -0.9 deg skew, slight lighting gradient, noise, JPEG q70",
-          "bytes": 314337
+          "bytes": 314606
         },
         "scan-severe.pdf": {
           "seed": 7112,
@@ -3689,7 +3746,7 @@
             "format": "png1"
           },
           "summary": "thick dark binarised photocopy at 200 dpi: ink spread, 2.5 deg skew, staple, two punch holes, salt & pepper",
-          "bytes": 145220
+          "bytes": 145553
         }
       },
       "files": [
@@ -3762,6 +3819,7 @@
       "symbols": [
         "acc-sharp",
         "accent",
+        "barline-final",
         "beam",
         "chord",
         "clef-alto",
@@ -3791,12 +3849,14 @@
         "time-3-4",
         "x-group-bracket",
         "x-measures",
+        "x-noteheads",
         "x-parts",
         "x-staves"
       ],
       "counts": {
         "acc-sharp": 1,
         "accent": 12,
+        "barline-final": 1,
         "beam": 6,
         "chord": 4,
         "clef-alto": 1,
@@ -3826,6 +3886,7 @@
         "time-3-4": 1,
         "x-group-bracket": 1,
         "x-measures": 12,
+        "x-noteheads": 128,
         "x-parts": 4,
         "x-staves": 4
       },
@@ -3848,6 +3909,7 @@
         "notes": "FOUR parts, exactly one per staff: Violin I, Violin II, Viola (alto clef), Violoncello, joined by a bracket. Each staff is one part: do not merge staves and do not split a staff - the double stops of Violin I (mm.11-12) are chords inside Violin I. \"pizz.\"/\"arco\" and \"dolce\" are words directions. Repeat sign at the end of m.8."
       },
       "notes": [],
+      "printed_not_in_truth": {},
       "layout_description": "A4 portrait, staff size 18, 3 systems of 4 measures on 4 bracketed staves, full then short names",
       "pages": 1,
       "measures": 12,
@@ -3870,7 +3932,7 @@
               ]
             }
           ],
-          "bytes": 132088
+          "bytes": 132127
         },
         "scan.pdf": {
           "seed": 7121,
@@ -3931,7 +3993,7 @@
             "jpeg": 80
           },
           "summary": "300 dpi colour scan on cream paper, 0.4 deg skew, noise, JPEG q80",
-          "bytes": 940196
+          "bytes": 942032
         },
         "scan-severe.pdf": {
           "seed": 7122,
@@ -4005,7 +4067,7 @@
             "format": "png1"
           },
           "summary": "thin, faded binarised photocopy at 150 dpi (rendered 300): ink dropout, 3 deg skew, broken lines, salt & pepper, toner specks",
-          "bytes": 39765
+          "bytes": 39712
         }
       },
       "files": [
@@ -4078,6 +4140,7 @@
       "title": "Festive March - 9-staff orchestral full score, two pages",
       "layout": "orchestral",
       "symbols": [
+        "barline-final",
         "beam",
         "chord",
         "clef-alto",
@@ -4112,10 +4175,12 @@
         "x-group-bracket",
         "x-group-square",
         "x-measures",
+        "x-noteheads",
         "x-parts",
         "x-staves"
       ],
       "counts": {
+        "barline-final": 1,
         "beam": 36,
         "chord": 4,
         "clef-alto": 1,
@@ -4150,6 +4215,7 @@
         "x-group-bracket": 2,
         "x-group-square": 1,
         "x-measures": 8,
+        "x-noteheads": 250,
         "x-parts": 9,
         "x-staves": 9
       },
@@ -4184,6 +4250,7 @@
       "notes": [
         "Part groups: woodwinds bracket, strings bracket, violins square (nested part-group); trumpet and timpani are not grouped."
       ],
+      "printed_not_in_truth": {},
       "layout_description": "A4 portrait, staff size 15, page 1: title + one 9-staff system (mm.1-4), page 2: one system (mm.5-8) with abbreviated names",
       "pages": 2,
       "measures": 8,
@@ -4213,7 +4280,7 @@
               ]
             }
           ],
-          "bytes": 177565
+          "bytes": 175859
         },
         "scan.pdf": {
           "seed": 7131,
@@ -4298,7 +4365,7 @@
             "jpeg": 65
           },
           "summary": "250 dpi grey scan, 1.2 deg skew, soft focus, toner specks, JPEG q65",
-          "bytes": 831345
+          "bytes": 833943
         },
         "scan-severe.pdf": {
           "seed": 7132,
@@ -4389,7 +4456,7 @@
             "jpeg": 20
           },
           "summary": "low-resolution 120 dpi grey scan, -4 deg skew, heavy blur and noise, JPEG q20",
-          "bytes": 85442
+          "bytes": 85799
         }
       },
       "files": [
@@ -4463,6 +4530,7 @@
       "layout": "lead-sheet",
       "symbols": [
         "barline-double",
+        "barline-final",
         "chord-symbol",
         "clef-treble",
         "dot",
@@ -4487,11 +4555,13 @@
         "volta-1",
         "volta-2",
         "x-measures",
+        "x-noteheads",
         "x-parts",
         "x-staves"
       ],
       "counts": {
         "barline-double": 1,
+        "barline-final": 1,
         "chord-symbol": 31,
         "clef-treble": 1,
         "dot": 2,
@@ -4516,6 +4586,7 @@
         "volta-1": 1,
         "volta-2": 1,
         "x-measures": 16,
+        "x-noteheads": 47,
         "x-parts": 1,
         "x-staves": 1
       },
@@ -4537,8 +4608,12 @@
         "notes": "ONE part (melody, no instrument name) with chord symbols above the staff (31 <harmony> elements, some changing in the middle of a whole note: <offset>) and two lyric lines under the repeated A section (verse 1 continues into the 1st ending and the B section, verse 2 into the 2nd ending). Repeat with 1st ending (m.8) and 2nd ending (m.9), notated order."
       },
       "notes": [
-        "Chord symbols are <harmony> (root/kind/bass); LilyPond prints them in its own style (e.g. superscript 7, \"m7\"); the stanza numbers \"1.\"/\"2.\" are not encoded."
+        "Chord symbols are <harmony> (root/kind/bass); LilyPond prints them in its own style (e.g. superscript 7, \"m7\"); the stanza numbers \"1.\"/\"2.\" are not encoded.",
+        "Printed but not representable in the MusicXML truth: stanza-text x2 (not in counts)."
       ],
+      "printed_not_in_truth": {
+        "stanza-text": 2
+      },
       "layout_description": "A4 portrait, staff size 20, 4 systems (4+5+4+3 measures), chord names above the staff",
       "pages": 1,
       "measures": 16,
@@ -4561,7 +4636,7 @@
               ]
             }
           ],
-          "bytes": 143841
+          "bytes": 143927
         },
         "scan.pdf": {
           "seed": 7141,
@@ -4617,7 +4692,7 @@
             "jpeg": 72
           },
           "summary": "240 dpi grey scan, -0.5 deg skew, faint bleed-through, JPEG q72",
-          "bytes": 371255
+          "bytes": 371527
         },
         "scan-severe.pdf": {
           "seed": 7142,
@@ -4691,7 +4766,7 @@
             "format": "png1"
           },
           "summary": "thin, faded binarised photocopy at 150 dpi (rendered 300): ink dropout, 3 deg skew, broken lines, salt & pepper, toner specks",
-          "bytes": 27685
+          "bytes": 27688
         }
       },
       "files": [
@@ -4759,6 +4834,7 @@
       "title": "Light of Ages - hymnal page: closed SATB with four stanzas between the staves",
       "layout": "hymnal-stanzas",
       "symbols": [
+        "barline-final",
         "clef-bass",
         "clef-treble",
         "fermata",
@@ -4778,10 +4854,12 @@
         "time-4-4",
         "x-group-bracket",
         "x-measures",
+        "x-noteheads",
         "x-parts",
         "x-staves"
       ],
       "counts": {
+        "barline-final": 1,
         "clef-bass": 2,
         "clef-treble": 2,
         "fermata": 16,
@@ -4801,6 +4879,7 @@
         "time-4-4": 1,
         "x-group-bracket": 1,
         "x-measures": 9,
+        "x-noteheads": 128,
         "x-parts": 4,
         "x-staves": 4
       },
@@ -4837,8 +4916,12 @@
         "notes": "FOUR parts (Soprano, Alto, Tenor, Bass) in hymnal closed score without part names: S+A share the treble staff, T+B the bass staff (split by stem direction). FOUR stanzas are interlined between the staves (lyric lines 1-4, numbered \"1.\"-\"4.\" at the start), aligned to the Soprano. Pickup measure, fermatas at the line ends, no bar numbers."
       },
       "notes": [
-        "All four stanzas are encoded on the Soprano (<lyric number=\"1\"..\"4\">); stanza numbers are not encoded."
+        "All four stanzas are encoded on the Soprano (<lyric number=\"1\"..\"4\">); stanza numbers are not encoded.",
+        "Printed but not representable in the MusicXML truth: stanza-text x4 (not in counts)."
       ],
+      "printed_not_in_truth": {
+        "stanza-text": 4
+      },
       "layout_description": "A4 portrait, staff size 19, 3 systems (pickup + 2, 3, 3 measures), four lyric lines between the staves",
       "pages": 1,
       "measures": 9,
@@ -4861,7 +4944,7 @@
               ]
             }
           ],
-          "bytes": 188671
+          "bytes": 188027
         },
         "scan.pdf": {
           "seed": 7151,
@@ -4909,7 +4992,7 @@
             "jpeg": 75
           },
           "summary": "300 dpi grey flatbed scan, 0.6 deg skew, light paper texture and noise, JPEG q75",
-          "bytes": 689563
+          "bytes": 690107
         },
         "scan-severe.pdf": {
           "seed": 7152,
@@ -4937,39 +5020,39 @@
                         1145
                       ],
                       [
-                        548,
-                        1143
+                        714,
+                        1412
                       ]
                     ],
                     "marks": [
                       [
-                        448,
-                        1378
+                        456,
+                        656
                       ],
                       [
-                        677,
-                        478
+                        512,
+                        674
                       ],
                       [
-                        555,
-                        233
+                        1137,
+                        929
                       ]
                     ],
                     "texts": [
                       [
                         "rit.",
-                        886,
-                        500
+                        820,
+                        910
                       ],
                       [
                         "breathe",
-                        240,
-                        1385
+                        400,
+                        496
                       ],
                       [
                         "p!",
-                        719,
-                        484
+                        217,
+                        1131
                       ]
                     ],
                     "lines": 1
@@ -4979,7 +5062,7 @@
                   "bleed_through",
                   {
                     "strength": 0.12,
-                    "shift_px": 0
+                    "shift_px": 4
                   }
                 ],
                 [
@@ -4999,8 +5082,8 @@
                   {
                     "coffee": [
                       [
-                        473,
-                        1230,
+                        852,
+                        899,
                         124
                       ]
                     ],
@@ -5056,7 +5139,7 @@
             "jpeg": 30
           },
           "summary": "old yellowed copy: bleed-through, foxing, coffee ring, pencil annotations, 150 dpi colour, 2 deg skew, JPEG q30",
-          "bytes": 133945
+          "bytes": 134588
         }
       },
       "files": [
@@ -5125,6 +5208,7 @@
       "layout": "divisi",
       "symbols": [
         "acc-sharp",
+        "barline-final",
         "beam",
         "chord",
         "clef-alto",
@@ -5150,12 +5234,14 @@
         "time-4-4",
         "x-group-bracket",
         "x-measures",
+        "x-noteheads",
         "x-parts",
         "x-staves",
         "x-two-voice-staff-measure"
       ],
       "counts": {
         "acc-sharp": 6,
+        "barline-final": 1,
         "beam": 4,
         "chord": 11,
         "clef-alto": 1,
@@ -5181,6 +5267,7 @@
         "time-4-4": 1,
         "x-group-bracket": 1,
         "x-measures": 8,
+        "x-noteheads": 126,
         "x-parts": 4,
         "x-staves": 4,
         "x-two-voice-staff-measure": 4
@@ -5206,6 +5293,7 @@
       "notes": [
         "Violin I voice 2 exists only in the divisi measures; elsewhere it is empty (<forward>)."
       ],
+      "printed_not_in_truth": {},
       "layout_description": "A4 portrait, staff size 19, 2 systems of 4 measures on 4 bracketed staves",
       "pages": 1,
       "measures": 8,
@@ -5228,7 +5316,7 @@
               ]
             }
           ],
-          "bytes": 111857
+          "bytes": 112977
         },
         "scan.pdf": {
           "seed": 7161,
@@ -5284,7 +5372,7 @@
             "jpeg": 70
           },
           "summary": "200 dpi grey office scan, -0.9 deg skew, slight lighting gradient, noise, JPEG q70",
-          "bytes": 337162
+          "bytes": 338029
         },
         "scan-severe.pdf": {
           "seed": 7162,
@@ -5431,7 +5519,7 @@
             "jpeg": 30
           },
           "summary": "old yellowed copy: bleed-through, foxing, coffee ring, pencil annotations, 150 dpi colour, 2 deg skew, JPEG q30",
-          "bytes": 120035
+          "bytes": 120620
         }
       },
       "files": [
@@ -5502,6 +5590,7 @@
       "title": "Bright New Day - open SATB with soprano divisi (two voices) and bass octave divisi (chords)",
       "layout": "divisi",
       "symbols": [
+        "barline-final",
         "chord",
         "clef-bass",
         "clef-treble",
@@ -5524,11 +5613,13 @@
         "time-4-4",
         "x-group-bracket",
         "x-measures",
+        "x-noteheads",
         "x-parts",
         "x-staves",
         "x-two-voice-staff-measure"
       ],
       "counts": {
+        "barline-final": 1,
         "chord": 7,
         "clef-bass": 1,
         "clef-treble": 2,
@@ -5551,6 +5642,7 @@
         "time-4-4": 1,
         "x-group-bracket": 1,
         "x-measures": 8,
+        "x-noteheads": 126,
         "x-parts": 4,
         "x-staves": 4,
         "x-two-voice-staff-measure": 2
@@ -5593,6 +5685,7 @@
       "notes": [
         "Soprano voice 2 exists only in mm.5-6 (elsewhere <forward>); it carries no lyrics."
       ],
+      "printed_not_in_truth": {},
       "layout_description": "A4 portrait, staff size 18, 2 systems of 4 measures on 4 bracketed staves",
       "pages": 1,
       "measures": 8,
@@ -5615,7 +5708,7 @@
               ]
             }
           ],
-          "bytes": 180902
+          "bytes": 185913
         },
         "scan.pdf": {
           "seed": 7171,
@@ -5668,7 +5761,7 @@
             "jpeg": 65
           },
           "summary": "250 dpi grey scan, 1.2 deg skew, soft focus, toner specks, JPEG q65",
-          "bytes": 472297
+          "bytes": 471663
         },
         "scan-severe.pdf": {
           "seed": 7172,
@@ -5742,7 +5835,7 @@
             "format": "png1"
           },
           "summary": "thin, faded binarised photocopy at 150 dpi (rendered 300): ink dropout, 3 deg skew, broken lines, salt & pepper, toner specks",
-          "bytes": 37836
+          "bytes": 37798
         }
       },
       "files": [
@@ -5814,6 +5907,7 @@
       "layout": "cross-staff",
       "symbols": [
         "acc-natural",
+        "barline-final",
         "beam",
         "chord",
         "clef-bass",
@@ -5839,12 +5933,14 @@
         "x-cross-staff-note",
         "x-measures",
         "x-multi-staff-part",
+        "x-noteheads",
         "x-parts",
         "x-staves",
         "x-two-voice-staff-measure"
       ],
       "counts": {
         "acc-natural": 6,
+        "barline-final": 1,
         "beam": 14,
         "chord": 2,
         "clef-bass": 1,
@@ -5870,6 +5966,7 @@
         "x-cross-staff-note": 29,
         "x-measures": 8,
         "x-multi-staff-part": 1,
+        "x-noteheads": 76,
         "x-parts": 1,
         "x-staves": 2,
         "x-two-voice-staff-measure": 8
@@ -5889,6 +5986,7 @@
       "notes": [
         "Cross-staff notes keep their voice and carry the staff they are printed on (<staff>)."
       ],
+      "printed_not_in_truth": {},
       "layout_description": "A4 portrait, staff size 20, 2 systems of 4 measures, kneed cross-staff beams",
       "pages": 1,
       "measures": 8,
@@ -5911,7 +6009,7 @@
               ]
             }
           ],
-          "bytes": 83778
+          "bytes": 83828
         },
         "scan.pdf": {
           "seed": 7181,
@@ -5972,7 +6070,7 @@
             "jpeg": 80
           },
           "summary": "300 dpi colour scan on cream paper, 0.4 deg skew, noise, JPEG q80",
-          "bytes": 751375
+          "bytes": 751594
         },
         "scan-severe.pdf": {
           "seed": 7182,
@@ -6028,7 +6126,7 @@
             "jpeg": 20
           },
           "summary": "low-resolution 120 dpi grey scan, -4 deg skew, heavy blur and noise, JPEG q20",
-          "bytes": 33587
+          "bytes": 33626
         }
       },
       "files": [
@@ -6107,6 +6205,7 @@
       "title": "Song without Words - piano right hand with two voices on one staff",
       "layout": "two-voices-one-staff-instrument",
       "symbols": [
+        "barline-final",
         "chord",
         "clef-bass",
         "clef-treble",
@@ -6128,11 +6227,13 @@
         "time-3-4",
         "x-measures",
         "x-multi-staff-part",
+        "x-noteheads",
         "x-parts",
         "x-staves",
         "x-two-voice-staff-measure"
       ],
       "counts": {
+        "barline-final": 1,
         "chord": 15,
         "clef-bass": 1,
         "clef-treble": 1,
@@ -6154,6 +6255,7 @@
         "time-3-4": 1,
         "x-measures": 8,
         "x-multi-staff-part": 1,
+        "x-noteheads": 70,
         "x-parts": 1,
         "x-staves": 2,
         "x-two-voice-staff-measure": 8
@@ -6171,6 +6273,7 @@
         "notes": "ONE part \"Piano\" (two staves, brace). The treble staff carries TWO voices: melody (voice 1, stems up) and inner voice (voice 2, stems down, with a quarter rest in m.4); both stay in the Piano part - this is NOT a closed choir score and must not be split into extra parts. Left hand: bass note + two-note chords."
       },
       "notes": [],
+      "printed_not_in_truth": {},
       "layout_description": "A4 portrait, staff size 20, 2 systems of 4 measures",
       "pages": 1,
       "measures": 8,
@@ -6193,7 +6296,7 @@
               ]
             }
           ],
-          "bytes": 79076
+          "bytes": 79140
         },
         "scan.pdf": {
           "seed": 7191,
@@ -6241,7 +6344,7 @@
             "jpeg": 75
           },
           "summary": "300 dpi grey flatbed scan, 0.6 deg skew, light paper texture and noise, JPEG q75",
-          "bytes": 518959
+          "bytes": 518831
         },
         "scan-severe.pdf": {
           "seed": 7192,
@@ -6336,7 +6439,7 @@
             "format": "png1"
           },
           "summary": "thick dark binarised photocopy at 200 dpi: ink spread, 2.5 deg skew, staple, two punch holes, salt & pepper",
-          "bytes": 137651
+          "bytes": 137883
         }
       },
       "files": [
@@ -6409,6 +6512,7 @@
       "symbols": [
         "acc-sharp",
         "accent",
+        "barline-final",
         "beam",
         "clef-bass",
         "clef-change",
@@ -6439,12 +6543,14 @@
         "tie",
         "time-3-4",
         "x-measures",
+        "x-noteheads",
         "x-parts",
         "x-staves"
       ],
       "counts": {
         "acc-sharp": 2,
         "accent": 3,
+        "barline-final": 1,
         "beam": 3,
         "clef-bass": 2,
         "clef-change": 2,
@@ -6475,6 +6581,7 @@
         "tie": 1,
         "time-3-4": 1,
         "x-measures": 16,
+        "x-noteheads": 40,
         "x-parts": 1,
         "x-staves": 1
       },
@@ -6493,6 +6600,7 @@
       "notes": [
         "Page numbers are printed (page 2) and recorded only as a <credit> on page 2."
       ],
+      "printed_not_in_truth": {},
       "layout_description": "A4 portrait, staff size 24, page 1: title + 2 systems, page 2: 2 systems; full name on the first system, \"Vc.\" afterwards",
       "pages": 2,
       "measures": 16,
@@ -6522,7 +6630,7 @@
               ]
             }
           ],
-          "bytes": 100219
+          "bytes": 100190
         },
         "scan.pdf": {
           "seed": 7201,
@@ -6613,7 +6721,7 @@
             "jpeg": 72
           },
           "summary": "240 dpi grey scan, -0.5 deg skew, faint bleed-through, JPEG q72",
-          "bytes": 517043
+          "bytes": 517214
         },
         "scan-severe.pdf": {
           "seed": 7202,
@@ -6863,7 +6971,7 @@
             "jpeg": 30
           },
           "summary": "old yellowed copy: bleed-through, foxing, coffee ring, pencil annotations, 150 dpi colour, 2 deg skew, JPEG q30",
-          "bytes": 145980
+          "bytes": 145934
         }
       },
       "files": [

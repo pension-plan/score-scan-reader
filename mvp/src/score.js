@@ -1132,8 +1132,41 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, cre
   }
   const dropout = (k) => (k === 0 || Math.sign(k) === Math.sign(fifths)) && Math.abs(k) < Math.abs(fifths);
   const keyOk = (k) => seenKey[k] >= 2 && (!dropout(k) || (seenKey[k] >= 3 && seenKey[k] > 0.5 * allSys.size));
+  // Key changes at system breaks: walk the systems in order with the key in
+  // force (the previous system's, or a change read inside it). A system whose
+  // staves all read another key takes it unless that is a dropout of the key
+  // in force (same side or none, fewer accidentals: a faded signature loses
+  // accidentals, it does not gain them in the right places), which still
+  // needs the majority rule above. A gain of a single accidental on a lone
+  // staff (a note's accidental just after the signature) must be confirmed
+  // by another staff, the next system or an earlier reading.
+  const seqKey = new Map();
+  {
+    const order = [...allSys], lastFifths = (sy) => {
+      let best = null;
+      for (const s of sy.staves) for (const ch of s.chords) for (const h of ch.heads) if (!best || h.x > best.x) best = h;
+      return best && best.fifths != null ? best.fifths : null;
+    };
+    const drop = (r, c) => (r === 0 || Math.sign(r) === Math.sign(c)) && Math.abs(r) < Math.abs(c);
+    let cur = null;
+    order.forEach((sy, i) => {
+      const r = sysKeyOf.get(sy), next = order[i + 1] ? sysKeyOf.get(order[i + 1]) : undefined;
+      let k;
+      // the first system: its own reading unless that is a dropout of a piece
+      // key read on two systems or more
+      if (cur == null) k = r != null && (keyOk(r) || !drop(r, fifths) || (seenKey[fifths] || 0) < 2) ? r : fifths;
+      else if (r == null || r === cur) k = cur;
+      else if (drop(r, cur)) k = seenKey[r] >= 3 && seenKey[r] > 0.5 * allSys.size ? r : cur;
+      else if (keyOk(r) || sy.staves.length >= 2 || next === r || Math.sign(r) !== Math.sign(cur) || Math.abs(r) >= Math.abs(cur) + 2) k = r;
+      else k = cur;
+      seqKey.set(sy, k);
+      const e = lastFifths(sy);
+      cur = e != null ? e : k;
+    });
+  }
   const keyAt = (mi) => {
     const sy = unitSys && unitSys[mi], k = sy != null ? sysKeyOf.get(sy) : undefined;
+    if (!process.env.OLDKEYS && sy != null && seqKey.has(sy)) return seqKey.get(sy);
     return k != null && keyOk(k) ? k : fifths;
   };
   const altsOf = new Map();

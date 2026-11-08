@@ -4,6 +4,7 @@
   "title": "Light of Ages - hymnal page: closed SATB with four stanzas between the staves",
   "layout": "hymnal-stanzas",
   "symbols": [
+    "barline-final",
     "clef-bass",
     "clef-treble",
     "fermata",
@@ -23,10 +24,12 @@
     "time-4-4",
     "x-group-bracket",
     "x-measures",
+    "x-noteheads",
     "x-parts",
     "x-staves"
   ],
   "counts": {
+    "barline-final": 1,
     "clef-bass": 2,
     "clef-treble": 2,
     "fermata": 16,
@@ -46,6 +49,7 @@
     "time-4-4": 1,
     "x-group-bracket": 1,
     "x-measures": 9,
+    "x-noteheads": 128,
     "x-parts": 4,
     "x-staves": 4
   },
@@ -82,8 +86,12 @@
     "notes": "FOUR parts (Soprano, Alto, Tenor, Bass) in hymnal closed score without part names: S+A share the treble staff, T+B the bass staff (split by stem direction). FOUR stanzas are interlined between the staves (lyric lines 1-4, numbered \"1.\"-\"4.\" at the start), aligned to the Soprano. Pickup measure, fermatas at the line ends, no bar numbers."
   },
   "notes": [
-    "All four stanzas are encoded on the Soprano (<lyric number=\"1\"..\"4\">); stanza numbers are not encoded."
+    "All four stanzas are encoded on the Soprano (<lyric number=\"1\"..\"4\">); stanza numbers are not encoded.",
+    "Printed but not representable in the MusicXML truth: stanza-text x4 (not in counts)."
   ],
+  "printed_not_in_truth": {
+    "stanza-text": 4
+  },
   "layout_description": "A4 portrait, staff size 19, 3 systems (pickup + 2, 3, 3 measures), four lyric lines between the staves",
   "pages": 1,
   "measures": 9,
@@ -106,7 +114,7 @@
           ]
         }
       ],
-      "bytes": 188671
+      "bytes": 188027
     },
     "scan.pdf": {
       "seed": 7151,
@@ -154,7 +162,7 @@
         "jpeg": 75
       },
       "summary": "300 dpi grey flatbed scan, 0.6 deg skew, light paper texture and noise, JPEG q75",
-      "bytes": 689563
+      "bytes": 690107
     },
     "scan-severe.pdf": {
       "seed": 7152,
@@ -182,39 +190,39 @@
                     1145
                   ],
                   [
-                    548,
-                    1143
+                    714,
+                    1412
                   ]
                 ],
                 "marks": [
                   [
-                    448,
-                    1378
+                    456,
+                    656
                   ],
                   [
-                    677,
-                    478
+                    512,
+                    674
                   ],
                   [
-                    555,
-                    233
+                    1137,
+                    929
                   ]
                 ],
                 "texts": [
                   [
                     "rit.",
-                    886,
-                    500
+                    820,
+                    910
                   ],
                   [
                     "breathe",
-                    240,
-                    1385
+                    400,
+                    496
                   ],
                   [
                     "p!",
-                    719,
-                    484
+                    217,
+                    1131
                   ]
                 ],
                 "lines": 1
@@ -224,7 +232,7 @@
               "bleed_through",
               {
                 "strength": 0.12,
-                "shift_px": 0
+                "shift_px": 4
               }
             ],
             [
@@ -244,8 +252,8 @@
               {
                 "coffee": [
                   [
-                    473,
-                    1230,
+                    852,
+                    899,
                     124
                   ]
                 ],
@@ -301,7 +309,7 @@
         "jpeg": 30
       },
       "summary": "old yellowed copy: bleed-through, foxing, coffee ring, pencil annotations, 150 dpi colour, 2 deg skew, JPEG q30",
-      "bytes": 133945
+      "bytes": 134588
     }
   },
   "files": [

@@ -35,7 +35,7 @@
     aes''4\mf g''4 f''4 ees''4 |
     \break f''4. ees''8 d''4 c''4 |
     bes'4\> c''4 d''4 ees''4 |
-    ees''1\fermata\! |
+    ees''1\fermata\! \bar "|." |
         }
     }
     \new Lyrics = "lyrvx1" \lyricsto "vVx1" { 

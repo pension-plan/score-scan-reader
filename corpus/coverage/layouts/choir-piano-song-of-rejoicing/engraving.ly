@@ -37,7 +37,7 @@
     g'4 a'4 g'2 |
     e'4 g'4 f'4 d'4 |
     c'4 d'4 c'2 |
-    R1 |
+    R1 \bar "|." |
           }
           \new Voice = "vAx1" {
     \autoBeamOff

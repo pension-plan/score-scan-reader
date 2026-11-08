@@ -35,7 +35,7 @@
     g'4 a'4 b'4 c''4 |
     \break d''4 c''4 b'4\fermata b'4 |
     c''4 b'4 a'4 g'4
-    \set Timing.measurePosition = #(ly:make-moment 1/4) a'4 fis'4 g'4\fermata |
+    \set Timing.measurePosition = #(ly:make-moment 1/4) a'4 fis'4 g'4\fermata \bar "|." |
           }
           \new Voice = "vAx1" {
     \autoBeamOff

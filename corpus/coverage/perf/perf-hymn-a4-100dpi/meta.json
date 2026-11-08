@@ -1,0 +1,568 @@
+{
+ "id": "perf-hymn-a4-100dpi",
+ "family": "perf",
+ "title": "O God, Our Help in Ages Past (BENCHMARK C.M.) - 1-page SATB hymn, 4 stanzas",
+ "symbols": [
+  "acc-flat",
+  "acc-natural",
+  "barline-final",
+  "clef-bass",
+  "clef-treble",
+  "dot",
+  "dyn-f",
+  "dyn-mf",
+  "dyn-p",
+  "fermata",
+  "flag",
+  "hairpin-dim",
+  "key-f3",
+  "ledger-above",
+  "ledger-below",
+  "lyrics",
+  "lyrics-extender",
+  "lyrics-hyphen",
+  "lyrics-melisma",
+  "lyrics-multi-verse",
+  "metronome",
+  "note-8th",
+  "note-half",
+  "note-quarter",
+  "pickup",
+  "slur",
+  "stanza-text",
+  "stem-down",
+  "stem-up",
+  "system-break",
+  "tempo-mark",
+  "time-3-4"
+ ],
+ "layout": "hymnal-stanzas",
+ "layout_also": [
+  "choir-closed-satb"
+ ],
+ "expected": {
+  "parts": [
+   "Soprano",
+   "Alto",
+   "Tenor",
+   "Bass"
+  ],
+  "must_not_split": false,
+  "notes": "Closed SATB score: Soprano + Alto share the treble staff (stems up / down), Tenor + Bass the bass staff; they must become 4 separate parts. Four stanzas are underlaid below the treble staff and belong to the Soprano part (lyric numbers 1-4)."
+ },
+ "counts": {
+  "acc-flat": 1,
+  "acc-natural": 1,
+  "barline-final": 1,
+  "clef-bass": 2,
+  "clef-treble": 2,
+  "dot": 5,
+  "dyn-f": 2,
+  "dyn-mf": 2,
+  "dyn-p": 2,
+  "fermata": 16,
+  "flag": 3,
+  "hairpin-dim": 1,
+  "key-f3": 1,
+  "ledger-above": 11,
+  "ledger-below": 1,
+  "lyrics": 112,
+  "lyrics-extender": 8,
+  "lyrics-hyphen": 24,
+  "lyrics-melisma": 12,
+  "lyrics-multi-verse": 4,
+  "metronome": 1,
+  "note-8th": 3,
+  "note-half": 53,
+  "note-quarter": 60,
+  "pickup": 1,
+  "slur": 3,
+  "stanza-text": 4,
+  "stem-down": 56,
+  "stem-up": 60,
+  "system-break": 3,
+  "tempo-mark": 1,
+  "time-3-4": 1
+ },
+ "degradations": {
+  "clean.pdf": {
+   "seed": null,
+   "params": {
+    "dpi": 100,
+    "format": "png",
+    "colour": "gray",
+    "damage": "none (anti-aliased raster of the engraving)"
+   },
+   "size_px": [
+    827,
+    1170
+   ],
+   "bytes": 53078
+  },
+  "scan.pdf": {
+   "seed": 51001,
+   "page_seeds": [
+    51001000
+   ],
+   "seed_rule": "page k (0-based) is damaged with numpy default_rng(seed * 1000 + k)",
+   "dpi": 100,
+   "format": "jpeg q80",
+   "colour": "gray",
+   "params": {
+    "mode": "gray",
+    "texture": 2,
+    "rotate": 0.6,
+    "gradient": 0.05,
+    "blur": 0.5,
+    "noise": 3,
+    "jpeg": 80,
+    "dpi": 100
+   },
+   "summary": "typical flatbed scan: grey, +0.6 deg skew, slight lighting gradient, light blur + sensor noise, JPEG q80",
+   "bytes": 147935,
+   "pdf_pages": [
+    {
+     "page": 1,
+     "size_px": [
+      827,
+      1170
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "paper_texture",
+       2
+      ],
+      [
+       "skew_rotation_deg",
+       0.6
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.05,
+        "angle_deg": 128.3
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       0.5
+      ],
+      [
+       "gaussian_noise_sigma",
+       3
+      ]
+     ]
+    }
+   ]
+  },
+  "scan-severe.pdf": {
+   "seed": 51002,
+   "page_seeds": [
+    51002000
+   ],
+   "seed_rule": "page k (0-based) is damaged with numpy default_rng(seed * 1000 + k)",
+   "dpi": 100,
+   "format": "jpeg q30",
+   "colour": "rgb",
+   "params": {
+    "mode": "rgb",
+    "paper_rgb": [
+     236,
+     226,
+     198
+    ],
+    "texture": 5,
+    "rotate": 2.5,
+    "phone": {
+     "margin": 0.05,
+     "bg": 60,
+     "jitter": 0.03,
+     "keystone": 0.04
+    },
+    "blotch": 0.25,
+    "vignette": 0.3,
+    "motion_blur": {
+     "len": 4,
+     "angle": 20
+    },
+    "blur": 0.8,
+    "noise": 7,
+    "jpeg": 30,
+    "dpi": 100
+   },
+   "summary": "phone photo of a yellowed copy: perspective / keystone, 2.5 deg rotation, uneven light, vignette, motion + focus blur, colour noise, JPEG q30",
+   "bytes": 81466,
+   "pdf_pages": [
+    {
+     "page": 1,
+     "size_px": [
+      909,
+      1252
+     ],
+     "mode": "RGB",
+     "ops": [
+      [
+       "paper_texture",
+       5
+      ],
+      [
+       "paper_colour",
+       [
+        236,
+        226,
+        198
+       ]
+      ],
+      [
+       "skew_rotation_deg",
+       2.5
+      ],
+      [
+       "perspective_phone",
+       {
+        "margin": 0.05,
+        "bg": 60,
+        "jitter": 0.03,
+        "keystone": 0.04,
+        "corners_src": [
+         [
+          -55,
+          11
+         ],
+         [
+          954,
+          26
+         ],
+         [
+          886,
+          1270
+         ],
+         [
+          25,
+          1235
+         ]
+        ]
+       }
+      ],
+      [
+       "uneven_lighting",
+       0.25
+      ],
+      [
+       "vignette",
+       0.3
+      ],
+      [
+       "focus_blur_sigma",
+       0.8
+      ],
+      [
+       "motion_blur",
+       {
+        "len": 4,
+        "angle": 20
+       }
+      ],
+      [
+       "gaussian_noise_sigma",
+       7
+      ]
+     ]
+    }
+   ]
+  }
+ },
+ "dpi": 100,
+ "pages": 1,
+ "license": "CC0",
+ "perf": {
+  "dpi": 100,
+  "pageSize": "A4",
+  "pages": 1,
+  "megapixels": 0.968,
+  "megapixels_total": 0.968,
+  "page_px": [
+   827,
+   1170
+  ],
+  "axis": "dpi",
+  "group": "hymn",
+  "engraving": "hymn-A4",
+  "file_bytes": {
+   "clean.pdf": 53078,
+   "scan.pdf": 147935,
+   "scan-severe.pdf": 81466
+  },
+  "measures": 15,
+  "systems": 4,
+  "notes_in_truth": 116,
+  "rests_in_truth": 0,
+  "staff_size_pt": 18.5,
+  "paper_mm": [
+   210.0,
+   297.0
+  ]
+ },
+ "notes": [
+  "counts follow the rules in _tools/symcount.py (run it on a converter output for comparable numbers); every count except stanza-text is computed from truth.musicxml and was cross-checked against the LilyPond grob log of the engraving (ties, slurs, beams, flags, articulations, ornaments, dynamics, hairpins, pedals, fingerings, accidentals, ottavas, tuplets, ledger lines, lyrics, rehearsal / tempo marks, voltas, whole-bar rests, clef changes).",
+  "ledger-above / ledger-below count note heads that need ledger lines (derived from clef + octave-shift; MusicXML does not encode ledger lines).",
+  "stem-up / stem-down / beam / flag / accidental elements in the truth are exactly what LilyPond engraved (harvested from the instrumented engraving).",
+  "stanza-text: the stanza numbers \"1.\"-\"4.\" are printed but MusicXML has no element for them; the count comes from the engraving, not from truth.musicxml.",
+  "Stanza labels \"1.\"-\"4.\" are printed but MusicXML has no element for them (only lyric number=1..4); stanza-text count comes from the engraving. Lyrics printed between the staves are encoded on the Soprano part only. Dynamics printed on both staves are encoded on Soprano and Tenor."
+ ],
+ "truth_limitations": "Stanza labels \"1.\"-\"4.\" are printed but MusicXML has no element for them (only lyric number=1..4); stanza-text count comes from the engraving. Lyrics printed between the staves are encoded on the Soprano part only. Dynamics printed on both staves are encoded on Soprano and Tenor.",
+ "source": "own composition (tune + harmony) on a public-domain text (Watts 1719)",
+ "validation": {
+  "xsd_valid": true,
+  "music21_parse": "4 116 0",
+  "engraving_matches_model": {
+   "ok": true,
+   "checked": 116,
+   "n_problems": 0,
+   "problems": []
+  },
+  "midi_vs_truth": {
+   "truth_attacks": 116,
+   "midi_attacks": 116,
+   "grace_extras": 0,
+   "missing": 0,
+   "extra": 0,
+   "notes_exact": true,
+   "truth_syllables": 112,
+   "midi_syllables": 112,
+   "lyrics_ok": true,
+   "missing_sample": [],
+   "extra_sample": [],
+   "lyr_missing_sample": []
+  },
+  "accidentals_cross_check": {
+   "printed": 2,
+   "simulated_per_part": 2,
+   "differences": []
+  },
+  "symbol_cross_check": {
+   "tie": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "tie-across-system": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "slur": {
+    "truth": 3,
+    "engraved": 3,
+    "ok": true
+   },
+   "beam": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "flag": {
+    "truth": 3,
+    "engraved": 3,
+    "ok": true
+   },
+   "staccato": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "staccatissimo": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "accent": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "tenuto": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "marcato": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "fermata": {
+    "truth": 16,
+    "engraved": 16,
+    "ok": true
+   },
+   "trill": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "mordent": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "turn": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "fingering": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "arpeggio": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "tremolo": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "breath": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "hairpin-cresc": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "hairpin-dim": {
+    "truth": 1,
+    "engraved": 1,
+    "ok": true
+   },
+   "pedal": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "accidentals(all)": {
+    "truth": 2,
+    "engraved": 2,
+    "ok": true
+   },
+   "acc-courtesy": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "ottava-8va": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "ottava-8vb": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "ottava-15ma": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "ledger-above": {
+    "truth": 11,
+    "engraved": 11,
+    "ok": true
+   },
+   "ledger-below": {
+    "truth": 1,
+    "engraved": 1,
+    "ok": true
+   },
+   "lyrics": {
+    "truth": 112,
+    "engraved": 112,
+    "ok": true
+   },
+   "rehearsal-mark": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "tempo-mark": {
+    "truth": 1,
+    "engraved": 1,
+    "ok": true
+   },
+   "volta": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "rest-whole-bar": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "clef-change": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "dyn-pp": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "dyn-p": {
+    "truth": 2,
+    "engraved": 2,
+    "ok": true
+   },
+   "dyn-mp": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "dyn-mf": {
+    "truth": 2,
+    "engraved": 2,
+    "ok": true
+   },
+   "dyn-f": {
+    "truth": 2,
+    "engraved": 2,
+    "ok": true
+   },
+   "dyn-ff": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "dyn-sfz": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   }
+  },
+  "twin_identical": true,
+  "lilypond_warnings": [],
+  "image_only": {
+   "clean.pdf": true,
+   "scan.pdf": true,
+   "scan-severe.pdf": true
+  }
+ },
+ "files": [
+  "ATTRIBUTION.txt",
+  "clean.pdf",
+  "engraving.ly",
+  "meta.json",
+  "scan-severe.pdf",
+  "scan.pdf",
+  "truth.musicxml"
+ ]
+}

@@ -5,6 +5,7 @@
   "layout": "organ",
   "symbols": [
     "acc-sharp",
+    "barline-final",
     "beam",
     "clef-bass",
     "clef-treble",
@@ -27,12 +28,14 @@
     "time-4-4",
     "x-measures",
     "x-multi-staff-part",
+    "x-noteheads",
     "x-parts",
     "x-staves",
     "x-two-voice-staff-measure"
   ],
   "counts": {
     "acc-sharp": 8,
+    "barline-final": 1,
     "beam": 4,
     "clef-bass": 2,
     "clef-treble": 1,
@@ -55,6 +58,7 @@
     "time-4-4": 1,
     "x-measures": 8,
     "x-multi-staff-part": 1,
+    "x-noteheads": 104,
     "x-parts": 1,
     "x-staves": 3,
     "x-two-voice-staff-measure": 8
@@ -74,6 +78,7 @@
   "notes": [
     "Organ = one part with <staves>3</staves> and <part-symbol top-staff=\"1\" bottom-staff=\"2\">brace</part-symbol>; voices 1+2 on staff 1, voice 5 on staff 2, voice 9 on staff 3."
   ],
+  "printed_not_in_truth": {},
   "layout_description": "A4 portrait, staff size 19, 2 systems of 4 measures, braced manuals + separate pedal staff",
   "pages": 1,
   "measures": 8,
@@ -96,7 +101,7 @@
           ]
         }
       ],
-      "bytes": 108132
+      "bytes": 108210
     },
     "scan.pdf": {
       "seed": 7111,
@@ -152,7 +157,7 @@
         "jpeg": 70
       },
       "summary": "200 dpi grey office scan, -0.9 deg skew, slight lighting gradient, noise, JPEG q70",
-      "bytes": 314337
+      "bytes": 314606
     },
     "scan-severe.pdf": {
       "seed": 7112,
@@ -247,7 +252,7 @@
         "format": "png1"
       },
       "summary": "thick dark binarised photocopy at 200 dpi: ink spread, 2.5 deg skew, staple, two punch holes, salt & pepper",
-      "bytes": 145220
+      "bytes": 145553
     }
   },
   "files": [

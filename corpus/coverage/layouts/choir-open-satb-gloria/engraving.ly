@@ -33,7 +33,7 @@
     r4 \stemDown e''4\f fis''4 e''8 d''8 |
     \break cis''4 b'8 \stemUp a'8 gis'4 a'4 |
     fis'2\>( gis'2) |
-    a'1\fermata\! |
+    a'1\fermata\! \bar "|." |
           }
       }
       \new Lyrics = "lyrsx1" \lyricsto "vSx1" { 

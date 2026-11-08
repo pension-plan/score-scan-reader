@@ -4,6 +4,7 @@
   "title": "Song of Rejoicing - closed SATB choir with piano accompaniment",
   "layout": "choir-piano",
   "symbols": [
+    "barline-final",
     "chord",
     "clef-bass",
     "clef-treble",
@@ -29,10 +30,12 @@
     "x-group-bracket",
     "x-measures",
     "x-multi-staff-part",
+    "x-noteheads",
     "x-parts",
     "x-staves"
   ],
   "counts": {
+    "barline-final": 1,
     "chord": 24,
     "clef-bass": 3,
     "clef-treble": 3,
@@ -58,6 +61,7 @@
     "x-group-bracket": 1,
     "x-measures": 10,
     "x-multi-staff-part": 1,
+    "x-noteheads": 215,
     "x-parts": 5,
     "x-staves": 6
   },
@@ -98,6 +102,7 @@
   "notes": [
     "Lyrics are encoded on the Soprano only."
   ],
+  "printed_not_in_truth": {},
   "layout_description": "A4 portrait, staff size 18, 2 systems (5 + 5 measures) of 4 staves: bracketed choir + braced piano",
   "pages": 1,
   "measures": 10,
@@ -120,7 +125,7 @@
           ]
         }
       ],
-      "bytes": 132088
+      "bytes": 132437
     },
     "scan.pdf": {
       "seed": 7101,
@@ -168,7 +173,7 @@
         "jpeg": 75
       },
       "summary": "300 dpi grey flatbed scan, 0.6 deg skew, light paper texture and noise, JPEG q75",
-      "bytes": 650991
+      "bytes": 651589
     },
     "scan-severe.pdf": {
       "seed": 7102,
@@ -278,7 +283,7 @@
         "jpeg": 25
       },
       "summary": "phone photo of the page: perspective/keystone, uneven light, vignette, motion blur, 150 dpi, JPEG q25",
-      "bytes": 110104
+      "bytes": 110216
     }
   },
   "files": [

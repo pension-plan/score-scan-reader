@@ -285,6 +285,7 @@
         <notations><fermata type="upright"/></notations>
         <lyric number="1"><syllabic>end</syllabic><text>men.</text></lyric>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
   <part id="A">
@@ -488,6 +489,7 @@
         <notations><fermata type="upright"/></notations>
         <lyric number="1"><syllabic>end</syllabic><text>men.</text></lyric>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
   <part id="T">
@@ -656,6 +658,7 @@
         <notations><fermata type="upright"/></notations>
         <lyric number="1"><syllabic>end</syllabic><text>men.</text></lyric>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
   <part id="B">
@@ -804,6 +807,7 @@
         <notations><fermata type="upright"/></notations>
         <lyric number="1"><syllabic>end</syllabic><text>men.</text></lyric>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
 </score-partwise>

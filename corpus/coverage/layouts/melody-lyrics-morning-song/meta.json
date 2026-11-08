@@ -4,6 +4,7 @@
   "title": "Morning Song - vocal melody with one verse of lyrics",
   "layout": "melody-lyrics",
   "symbols": [
+    "barline-final",
     "beam",
     "breath",
     "clef-treble",
@@ -34,10 +35,12 @@
     "tie",
     "time-3-4",
     "x-measures",
+    "x-noteheads",
     "x-parts",
     "x-staves"
   ],
   "counts": {
+    "barline-final": 1,
     "beam": 4,
     "breath": 1,
     "clef-treble": 1,
@@ -68,6 +71,7 @@
     "tie": 3,
     "time-3-4": 1,
     "x-measures": 17,
+    "x-noteheads": 39,
     "x-parts": 1,
     "x-staves": 1
   },
@@ -91,6 +95,7 @@
   "notes": [
     "Lyrics are encoded as <lyric number=\"1\"> on the voice; melisma extenders as <extend/>."
   ],
+  "printed_not_in_truth": {},
   "layout_description": "A4 portrait, staff size 20, pickup + 16 measures on 4 systems, no instrument name",
   "pages": 1,
   "measures": 17,
@@ -113,7 +118,7 @@
           ]
         }
       ],
-      "bytes": 92444
+      "bytes": 93716
     },
     "scan.pdf": {
       "seed": 7021,
@@ -174,7 +179,7 @@
         "jpeg": 80
       },
       "summary": "300 dpi colour scan on cream paper, 0.4 deg skew, noise, JPEG q80",
-      "bytes": 755040
+      "bytes": 755459
     },
     "scan-severe.pdf": {
       "seed": 7022,
@@ -230,7 +235,7 @@
         "jpeg": 20
       },
       "summary": "low-resolution 120 dpi grey scan, -4 deg skew, heavy blur and noise, JPEG q20",
-      "bytes": 33844
+      "bytes": 34087
     }
   },
   "files": [

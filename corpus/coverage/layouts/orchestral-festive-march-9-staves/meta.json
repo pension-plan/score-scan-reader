@@ -4,6 +4,7 @@
   "title": "Festive March - 9-staff orchestral full score, two pages",
   "layout": "orchestral",
   "symbols": [
+    "barline-final",
     "beam",
     "chord",
     "clef-alto",
@@ -38,10 +39,12 @@
     "x-group-bracket",
     "x-group-square",
     "x-measures",
+    "x-noteheads",
     "x-parts",
     "x-staves"
   ],
   "counts": {
+    "barline-final": 1,
     "beam": 36,
     "chord": 4,
     "clef-alto": 1,
@@ -76,6 +79,7 @@
     "x-group-bracket": 2,
     "x-group-square": 1,
     "x-measures": 8,
+    "x-noteheads": 250,
     "x-parts": 9,
     "x-staves": 9
   },
@@ -110,6 +114,7 @@
   "notes": [
     "Part groups: woodwinds bracket, strings bracket, violins square (nested part-group); trumpet and timpani are not grouped."
   ],
+  "printed_not_in_truth": {},
   "layout_description": "A4 portrait, staff size 15, page 1: title + one 9-staff system (mm.1-4), page 2: one system (mm.5-8) with abbreviated names",
   "pages": 2,
   "measures": 8,
@@ -139,7 +144,7 @@
           ]
         }
       ],
-      "bytes": 177565
+      "bytes": 175859
     },
     "scan.pdf": {
       "seed": 7131,
@@ -224,7 +229,7 @@
         "jpeg": 65
       },
       "summary": "250 dpi grey scan, 1.2 deg skew, soft focus, toner specks, JPEG q65",
-      "bytes": 831345
+      "bytes": 833943
     },
     "scan-severe.pdf": {
       "seed": 7132,
@@ -315,7 +320,7 @@
         "jpeg": 20
       },
       "summary": "low-resolution 120 dpi grey scan, -4 deg skew, heavy blur and noise, JPEG q20",
-      "bytes": 85442
+      "bytes": 85799
     }
   },
   "files": [

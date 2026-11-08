@@ -34,7 +34,7 @@
     \break \stemDown d''4\f d''4 c''4 b'4 |
     c''4 b'4 \stemUp a'2 |
     g'4\> \stemDown b'4 \stemUp a'4 g'4 |
-    fis'4 a'4\! g'2\fermata |
+    fis'4 a'4\! g'2\fermata \bar "|." |
           }
       }
       \new Lyrics = "lyrsx1" \lyricsto "vSx1" { 

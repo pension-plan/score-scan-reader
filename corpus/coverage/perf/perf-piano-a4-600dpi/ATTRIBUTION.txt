@@ -1,0 +1,3 @@
+Toccatina (symbol-dense piano page): composed for the coverage corpus - CC0 1.0.
+
+Engraving, truth encoding, rasterisation and scan simulation produced by the coverage/perf generator (corpus/coverage/perf/_tools); all generated files are dedicated to the public domain (CC0 1.0).

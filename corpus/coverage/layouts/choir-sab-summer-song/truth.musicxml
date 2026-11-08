@@ -299,6 +299,7 @@
         <notations><fermata type="upright"/></notations>
         <lyric number="1"><syllabic>single</syllabic><text>song.</text></lyric>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
   <part id="A">
@@ -553,6 +554,7 @@
         <notations><fermata type="upright"/></notations>
         <lyric number="1"><syllabic>single</syllabic><text>song.</text></lyric>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
   <part id="B">
@@ -807,6 +809,7 @@
         <notations><fermata type="upright"/></notations>
         <lyric number="1"><syllabic>single</syllabic><text>song.</text></lyric>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
 </score-partwise>

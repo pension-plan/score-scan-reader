@@ -33,7 +33,7 @@
     \break \oneVoice \stemDown e''4^\markup { \italic "unis." } g''8[ fis''8] e''4 b'4 |
     c''4 d''4 e''2 |
     \voiceOne \stemUp fis''4\<^\markup { \italic "div." } g''4 a''4 fis''4 |
-    g''1\fermata\!\f |
+    g''1\fermata\!\f \bar "|." |
           }
           \new Voice = "vV1x2" {
     \autoBeamOff

@@ -45,6 +45,7 @@ ITEM = dict(
     id='lead-sheet-long-road',
     title='The Long Road - lead sheet: melody, chord symbols, two verses, 1st/2nd endings',
     layout='lead-sheet', make=make, pages=1, must_not_split=False,
+    printed_not_in_truth={'stanza-text': 2},
     expected_notes=('ONE part (melody, no instrument name) with chord symbols above the staff (31 <harmony> '
                     'elements, some changing in the middle of a whole note: <offset>) and two lyric lines under '
                     'the repeated A section (verse 1 continues into the 1st ending and the B section, verse 2 into '

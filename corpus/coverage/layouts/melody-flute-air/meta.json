@@ -7,6 +7,7 @@
     "acc-natural",
     "acc-sharp",
     "accent",
+    "barline-final",
     "beam",
     "breath",
     "clef-treble",
@@ -42,6 +43,7 @@
     "trill",
     "tuplet-3",
     "x-measures",
+    "x-noteheads",
     "x-parts",
     "x-staves"
   ],
@@ -49,6 +51,7 @@
     "acc-natural": 2,
     "acc-sharp": 1,
     "accent": 1,
+    "barline-final": 1,
     "beam": 23,
     "breath": 1,
     "clef-treble": 1,
@@ -84,6 +87,7 @@
     "trill": 1,
     "tuplet-3": 1,
     "x-measures": 16,
+    "x-noteheads": 55,
     "x-parts": 1,
     "x-staves": 1
   },
@@ -100,6 +104,7 @@
     "notes": "ONE part \"Flute\", one treble staff, one voice. 16 measures of 2/4 on 4 systems; triplet in m.7, trill in m.4, breath mark in m.8, tie across the system break m.12-13, rehearsal mark A at m.9."
   },
   "notes": [],
+  "printed_not_in_truth": {},
   "layout_description": "A4 portrait, staff size 20, 4 systems of 4 measures, instrument name on the first system",
   "pages": 1,
   "measures": 16,
@@ -122,7 +127,7 @@
           ]
         }
       ],
-      "bytes": 80292
+      "bytes": 80288
     },
     "scan.pdf": {
       "seed": 7011,
@@ -178,7 +183,7 @@
         "jpeg": 70
       },
       "summary": "200 dpi grey office scan, -0.9 deg skew, slight lighting gradient, noise, JPEG q70",
-      "bytes": 281172
+      "bytes": 281413
     },
     "scan-severe.pdf": {
       "seed": 7012,
@@ -288,7 +293,7 @@
         "jpeg": 25
       },
       "summary": "phone photo of the page: perspective/keystone, uneven light, vignette, motion blur, 150 dpi, JPEG q25",
-      "bytes": 77100
+      "bytes": 77150
     }
   },
   "files": [

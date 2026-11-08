@@ -35,7 +35,7 @@
     \break \voiceOne \stemUp e''4\f^\markup { \italic "div." } e''4 f''4 g''4 |
     e''4 d''4 c''2 |
     \oneVoice \stemUp a'4^\markup { \italic "unis." } \stemDown c''4 b'4 \stemUp a'4 |
-    g'4 \stemDown b'4 c''2\fermata |
+    g'4 \stemDown b'4 c''2\fermata \bar "|." |
           }
           \new Voice = "vSx2" {
     \autoBeamOff

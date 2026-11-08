@@ -34,7 +34,7 @@
     \pageBreak \mark \markup { \box \bold "B" } b''4.\mf a''8 g''4 b''4 |
     a''4 fis''4 e''8[ fis''8] g''8[ e''8] |
     d''4\< fis''8[ e''8] d''4 b'4 |
-    d''1\fermata\!\ff |
+    d''1\fermata\!\ff \bar "|." |
           }
       }
       \new Staff = "ob" \with { instrumentName = "Oboe" shortInstrumentName = "Ob." } { \clef "treble"

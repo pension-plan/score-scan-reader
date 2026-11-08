@@ -4,6 +4,7 @@
   "title": "Song without Words - piano right hand with two voices on one staff",
   "layout": "two-voices-one-staff-instrument",
   "symbols": [
+    "barline-final",
     "chord",
     "clef-bass",
     "clef-treble",
@@ -25,11 +26,13 @@
     "time-3-4",
     "x-measures",
     "x-multi-staff-part",
+    "x-noteheads",
     "x-parts",
     "x-staves",
     "x-two-voice-staff-measure"
   ],
   "counts": {
+    "barline-final": 1,
     "chord": 15,
     "clef-bass": 1,
     "clef-treble": 1,
@@ -51,6 +54,7 @@
     "time-3-4": 1,
     "x-measures": 8,
     "x-multi-staff-part": 1,
+    "x-noteheads": 70,
     "x-parts": 1,
     "x-staves": 2,
     "x-two-voice-staff-measure": 8
@@ -68,6 +72,7 @@
     "notes": "ONE part \"Piano\" (two staves, brace). The treble staff carries TWO voices: melody (voice 1, stems up) and inner voice (voice 2, stems down, with a quarter rest in m.4); both stay in the Piano part - this is NOT a closed choir score and must not be split into extra parts. Left hand: bass note + two-note chords."
   },
   "notes": [],
+  "printed_not_in_truth": {},
   "layout_description": "A4 portrait, staff size 20, 2 systems of 4 measures",
   "pages": 1,
   "measures": 8,
@@ -90,7 +95,7 @@
           ]
         }
       ],
-      "bytes": 79076
+      "bytes": 79140
     },
     "scan.pdf": {
       "seed": 7191,
@@ -138,7 +143,7 @@
         "jpeg": 75
       },
       "summary": "300 dpi grey flatbed scan, 0.6 deg skew, light paper texture and noise, JPEG q75",
-      "bytes": 518959
+      "bytes": 518831
     },
     "scan-severe.pdf": {
       "seed": 7192,
@@ -233,7 +238,7 @@
         "format": "png1"
       },
       "summary": "thick dark binarised photocopy at 200 dpi: ink spread, 2.5 deg skew, staple, two punch holes, salt & pepper",
-      "bytes": 137651
+      "bytes": 137883
     }
   },
   "files": [

@@ -48,11 +48,30 @@ def expected_from_model(score, layout, opts, prep):
     E = {k: Counter() for k in ('heads', 'stems', 'acc', 'rests', 'scripts', 'dyn', 'hairpin', 'lyric',
                                 'chordname', 'fingering')}
     n = Counter()
+    on = prep['onset_of']
+    for k in ('pos_heads', 'pos_lyric', 'pos_dyn', 'pos_scripts', 'pos_chordname'):
+        E[k] = Counter()
     for p in score.parts:
         for v in p.voices:
             prev_tie = None
             for i, m in enumerate(p.measures):
                 for ev in m.get(v.key, []):
+                    if ev.kind == 'note':
+                        t = str(on[id(ev)])
+                        for pp in ev.pitches:
+                            E['pos_heads'][(ev.printed_staff, t, midi(pp))] += 1
+                        for vn, ly in ev.lyrics.items():
+                            E['pos_lyric'][(t, ly.text)] += 1
+                        for d in ev.dynamics:
+                            E['pos_dyn'][(ev.printed_staff, t, d)] += 1
+                        for a in ev.artic:
+                            E['pos_scripts'][(t, SCRIPT[a])] += 1
+                        for o in ev.ornaments:
+                            E['pos_scripts'][(t, ORN[o])] += 1
+                        if ev.fermata:
+                            E['pos_scripts'][(t, 'fermata')] += 1
+                    elif ev.kind == 'rest' and ev.fermata and not ev.hidden:
+                        E['pos_scripts'][(str(on[id(ev)]), 'fermata')] += 1
                     if ev.kind == 'rest':
                         if ev.hidden:
                             continue
@@ -114,6 +133,7 @@ def expected_from_model(score, layout, opts, prep):
         E['acc'][(sid, str(F(onset)), midi(pp), GLYPH[name])] += 1
     for i, o, sym in score.harmonies:
         E['chordname'][sym] += 1
+        E['pos_chordname'][str(offs[i] + F(o))] += 1
     # system delimiters
     nsys = len(system_starts(score, layout))
     delim = Counter()
@@ -155,11 +175,15 @@ def compare(score, layout, opts, prep, log_rows):
         return True
 
     acc_rows = []
+    pos_rows = []      # (kind, key-without-time-prefix, when) placed into segments below
     for r in log_rows:
         nm, sid, when = r[0], r[1], r[2]
         f = r[5:]
         if nm == 'NoteHead':
             G['heads'][(int(f[1]), int(f[3]))] += 1
+            pos_rows.append(('pos_heads', lambda t, sid=sid, m=f[0]: (sid, t, int(m) if m.lstrip('-').isdigit() else m),
+                             when))
+
         elif nm == 'Stem':
             dl = int(f[1])
             if dl >= 1 and int(f[3]) > 0:      # rests also get (invisible, head-less) Stem grobs
@@ -234,6 +258,24 @@ def compare(score, layout, opts, prep, log_rows):
         pick = next((c for c in cands if exp_acc.get(c, 0) > got_acc.get(c, 0)), cands[0])
         got_acc[pick] += 1
     G['acc'] = got_acc
+    for r in log_rows:
+        nm, sid, when, f = r[0], r[1], r[2], r[5:]
+        if nm == 'LyricText':
+            pos_rows.append(('pos_lyric', lambda t, x=f[0]: (t, x), when))
+        elif nm == 'DynamicText':
+            pos_rows.append(('pos_dyn', lambda t, sid=sid, x=f[0]: (sid, t, x), when))
+        elif nm == 'Script':
+            nm2 = next((x for x in SCRIPT_NAMES if x in f[0]), f[0])
+            pos_rows.append(('pos_scripts', lambda t, x=nm2: (t, x), when))
+        elif nm == 'ChordName':
+            pos_rows.append(('pos_chordname', lambda t: t, when))
+    for k in ('pos_heads', 'pos_lyric', 'pos_dyn', 'pos_scripts', 'pos_chordname'):
+        G[k] = Counter()
+    for kind, keyf, w in pos_rows:
+        w4 = _when(w)
+        cands = [keyf(str(w4 + so)) for so in seg_starts]
+        pick = next((c for c in cands if E[kind].get(c, 0) > G[kind].get(c, 0)), cands[0])
+        G[kind][pick] += 1
     rep = {'ok': True, 'systems_expected': nsys, 'mismatch': {}}
     for k in E:
         if k == 'chordname':

@@ -6,6 +6,7 @@
   "symbols": [
     "acc-sharp",
     "accent",
+    "barline-final",
     "beam",
     "clef-bass",
     "clef-change",
@@ -36,12 +37,14 @@
     "tie",
     "time-3-4",
     "x-measures",
+    "x-noteheads",
     "x-parts",
     "x-staves"
   ],
   "counts": {
     "acc-sharp": 2,
     "accent": 3,
+    "barline-final": 1,
     "beam": 3,
     "clef-bass": 2,
     "clef-change": 2,
@@ -72,6 +75,7 @@
     "tie": 1,
     "time-3-4": 1,
     "x-measures": 16,
+    "x-noteheads": 40,
     "x-parts": 1,
     "x-staves": 1
   },
@@ -90,6 +94,7 @@
   "notes": [
     "Page numbers are printed (page 2) and recorded only as a <credit> on page 2."
   ],
+  "printed_not_in_truth": {},
   "layout_description": "A4 portrait, staff size 24, page 1: title + 2 systems, page 2: 2 systems; full name on the first system, \"Vc.\" afterwards",
   "pages": 2,
   "measures": 16,
@@ -119,7 +124,7 @@
           ]
         }
       ],
-      "bytes": 100219
+      "bytes": 100190
     },
     "scan.pdf": {
       "seed": 7201,
@@ -210,7 +215,7 @@
         "jpeg": 72
       },
       "summary": "240 dpi grey scan, -0.5 deg skew, faint bleed-through, JPEG q72",
-      "bytes": 517043
+      "bytes": 517214
     },
     "scan-severe.pdf": {
       "seed": 7202,
@@ -460,7 +465,7 @@
         "jpeg": 30
       },
       "summary": "old yellowed copy: bleed-through, foxing, coffee ring, pencil annotations, 150 dpi colour, 2 deg skew, JPEG q30",
-      "bytes": 145980
+      "bytes": 145934
     }
   },
   "files": [

@@ -80,6 +80,9 @@ function fillHoles(B, R, ss, lt = 2, opts = {}) {
       // wide, flat insides: hollow heads of older engravings run up to ~1.9
       // spaces wide (taller regions that wide are gaps between lines and stems)
       if (!(ch <= maxH && c.area <= maxA && c.area >= 2)) continue;
+      // a narrow, upright gap is the paper between two glyphs closed by staff
+      // lines (an accidental and its head), not a head's inside (flat or tilted)
+      if (cw < 0.5 * ss && ch > 1.4 * cw && ch >= 0.5 * ss) continue;
       const flat = cw >= 0.4 * ss && cw >= ch && ch <= 0.65 * ss;
       if (cw <= maxW) {
         fill[c.id] = 1;
@@ -338,6 +341,16 @@ function ledgerOK(bin, staves, hd, lt) {
     }
     return false;
   };
+  // the ends of a ledger reaching past a head on it (the head hides the middle)
+  const ends = (yq) => {
+    const reach = Math.round(1.25 * sp), inner = Math.round(0.45 * sp);
+    let left = 0, right = 0;
+    for (let x = xm - reach; x <= xm + reach; x++) {
+      if (Math.abs(x - xm) <= inner || !thinAt(x, yq)) continue;
+      if (x < xm) left++; else right++;
+    }
+    return { left, right };
+  };
   for (let q = 6; q <= ap; q += 2) {
     const yq = ymid - sgn * (q * sp) / 2;
     if (ap - q >= 2) {
@@ -347,7 +360,11 @@ function ledgerOK(bin, staves, hd, lt) {
         if (!thinAt(x, yq)) continue;
         n++; if (x < xm - side) left++; else if (x > xm + side) right++;
       }
-      if (n < 0.8 * sp || left < 2 || right < 2) return false;
+      if (n >= 0.8 * sp && left >= 2 && right >= 2) continue;
+      // a lower head of the same chord sits on this ledger: only its two
+      // ends show, on both sides
+      const e = ends(yq);
+      if (e.left < 2 || e.right < 2 || e.left + e.right < Math.max(4, 0.4 * sp)) return false;
     } else {
       const reach = Math.round(1.25 * sp), inner = Math.round(0.45 * sp);
       let left = 0, right = 0;
@@ -385,7 +402,7 @@ function chordStems(L, heads, opts = {}) {
     }
   }
   const ink = (x, y) => x >= 0 && y >= 0 && x < w && y < h && data[y * w + x];
-  for (const c of chords) {
+  const stems = (c) => {
     c.heads.sort((a, b) => a.y - b.y);
     const sp = c.heads[0].sp;
     const top = c.heads[0], bot = c.heads[c.heads.length - 1];
@@ -403,7 +420,6 @@ function chordStems(L, heads, opts = {}) {
       if (y0 >= 0) {
         let yt = y0, gap = 0;
         for (let y = y0 - 1; y >= 0; y--) { if (ink(x, y)) { yt = y; gap = 0; } else if (++gap > maxGap) break; }
-        // thin: the run's upper part must not be wide (not a beam/flag-free blob check, cheap)
         const len = (top.y - yt) / sp;
         if (opts.sides && x < xl) { if (len > upIll) upIll = len; }
         else if (len > up) { up = len; upX = x; c.upEnd = yt; }
@@ -419,6 +435,7 @@ function chordStems(L, heads, opts = {}) {
       }
     }
     c.up = up >= minLen ? up : 0; c.down = down >= minLen ? down : 0;
+    c.accidental = false;
     if (opts.sides) {
       // only wrong-side strokes, or two short strokes both ways (a sharp):
       // an accidental, not a note
@@ -428,6 +445,46 @@ function chordStems(L, heads, opts = {}) {
     }
     c.upX = upX; c.downX = downX;
     c.x = c.xs.reduce((a, b) => a + b, 0) / c.xs.length;
+  };
+  // heads of one column far apart with nothing between them (a rest's flag
+  // blob over a low note, a lyric glyph under a head) are not one chord: when
+  // the column has a stem one way only, each such group is read on its own
+  // (two voices sharing a column, stems up and down, stay one chord)
+  // (a faint stem may break where it crosses a staff line: mostly ink, no
+  // long gap, is enough)
+  const linked = (a, b, xa, xb, sp) => {
+    const ya = Math.round(a.y + 0.3 * sp), yb = Math.round(b.y - 0.3 * sp), gapMax = Math.max(2, Math.round(0.6 * sp));
+    for (let x = Math.round(xa); x <= Math.round(xb); x++) {
+      let gap = 0, n = 0, ok = true;
+      for (let y = ya; y <= yb && ok; y++) { if (ink(x, y)) { gap = 0; n++; } else if (++gap > gapMax) ok = false; }
+      if (ok && n >= 0.7 * (yb - ya + 1)) return true;
+    }
+    return false;
+  };
+  for (let i = 0; i < chords.length; i++) {
+    const c = chords[i];
+    stems(c);
+    if (c.heads.length < 2 || (c.up && c.down)) continue;
+    const hs = c.heads, sp = hs[0].sp;
+    const xa = Math.min(...c.xs) - 0.85 * sp, xb = Math.max(...c.xs) + 0.85 * sp;
+    const parts = [[hs[0]]];
+    for (let k = 1; k < hs.length; k++) {
+      if (hs[k].y - hs[k - 1].y > 2.0 * sp && !linked(hs[k - 1], hs[k], xa, xb, sp)) parts.push([hs[k]]);
+      else parts[parts.length - 1].push(hs[k]);
+    }
+    if (parts.length < 2) continue;
+    // a detached hollow head stays (a stemless half note of a second voice
+    // drawn on the chord's stem); black heads need a stem of their own
+    for (let k = parts.length - 1; k > 0; k--) {
+      if (parts[k].every(hd => hd.kind === 'hollow') || parts[k - 1].every(hd => hd.kind === 'hollow')) parts.splice(k - 1, 2, parts[k - 1].concat(parts[k]));
+    }
+    if (parts.length < 2) continue;
+    const sub = parts.map(p => ({ heads: p, xs: p.map(hd => hd.x), staff: c.staff }));
+    sub.forEach(stems);
+    chords.splice(i, 1, ...sub);
+    i += sub.length - 1;
+  }
+  for (const c of chords) {
     for (const hd of c.heads) hd.chord = c;
     if (c.up && c.down) {
       // two voices: the head(s) nearest the up stem go up; split at the largest gap
@@ -438,7 +495,7 @@ function chordStems(L, heads, opts = {}) {
     } else if (c.up) c.heads.forEach(hd => { hd.stemDir = 1; });
     else if (c.down) c.heads.forEach(hd => { hd.stemDir = -1; });
     else c.heads.forEach(hd => { hd.stemDir = 0; });
-    for (const hd of c.heads) hd.stem = { dir: hd.stemDir, upX, downX, up: c.up, down: c.down };
+    for (const hd of c.heads) hd.stem = { dir: hd.stemDir, upX: c.upX, downX: c.downX, up: c.up, down: c.down };
   }
   return chords;
 }

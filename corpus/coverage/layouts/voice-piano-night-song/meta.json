@@ -4,6 +4,7 @@
   "title": "Night Song - voice with lyrics above a piano grand staff",
   "layout": "voice-piano",
   "symbols": [
+    "barline-final",
     "beam",
     "chord",
     "clef-bass",
@@ -40,10 +41,12 @@
     "time-4-4",
     "x-measures",
     "x-multi-staff-part",
+    "x-noteheads",
     "x-parts",
     "x-staves"
   ],
   "counts": {
+    "barline-final": 1,
     "beam": 8,
     "chord": 23,
     "clef-bass": 1,
@@ -80,6 +83,7 @@
     "time-4-4": 1,
     "x-measures": 11,
     "x-multi-staff-part": 1,
+    "x-noteheads": 122,
     "x-parts": 2,
     "x-staves": 3
   },
@@ -105,6 +109,7 @@
   "notes": [
     "Lyrics belong to the Voice part only."
   ],
+  "printed_not_in_truth": {},
   "layout_description": "A4 portrait, staff size 19, 3 systems (4+4+3 measures) of voice staff + piano grand staff",
   "pages": 1,
   "measures": 11,
@@ -127,7 +132,7 @@
           ]
         }
       ],
-      "bytes": 136695
+      "bytes": 136555
     },
     "scan.pdf": {
       "seed": 7041,
@@ -180,7 +185,7 @@
         "jpeg": 65
       },
       "summary": "250 dpi grey scan, 1.2 deg skew, soft focus, toner specks, JPEG q65",
-      "bytes": 450452
+      "bytes": 450995
     },
     "scan-severe.pdf": {
       "seed": 7042,
@@ -275,7 +280,7 @@
         "format": "png1"
       },
       "summary": "thick dark binarised photocopy at 200 dpi: ink spread, 2.5 deg skew, staple, two punch holes, salt & pepper",
-      "bytes": 151984
+      "bytes": 152003
     }
   },
   "files": [

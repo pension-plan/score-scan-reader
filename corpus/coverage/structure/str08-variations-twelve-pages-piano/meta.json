@@ -1,0 +1,1593 @@
+{
+  "id": "str08-variations-twelve-pages-piano",
+  "family": "structure",
+  "title": "Theme and Variations in A - 12-page piano score: repeats in every section, endings, key changes, To Coda on page 1 and D.C. al Coda on page 11",
+  "symbols": [
+    "acc-sharp",
+    "barline-double",
+    "barline-final",
+    "beam",
+    "chord",
+    "clef-bass",
+    "clef-treble",
+    "coda",
+    "dc",
+    "dot",
+    "dyn-f",
+    "dyn-ff",
+    "dyn-mf",
+    "dyn-mp",
+    "dyn-p",
+    "flag",
+    "key-0",
+    "key-change",
+    "key-s3",
+    "ledger-above",
+    "ledger-below",
+    "metronome",
+    "multi-page",
+    "note-16th",
+    "note-8th",
+    "note-half",
+    "note-quarter",
+    "page-break",
+    "repeat-end",
+    "repeat-start",
+    "rest-8th",
+    "rest-quarter",
+    "stem-down",
+    "stem-up",
+    "system-break",
+    "tempo-mark",
+    "text-expression",
+    "time-2-4",
+    "tuplet-3",
+    "volta-1",
+    "volta-2",
+    "x-to-coda"
+  ],
+  "focus_symbols": [
+    "multi-page",
+    "page-break",
+    "system-break",
+    "repeat-start",
+    "repeat-end",
+    "volta-1",
+    "volta-2",
+    "dc",
+    "coda",
+    "x-to-coda",
+    "barline-double",
+    "barline-final"
+  ],
+  "layout": "piano",
+  "expected": {
+    "parts": [
+      "Piano"
+    ],
+    "must_not_split": true,
+    "staves_per_part": {
+      "Piano": 2
+    },
+    "lyrics": [],
+    "structure": "146 bars, 36 systems, 3 per page (page breaks before every 3rd system). Thema mm.1-16 (||: implied :|| ||: :||, \"To Coda\" + coda sign after m.8); Var. I mm.17-32; Var. II mm.33-49 (1st ending m.40, 2nd ending m.41 + double bar); Var. III mm.50-65; Var. IV Minore mm.66-81 (A minor); Var. V Maggiore mm.82-98 (A major, 1st ending m.97, 2nd ending m.98); Var. VI mm.99-114; Var. VII mm.115-130 (only the first half repeated; double bar + \"D.C. al Coda\" after m.130); Coda sign + Coda mm.131-146, final bar. Every start+end repeat between sections falls on a system break and is split by the line break. Played form: Thema and Var. I-VII with repeats, then D.C.: mm.1-8, jump to the Coda (m.131).",
+    "notes": "One part (Piano), grand staff, must NOT be split. 2/4 throughout. Key A major (3 sharps); Var. IV in A minor (0 sharps, key change with cancellation naturals), Var. V back to A major. Section headings (Thema, Var. I ...) are bold text; tempo texts Andante (quarter = 69), Adagio (quarter = 50), Tempo I, Più mosso. Running header with title and page number on pages 2-12."
+  },
+  "counts": {
+    "acc-sharp": 5,
+    "barline-double": 3,
+    "barline-final": 1,
+    "beam": 195,
+    "chord": 143,
+    "clef-bass": 1,
+    "clef-treble": 1,
+    "coda": 2,
+    "dc": 1,
+    "dot": 28,
+    "dyn-f": 3,
+    "dyn-ff": 1,
+    "dyn-mf": 2,
+    "dyn-mp": 1,
+    "dyn-p": 2,
+    "flag": 32,
+    "key-0": 1,
+    "key-change": 2,
+    "key-s3": 2,
+    "ledger-above": 115,
+    "ledger-below": 24,
+    "metronome": 2,
+    "multi-page": 12,
+    "note-16th": 276,
+    "note-8th": 300,
+    "note-half": 34,
+    "note-quarter": 275,
+    "page-break": 11,
+    "repeat-end": 15,
+    "repeat-start": 14,
+    "rest-8th": 32,
+    "rest-quarter": 14,
+    "stem-down": 580,
+    "stem-up": 305,
+    "system-break": 24,
+    "tempo-mark": 4,
+    "text-expression": 9,
+    "time-2-4": 1,
+    "tuplet-3": 30,
+    "volta-1": 2,
+    "volta-2": 2,
+    "x-to-coda": 1
+  },
+  "counts_by_part": {
+    "Piano": {
+      "acc-sharp": 5,
+      "beam": 195,
+      "chord": 143,
+      "clef-bass": 1,
+      "clef-treble": 1,
+      "dot": 28,
+      "dyn-f": 3,
+      "dyn-ff": 1,
+      "dyn-mf": 2,
+      "dyn-mp": 1,
+      "dyn-p": 2,
+      "flag": 32,
+      "ledger-above": 115,
+      "ledger-below": 24,
+      "note-16th": 276,
+      "note-8th": 300,
+      "note-half": 34,
+      "note-quarter": 275,
+      "rest-8th": 32,
+      "rest-quarter": 14,
+      "stem-down": 580,
+      "stem-up": 305,
+      "text-expression": 9,
+      "tuplet-3": 30
+    }
+  },
+  "count_rules": "Coverage-taxonomy symbol counts read from truth.musicxml.\n\nCounting rules (also written to meta.json 'count_rules'):\n  * score-wide tags are counted ONCE per score position even when MusicXML repeats them in every\n    part: barline-double, barline-final, repeat-start, repeat-end, volta-N, segno, coda, dc, ds,\n    fine, x-to-coda, system-break, page-break, multi-page, rehearsal-mark, tempo-mark, metronome,\n    key-*, key-change, time-*, time-change, pickup;\n  * every other tag is counted per occurrence in every part (also listed per part in\n    'counts_by_part'):\n      note-<type>  note events (a chord counts once, as its stem/duration), no grace / cue notes\n      chord        note events with two or more noteheads\n      dot / double-dot  dotted / double-dotted note events;  rest-dotted  dotted rests\n      beam         beam groups (<beam number=\"1\">begin);  flag  unbeamed note events of 8th or shorter\n      stem-up / stem-down  note events with that <stem>\n      ledger-above / ledger-below  noteheads on or beyond the first ledger line (per clef in force)\n      rest-<type>  rests that are not whole-bar rests;  rest-whole-bar  <rest measure=\"yes\"/>\n      clef-*       <clef> elements (initial and changes);  clef-change  clefs after the first measure\n      acc-*        printed <accidental> elements;  acc-courtesy  cautionary / parenthesised ones\n      tie          <tie type=\"start\"> per notehead;  tie-across-system  ties whose end note starts a\n                   new system or page\n      slur, staccato, accent, tenuto, ..., fermata   per element;  dyn-*  per dynamic;  hairpin-*  per\n      wedge start;  pedal  per pedal start;  text-expression  words that are not tempo / jump text\n      lyrics  <lyric> syllables;  lyrics-hyphen  begin/middle syllables;  lyrics-extender  <extend>\n      lyrics-multi-verse  syllables of verse 2 and higher",
+  "degradations": {
+    "clean.pdf": {
+      "seed": null,
+      "render_dpi": 300,
+      "dpi": 300,
+      "format": "png (lossless)",
+      "colour": "gray",
+      "params": {},
+      "summary": "undamaged raster of the engraving",
+      "bytes": 1006175
+    },
+    "scan.pdf": {
+      "seed": 48001,
+      "render_dpi": 200,
+      "dpi": 200,
+      "format": "jpeg q70",
+      "colour": "gray",
+      "params": {
+        "dpi": 200,
+        "mode": "gray",
+        "texture": 3,
+        "rotate_pages": {
+          "0": 0.4,
+          "1": -0.6,
+          "2": 0.9,
+          "3": -0.3,
+          "4": 0.7,
+          "5": -1.0,
+          "6": 0.5,
+          "7": -0.2,
+          "8": 0.8,
+          "9": -0.7,
+          "10": 0.3,
+          "11": -0.5
+        },
+        "blur": 0.4,
+        "noise": 4,
+        "jpeg": 70
+      },
+      "summary": "12 pages from a sheet feeder, 200 dpi grey, small random skew per page, paper texture, noise, JPEG q70",
+      "bytes": 3778474,
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1654,
+            2339
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              3
+            ],
+            [
+              "skew_rotation_deg",
+              0.4
+            ],
+            [
+              "focus_blur_sigma",
+              0.4
+            ],
+            [
+              "gaussian_noise_sigma",
+              4
+            ]
+          ]
+        },
+        {
+          "image": 2,
+          "source_pages": [
+            2
+          ],
+          "size_px": [
+            1654,
+            2339
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              3
+            ],
+            [
+              "skew_rotation_deg",
+              -0.6
+            ],
+            [
+              "focus_blur_sigma",
+              0.4
+            ],
+            [
+              "gaussian_noise_sigma",
+              4
+            ]
+          ]
+        },
+        {
+          "image": 3,
+          "source_pages": [
+            3
+          ],
+          "size_px": [
+            1654,
+            2339
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              3
+            ],
+            [
+              "skew_rotation_deg",
+              0.9
+            ],
+            [
+              "focus_blur_sigma",
+              0.4
+            ],
+            [
+              "gaussian_noise_sigma",
+              4
+            ]
+          ]
+        },
+        {
+          "image": 4,
+          "source_pages": [
+            4
+          ],
+          "size_px": [
+            1654,
+            2339
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              3
+            ],
+            [
+              "skew_rotation_deg",
+              -0.3
+            ],
+            [
+              "focus_blur_sigma",
+              0.4
+            ],
+            [
+              "gaussian_noise_sigma",
+              4
+            ]
+          ]
+        },
+        {
+          "image": 5,
+          "source_pages": [
+            5
+          ],
+          "size_px": [
+            1654,
+            2339
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              3
+            ],
+            [
+              "skew_rotation_deg",
+              0.7
+            ],
+            [
+              "focus_blur_sigma",
+              0.4
+            ],
+            [
+              "gaussian_noise_sigma",
+              4
+            ]
+          ]
+        },
+        {
+          "image": 6,
+          "source_pages": [
+            6
+          ],
+          "size_px": [
+            1654,
+            2339
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              3
+            ],
+            [
+              "skew_rotation_deg",
+              -1.0
+            ],
+            [
+              "focus_blur_sigma",
+              0.4
+            ],
+            [
+              "gaussian_noise_sigma",
+              4
+            ]
+          ]
+        },
+        {
+          "image": 7,
+          "source_pages": [
+            7
+          ],
+          "size_px": [
+            1654,
+            2339
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              3
+            ],
+            [
+              "skew_rotation_deg",
+              0.5
+            ],
+            [
+              "focus_blur_sigma",
+              0.4
+            ],
+            [
+              "gaussian_noise_sigma",
+              4
+            ]
+          ]
+        },
+        {
+          "image": 8,
+          "source_pages": [
+            8
+          ],
+          "size_px": [
+            1654,
+            2339
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              3
+            ],
+            [
+              "skew_rotation_deg",
+              -0.2
+            ],
+            [
+              "focus_blur_sigma",
+              0.4
+            ],
+            [
+              "gaussian_noise_sigma",
+              4
+            ]
+          ]
+        },
+        {
+          "image": 9,
+          "source_pages": [
+            9
+          ],
+          "size_px": [
+            1654,
+            2339
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              3
+            ],
+            [
+              "skew_rotation_deg",
+              0.8
+            ],
+            [
+              "focus_blur_sigma",
+              0.4
+            ],
+            [
+              "gaussian_noise_sigma",
+              4
+            ]
+          ]
+        },
+        {
+          "image": 10,
+          "source_pages": [
+            10
+          ],
+          "size_px": [
+            1654,
+            2339
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              3
+            ],
+            [
+              "skew_rotation_deg",
+              -0.7
+            ],
+            [
+              "focus_blur_sigma",
+              0.4
+            ],
+            [
+              "gaussian_noise_sigma",
+              4
+            ]
+          ]
+        },
+        {
+          "image": 11,
+          "source_pages": [
+            11
+          ],
+          "size_px": [
+            1654,
+            2339
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              3
+            ],
+            [
+              "skew_rotation_deg",
+              0.3
+            ],
+            [
+              "focus_blur_sigma",
+              0.4
+            ],
+            [
+              "gaussian_noise_sigma",
+              4
+            ]
+          ]
+        },
+        {
+          "image": 12,
+          "source_pages": [
+            12
+          ],
+          "size_px": [
+            1654,
+            2339
+          ],
+          "ops": [
+            [
+              "paper_texture",
+              3
+            ],
+            [
+              "skew_rotation_deg",
+              -0.5
+            ],
+            [
+              "focus_blur_sigma",
+              0.4
+            ],
+            [
+              "gaussian_noise_sigma",
+              4
+            ]
+          ]
+        }
+      ]
+    },
+    "scan-severe.pdf": {
+      "seed": 48002,
+      "render_dpi": 300,
+      "dpi": 150,
+      "format": "png1",
+      "colour": "bw",
+      "params": {
+        "dpi": 300,
+        "out_dpi": 150,
+        "punch_holes": {
+          "n": 3,
+          "side": "left",
+          "level": 25
+        },
+        "rotate_pages": {
+          "0": 2.0,
+          "1": -3.0,
+          "2": 4.5,
+          "3": -1.5,
+          "4": 3.5,
+          "5": -4.0,
+          "6": 2.8,
+          "7": -2.2,
+          "8": 5.0,
+          "9": -3.6,
+          "10": 1.8,
+          "11": -2.7
+        },
+        "page_rotate": {
+          "5": 180
+        },
+        "scale_pages": {
+          "2": 0.96,
+          "8": 1.03
+        },
+        "bleed": 0.12,
+        "ink_dropout": 0.08,
+        "blur": 0.7,
+        "noise": 9,
+        "binarize": 125,
+        "binarize_noise": 18,
+        "speckle": 80,
+        "format": "png1"
+      },
+      "summary": "ring-binder photocopies at 150 dpi: punch holes, skew -4..5 deg per page, page 6 upside down, pages 3 and 9 at a different scale, strong bleed-through, binarised with speckles",
+      "bytes": 302712,
+      "pdf_pages": [
+        {
+          "image": 1,
+          "source_pages": [
+            1
+          ],
+          "size_px": [
+            1240,
+            1754
+          ],
+          "ops": [
+            [
+              "faded_ink",
+              0.08
+            ],
+            [
+              "punch_holes",
+              {
+                "side": "left",
+                "centers_px": [
+                  [
+                    130,
+                    474
+                  ],
+                  [
+                    130,
+                    1754
+                  ],
+                  [
+                    130,
+                    3034
+                  ]
+                ]
+              }
+            ],
+            [
+              "bleed_through",
+              {
+                "strength": 0.12,
+                "shift_px": -3
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              2.0
+            ],
+            [
+              "focus_blur_sigma",
+              0.7
+            ],
+            [
+              "gaussian_noise_sigma",
+              9
+            ],
+            [
+              "speckles_per_mpx",
+              80
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 125,
+                "noise": 18
+              }
+            ],
+            [
+              "resampled_dpi",
+              [
+                300,
+                150
+              ]
+            ]
+          ]
+        },
+        {
+          "image": 2,
+          "source_pages": [
+            2
+          ],
+          "size_px": [
+            1240,
+            1754
+          ],
+          "ops": [
+            [
+              "faded_ink",
+              0.08
+            ],
+            [
+              "punch_holes",
+              {
+                "side": "left",
+                "centers_px": [
+                  [
+                    130,
+                    474
+                  ],
+                  [
+                    130,
+                    1754
+                  ],
+                  [
+                    130,
+                    3034
+                  ]
+                ]
+              }
+            ],
+            [
+              "bleed_through",
+              {
+                "strength": 0.12,
+                "shift_px": 8
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              -3.0
+            ],
+            [
+              "focus_blur_sigma",
+              0.7
+            ],
+            [
+              "gaussian_noise_sigma",
+              9
+            ],
+            [
+              "speckles_per_mpx",
+              80
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 125,
+                "noise": 18
+              }
+            ],
+            [
+              "resampled_dpi",
+              [
+                300,
+                150
+              ]
+            ]
+          ]
+        },
+        {
+          "image": 3,
+          "source_pages": [
+            3
+          ],
+          "size_px": [
+            1240,
+            1754
+          ],
+          "ops": [
+            [
+              "faded_ink",
+              0.08
+            ],
+            [
+              "punch_holes",
+              {
+                "side": "left",
+                "centers_px": [
+                  [
+                    130,
+                    474
+                  ],
+                  [
+                    130,
+                    1754
+                  ],
+                  [
+                    130,
+                    3034
+                  ]
+                ]
+              }
+            ],
+            [
+              "bleed_through",
+              {
+                "strength": 0.12,
+                "shift_px": -12
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              4.5
+            ],
+            [
+              "scale",
+              0.96
+            ],
+            [
+              "focus_blur_sigma",
+              0.7
+            ],
+            [
+              "gaussian_noise_sigma",
+              9
+            ],
+            [
+              "speckles_per_mpx",
+              80
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 125,
+                "noise": 18
+              }
+            ],
+            [
+              "resampled_dpi",
+              [
+                300,
+                150
+              ]
+            ]
+          ]
+        },
+        {
+          "image": 4,
+          "source_pages": [
+            4
+          ],
+          "size_px": [
+            1240,
+            1754
+          ],
+          "ops": [
+            [
+              "faded_ink",
+              0.08
+            ],
+            [
+              "punch_holes",
+              {
+                "side": "left",
+                "centers_px": [
+                  [
+                    130,
+                    474
+                  ],
+                  [
+                    130,
+                    1754
+                  ],
+                  [
+                    130,
+                    3034
+                  ]
+                ]
+              }
+            ],
+            [
+              "bleed_through",
+              {
+                "strength": 0.12,
+                "shift_px": -5
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              -1.5
+            ],
+            [
+              "focus_blur_sigma",
+              0.7
+            ],
+            [
+              "gaussian_noise_sigma",
+              9
+            ],
+            [
+              "speckles_per_mpx",
+              80
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 125,
+                "noise": 18
+              }
+            ],
+            [
+              "resampled_dpi",
+              [
+                300,
+                150
+              ]
+            ]
+          ]
+        },
+        {
+          "image": 5,
+          "source_pages": [
+            5
+          ],
+          "size_px": [
+            1240,
+            1754
+          ],
+          "ops": [
+            [
+              "faded_ink",
+              0.08
+            ],
+            [
+              "punch_holes",
+              {
+                "side": "left",
+                "centers_px": [
+                  [
+                    130,
+                    474
+                  ],
+                  [
+                    130,
+                    1754
+                  ],
+                  [
+                    130,
+                    3034
+                  ]
+                ]
+              }
+            ],
+            [
+              "bleed_through",
+              {
+                "strength": 0.12,
+                "shift_px": -16
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              3.5
+            ],
+            [
+              "focus_blur_sigma",
+              0.7
+            ],
+            [
+              "gaussian_noise_sigma",
+              9
+            ],
+            [
+              "speckles_per_mpx",
+              80
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 125,
+                "noise": 18
+              }
+            ],
+            [
+              "resampled_dpi",
+              [
+                300,
+                150
+              ]
+            ]
+          ]
+        },
+        {
+          "image": 6,
+          "source_pages": [
+            6
+          ],
+          "size_px": [
+            1240,
+            1754
+          ],
+          "ops": [
+            [
+              "faded_ink",
+              0.08
+            ],
+            [
+              "punch_holes",
+              {
+                "side": "left",
+                "centers_px": [
+                  [
+                    130,
+                    474
+                  ],
+                  [
+                    130,
+                    1754
+                  ],
+                  [
+                    130,
+                    3034
+                  ]
+                ]
+              }
+            ],
+            [
+              "bleed_through",
+              {
+                "strength": 0.12,
+                "shift_px": 16
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              -4.0
+            ],
+            [
+              "focus_blur_sigma",
+              0.7
+            ],
+            [
+              "gaussian_noise_sigma",
+              9
+            ],
+            [
+              "speckles_per_mpx",
+              80
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 125,
+                "noise": 18
+              }
+            ],
+            [
+              "page_rotated_deg",
+              180
+            ],
+            [
+              "resampled_dpi",
+              [
+                300,
+                150
+              ]
+            ]
+          ]
+        },
+        {
+          "image": 7,
+          "source_pages": [
+            7
+          ],
+          "size_px": [
+            1240,
+            1754
+          ],
+          "ops": [
+            [
+              "faded_ink",
+              0.08
+            ],
+            [
+              "punch_holes",
+              {
+                "side": "left",
+                "centers_px": [
+                  [
+                    130,
+                    474
+                  ],
+                  [
+                    130,
+                    1754
+                  ],
+                  [
+                    130,
+                    3034
+                  ]
+                ]
+              }
+            ],
+            [
+              "bleed_through",
+              {
+                "strength": 0.12,
+                "shift_px": -7
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              2.8
+            ],
+            [
+              "focus_blur_sigma",
+              0.7
+            ],
+            [
+              "gaussian_noise_sigma",
+              9
+            ],
+            [
+              "speckles_per_mpx",
+              80
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 125,
+                "noise": 18
+              }
+            ],
+            [
+              "resampled_dpi",
+              [
+                300,
+                150
+              ]
+            ]
+          ]
+        },
+        {
+          "image": 8,
+          "source_pages": [
+            8
+          ],
+          "size_px": [
+            1240,
+            1754
+          ],
+          "ops": [
+            [
+              "faded_ink",
+              0.08
+            ],
+            [
+              "punch_holes",
+              {
+                "side": "left",
+                "centers_px": [
+                  [
+                    130,
+                    474
+                  ],
+                  [
+                    130,
+                    1754
+                  ],
+                  [
+                    130,
+                    3034
+                  ]
+                ]
+              }
+            ],
+            [
+              "bleed_through",
+              {
+                "strength": 0.12,
+                "shift_px": -2
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              -2.2
+            ],
+            [
+              "focus_blur_sigma",
+              0.7
+            ],
+            [
+              "gaussian_noise_sigma",
+              9
+            ],
+            [
+              "speckles_per_mpx",
+              80
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 125,
+                "noise": 18
+              }
+            ],
+            [
+              "resampled_dpi",
+              [
+                300,
+                150
+              ]
+            ]
+          ]
+        },
+        {
+          "image": 9,
+          "source_pages": [
+            9
+          ],
+          "size_px": [
+            1240,
+            1754
+          ],
+          "ops": [
+            [
+              "faded_ink",
+              0.08
+            ],
+            [
+              "punch_holes",
+              {
+                "side": "left",
+                "centers_px": [
+                  [
+                    130,
+                    474
+                  ],
+                  [
+                    130,
+                    1754
+                  ],
+                  [
+                    130,
+                    3034
+                  ]
+                ]
+              }
+            ],
+            [
+              "bleed_through",
+              {
+                "strength": 0.12,
+                "shift_px": 10
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              5.0
+            ],
+            [
+              "scale",
+              1.03
+            ],
+            [
+              "focus_blur_sigma",
+              0.7
+            ],
+            [
+              "gaussian_noise_sigma",
+              9
+            ],
+            [
+              "speckles_per_mpx",
+              80
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 125,
+                "noise": 18
+              }
+            ],
+            [
+              "resampled_dpi",
+              [
+                300,
+                150
+              ]
+            ]
+          ]
+        },
+        {
+          "image": 10,
+          "source_pages": [
+            10
+          ],
+          "size_px": [
+            1240,
+            1754
+          ],
+          "ops": [
+            [
+              "faded_ink",
+              0.08
+            ],
+            [
+              "punch_holes",
+              {
+                "side": "left",
+                "centers_px": [
+                  [
+                    130,
+                    474
+                  ],
+                  [
+                    130,
+                    1754
+                  ],
+                  [
+                    130,
+                    3034
+                  ]
+                ]
+              }
+            ],
+            [
+              "bleed_through",
+              {
+                "strength": 0.12,
+                "shift_px": 18
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              -3.6
+            ],
+            [
+              "focus_blur_sigma",
+              0.7
+            ],
+            [
+              "gaussian_noise_sigma",
+              9
+            ],
+            [
+              "speckles_per_mpx",
+              80
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 125,
+                "noise": 18
+              }
+            ],
+            [
+              "resampled_dpi",
+              [
+                300,
+                150
+              ]
+            ]
+          ]
+        },
+        {
+          "image": 11,
+          "source_pages": [
+            11
+          ],
+          "size_px": [
+            1240,
+            1754
+          ],
+          "ops": [
+            [
+              "faded_ink",
+              0.08
+            ],
+            [
+              "punch_holes",
+              {
+                "side": "left",
+                "centers_px": [
+                  [
+                    130,
+                    474
+                  ],
+                  [
+                    130,
+                    1754
+                  ],
+                  [
+                    130,
+                    3034
+                  ]
+                ]
+              }
+            ],
+            [
+              "bleed_through",
+              {
+                "strength": 0.12,
+                "shift_px": -10
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              1.8
+            ],
+            [
+              "focus_blur_sigma",
+              0.7
+            ],
+            [
+              "gaussian_noise_sigma",
+              9
+            ],
+            [
+              "speckles_per_mpx",
+              80
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 125,
+                "noise": 18
+              }
+            ],
+            [
+              "resampled_dpi",
+              [
+                300,
+                150
+              ]
+            ]
+          ]
+        },
+        {
+          "image": 12,
+          "source_pages": [
+            12
+          ],
+          "size_px": [
+            1240,
+            1754
+          ],
+          "ops": [
+            [
+              "faded_ink",
+              0.08
+            ],
+            [
+              "punch_holes",
+              {
+                "side": "left",
+                "centers_px": [
+                  [
+                    130,
+                    474
+                  ],
+                  [
+                    130,
+                    1754
+                  ],
+                  [
+                    130,
+                    3034
+                  ]
+                ]
+              }
+            ],
+            [
+              "bleed_through",
+              {
+                "strength": 0.12,
+                "shift_px": -6
+              }
+            ],
+            [
+              "skew_rotation_deg",
+              -2.7
+            ],
+            [
+              "focus_blur_sigma",
+              0.7
+            ],
+            [
+              "gaussian_noise_sigma",
+              9
+            ],
+            [
+              "speckles_per_mpx",
+              80
+            ],
+            [
+              "binarized_photocopy",
+              {
+                "threshold": 125,
+                "noise": 18
+              }
+            ],
+            [
+              "resampled_dpi",
+              [
+                300,
+                150
+              ]
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "dpi": 200,
+  "pages": 12,
+  "systems_per_page": [
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3
+  ],
+  "system_start_measures": [
+    [
+      "1",
+      "5",
+      "9"
+    ],
+    [
+      "13",
+      "17",
+      "21"
+    ],
+    [
+      "25",
+      "29",
+      "33"
+    ],
+    [
+      "37",
+      "42",
+      "46"
+    ],
+    [
+      "50",
+      "54",
+      "58"
+    ],
+    [
+      "62",
+      "66",
+      "70"
+    ],
+    [
+      "74",
+      "78",
+      "82"
+    ],
+    [
+      "86",
+      "90",
+      "94"
+    ],
+    [
+      "99",
+      "103",
+      "107"
+    ],
+    [
+      "111",
+      "115",
+      "119"
+    ],
+    [
+      "123",
+      "127",
+      "131"
+    ],
+    [
+      "135",
+      "139",
+      "143"
+    ]
+  ],
+  "measures": 146,
+  "noteheads_in_truth": 1152,
+  "license": "CC0",
+  "license_detail": "CC0 1.0 Universal - composition, engraving, truth and scans",
+  "notes": "Truth limitations: (1) running headers and page numbers are not encoded as <credit>s; (2) the courtesy key signature at the end of the system before Var. IV / Var. V and the cancellation naturals are implied by <key> (no <cancel> element is written); (3) whether repeats are taken after the D.C. is not encoded.",
+  "files": [
+    "ATTRIBUTION.txt",
+    "clean.pdf",
+    "engraving.ly",
+    "meta.json",
+    "truth.musicxml",
+    "scan-severe.pdf",
+    "scan.pdf"
+  ],
+  "generator": "corpus/coverage/structure/_tools (model -> MusicXML 4.0 truth + LilyPond 2.24 engraving)",
+  "validation": {
+    "xsd_valid": true,
+    "music21_parse": "2 885",
+    "engraving_matches_truth": true,
+    "checked": [
+      "notes",
+      "rests",
+      "full-bar rests",
+      "ties",
+      "beams",
+      "slurs",
+      "stems",
+      "articulations",
+      "dynamics/hairpins/text",
+      "lyrics",
+      "clefs",
+      "keys",
+      "times",
+      "bar-line glyphs",
+      "volta spans",
+      "segno/coda/text/rehearsal/metronome marks",
+      "system and page starts",
+      "MIDI attacks"
+    ],
+    "midi_attacks": 1152,
+    "lilypond_warnings": [],
+    "lyric_syllables_found_in_engraving": null,
+    "image_only": {
+      "clean.pdf": true,
+      "scan.pdf": true,
+      "scan-severe.pdf": true
+    }
+  }
+}

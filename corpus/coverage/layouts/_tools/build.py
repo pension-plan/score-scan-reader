@@ -265,6 +265,9 @@ def build_item(item: dict, keep_work=False):
         lyr = [{'part': score.part(pid).name, 'verses': len(vs)} for pid, vk, vs in voices_with_lyrics(score)]
         symbols = [k for k in counts if not k.startswith('x-')] + [k for k in counts if k.startswith('x-')]
         notes = list(item.get('truth_limitations', []))
+        pnt = item.get('printed_not_in_truth', {})
+        for k, v in pnt.items():
+            notes.append(f'Printed but not representable in the MusicXML truth: {k} x{v} (not in counts).')
         if prep['acc_truth_differs_from_print']:
             notes.append(f'Accidentals in the truth are per PART (what a per-part transcription displays): '
                          f'{prep["truth_acc_n"]} in the truth vs {prep["printed_acc_n"]} printed on the shared '
@@ -285,6 +288,7 @@ def build_item(item: dict, keep_work=False):
                 'notes': item['expected_notes'],
             },
             'notes': notes,
+            'printed_not_in_truth': pnt,
             'layout_description': item.get('layout_desc', ''),
             'pages': npages,
             'measures': len(score.measures),

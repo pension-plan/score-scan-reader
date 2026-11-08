@@ -366,6 +366,7 @@
       </note>
       <backup><duration>4</duration></backup>
       <forward><duration>4</duration><voice>2</voice></forward>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
   <part id="A">
@@ -617,6 +618,7 @@
         <notations><fermata type="upright"/></notations>
         <lyric number="1"><syllabic>single</syllabic><text>sing.</text></lyric>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
   <part id="T">
@@ -868,6 +870,7 @@
         <notations><fermata type="upright"/></notations>
         <lyric number="1"><syllabic>single</syllabic><text>sing.</text></lyric>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
   <part id="B">
@@ -1176,6 +1179,7 @@
         <type>half</type>
         <stem>up</stem>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
 </score-partwise>

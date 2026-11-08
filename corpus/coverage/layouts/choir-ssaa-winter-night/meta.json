@@ -4,6 +4,7 @@
   "title": "Winter Night - SSAA choir in closed score on two treble staves",
   "layout": "choir-ssaa",
   "symbols": [
+    "barline-final",
     "beam",
     "clef-treble",
     "dot",
@@ -30,10 +31,12 @@
     "time-3-4",
     "x-group-bracket",
     "x-measures",
+    "x-noteheads",
     "x-parts",
     "x-staves"
   ],
   "counts": {
+    "barline-final": 1,
     "beam": 2,
     "clef-treble": 4,
     "dot": 15,
@@ -60,6 +63,7 @@
     "time-3-4": 1,
     "x-group-bracket": 1,
     "x-measures": 12,
+    "x-noteheads": 116,
     "x-parts": 4,
     "x-staves": 4
   },
@@ -98,6 +102,7 @@
   "notes": [
     "Lyrics are encoded on Soprano I only."
   ],
+  "printed_not_in_truth": {},
   "layout_description": "A4 portrait, staff size 20, 2 systems of 6 measures, bracketed two-staff closed score",
   "pages": 1,
   "measures": 12,
@@ -120,7 +125,7 @@
           ]
         }
       ],
-      "bytes": 121760
+      "bytes": 122041
     },
     "scan.pdf": {
       "seed": 7091,
@@ -173,7 +178,7 @@
         "jpeg": 65
       },
       "summary": "250 dpi grey scan, 1.2 deg skew, soft focus, toner specks, JPEG q65",
-      "bytes": 391165
+      "bytes": 391348
     },
     "scan-severe.pdf": {
       "seed": 7092,
@@ -201,39 +206,39 @@
                     272
                   ],
                   [
-                    722,
-                    596
+                    193,
+                    756
                   ]
                 ],
                 "marks": [
                   [
-                    442,
-                    405
+                    422,
+                    364
                   ],
                   [
-                    688,
-                    394
+                    648,
+                    283
                   ],
                   [
-                    506,
-                    405
+                    813,
+                    757
                   ]
                 ],
                 "texts": [
                   [
                     "rit.",
-                    373,
-                    361
+                    544,
+                    229
                   ],
                   [
                     "breathe",
-                    802,
-                    582
+                    731,
+                    367
                   ],
                   [
                     "p!",
-                    700,
-                    754
+                    923,
+                    279
                   ]
                 ],
                 "lines": 1
@@ -243,7 +248,7 @@
               "bleed_through",
               {
                 "strength": 0.12,
-                "shift_px": 4
+                "shift_px": -2
               }
             ],
             [
@@ -263,8 +268,8 @@
               {
                 "coffee": [
                   [
-                    964,
-                    1271,
+                    966,
+                    981,
                     124
                   ]
                 ],
@@ -320,7 +325,7 @@
         "jpeg": 30
       },
       "summary": "old yellowed copy: bleed-through, foxing, coffee ring, pencil annotations, 150 dpi colour, 2 deg skew, JPEG q30",
-      "bytes": 105705
+      "bytes": 105786
     }
   },
   "files": [

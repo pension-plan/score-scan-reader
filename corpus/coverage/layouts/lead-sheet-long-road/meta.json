@@ -5,6 +5,7 @@
   "layout": "lead-sheet",
   "symbols": [
     "barline-double",
+    "barline-final",
     "chord-symbol",
     "clef-treble",
     "dot",
@@ -29,11 +30,13 @@
     "volta-1",
     "volta-2",
     "x-measures",
+    "x-noteheads",
     "x-parts",
     "x-staves"
   ],
   "counts": {
     "barline-double": 1,
+    "barline-final": 1,
     "chord-symbol": 31,
     "clef-treble": 1,
     "dot": 2,
@@ -58,6 +61,7 @@
     "volta-1": 1,
     "volta-2": 1,
     "x-measures": 16,
+    "x-noteheads": 47,
     "x-parts": 1,
     "x-staves": 1
   },
@@ -79,8 +83,12 @@
     "notes": "ONE part (melody, no instrument name) with chord symbols above the staff (31 <harmony> elements, some changing in the middle of a whole note: <offset>) and two lyric lines under the repeated A section (verse 1 continues into the 1st ending and the B section, verse 2 into the 2nd ending). Repeat with 1st ending (m.8) and 2nd ending (m.9), notated order."
   },
   "notes": [
-    "Chord symbols are <harmony> (root/kind/bass); LilyPond prints them in its own style (e.g. superscript 7, \"m7\"); the stanza numbers \"1.\"/\"2.\" are not encoded."
+    "Chord symbols are <harmony> (root/kind/bass); LilyPond prints them in its own style (e.g. superscript 7, \"m7\"); the stanza numbers \"1.\"/\"2.\" are not encoded.",
+    "Printed but not representable in the MusicXML truth: stanza-text x2 (not in counts)."
   ],
+  "printed_not_in_truth": {
+    "stanza-text": 2
+  },
   "layout_description": "A4 portrait, staff size 20, 4 systems (4+5+4+3 measures), chord names above the staff",
   "pages": 1,
   "measures": 16,
@@ -103,7 +111,7 @@
           ]
         }
       ],
-      "bytes": 143841
+      "bytes": 143927
     },
     "scan.pdf": {
       "seed": 7141,
@@ -159,7 +167,7 @@
         "jpeg": 72
       },
       "summary": "240 dpi grey scan, -0.5 deg skew, faint bleed-through, JPEG q72",
-      "bytes": 371255
+      "bytes": 371527
     },
     "scan-severe.pdf": {
       "seed": 7142,
@@ -233,7 +241,7 @@
         "format": "png1"
       },
       "summary": "thin, faded binarised photocopy at 150 dpi (rendered 300): ink dropout, 3 deg skew, broken lines, salt & pepper, toner specks",
-      "bytes": 27685
+      "bytes": 27688
     }
   },
   "files": [

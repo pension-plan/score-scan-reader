@@ -433,6 +433,7 @@
         <lyric number="3"><syllabic>single</syllabic><text>found.</text></lyric>
         <lyric number="4"><syllabic>single</syllabic><text>light.</text></lyric>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
   <part id="A">
@@ -689,6 +690,7 @@
         <stem>down</stem>
         <notations><fermata type="upright"/></notations>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
   <part id="T">
@@ -945,6 +947,7 @@
         <stem>up</stem>
         <notations><fermata type="upright"/></notations>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
   <part id="B">
@@ -1201,6 +1204,7 @@
         <stem>down</stem>
         <notations><fermata type="upright"/></notations>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
 </score-partwise>

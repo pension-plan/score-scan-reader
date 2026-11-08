@@ -41,7 +41,7 @@
     c''1 |
     \break bes'4 c''4 d''4 ees''4 |
     f''4 g''8 f''8 d''4 c''4 |
-    bes'1\fermata |
+    bes'1\fermata \bar "|." |
         }
     }
     \new Lyrics = "lyrmelx1" \lyricsto "vP1x1" { 

@@ -30,6 +30,7 @@ from count_symbols import count_all  # noqa: E402
 
 FAMILY_DIR = HERE.parent
 chval.CH = FAMILY_DIR.parent           # corpus/coverage  (render_check uses CH / cat / id)
+chval.XSD = Path('/Users/d.sloane/music/mvp/work/schema/musicxml.xsd')
 LAYOUTS = {'melody', 'melody-lyrics', 'piano', 'voice-piano', 'choir-closed-satb', 'choir-open-satb', 'choir-sab',
            'choir-ttbb', 'choir-ssaa', 'choir-piano', 'organ', 'string-quartet', 'orchestral', 'lead-sheet',
            'hymnal-stanzas', 'divisi', 'cross-staff', 'two-voices-one-staff-instrument', 'percussion-none'}

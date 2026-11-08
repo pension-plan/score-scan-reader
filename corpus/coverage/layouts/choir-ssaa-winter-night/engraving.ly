@@ -39,7 +39,7 @@
     g'2. |
     a'4\> c''4 bes'4 |
     a'4 g'4 f'8[( g'8]) |
-    f'2.\fermata\!\pp |
+    f'2.\fermata\!\pp \bar "|." |
           }
           \new Voice = "vS2x1" {
     \autoBeamOff

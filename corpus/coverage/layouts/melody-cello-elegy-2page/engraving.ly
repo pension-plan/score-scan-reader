@@ -41,7 +41,7 @@
     \break \clef "bass" g4\!\p( fis4 g4) |
     ees4( d4 \stemUp c4) |
     \stemDown d4-- \stemUp d,4-- r4 |
-    g,2.\fermata |
+    g,2.\fermata \bar "|." |
         }
     }
   >>

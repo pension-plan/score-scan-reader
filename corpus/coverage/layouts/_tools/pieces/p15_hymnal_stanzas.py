@@ -43,6 +43,7 @@ ITEM = dict(
     id='hymnal-stanzas-light-of-ages',
     title='Light of Ages - hymnal page: closed SATB with four stanzas between the staves',
     layout='hymnal-stanzas', make=make, pages=1, must_not_split=False,
+    printed_not_in_truth={'stanza-text': 4},
     shared_staves=[['Soprano', 'Alto'], ['Tenor', 'Bass']],
     expected_notes=('FOUR parts (Soprano, Alto, Tenor, Bass) in hymnal closed score without part names: S+A share the '
                     'treble staff, T+B the bass staff (split by stem direction). FOUR stanzas are interlined between '

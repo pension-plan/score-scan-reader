@@ -5,6 +5,7 @@
   "layout": "cross-staff",
   "symbols": [
     "acc-natural",
+    "barline-final",
     "beam",
     "chord",
     "clef-bass",
@@ -30,12 +31,14 @@
     "x-cross-staff-note",
     "x-measures",
     "x-multi-staff-part",
+    "x-noteheads",
     "x-parts",
     "x-staves",
     "x-two-voice-staff-measure"
   ],
   "counts": {
     "acc-natural": 6,
+    "barline-final": 1,
     "beam": 14,
     "chord": 2,
     "clef-bass": 1,
@@ -61,6 +64,7 @@
     "x-cross-staff-note": 29,
     "x-measures": 8,
     "x-multi-staff-part": 1,
+    "x-noteheads": 76,
     "x-parts": 1,
     "x-staves": 2,
     "x-two-voice-staff-measure": 8
@@ -80,6 +84,7 @@
   "notes": [
     "Cross-staff notes keep their voice and carry the staff they are printed on (<staff>)."
   ],
+  "printed_not_in_truth": {},
   "layout_description": "A4 portrait, staff size 20, 2 systems of 4 measures, kneed cross-staff beams",
   "pages": 1,
   "measures": 8,
@@ -102,7 +107,7 @@
           ]
         }
       ],
-      "bytes": 83778
+      "bytes": 83828
     },
     "scan.pdf": {
       "seed": 7181,
@@ -163,7 +168,7 @@
         "jpeg": 80
       },
       "summary": "300 dpi colour scan on cream paper, 0.4 deg skew, noise, JPEG q80",
-      "bytes": 751375
+      "bytes": 751594
     },
     "scan-severe.pdf": {
       "seed": 7182,
@@ -219,7 +224,7 @@
         "jpeg": 20
       },
       "summary": "low-resolution 120 dpi grey scan, -4 deg skew, heavy blur and noise, JPEG q20",
-      "bytes": 33587
+      "bytes": 33626
     }
   },
   "files": [

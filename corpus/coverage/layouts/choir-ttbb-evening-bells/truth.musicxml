@@ -303,6 +303,7 @@
         <notations><fermata type="upright"/></notations>
         <lyric number="1"><syllabic>single</syllabic><text>sun.</text></lyric>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
   <part id="T2">
@@ -526,6 +527,7 @@
         <stem>down</stem>
         <notations><fermata type="upright"/></notations>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
   <part id="B1">
@@ -752,6 +754,7 @@
         <stem>up</stem>
         <notations><fermata type="upright"/></notations>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
   <part id="B2">
@@ -975,6 +978,7 @@
         <stem>down</stem>
         <notations><fermata type="upright"/></notations>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
 </score-partwise>

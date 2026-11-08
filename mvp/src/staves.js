@@ -430,4 +430,26 @@ function groupSystems(bin, staves, ss, lenient) {
   return sys;
 }
 
-module.exports = { detectStaves, groupSystems, thinLineMask, mergeStaffSets, lineCoverage };
+// Staff lines of thin photocopies survive only as rows of loose dots: no
+// horizontal run is long enough for the thin-line mask.  Bridging each row's
+// gaps of up to r px (a pixel is set when ink lies within r on both sides in
+// its own row) joins the dots into lines; letters and heads stay thick, so
+// the line search still ignores them.  Used for staff finding only.
+function bridgeRows(b, r) {
+  const { width: w, height: h, data } = b;
+  const out = { width: w, height: h, data: new Uint8Array(w * h) };
+  const left = new Int32Array(w);
+  for (let y = 0; y < h; y++) {
+    const row = y * w;
+    let last = -1e9;
+    for (let x = 0; x < w; x++) { if (data[row + x]) last = x; left[x] = last; }
+    let next = 1e9;
+    for (let x = w - 1; x >= 0; x--) {
+      if (data[row + x]) next = x;
+      if (x - left[x] <= r && next - x <= r) out.data[row + x] = 1;
+    }
+  }
+  return out;
+}
+
+module.exports = { detectStaves, groupSystems, thinLineMask, mergeStaffSets, lineCoverage, bridgeRows };

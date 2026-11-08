@@ -24,7 +24,7 @@ const base = opt('--base', git('tag', '--list', 'score-scan-reader-v*', '--sort=
 if (!base) { console.error('no release tag found'); process.exit(2); }
 const set = opt('--set', 'default');
 const ocr = argv.includes('--ocr');
-const jobs = opt('--jobs', '16');
+const jobs = opt('--jobs', '8');
 const work = path.join(ROOT, 'mvp/work/regress', base);
 const baseSrc = path.join(work, 'src');
 

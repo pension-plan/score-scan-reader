@@ -40,13 +40,14 @@
     \break f'4 g'4 a'4 |
     \stemDown c''4\> \stemUp a'4 g'8[( a'8]) |
     f'2.~ |
-    f'2\! r4 |
+    f'2\! r4 \bar "|." |
         }
     }
     \new Lyrics = "lyrvx1" \lyricsto "vP1x1" { 
-      "The" "morn" -- "ing" "light" "is" "on" __ _ "the" "hill," __ "the" "riv" -- "er"
-      "runs" "so" "clear" __ _ "and" "still;" "come" "walk" "with" "me" "a" -- "long" __
-      _ "the" "way," __ "and" "sing" "the" "sun" -- "rise" "in" -- "to" __ _ "day." __
+      "The" "morn" -- "ing" "light" "is" "on" __ _ "the" "hill," __ _ "the" "riv" --
+      "er" "runs" "so" "clear" __ _ "and" "still;" "come" "walk" "with" "me" "a" --
+      "long" __ _ "the" "way," __ _ "and" "sing" "the" "sun" -- "rise" "in" -- "to" __
+      _ "day." __
     }
   >>
   \layout {

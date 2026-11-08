@@ -26,6 +26,13 @@ fi
 CRED=(-c credential.helper= -c credential.helper='!f(){ echo username=x-access-token; echo "password=$(tr -d " \n\r" < ~/github-amiga-exposed.txt)"; }; f')
 # release-please merges land on origin/main: rebase onto them before pushing
 git "${CRED[@]}" fetch -q origin main
-git -c rebase.autoStash=true rebase -q origin/main
+# untracked files that upstream also has (agents regenerate files while we push)
+# would block the rebase: hold them aside, rebase, put them back
+HOLD=$(mktemp -d)
+git ls-tree -r --name-only origin/main | while read -r f; do
+  if [ -e "$f" ] && ! git ls-files --error-unmatch "$f" >/dev/null 2>&1; then mkdir -p "$HOLD/$(dirname "$f")"; mv "$f" "$HOLD/$f"; fi
+done
+git -c rebase.autoStash=true rebase -q origin/main || { git rebase --abort 2>/dev/null; cp -a "$HOLD/." . ; echo "rebase failed"; exit 1; }
+cp -a "$HOLD/." . 2>/dev/null; rm -rf "$HOLD"
 git "${CRED[@]}" push -q origin HEAD:main
 git log --oneline -1

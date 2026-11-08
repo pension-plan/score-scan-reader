@@ -33,7 +33,7 @@
     \break e''4\f d''4 c''4 b'4 |
     a'4 b'4 c''2\fermata |
     b'4 a'4 a'4 gis'4 |
-    a'1\fermata |
+    a'1\fermata \bar "|." |
           }
           \new Voice = "vOx2" {
     \autoBeamOff

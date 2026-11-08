@@ -1,15 +1,18 @@
 // Browser test of the ML detector under the artifact CSP (Playwright, headless Chromium).
-//   node assets-src/ml/browser-test.js [page.pgm] [--nested]
+//   node assets-src/ml/browser-test.js [page.pgm] [--nested] [--page]
 // Serves dist/assets/ and a test page that bundles src/ml-worker.js + src/ml.js the way
 // tools/build.js does; runs createBrowserDetector().detect() on the page (main thread,
 // or with --nested from inside a blob: worker, as the app's recognition worker would),
 // and compares the detections with onnxruntime-node on the same image.
+// --page loads the built dist/index.html instead (the bundle's omrRequire('./ml')),
+// after its default sample has converted.
 const http = require('http'), fs = require('fs'), path = require('path');
 const MVP = path.join(__dirname, '../..');
 const { chromium } = require(path.join(MVP, 'tools/pw/node_modules/playwright'));
-const CSP = "default-src 'self'; script-src https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com 'unsafe-inline' 'wasm-unsafe-eval' blob:; connect-src 'self' blob: data:; worker-src 'self' blob:; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'";
+const CSP = "default-src 'self'; script-src https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com 'unsafe-inline' 'wasm-unsafe-eval' blob:; connect-src 'self' blob: data:; worker-src 'self' blob:; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com";
 const args = process.argv.slice(2);
 const nested = args.includes('--nested');
+const usePage = args.includes('--page');
 const pgm = args.find(a => !a.startsWith('--')) || path.join(MVP, 'work/cache/synthetic__joplin-maple-leaf-piano__r200/p-1.pgm');
 const { readGray } = require(path.join(MVP, 'src/image'));
 const gray = readGray(pgm);
@@ -22,7 +25,11 @@ window.mlBundle = ${JSON.stringify(bundle)};
 </script>`;
 const srv = http.createServer((q, res) => {
   const p = decodeURIComponent(q.url.split('?')[0]);
-  if (p === '/') { res.writeHead(200, { 'Content-Type': 'text/html', 'Content-Security-Policy': CSP }); return res.end(page); }
+  if (p === '/') {
+    res.writeHead(200, { 'Content-Type': 'text/html', 'Content-Security-Policy': CSP });
+    if (!usePage) return res.end(page);
+    return res.end('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>' + fs.readFileSync(path.join(MVP, 'dist/index.html'), 'utf8') + '</body></html>');
+  }
   if (p === '/gray.bin') { res.writeHead(200, { 'Content-Type': 'application/octet-stream' }); return res.end(Buffer.from(gray.data.buffer, gray.data.byteOffset, gray.data.byteLength)); }
   const f = path.join(MVP, 'dist', p);
   if (!f.startsWith(path.join(MVP, 'dist')) || !fs.existsSync(f)) { res.writeHead(404); return res.end(); }
@@ -30,7 +37,7 @@ const srv = http.createServer((q, res) => {
   fs.createReadStream(f).pipe(res);
 }).listen(0, async () => {
   const port = srv.address().port;
-  const out = { pgm, nested, errors: [], csp: [] };
+  const out = { pgm, nested, page: usePage, errors: [], csp: [] };
   const cached = process.env.HOME + '/.cache/ms-playwright/chromium_headless_shell-1208/chrome-linux/headless_shell';
   const browser = await chromium.launch(fs.existsSync(cached) ? { executablePath: cached } : {});
   try {
@@ -38,6 +45,11 @@ const srv = http.createServer((q, res) => {
     pg.on('console', m => { if (m.type() === 'error') out.errors.push(m.text()); if (/Content Security Policy/i.test(m.text())) out.csp.push(m.text()); });
     pg.on('pageerror', e => out.errors.push('pageerror: ' + e.message));
     await pg.goto(`http://localhost:${port}/`);
+    if (usePage) {
+      await pg.waitForFunction(() => window.__omrResult, null, { timeout: 240000 });
+      out.sample = await pg.evaluate(() => ({ parts: (window.__omrResult.parts || []).map(p => p.name), status: (document.getElementById('status') || {}).textContent }));
+      await pg.evaluate(() => { window.mlReq = window.omrRequire; });
+    }
     const r = await pg.evaluate(async ({ w, h, nested }) => {
       const data = new Uint8ClampedArray(await (await fetch('gray.bin')).arrayBuffer());
       const t0 = performance.now();

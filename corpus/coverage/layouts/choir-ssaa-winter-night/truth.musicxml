@@ -327,6 +327,7 @@
         <notations><fermata type="upright"/></notations>
         <lyric number="1"><syllabic>single</syllabic><text>keep.</text></lyric>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
   <part id="S2">
@@ -587,6 +588,7 @@
         <stem>down</stem>
         <notations><fermata type="upright"/></notations>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
   <part id="A1">
@@ -826,6 +828,7 @@
         <stem>up</stem>
         <notations><fermata type="upright"/></notations>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
   <part id="A2">
@@ -1060,6 +1063,7 @@
         <stem>down</stem>
         <notations><fermata type="upright"/></notations>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
 </score-partwise>

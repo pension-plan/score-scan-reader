@@ -35,7 +35,7 @@
     \break d'4\mf f'4 g'4 a'4 |
     bes'4 a'4 g'2 |
     f'4\pp d'4 ees'4 c'4 |
-    d'4 c'4 bes2\fermata |
+    d'4 c'4 bes2\fermata \bar "|." |
           }
           \new Voice = "vT2x1" {
     \autoBeamOff

@@ -32,7 +32,7 @@
     \break b'4\mf( e''4 gis''4 |
     fis''2 e''4) |
     dis''4( cis''4 b'4 |
-    e''2.\fermata) |
+    e''2.\fermata) \bar "|." |
           }
           \new Voice = "vP1x2" {
     \autoBeamOff

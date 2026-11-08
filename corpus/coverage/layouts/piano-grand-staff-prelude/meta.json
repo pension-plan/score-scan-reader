@@ -9,6 +9,7 @@
     "acc-sharp",
     "arpeggio",
     "barline-double",
+    "barline-final",
     "beam",
     "chord",
     "clef-bass",
@@ -41,6 +42,7 @@
     "time-4-4",
     "x-measures",
     "x-multi-staff-part",
+    "x-noteheads",
     "x-parts",
     "x-staves"
   ],
@@ -50,6 +52,7 @@
     "acc-sharp": 2,
     "arpeggio": 2,
     "barline-double": 1,
+    "barline-final": 1,
     "beam": 31,
     "chord": 10,
     "clef-bass": 1,
@@ -82,6 +85,7 @@
     "time-4-4": 1,
     "x-measures": 12,
     "x-multi-staff-part": 1,
+    "x-noteheads": 131,
     "x-parts": 1,
     "x-staves": 2
   },
@@ -100,6 +104,7 @@
   "notes": [
     "Sustain-pedal marks are <pedal type=\"start\"/\"stop\" sign=\"yes\" line=\"no\">."
   ],
+  "printed_not_in_truth": {},
   "layout_description": "A4 portrait, staff size 20, 3 systems of 4 measures, instrument name on the first system only",
   "pages": 1,
   "measures": 12,
@@ -122,7 +127,7 @@
           ]
         }
       ],
-      "bytes": 110005
+      "bytes": 110134
     },
     "scan.pdf": {
       "seed": 7031,
@@ -170,7 +175,7 @@
         "jpeg": 75
       },
       "summary": "300 dpi grey flatbed scan, 0.6 deg skew, light paper texture and noise, JPEG q75",
-      "bytes": 593833
+      "bytes": 594408
     },
     "scan-severe.pdf": {
       "seed": 7032,
@@ -244,7 +249,7 @@
         "format": "png1"
       },
       "summary": "thin, faded binarised photocopy at 150 dpi (rendered 300): ink dropout, 3 deg skew, broken lines, salt & pepper, toner specks",
-      "bytes": 28349
+      "bytes": 28314
     }
   },
   "files": [

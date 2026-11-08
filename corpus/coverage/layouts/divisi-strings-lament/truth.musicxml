@@ -361,6 +361,7 @@
         <type>whole</type>
         <notations><fermata type="upright"/></notations>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
   <part id="V2">
@@ -673,6 +674,7 @@
         <voice>1</voice>
         <type>whole</type>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
   <part id="VA">
@@ -879,6 +881,7 @@
         <type>whole</type>
         <notations><fermata type="upright"/></notations>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
   <part id="VC">
@@ -1083,6 +1086,7 @@
         <type>whole</type>
         <notations><fermata type="upright"/></notations>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
 </score-partwise>

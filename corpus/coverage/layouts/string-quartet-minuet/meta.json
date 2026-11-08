@@ -6,6 +6,7 @@
   "symbols": [
     "acc-sharp",
     "accent",
+    "barline-final",
     "beam",
     "chord",
     "clef-alto",
@@ -35,12 +36,14 @@
     "time-3-4",
     "x-group-bracket",
     "x-measures",
+    "x-noteheads",
     "x-parts",
     "x-staves"
   ],
   "counts": {
     "acc-sharp": 1,
     "accent": 12,
+    "barline-final": 1,
     "beam": 6,
     "chord": 4,
     "clef-alto": 1,
@@ -70,6 +73,7 @@
     "time-3-4": 1,
     "x-group-bracket": 1,
     "x-measures": 12,
+    "x-noteheads": 128,
     "x-parts": 4,
     "x-staves": 4
   },
@@ -92,6 +96,7 @@
     "notes": "FOUR parts, exactly one per staff: Violin I, Violin II, Viola (alto clef), Violoncello, joined by a bracket. Each staff is one part: do not merge staves and do not split a staff - the double stops of Violin I (mm.11-12) are chords inside Violin I. \"pizz.\"/\"arco\" and \"dolce\" are words directions. Repeat sign at the end of m.8."
   },
   "notes": [],
+  "printed_not_in_truth": {},
   "layout_description": "A4 portrait, staff size 18, 3 systems of 4 measures on 4 bracketed staves, full then short names",
   "pages": 1,
   "measures": 12,
@@ -114,7 +119,7 @@
           ]
         }
       ],
-      "bytes": 132088
+      "bytes": 132127
     },
     "scan.pdf": {
       "seed": 7121,
@@ -175,7 +180,7 @@
         "jpeg": 80
       },
       "summary": "300 dpi colour scan on cream paper, 0.4 deg skew, noise, JPEG q80",
-      "bytes": 940196
+      "bytes": 942032
     },
     "scan-severe.pdf": {
       "seed": 7122,
@@ -249,7 +254,7 @@
         "format": "png1"
       },
       "summary": "thin, faded binarised photocopy at 150 dpi (rendered 300): ink dropout, 3 deg skew, broken lines, salt & pepper, toner specks",
-      "bytes": 39765
+      "bytes": 39712
     }
   },
   "files": [

@@ -1,0 +1,520 @@
+{
+ "id": "perf-pages-01",
+ "family": "perf",
+ "title": "Forty Variations for piano - 1-page document",
+ "symbols": [
+  "acc-sharp",
+  "barline-final",
+  "clef-bass",
+  "clef-treble",
+  "dyn-mf",
+  "fermata",
+  "key-0",
+  "ledger-above",
+  "ledger-below",
+  "metronome",
+  "note-half",
+  "note-quarter",
+  "note-whole",
+  "rehearsal-mark",
+  "stem-down",
+  "stem-up",
+  "system-break",
+  "tempo-mark",
+  "tenuto",
+  "time-common"
+ ],
+ "layout": "piano",
+ "layout_also": [],
+ "expected": {
+  "parts": [
+   "Piano"
+  ],
+  "must_not_split": true,
+  "notes": "One Piano part (grand staff) over 1 page(s); every page is one variation with its own key, metre, tempo + metronome mark and rehearsal number (1, 2, ...). Pages are separated by double barlines + page breaks; systems hold 4 bars."
+ },
+ "counts": {
+  "acc-sharp": 2,
+  "barline-final": 1,
+  "clef-bass": 1,
+  "clef-treble": 1,
+  "dyn-mf": 1,
+  "fermata": 8,
+  "key-0": 1,
+  "ledger-above": 21,
+  "ledger-below": 10,
+  "metronome": 1,
+  "note-half": 72,
+  "note-quarter": 72,
+  "note-whole": 20,
+  "rehearsal-mark": 1,
+  "stem-down": 41,
+  "stem-up": 19,
+  "system-break": 3,
+  "tempo-mark": 1,
+  "tenuto": 12,
+  "time-common": 1
+ },
+ "degradations": {
+  "clean.pdf": {
+   "seed": null,
+   "params": {
+    "dpi": 300,
+    "format": "png",
+    "colour": "gray",
+    "damage": "none (anti-aliased raster of the engraving)"
+   },
+   "size_px": [
+    2481,
+    3508
+   ],
+   "bytes": 108380
+  },
+  "scan.pdf": {
+   "seed": 53001,
+   "page_seeds": [
+    53001000
+   ],
+   "seed_rule": "page k (0-based) is damaged with numpy default_rng(seed * 1000 + k)",
+   "dpi": 300,
+   "format": "jpeg q80",
+   "colour": "gray",
+   "params": {
+    "mode": "gray",
+    "texture": 2,
+    "rotate_pages": {
+     "0": -0.57
+    },
+    "gradient": 0.05,
+    "blur": 0.5,
+    "noise": 3,
+    "jpeg": 80,
+    "dpi": 300
+   },
+   "summary": "typical sheet-fed scan of every page: grey, 0.2-1.0 deg skew that differs per page, light blur + noise, JPEG q80",
+   "bytes": 741143,
+   "pdf_pages": [
+    {
+     "page": 1,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "paper_texture",
+       2
+      ],
+      [
+       "skew_rotation_deg",
+       -0.57
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.05,
+        "angle_deg": 170.7
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       0.5
+      ],
+      [
+       "gaussian_noise_sigma",
+       3
+      ]
+     ]
+    }
+   ]
+  },
+  "scan-severe.pdf": {
+   "seed": 53002,
+   "page_seeds": [
+    53002000
+   ],
+   "seed_rule": "page k (0-based) is damaged with numpy default_rng(seed * 1000 + k)",
+   "dpi": 300,
+   "format": "jpeg q35",
+   "colour": "gray",
+   "params": {
+    "mode": "gray",
+    "texture": 4,
+    "rotate_pages": {
+     "0": -3.39
+    },
+    "bleed": 0.12,
+    "gradient": 0.15,
+    "blur": 1.0,
+    "noise": 9,
+    "speckle": 60,
+    "jpeg": 35,
+    "dpi": 300
+   },
+   "summary": "worn photocopies scanned in grey: 1.5-3.5 deg skew per page, bleed-through of the next page, strong lighting gradient, blur, noise, toner speckles, JPEG q35",
+   "bytes": 514220,
+   "pdf_pages": [
+    {
+     "page": 1,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "bleed_through",
+       {
+        "strength": 0.12,
+        "shift_px": -20
+       }
+      ],
+      [
+       "paper_texture",
+       4
+      ],
+      [
+       "skew_rotation_deg",
+       -3.39
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.15,
+        "angle_deg": 286.7
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       1.0
+      ],
+      [
+       "gaussian_noise_sigma",
+       9
+      ],
+      [
+       "speckles_per_mpx",
+       60
+      ]
+     ]
+    }
+   ]
+  }
+ },
+ "dpi": 300,
+ "pages": 1,
+ "license": "CC0",
+ "perf": {
+  "dpi": 300,
+  "pageSize": "A4",
+  "pages": 1,
+  "megapixels": 8.703,
+  "megapixels_total": 8.703,
+  "page_px": [
+   2481,
+   3508
+  ],
+  "axis": "pages",
+  "group": "pages",
+  "engraving": "var-1",
+  "file_bytes": {
+   "clean.pdf": 108380,
+   "scan.pdf": 741143,
+   "scan-severe.pdf": 514220
+  },
+  "measures": 16,
+  "systems": 4,
+  "notes_in_truth": 164,
+  "rests_in_truth": 0,
+  "staff_size_pt": 18,
+  "paper_mm": [
+   210.0,
+   297.0
+  ]
+ },
+ "notes": [
+  "counts follow the rules in _tools/symcount.py (run it on a converter output for comparable numbers); every count except stanza-text is computed from truth.musicxml and was cross-checked against the LilyPond grob log of the engraving (ties, slurs, beams, flags, articulations, ornaments, dynamics, hairpins, pedals, fingerings, accidentals, ottavas, tuplets, ledger lines, lyrics, rehearsal / tempo marks, voltas, whole-bar rests, clef changes).",
+  "ledger-above / ledger-below count note heads that need ledger lines (derived from clef + octave-shift; MusicXML does not encode ledger lines).",
+  "stem-up / stem-down / beam / flag / accidental elements in the truth are exactly what LilyPond engraved (harvested from the instrumented engraving).",
+  "Page numbers are printed (pages >= 2) and encoded only as <credit> page numbers. Dynamics / hairpins / pedal marks are directions without placement attributes."
+ ],
+ "truth_limitations": "Page numbers are printed (pages >= 2) and encoded only as <credit> page numbers. Dynamics / hairpins / pedal marks are directions without placement attributes.",
+ "source": "own procedural composition for the coverage corpus (pieces/variations.py)",
+ "validation": {
+  "xsd_valid": true,
+  "music21_parse": "2 68 0",
+  "engraving_matches_model": {
+   "ok": true,
+   "checked": 164,
+   "n_problems": 0,
+   "problems": []
+  },
+  "midi_vs_truth": {
+   "truth_attacks": 164,
+   "midi_attacks": 164,
+   "grace_extras": 0,
+   "missing": 0,
+   "extra": 0,
+   "notes_exact": true,
+   "truth_syllables": 0,
+   "midi_syllables": 0,
+   "lyrics_ok": true,
+   "missing_sample": [],
+   "extra_sample": [],
+   "lyr_missing_sample": []
+  },
+  "accidentals_cross_check": {
+   "printed": 2,
+   "simulated_per_part": 2,
+   "differences": []
+  },
+  "symbol_cross_check": {
+   "tie": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "tie-across-system": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "slur": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "beam": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "flag": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "staccato": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "staccatissimo": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "accent": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "tenuto": {
+    "truth": 12,
+    "engraved": 12,
+    "ok": true
+   },
+   "marcato": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "fermata": {
+    "truth": 8,
+    "engraved": 8,
+    "ok": true
+   },
+   "trill": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "mordent": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "turn": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "fingering": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "arpeggio": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "tremolo": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "breath": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "hairpin-cresc": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "hairpin-dim": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "pedal": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "accidentals(all)": {
+    "truth": 2,
+    "engraved": 2,
+    "ok": true
+   },
+   "acc-courtesy": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "ottava-8va": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "ottava-8vb": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "ottava-15ma": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "ledger-above": {
+    "truth": 21,
+    "engraved": 21,
+    "ok": true
+   },
+   "ledger-below": {
+    "truth": 10,
+    "engraved": 10,
+    "ok": true
+   },
+   "lyrics": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "rehearsal-mark": {
+    "truth": 1,
+    "engraved": 1,
+    "ok": true
+   },
+   "tempo-mark": {
+    "truth": 1,
+    "engraved": 1,
+    "ok": true
+   },
+   "volta": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "rest-whole-bar": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "clef-change": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "dyn-pp": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "dyn-p": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "dyn-mp": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "dyn-mf": {
+    "truth": 1,
+    "engraved": 1,
+    "ok": true
+   },
+   "dyn-f": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "dyn-ff": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "dyn-sfz": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   }
+  },
+  "twin_identical": true,
+  "lilypond_warnings": [],
+  "image_only": {
+   "clean.pdf": true,
+   "scan.pdf": true,
+   "scan-severe.pdf": true
+  }
+ },
+ "files": [
+  "ATTRIBUTION.txt",
+  "clean.pdf",
+  "engraving.ly",
+  "meta.json",
+  "scan-severe.pdf",
+  "scan.pdf",
+  "truth.musicxml"
+ ],
+ "pages_plan": [
+  {
+   "variation": 1,
+   "texture": "Chorale",
+   "time": [
+    4,
+    4
+   ],
+   "symbol": "common",
+   "key": [
+    0,
+    "major"
+   ],
+   "tempo": [
+    "Maestoso",
+    "quarter",
+    66,
+    0
+   ],
+   "bars": 16,
+   "systems": 4,
+   "first_bar": 1
+  }
+ ]
+}

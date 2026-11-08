@@ -35,7 +35,7 @@
     \break \stemDown g''4\p( fis''16[ e''16 d''16 c''16] b'4 \stemUp a'4) |
     g'8[( a'8] bes'8[ a'8] g'4 f'4) |
     e'4\>( fis'8[ g'8] a'4 \stemDown c''4\!) |
-    <b'-1 d''-2 g''-5>1\arpeggio\fermata |
+    <b'-1 d''-2 g''-5>1\arpeggio\fermata \bar "|." |
           }
       }
       \new Staff = "lh" { \clef "bass"

@@ -527,7 +527,14 @@ async function main() {
   if (!args.out) throw new Error('--out <file.json> is required');
   const items = listItems(args);
   if (!items.length) throw new Error('no corpus items with scan.pdf + truth.musicxml' + (args.only ? ' matching --only' : ''));
-  const jobs = args.jobs > 0 ? args.jobs : Math.min(items.length, Math.max(1, os.cpus().length - 2));
+  // shared host: never more than OMR_MAX_JOBS (default 16) child processes, and while the
+  // machine is over 90% busy (load1 > 0.9 x CPUs) wait before starting heavy work
+  const CAP = Math.max(1, +(process.env.OMR_MAX_JOBS || 16));
+  const jobs = Math.min(CAP, items.length, args.jobs > 0 ? args.jobs : CAP);
+  for (let w = 0; w < 30 && os.loadavg()[0] > 0.9 * os.cpus().length; w++) {
+    if (w === 0) log(`eval: host over 90% busy (load ${os.loadavg()[0].toFixed(0)}), waiting up to 5 min before starting`);
+    await new Promise((r) => setTimeout(r, 10000));
+  }
   const outDir = args.out.replace(/\.json$/i, '') + '.out';
   fs.mkdirSync(outDir, { recursive: true });
   const schema = findSchema();

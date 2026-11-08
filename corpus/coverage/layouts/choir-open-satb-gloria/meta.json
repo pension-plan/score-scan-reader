@@ -4,6 +4,7 @@
   "title": "Gloria - SATB choir in open score with imitative entries",
   "layout": "choir-open-satb",
   "symbols": [
+    "barline-final",
     "beam",
     "clef-bass",
     "clef-treble",
@@ -32,10 +33,12 @@
     "time-4-4",
     "x-group-bracket",
     "x-measures",
+    "x-noteheads",
     "x-parts",
     "x-staves"
   ],
   "counts": {
+    "barline-final": 1,
     "beam": 3,
     "clef-bass": 1,
     "clef-treble": 2,
@@ -64,6 +67,7 @@
     "time-4-4": 1,
     "x-group-bracket": 1,
     "x-measures": 7,
+    "x-noteheads": 75,
     "x-parts": 4,
     "x-staves": 4
   },
@@ -105,6 +109,7 @@
   "notes": [
     "The tenor clef is <clef><sign>G</sign><line>2</line><clef-octave-change>-1</clef-octave-change>; its pitches are written at sounding pitch as usual for vocal tenor parts."
   ],
+  "printed_not_in_truth": {},
   "layout_description": "A4 portrait, staff size 19, 2 systems (4 + 3 measures) on 4 bracketed staves, full then short names",
   "pages": 1,
   "measures": 7,
@@ -127,7 +132,7 @@
           ]
         }
       ],
-      "bytes": 150762
+      "bytes": 151121
     },
     "scan.pdf": {
       "seed": 7061,
@@ -183,7 +188,7 @@
         "jpeg": 70
       },
       "summary": "200 dpi grey office scan, -0.9 deg skew, slight lighting gradient, noise, JPEG q70",
-      "bytes": 355441
+      "bytes": 356360
     },
     "scan-severe.pdf": {
       "seed": 7062,
@@ -257,7 +262,7 @@
         "format": "png1"
       },
       "summary": "thin, faded binarised photocopy at 150 dpi (rendered 300): ink dropout, 3 deg skew, broken lines, salt & pepper, toner specks",
-      "bytes": 34526
+      "bytes": 34525
     }
   },
   "files": [

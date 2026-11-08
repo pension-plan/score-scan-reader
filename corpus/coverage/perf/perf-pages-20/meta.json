@@ -1,0 +1,2620 @@
+{
+ "id": "perf-pages-20",
+ "family": "perf",
+ "title": "Forty Variations for piano - 20-page document",
+ "symbols": [
+  "acc-courtesy",
+  "acc-double-sharp",
+  "acc-flat",
+  "acc-natural",
+  "acc-sharp",
+  "accent",
+  "barline-double",
+  "barline-final",
+  "beam",
+  "clef-bass",
+  "clef-change",
+  "clef-treble",
+  "dot",
+  "dyn-f",
+  "dyn-ff",
+  "dyn-mf",
+  "dyn-mp",
+  "dyn-p",
+  "dyn-pp",
+  "fermata",
+  "flag",
+  "grace",
+  "grace-slash",
+  "hairpin-cresc",
+  "hairpin-dim",
+  "key-0",
+  "key-change",
+  "key-f1",
+  "key-f2",
+  "key-f4",
+  "key-f5",
+  "key-f6",
+  "key-f7",
+  "key-s1",
+  "key-s2",
+  "key-s3",
+  "key-s4",
+  "key-s6",
+  "key-s7",
+  "ledger-above",
+  "ledger-below",
+  "marcato",
+  "metronome",
+  "mordent",
+  "multi-page",
+  "note-16th",
+  "note-32nd",
+  "note-8th",
+  "note-half",
+  "note-quarter",
+  "note-whole",
+  "ottava-8va",
+  "ottava-8vb",
+  "page-break",
+  "pedal",
+  "rehearsal-mark",
+  "rest-half",
+  "rest-quarter",
+  "slur",
+  "staccato",
+  "stem-down",
+  "stem-up",
+  "system-break",
+  "tempo-mark",
+  "tenuto",
+  "time-12-8",
+  "time-2-4",
+  "time-3-2",
+  "time-3-4",
+  "time-4-4",
+  "time-5-4",
+  "time-6-8",
+  "time-7-8",
+  "time-9-8",
+  "time-change",
+  "time-common",
+  "time-cut",
+  "tremolo",
+  "trill",
+  "tuplet-3",
+  "tuplet-5",
+  "tuplet-6",
+  "turn"
+ ],
+ "layout": "piano",
+ "layout_also": [
+  "two-voices-one-staff-instrument"
+ ],
+ "expected": {
+  "parts": [
+   "Piano"
+  ],
+  "must_not_split": true,
+  "notes": "One Piano part (grand staff) over 20 page(s); every page is one variation with its own key, metre, tempo + metronome mark and rehearsal number (1, 2, ...). Pages are separated by double barlines + page breaks; systems hold 4 bars."
+ },
+ "counts": {
+  "acc-courtesy": 4,
+  "acc-double-sharp": 36,
+  "acc-flat": 1,
+  "acc-natural": 69,
+  "acc-sharp": 90,
+  "accent": 45,
+  "barline-double": 19,
+  "barline-final": 1,
+  "beam": 710,
+  "clef-bass": 6,
+  "clef-change": 10,
+  "clef-treble": 6,
+  "dot": 325,
+  "dyn-f": 4,
+  "dyn-ff": 3,
+  "dyn-mf": 4,
+  "dyn-mp": 3,
+  "dyn-p": 3,
+  "dyn-pp": 3,
+  "fermata": 18,
+  "flag": 90,
+  "grace": 70,
+  "grace-slash": 30,
+  "hairpin-cresc": 10,
+  "hairpin-dim": 10,
+  "key-0": 1,
+  "key-change": 19,
+  "key-f1": 1,
+  "key-f2": 2,
+  "key-f4": 1,
+  "key-f5": 2,
+  "key-f6": 1,
+  "key-f7": 2,
+  "key-s1": 2,
+  "key-s2": 2,
+  "key-s3": 2,
+  "key-s4": 1,
+  "key-s6": 1,
+  "key-s7": 2,
+  "ledger-above": 1139,
+  "ledger-below": 161,
+  "marcato": 20,
+  "metronome": 20,
+  "mordent": 10,
+  "multi-page": 1,
+  "note-16th": 535,
+  "note-32nd": 160,
+  "note-8th": 1945,
+  "note-half": 722,
+  "note-quarter": 1807,
+  "note-whole": 45,
+  "ottava-8va": 3,
+  "ottava-8vb": 2,
+  "page-break": 19,
+  "pedal": 40,
+  "rehearsal-mark": 20,
+  "rest-half": 5,
+  "rest-quarter": 5,
+  "slur": 105,
+  "staccato": 265,
+  "stem-down": 3111,
+  "stem-up": 914,
+  "system-break": 79,
+  "tempo-mark": 20,
+  "tenuto": 27,
+  "time-12-8": 1,
+  "time-2-4": 2,
+  "time-3-2": 1,
+  "time-3-4": 1,
+  "time-4-4": 4,
+  "time-5-4": 1,
+  "time-6-8": 1,
+  "time-7-8": 1,
+  "time-9-8": 1,
+  "time-change": 14,
+  "time-common": 1,
+  "time-cut": 1,
+  "tremolo": 40,
+  "trill": 5,
+  "tuplet-3": 80,
+  "tuplet-5": 20,
+  "tuplet-6": 40,
+  "turn": 5
+ },
+ "degradations": {
+  "clean.pdf": {
+   "seed": null,
+   "params": {
+    "dpi": 300,
+    "format": "png",
+    "colour": "gray",
+    "damage": "none (anti-aliased raster of the engraving)"
+   },
+   "size_px": [
+    2481,
+    3508
+   ],
+   "bytes": 2788684
+  },
+  "scan.pdf": {
+   "seed": 53001,
+   "page_seeds": [
+    53001000,
+    53001001,
+    53001002,
+    53001003,
+    53001004,
+    53001005,
+    53001006,
+    53001007,
+    53001008,
+    53001009,
+    53001010,
+    53001011,
+    53001012,
+    53001013,
+    53001014,
+    53001015,
+    53001016,
+    53001017,
+    53001018,
+    53001019
+   ],
+   "seed_rule": "page k (0-based) is damaged with numpy default_rng(seed * 1000 + k)",
+   "dpi": 300,
+   "format": "jpeg q80",
+   "colour": "gray",
+   "params": {
+    "mode": "gray",
+    "texture": 2,
+    "rotate_pages": {
+     "0": -0.57,
+     "1": 0.92,
+     "2": 0.32,
+     "3": -0.64,
+     "4": 0.65,
+     "5": 0.33,
+     "6": 0.87,
+     "7": -0.84,
+     "8": -0.54,
+     "9": -0.56,
+     "10": 0.54,
+     "11": -0.79,
+     "12": -0.54,
+     "13": 0.65,
+     "14": 0.61,
+     "15": -0.3,
+     "16": 0.63,
+     "17": 0.24,
+     "18": -0.49,
+     "19": -0.62
+    },
+    "gradient": 0.05,
+    "blur": 0.5,
+    "noise": 3,
+    "jpeg": 80,
+    "dpi": 300
+   },
+   "summary": "typical sheet-fed scan of every page: grey, 0.2-1.0 deg skew that differs per page, light blur + noise, JPEG q80",
+   "bytes": 17137670,
+   "pdf_pages": [
+    {
+     "page": 1,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "paper_texture",
+       2
+      ],
+      [
+       "skew_rotation_deg",
+       -0.57
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.05,
+        "angle_deg": 170.7
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       0.5
+      ],
+      [
+       "gaussian_noise_sigma",
+       3
+      ]
+     ]
+    },
+    {
+     "page": 2,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "paper_texture",
+       2
+      ],
+      [
+       "skew_rotation_deg",
+       0.92
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.05,
+        "angle_deg": 243.7
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       0.5
+      ],
+      [
+       "gaussian_noise_sigma",
+       3
+      ]
+     ]
+    },
+    {
+     "page": 3,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "paper_texture",
+       2
+      ],
+      [
+       "skew_rotation_deg",
+       0.32
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.05,
+        "angle_deg": 111.9
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       0.5
+      ],
+      [
+       "gaussian_noise_sigma",
+       3
+      ]
+     ]
+    },
+    {
+     "page": 4,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "paper_texture",
+       2
+      ],
+      [
+       "skew_rotation_deg",
+       -0.64
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.05,
+        "angle_deg": 198.9
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       0.5
+      ],
+      [
+       "gaussian_noise_sigma",
+       3
+      ]
+     ]
+    },
+    {
+     "page": 5,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "paper_texture",
+       2
+      ],
+      [
+       "skew_rotation_deg",
+       0.65
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.05,
+        "angle_deg": 319.1
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       0.5
+      ],
+      [
+       "gaussian_noise_sigma",
+       3
+      ]
+     ]
+    },
+    {
+     "page": 6,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "paper_texture",
+       2
+      ],
+      [
+       "skew_rotation_deg",
+       0.33
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.05,
+        "angle_deg": 126.3
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       0.5
+      ],
+      [
+       "gaussian_noise_sigma",
+       3
+      ]
+     ]
+    },
+    {
+     "page": 7,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "paper_texture",
+       2
+      ],
+      [
+       "skew_rotation_deg",
+       0.87
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.05,
+        "angle_deg": 232.1
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       0.5
+      ],
+      [
+       "gaussian_noise_sigma",
+       3
+      ]
+     ]
+    },
+    {
+     "page": 8,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "paper_texture",
+       2
+      ],
+      [
+       "skew_rotation_deg",
+       -0.84
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.05,
+        "angle_deg": 3.7
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       0.5
+      ],
+      [
+       "gaussian_noise_sigma",
+       3
+      ]
+     ]
+    },
+    {
+     "page": 9,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "paper_texture",
+       2
+      ],
+      [
+       "skew_rotation_deg",
+       -0.54
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.05,
+        "angle_deg": 144.2
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       0.5
+      ],
+      [
+       "gaussian_noise_sigma",
+       3
+      ]
+     ]
+    },
+    {
+     "page": 10,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "paper_texture",
+       2
+      ],
+      [
+       "skew_rotation_deg",
+       -0.56
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.05,
+        "angle_deg": 27.9
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       0.5
+      ],
+      [
+       "gaussian_noise_sigma",
+       3
+      ]
+     ]
+    },
+    {
+     "page": 11,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "paper_texture",
+       2
+      ],
+      [
+       "skew_rotation_deg",
+       0.54
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.05,
+        "angle_deg": 255.0
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       0.5
+      ],
+      [
+       "gaussian_noise_sigma",
+       3
+      ]
+     ]
+    },
+    {
+     "page": 12,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "paper_texture",
+       2
+      ],
+      [
+       "skew_rotation_deg",
+       -0.79
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.05,
+        "angle_deg": 37.7
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       0.5
+      ],
+      [
+       "gaussian_noise_sigma",
+       3
+      ]
+     ]
+    },
+    {
+     "page": 13,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "paper_texture",
+       2
+      ],
+      [
+       "skew_rotation_deg",
+       -0.54
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.05,
+        "angle_deg": 62.2
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       0.5
+      ],
+      [
+       "gaussian_noise_sigma",
+       3
+      ]
+     ]
+    },
+    {
+     "page": 14,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "paper_texture",
+       2
+      ],
+      [
+       "skew_rotation_deg",
+       0.65
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.05,
+        "angle_deg": 251.7
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       0.5
+      ],
+      [
+       "gaussian_noise_sigma",
+       3
+      ]
+     ]
+    },
+    {
+     "page": 15,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "paper_texture",
+       2
+      ],
+      [
+       "skew_rotation_deg",
+       0.61
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.05,
+        "angle_deg": 348.8
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       0.5
+      ],
+      [
+       "gaussian_noise_sigma",
+       3
+      ]
+     ]
+    },
+    {
+     "page": 16,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "paper_texture",
+       2
+      ],
+      [
+       "skew_rotation_deg",
+       -0.3
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.05,
+        "angle_deg": 238.5
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       0.5
+      ],
+      [
+       "gaussian_noise_sigma",
+       3
+      ]
+     ]
+    },
+    {
+     "page": 17,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "paper_texture",
+       2
+      ],
+      [
+       "skew_rotation_deg",
+       0.63
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.05,
+        "angle_deg": 305.4
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       0.5
+      ],
+      [
+       "gaussian_noise_sigma",
+       3
+      ]
+     ]
+    },
+    {
+     "page": 18,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "paper_texture",
+       2
+      ],
+      [
+       "skew_rotation_deg",
+       0.24
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.05,
+        "angle_deg": 227.2
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       0.5
+      ],
+      [
+       "gaussian_noise_sigma",
+       3
+      ]
+     ]
+    },
+    {
+     "page": 19,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "paper_texture",
+       2
+      ],
+      [
+       "skew_rotation_deg",
+       -0.49
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.05,
+        "angle_deg": 16.3
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       0.5
+      ],
+      [
+       "gaussian_noise_sigma",
+       3
+      ]
+     ]
+    },
+    {
+     "page": 20,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "paper_texture",
+       2
+      ],
+      [
+       "skew_rotation_deg",
+       -0.62
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.05,
+        "angle_deg": 245.6
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       0.5
+      ],
+      [
+       "gaussian_noise_sigma",
+       3
+      ]
+     ]
+    }
+   ]
+  },
+  "scan-severe.pdf": {
+   "seed": 53002,
+   "page_seeds": [
+    53002000,
+    53002001,
+    53002002,
+    53002003,
+    53002004,
+    53002005,
+    53002006,
+    53002007,
+    53002008,
+    53002009,
+    53002010,
+    53002011,
+    53002012,
+    53002013,
+    53002014,
+    53002015,
+    53002016,
+    53002017,
+    53002018,
+    53002019
+   ],
+   "seed_rule": "page k (0-based) is damaged with numpy default_rng(seed * 1000 + k)",
+   "dpi": 300,
+   "format": "jpeg q35",
+   "colour": "gray",
+   "params": {
+    "mode": "gray",
+    "texture": 4,
+    "rotate_pages": {
+     "0": -3.39,
+     "1": -2.39,
+     "2": -2.51,
+     "3": -3.07,
+     "4": 1.55,
+     "5": 3.25,
+     "6": 2.71,
+     "7": 3.05,
+     "8": -2.17,
+     "9": 1.75,
+     "10": 2.68,
+     "11": -1.91,
+     "12": 2.99,
+     "13": -2.74,
+     "14": 2.92,
+     "15": -2.83,
+     "16": 3.43,
+     "17": -3.47,
+     "18": -3.07,
+     "19": -3.34
+    },
+    "bleed": 0.12,
+    "gradient": 0.15,
+    "blur": 1.0,
+    "noise": 9,
+    "speckle": 60,
+    "jpeg": 35,
+    "dpi": 300
+   },
+   "summary": "worn photocopies scanned in grey: 1.5-3.5 deg skew per page, bleed-through of the next page, strong lighting gradient, blur, noise, toner speckles, JPEG q35",
+   "bytes": 11327921,
+   "pdf_pages": [
+    {
+     "page": 1,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "bleed_through",
+       {
+        "strength": 0.12,
+        "shift_px": -20
+       }
+      ],
+      [
+       "paper_texture",
+       4
+      ],
+      [
+       "skew_rotation_deg",
+       -3.39
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.15,
+        "angle_deg": 286.7
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       1.0
+      ],
+      [
+       "gaussian_noise_sigma",
+       9
+      ],
+      [
+       "speckles_per_mpx",
+       60
+      ]
+     ]
+    },
+    {
+     "page": 2,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "bleed_through",
+       {
+        "strength": 0.12,
+        "shift_px": -2
+       }
+      ],
+      [
+       "paper_texture",
+       4
+      ],
+      [
+       "skew_rotation_deg",
+       -2.39
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.15,
+        "angle_deg": 163.8
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       1.0
+      ],
+      [
+       "gaussian_noise_sigma",
+       9
+      ],
+      [
+       "speckles_per_mpx",
+       60
+      ]
+     ]
+    },
+    {
+     "page": 3,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "bleed_through",
+       {
+        "strength": 0.12,
+        "shift_px": -17
+       }
+      ],
+      [
+       "paper_texture",
+       4
+      ],
+      [
+       "skew_rotation_deg",
+       -2.51
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.15,
+        "angle_deg": 286.0
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       1.0
+      ],
+      [
+       "gaussian_noise_sigma",
+       9
+      ],
+      [
+       "speckles_per_mpx",
+       60
+      ]
+     ]
+    },
+    {
+     "page": 4,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "bleed_through",
+       {
+        "strength": 0.12,
+        "shift_px": 2
+       }
+      ],
+      [
+       "paper_texture",
+       4
+      ],
+      [
+       "skew_rotation_deg",
+       -3.07
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.15,
+        "angle_deg": 202.9
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       1.0
+      ],
+      [
+       "gaussian_noise_sigma",
+       9
+      ],
+      [
+       "speckles_per_mpx",
+       60
+      ]
+     ]
+    },
+    {
+     "page": 5,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "bleed_through",
+       {
+        "strength": 0.12,
+        "shift_px": 14
+       }
+      ],
+      [
+       "paper_texture",
+       4
+      ],
+      [
+       "skew_rotation_deg",
+       1.55
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.15,
+        "angle_deg": 98.0
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       1.0
+      ],
+      [
+       "gaussian_noise_sigma",
+       9
+      ],
+      [
+       "speckles_per_mpx",
+       60
+      ]
+     ]
+    },
+    {
+     "page": 6,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "bleed_through",
+       {
+        "strength": 0.12,
+        "shift_px": -9
+       }
+      ],
+      [
+       "paper_texture",
+       4
+      ],
+      [
+       "skew_rotation_deg",
+       3.25
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.15,
+        "angle_deg": 102.2
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       1.0
+      ],
+      [
+       "gaussian_noise_sigma",
+       9
+      ],
+      [
+       "speckles_per_mpx",
+       60
+      ]
+     ]
+    },
+    {
+     "page": 7,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "bleed_through",
+       {
+        "strength": 0.12,
+        "shift_px": -3
+       }
+      ],
+      [
+       "paper_texture",
+       4
+      ],
+      [
+       "skew_rotation_deg",
+       2.71
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.15,
+        "angle_deg": 243.3
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       1.0
+      ],
+      [
+       "gaussian_noise_sigma",
+       9
+      ],
+      [
+       "speckles_per_mpx",
+       60
+      ]
+     ]
+    },
+    {
+     "page": 8,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "bleed_through",
+       {
+        "strength": 0.12,
+        "shift_px": -13
+       }
+      ],
+      [
+       "paper_texture",
+       4
+      ],
+      [
+       "skew_rotation_deg",
+       3.05
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.15,
+        "angle_deg": 291.8
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       1.0
+      ],
+      [
+       "gaussian_noise_sigma",
+       9
+      ],
+      [
+       "speckles_per_mpx",
+       60
+      ]
+     ]
+    },
+    {
+     "page": 9,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "bleed_through",
+       {
+        "strength": 0.12,
+        "shift_px": -7
+       }
+      ],
+      [
+       "paper_texture",
+       4
+      ],
+      [
+       "skew_rotation_deg",
+       -2.17
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.15,
+        "angle_deg": 111.2
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       1.0
+      ],
+      [
+       "gaussian_noise_sigma",
+       9
+      ],
+      [
+       "speckles_per_mpx",
+       60
+      ]
+     ]
+    },
+    {
+     "page": 10,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "bleed_through",
+       {
+        "strength": 0.12,
+        "shift_px": 7
+       }
+      ],
+      [
+       "paper_texture",
+       4
+      ],
+      [
+       "skew_rotation_deg",
+       1.75
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.15,
+        "angle_deg": 139.5
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       1.0
+      ],
+      [
+       "gaussian_noise_sigma",
+       9
+      ],
+      [
+       "speckles_per_mpx",
+       60
+      ]
+     ]
+    },
+    {
+     "page": 11,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "bleed_through",
+       {
+        "strength": 0.12,
+        "shift_px": 15
+       }
+      ],
+      [
+       "paper_texture",
+       4
+      ],
+      [
+       "skew_rotation_deg",
+       2.68
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.15,
+        "angle_deg": 130.6
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       1.0
+      ],
+      [
+       "gaussian_noise_sigma",
+       9
+      ],
+      [
+       "speckles_per_mpx",
+       60
+      ]
+     ]
+    },
+    {
+     "page": 12,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "bleed_through",
+       {
+        "strength": 0.12,
+        "shift_px": 4
+       }
+      ],
+      [
+       "paper_texture",
+       4
+      ],
+      [
+       "skew_rotation_deg",
+       -1.91
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.15,
+        "angle_deg": 276.6
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       1.0
+      ],
+      [
+       "gaussian_noise_sigma",
+       9
+      ],
+      [
+       "speckles_per_mpx",
+       60
+      ]
+     ]
+    },
+    {
+     "page": 13,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "bleed_through",
+       {
+        "strength": 0.12,
+        "shift_px": 14
+       }
+      ],
+      [
+       "paper_texture",
+       4
+      ],
+      [
+       "skew_rotation_deg",
+       2.99
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.15,
+        "angle_deg": 333.3
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       1.0
+      ],
+      [
+       "gaussian_noise_sigma",
+       9
+      ],
+      [
+       "speckles_per_mpx",
+       60
+      ]
+     ]
+    },
+    {
+     "page": 14,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "bleed_through",
+       {
+        "strength": 0.12,
+        "shift_px": 20
+       }
+      ],
+      [
+       "paper_texture",
+       4
+      ],
+      [
+       "skew_rotation_deg",
+       -2.74
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.15,
+        "angle_deg": 1.6
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       1.0
+      ],
+      [
+       "gaussian_noise_sigma",
+       9
+      ],
+      [
+       "speckles_per_mpx",
+       60
+      ]
+     ]
+    },
+    {
+     "page": 15,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "bleed_through",
+       {
+        "strength": 0.12,
+        "shift_px": 4
+       }
+      ],
+      [
+       "paper_texture",
+       4
+      ],
+      [
+       "skew_rotation_deg",
+       2.92
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.15,
+        "angle_deg": 114.0
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       1.0
+      ],
+      [
+       "gaussian_noise_sigma",
+       9
+      ],
+      [
+       "speckles_per_mpx",
+       60
+      ]
+     ]
+    },
+    {
+     "page": 16,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "bleed_through",
+       {
+        "strength": 0.12,
+        "shift_px": 19
+       }
+      ],
+      [
+       "paper_texture",
+       4
+      ],
+      [
+       "skew_rotation_deg",
+       -2.83
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.15,
+        "angle_deg": 216.5
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       1.0
+      ],
+      [
+       "gaussian_noise_sigma",
+       9
+      ],
+      [
+       "speckles_per_mpx",
+       60
+      ]
+     ]
+    },
+    {
+     "page": 17,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "bleed_through",
+       {
+        "strength": 0.12,
+        "shift_px": 6
+       }
+      ],
+      [
+       "paper_texture",
+       4
+      ],
+      [
+       "skew_rotation_deg",
+       3.43
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.15,
+        "angle_deg": 72.1
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       1.0
+      ],
+      [
+       "gaussian_noise_sigma",
+       9
+      ],
+      [
+       "speckles_per_mpx",
+       60
+      ]
+     ]
+    },
+    {
+     "page": 18,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "bleed_through",
+       {
+        "strength": 0.12,
+        "shift_px": -4
+       }
+      ],
+      [
+       "paper_texture",
+       4
+      ],
+      [
+       "skew_rotation_deg",
+       -3.47
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.15,
+        "angle_deg": 165.9
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       1.0
+      ],
+      [
+       "gaussian_noise_sigma",
+       9
+      ],
+      [
+       "speckles_per_mpx",
+       60
+      ]
+     ]
+    },
+    {
+     "page": 19,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "bleed_through",
+       {
+        "strength": 0.12,
+        "shift_px": -9
+       }
+      ],
+      [
+       "paper_texture",
+       4
+      ],
+      [
+       "skew_rotation_deg",
+       -3.07
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.15,
+        "angle_deg": 159.0
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       1.0
+      ],
+      [
+       "gaussian_noise_sigma",
+       9
+      ],
+      [
+       "speckles_per_mpx",
+       60
+      ]
+     ]
+    },
+    {
+     "page": 20,
+     "size_px": [
+      2481,
+      3508
+     ],
+     "mode": "L",
+     "ops": [
+      [
+       "bleed_through",
+       {
+        "strength": 0.12,
+        "shift_px": 10
+       }
+      ],
+      [
+       "paper_texture",
+       4
+      ],
+      [
+       "skew_rotation_deg",
+       -3.34
+      ],
+      [
+       "lighting_gradient",
+       {
+        "strength": 0.15,
+        "angle_deg": 262.7
+       }
+      ],
+      [
+       "focus_blur_sigma",
+       1.0
+      ],
+      [
+       "gaussian_noise_sigma",
+       9
+      ],
+      [
+       "speckles_per_mpx",
+       60
+      ]
+     ]
+    }
+   ]
+  }
+ },
+ "dpi": 300,
+ "pages": 20,
+ "license": "CC0",
+ "perf": {
+  "dpi": 300,
+  "pageSize": "A4",
+  "pages": 20,
+  "megapixels": 8.703,
+  "megapixels_total": 174.06,
+  "page_px": [
+   2481,
+   3508
+  ],
+  "axis": "pages",
+  "group": "pages",
+  "engraving": "var-20",
+  "file_bytes": {
+   "clean.pdf": 2788684,
+   "scan.pdf": 17137670,
+   "scan-severe.pdf": 11327921
+  },
+  "measures": 396,
+  "systems": 99,
+  "notes_in_truth": 5214,
+  "rests_in_truth": 10,
+  "staff_size_pt": 18,
+  "paper_mm": [
+   210.0,
+   297.0
+  ]
+ },
+ "notes": [
+  "counts follow the rules in _tools/symcount.py (run it on a converter output for comparable numbers); every count except stanza-text is computed from truth.musicxml and was cross-checked against the LilyPond grob log of the engraving (ties, slurs, beams, flags, articulations, ornaments, dynamics, hairpins, pedals, fingerings, accidentals, ottavas, tuplets, ledger lines, lyrics, rehearsal / tempo marks, voltas, whole-bar rests, clef changes).",
+  "ledger-above / ledger-below count note heads that need ledger lines (derived from clef + octave-shift; MusicXML does not encode ledger lines).",
+  "stem-up / stem-down / beam / flag / accidental elements in the truth are exactly what LilyPond engraved (harvested from the instrumented engraving).",
+  "Page numbers are printed (pages >= 2) and encoded only as <credit> page numbers. Dynamics / hairpins / pedal marks are directions without placement attributes."
+ ],
+ "truth_limitations": "Page numbers are printed (pages >= 2) and encoded only as <credit> page numbers. Dynamics / hairpins / pedal marks are directions without placement attributes.",
+ "source": "own procedural composition for the coverage corpus (pieces/variations.py)",
+ "validation": {
+  "xsd_valid": true,
+  "music21_parse": "2 4048 10",
+  "engraving_matches_model": {
+   "ok": true,
+   "checked": 5294,
+   "n_problems": 0,
+   "problems": []
+  },
+  "midi_vs_truth": {
+   "truth_attacks": 5214,
+   "midi_attacks": 5284,
+   "grace_extras": 70,
+   "missing": 0,
+   "extra": 0,
+   "notes_exact": true,
+   "truth_syllables": 0,
+   "midi_syllables": 0,
+   "lyrics_ok": true,
+   "missing_sample": [],
+   "extra_sample": [],
+   "lyr_missing_sample": []
+  },
+  "accidentals_cross_check": {
+   "printed": 196,
+   "simulated_per_part": 196,
+   "differences": []
+  },
+  "symbol_cross_check": {
+   "tie": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "tie-across-system": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "slur": {
+    "truth": 105,
+    "engraved": 105,
+    "ok": true
+   },
+   "beam": {
+    "truth": 710,
+    "engraved": 710,
+    "ok": true
+   },
+   "flag": {
+    "truth": 90,
+    "engraved": 90,
+    "ok": true
+   },
+   "staccato": {
+    "truth": 265,
+    "engraved": 265,
+    "ok": true
+   },
+   "staccatissimo": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "accent": {
+    "truth": 45,
+    "engraved": 45,
+    "ok": true
+   },
+   "tenuto": {
+    "truth": 27,
+    "engraved": 27,
+    "ok": true
+   },
+   "marcato": {
+    "truth": 20,
+    "engraved": 20,
+    "ok": true
+   },
+   "fermata": {
+    "truth": 18,
+    "engraved": 18,
+    "ok": true
+   },
+   "trill": {
+    "truth": 5,
+    "engraved": 5,
+    "ok": true
+   },
+   "mordent": {
+    "truth": 10,
+    "engraved": 10,
+    "ok": true
+   },
+   "turn": {
+    "truth": 5,
+    "engraved": 5,
+    "ok": true
+   },
+   "fingering": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "arpeggio": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "tremolo": {
+    "truth": 40,
+    "engraved": 40,
+    "ok": true
+   },
+   "breath": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "hairpin-cresc": {
+    "truth": 10,
+    "engraved": 10,
+    "ok": true
+   },
+   "hairpin-dim": {
+    "truth": 10,
+    "engraved": 10,
+    "ok": true
+   },
+   "pedal": {
+    "truth": 40,
+    "engraved": 40,
+    "ok": true
+   },
+   "accidentals(all)": {
+    "truth": 196,
+    "engraved": 196,
+    "ok": true
+   },
+   "acc-courtesy": {
+    "truth": 4,
+    "engraved": 4,
+    "ok": true
+   },
+   "ottava-8va": {
+    "truth": 3,
+    "engraved": 3,
+    "ok": true
+   },
+   "ottava-8vb": {
+    "truth": 2,
+    "engraved": 2,
+    "ok": true
+   },
+   "ottava-15ma": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "ledger-above": {
+    "truth": 1139,
+    "engraved": 1139,
+    "ok": true
+   },
+   "ledger-below": {
+    "truth": 161,
+    "engraved": 161,
+    "ok": true
+   },
+   "lyrics": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "rehearsal-mark": {
+    "truth": 20,
+    "engraved": 20,
+    "ok": true
+   },
+   "tempo-mark": {
+    "truth": 20,
+    "engraved": 20,
+    "ok": true
+   },
+   "volta": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "rest-whole-bar": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "clef-change": {
+    "truth": 10,
+    "engraved": 10,
+    "ok": true
+   },
+   "dyn-pp": {
+    "truth": 3,
+    "engraved": 3,
+    "ok": true
+   },
+   "dyn-p": {
+    "truth": 3,
+    "engraved": 3,
+    "ok": true
+   },
+   "dyn-mp": {
+    "truth": 3,
+    "engraved": 3,
+    "ok": true
+   },
+   "dyn-mf": {
+    "truth": 4,
+    "engraved": 4,
+    "ok": true
+   },
+   "dyn-f": {
+    "truth": 4,
+    "engraved": 4,
+    "ok": true
+   },
+   "dyn-ff": {
+    "truth": 3,
+    "engraved": 3,
+    "ok": true
+   },
+   "dyn-sfz": {
+    "truth": 0,
+    "engraved": 0,
+    "ok": true
+   },
+   "tuplet-3": {
+    "truth": 80,
+    "engraved": 80,
+    "ok": true
+   },
+   "tuplet-5": {
+    "truth": 20,
+    "engraved": 20,
+    "ok": true
+   },
+   "tuplet-6": {
+    "truth": 40,
+    "engraved": 40,
+    "ok": true
+   }
+  },
+  "twin_identical": true,
+  "lilypond_warnings": [],
+  "image_only": {
+   "clean.pdf": true,
+   "scan.pdf": true,
+   "scan-severe.pdf": true
+  }
+ },
+ "files": [
+  "ATTRIBUTION.txt",
+  "clean.pdf",
+  "engraving.ly",
+  "meta.json",
+  "scan-severe.pdf",
+  "scan.pdf",
+  "truth.musicxml"
+ ],
+ "pages_plan": [
+  {
+   "variation": 1,
+   "texture": "Chorale",
+   "time": [
+    4,
+    4
+   ],
+   "symbol": "common",
+   "key": [
+    0,
+    "major"
+   ],
+   "tempo": [
+    "Maestoso",
+    "quarter",
+    66,
+    0
+   ],
+   "bars": 16,
+   "systems": 4,
+   "first_bar": 1
+  },
+  {
+   "variation": 2,
+   "texture": "Alberti",
+   "time": [
+    4,
+    4
+   ],
+   "symbol": null,
+   "key": [
+    -4,
+    "major"
+   ],
+   "tempo": [
+    "Allegretto",
+    "quarter",
+    108,
+    0
+   ],
+   "bars": 20,
+   "systems": 5,
+   "first_bar": 17
+  },
+  {
+   "variation": 3,
+   "texture": "Toccata",
+   "time": [
+    2,
+    4
+   ],
+   "symbol": null,
+   "key": [
+    6,
+    "major"
+   ],
+   "tempo": [
+    "Presto",
+    "quarter",
+    152,
+    0
+   ],
+   "bars": 20,
+   "systems": 5,
+   "first_bar": 37
+  },
+  {
+   "variation": 4,
+   "texture": "Valse",
+   "time": [
+    3,
+    4
+   ],
+   "symbol": null,
+   "key": [
+    3,
+    "minor"
+   ],
+   "tempo": [
+    "Tempo di valse",
+    "quarter",
+    160,
+    0
+   ],
+   "bars": 20,
+   "systems": 5,
+   "first_bar": 57
+  },
+  {
+   "variation": 5,
+   "texture": "Barcarolle",
+   "time": [
+    6,
+    8
+   ],
+   "symbol": null,
+   "key": [
+    -7,
+    "minor"
+   ],
+   "tempo": [
+    "Andante",
+    "quarter",
+    54,
+    1
+   ],
+   "bars": 20,
+   "systems": 5,
+   "first_bar": 77
+  },
+  {
+   "variation": 6,
+   "texture": "Triplets",
+   "time": [
+    4,
+    4
+   ],
+   "symbol": null,
+   "key": [
+    3,
+    "major"
+   ],
+   "tempo": [
+    "Moderato",
+    "quarter",
+    88,
+    0
+   ],
+   "bars": 20,
+   "systems": 5,
+   "first_bar": 97
+  },
+  {
+   "variation": 7,
+   "texture": "Octaves",
+   "time": [
+    4,
+    4
+   ],
+   "symbol": null,
+   "key": [
+    1,
+    "minor"
+   ],
+   "tempo": [
+    "Con fuoco",
+    "quarter",
+    120,
+    0
+   ],
+   "bars": 20,
+   "systems": 5,
+   "first_bar": 117
+  },
+  {
+   "variation": 8,
+   "texture": "Duet",
+   "time": [
+    4,
+    4
+   ],
+   "symbol": null,
+   "key": [
+    7,
+    "major"
+   ],
+   "tempo": [
+    "Cantabile",
+    "quarter",
+    72,
+    0
+   ],
+   "bars": 20,
+   "systems": 5,
+   "first_bar": 137
+  },
+  {
+   "variation": 9,
+   "texture": "Sarabande",
+   "time": [
+    3,
+    2
+   ],
+   "symbol": null,
+   "key": [
+    -6,
+    "minor"
+   ],
+   "tempo": [
+    "Grave",
+    "half",
+    48,
+    0
+   ],
+   "bars": 20,
+   "systems": 5,
+   "first_bar": 157
+  },
+  {
+   "variation": 10,
+   "texture": "Etude",
+   "time": [
+    4,
+    4
+   ],
+   "symbol": null,
+   "key": [
+    2,
+    "major"
+   ],
+   "tempo": [
+    "Allegro",
+    "quarter",
+    116,
+    0
+   ],
+   "bars": 20,
+   "systems": 5,
+   "first_bar": 177
+  },
+  {
+   "variation": 11,
+   "texture": "Pastorale",
+   "time": [
+    12,
+    8
+   ],
+   "symbol": null,
+   "key": [
+    -2,
+    "major"
+   ],
+   "tempo": [
+    "Pastorale",
+    "quarter",
+    60,
+    1
+   ],
+   "bars": 20,
+   "systems": 5,
+   "first_bar": 197
+  },
+  {
+   "variation": 12,
+   "texture": "March",
+   "time": [
+    2,
+    2
+   ],
+   "symbol": "cut",
+   "key": [
+    2,
+    "minor"
+   ],
+   "tempo": [
+    "Alla marcia",
+    "half",
+    60,
+    0
+   ],
+   "bars": 20,
+   "systems": 5,
+   "first_bar": 217
+  },
+  {
+   "variation": 13,
+   "texture": "Siciliano",
+   "time": [
+    9,
+    8
+   ],
+   "symbol": null,
+   "key": [
+    -5,
+    "minor"
+   ],
+   "tempo": [
+    "Siciliano",
+    "quarter",
+    50,
+    1
+   ],
+   "bars": 20,
+   "systems": 5,
+   "first_bar": 237
+  },
+  {
+   "variation": 14,
+   "texture": "Five",
+   "time": [
+    5,
+    4
+   ],
+   "symbol": null,
+   "key": [
+    1,
+    "major"
+   ],
+   "tempo": [
+    "Inquieto",
+    "quarter",
+    132,
+    0
+   ],
+   "bars": 20,
+   "systems": 5,
+   "first_bar": 257
+  },
+  {
+   "variation": 15,
+   "texture": "Seven",
+   "time": [
+    7,
+    8
+   ],
+   "symbol": null,
+   "key": [
+    4,
+    "major"
+   ],
+   "tempo": [
+    "Danza",
+    "eighth",
+    220,
+    0
+   ],
+   "bars": 20,
+   "systems": 5,
+   "first_bar": 277
+  },
+  {
+   "variation": 16,
+   "texture": "Tremolo",
+   "time": [
+    4,
+    4
+   ],
+   "symbol": null,
+   "key": [
+    -1,
+    "minor"
+   ],
+   "tempo": [
+    "Misterioso",
+    "quarter",
+    60,
+    0
+   ],
+   "bars": 20,
+   "systems": 5,
+   "first_bar": 297
+  },
+  {
+   "variation": 17,
+   "texture": "Clefs",
+   "time": [
+    4,
+    4
+   ],
+   "symbol": null,
+   "key": [
+    -7,
+    "major"
+   ],
+   "tempo": [
+    "Comodo",
+    "quarter",
+    96,
+    0
+   ],
+   "bars": 20,
+   "systems": 5,
+   "first_bar": 317
+  },
+  {
+   "variation": 18,
+   "texture": "Sextuplets",
+   "time": [
+    4,
+    4
+   ],
+   "symbol": null,
+   "key": [
+    7,
+    "minor"
+   ],
+   "tempo": [
+    "Fluido",
+    "quarter",
+    69,
+    0
+   ],
+   "bars": 20,
+   "systems": 5,
+   "first_bar": 337
+  },
+  {
+   "variation": 19,
+   "texture": "Quintuplets",
+   "time": [
+    4,
+    4
+   ],
+   "symbol": null,
+   "key": [
+    -2,
+    "minor"
+   ],
+   "tempo": [
+    "Capriccioso",
+    "quarter",
+    76,
+    0
+   ],
+   "bars": 20,
+   "systems": 5,
+   "first_bar": 357
+  },
+  {
+   "variation": 20,
+   "texture": "Graces",
+   "time": [
+    2,
+    4
+   ],
+   "symbol": null,
+   "key": [
+    -5,
+    "major"
+   ],
+   "tempo": [
+    "Scherzando",
+    "quarter",
+    100,
+    0
+   ],
+   "bars": 20,
+   "systems": 5,
+   "first_bar": 377
+  }
+ ]
+}

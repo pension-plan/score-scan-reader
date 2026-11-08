@@ -4,6 +4,7 @@
   "title": "Light of Morning - SATB choir in closed score (two staves)",
   "layout": "choir-closed-satb",
   "symbols": [
+    "barline-final",
     "beam",
     "clef-bass",
     "clef-treble",
@@ -30,10 +31,12 @@
     "time-4-4",
     "x-group-bracket",
     "x-measures",
+    "x-noteheads",
     "x-parts",
     "x-staves"
   ],
   "counts": {
+    "barline-final": 1,
     "beam": 4,
     "clef-bass": 2,
     "clef-treble": 2,
@@ -60,6 +63,7 @@
     "time-4-4": 1,
     "x-group-bracket": 1,
     "x-measures": 8,
+    "x-noteheads": 116,
     "x-parts": 4,
     "x-staves": 4
   },
@@ -98,6 +102,7 @@
   "notes": [
     "Lyrics are encoded on the Soprano only (they are printed once between the staves)."
   ],
+  "printed_not_in_truth": {},
   "layout_description": "A4 portrait, staff size 20, 2 systems of 4 measures, bracketed choir staves with two-line names",
   "pages": 1,
   "measures": 8,
@@ -120,7 +125,7 @@
           ]
         }
       ],
-      "bytes": 114090
+      "bytes": 115062
     },
     "scan.pdf": {
       "seed": 7051,
@@ -168,7 +173,7 @@
         "jpeg": 75
       },
       "summary": "300 dpi grey flatbed scan, 0.6 deg skew, light paper texture and noise, JPEG q75",
-      "bytes": 565607
+      "bytes": 566120
     },
     "scan-severe.pdf": {
       "seed": 7052,
@@ -224,7 +229,7 @@
         "jpeg": 20
       },
       "summary": "low-resolution 120 dpi grey scan, -4 deg skew, heavy blur and noise, JPEG q20",
-      "bytes": 39205
+      "bytes": 39282
     }
   },
   "files": [

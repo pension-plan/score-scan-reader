@@ -232,8 +232,12 @@ function detectRests({ R, comps, s, xa, xb, debug }) {
     } else if (f.h >= 1.3 && f.h <= 5.4 && f.w >= 0.6 && f.w <= 1.9 && f.fill >= 0.15 && f.fill <= 0.65) {
       const rows = rowProfile(R, c);
       const sh = strokeShape(rows, sp), nh = hookCount(rows, sp);
-      if (debug) debug('  shape', Math.round(f.xc), 'tail', sh.tail.toFixed(2), 'slant', sh.slant.toFixed(2), 'rise', sh.rise.toFixed(2), 'hooks', nh);
-      if (f.h >= 2.2 && f.h <= 3.4 && f.w <= 1.5 && sh.tail < 0.75 && sh.rise >= 0.25 && f.fill >= 0.25) { kind = 'quarter'; q = 1; }
+      const two = rows.filter(r => r.runs >= 2).length / rows.length;
+      if (debug) debug('  shape', Math.round(f.xc), 'tail', sh.tail.toFixed(2), 'slant', sh.slant.toFixed(2), 'rise', sh.rise.toFixed(2), 'hooks', nh, 'two', two.toFixed(2));
+      // a quarter rest zigzags and ends in a hook curling right; a sharp or
+      // natural (key signature, courtesy sign) has two upright strokes side
+      // by side and a straight end
+      if (f.h >= 2.2 && f.h <= 3.4 && f.w <= 1.5 && sh.tail < 0.75 && sh.rise >= 0.25 && f.fill >= 0.25 && sh.slant < -0.02 && two < 0.25) { kind = 'quarter'; q = 1; }
       else if (sh.tail >= 0.55 && sh.slant >= 0.05 && nh >= 1) {
         const byH = Math.max(1, Math.min(4, Math.round(f.h - 0.9)));
         if (Math.abs(byH - nh) <= 1) { kind = 'flag' + byH; q = 0.5 / Math.pow(2, byH - 1); }

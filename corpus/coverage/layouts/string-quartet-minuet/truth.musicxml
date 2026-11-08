@@ -390,6 +390,7 @@
         <dot/>
         <stem>up</stem>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
   <part id="V2">
@@ -685,6 +686,7 @@
         <stem>up</stem>
         <notations><fermata type="upright"/></notations>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
   <part id="VA">
@@ -955,6 +957,7 @@
         <stem>down</stem>
         <notations><fermata type="upright"/></notations>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
   <part id="VC">
@@ -1225,6 +1228,7 @@
         <stem>up</stem>
         <notations><fermata type="upright"/></notations>
       </note>
+      <barline location="right"><bar-style>light-heavy</bar-style></barline>
     </measure>
   </part>
 </score-partwise>

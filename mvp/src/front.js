@@ -4,7 +4,7 @@
 const { binarize, boxBlur, despeckle } = require('./binarize');
 const { estimateSkew } = require('./skew');
 const { estimateStaffSpace } = require('./staffspace');
-const { detectStaves, groupSystems, mergeStaffSets, lineCoverage } = require('./staves');
+const { detectStaves, groupSystems, mergeStaffSets, lineCoverage, bridgeRows } = require('./staves');
 const { removeStaffLines } = require('./staffremoval');
 const { detectHeads, chordStems, ledgerOK } = require('./heads');
 const { threshold } = require('./binarize');
@@ -93,12 +93,22 @@ function eraseStartLines(R, staves, ss) {
 //   raw      no median: a 3x3 median erases 1-px staff lines on noisy scans
 //   blur1/2  box blur first: descreens halftone dots, rejoins broken lines of
 //            heavy photocopies
+//   bridge   thin photocopies: staff lines are rows of loose dots and thin
+//            strokes break up; a lenient threshold, staves found with each
+//            row's gaps bridged
 const MODES = [
   { name: 'default' },
   { name: 'raw', denoise: false, despeckle: true },
   { name: 'blur1', denoise: false, blur: 1 },
   { name: 'blur2', denoise: false, blur: 2 },
+  { name: 'bridge', denoise: false, bridge: true },
 ];
+
+// bridge mode reads a lenient threshold (thin strokes keep their ink, broken
+// hollow-head outlines close); staves are found on it with each row's gaps
+// bridged, the gap limit following the page width (about a staff space)
+const BRIDGE_T = 230;
+const staffBinary = (bz, mode) => mode.bridge ? bridgeRows(threshold(bz.gray, BRIDGE_T), Math.max(6, Math.round(bz.gray.width / 110))) : bz.binary;
 
 // Exact quarter / half turns of a gray page (clockwise).
 function turn(g, quarter) {
@@ -120,7 +130,7 @@ function turn(g, quarter) {
 function clean(gray, mode) {
   const bin = (g) => binarize(mode.blur ? boxBlur(g, mode.blur) : g, mode.denoise === false ? { denoise: false } : {});
   let bz = bin(gray);
-  let sp = estimateStaffSpace(bz.binary);
+  let sp = estimateStaffSpace(staffBinary(bz, mode));
   let scale = 1;
   // normalise staff space to ~18 px (speed for big scans, detail for small
   // ones), when the estimate is trustworthy (a blank, text-only or sideways
@@ -135,18 +145,23 @@ function clean(gray, mode) {
     gray = rotateGray(gray, (-skew.angle * Math.PI) / 180);
     bz = bin(gray);
   }
-  let B = bz.binary;
-  sp = estimateStaffSpace(B);
+  let B = mode.bridge ? threshold(bz.gray, BRIDGE_T) : bz.binary;
+  const SB = mode.bridge ? staffBinary(bz, mode) : null;
+  sp = estimateStaffSpace(SB || B);
   if (mode.despeckle && bz.info.noise > 12) { B = despeckle(B, Math.max(2, Math.round(0.02 * sp.ss * sp.ss))); sp = estimateStaffSpace(B); }
-  return { gray, bz, B, sp, scale, skew, mode: mode.name };
+  return { gray, bz, B, SB, sp, scale, skew, mode: mode.name };
 }
 
 // Staves on the main binary and on a lenient one (faint / thin-ruled scans
 // lose staff lines in B); the better-supported staff is kept where they clash.
 function findStaves(c) {
-  const { bz, B } = c;
+  const { bz, B, SB } = c;
   let { sp } = c;
   const L0 = threshold(bz.gray, Math.min(235, (bz.info.threshold || 180) + 35));
+  if (SB) {
+    c.staves = mergeStaffSets([detectStaves(SB, sp.ss, sp.lt)], SB, sp.lt, sp.ss);
+    return Object.assign(c, { L0, ltL: sp.lt });
+  }
   const spL = estimateStaffSpace(L0);
   const sB = detectStaves(B, sp.ss, sp.lt), sL = detectStaves(L0, spL.ss, spL.lt);
   const staves = mergeStaffSets([sB, sL], L0, Math.max(sp.lt, spL.lt), sp.ss);
@@ -220,12 +235,16 @@ function* frontSteps(gray0, opts = {}) {
     const tries = [];
     if (rowConf >= 1.5) for (const m of MODES.slice(1)) tries.push([0, m]);
     if (colConf >= 1.5) for (const q of [1, 3]) for (const m of [MODES[0], MODES[2]]) tries.push([q, m]);
-    for (const [q, m] of tries) {
-      const c = prepare(turn(gray0, q), m);
-      if (!plausible(c)) continue;
-      if (c.staves.length > ctx.staves.length) { ctx = c; quarter = q; }
-      if (ctx.staves.length && q === 0 && m === MODES[MODES.length - 1]) break;
-      if (ctx.staves.length && q !== 0) break;
+    for (let i = 0; i < tries.length; i++) {
+      const [q, m] = tries[i];
+      // bridging is the last resort: it also joins a halftone screen's dots
+      // into tight phantom "staves" (a 3-5 px spacing nothing can be read at)
+      if (!(m.bridge && ctx.staves.length)) {
+        const c = prepare(turn(gray0, q), m);
+        if (!(m.bridge && c.sp.ss < 6) && plausible(c) && c.staves.length > ctx.staves.length) { ctx = c; quarter = q; }
+      }
+      // upright readings first; a turned page only when none of them works
+      if (ctx.staves.length && (q !== 0 || !tries[i + 1] || tries[i + 1][0] !== 0)) break;
     }
   }
   let { gray, B, L0, sp, ltL, scale, skew, staves } = ctx;

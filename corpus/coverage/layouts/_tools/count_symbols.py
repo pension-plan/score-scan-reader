@@ -358,6 +358,7 @@ def _count_note(el, c, is_chord, mi, voice, sn, open_ties, open_tuplets, sys_bre
             lyric_slots[voice].append((not tied_stop, lys))
     if pitch is not None and grace is None and not cue:
         pending_heads.append((onset, sn, pitch.findtext('step'), int(pitch.findtext('octave'))))
+        c['x-noteheads'] += 1
     acc = el.find('accidental')
     if acc is not None and grace is None and not cue:
         c[ACC_TAG.get((acc.text or '').strip(), 'x-acc-' + (acc.text or '').strip())] += 1
