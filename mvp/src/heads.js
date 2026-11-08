@@ -508,7 +508,7 @@ function chordStems(L, heads, opts = {}) {
     const sp = c.heads[0].sp;
     const top = c.heads[0], bot = c.heads[c.heads.length - 1];
     const xa = Math.round(Math.min(...c.xs) - 0.85 * sp), xb = Math.round(Math.max(...c.xs) + 0.85 * sp);
-    const maxGap = Math.max(2, Math.round(0.4 * sp));
+    const maxGap = Math.max(2, Math.round((opts.stemGap ?? 0.4) * sp));
     // stems sit right of the heads going up and left going down; a stroke on
     // the other side is an accidental's (flat: up on the left, natural: up on
     // the left and down on the right)

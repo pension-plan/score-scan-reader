@@ -2,6 +2,17 @@
 
 Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
 
+## Update: missing heads, 2: dotted stems on thin photocopies
+
+On thin photocopies read in the bridge mode (staff lines are rows of dots), the stems break up as well: dashes with
+gaps of 6–12 px, longer than the 0.4 space the stem search bridges, so filled heads with a visible stem were dropped as
+stemless (`twinkle-piano2p-photocopy-thin` severe). In that mode the search now bridges 0.9 space. Challenge +0.0001
+(the four photocopy-thin severe items +0.004 to +0.020), coverage +0.0002, benchmark unchanged; no item down.
+Tried and dropped: bridging 0.6 space on every page (challenge −0.0019: beams, slurs and text joined to heads), and
+drawing broken staff lines back into B before the hole fill, to close hollow heads on dotted lines (challenge −0.0037:
+`rh03` severe −0.31, `wind-melody-phone` severe −0.59). The broken hollow heads on that page are open where their own
+thin outline breaks, not only where the line is missing.
+
 ## Update: position errors, thick heads split in two (±1–2 steps)
 
 Heads one or two staff steps off (wp.py: 325 + 144 on the challenge set) are mostly on severe scans (359 of 468). On

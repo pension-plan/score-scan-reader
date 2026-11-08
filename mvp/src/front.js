@@ -429,7 +429,7 @@ function* frontSteps(gray0, opts = {}) {
     const c = other(h);
     if (c && !heads.some(o => o.staff === c.staff && o.p === c.p && Math.abs(o.x - c.x) < 0.6 * c.sp)) hs.push(c);
   }
-  const chords = chordStems(L, hs, { minLen: 1.5, sides: true });
+  const chords = chordStems(L, hs, { minLen: 1.5, sides: true, stemGap: ctx.mode === 'bridge' ? 0.9 : 0.4 });
   // (on a staff inferred from washed-out music the stems faded with the lines: filled heads stay)
   hs = hs.filter(h => (h.stemDir !== 0 || h.kind === 'hollow' || staves[h.staff].inferred) && !(h.chord && h.chord.accidental));
   // cue-size heads (heads.js h.small) only with a stem of their own: a dot, a letter or a stray blob has none
