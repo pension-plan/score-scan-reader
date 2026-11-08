@@ -1687,6 +1687,8 @@ function clefXML(c, n) {
   const num = n ? ` number="${n}"` : '';
   if (c === 'F') return `<clef${num}><sign>F</sign><line>4</line></clef>`;
   if (c === 'G8') return `<clef${num}><sign>G</sign><line>2</line><clef-octave-change>-1</clef-octave-change></clef>`;
+  if (c === 'F8') return `<clef${num}><sign>F</sign><line>4</line><clef-octave-change>-1</clef-octave-change></clef>`;
+  if (c === 'F8va') return `<clef${num}><sign>F</sign><line>4</line><clef-octave-change>1</clef-octave-change></clef>`;
   if (c === 'G8va') return `<clef${num}><sign>G</sign><line>2</line><clef-octave-change>1</clef-octave-change></clef>`;
   if (/^C[1-5]$/.test(c)) return `<clef${num}><sign>C</sign><line>${c[1]}</line></clef>`;
   return `<clef${num}><sign>G</sign><line>2</line></clef>`;

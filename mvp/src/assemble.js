@@ -312,6 +312,8 @@ function groupGlyphs(cs, sp) {
 // (treble 8vb), B4 (treble); C clefs 'C1'..'C5' put C4 on line 1..5
 function clefBase(clef) {
   if (clef === 'F') return 22;
+  if (clef === 'F8') return 15;
+  if (clef === 'F8va') return 29;
   if (clef === 'G8') return 27;
   if (clef === 'G8va') return 41;
   if (/^C[1-5]$/.test(clef || '')) return 28 - 2 * (+clef[1] - 3);
@@ -330,7 +332,7 @@ for (const k of ['C1', 'C2', 'C5']) {
   const move = (t) => [t + shift - 14, t + shift - 7, t + shift, t + shift + 7].reduce((a, b) => (Math.abs(b - t) < Math.abs(a - t) ? b : a));
   KEY_POS[k] = { sharp: KEY_POS.G.sharp.map(move), flat: KEY_POS.G.flat.map(move) };
 }
-const keyPosFor = (clef) => KEY_POS[clef] || KEY_POS[clef === 'F' ? 'F' : 'G'];
+const keyPosFor = (clef) => KEY_POS[clef] || KEY_POS[/^F/.test(clef || '') ? 'F' : 'G'];
 
 // accidental's staff position: sharps/naturals are centred on it, a flat's
 // bowl sits at the bottom of the glyph
@@ -423,7 +425,7 @@ function clefFrom(R, near, c0, left, lineY, sp, yTop, yBot) {
   // to about the fourth line (its dots follow); C: two full-height bars on
   // the left, centred on the line it names
   if (hgt > 5.2 && hgt < 9.5 && top < -0.6 && bot > 0.4) clef = 'G';
-  else if (hgt > 3.3 && hgt < 5.4 && top > -2.6 && top < 0.6 && bot > -2.6 && bot < 2.6 && cClefBars(R, cb, parts, sp)) {
+  else if (hgt > 3.3 && hgt < 5.4 && top > -2.6 && top < 2.6 && bot > -2.6 && bot < 2.6 && cClefBars(R, cb, parts, sp)) {
     const p = Math.round((lineY(2) - (cb.y0 + cb.y1) / 2) / sp); // lines from the middle
     // an F clef's two dots to its right in the spaces around the fourth line
     const dots = near.filter(c => c.x0 > cb.x1 - 0.2 * sp && c.x0 < cb.x1 + 0.8 * sp && (c.x1 - c.x0) < 0.7 * sp && (c.y1 - c.y0) < 0.7 * sp &&
@@ -437,6 +439,8 @@ function clefFrom(R, near, c0, left, lineY, sp, yTop, yBot) {
     const eight = near.find(c => c.y0 > cb.y1 - 0.2 * sp && c.y0 < cb.y1 + 0.8 * sp && c.x0 >= cb.x0 - 0.2 * sp && c.x1 <= cb.x1 + 0.2 * sp &&
       (c.y1 - c.y0) > 0.5 * sp && (c.y1 - c.y0) < 1.4 * sp && (c.x1 - c.x0) > 0.3 * sp && (c.x1 - c.x0) < 1.0 * sp);
     if ((eight && c0.y1 < lineY(4) + 2.2 * sp) || cb.y1 > lineY(4) + 2.05 * sp) clefOct = -1;
+    // an 8 over it (joined to the clef's top): an octave higher
+    else if (top < -2.55 && hgt > 7.8) clefOct = 1;
   }
   if (clef === 'F') {
     // the two dots right of the bass clef
@@ -609,7 +613,7 @@ function analyseHeader(R, comps, st, limitX, trace) {
     }
     break;
   }
-  return { clef: clef === 'G' && clefOct === -1 ? 'G8' : clef, clefOct, fifths: kind === 'flat' ? -n : n, end: end + 0.2 * sp, keyN: n, time, mid: lineY(2),
+  return { clef: clef === 'G' && clefOct === -1 ? 'G8' : clef === 'G' && clefOct === 1 ? 'G8va' : clef, clefOct, fifths: kind === 'flat' ? -n : n, end: end + 0.2 * sp, keyN: n, time, mid: lineY(2),
     clefEnd, keyBox: keySigns.length ? boxOf(keySigns) : null };
 }
 
@@ -650,7 +654,8 @@ function clefChangeAt(R, near, c0, st, sp, heads) {
   let clef = null;
   // G: its tail ends about a space below the staff (a small clef) or up to
   // two (a full-size one); a chord's lowest note or a stem reaches elsewhere
-  const gTail = hgt < 7 ? bot > 0.5 && bot < 1.3 && top > -2.1 && top < -0.5 : bot > 0.8 && bot < 2.3 && top > -3.0 && top < -1.0;
+  // (a small clef with its 8 joined below reaches about a space further down)
+  const gTail = hgt < 7 ? (bot > 0.5 && bot < 1.3 && top > -2.1 && top < -0.5) || (bot >= 1.3 && bot < 2.6 && top > -1.4 && top < -0.5) : bot > 0.8 && bot < 2.3 && top > -3.0 && top < -1.0;
   if (hgt > 4.2 && hgt < 8.5 && w > 1.2 && w < 3.0 && gTail && fill > 0.22 && fill < 0.6) {
     // G clef: its loops cross the middle column several times
     const img = glyphImage(R, { ...cb, parts });
@@ -665,12 +670,23 @@ function clefChangeAt(R, near, c0, st, sp, heads) {
         (c.y1 - c.y0) > 0.4 * sp && (c.y1 - c.y0) < 1.4 * sp && (c.x1 - c.x0) > 0.25 * sp && (c.x1 - c.x0) < 1.0 * sp &&
         (above ? c.y1 < cb.y0 + 0.2 * sp && c.y1 > cb.y0 - 1.0 * sp : c.y0 > cb.y1 - 0.2 * sp && c.y0 < cb.y1 + 1.0 * sp));
       if (eight(true)) clef = 'G8va'; else if (eight(false)) clef = 'G8';
+      // the 8 joined to a small clef: the clef reaches further down (8 under) or up (8 over)
+      // (a small clef, narrower than a full one; not a staff's own clef at its start)
+      else if (hgt > 6.4 && hgt < 7.8 && w < 2.2 && cb.x0 > st.left + 5 * sp && bot >= 1.4) clef = 'G8';
+      else if (hgt > 6.4 && hgt < 7.8 && w < 2.2 && cb.x0 > st.left + 5 * sp && top < -1.6) clef = 'G8va';
     }
   } else if (!stemmedIn && hgt > 1.8 && hgt < 3.6 && w > 1.0 && w < 2.6 && top > -0.7 && top < 0.8 && fill > 0.2) {
     // F clef: needs its two dots
     const dots = near.filter(c => c.x0 > cb.x1 - 0.2 * sp && c.x0 < cb.x1 + 0.8 * sp && (c.x1 - c.x0) < 0.6 * sp && (c.y1 - c.y0) < 0.6 * sp &&
       c.y0 > lineY(0) - 0.3 * sp && c.y1 < lineY(2) + 0.3 * sp);
-    if (dots.length === 2 && Math.abs(dots[0].x0 - dots[1].x0) < 0.4 * sp) { clef = 'F'; cb = boxOf(parts.concat(dots)); }
+    if (dots.length === 2 && Math.abs(dots[0].x0 - dots[1].x0) < 0.4 * sp) {
+      clef = 'F'; cb = boxOf(parts.concat(dots));
+      // a small 8 under / over it: an octave lower / higher
+      const eight = (above) => near.find(c => !parts.includes(c) && !dots.includes(c) && c.x0 >= cb.x0 - 0.3 * sp && c.x1 <= cb.x1 + 0.3 * sp &&
+        (c.y1 - c.y0) > 0.4 * sp && (c.y1 - c.y0) < 1.4 * sp && (c.x1 - c.x0) > 0.25 * sp && (c.x1 - c.x0) < 1.0 * sp &&
+        (above ? c.y1 < cb.y0 + 0.2 * sp && c.y1 > cb.y0 - 2.0 * sp : c.y0 > cb.y1 - 0.2 * sp && c.y0 < cb.y1 + 2.0 * sp));
+      if (eight(false)) clef = 'F8'; else if (eight(true)) clef = 'F8va';
+    }
   }
   // (C clefs inside a staff are not read: a sharp or natural looks too alike)
   return clef ? { clef, box: cb } : null;
@@ -743,6 +759,24 @@ function staffChanges(R, comps, s, sp, barX) {
     if (changes.some(ch => ch.box && c0.x0 <= ch.box.x1 && c0.x1 >= ch.box.x0)) continue;
     const r = clefChangeAt(R, near, c0, st, sp, heads);
     if (r) changes.push({ x: r.box.x1, clef: r.clef, box: r.box });
+  }
+  // C clefs: a thick bar, a thin bar right after it and the clef's two lobes, all about the
+  // staff's height (staff-line removal leaves them as separate pieces), centred on the line
+  // the clef names
+  for (const a of near) {
+    const ah = (a.y1 - a.y0 + 1) / sp, aw = (a.x1 - a.x0 + 1) / sp;
+    if (aw < 0.3 || aw > 0.7 || ah < 2.6 || ah > 4.6) continue;
+    const cy = (a.y0 + a.y1) / 2, p = Math.round((st.yAt(2, a.x0) - cy) / sp);
+    if (Math.abs(p) > 2) continue;
+    const b = near.find(o => o !== a && o.x0 >= a.x1 - 1 && o.x0 <= a.x1 + 0.45 * sp && (o.x1 - o.x0 + 1) <= 0.3 * sp &&
+      Math.abs((o.y1 - o.y0) - (a.y1 - a.y0)) < 0.45 * sp && Math.abs((o.y0 + o.y1) / 2 - cy) < 0.3 * sp);
+    if (!b) continue;
+    const r = near.find(o => o !== a && o !== b && o.x0 >= b.x1 - 0.15 * sp && o.x0 <= b.x1 + 0.5 * sp && (o.x1 - o.x0 + 1) >= 0.9 * sp && (o.x1 - o.x0 + 1) <= 2.0 * sp &&
+      (o.y1 - o.y0 + 1) >= 0.55 * (a.y1 - a.y0 + 1) && o.y0 >= a.y0 - 0.3 * sp && o.y1 <= a.y1 + 0.3 * sp);
+    if (!r) continue;
+    const box = boxOf([a, b, r]);
+    if (changes.some(ch => ch.box && box.x0 <= ch.box.x1 && box.x1 >= ch.box.x0)) continue;
+    changes.push({ x: box.x1, clef: 'C' + (3 + p), box });
   }
   changes.sort((a, b) => a.x - b.x);
   // keys: after barlines, read with the clef in force there
