@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 17:12 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 17:14 AEDT.
 
 ## Events
 
@@ -56,6 +56,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 17:04 | Policy from now on: ship first, then test for regressions. CI runs tools/regress.mjs against the last release on every push; /app/ now shows a changelog panel and which engine it runs. |
 | 17:06 | Round 2 noteheads owner finished: challenge set 0.745 → 0.784 from the front end alone (pitch 0.785 → 0.841), challenge files with no staves 19 → 4, benchmark 0.905 → 0.918. Only the symbols owner and the integrator remain in round 2. |
 | 17:12 | Round 2 symbols owner finished: tuplets read and represented exactly (L3c resolved), key signatures right on every real scan but one (L2 resolved), mid-piece clef and key changes detected, slurs no longer mistaken for beams. Live tree 0.919, real scans 0.902. All five owners done; the round 2 integrator is running. |
+| 17:14 | Release 0.4.0 (17:13 AEDT) regression-tested against 0.3.0: no regression on the benchmark (0.918 → 0.919, real scans 0.900 → 0.902) or the challenge set (0.784, no item worse). |
 
 ## Accuracy by round
 
@@ -68,6 +69,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | Challenge set baseline (round 1 code, OCR) | 0.747 | – | – | – | – | – | – |
 | Round 2 (interim) | 0.918 | – | – | 0.911 | – | 1.000 | 0.900 |
 | v0.3.0 released (benchmark, OCR) | 0.918 | 0.891 | 0.851 | 0.911 | 0.992 | 1.000 | 0.900 |
+| v0.4.0 released (benchmark, OCR) | 0.919 | 0.892 | 0.854 | 0.911 | 0.992 | 1.000 | 0.902 |
 
 ## Known limits
 
@@ -154,7 +156,7 @@ Every agent started for this build, including stopped runs. Outcomes are on the 
 | Run 6 | Fix | fix:r2:score | done | 16:21 | 17:00 | 39 | 170 |
 | Run 6 | Fix | fix:r2:lyrics | done | 16:21 | 16:41 | 20 | 109 |
 | Run 6 | Fix | fix:r2:ui | done | 16:21 | 16:45 | 24 | 87 |
-| Run 6 | Integrate | integrate:r2 | run | 17:12 |  | 0 | 6 |
+| Run 6 | Integrate | integrate:r2 | run | 17:12 |  | 2 | 24 |
 | Side | ML demo | copista-2m demo page for GitHub Pages | done | 16:38 | 16:41 | 3 | 21 |
 | Side | Fast track | First version build (mvp/) | done | 15:19 | 15:29 | 10 | 69 |
 | Side | Fast track | Software design document | done | 15:20 | 15:22 | 2 | 16 |
