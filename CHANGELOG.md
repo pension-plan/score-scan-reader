@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.10.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.9.0...score-scan-reader-v0.10.0) (2026-11-08)
+
+
+### Features
+
+* **ui:** All examples picker loads any of the 19 shareable benchmark scans ([184d5b5](https://github.com/pension-plan/score-scan-reader/commit/184d5b54279d26ebb2eda98b80714a3c484b96fe))
+* **ui:** overlay marks every recognised symbol, labels pitch and duration, highlights unrecognised ink ([42663a6](https://github.com/pension-plan/score-scan-reader/commit/42663a6c5878dc9457a766f4bd590f0a1fb87896))
+
 ## [0.9.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.8.0...score-scan-reader-v0.9.0) (2026-11-08)
 
 
