@@ -354,7 +354,7 @@ function readMeters(fr, asm, stats = {}) {
     sy.measures = sy.measures.filter(([xa, xb]) => {
       const sp = fr.ss;
       if (sy.staves.some(s => s.chords.some(c => c.x > xa && c.x < xb))) return true;
-      if (meters.some(m => m.courtesy && m.x >= xa - sp && m.x <= xb)) return false;
+      if (meters.some(m => m.courtesy && m.x >= xa - sp && m.x < xb - sp)) return false;
       // the system's last 'bar' holding only a courtesy key signature (a key change read there)
       const last = xb >= Math.max(...sy.staves.map(s => s.st.right)) - sp;
       if (last && sy.staves.some(s => (s.changes || []).some(ch => ch.fifths != null && ch.x > xa && ch.x <= xb)) &&
