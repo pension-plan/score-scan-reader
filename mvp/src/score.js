@@ -2562,6 +2562,12 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, unitTime, unitBar
             const pk = pitchOf(hClef, pos, hAlt, {}), kk = pk.step + pk.octave;
             let alt = null;
             for (const a of line) { if (a.t > t0 + 1e-6) break; if (a.k === kk) alt = a.a; }
+            // a note tied over the barline keeps the alteration it had in the bar before (that
+            // bar's last accidental on its step and octave), without an accidental of its own
+            if (alt == null && mi > 0 && t0 < 1e-6 && (e.tieStop || h.tieOff)) {
+              const prev = (accLine.get((mi - 1) + ':' + s.staff) || []).filter(a => a.k === kk);
+              if (prev.length) alt = prev[prev.length - 1].a;
+            }
             const pw = pitchOf(hClef, pos, hAlt, alt == null ? {} : { [kk]: alt });
             // under an octave line (ottava.js: h.ott) the note sounds 1 or 2 octaves away
             const pt = h.ott && pw.octave + h.ott >= 0 && pw.octave + h.ott <= 9 ? { ...pw, octave: pw.octave + h.ott, d: pw.d + 7 * h.ott } : pw;

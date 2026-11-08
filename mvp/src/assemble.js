@@ -1391,13 +1391,28 @@ function keyAlters(fifths) {
 // window left of the head is cut out of the page and its own components tried, with the window's
 // top lowered step by step until the passing stroke is cut away (pieces crossing the whole window
 // are that stroke, not a sign)
+// whether a q x q square of solid ink lies inside the box (summed-area table)
+function solidSquare(R, x0, y0, x1, y1, q) {
+  x0 = Math.max(0, x0); y0 = Math.max(0, y0); x1 = Math.min(R.width - 1, x1); y1 = Math.min(R.height - 1, y1);
+  const w = x1 - x0 + 2, h = y1 - y0 + 2;
+  if (w - 1 < q || h - 1 < q) return false;
+  const S = new Int32Array(w * h);
+  for (let y = 1; y < h; y++) for (let x = 1; x < w; x++)
+    S[y * w + x] = (R.data[(y0 + y - 1) * R.width + x0 + x - 1] ? 1 : 0) + S[(y - 1) * w + x] + S[y * w + x - 1] - S[(y - 1) * w + x - 1];
+  for (let y = q; y < h; y++) for (let x = q; x < w; x++)
+    if (S[y * w + x] - S[(y - q) * w + x] - S[y * w + x - q] + S[(y - q) * w + x - q] === q * q) return true;
+  return false;
+}
+
 function cutAccidental(R, comps, hd, minX = -Infinity, reach = 1.9) {
   const sp = hd.sp;
   // only where a long stroke passes through the sign's place (a slur, tie or beam)
   const ya = hd.y - 2.6 * sp, yb = hd.y + 1.6 * sp, xa = hd.x - (reach + 0.4) * sp, xb = hd.x - 0.5 * sp;
-  // (thin ink across a wide box, starting left of the sign's place: a curve or a line, not a chord)
+  // (thin ink across a wide box, starting left of the sign's place: a curve or a line, not a chord,
+  // nor a beamed group whose noteheads (solid ink over 0.6 space square) stand there)
   if (!comps.some(c => c.x1 - c.x0 >= 2.2 * sp && c.x0 < xa && c.x1 > xa + 0.5 * sp && c.y0 < yb && c.y1 > ya && c.x0 > minX &&
-    c.area <= 0.2 * (c.x1 - c.x0 + 1) * (c.y1 - c.y0 + 1))) return null;
+    c.area <= 0.2 * (c.x1 - c.x0 + 1) * (c.y1 - c.y0 + 1) && !solidSquare(R, Math.max(c.x0, Math.round(hd.x - (reach + 1.2) * sp)), Math.max(c.y0, Math.round(ya)),
+      Math.min(c.x1, Math.round(xb)), Math.min(c.y1, Math.round(yb)), Math.round(0.6 * sp)))) return null;
   const x0 = Math.max(0, Math.round(Math.max(minX, hd.x - (reach + 1.2) * sp))), x1 = Math.min(R.width - 1, Math.round(hd.x - 0.45 * sp));
   if (x1 - x0 < 0.5 * sp) return null;
   for (const top of [2.6, 2.0, 1.6, 1.25]) {
