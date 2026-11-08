@@ -729,6 +729,24 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   if (!systems.length) return { parts: [], measures: 0, warnings: ['No music systems found.'], xml: emptyXML() };
   // marks first (text.js via symbols.js): braces inform the layout
   for (const p of pages) { try { pageMarks(p.fr, p.asm); } catch (e) { /* layout reads without them */ } }
+  // a stemless 'head' inside a word read as text over or between the staves (the o of
+  // "Moderato" read as a whole note) is a letter, not a note
+  for (const p of pages) {
+    const m = p.fr && p.fr._marks && p.fr._marks.marks;
+    if (!m || !p.asm || p.asm.lettersDropped) continue;
+    p.asm.lettersDropped = true;
+    // (word boxes from the layout of the ink: the text itself may be read later)
+    const boxes = m.text.filter(t => ['tempo', 'expression', 'text', 'title', 'subtitle', 'composer', 'lyricist', 'arranger', 'credit'].includes(t.role) && (t.words || 0) >= 1 && t.box[2] - t.box[0] >= 2 * (p.fr.ss || 16)).map(t => t.box);
+    if (!boxes.length) continue;
+    for (const sy of p.asm.systems) for (const s of sy.staves) {
+      // (in the word's row, within three spaces before it or six after: the letters taken for
+      // notes are not in the word's box)
+      const sp = s.st.space || p.fr.ss;
+      const inWord = (h) => h.stemDir === 0 && boxes.some(b => h.x > b[0] - 3 * sp && h.x < b[2] + 6 * sp && h.y > b[1] - 0.2 * sp && h.y < b[3] + 0.2 * sp);
+      if (!s.chords.some(c => c.heads.some(inWord))) continue;
+      s.chords = s.chords.map(c => (c.heads.some(inWord) ? { ...c, heads: c.heads.filter(h => !inWord(h)) } : c)).filter(c => c.heads.length);
+    }
+  }
   const layout = chooseLayout(systems, lyricsBySystem, opts);
   const { parts } = layout;
   const fifths = chooseKey(systems);

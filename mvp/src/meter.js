@@ -201,7 +201,10 @@ function readMeters(fr, asm, stats = {}) {
           if (t) { h.time.beats = t.beats; h.time.type = t.type; h.time.cv = true; stats.timeRead = (stats.timeRead || 0) + 1; }
         } else if (!h.time) {
           const x0 = h.end - 0.4 * sp;
-          const t = si > 0 ? readTime(matcher(), R, st, x0, x0 + 3.6 * sp, sp, 0.55) : null;
+          // (the first system was tried by cv.js readHeaders: there, worn digits only; a weak
+          // reading only on the piece's first system, where a time signature is expected)
+          const t = (si > 0 && readTime(matcher(), R, st, x0, x0 + 3.6 * sp, sp, 0.55)) || bandTime(R, st, h.end, sp) ||
+            (si === 0 && sy.page === 0 ? weakTime(R, st, h.end, sp) : null);
           const m = t && t.x0 < h.end + 1.5 * sp ? { beats: t.beats, type: t.type, symbol: '', x0: t.x0, x1: t.x1 } : readCommon(R, st, h.end - 0.3 * sp, h.end + 1.5 * sp, sp);
           if (m) {
             h.time = { x0: m.x0, x1: m.x1, beats: m.beats, type: m.type, symbol: m.symbol || undefined, cv: true };
@@ -380,4 +383,4 @@ function readMeters(fr, asm, stats = {}) {
   return stats;
 }
 
-module.exports = { readMeters, readCommon, systemBars, plausibleMeter: plausible, matcher, crop, heal };
+module.exports = { readMeters, readCommon, systemBars, plausibleMeter: plausible, matcher, crop, heal, _weakTime: weakTime, _bandTime: bandTime };
