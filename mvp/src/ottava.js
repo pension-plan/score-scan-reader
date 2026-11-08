@@ -48,8 +48,8 @@ function holes(R, c) {
 // glyph with two holes; 15 is a narrow 1 and a 5, neither with two holes
 function lineNumber(R, comps, row, sp) {
   // the word left of the line ("8", "8va", "15ma"): glyphs run together leftwards from its start
-  const near = comps.filter(c => c.x1 <= row.x0 + 0.3 * sp && c.x0 >= row.x0 - 6 * sp && c.y0 <= row.y + 0.8 * sp && c.y1 >= row.y - 1.2 * sp &&
-    c.y1 - c.y0 >= 0.35 * sp && c.y1 - c.y0 <= 2.2 * sp && c.x1 - c.x0 <= 1.6 * sp).sort((a, b) => b.x1 - a.x1);
+  const near = comps.filter(c => c.x1 <= row.x0 + 0.3 * sp && c.x0 >= row.x0 - 8 * sp && c.y0 <= row.y + 0.8 * sp && c.y1 >= row.y - 1.2 * sp &&
+    c.y1 - c.y0 >= 0.35 * sp && c.y1 - c.y0 <= 2.2 * sp && c.x1 - c.x0 <= 2.2 * sp).sort((a, b) => b.x1 - a.x1);
   const word = [];
   let edge = row.x0;
   for (const c of near) {
@@ -94,10 +94,29 @@ function readOttavas(fr, asm, stats = {}) {
         const x0 = num.x0 - 0.3 * sp, x1 = row.x1 + 0.8 * sp;
         let n = 0;
         for (const ch of s.chords) if (ch.x >= x0 && ch.x <= x1) for (const h of ch.heads) { h.ott = k; n++; }
-        if (!hook && st.right - row.x1 < 3 * sp) next.set(si, { k: num.k, above });
+        if (!hook && st.right - row.x1 < 3 * sp) next.set(si, { k: num.k, above, dy: row.y - top });
+        if (num.cont) open.delete(si);
         (s.ottavas ||= []).push({ x0, x1, k });
         stats.lines = (stats.lines || 0) + 1;
         stats.heads = (stats.heads || 0) + n;
+      }
+      // a line run on from the system before that is too short for dashes here: its number again
+      // ("15ma") and the hook at the height the line had; the notes up to the hook are under it
+      const o = open.get(si);
+      if (o && !(s.ottavas || []).some(v => v.x0 < (s.hdr && s.hdr.end != null ? s.hdr.end : st.left) + 4 * sp)) {
+        // (the line's height follows the notes, so the hook is looked for on the number's side of
+        // the staff, right after the number: tall glyphs within a space of each other)
+        const hk = near.filter(c => c.x0 > st.left && c.x0 < st.left + 16 * sp && c.x1 - c.x0 <= 0.6 * sp && c.y1 - c.y0 >= 0.4 * sp && c.y1 - c.y0 <= 1.4 * sp &&
+          (o.above ? c.y1 < top : c.y0 > bot) &&
+          near.some(d => d !== c && d.x1 <= c.x0 && c.x0 - d.x1 <= 1.0 * sp && d.y1 - d.y0 >= 0.5 * sp && (o.above ? Math.abs(d.y0 - c.y0) <= 1.0 * sp : Math.abs(d.y1 - c.y1) <= 1.0 * sp)) &&
+          near.some(d => d.x1 <= c.x0 && c.x0 - d.x0 <= 6 * sp && d.y1 - d.y0 >= 0.8 * sp && holes(R, d) !== 1))
+          .sort((a, b) => a.x0 - b.x0)[0];
+        if (hk) {
+          const k = o.above ? o.k : -o.k;
+          for (const ch of s.chords) if (ch.x <= hk.x1 + 0.3 * sp) for (const h of ch.heads) h.ott = k;
+          (s.ottavas ||= []).push({ x0: st.left, x1: hk.x1, k });
+          stats.lines = (stats.lines || 0) + 1;
+        }
       }
     });
     open = next;

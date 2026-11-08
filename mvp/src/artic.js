@@ -97,15 +97,21 @@ function readArticulations(fr, asm, stats = {}) {
           if (used.has(c)) continue;
           const g = { x0: c.x0, y0: c.y0, x1: c.x1, y1: c.y1, area: c.area };
           used.add(c);
-          for (const o of cand) if (!used.has(o) && o.x0 <= g.x1 + 0.3 * sp && o.x1 >= g.x0 - 0.3 * sp && o.y0 <= g.y1 + 0.3 * sp && o.y1 >= g.y0 - 0.3 * sp &&
-            !markKind(R, c, sp, above) && !markKind(R, o, sp, above)) {
-            used.add(o); g.x0 = Math.min(g.x0, o.x0); g.y0 = Math.min(g.y0, o.y0); g.x1 = Math.max(g.x1, o.x1); g.y1 = Math.max(g.y1, o.y1); g.area += o.area;
+          for (const o of cand) {
+            if (used.has(o) || o.x0 > g.x1 + 0.3 * sp || o.x1 < g.x0 - 0.3 * sp || o.y0 > g.y1 + 0.3 * sp || o.y1 < g.y0 - 0.3 * sp) continue;
+            const u = { x0: Math.min(g.x0, o.x0), y0: Math.min(g.y0, o.y0), x1: Math.max(g.x1, o.x1), y1: Math.max(g.y1, o.y1), area: g.area + o.area };
+            // joined when neither piece is a mark by itself, or when together they make a wedge
+            // (a marcato's thin stroke cut off reads as a staccatissimo on its own)
+            const uk = markKind(R, u, sp, above);
+            if ((!markKind(R, g, sp, above) && !markKind(R, o, sp, above)) || uk === 'marcato' || uk === 'accent') { used.add(o); Object.assign(g, u); }
           }
           glyphs.push(g);
         }
         // the dot of a fermata has its arc over (under) it
         const inArc = (c) => near(c.x0 - 2 * sp, c.x1 + 2 * sp).some(o => o.x0 < c.x0 - 0.3 * sp && o.x1 > c.x1 + 0.3 * sp && o.x1 - o.x0 >= 1.2 * sp && o.x1 - o.x0 <= 3.8 * sp &&
-          (above ? o.y1 <= c.y0 + 0.3 * sp && o.y1 >= c.y0 - 1.4 * sp : o.y0 >= c.y1 - 0.3 * sp && o.y0 <= c.y1 + 1.4 * sp));
+          (above ? o.y1 <= c.y0 + 0.3 * sp && o.y1 >= c.y0 - 1.4 * sp : o.y0 >= c.y1 - 0.3 * sp && o.y0 <= c.y1 + 1.4 * sp) &&
+          // (an accent standing beyond a staccato dot is no fermata's arc)
+          !markKind(R, o, sp, above));
         // a letter of a word (lyrics or text over the staff): ink of its size right beside it
         const inWord = (c) => near(c.x0 - 1.5 * sp, c.x1 + 1.5 * sp).some(o => !(o.x0 >= c.x0 && o.x1 <= c.x1 && o.y0 >= c.y0 && o.y1 <= c.y1) && o.y0 < c.y1 && o.y1 > c.y0 &&
           o.y1 - o.y0 >= 0.3 * sp && o.y1 - o.y0 <= 1.6 * sp && o.x1 - o.x0 <= 1.6 * sp && (Math.abs(o.x0 - c.x1) < 0.6 * sp || Math.abs(c.x0 - o.x1) < 0.6 * sp) &&
