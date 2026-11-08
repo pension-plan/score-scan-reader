@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.14.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.13.0...score-scan-reader-v0.14.0) (2026-11-08)
+
+
+### Features
+
+* **cv:** pre-clean in plain JS, OpenCV.js no longer shipped ([4aab1af](https://github.com/pension-plan/score-scan-reader/commit/4aab1af96319f776b4a12c68d39000e854af49f2))
+* **cv:** read time-signature numbers and unread clefs from templates (plain JS, default on) ([9a124ee](https://github.com/pension-plan/score-scan-reader/commit/9a124eec7f0754b94c81845a0c7b8f751708521c))
+
 ## [0.13.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.12.0...score-scan-reader-v0.13.0) (2026-11-08)
 
 
