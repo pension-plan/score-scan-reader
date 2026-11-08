@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.33.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.32.2...score-scan-reader-v0.33.0) (2026-11-08)
+
+
+### Features
+
+* **score:** ties across system breaks paired (L20) ([fc49ef6](https://github.com/pension-plan/score-scan-reader/commit/fc49ef640e8da07e8dc7c2267c1c9602e9aabc38))
+
 ## [0.32.2](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.32.1...score-scan-reader-v0.32.2) (2026-11-08)
 
 
