@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.21.1](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.21.0...score-scan-reader-v0.21.1) (2026-11-08)
+
+
+### Bug Fixes
+
+* **playback:** audible first dynamic, staff-scoped dynamics, sound dynamics export, dynamic shown in the transport ([437afb3](https://github.com/pension-plan/score-scan-reader/commit/437afb3087b8f4792fd4c494e507d63b365a2de7))
+
 ## [0.21.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.20.0...score-scan-reader-v0.21.0) (2026-11-08)
 
 
