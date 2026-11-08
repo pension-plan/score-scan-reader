@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.26.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.25.0...score-scan-reader-v0.26.0) (2026-11-08)
+
+
+### Features
+
+* **lyrics:** lazy second OCR pass with fra/spa/ita/ces for accented rows; elisions across word gaps ([42f3d40](https://github.com/pension-plan/score-scan-reader/commit/42f3d40a32d2725cb7baaca261d14cd2b4e24b74))
+
+
+### Bug Fixes
+
+* **artic:** marcato cut in two by staff-line removal joined ([03ada96](https://github.com/pension-plan/score-scan-reader/commit/03ada96c263c7b9835951f337c22421209d62df4))
+* **meter,artic:** meters after missed barlines and on worn digits; fewer false articulations ([0155e68](https://github.com/pension-plan/score-scan-reader/commit/0155e6816dccb130c2c1b3cee18121d2269a575b))
+
+
+### Performance Improvements
+
+* **memory:** flat memory per page in long documents (L26) ([8b5d595](https://github.com/pension-plan/score-scan-reader/commit/8b5d595a9896589aaafe1bf0a69d5d5b19e027ee))
+
 ## [0.25.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.24.0...score-scan-reader-v0.25.0) (2026-11-08)
 
 
