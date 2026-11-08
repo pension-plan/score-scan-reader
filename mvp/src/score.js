@@ -696,6 +696,42 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
       return mergeRests(c[src.voice] || [], rs, src.voice, s.st.space);
     }));
   });
+  // grace notes the head finder took as notes: filled heads clearly narrower
+  // than the page's heads (upper quartile; about 0.9 staff space against 1.2-1.3), short
+  // values, leave the bar's count and go before the next note (e.graces)
+  // Off unless opts.graceHeads: per item it moves pitch and duration both
+  // ways (coverage nt07 scan pitch +0.35, trio-minuet scan-mild -0.05)
+  if (opts.graceHeads) {
+    const ratio = new Map();
+    const pageRatio = (fr) => {
+      if (!ratio.has(fr)) {
+        const r = (fr.heads || []).filter(h => h.kind === 'filled' && h.w).map(h => h.w / (h.sp || fr.ss)).sort((a, b) => a - b);
+        ratio.set(fr, r.length >= 8 ? r[Math.floor(0.75 * r.length)] : 0);
+      }
+      return ratio.get(fr);
+    };
+    segEv.forEach((e, si) => {
+      const fr = segs[si].sy.fr, med = pageRatio(fr);
+      if (med < 1.12) return;
+      const small = (h) => h.kind === 'filled' && h.w && h.w / (h.sp || fr.ss) <= Math.min(1.0, 0.8 * med);
+      e.forEach((streams, pi) => streams.forEach((evs, k) => {
+        if (!evs.some(x => !x.rest && x.heads && x.heads.length && x.heads.every(small))) return;
+        const out = [];
+        let pend = [];
+        const isGrace = (i) => { const x = evs[i]; return !x.rest && !x.forward && x.heads && x.heads.length && x.heads.every(small) && x.q <= 0.5; };
+        for (let i = 0; i < evs.length; i++) {
+          const x = evs[i];
+          if (isGrace(i)) {
+            pend.push(...x.heads.map(h => ({ p: Math.round(h.p), slash: false, n: 2 })));
+            continue;
+          }
+          if (pend.length && !x.rest && x.heads) { if (pend.length === 1) pend[0].n = 1; x.graces = pend; pend = []; }
+          out.push(x);
+        }
+        streams[k] = out;
+      }));
+    });
+  }
   // length of each segment: the most common stream total (a stream that lost
   // a note or a rest comes out short, so one stream alone is not trusted)
   const segSum = segEv.map(e => {

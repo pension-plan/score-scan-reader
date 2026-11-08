@@ -1170,7 +1170,14 @@ staff, its pitch from its staff position. Coverage recall (clean / scan / severe
 43 / 39 / 33%, tie 17 / 15 / 11%, tie across systems 13 / 15 / 11%, grace 21 / 7 / 2%, grace slash 17 / 0 /
 0%; no item's pitch, duration, rests, lyrics or parts changed on benchmark, challenge or coverage. Grace
 notes on scans are mostly missed: the head detector takes their heads as normal notes (they are then
-explained ink), which this does not undo.
+explained ink); see `opts.graceHeads` below.
+
+**Grace heads the head finder took as notes** (`opts.graceHeads`, off): filled heads clearly narrower
+than the page's heads (width / staff space at most min(1.0, 0.8 x the upper quartile), short values)
+leave the bar's count and become grace notes before the next note. Coverage grace recall rises to
+17 / 37 / 49% (clean / scan / severe) and nt07-grace-notes scan pitch 0.57 to 0.92, benchmark aggregate
+0.9499 to 0.9509 and challenge 0.8278 to 0.8283, but per item it moves both ways (challenge: 38 items only
+better, 42 with some metric worse, e.g. trio-minuet scan-mild pitch -0.05), so it is off by default.
 
 **Fermatas** (an arc with a dot inside its bow) go on the note or rest nearest by x on the staff they
 stand by, as `<fermata type="upright">` (or `inverted` below the staff). Coverage recall 62 / 37 / 27%
