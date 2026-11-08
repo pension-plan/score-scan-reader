@@ -1162,7 +1162,10 @@ touches the heads it joins. Its two ends are matched to note heads (left end wit
 spaces right of a head, right end left of one, 1.6 spaces vertically): two heads of one pitch on one staff
 make a tie (`<tie>` + `<tied>` on each head), other pairs a slur (`<slur number="1">` start / stop). With
 one end at a head and the other at the end of the staff (or the staff start before the first note) it is
-half of a tie or slur across a system break. Grace notes: unexplained ink by a staff holding blobs of the
+half of a tie or slur across a system break. Ties the curve finder misses (broken by staff-line removal
+or joined to their heads) are found from the heads: two neighbouring heads of one pitch on one staff, at
+most 40 staff spaces apart, with a thin arc of ink between them (in at least 60% of the columns, smooth,
+bowing away from the heads) above or below; tie recall 17 to 33% clean, 15 to 30% scan. Grace notes: unexplained ink by a staff holding blobs of the
 size of a small head (ink at least 0.42 staff space wide and tall, blobs 0.45-1.0 x 0.4-0.85 spaces) and a
 stem; a stroke left of the stem clear of the head is the acciaccatura slash. Each small head becomes a
 `<grace>` note (no duration, eighth, or 16th in a beamed group) before the first note after it on its

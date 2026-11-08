@@ -1507,6 +1507,60 @@ function readMarks(pages, segs, units, parts, partMeasures) {
       }
     }
   }
+  // ties the curve finder missed (a tie broken by staff-line removal, or
+  // joined to its heads): two neighbouring heads of one pitch on one staff
+  // with a thin arc of ink between them, above or below
+  {
+    const written = new Set();
+    for (const pm of partMeasures) for (const m of pm) for (const st of m || []) if (st) for (const e of st.events) for (const h of e.heads || []) written.add(h);
+    const seen = new Set();
+    for (const pg of pages) {
+      const fr = pg.fr, R = fr && fr.R;
+      if (!R || seen.has(fr)) continue;
+      seen.add(fr);
+      const W = R.width, H = R.height;
+      const byStaff = new Map();
+      for (const h of fr.heads || []) { if (!byStaff.has(h.staff)) byStaff.set(h.staff, []); byStaff.get(h.staff).push(h); }
+      const arc = (a, b, side) => {
+        const sp = a.sp || fr.ss, x0 = Math.round(a.x + 0.7 * sp), x1 = Math.round(b.x - 0.7 * sp);
+        if (x1 - x0 < 3) return false;
+        const ys = [];
+        let hit = 0;
+        for (let x = x0; x <= x1; x++) {
+          let best = null;
+          const ya = Math.round(side < 0 ? a.y - 1.8 * sp : a.y + 0.3 * sp), yb = Math.round(side < 0 ? a.y - 0.3 * sp : a.y + 1.8 * sp);
+          for (let y = Math.max(0, ya); y <= Math.min(H - 1, yb);) {
+            if (!R.data[y * W + x]) { y++; continue; }
+            let e = y; while (e <= yb && e < H && R.data[e * W + x]) e++;
+            const run = e - y, mid = (y + e - 1) / 2;
+            if (run <= 0.45 * sp && (!best || Math.abs(mid - a.y) < Math.abs(best - a.y))) best = mid;
+            y = e;
+          }
+          if (best != null) { hit++; ys.push([x, best]); }
+        }
+        if (hit < 0.6 * (x1 - x0 + 1) || ys.length < 3) return false;
+        for (let i = 1; i < ys.length; i++) if (ys[i][0] - ys[i - 1][0] <= 2 && Math.abs(ys[i][1] - ys[i - 1][1]) > 0.35 * sp) return false;
+        // it bows away from the heads: the middle farther from them than the ends
+        const dist = (p) => Math.abs(p[1] - a.y);
+        const m = ys[ys.length >> 1];
+        return dist(m) >= Math.max(dist(ys[0]), dist(ys[ys.length - 1])) - 0.05 * sp;
+      };
+      for (const hs of byStaff.values()) {
+        const w = hs.filter(h => written.has(h)).sort((p, q) => p.x - q.x);
+        for (let i = 0; i < w.length; i++) {
+          const a = w[i];
+          if (a.tieOn) continue;
+          const sp = a.sp || fr.ss;
+          // the next head on this staff to the right (other heads of the same chord skipped)
+          const nextX = w.find(h => h.x > a.x + 0.8 * sp);
+          if (!nextX) continue;
+          const b = w.find(h => h.x >= nextX.x - 0.3 * sp && h.x <= nextX.x + 0.3 * sp && h.p === a.p);
+          if (!b || b.tieOff || b.x - a.x > 40 * sp) continue;
+          if (arc(a, b, -1) || arc(a, b, 1)) { a.tieOn = true; b.tieOff = true; nTie++; }
+        }
+      }
+    }
+  }
   // grace notes (text.js): each small head goes before the first note after
   // it on its staff, in each part reading that staff (e.graces)
   let nGrace = 0;

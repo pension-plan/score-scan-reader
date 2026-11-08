@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 23:14 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 23:29 AEDT.
 
 ## Events
 
@@ -119,6 +119,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 23:09 | Shipped 35b4034 (fermatas written) and 0cd2fc0 (grace heads from the head finder, opt-in; lifts benchmark 0.9499 to 0.9509 and coverage grace recall on scans 7 to 37%). Decision: enable it by default if regress.mjs passes (the project gate), after the tempo fix. |
 | 23:14 | Release 0.21.0 had all dynamics/text marks dropped (swept-in partial change). Fixed by 437afb3 (release 0.21.1 merged: also default velocity 72, staff-scoped dynamics, <sound dynamics>, dynamic badge in the transport). regress.mjs now fails when written notation elements drop (L27). |
 | 23:14 | opencv: 32nd/64th notes (713fbe7, in 0.21.0) kept; 4 coverage items down at most 0.029, within the gate. Next: stacked whole-note chords, half notes read as filled, dots. |
+| 23:29 | Shipped 3ae56fa (textsym, release merged): metronome marks ('Vivace ♩ = 144') read as one tempo line; <words>+<metronome>+<sound tempo> written; coverage metronome 0 to 88/88/78%; bar numbers not read now labelled 'Bar ? (number not read)'. No item moved; regressions clean. |
 
 ## Accuracy by round
 
