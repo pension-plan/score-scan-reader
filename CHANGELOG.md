@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.32.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.31.0...score-scan-reader-v0.32.0) (2026-11-08)
+
+
+### Features
+
+* **text:** rehearsal letters and chord symbols read by shape (no OCR needed) ([c5c0e1c](https://github.com/pension-plan/score-scan-reader/commit/c5c0e1c796d58954b58509660a3482f5f26dda6a))
+
+
+### Bug Fixes
+
+* **staves:** small staves over a piano score found on low-resolution copies; system gaps in the page's staff space ([190c27d](https://github.com/pension-plan/score-scan-reader/commit/190c27dd9d7ddb7e914e34c074720b0d3f3442a3))
+
 ## [0.31.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.30.1...score-scan-reader-v0.31.0) (2026-11-08)
 
 
