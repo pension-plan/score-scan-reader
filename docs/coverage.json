@@ -1,11 +1,11 @@
 {
- "generated": "2026-11-08T17:13:53.745Z",
+ "generated": "2026-11-08T18:08:03.899Z",
  "inputs": {
-  "eval": "../l11/eval-cov-ocr.json",
-  "eval_when": "2026-11-08T17:13:52.724Z",
+  "eval": "../sf/eval-cov-ocr.json",
+  "eval_when": "2026-11-08T18:08:02.929Z",
   "perf": null,
   "coverage_dir": "../../../../../../Users/d.sloane/music/corpus/coverage",
-  "src_hash": "b3fece99afcc",
+  "src_hash": "365f9e84c90e",
   "ocr": true,
   "dpi": 200
  },
@@ -214,7 +214,7 @@
      "variants": 39,
      "n": 199,
      "hit": 96,
-     "read": 0.5578,
+     "read": 0.5628,
      "emitted": 121,
      "emitted_any_item": 29,
      "crashes": 0,
@@ -377,12 +377,12 @@
     "scan-severe": {
      "variants": 77,
      "n": 1510,
-     "hit": 723,
+     "hit": 722,
      "read": 0.7623,
-     "emitted": 963,
+     "emitted": 964,
      "emitted_any_item": 72,
      "crashes": 0,
-     "accuracy": 0.4788,
+     "accuracy": 0.4781,
      "false_notes_per_note_in": 0.1495,
      "false_notes_per_note_out": 0.1292,
      "false_baseline": "other measures",
@@ -546,20 +546,20 @@
     "scan-severe": {
      "variants": 82,
      "n": 4502,
-     "hit": 3501,
-     "read": 0.8407,
-     "emitted": 4594,
-     "emitted_any_item": 80,
+     "hit": 3508,
+     "read": 0.8418,
+     "emitted": 4611,
+     "emitted_any_item": 81,
      "crashes": 0,
-     "accuracy": 0.7777,
+     "accuracy": 0.7792,
      "false_notes_per_note_in": 0.1237,
-     "false_notes_per_note_out": 0.1992,
+     "false_notes_per_note_out": 0.203,
      "false_baseline": "other measures",
      "false_counts": {
       "truth_notes_in": 6716,
       "false_in": 831,
       "truth_notes_out": 1842,
-      "false_out": 367
+      "false_out": 374
      }
     }
    },
@@ -695,20 +695,20 @@
     "scan-severe": {
      "variants": 62,
      "n": 1620,
-     "hit": 1129,
-     "read": 0.7741,
-     "emitted": 1570,
-     "emitted_any_item": 60,
+     "hit": 1130,
+     "read": 0.7809,
+     "emitted": 1579,
+     "emitted_any_item": 61,
      "crashes": 0,
-     "accuracy": 0.6969,
-     "false_notes_per_note_in": 0.1104,
-     "false_notes_per_note_out": 0.1206,
+     "accuracy": 0.6975,
+     "false_notes_per_note_in": 0.1116,
+     "false_notes_per_note_out": 0.1214,
      "false_baseline": "other measures",
      "false_counts": {
       "truth_notes_in": 3244,
-      "false_in": 358,
+      "false_in": 362,
       "truth_notes_out": 3516,
-      "false_out": 424
+      "false_out": 427
      }
     }
    },
@@ -805,19 +805,19 @@
      "variants": 22,
      "n": 651,
      "hit": 453,
-     "read": 0.8126,
-     "emitted": 573,
-     "emitted_any_item": 19,
+     "read": 0.8218,
+     "emitted": 577,
+     "emitted_any_item": 20,
      "crashes": 0,
      "accuracy": 0.6959,
-     "false_notes_per_note_in": 0.0766,
-     "false_notes_per_note_out": 0.0917,
+     "false_notes_per_note_in": 0.0804,
+     "false_notes_per_note_out": 0.0927,
      "false_baseline": "other measures",
      "false_counts": {
       "truth_notes_in": 1293,
-      "false_in": 99,
+      "false_in": 104,
       "truth_notes_out": 1952,
-      "false_out": 179
+      "false_out": 181
      }
     }
    },
@@ -908,13 +908,13 @@
      "crashes": 0,
      "accuracy": 0.4425,
      "false_notes_per_note_in": 0.087,
-     "false_notes_per_note_out": 0.1433,
+     "false_notes_per_note_out": 0.1537,
      "false_baseline": "other measures",
      "false_counts": {
       "truth_notes_in": 207,
       "false_in": 18,
       "truth_notes_out": 670,
-      "false_out": 96
+      "false_out": 103
      }
     }
    },
@@ -1129,20 +1129,20 @@
     "scan-severe": {
      "variants": 49,
      "n": 299,
-     "hit": 206,
+     "hit": 208,
      "read": 0.8161,
-     "emitted": 363,
-     "emitted_any_item": 45,
+     "emitted": 368,
+     "emitted_any_item": 47,
      "crashes": 0,
-     "accuracy": 0.689,
+     "accuracy": 0.6957,
      "false_notes_per_note_in": 0.1589,
-     "false_notes_per_note_out": 0.0921,
+     "false_notes_per_note_out": 0.0935,
      "false_baseline": "other measures",
      "false_counts": {
       "truth_notes_in": 818,
       "false_in": 130,
       "truth_notes_out": 4789,
-      "false_out": 441
+      "false_out": 448
      }
     }
    },
@@ -1482,19 +1482,19 @@
      "variants": 57,
      "n": 2076,
      "hit": 1342,
-     "read": 0.7895,
+     "read": 0.7977,
      "emitted": 1420,
      "emitted_any_item": 50,
      "crashes": 0,
      "accuracy": 0.6464,
-     "false_notes_per_note_in": 0.0934,
-     "false_notes_per_note_out": 0.1293,
+     "false_notes_per_note_in": 0.095,
+     "false_notes_per_note_out": 0.1299,
      "false_baseline": "other measures",
      "false_counts": {
       "truth_notes_in": 3179,
-      "false_in": 297,
+      "false_in": 302,
       "truth_notes_out": 3310,
-      "false_out": 428
+      "false_out": 430
      }
     }
    },
@@ -1601,18 +1601,18 @@
      "n": 308,
      "hit": 152,
      "read": 0.6981,
-     "emitted": 498,
-     "emitted_any_item": 30,
+     "emitted": 510,
+     "emitted_any_item": 31,
      "crashes": 0,
      "accuracy": 0.4935,
      "false_notes_per_note_in": 0.1516,
-     "false_notes_per_note_out": 0.1067,
+     "false_notes_per_note_out": 0.1094,
      "false_baseline": "other measures",
      "false_counts": {
       "truth_notes_in": 851,
       "false_in": 129,
       "truth_notes_out": 2569,
-      "false_out": 274
+      "false_out": 281
      }
     }
    },
@@ -1916,20 +1916,20 @@
     "scan-severe": {
      "variants": 74,
      "n": 4218,
-     "hit": 3371,
-     "read": 0.8158,
-     "emitted": 3719,
+     "hit": 3376,
+     "read": 0.821,
+     "emitted": 3724,
      "emitted_any_item": 72,
      "crashes": 0,
-     "accuracy": 0.7992,
-     "false_notes_per_note_in": 0.1299,
-     "false_notes_per_note_out": 0.3597,
+     "accuracy": 0.8004,
+     "false_notes_per_note_in": 0.1306,
+     "false_notes_per_note_out": 0.3635,
      "false_baseline": "other measures",
      "false_counts": {
       "truth_notes_in": 7565,
-      "false_in": 983,
+      "false_in": 988,
       "truth_notes_out": 531,
-      "false_out": 191
+      "false_out": 193
      }
     }
    },
@@ -2063,20 +2063,20 @@
     "scan-severe": {
      "variants": 60,
      "n": 608,
-     "hit": 502,
-     "read": 0.8257,
-     "emitted": 533,
-     "emitted_any_item": 54,
+     "hit": 506,
+     "read": 0.8322,
+     "emitted": 537,
+     "emitted_any_item": 55,
      "crashes": 0,
-     "accuracy": 0.8257,
-     "false_notes_per_note_in": 0.0993,
-     "false_notes_per_note_out": 0.1636,
+     "accuracy": 0.8322,
+     "false_notes_per_note_in": 0.1009,
+     "false_notes_per_note_out": 0.1642,
      "false_baseline": "other measures",
      "false_counts": {
       "truth_notes_in": 3112,
-      "false_in": 309,
+      "false_in": 314,
       "truth_notes_out": 3911,
-      "false_out": 640
+      "false_out": 642
      }
     }
    },
@@ -2803,14 +2803,14 @@
      "emitted_any_item": 14,
      "crashes": 0,
      "accuracy": 0.5405,
-     "false_notes_per_note_in": 0.2566,
-     "false_notes_per_note_out": 0.1615,
+     "false_notes_per_note_in": 0.2655,
+     "false_notes_per_note_out": 0.1648,
      "false_baseline": "other measures",
      "false_counts": {
       "truth_notes_in": 113,
-      "false_in": 29,
+      "false_in": 30,
       "truth_notes_out": 1814,
-      "false_out": 293
+      "false_out": 299
      }
     }
    },
@@ -2923,14 +2923,14 @@
      "emitted_any_item": 25,
      "crashes": 0,
      "accuracy": 0.4973,
-     "false_notes_per_note_in": 0.2231,
-     "false_notes_per_note_out": 0.0874,
+     "false_notes_per_note_in": 0.2283,
+     "false_notes_per_note_out": 0.0882,
      "false_baseline": "other measures",
      "false_counts": {
       "truth_notes_in": 762,
-      "false_in": 170,
+      "false_in": 174,
       "truth_notes_out": 3673,
-      "false_out": 321
+      "false_out": 324
      }
     }
    },
@@ -3026,14 +3026,14 @@
      "emitted_any_item": 15,
      "crashes": 0,
      "accuracy": 0.6935,
-     "false_notes_per_note_in": 0.14,
-     "false_notes_per_note_out": 0.0407,
+     "false_notes_per_note_in": 0.1514,
+     "false_notes_per_note_out": 0.0424,
      "false_baseline": "other measures",
      "false_counts": {
       "truth_notes_in": 350,
-      "false_in": 49,
+      "false_in": 53,
       "truth_notes_out": 1794,
-      "false_out": 73
+      "false_out": 76
      }
     }
    },
@@ -3120,14 +3120,14 @@
      "emitted_any_item": 6,
      "crashes": 0,
      "accuracy": 0.5167,
-     "false_notes_per_note_in": 0.2149,
-     "false_notes_per_note_out": 0.0831,
+     "false_notes_per_note_in": 0.2562,
+     "false_notes_per_note_out": 0.0888,
      "false_baseline": "other measures",
      "false_counts": {
       "truth_notes_in": 121,
-      "false_in": 26,
+      "false_in": 31,
       "truth_notes_out": 349,
-      "false_out": 29
+      "false_out": 31
      }
     }
    },
@@ -3212,13 +3212,13 @@
      "crashes": 0,
      "accuracy": 0.6364,
      "false_notes_per_note_in": 0.9286,
-     "false_notes_per_note_out": 0.1228,
+     "false_notes_per_note_out": 0.1637,
      "false_baseline": "other measures",
      "false_counts": {
       "truth_notes_in": 28,
       "false_in": 26,
       "truth_notes_out": 171,
-      "false_out": 21
+      "false_out": 28
      }
     }
    },
@@ -3487,12 +3487,12 @@
     "scan-severe": {
      "variants": 14,
      "n": 202,
-     "hit": 98,
-     "read": 0.6386,
-     "emitted": 152,
+     "hit": 104,
+     "read": 0.6089,
+     "emitted": 146,
      "emitted_any_item": 14,
      "crashes": 0,
-     "accuracy": 0.4851,
+     "accuracy": 0.5149,
      "false_notes_per_note_in": 0.0735,
      "false_notes_per_note_out": 0.1678,
      "false_baseline": "other measures",
@@ -3557,12 +3557,12 @@
     "scan-severe": {
      "variants": 1,
      "n": 9,
-     "hit": 0,
+     "hit": 1,
      "read": null,
-     "emitted": 4,
+     "emitted": 3,
      "emitted_any_item": 1,
      "crashes": 0,
-     "accuracy": 0
+     "accuracy": 0.1111
     }
    },
    "notes": [],
@@ -3697,20 +3697,20 @@
     "scan-severe": {
      "variants": 73,
      "n": 107,
-     "hit": 93,
+     "hit": 94,
      "read": null,
-     "emitted": 101,
-     "emitted_any_item": 71,
+     "emitted": 102,
+     "emitted_any_item": 72,
      "crashes": 0,
-     "accuracy": 0.8692,
+     "accuracy": 0.8785,
      "false_notes_per_note_in": 0.1405,
-     "false_notes_per_note_out": 0.1342,
+     "false_notes_per_note_out": 0.1351,
      "false_baseline": "other measures",
      "false_counts": {
       "truth_notes_in": 612,
       "false_in": 86,
       "truth_notes_out": 7587,
-      "false_out": 1018
+      "false_out": 1025
      }
     }
    },
@@ -4603,20 +4603,20 @@
     "scan-severe": {
      "variants": 38,
      "n": 38,
-     "hit": 35,
+     "hit": 36,
      "read": null,
-     "emitted": 49,
-     "emitted_any_item": 37,
+     "emitted": 50,
+     "emitted_any_item": 38,
      "crashes": 0,
-     "accuracy": 0.9211,
+     "accuracy": 0.9474,
      "false_notes_per_note_in": 0.0875,
-     "false_notes_per_note_out": 0.0983,
+     "false_notes_per_note_out": 0.1001,
      "false_baseline": "other measures",
      "false_counts": {
       "truth_notes_in": 240,
       "false_in": 21,
       "truth_notes_out": 3896,
-      "false_out": 383
+      "false_out": 390
      }
     }
    },
@@ -7047,8 +7047,8 @@
      "n": 29,
      "hit": 22,
      "read": null,
-     "emitted": 34,
-     "emitted_any_item": 20,
+     "emitted": 35,
+     "emitted_any_item": 21,
      "crashes": 0,
      "accuracy": 0.7586,
      "false_notes_per_note_in": 0.1528,
@@ -7195,13 +7195,13 @@
      "crashes": 0,
      "accuracy": 0.8281,
      "false_notes_per_note_in": 0.1358,
-     "false_notes_per_note_out": 0.1919,
+     "false_notes_per_note_out": 0.1935,
      "false_baseline": "other measures",
      "false_counts": {
       "truth_notes_in": 523,
       "false_in": 71,
       "truth_notes_out": 4517,
-      "false_out": 867
+      "false_out": 874
      }
     }
    },
@@ -7476,13 +7476,13 @@
      "crashes": 0,
      "accuracy": 0.6111,
      "false_notes_per_note_in": 0.0615,
-     "false_notes_per_note_out": 0.0956,
+     "false_notes_per_note_out": 0.1042,
      "false_baseline": "other measures",
      "false_counts": {
       "truth_notes_in": 65,
       "false_in": 4,
       "truth_notes_out": 816,
-      "false_out": 78
+      "false_out": 85
      }
     }
    },
@@ -8219,13 +8219,13 @@
      "crashes": 0,
      "accuracy": 0.618,
      "false_notes_per_note_in": 0.0805,
-     "false_notes_per_note_out": 0.1456,
+     "false_notes_per_note_out": 0.1545,
      "false_baseline": "other measures",
      "false_counts": {
       "truth_notes_in": 410,
       "false_in": 33,
       "truth_notes_out": 783,
-      "false_out": 114
+      "false_out": 121
      }
     }
    },
@@ -8404,19 +8404,19 @@
      "variants": 8,
      "n": 200,
      "hit": 85,
-     "read": 0.71,
+     "read": 0.74,
      "emitted": 96,
      "emitted_any_item": 7,
      "crashes": 0,
      "accuracy": 0.425,
-     "false_notes_per_note_in": 0.0789,
-     "false_notes_per_note_out": 0.0295,
+     "false_notes_per_note_in": 0.0932,
+     "false_notes_per_note_out": 0.0318,
      "false_baseline": "other measures",
      "false_counts": {
       "truth_notes_in": 279,
-      "false_in": 22,
+      "false_in": 26,
       "truth_notes_out": 1320,
-      "false_out": 39
+      "false_out": 42
      }
     }
    },
@@ -8503,13 +8503,13 @@
      "crashes": 0,
      "accuracy": 0,
      "false_notes_per_note_in": 0.082,
-     "false_notes_per_note_out": 0.1338,
+     "false_notes_per_note_out": 0.1561,
      "false_baseline": "other measures",
      "false_counts": {
       "truth_notes_in": 61,
       "false_in": 5,
       "truth_notes_out": 314,
-      "false_out": 42
+      "false_out": 49
      }
     }
    },
@@ -8590,19 +8590,19 @@
      "variants": 4,
      "n": 44,
      "hit": 15,
-     "read": 0.75,
+     "read": 0.7955,
      "emitted": 19,
      "emitted_any_item": 2,
      "crashes": 0,
      "accuracy": 0.3409,
      "false_notes_per_note_in": 0,
-     "false_notes_per_note_out": 0.0856,
+     "false_notes_per_note_out": 0.1171,
      "false_baseline": "other measures",
      "false_counts": {
       "truth_notes_in": 75,
       "false_in": 0,
       "truth_notes_out": 222,
-      "false_out": 19
+      "false_out": 26
      }
     }
    },
@@ -8679,19 +8679,19 @@
      "variants": 2,
      "n": 36,
      "hit": 16,
-     "read": 0.6111,
+     "read": 0.6389,
      "emitted": 17,
      "emitted_any_item": 1,
      "crashes": 0,
      "accuracy": 0.4444,
      "false_notes_per_note_in": 0,
-     "false_notes_per_note_out": 0.0093,
+     "false_notes_per_note_out": 0.0748,
      "false_baseline": "other measures",
      "false_counts": {
       "truth_notes_in": 49,
       "false_in": 0,
       "truth_notes_out": 107,
-      "false_out": 1
+      "false_out": 8
      }
     }
    },
@@ -8768,19 +8768,19 @@
      "variants": 2,
      "n": 35,
      "hit": 14,
-     "read": 0.6,
+     "read": 0.6571,
      "emitted": 14,
      "emitted_any_item": 1,
      "crashes": 0,
      "accuracy": 0.4,
-     "false_notes_per_note_in": 0,
-     "false_notes_per_note_out": 0.0082,
+     "false_notes_per_note_in": 0.0294,
+     "false_notes_per_note_out": 0.0574,
      "false_baseline": "other measures",
      "false_counts": {
       "truth_notes_in": 34,
-      "false_in": 0,
+      "false_in": 1,
       "truth_notes_out": 122,
-      "false_out": 1
+      "false_out": 7
      }
     }
    },
@@ -9745,20 +9745,20 @@
     "scan-severe": {
      "variants": 32,
      "n": 130,
-     "hit": 18,
-     "read": 0.6462,
-     "emitted": 27,
-     "emitted_any_item": 12,
+     "hit": 19,
+     "read": 0.6538,
+     "emitted": 28,
+     "emitted_any_item": 13,
      "crashes": 0,
-     "accuracy": 0.1385,
+     "accuracy": 0.1462,
      "false_notes_per_note_in": 0.3383,
-     "false_notes_per_note_out": 0.1937,
+     "false_notes_per_note_out": 0.1964,
      "false_baseline": "other measures",
      "false_counts": {
       "truth_notes_in": 266,
       "false_in": 90,
       "truth_notes_out": 2535,
-      "false_out": 491
+      "false_out": 498
      }
     }
    },
@@ -11537,13 +11537,13 @@
      "crashes": 0,
      "accuracy": 0.4571,
      "false_notes_per_note_in": 0.1522,
-     "false_notes_per_note_out": 0.1227,
+     "false_notes_per_note_out": 0.124,
      "false_baseline": "other measures",
      "false_counts": {
       "truth_notes_in": 519,
       "false_in": 79,
       "truth_notes_out": 5711,
-      "false_out": 701
+      "false_out": 708
      }
     }
    },
@@ -11840,7 +11840,7 @@
      "crashes": 0,
      "accuracy": 0.7213,
      "false_notes_per_note_in": 0.0421,
-     "false_notes_per_note_out": 0.1398,
+     "false_notes_per_note_out": 0.1406,
      "false_baseline": "all items",
      "false_counts": {
       "truth_notes_in": 95,
@@ -12103,20 +12103,20 @@
     "scan-severe": {
      "variants": 82,
      "n": 83,
-     "hit": 76,
+     "hit": 78,
      "read": null,
-     "emitted": 166,
-     "emitted_any_item": 79,
+     "emitted": 167,
+     "emitted_any_item": 80,
      "crashes": 0,
-     "accuracy": 0.9157,
+     "accuracy": 0.9398,
      "false_notes_per_note_in": 0.1909,
-     "false_notes_per_note_out": 0.14,
+     "false_notes_per_note_out": 0.1409,
      "false_baseline": "other measures",
      "false_counts": {
       "truth_notes_in": 330,
       "false_in": 63,
       "truth_notes_out": 8176,
-      "false_out": 1145
+      "false_out": 1152
      }
     }
    },
@@ -13103,14 +13103,14 @@
      "emitted_any_item": 0,
      "crashes": 0,
      "accuracy": 0,
-     "false_notes_per_note_in": 0.1202,
-     "false_notes_per_note_out": 0.151,
+     "false_notes_per_note_in": 0.1217,
+     "false_notes_per_note_out": 0.1514,
      "false_baseline": "other measures",
      "false_counts": {
       "truth_notes_in": 3269,
-      "false_in": 393,
+      "false_in": 398,
       "truth_notes_out": 5151,
-      "false_out": 778
+      "false_out": 780
      }
     }
    },
@@ -13675,7 +13675,7 @@
      "n": 19,
      "hit": 9,
      "read": 0.8947,
-     "emitted": 15,
+     "emitted": 16,
      "emitted_any_item": 8,
      "crashes": 0,
      "accuracy": 0.4737,
@@ -16679,13 +16679,13 @@
      "crashes": 0,
      "accuracy": 0,
      "false_notes_per_note_in": 0.0769,
-     "false_notes_per_note_out": 0.0081,
+     "false_notes_per_note_out": 0.0645,
      "false_baseline": "other measures",
      "false_counts": {
       "truth_notes_in": 13,
       "false_in": 1,
       "truth_notes_out": 124,
-      "false_out": 1
+      "false_out": 8
      }
     }
    },
@@ -17117,11 +17117,11 @@
      "n": 33,
      "part_count_ok": 1,
      "part_names": 0.7576,
-     "right_part_share": 0.9697,
+     "right_part_share": 1,
      "split_violations": 0,
-     "layout_score": 0.9091,
-     "aggregate": 0.8575,
-     "pitch": 0.8222,
+     "layout_score": 0.9192,
+     "aggregate": 0.8662,
+     "pitch": 0.8401,
      "lyrics": 0.9697,
      "crashes": 0
     }
@@ -18042,8 +18042,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 116,
-   "ms_per_page": 1588,
-   "peak_rss_mb": 279.2,
+   "ms_per_page": 1605,
+   "peak_rss_mb": 290.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -18079,7 +18079,7 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 116,
-   "ms_per_page": 1761,
+   "ms_per_page": 1780,
    "peak_rss_mb": 284.6,
    "pages": 1,
    "layout_score": 1
@@ -18116,8 +18116,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 116,
-   "ms_per_page": 1700,
-   "peak_rss_mb": 294,
+   "ms_per_page": 1789,
+   "peak_rss_mb": 278.7,
    "pages": 1,
    "layout_score": 0.9971
   },
@@ -18153,8 +18153,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 75,
-   "ms_per_page": 2131,
-   "peak_rss_mb": 304.9,
+   "ms_per_page": 2156,
+   "peak_rss_mb": 300.4,
    "pages": 1,
    "layout_score": 0.9954
   },
@@ -18190,8 +18190,8 @@
    "crash": 0,
    "false_notes": 4,
    "truth_notes": 75,
-   "ms_per_page": 2309,
-   "peak_rss_mb": 317.1,
+   "ms_per_page": 2327,
+   "peak_rss_mb": 316.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -18227,8 +18227,8 @@
    "crash": 0,
    "false_notes": 4,
    "truth_notes": 75,
-   "ms_per_page": 2366,
-   "peak_rss_mb": 311,
+   "ms_per_page": 2330,
+   "peak_rss_mb": 312.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -18266,8 +18266,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 215,
-   "ms_per_page": 3125,
-   "peak_rss_mb": 345.5,
+   "ms_per_page": 3148,
+   "peak_rss_mb": 426.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -18305,8 +18305,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 215,
-   "ms_per_page": 3454,
-   "peak_rss_mb": 369.2,
+   "ms_per_page": 3473,
+   "peak_rss_mb": 359.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -18344,8 +18344,8 @@
    "crash": 0,
    "false_notes": 10,
    "truth_notes": 215,
-   "ms_per_page": 6039,
-   "peak_rss_mb": 509.2,
+   "ms_per_page": 6451,
+   "peak_rss_mb": 480.6,
    "pages": 1,
    "layout_score": 0.9984
   },
@@ -18379,8 +18379,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 84,
-   "ms_per_page": 1979,
-   "peak_rss_mb": 273.5,
+   "ms_per_page": 1982,
+   "peak_rss_mb": 296.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -18414,8 +18414,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 84,
-   "ms_per_page": 2306,
-   "peak_rss_mb": 305,
+   "ms_per_page": 2164,
+   "peak_rss_mb": 294.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -18447,8 +18447,8 @@
    "crash": 0,
    "false_notes": 51,
    "truth_notes": 84,
-   "ms_per_page": 3065,
-   "peak_rss_mb": 408.5,
+   "ms_per_page": 3317,
+   "peak_rss_mb": 423.3,
    "pages": 1,
    "layout_score": 0.2349
   },
@@ -18484,8 +18484,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 116,
-   "ms_per_page": 1598,
-   "peak_rss_mb": 286.4,
+   "ms_per_page": 1629,
+   "peak_rss_mb": 275.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -18521,8 +18521,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 116,
-   "ms_per_page": 1713,
-   "peak_rss_mb": 276.9,
+   "ms_per_page": 1777,
+   "peak_rss_mb": 281.9,
    "pages": 1,
    "layout_score": 0.9792
   },
@@ -18558,8 +18558,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 116,
-   "ms_per_page": 1699,
-   "peak_rss_mb": 293.8,
+   "ms_per_page": 1679,
+   "peak_rss_mb": 271.4,
    "pages": 1,
    "layout_score": 0.9943
   },
@@ -18595,8 +18595,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 112,
-   "ms_per_page": 1670,
-   "peak_rss_mb": 288,
+   "ms_per_page": 1669,
+   "peak_rss_mb": 294.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -18632,8 +18632,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 112,
-   "ms_per_page": 1819,
-   "peak_rss_mb": 294.1,
+   "ms_per_page": 1831,
+   "peak_rss_mb": 299.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -18669,8 +18669,8 @@
    "crash": 0,
    "false_notes": 43,
    "truth_notes": 112,
-   "ms_per_page": 3577,
-   "peak_rss_mb": 369.9,
+   "ms_per_page": 3625,
+   "peak_rss_mb": 380.5,
    "pages": 1,
    "layout_score": 0.9797
   },
@@ -18700,8 +18700,8 @@
    "crash": 0,
    "false_notes": 16,
    "truth_notes": 76,
-   "ms_per_page": 1237,
-   "peak_rss_mb": 271.8,
+   "ms_per_page": 1297,
+   "peak_rss_mb": 252.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -18731,8 +18731,8 @@
    "crash": 0,
    "false_notes": 13,
    "truth_notes": 76,
-   "ms_per_page": 1408,
-   "peak_rss_mb": 277.8,
+   "ms_per_page": 1371,
+   "peak_rss_mb": 287.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -18762,8 +18762,8 @@
    "crash": 0,
    "false_notes": 27,
    "truth_notes": 76,
-   "ms_per_page": 1339,
-   "peak_rss_mb": 283,
+   "ms_per_page": 1353,
+   "peak_rss_mb": 278.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -18799,8 +18799,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 126,
-   "ms_per_page": 3982,
-   "peak_rss_mb": 376.3,
+   "ms_per_page": 3931,
+   "peak_rss_mb": 403.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -18836,8 +18836,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 126,
-   "ms_per_page": 4437,
-   "peak_rss_mb": 354.3,
+   "ms_per_page": 4211,
+   "peak_rss_mb": 363.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -18873,8 +18873,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 126,
-   "ms_per_page": 4051,
-   "peak_rss_mb": 354.7,
+   "ms_per_page": 4208,
+   "peak_rss_mb": 396,
    "pages": 1,
    "layout_score": 1
   },
@@ -18910,8 +18910,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 126,
-   "ms_per_page": 1858,
-   "peak_rss_mb": 290.1,
+   "ms_per_page": 1944,
+   "peak_rss_mb": 302.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -18947,8 +18947,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 126,
-   "ms_per_page": 2001,
-   "peak_rss_mb": 310.4,
+   "ms_per_page": 2040,
+   "peak_rss_mb": 320.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -18984,8 +18984,8 @@
    "crash": 0,
    "false_notes": 6,
    "truth_notes": 126,
-   "ms_per_page": 2149,
-   "peak_rss_mb": 304.6,
+   "ms_per_page": 2131,
+   "peak_rss_mb": 318.4,
    "pages": 1,
    "layout_score": 0.9763
   },
@@ -19021,8 +19021,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 128,
-   "ms_per_page": 2183,
-   "peak_rss_mb": 303.2,
+   "ms_per_page": 2201,
+   "peak_rss_mb": 289.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -19058,8 +19058,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 128,
-   "ms_per_page": 2298,
-   "peak_rss_mb": 327.1,
+   "ms_per_page": 2271,
+   "peak_rss_mb": 327,
    "pages": 1,
    "layout_score": 1
   },
@@ -19095,8 +19095,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 128,
-   "ms_per_page": 2247,
-   "peak_rss_mb": 327,
+   "ms_per_page": 2251,
+   "peak_rss_mb": 321.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -19126,8 +19126,8 @@
    "crash": 0,
    "false_notes": 4,
    "truth_notes": 47,
-   "ms_per_page": 1873,
-   "peak_rss_mb": 292.5,
+   "ms_per_page": 1851,
+   "peak_rss_mb": 295.1,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -19157,8 +19157,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 47,
-   "ms_per_page": 1951,
-   "peak_rss_mb": 297.4,
+   "ms_per_page": 1986,
+   "peak_rss_mb": 301,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -19188,8 +19188,8 @@
    "crash": 0,
    "false_notes": 6,
    "truth_notes": 47,
-   "ms_per_page": 1998,
-   "peak_rss_mb": 318.5,
+   "ms_per_page": 1985,
+   "peak_rss_mb": 300,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -19219,8 +19219,8 @@
    "crash": 0,
    "false_notes": 13,
    "truth_notes": 40,
-   "ms_per_page": 1107,
-   "peak_rss_mb": 319.5,
+   "ms_per_page": 1136,
+   "peak_rss_mb": 323.8,
    "pages": 2,
    "layout_score": 1
   },
@@ -19250,8 +19250,8 @@
    "crash": 0,
    "false_notes": 16,
    "truth_notes": 40,
-   "ms_per_page": 1343,
-   "peak_rss_mb": 316.4,
+   "ms_per_page": 1244,
+   "peak_rss_mb": 320.8,
    "pages": 2,
    "layout_score": 1
   },
@@ -19281,8 +19281,8 @@
    "crash": 0,
    "false_notes": 20,
    "truth_notes": 40,
-   "ms_per_page": 1351,
-   "peak_rss_mb": 311,
+   "ms_per_page": 1358,
+   "peak_rss_mb": 347.5,
    "pages": 2,
    "layout_score": 0.6667
   },
@@ -19312,8 +19312,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 55,
-   "ms_per_page": 1262,
-   "peak_rss_mb": 276.4,
+   "ms_per_page": 1216,
+   "peak_rss_mb": 263.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -19343,8 +19343,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 55,
-   "ms_per_page": 1400,
-   "peak_rss_mb": 278.7,
+   "ms_per_page": 1394,
+   "peak_rss_mb": 290,
    "pages": 1,
    "layout_score": 1
   },
@@ -19374,8 +19374,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 55,
-   "ms_per_page": 2914,
-   "peak_rss_mb": 402.6,
+   "ms_per_page": 3047,
+   "peak_rss_mb": 410.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -19405,8 +19405,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 39,
-   "ms_per_page": 1401,
-   "peak_rss_mb": 268,
+   "ms_per_page": 1466,
+   "peak_rss_mb": 293.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -19436,8 +19436,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 39,
-   "ms_per_page": 1573,
-   "peak_rss_mb": 282.8,
+   "ms_per_page": 1575,
+   "peak_rss_mb": 275.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -19467,8 +19467,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 39,
-   "ms_per_page": 1552,
-   "peak_rss_mb": 288.4,
+   "ms_per_page": 1515,
+   "peak_rss_mb": 269.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -19514,8 +19514,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 250,
-   "ms_per_page": 3836,
-   "peak_rss_mb": 507.9,
+   "ms_per_page": 3821,
+   "peak_rss_mb": 501.9,
    "pages": 2,
    "layout_score": 0.8889
   },
@@ -19561,8 +19561,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 250,
-   "ms_per_page": 4388,
-   "peak_rss_mb": 501.8,
+   "ms_per_page": 4350,
+   "peak_rss_mb": 517.5,
    "pages": 2,
    "layout_score": 0.8889
   },
@@ -19608,8 +19608,8 @@
    "crash": 0,
    "false_notes": 41,
    "truth_notes": 250,
-   "ms_per_page": 6609,
-   "peak_rss_mb": 595.3,
+   "ms_per_page": 6747,
+   "peak_rss_mb": 617,
    "pages": 2,
    "layout_score": 0.8704
   },
@@ -19640,7 +19640,7 @@
    "false_notes": 0,
    "truth_notes": 104,
    "ms_per_page": 1851,
-   "peak_rss_mb": 289.7,
+   "peak_rss_mb": 287.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -19670,8 +19670,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 104,
-   "ms_per_page": 1849,
-   "peak_rss_mb": 267.8,
+   "ms_per_page": 1868,
+   "peak_rss_mb": 267.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -19701,8 +19701,8 @@
    "crash": 0,
    "false_notes": 77,
    "truth_notes": 104,
-   "ms_per_page": 4401,
-   "peak_rss_mb": 400.9,
+   "ms_per_page": 4437,
+   "peak_rss_mb": 410.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -19732,8 +19732,8 @@
    "crash": 0,
    "false_notes": 21,
    "truth_notes": 131,
-   "ms_per_page": 1446,
-   "peak_rss_mb": 254.2,
+   "ms_per_page": 1420,
+   "peak_rss_mb": 274.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -19763,8 +19763,8 @@
    "crash": 0,
    "false_notes": 7,
    "truth_notes": 131,
-   "ms_per_page": 1540,
-   "peak_rss_mb": 282.7,
+   "ms_per_page": 1596,
+   "peak_rss_mb": 299.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -19794,8 +19794,8 @@
    "crash": 0,
    "false_notes": 10,
    "truth_notes": 131,
-   "ms_per_page": 1561,
-   "peak_rss_mb": 285.2,
+   "ms_per_page": 1591,
+   "peak_rss_mb": 275.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -19831,8 +19831,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 128,
-   "ms_per_page": 3559,
-   "peak_rss_mb": 375.5,
+   "ms_per_page": 3564,
+   "peak_rss_mb": 390.4,
    "pages": 1,
    "layout_score": 0.8958
   },
@@ -19868,8 +19868,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 128,
-   "ms_per_page": 4147,
-   "peak_rss_mb": 378.8,
+   "ms_per_page": 4423,
+   "peak_rss_mb": 420.7,
    "pages": 1,
    "layout_score": 0.9974
   },
@@ -19904,8 +19904,8 @@
    "crash": 0,
    "false_notes": 4,
    "truth_notes": 128,
-   "ms_per_page": 3863,
-   "peak_rss_mb": 354.8,
+   "ms_per_page": 4006,
+   "peak_rss_mb": 399.3,
    "pages": 1,
    "layout_score": 0.4217
   },
@@ -19935,8 +19935,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 70,
-   "ms_per_page": 1291,
-   "peak_rss_mb": 264.9,
+   "ms_per_page": 1413,
+   "peak_rss_mb": 255.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -19966,8 +19966,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 70,
-   "ms_per_page": 1507,
-   "peak_rss_mb": 308.5,
+   "ms_per_page": 1459,
+   "peak_rss_mb": 285.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -19997,8 +19997,8 @@
    "crash": 0,
    "false_notes": 58,
    "truth_notes": 70,
-   "ms_per_page": 3222,
-   "peak_rss_mb": 360.8,
+   "ms_per_page": 3121,
+   "peak_rss_mb": 377.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -20030,8 +20030,8 @@
    "crash": 0,
    "false_notes": 5,
    "truth_notes": 122,
-   "ms_per_page": 1799,
-   "peak_rss_mb": 276.2,
+   "ms_per_page": 1774,
+   "peak_rss_mb": 287.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -20063,8 +20063,8 @@
    "crash": 0,
    "false_notes": 6,
    "truth_notes": 122,
-   "ms_per_page": 1919,
-   "peak_rss_mb": 311.4,
+   "ms_per_page": 1980,
+   "peak_rss_mb": 299,
    "pages": 1,
    "layout_score": 1
   },
@@ -20096,8 +20096,8 @@
    "crash": 0,
    "false_notes": 126,
    "truth_notes": 122,
-   "ms_per_page": 4121,
-   "peak_rss_mb": 372.4,
+   "ms_per_page": 4062,
+   "peak_rss_mb": 404.4,
    "pages": 1,
    "layout_score": 0.9185
   },
@@ -20127,8 +20127,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 24,
-   "ms_per_page": 1632,
-   "peak_rss_mb": 285.5,
+   "ms_per_page": 1631,
+   "peak_rss_mb": 295.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -20158,8 +20158,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 24,
-   "ms_per_page": 1732,
-   "peak_rss_mb": 314.8,
+   "ms_per_page": 1717,
+   "peak_rss_mb": 302.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -20189,8 +20189,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 24,
-   "ms_per_page": 1658,
-   "peak_rss_mb": 306.2,
+   "ms_per_page": 1698,
+   "peak_rss_mb": 286.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -20220,8 +20220,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 32,
-   "ms_per_page": 1956,
-   "peak_rss_mb": 289.3,
+   "ms_per_page": 1930,
+   "peak_rss_mb": 286.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -20251,8 +20251,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 32,
-   "ms_per_page": 2007,
-   "peak_rss_mb": 279,
+   "ms_per_page": 2017,
+   "peak_rss_mb": 288.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -20282,8 +20282,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 32,
-   "ms_per_page": 2189,
-   "peak_rss_mb": 349.5,
+   "ms_per_page": 2207,
+   "peak_rss_mb": 306.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -20313,8 +20313,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 58,
-   "ms_per_page": 1263,
-   "peak_rss_mb": 271.6,
+   "ms_per_page": 1219,
+   "peak_rss_mb": 269.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -20344,8 +20344,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 58,
-   "ms_per_page": 1389,
-   "peak_rss_mb": 310.5,
+   "ms_per_page": 1462,
+   "peak_rss_mb": 273.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -20375,8 +20375,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 58,
-   "ms_per_page": 1485,
-   "peak_rss_mb": 295.9,
+   "ms_per_page": 1476,
+   "peak_rss_mb": 273.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -20406,8 +20406,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 33,
-   "ms_per_page": 1273,
-   "peak_rss_mb": 256.3,
+   "ms_per_page": 1214,
+   "peak_rss_mb": 279.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -20437,8 +20437,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 33,
-   "ms_per_page": 1455,
-   "peak_rss_mb": 286.4,
+   "ms_per_page": 1416,
+   "peak_rss_mb": 272.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -20468,8 +20468,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 33,
-   "ms_per_page": 2811,
-   "peak_rss_mb": 422.3,
+   "ms_per_page": 2898,
+   "peak_rss_mb": 388.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -20499,8 +20499,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 44,
-   "ms_per_page": 1388,
-   "peak_rss_mb": 296.1,
+   "ms_per_page": 1361,
+   "peak_rss_mb": 284.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -20530,8 +20530,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 44,
-   "ms_per_page": 1567,
-   "peak_rss_mb": 276.7,
+   "ms_per_page": 1564,
+   "peak_rss_mb": 268.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -20561,8 +20561,8 @@
    "crash": 0,
    "false_notes": 6,
    "truth_notes": 44,
-   "ms_per_page": 2056,
-   "peak_rss_mb": 295.8,
+   "ms_per_page": 2092,
+   "peak_rss_mb": 332.6,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -20592,8 +20592,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 96,
-   "ms_per_page": 1735,
-   "peak_rss_mb": 290.1,
+   "ms_per_page": 1754,
+   "peak_rss_mb": 273.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -20623,8 +20623,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 96,
-   "ms_per_page": 1901,
-   "peak_rss_mb": 277.9,
+   "ms_per_page": 1864,
+   "peak_rss_mb": 287.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -20654,8 +20654,8 @@
    "crash": 0,
    "false_notes": 14,
    "truth_notes": 96,
-   "ms_per_page": 1981,
-   "peak_rss_mb": 313.2,
+   "ms_per_page": 1984,
+   "peak_rss_mb": 312.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -20685,8 +20685,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 59,
-   "ms_per_page": 1562,
-   "peak_rss_mb": 276,
+   "ms_per_page": 1549,
+   "peak_rss_mb": 293.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -20716,8 +20716,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 59,
-   "ms_per_page": 1731,
-   "peak_rss_mb": 298.9,
+   "ms_per_page": 1717,
+   "peak_rss_mb": 287.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -20747,8 +20747,8 @@
    "crash": 0,
    "false_notes": 8,
    "truth_notes": 59,
-   "ms_per_page": 1786,
-   "peak_rss_mb": 292.2,
+   "ms_per_page": 1810,
+   "peak_rss_mb": 291.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -20778,8 +20778,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 48,
-   "ms_per_page": 1560,
-   "peak_rss_mb": 292.2,
+   "ms_per_page": 1540,
+   "peak_rss_mb": 272.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -20809,8 +20809,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 48,
-   "ms_per_page": 1677,
-   "peak_rss_mb": 318,
+   "ms_per_page": 1740,
+   "peak_rss_mb": 287.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -20840,8 +20840,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 48,
-   "ms_per_page": 3537,
-   "peak_rss_mb": 342.7,
+   "ms_per_page": 3482,
+   "peak_rss_mb": 351.2,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -20873,8 +20873,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 130,
-   "ms_per_page": 1808,
-   "peak_rss_mb": 301.6,
+   "ms_per_page": 1817,
+   "peak_rss_mb": 280.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -20906,8 +20906,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 130,
-   "ms_per_page": 1898,
-   "peak_rss_mb": 299.2,
+   "ms_per_page": 1974,
+   "peak_rss_mb": 317.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -20939,8 +20939,8 @@
    "crash": 0,
    "false_notes": 15,
    "truth_notes": 130,
-   "ms_per_page": 2156,
-   "peak_rss_mb": 325.6,
+   "ms_per_page": 2114,
+   "peak_rss_mb": 321.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -20976,8 +20976,8 @@
    "crash": 0,
    "false_notes": 5,
    "truth_notes": 126,
-   "ms_per_page": 2041,
-   "peak_rss_mb": 333.9,
+   "ms_per_page": 2078,
+   "peak_rss_mb": 334.9,
    "pages": 1,
    "layout_score": 0.9974
   },
@@ -21013,8 +21013,8 @@
    "crash": 0,
    "false_notes": 5,
    "truth_notes": 126,
-   "ms_per_page": 2251,
-   "peak_rss_mb": 329.3,
+   "ms_per_page": 2317,
+   "peak_rss_mb": 324.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -21050,8 +21050,8 @@
    "crash": 0,
    "false_notes": 14,
    "truth_notes": 126,
-   "ms_per_page": 2432,
-   "peak_rss_mb": 304.5,
+   "ms_per_page": 2408,
+   "peak_rss_mb": 289.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -21081,8 +21081,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 29,
-   "ms_per_page": 1488,
-   "peak_rss_mb": 265.5,
+   "ms_per_page": 1395,
+   "peak_rss_mb": 287.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -21112,8 +21112,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 29,
-   "ms_per_page": 1738,
-   "peak_rss_mb": 312.9,
+   "ms_per_page": 1659,
+   "peak_rss_mb": 292.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -21143,8 +21143,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 29,
-   "ms_per_page": 1791,
-   "peak_rss_mb": 364.6,
+   "ms_per_page": 1776,
+   "peak_rss_mb": 361.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -21174,8 +21174,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 96,
-   "ms_per_page": 1459,
-   "peak_rss_mb": 281.7,
+   "ms_per_page": 1508,
+   "peak_rss_mb": 271.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -21205,8 +21205,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 96,
-   "ms_per_page": 1575,
-   "peak_rss_mb": 280.9,
+   "ms_per_page": 1606,
+   "peak_rss_mb": 283.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -21236,8 +21236,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 96,
-   "ms_per_page": 1627,
-   "peak_rss_mb": 315.5,
+   "ms_per_page": 1674,
+   "peak_rss_mb": 301.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -21267,8 +21267,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 42,
-   "ms_per_page": 1283,
-   "peak_rss_mb": 269.5,
+   "ms_per_page": 1248,
+   "peak_rss_mb": 253.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -21298,8 +21298,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 42,
-   "ms_per_page": 1417,
-   "peak_rss_mb": 281.1,
+   "ms_per_page": 1384,
+   "peak_rss_mb": 303.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -21329,8 +21329,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 42,
-   "ms_per_page": 1415,
-   "peak_rss_mb": 288.7,
+   "ms_per_page": 1461,
+   "peak_rss_mb": 286.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -21360,8 +21360,8 @@
    "crash": 0,
    "false_notes": 18,
    "truth_notes": 138,
-   "ms_per_page": 1402,
-   "peak_rss_mb": 269,
+   "ms_per_page": 1443,
+   "peak_rss_mb": 295.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -21391,8 +21391,8 @@
    "crash": 0,
    "false_notes": 10,
    "truth_notes": 138,
-   "ms_per_page": 1612,
-   "peak_rss_mb": 293.9,
+   "ms_per_page": 1590,
+   "peak_rss_mb": 298.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -21422,8 +21422,8 @@
    "crash": 0,
    "false_notes": 24,
    "truth_notes": 138,
-   "ms_per_page": 1923,
-   "peak_rss_mb": 289.5,
+   "ms_per_page": 1890,
+   "peak_rss_mb": 273.9,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -21453,8 +21453,8 @@
    "crash": 0,
    "false_notes": 5,
    "truth_notes": 72,
-   "ms_per_page": 1412,
-   "peak_rss_mb": 252.9,
+   "ms_per_page": 1410,
+   "peak_rss_mb": 269.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -21484,8 +21484,8 @@
    "crash": 0,
    "false_notes": 11,
    "truth_notes": 72,
-   "ms_per_page": 1511,
-   "peak_rss_mb": 318.2,
+   "ms_per_page": 1550,
+   "peak_rss_mb": 318,
    "pages": 1,
    "layout_score": 1
   },
@@ -21515,8 +21515,8 @@
    "crash": 0,
    "false_notes": 13,
    "truth_notes": 72,
-   "ms_per_page": 1586,
-   "peak_rss_mb": 313,
+   "ms_per_page": 1606,
+   "peak_rss_mb": 279.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -21546,8 +21546,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 200,
-   "ms_per_page": 1488,
-   "peak_rss_mb": 280.7,
+   "ms_per_page": 1440,
+   "peak_rss_mb": 296.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -21577,8 +21577,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 200,
-   "ms_per_page": 1526,
-   "peak_rss_mb": 266.1,
+   "ms_per_page": 1469,
+   "peak_rss_mb": 269.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -21608,8 +21608,8 @@
    "crash": 0,
    "false_notes": 5,
    "truth_notes": 200,
-   "ms_per_page": 1679,
-   "peak_rss_mb": 299.7,
+   "ms_per_page": 1668,
+   "peak_rss_mb": 322.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -21639,8 +21639,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 144,
-   "ms_per_page": 1443,
-   "peak_rss_mb": 276.1,
+   "ms_per_page": 1420,
+   "peak_rss_mb": 282.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -21670,8 +21670,8 @@
    "crash": 0,
    "false_notes": 8,
    "truth_notes": 144,
-   "ms_per_page": 1658,
-   "peak_rss_mb": 298.9,
+   "ms_per_page": 1618,
+   "peak_rss_mb": 292.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -21701,8 +21701,8 @@
    "crash": 0,
    "false_notes": 4,
    "truth_notes": 144,
-   "ms_per_page": 1625,
-   "peak_rss_mb": 307.8,
+   "ms_per_page": 1642,
+   "peak_rss_mb": 305.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -21732,8 +21732,8 @@
    "crash": 0,
    "false_notes": 22,
    "truth_notes": 93,
-   "ms_per_page": 1456,
-   "peak_rss_mb": 273.1,
+   "ms_per_page": 1446,
+   "peak_rss_mb": 267,
    "pages": 1,
    "layout_score": 1
   },
@@ -21763,8 +21763,8 @@
    "crash": 0,
    "false_notes": 26,
    "truth_notes": 93,
-   "ms_per_page": 1587,
-   "peak_rss_mb": 311.1,
+   "ms_per_page": 1628,
+   "peak_rss_mb": 282.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -21794,8 +21794,8 @@
    "crash": 0,
    "false_notes": 17,
    "truth_notes": 93,
-   "ms_per_page": 1581,
-   "peak_rss_mb": 305.9,
+   "ms_per_page": 1657,
+   "peak_rss_mb": 313.6,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -21825,8 +21825,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 93,
-   "ms_per_page": 1279,
-   "peak_rss_mb": 278.9,
+   "ms_per_page": 1306,
+   "peak_rss_mb": 270,
    "pages": 1,
    "layout_score": 1
   },
@@ -21856,8 +21856,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 93,
-   "ms_per_page": 1544,
-   "peak_rss_mb": 280.9,
+   "ms_per_page": 1464,
+   "peak_rss_mb": 279.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -21887,8 +21887,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 93,
-   "ms_per_page": 1541,
-   "peak_rss_mb": 309.8,
+   "ms_per_page": 1539,
+   "peak_rss_mb": 321.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -21918,8 +21918,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 30,
-   "ms_per_page": 1400,
-   "peak_rss_mb": 278.1,
+   "ms_per_page": 1434,
+   "peak_rss_mb": 248.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -21949,8 +21949,8 @@
    "crash": 0,
    "false_notes": 8,
    "truth_notes": 30,
-   "ms_per_page": 1578,
-   "peak_rss_mb": 286.8,
+   "ms_per_page": 1592,
+   "peak_rss_mb": 291.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -21980,8 +21980,8 @@
    "crash": 0,
    "false_notes": 7,
    "truth_notes": 30,
-   "ms_per_page": 2126,
-   "peak_rss_mb": 337.4,
+   "ms_per_page": 2061,
+   "peak_rss_mb": 351.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -22011,8 +22011,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 14,
-   "ms_per_page": 1195,
-   "peak_rss_mb": 279.6,
+   "ms_per_page": 1267,
+   "peak_rss_mb": 266.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -22042,8 +22042,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 14,
-   "ms_per_page": 1323,
-   "peak_rss_mb": 274.9,
+   "ms_per_page": 1353,
+   "peak_rss_mb": 297.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -22073,8 +22073,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 14,
-   "ms_per_page": 1684,
-   "peak_rss_mb": 347.7,
+   "ms_per_page": 1733,
+   "peak_rss_mb": 338,
    "pages": 1,
    "layout_score": 1
   },
@@ -22104,8 +22104,8 @@
    "crash": 0,
    "false_notes": 10,
    "truth_notes": 60,
-   "ms_per_page": 1286,
-   "peak_rss_mb": 261,
+   "ms_per_page": 1339,
+   "peak_rss_mb": 288.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -22135,8 +22135,8 @@
    "crash": 0,
    "false_notes": 7,
    "truth_notes": 60,
-   "ms_per_page": 1417,
-   "peak_rss_mb": 307.5,
+   "ms_per_page": 1478,
+   "peak_rss_mb": 287.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -22166,8 +22166,8 @@
    "crash": 0,
    "false_notes": 16,
    "truth_notes": 60,
-   "ms_per_page": 5239,
-   "peak_rss_mb": 549.1,
+   "ms_per_page": 5437,
+   "peak_rss_mb": 492.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -22197,8 +22197,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 153,
-   "ms_per_page": 1351,
-   "peak_rss_mb": 285.1,
+   "ms_per_page": 1448,
+   "peak_rss_mb": 270.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -22228,8 +22228,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 153,
-   "ms_per_page": 1515,
-   "peak_rss_mb": 334.3,
+   "ms_per_page": 1537,
+   "peak_rss_mb": 293.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -22259,8 +22259,8 @@
    "crash": 0,
    "false_notes": 8,
    "truth_notes": 153,
-   "ms_per_page": 1597,
-   "peak_rss_mb": 293.9,
+   "ms_per_page": 1645,
+   "peak_rss_mb": 289.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -22293,8 +22293,8 @@
    "crash": 0,
    "false_notes": 52,
    "truth_notes": 172,
-   "ms_per_page": 1663,
-   "peak_rss_mb": 272.5,
+   "ms_per_page": 1666,
+   "peak_rss_mb": 266.5,
    "pages": 1,
    "layout_score": 0.4444
   },
@@ -22327,8 +22327,8 @@
    "crash": 0,
    "false_notes": 63,
    "truth_notes": 172,
-   "ms_per_page": 1794,
-   "peak_rss_mb": 269.1,
+   "ms_per_page": 1820,
+   "peak_rss_mb": 279.1,
    "pages": 1,
    "layout_score": 0.4444
   },
@@ -22361,8 +22361,8 @@
    "crash": 0,
    "false_notes": 50,
    "truth_notes": 172,
-   "ms_per_page": 1885,
-   "peak_rss_mb": 280,
+   "ms_per_page": 1869,
+   "peak_rss_mb": 285.7,
    "pages": 1,
    "layout_score": 0.4444
   },
@@ -22392,8 +22392,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 90,
-   "ms_per_page": 1417,
-   "peak_rss_mb": 286.9,
+   "ms_per_page": 1430,
+   "peak_rss_mb": 266.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -22423,8 +22423,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 90,
-   "ms_per_page": 1515,
-   "peak_rss_mb": 297,
+   "ms_per_page": 1565,
+   "peak_rss_mb": 279.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -22454,8 +22454,8 @@
    "crash": 0,
    "false_notes": 6,
    "truth_notes": 90,
-   "ms_per_page": 1580,
-   "peak_rss_mb": 281,
+   "ms_per_page": 1636,
+   "peak_rss_mb": 275,
    "pages": 1,
    "layout_score": 1
   },
@@ -22485,8 +22485,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 49,
-   "ms_per_page": 1542,
-   "peak_rss_mb": 287.4,
+   "ms_per_page": 1494,
+   "peak_rss_mb": 264.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -22517,7 +22517,7 @@
    "false_notes": 1,
    "truth_notes": 49,
    "ms_per_page": 1668,
-   "peak_rss_mb": 280.4,
+   "peak_rss_mb": 266.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -22547,8 +22547,8 @@
    "crash": 0,
    "false_notes": 11,
    "truth_notes": 49,
-   "ms_per_page": 1755,
-   "peak_rss_mb": 293.6,
+   "ms_per_page": 1736,
+   "peak_rss_mb": 277.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -22578,8 +22578,8 @@
    "crash": 0,
    "false_notes": 9,
    "truth_notes": 67,
-   "ms_per_page": 1432,
-   "peak_rss_mb": 275,
+   "ms_per_page": 1476,
+   "peak_rss_mb": 278.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -22609,8 +22609,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 67,
-   "ms_per_page": 1778,
-   "peak_rss_mb": 285.1,
+   "ms_per_page": 1641,
+   "peak_rss_mb": 272.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -22640,8 +22640,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 67,
-   "ms_per_page": 7086,
-   "peak_rss_mb": 349.5,
+   "ms_per_page": 7404,
+   "peak_rss_mb": 360.3,
    "pages": 1,
    "layout_score": 0.3333
   },
@@ -22671,8 +22671,8 @@
    "crash": 0,
    "false_notes": 49,
    "truth_notes": 80,
-   "ms_per_page": 1393,
-   "peak_rss_mb": 270.8,
+   "ms_per_page": 1424,
+   "peak_rss_mb": 279.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -22702,8 +22702,8 @@
    "crash": 0,
    "false_notes": 49,
    "truth_notes": 80,
-   "ms_per_page": 1591,
-   "peak_rss_mb": 292.5,
+   "ms_per_page": 1554,
+   "peak_rss_mb": 277.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -22733,8 +22733,8 @@
    "crash": 0,
    "false_notes": 59,
    "truth_notes": 80,
-   "ms_per_page": 2115,
-   "peak_rss_mb": 329.4,
+   "ms_per_page": 2183,
+   "peak_rss_mb": 342.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -22770,8 +22770,8 @@
    "crash": 0,
    "false_notes": 13,
    "truth_notes": 113,
-   "ms_per_page": 1805,
-   "peak_rss_mb": 301.6,
+   "ms_per_page": 1916,
+   "peak_rss_mb": 290.1,
    "pages": 1,
    "layout_score": 0.9935
   },
@@ -22807,8 +22807,8 @@
    "crash": 0,
    "false_notes": 15,
    "truth_notes": 113,
-   "ms_per_page": 1987,
-   "peak_rss_mb": 267.7,
+   "ms_per_page": 2013,
+   "peak_rss_mb": 286.1,
    "pages": 1,
    "layout_score": 0.9902
   },
@@ -22844,8 +22844,8 @@
    "crash": 0,
    "false_notes": 20,
    "truth_notes": 113,
-   "ms_per_page": 2172,
-   "peak_rss_mb": 325,
+   "ms_per_page": 2227,
+   "peak_rss_mb": 331.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -22875,8 +22875,8 @@
    "crash": 0,
    "false_notes": 4,
    "truth_notes": 112,
-   "ms_per_page": 1680,
-   "peak_rss_mb": 275.4,
+   "ms_per_page": 1788,
+   "peak_rss_mb": 280.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -22906,8 +22906,8 @@
    "crash": 0,
    "false_notes": 4,
    "truth_notes": 112,
-   "ms_per_page": 1860,
-   "peak_rss_mb": 295.9,
+   "ms_per_page": 1861,
+   "peak_rss_mb": 298.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -22937,8 +22937,8 @@
    "crash": 0,
    "false_notes": 14,
    "truth_notes": 112,
-   "ms_per_page": 2060,
-   "peak_rss_mb": 292.1,
+   "ms_per_page": 1980,
+   "peak_rss_mb": 307.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -22968,8 +22968,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 98,
-   "ms_per_page": 1610,
-   "peak_rss_mb": 270.4,
+   "ms_per_page": 1630,
+   "peak_rss_mb": 275.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -22999,8 +22999,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 98,
-   "ms_per_page": 1732,
-   "peak_rss_mb": 269.5,
+   "ms_per_page": 1770,
+   "peak_rss_mb": 292.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -23030,8 +23030,8 @@
    "crash": 0,
    "false_notes": 65,
    "truth_notes": 98,
-   "ms_per_page": 2137,
-   "peak_rss_mb": 304.4,
+   "ms_per_page": 2225,
+   "peak_rss_mb": 303.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -23061,8 +23061,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 88,
-   "ms_per_page": 1424,
-   "peak_rss_mb": 282.9,
+   "ms_per_page": 1473,
+   "peak_rss_mb": 290.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -23092,8 +23092,8 @@
    "crash": 0,
    "false_notes": 6,
    "truth_notes": 88,
-   "ms_per_page": 1648,
-   "peak_rss_mb": 303.1,
+   "ms_per_page": 1684,
+   "peak_rss_mb": 264.3,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -23123,8 +23123,8 @@
    "crash": 0,
    "false_notes": 15,
    "truth_notes": 88,
-   "ms_per_page": 2236,
-   "peak_rss_mb": 319.7,
+   "ms_per_page": 2274,
+   "peak_rss_mb": 359.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -23154,8 +23154,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 49,
-   "ms_per_page": 1508,
-   "peak_rss_mb": 281.6,
+   "ms_per_page": 1427,
+   "peak_rss_mb": 289.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -23185,8 +23185,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 49,
-   "ms_per_page": 1618,
-   "peak_rss_mb": 266.8,
+   "ms_per_page": 1616,
+   "peak_rss_mb": 288.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -23216,8 +23216,8 @@
    "crash": 0,
    "false_notes": 5,
    "truth_notes": 49,
-   "ms_per_page": 1644,
-   "peak_rss_mb": 313.9,
+   "ms_per_page": 1705,
+   "peak_rss_mb": 279.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -23247,8 +23247,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 48,
-   "ms_per_page": 1451,
-   "peak_rss_mb": 280.9,
+   "ms_per_page": 1432,
+   "peak_rss_mb": 286.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -23278,8 +23278,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 48,
-   "ms_per_page": 1580,
-   "peak_rss_mb": 287.7,
+   "ms_per_page": 1499,
+   "peak_rss_mb": 312.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -23309,8 +23309,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 48,
-   "ms_per_page": 2299,
-   "peak_rss_mb": 298,
+   "ms_per_page": 2366,
+   "peak_rss_mb": 315.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -23340,8 +23340,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 37,
-   "ms_per_page": 1205,
-   "peak_rss_mb": 272,
+   "ms_per_page": 1248,
+   "peak_rss_mb": 266,
    "pages": 1,
    "layout_score": 1
   },
@@ -23371,8 +23371,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 37,
-   "ms_per_page": 1349,
-   "peak_rss_mb": 308.8,
+   "ms_per_page": 1371,
+   "peak_rss_mb": 280.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -23402,8 +23402,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 37,
-   "ms_per_page": 1863,
-   "peak_rss_mb": 364.3,
+   "ms_per_page": 1897,
+   "peak_rss_mb": 338,
    "pages": 1,
    "layout_score": 1
   },
@@ -23433,8 +23433,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 62,
-   "ms_per_page": 1582,
-   "peak_rss_mb": 275,
+   "ms_per_page": 1514,
+   "peak_rss_mb": 279.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -23464,8 +23464,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 62,
-   "ms_per_page": 1591,
-   "peak_rss_mb": 290.4,
+   "ms_per_page": 1579,
+   "peak_rss_mb": 274,
    "pages": 1,
    "layout_score": 1
   },
@@ -23495,8 +23495,8 @@
    "crash": 0,
    "false_notes": 6,
    "truth_notes": 62,
-   "ms_per_page": 1921,
-   "peak_rss_mb": 303.5,
+   "ms_per_page": 1968,
+   "peak_rss_mb": 295.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -23526,8 +23526,8 @@
    "crash": 0,
    "false_notes": 12,
    "truth_notes": 33,
-   "ms_per_page": 1437,
-   "peak_rss_mb": 278.1,
+   "ms_per_page": 1510,
+   "peak_rss_mb": 263.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -23557,8 +23557,8 @@
    "crash": 0,
    "false_notes": 8,
    "truth_notes": 33,
-   "ms_per_page": 1913,
-   "peak_rss_mb": 312.6,
+   "ms_per_page": 1746,
+   "peak_rss_mb": 278.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -23588,8 +23588,8 @@
    "crash": 0,
    "false_notes": 26,
    "truth_notes": 33,
-   "ms_per_page": 2191,
-   "peak_rss_mb": 378.4,
+   "ms_per_page": 2229,
+   "peak_rss_mb": 386.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -23619,8 +23619,8 @@
    "crash": 0,
    "false_notes": 6,
    "truth_notes": 34,
-   "ms_per_page": 1660,
-   "peak_rss_mb": 281.7,
+   "ms_per_page": 1600,
+   "peak_rss_mb": 269.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -23650,8 +23650,8 @@
    "crash": 0,
    "false_notes": 4,
    "truth_notes": 34,
-   "ms_per_page": 1715,
-   "peak_rss_mb": 304.3,
+   "ms_per_page": 1666,
+   "peak_rss_mb": 289,
    "pages": 1,
    "layout_score": 1
   },
@@ -23681,8 +23681,8 @@
    "crash": 0,
    "false_notes": 14,
    "truth_notes": 34,
-   "ms_per_page": 1878,
-   "peak_rss_mb": 285.3,
+   "ms_per_page": 1897,
+   "peak_rss_mb": 281.3,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -23712,8 +23712,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 10,
-   "ms_per_page": 1453,
-   "peak_rss_mb": 270.3,
+   "ms_per_page": 1426,
+   "peak_rss_mb": 271,
    "pages": 1,
    "layout_score": 1
   },
@@ -23743,8 +23743,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 10,
-   "ms_per_page": 1581,
-   "peak_rss_mb": 316.3,
+   "ms_per_page": 1554,
+   "peak_rss_mb": 284.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -23774,8 +23774,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 10,
-   "ms_per_page": 2849,
-   "peak_rss_mb": 440.8,
+   "ms_per_page": 2919,
+   "peak_rss_mb": 392.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -23805,8 +23805,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 19,
-   "ms_per_page": 1451,
-   "peak_rss_mb": 282.9,
+   "ms_per_page": 1486,
+   "peak_rss_mb": 268.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -23836,8 +23836,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 19,
-   "ms_per_page": 1525,
-   "peak_rss_mb": 285.9,
+   "ms_per_page": 1536,
+   "peak_rss_mb": 272.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -23867,8 +23867,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 19,
-   "ms_per_page": 2443,
-   "peak_rss_mb": 372.7,
+   "ms_per_page": 2460,
+   "peak_rss_mb": 315,
    "pages": 1,
    "layout_score": 1
   },
@@ -23898,8 +23898,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 19,
-   "ms_per_page": 1537,
-   "peak_rss_mb": 290.3,
+   "ms_per_page": 1566,
+   "peak_rss_mb": 275.4,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -23929,8 +23929,8 @@
    "crash": 0,
    "false_notes": 5,
    "truth_notes": 19,
-   "ms_per_page": 1778,
-   "peak_rss_mb": 286.8,
+   "ms_per_page": 1755,
+   "peak_rss_mb": 314.8,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -23951,17 +23951,17 @@
    "part_names": 0,
    "right_part_share": 1,
    "split_violation": 0,
-   "aggregate": 0.6261,
-   "pitch": 0.5926,
-   "duration": 0.0752,
-   "rests": 0,
+   "aggregate": 0.739,
+   "pitch": 0.8485,
+   "duration": 0.2556,
+   "rests": 0.12,
    "lyrics": 1,
    "xml_valid": 1,
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 19,
-   "ms_per_page": 1688,
-   "peak_rss_mb": 330.8,
+   "ms_per_page": 1951,
+   "peak_rss_mb": 312,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -23991,8 +23991,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 49,
-   "ms_per_page": 1320,
-   "peak_rss_mb": 290.8,
+   "ms_per_page": 1352,
+   "peak_rss_mb": 279.1,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -24022,8 +24022,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 49,
-   "ms_per_page": 1457,
-   "peak_rss_mb": 299.6,
+   "ms_per_page": 1505,
+   "peak_rss_mb": 280.1,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -24053,8 +24053,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 49,
-   "ms_per_page": 1540,
-   "peak_rss_mb": 288.1,
+   "ms_per_page": 1627,
+   "peak_rss_mb": 318.9,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -24084,8 +24084,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 54,
-   "ms_per_page": 1613,
-   "peak_rss_mb": 273.9,
+   "ms_per_page": 1727,
+   "peak_rss_mb": 255.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -24115,8 +24115,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 54,
-   "ms_per_page": 1710,
-   "peak_rss_mb": 285.2,
+   "ms_per_page": 1733,
+   "peak_rss_mb": 271.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -24146,8 +24146,8 @@
    "crash": 0,
    "false_notes": 7,
    "truth_notes": 54,
-   "ms_per_page": 1886,
-   "peak_rss_mb": 318.6,
+   "ms_per_page": 1902,
+   "peak_rss_mb": 290.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -24177,8 +24177,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 78,
-   "ms_per_page": 1645,
-   "peak_rss_mb": 277.9,
+   "ms_per_page": 1690,
+   "peak_rss_mb": 270.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -24208,8 +24208,8 @@
    "crash": 0,
    "false_notes": 6,
    "truth_notes": 78,
-   "ms_per_page": 1829,
-   "peak_rss_mb": 330.8,
+   "ms_per_page": 1830,
+   "peak_rss_mb": 276.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -24224,25 +24224,25 @@
     "Flute"
    ],
    "produced_parts": [
-    "Music"
+    "Voice"
    ],
    "part_count_ok": 1,
    "part_names": 0,
-   "right_part_share": 0,
+   "right_part_share": 1,
    "split_violation": 0,
-   "aggregate": 0.3667,
-   "pitch": 0,
-   "duration": 0,
+   "aggregate": 0.5384,
+   "pitch": 0.3333,
+   "duration": 0.0255,
    "rests": 0,
    "lyrics": 1,
    "xml_valid": 1,
    "crash": 0,
-   "false_notes": 0,
+   "false_notes": 7,
    "truth_notes": 78,
-   "ms_per_page": 18668,
-   "peak_rss_mb": 626.7,
+   "ms_per_page": 8333,
+   "peak_rss_mb": 573.2,
    "pages": 1,
-   "layout_score": 0.3333
+   "layout_score": 0.6667
   },
   {
    "id": "rests/rst09-quartet-rests/clean",
@@ -24276,8 +24276,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 66,
-   "ms_per_page": 3165,
-   "peak_rss_mb": 415.5,
+   "ms_per_page": 3121,
+   "peak_rss_mb": 364.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -24313,8 +24313,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 66,
-   "ms_per_page": 3429,
-   "peak_rss_mb": 396.1,
+   "ms_per_page": 3454,
+   "peak_rss_mb": 372,
    "pages": 1,
    "layout_score": 1
   },
@@ -24350,8 +24350,8 @@
    "crash": 0,
    "false_notes": 5,
    "truth_notes": 66,
-   "ms_per_page": 3591,
-   "peak_rss_mb": 401,
+   "ms_per_page": 3767,
+   "peak_rss_mb": 403.4,
    "pages": 1,
    "layout_score": 0.9841
   },
@@ -24381,8 +24381,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 59,
-   "ms_per_page": 1400,
-   "peak_rss_mb": 287.4,
+   "ms_per_page": 1409,
+   "peak_rss_mb": 263.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -24412,8 +24412,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 59,
-   "ms_per_page": 1488,
-   "peak_rss_mb": 297.8,
+   "ms_per_page": 1676,
+   "peak_rss_mb": 281.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -24443,8 +24443,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 59,
-   "ms_per_page": 1442,
-   "peak_rss_mb": 287,
+   "ms_per_page": 1487,
+   "peak_rss_mb": 297.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -24474,8 +24474,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 164,
-   "ms_per_page": 1586,
-   "peak_rss_mb": 303.1,
+   "ms_per_page": 1766,
+   "peak_rss_mb": 291.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -24505,8 +24505,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 164,
-   "ms_per_page": 1763,
-   "peak_rss_mb": 297.1,
+   "ms_per_page": 1790,
+   "peak_rss_mb": 303.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -24536,8 +24536,8 @@
    "crash": 0,
    "false_notes": 4,
    "truth_notes": 164,
-   "ms_per_page": 3031,
-   "peak_rss_mb": 404.9,
+   "ms_per_page": 3282,
+   "peak_rss_mb": 374.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -24573,8 +24573,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 192,
-   "ms_per_page": 4677,
-   "peak_rss_mb": 377.9,
+   "ms_per_page": 4726,
+   "peak_rss_mb": 413.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -24610,8 +24610,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 192,
-   "ms_per_page": 5198,
-   "peak_rss_mb": 373.2,
+   "ms_per_page": 5401,
+   "peak_rss_mb": 417.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -24648,8 +24648,8 @@
    "crash": 0,
    "false_notes": 124,
    "truth_notes": 192,
-   "ms_per_page": 6830,
-   "peak_rss_mb": 421.3,
+   "ms_per_page": 7025,
+   "peak_rss_mb": 448.8,
    "pages": 1,
    "layout_score": 0.4435
   },
@@ -24679,8 +24679,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 57,
-   "ms_per_page": 1549,
-   "peak_rss_mb": 269.9,
+   "ms_per_page": 1566,
+   "peak_rss_mb": 265.3,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -24710,8 +24710,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 57,
-   "ms_per_page": 1702,
-   "peak_rss_mb": 304.4,
+   "ms_per_page": 1705,
+   "peak_rss_mb": 266.1,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -24741,8 +24741,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 57,
-   "ms_per_page": 1661,
-   "peak_rss_mb": 295.3,
+   "ms_per_page": 1705,
+   "peak_rss_mb": 298,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -24772,8 +24772,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 168,
-   "ms_per_page": 1734,
-   "peak_rss_mb": 304.3,
+   "ms_per_page": 1768,
+   "peak_rss_mb": 293.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -24803,8 +24803,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 168,
-   "ms_per_page": 1826,
-   "peak_rss_mb": 312.5,
+   "ms_per_page": 1920,
+   "peak_rss_mb": 320.6,
    "pages": 1,
    "layout_score": 1
   },
@@ -24834,8 +24834,8 @@
    "crash": 0,
    "false_notes": 13,
    "truth_notes": 168,
-   "ms_per_page": 3807,
-   "peak_rss_mb": 392,
+   "ms_per_page": 3907,
+   "peak_rss_mb": 380.9,
    "pages": 1,
    "layout_score": 0.6667
   },
@@ -24867,8 +24867,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 158,
-   "ms_per_page": 2940,
-   "peak_rss_mb": 502,
+   "ms_per_page": 2808,
+   "peak_rss_mb": 483.6,
    "pages": 2,
    "layout_score": 1
   },
@@ -24900,8 +24900,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 158,
-   "ms_per_page": 3124,
-   "peak_rss_mb": 513,
+   "ms_per_page": 3224,
+   "peak_rss_mb": 522.8,
    "pages": 2,
    "layout_score": 1
   },
@@ -24933,8 +24933,8 @@
    "crash": 0,
    "false_notes": 8,
    "truth_notes": 158,
-   "ms_per_page": 11477,
-   "peak_rss_mb": 617.5,
+   "ms_per_page": 11408,
+   "peak_rss_mb": 679.2,
    "pages": 1,
    "layout_score": 0.9972
   },
@@ -24976,8 +24976,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 708,
-   "ms_per_page": 3714,
-   "peak_rss_mb": 566.3,
+   "ms_per_page": 3824,
+   "peak_rss_mb": 583.9,
    "pages": 5,
    "layout_score": 0.9524
   },
@@ -25019,8 +25019,8 @@
    "crash": 0,
    "false_notes": 5,
    "truth_notes": 708,
-   "ms_per_page": 4105,
-   "peak_rss_mb": 591.8,
+   "ms_per_page": 4227,
+   "peak_rss_mb": 561.8,
    "pages": 5,
    "layout_score": 0.9798
   },
@@ -25062,8 +25062,8 @@
    "crash": 0,
    "false_notes": 27,
    "truth_notes": 708,
-   "ms_per_page": 5228,
-   "peak_rss_mb": 626.9,
+   "ms_per_page": 5284,
+   "peak_rss_mb": 653.5,
    "pages": 5,
    "layout_score": 0.943
   },
@@ -25093,8 +25093,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 1152,
-   "ms_per_page": 1364,
-   "peak_rss_mb": 497.9,
+   "ms_per_page": 1444,
+   "peak_rss_mb": 456.4,
    "pages": 12,
    "layout_score": 1
   },
@@ -25124,8 +25124,8 @@
    "crash": 0,
    "false_notes": 13,
    "truth_notes": 1152,
-   "ms_per_page": 1588,
-   "peak_rss_mb": 489.8,
+   "ms_per_page": 1631,
+   "peak_rss_mb": 526.3,
    "pages": 12,
    "layout_score": 1
   },
@@ -25155,8 +25155,8 @@
    "crash": 0,
    "false_notes": 27,
    "truth_notes": 1152,
-   "ms_per_page": 1641,
-   "peak_rss_mb": 521.2,
+   "ms_per_page": 1632,
+   "peak_rss_mb": 551.7,
    "pages": 12,
    "layout_score": 1
   },
@@ -25186,8 +25186,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 41,
-   "ms_per_page": 1540,
-   "peak_rss_mb": 274,
+   "ms_per_page": 1654,
+   "peak_rss_mb": 264.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -25217,8 +25217,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 41,
-   "ms_per_page": 1746,
-   "peak_rss_mb": 290.6,
+   "ms_per_page": 1767,
+   "peak_rss_mb": 305.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -25248,8 +25248,8 @@
    "crash": 0,
    "false_notes": 8,
    "truth_notes": 41,
-   "ms_per_page": 1982,
-   "peak_rss_mb": 300,
+   "ms_per_page": 2028,
+   "peak_rss_mb": 280.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -25279,8 +25279,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 59,
-   "ms_per_page": 1745,
-   "peak_rss_mb": 263.6,
+   "ms_per_page": 1642,
+   "peak_rss_mb": 264.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -25310,8 +25310,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 59,
-   "ms_per_page": 1823,
-   "peak_rss_mb": 275.2,
+   "ms_per_page": 1795,
+   "peak_rss_mb": 287.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -25341,8 +25341,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 59,
-   "ms_per_page": 1943,
-   "peak_rss_mb": 297.5,
+   "ms_per_page": 2055,
+   "peak_rss_mb": 311,
    "pages": 1,
    "layout_score": 1
   },
@@ -25372,8 +25372,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 85,
-   "ms_per_page": 1687,
-   "peak_rss_mb": 274.1,
+   "ms_per_page": 1695,
+   "peak_rss_mb": 300.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -25403,8 +25403,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 85,
-   "ms_per_page": 1816,
-   "peak_rss_mb": 317.3,
+   "ms_per_page": 1835,
+   "peak_rss_mb": 275.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -25434,8 +25434,8 @@
    "crash": 0,
    "false_notes": 5,
    "truth_notes": 85,
-   "ms_per_page": 2092,
-   "peak_rss_mb": 292.3,
+   "ms_per_page": 2086,
+   "peak_rss_mb": 342.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -25465,8 +25465,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 34,
-   "ms_per_page": 1625,
-   "peak_rss_mb": 289.1,
+   "ms_per_page": 1590,
+   "peak_rss_mb": 271.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -25496,8 +25496,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 34,
-   "ms_per_page": 1722,
-   "peak_rss_mb": 276.7,
+   "ms_per_page": 1715,
+   "peak_rss_mb": 274,
    "pages": 1,
    "layout_score": 1
   },
@@ -25527,8 +25527,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 34,
-   "ms_per_page": 1762,
-   "peak_rss_mb": 303.4,
+   "ms_per_page": 1774,
+   "peak_rss_mb": 286.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -25558,8 +25558,8 @@
    "crash": 0,
    "false_notes": 4,
    "truth_notes": 59,
-   "ms_per_page": 1530,
-   "peak_rss_mb": 254.3,
+   "ms_per_page": 1521,
+   "peak_rss_mb": 257.1,
    "pages": 1,
    "layout_score": 1
   },
@@ -25589,8 +25589,8 @@
    "crash": 0,
    "false_notes": 4,
    "truth_notes": 59,
-   "ms_per_page": 1815,
-   "peak_rss_mb": 282.1,
+   "ms_per_page": 1712,
+   "peak_rss_mb": 280.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -25620,8 +25620,8 @@
    "crash": 0,
    "false_notes": 2,
    "truth_notes": 59,
-   "ms_per_page": 2220,
-   "peak_rss_mb": 312,
+   "ms_per_page": 2219,
+   "peak_rss_mb": 321.5,
    "pages": 1,
    "layout_score": 1
   },
@@ -25651,8 +25651,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 78,
-   "ms_per_page": 1200,
-   "peak_rss_mb": 257.3,
+   "ms_per_page": 1159,
+   "peak_rss_mb": 279.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -25682,8 +25682,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 78,
-   "ms_per_page": 1336,
-   "peak_rss_mb": 280.9,
+   "ms_per_page": 1380,
+   "peak_rss_mb": 275,
    "pages": 1,
    "layout_score": 1
   },
@@ -25713,8 +25713,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 78,
-   "ms_per_page": 1560,
-   "peak_rss_mb": 295.5,
+   "ms_per_page": 1508,
+   "peak_rss_mb": 312.3,
    "pages": 1,
    "layout_score": 1
   },
@@ -25744,8 +25744,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 52,
-   "ms_per_page": 1232,
-   "peak_rss_mb": 282.5,
+   "ms_per_page": 1283,
+   "peak_rss_mb": 279.7,
    "pages": 1,
    "layout_score": 1
   },
@@ -25775,8 +25775,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 52,
-   "ms_per_page": 1446,
-   "peak_rss_mb": 298.9,
+   "ms_per_page": 1416,
+   "peak_rss_mb": 276.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -25806,8 +25806,8 @@
    "crash": 0,
    "false_notes": 3,
    "truth_notes": 52,
-   "ms_per_page": 1582,
-   "peak_rss_mb": 320.1,
+   "ms_per_page": 1672,
+   "peak_rss_mb": 294.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -25837,8 +25837,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 77,
-   "ms_per_page": 1328,
-   "peak_rss_mb": 321.2,
+   "ms_per_page": 1255,
+   "peak_rss_mb": 303,
    "pages": 2,
    "layout_score": 1
   },
@@ -25868,8 +25868,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 77,
-   "ms_per_page": 1390,
-   "peak_rss_mb": 336.8,
+   "ms_per_page": 1456,
+   "peak_rss_mb": 349.1,
    "pages": 2,
    "layout_score": 1
   },
@@ -25899,8 +25899,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 77,
-   "ms_per_page": 4905,
-   "peak_rss_mb": 465.3,
+   "ms_per_page": 4922,
+   "peak_rss_mb": 471.2,
    "pages": 1,
    "layout_score": 1
   },
@@ -25930,8 +25930,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 37,
-   "ms_per_page": 1225,
-   "peak_rss_mb": 257.4,
+   "ms_per_page": 1253,
+   "peak_rss_mb": 261.4,
    "pages": 1,
    "layout_score": 1
   },
@@ -25961,8 +25961,8 @@
    "crash": 0,
    "false_notes": 0,
    "truth_notes": 37,
-   "ms_per_page": 1359,
-   "peak_rss_mb": 275,
+   "ms_per_page": 1471,
+   "peak_rss_mb": 261.9,
    "pages": 1,
    "layout_score": 1
   },
@@ -25992,8 +25992,8 @@
    "crash": 0,
    "false_notes": 11,
    "truth_notes": 37,
-   "ms_per_page": 2014,
-   "peak_rss_mb": 325.7,
+   "ms_per_page": 2461,
+   "peak_rss_mb": 334.8,
    "pages": 1,
    "layout_score": 1
   },
@@ -26029,8 +26029,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 89,
-   "ms_per_page": 2070,
-   "peak_rss_mb": 289.2,
+   "ms_per_page": 2193,
+   "peak_rss_mb": 297.9,
    "pages": 1,
    "layout_score": 0.9962
   },
@@ -26066,8 +26066,8 @@
    "crash": 0,
    "false_notes": 1,
    "truth_notes": 89,
-   "ms_per_page": 2361,
-   "peak_rss_mb": 298.9,
+   "ms_per_page": 2294,
+   "peak_rss_mb": 289.8,
    "pages": 1,
    "layout_score": 0.9962
   },
@@ -26103,23 +26103,23 @@
    "crash": 0,
    "false_notes": 15,
    "truth_notes": 89,
-   "ms_per_page": 2190,
+   "ms_per_page": 2237,
    "peak_rss_mb": 308.7,
    "pages": 1,
    "layout_score": 0.9629
   }
  ],
  "perf": {
-  "source": "../l11/eval-cov-ocr.json",
+  "source": "../sf/eval-cov-ocr.json",
   "scope": "all coverage items, no perf family yet",
   "config": {
    "dpi": 200,
    "jobs": 8,
    "ocr": true,
    "loadavg": [
-    50.6,
-    51.3,
-    48.4
+    38.9,
+    45,
+    46.6
    ],
    "cpus": 192
   },
@@ -26129,17 +26129,17 @@
     "src_dpi": "100",
     "n": 4,
     "mp_per_page": 4.582,
-    "ms_per_page_median": 1755,
-    "ms_per_page_max": 3807,
-    "peak_rss_mb_median": 313,
-    "peak_rss_mb_max": 392
+    "ms_per_page_median": 1736,
+    "ms_per_page_max": 3907,
+    "peak_rss_mb_median": 312.3,
+    "peak_rss_mb_max": 380.9
    },
    {
     "src_dpi": "110",
     "n": 2,
     "mp_per_page": 4.555,
-    "ms_per_page_median": 2190,
-    "ms_per_page_max": 2190,
+    "ms_per_page_median": 2237,
+    "ms_per_page_max": 2237,
     "peak_rss_mb_median": 308.7,
     "peak_rss_mb_max": 308.7
    },
@@ -26147,55 +26147,55 @@
     "src_dpi": "120",
     "n": 8,
     "mp_per_page": 3.869,
-    "ms_per_page_median": 1943,
-    "ms_per_page_max": 6609,
-    "peak_rss_mb_median": 297.5,
-    "peak_rss_mb_max": 595.3
+    "ms_per_page_median": 2055,
+    "ms_per_page_max": 6747,
+    "peak_rss_mb_median": 311,
+    "peak_rss_mb_max": 617
    },
    {
     "src_dpi": "150",
     "n": 40,
     "mp_per_page": 4.31,
-    "ms_per_page_median": 2172,
-    "ms_per_page_max": 18668,
-    "peak_rss_mb_median": 325,
-    "peak_rss_mb_max": 626.7
+    "ms_per_page_median": 2207,
+    "ms_per_page_max": 11408,
+    "peak_rss_mb_median": 321.5,
+    "peak_rss_mb_max": 679.2
    },
    {
     "src_dpi": "200",
     "n": 45,
     "mp_per_page": 4.018,
-    "ms_per_page_median": 1738,
-    "ms_per_page_max": 6830,
-    "peak_rss_mb_median": 312.9,
-    "peak_rss_mb_max": 626.9
+    "ms_per_page_median": 1740,
+    "ms_per_page_max": 7025,
+    "peak_rss_mb_median": 301.4,
+    "peak_rss_mb_max": 653.5
    },
    {
     "src_dpi": "240",
     "n": 3,
     "mp_per_page": 3.873,
-    "ms_per_page_median": 1951,
-    "ms_per_page_max": 2306,
-    "peak_rss_mb_median": 305,
-    "peak_rss_mb_max": 316.4
+    "ms_per_page_median": 1986,
+    "ms_per_page_max": 2164,
+    "peak_rss_mb_median": 301,
+    "peak_rss_mb_max": 320.8
    },
    {
     "src_dpi": "250",
     "n": 17,
     "mp_per_page": 3.87,
-    "ms_per_page_median": 1763,
-    "ms_per_page_max": 4437,
-    "peak_rss_mb_median": 297.1,
-    "peak_rss_mb_max": 501.8
+    "ms_per_page_median": 1777,
+    "ms_per_page_max": 4350,
+    "peak_rss_mb_median": 289.8,
+    "peak_rss_mb_max": 517.5
    },
    {
     "src_dpi": "300",
     "n": 130,
     "mp_per_page": 3.869,
-    "ms_per_page_median": 1586,
-    "ms_per_page_max": 5198,
-    "peak_rss_mb_median": 285.5,
-    "peak_rss_mb_max": 591.8
+    "ms_per_page_median": 1600,
+    "ms_per_page_max": 5401,
+    "peak_rss_mb_median": 285.9,
+    "peak_rss_mb_max": 583.9
    }
   ],
   "by_raster_dpi": [
@@ -26203,10 +26203,10 @@
     "raster_dpi": "200",
     "n": 249,
     "mp_per_page": 3.869,
-    "ms_per_page_median": 1700,
-    "ms_per_page_max": 18668,
-    "peak_rss_mb_median": 297,
-    "peak_rss_mb_max": 626.9
+    "ms_per_page_median": 1715,
+    "ms_per_page_max": 11408,
+    "peak_rss_mb_median": 291.9,
+    "peak_rss_mb_max": 679.2
    }
   ],
   "by_paper": [
@@ -26214,55 +26214,55 @@
     "paper": "~A3 landscape",
     "n": 1,
     "mp_per_page": 9.314,
-    "ms_per_page_median": 4905,
-    "ms_per_page_max": 4905,
-    "peak_rss_mb_median": 465.3,
-    "peak_rss_mb_max": 465.3
+    "ms_per_page_median": 4922,
+    "ms_per_page_max": 4922,
+    "peak_rss_mb_median": 471.2,
+    "peak_rss_mb_max": 471.2
    },
    {
     "paper": "~A4",
     "n": 39,
     "mp_per_page": 4.234,
-    "ms_per_page_median": 1878,
-    "ms_per_page_max": 18668,
-    "peak_rss_mb_median": 312,
-    "peak_rss_mb_max": 626.7
+    "ms_per_page_median": 1897,
+    "ms_per_page_max": 8333,
+    "peak_rss_mb_median": 311,
+    "peak_rss_mb_max": 573.2
    },
    {
     "paper": "~B4",
     "n": 19,
     "mp_per_page": 4.697,
-    "ms_per_page_median": 2189,
-    "ms_per_page_max": 6039,
-    "peak_rss_mb_median": 325,
-    "peak_rss_mb_max": 549.1
+    "ms_per_page_median": 2227,
+    "ms_per_page_max": 6451,
+    "peak_rss_mb_median": 338,
+    "peak_rss_mb_max": 492.4
    },
    {
     "paper": "A3 landscape",
     "n": 1,
     "mp_per_page": 7.742,
-    "ms_per_page_median": 11477,
-    "ms_per_page_max": 11477,
-    "peak_rss_mb_median": 617.5,
-    "peak_rss_mb_max": 617.5
+    "ms_per_page_median": 11408,
+    "ms_per_page_max": 11408,
+    "peak_rss_mb_median": 679.2,
+    "peak_rss_mb_max": 679.2
    },
    {
     "paper": "A4",
     "n": 188,
     "mp_per_page": 3.869,
-    "ms_per_page_median": 1648,
-    "ms_per_page_max": 6830,
-    "peak_rss_mb_median": 290.1,
-    "peak_rss_mb_max": 626.9
+    "ms_per_page_median": 1666,
+    "ms_per_page_max": 7025,
+    "peak_rss_mb_median": 287.6,
+    "peak_rss_mb_max": 653.5
    },
    {
     "paper": "A4 landscape",
     "n": 1,
     "mp_per_page": 3.871,
-    "ms_per_page_median": 1921,
-    "ms_per_page_max": 1921,
-    "peak_rss_mb_median": 303.5,
-    "peak_rss_mb_max": 303.5
+    "ms_per_page_median": 1968,
+    "ms_per_page_max": 1968,
+    "peak_rss_mb_median": 295.8,
+    "peak_rss_mb_max": 295.8
    }
   ],
   "by_pages": [
@@ -26270,52 +26270,52 @@
     "pages": "1",
     "n": 233,
     "mp_per_page": 3.869,
-    "ms_per_page_median": 1700,
-    "ms_per_page_max": 18668,
-    "peak_rss_mb_median": 294,
-    "peak_rss_mb_max": 626.7
+    "ms_per_page_median": 1715,
+    "ms_per_page_max": 11408,
+    "peak_rss_mb_median": 289.8,
+    "peak_rss_mb_max": 679.2
    },
    {
     "pages": "2",
     "n": 10,
     "mp_per_page": 3.869,
-    "ms_per_page_median": 2940,
-    "ms_per_page_max": 6609,
-    "peak_rss_mb_median": 501.8,
-    "peak_rss_mb_max": 595.3
+    "ms_per_page_median": 2808,
+    "ms_per_page_max": 6747,
+    "peak_rss_mb_median": 483.6,
+    "peak_rss_mb_max": 617
    },
    {
     "pages": "5",
     "n": 3,
     "mp_per_page": 3.869,
-    "ms_per_page_median": 4105,
-    "ms_per_page_max": 5228,
-    "peak_rss_mb_median": 591.8,
-    "peak_rss_mb_max": 626.9
+    "ms_per_page_median": 4227,
+    "ms_per_page_max": 5284,
+    "peak_rss_mb_median": 583.9,
+    "peak_rss_mb_max": 653.5
    },
    {
     "pages": "12",
     "n": 3,
     "mp_per_page": 3.869,
-    "ms_per_page_median": 1588,
-    "ms_per_page_max": 1641,
-    "peak_rss_mb_median": 497.9,
-    "peak_rss_mb_max": 521.2
+    "ms_per_page_median": 1631,
+    "ms_per_page_max": 1632,
+    "peak_rss_mb_median": 526.3,
+    "peak_rss_mb_max": 551.7
    }
   ],
   "fit_ms_per_page_vs_mp": {
    "n": 249,
-   "slope": 1093.62,
-   "intercept": -2274.4,
-   "r2": 0.112
+   "slope": 1069.27,
+   "intercept": -2192.5,
+   "r2": 0.168
   },
   "fit_peak_mb_vs_total_mp": {
    "n": 249,
-   "slope": 7.02,
-   "intercept": 285.2,
-   "r2": 0.252
+   "slope": 7.35,
+   "intercept": 281.9,
+   "r2": 0.256
   },
-  "ms_per_megapixel_overall": 545,
+  "ms_per_megapixel_overall": 544,
   "rows": [
    {
     "id": "layouts/choir-closed-satb-light-of-morning/clean",
@@ -26329,14 +26329,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1588,
+    "ms_per_page": 1605,
     "page_ms": [
-     1473.1
+     1498.9
     ],
-    "assemble_ms": 110.6,
-    "runtime_ms": 1588,
-    "wall_ms": 2145,
-    "peak_rss_mb": 279.2
+    "assemble_ms": 100.7,
+    "runtime_ms": 1605,
+    "wall_ms": 2150,
+    "peak_rss_mb": 290.1
    },
    {
     "id": "layouts/choir-closed-satb-light-of-morning/scan",
@@ -26350,13 +26350,13 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1761,
+    "ms_per_page": 1780,
     "page_ms": [
-     1647.1
+     1661.4
     ],
-    "assemble_ms": 108.3,
-    "runtime_ms": 1761,
-    "wall_ms": 2298,
+    "assemble_ms": 112.3,
+    "runtime_ms": 1780,
+    "wall_ms": 2318,
     "peak_rss_mb": 284.6
    },
    {
@@ -26371,14 +26371,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1700,
+    "ms_per_page": 1789,
     "page_ms": [
-     1568.9
+     1652.3
     ],
-    "assemble_ms": 126.4,
-    "runtime_ms": 1700,
-    "wall_ms": 2224,
-    "peak_rss_mb": 294
+    "assemble_ms": 131.4,
+    "runtime_ms": 1789,
+    "wall_ms": 2324,
+    "peak_rss_mb": 278.7
    },
    {
     "id": "layouts/choir-open-satb-gloria/clean",
@@ -26392,14 +26392,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 2131,
+    "ms_per_page": 2156,
     "page_ms": [
-     1994.2
+     2005.9
     ],
-    "assemble_ms": 132.4,
-    "runtime_ms": 2131,
-    "wall_ms": 2685,
-    "peak_rss_mb": 304.9
+    "assemble_ms": 145.3,
+    "runtime_ms": 2156,
+    "wall_ms": 2726,
+    "peak_rss_mb": 300.4
    },
    {
     "id": "layouts/choir-open-satb-gloria/scan",
@@ -26413,14 +26413,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 2309,
+    "ms_per_page": 2327,
     "page_ms": [
-     2154.5
+     2176.7
     ],
-    "assemble_ms": 149.9,
-    "runtime_ms": 2309,
-    "wall_ms": 2861,
-    "peak_rss_mb": 317.1
+    "assemble_ms": 144.7,
+    "runtime_ms": 2327,
+    "wall_ms": 2878,
+    "peak_rss_mb": 316.8
    },
    {
     "id": "layouts/choir-open-satb-gloria/scan-severe",
@@ -26434,14 +26434,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 2366,
+    "ms_per_page": 2330,
     "page_ms": [
-     2184.6
+     2156.9
     ],
-    "assemble_ms": 178.1,
-    "runtime_ms": 2366,
-    "wall_ms": 2930,
-    "peak_rss_mb": 311
+    "assemble_ms": 169.4,
+    "runtime_ms": 2330,
+    "wall_ms": 2880,
+    "peak_rss_mb": 312.1
    },
    {
     "id": "layouts/choir-piano-song-of-rejoicing/clean",
@@ -26455,14 +26455,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 3125,
+    "ms_per_page": 3148,
     "page_ms": [
-     2817.5
+     2851.2
     ],
-    "assemble_ms": 302.5,
-    "runtime_ms": 3125,
-    "wall_ms": 3678,
-    "peak_rss_mb": 345.5
+    "assemble_ms": 292.8,
+    "runtime_ms": 3148,
+    "wall_ms": 3701,
+    "peak_rss_mb": 426.1
    },
    {
     "id": "layouts/choir-piano-song-of-rejoicing/scan",
@@ -26476,14 +26476,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 3454,
+    "ms_per_page": 3473,
     "page_ms": [
-     3139.2
+     3161
     ],
-    "assemble_ms": 309.1,
-    "runtime_ms": 3454,
-    "wall_ms": 4016,
-    "peak_rss_mb": 369.2
+    "assemble_ms": 307.3,
+    "runtime_ms": 3473,
+    "wall_ms": 4047,
+    "peak_rss_mb": 359.7
    },
    {
     "id": "layouts/choir-piano-song-of-rejoicing/scan-severe",
@@ -26497,14 +26497,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.697,
-    "ms_per_page": 6039,
+    "ms_per_page": 6451,
     "page_ms": [
-     5746.4
+     6168.3
     ],
-    "assemble_ms": 287.4,
-    "runtime_ms": 6039,
-    "wall_ms": 6582,
-    "peak_rss_mb": 509.2
+    "assemble_ms": 277.2,
+    "runtime_ms": 6451,
+    "wall_ms": 6988,
+    "peak_rss_mb": 480.6
    },
    {
     "id": "layouts/choir-sab-summer-song/clean",
@@ -26518,14 +26518,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1979,
+    "ms_per_page": 1982,
     "page_ms": [
-     1834.5
+     1855.6
     ],
-    "assemble_ms": 140.3,
-    "runtime_ms": 1979,
-    "wall_ms": 2535,
-    "peak_rss_mb": 273.5
+    "assemble_ms": 122,
+    "runtime_ms": 1982,
+    "wall_ms": 2512,
+    "peak_rss_mb": 296.1
    },
    {
     "id": "layouts/choir-sab-summer-song/scan",
@@ -26539,14 +26539,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.873,
-    "ms_per_page": 2306,
+    "ms_per_page": 2164,
     "page_ms": [
-     2154.3
+     2019.3
     ],
-    "assemble_ms": 147.3,
-    "runtime_ms": 2306,
-    "wall_ms": 2851,
-    "peak_rss_mb": 305
+    "assemble_ms": 139.6,
+    "runtime_ms": 2164,
+    "wall_ms": 2681,
+    "peak_rss_mb": 294.5
    },
    {
     "id": "layouts/choir-sab-summer-song/scan-severe",
@@ -26560,14 +26560,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.697,
-    "ms_per_page": 3065,
+    "ms_per_page": 3317,
     "page_ms": [
-     2836.6
+     3095.5
     ],
-    "assemble_ms": 223.9,
-    "runtime_ms": 3065,
-    "wall_ms": 3597,
-    "peak_rss_mb": 408.5
+    "assemble_ms": 215.7,
+    "runtime_ms": 3317,
+    "wall_ms": 3847,
+    "peak_rss_mb": 423.3
    },
    {
     "id": "layouts/choir-ssaa-winter-night/clean",
@@ -26581,14 +26581,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1598,
+    "ms_per_page": 1629,
     "page_ms": [
-     1509.1
+     1552.9
     ],
-    "assemble_ms": 84.1,
-    "runtime_ms": 1598,
-    "wall_ms": 2151,
-    "peak_rss_mb": 286.4
+    "assemble_ms": 71.2,
+    "runtime_ms": 1629,
+    "wall_ms": 2158,
+    "peak_rss_mb": 275.1
    },
    {
     "id": "layouts/choir-ssaa-winter-night/scan",
@@ -26602,14 +26602,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.87,
-    "ms_per_page": 1713,
+    "ms_per_page": 1777,
     "page_ms": [
-     1631.2
+     1705.9
     ],
-    "assemble_ms": 77.1,
-    "runtime_ms": 1713,
-    "wall_ms": 2246,
-    "peak_rss_mb": 276.9
+    "assemble_ms": 66.7,
+    "runtime_ms": 1777,
+    "wall_ms": 2289,
+    "peak_rss_mb": 281.9
    },
    {
     "id": "layouts/choir-ssaa-winter-night/scan-severe",
@@ -26623,14 +26623,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.871,
-    "ms_per_page": 1699,
+    "ms_per_page": 1679,
     "page_ms": [
-     1621.6
+     1592
     ],
-    "assemble_ms": 73.2,
-    "runtime_ms": 1699,
-    "wall_ms": 2247,
-    "peak_rss_mb": 293.8
+    "assemble_ms": 81.9,
+    "runtime_ms": 1679,
+    "wall_ms": 2255,
+    "peak_rss_mb": 271.4
    },
    {
     "id": "layouts/choir-ttbb-evening-bells/clean",
@@ -26644,14 +26644,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1670,
+    "ms_per_page": 1669,
     "page_ms": [
-     1528.8
+     1537.5
     ],
-    "assemble_ms": 137,
-    "runtime_ms": 1670,
-    "wall_ms": 2215,
-    "peak_rss_mb": 288
+    "assemble_ms": 126.7,
+    "runtime_ms": 1669,
+    "wall_ms": 2257,
+    "peak_rss_mb": 294.8
    },
    {
     "id": "layouts/choir-ttbb-evening-bells/scan",
@@ -26665,14 +26665,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1819,
+    "ms_per_page": 1831,
     "page_ms": [
-     1680.3
+     1685.5
     ],
-    "assemble_ms": 133.8,
-    "runtime_ms": 1819,
-    "wall_ms": 2352,
-    "peak_rss_mb": 294.1
+    "assemble_ms": 141.5,
+    "runtime_ms": 1831,
+    "wall_ms": 2344,
+    "peak_rss_mb": 299.1
    },
    {
     "id": "layouts/choir-ttbb-evening-bells/scan-severe",
@@ -26686,14 +26686,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 3577,
+    "ms_per_page": 3625,
     "page_ms": [
-     3418.4
+     3472.2
     ],
-    "assemble_ms": 154.6,
-    "runtime_ms": 3577,
-    "wall_ms": 4150,
-    "peak_rss_mb": 369.9
+    "assemble_ms": 148.1,
+    "runtime_ms": 3625,
+    "wall_ms": 4151,
+    "peak_rss_mb": 380.5
    },
    {
     "id": "layouts/cross-staff-piano-arpeggio-study/clean",
@@ -26707,14 +26707,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1237,
+    "ms_per_page": 1297,
     "page_ms": [
-     1168.4
+     1225.3
     ],
-    "assemble_ms": 64.3,
-    "runtime_ms": 1237,
-    "wall_ms": 1751,
-    "peak_rss_mb": 271.8
+    "assemble_ms": 66,
+    "runtime_ms": 1297,
+    "wall_ms": 1822,
+    "peak_rss_mb": 252.3
    },
    {
     "id": "layouts/cross-staff-piano-arpeggio-study/scan",
@@ -26728,14 +26728,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1408,
+    "ms_per_page": 1371,
     "page_ms": [
-     1336.7
+     1302.8
     ],
-    "assemble_ms": 67.6,
-    "runtime_ms": 1408,
-    "wall_ms": 1939,
-    "peak_rss_mb": 277.8
+    "assemble_ms": 63.7,
+    "runtime_ms": 1371,
+    "wall_ms": 1910,
+    "peak_rss_mb": 287.6
    },
    {
     "id": "layouts/cross-staff-piano-arpeggio-study/scan-severe",
@@ -26749,14 +26749,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1339,
+    "ms_per_page": 1353,
     "page_ms": [
-     1265
+     1280.1
     ],
-    "assemble_ms": 69.9,
-    "runtime_ms": 1339,
-    "wall_ms": 1884,
-    "peak_rss_mb": 283
+    "assemble_ms": 67.6,
+    "runtime_ms": 1353,
+    "wall_ms": 1859,
+    "peak_rss_mb": 278.8
    },
    {
     "id": "layouts/divisi-choir-bright-new-day/clean",
@@ -26770,14 +26770,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 3982,
+    "ms_per_page": 3931,
     "page_ms": [
-     3506.5
+     3461.4
     ],
-    "assemble_ms": 471.5,
-    "runtime_ms": 3982,
-    "wall_ms": 4537,
-    "peak_rss_mb": 376.3
+    "assemble_ms": 464,
+    "runtime_ms": 3931,
+    "wall_ms": 4452,
+    "peak_rss_mb": 403.2
    },
    {
     "id": "layouts/divisi-choir-bright-new-day/scan",
@@ -26791,14 +26791,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.87,
-    "ms_per_page": 4437,
+    "ms_per_page": 4211,
     "page_ms": [
-     3924.9
+     3713.5
     ],
-    "assemble_ms": 508.2,
-    "runtime_ms": 4437,
-    "wall_ms": 4979,
-    "peak_rss_mb": 354.3
+    "assemble_ms": 491.7,
+    "runtime_ms": 4211,
+    "wall_ms": 4724,
+    "peak_rss_mb": 363.1
    },
    {
     "id": "layouts/divisi-choir-bright-new-day/scan-severe",
@@ -26812,14 +26812,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 4051,
+    "ms_per_page": 4208,
     "page_ms": [
-     3582.5
+     3735.3
     ],
-    "assemble_ms": 463.3,
-    "runtime_ms": 4051,
-    "wall_ms": 4557,
-    "peak_rss_mb": 354.7
+    "assemble_ms": 467.7,
+    "runtime_ms": 4208,
+    "wall_ms": 4751,
+    "peak_rss_mb": 396
    },
    {
     "id": "layouts/divisi-strings-lament/clean",
@@ -26833,14 +26833,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1858,
+    "ms_per_page": 1944,
     "page_ms": [
-     1669.5
+     1748.8
     ],
-    "assemble_ms": 183.4,
-    "runtime_ms": 1858,
-    "wall_ms": 2373,
-    "peak_rss_mb": 290.1
+    "assemble_ms": 190.4,
+    "runtime_ms": 1944,
+    "wall_ms": 2469,
+    "peak_rss_mb": 302.4
    },
    {
     "id": "layouts/divisi-strings-lament/scan",
@@ -26854,14 +26854,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 2001,
+    "ms_per_page": 2040,
     "page_ms": [
-     1794.6
+     1834.5
     ],
-    "assemble_ms": 202.7,
-    "runtime_ms": 2001,
-    "wall_ms": 2534,
-    "peak_rss_mb": 310.4
+    "assemble_ms": 201,
+    "runtime_ms": 2040,
+    "wall_ms": 2572,
+    "peak_rss_mb": 320.5
    },
    {
     "id": "layouts/divisi-strings-lament/scan-severe",
@@ -26875,14 +26875,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.871,
-    "ms_per_page": 2149,
+    "ms_per_page": 2131,
     "page_ms": [
-     1876.6
+     1869.3
     ],
-    "assemble_ms": 268.4,
-    "runtime_ms": 2149,
-    "wall_ms": 2691,
-    "peak_rss_mb": 304.6
+    "assemble_ms": 256.8,
+    "runtime_ms": 2131,
+    "wall_ms": 2648,
+    "peak_rss_mb": 318.4
    },
    {
     "id": "layouts/hymnal-stanzas-light-of-ages/clean",
@@ -26896,14 +26896,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 2183,
+    "ms_per_page": 2201,
     "page_ms": [
-     2055.6
+     2071
     ],
-    "assemble_ms": 123.3,
-    "runtime_ms": 2183,
-    "wall_ms": 2730,
-    "peak_rss_mb": 303.2
+    "assemble_ms": 125.4,
+    "runtime_ms": 2201,
+    "wall_ms": 2711,
+    "peak_rss_mb": 289.2
    },
    {
     "id": "layouts/hymnal-stanzas-light-of-ages/scan",
@@ -26917,14 +26917,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 2298,
+    "ms_per_page": 2271,
     "page_ms": [
-     2161.2
+     2133.8
     ],
-    "assemble_ms": 132.1,
-    "runtime_ms": 2298,
-    "wall_ms": 2842,
-    "peak_rss_mb": 327.1
+    "assemble_ms": 132.8,
+    "runtime_ms": 2271,
+    "wall_ms": 2808,
+    "peak_rss_mb": 327
    },
    {
     "id": "layouts/hymnal-stanzas-light-of-ages/scan-severe",
@@ -26938,14 +26938,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.871,
-    "ms_per_page": 2247,
+    "ms_per_page": 2251,
     "page_ms": [
-     2105.3
+     2113.8
     ],
-    "assemble_ms": 137.3,
-    "runtime_ms": 2247,
-    "wall_ms": 2803,
-    "peak_rss_mb": 327
+    "assemble_ms": 132.4,
+    "runtime_ms": 2251,
+    "wall_ms": 2784,
+    "peak_rss_mb": 321.2
    },
    {
     "id": "layouts/lead-sheet-long-road/clean",
@@ -26959,14 +26959,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1873,
+    "ms_per_page": 1851,
     "page_ms": [
-     1740.6
+     1727.2
     ],
-    "assemble_ms": 128,
-    "runtime_ms": 1873,
-    "wall_ms": 2427,
-    "peak_rss_mb": 292.5
+    "assemble_ms": 119.3,
+    "runtime_ms": 1851,
+    "wall_ms": 2377,
+    "peak_rss_mb": 295.1
    },
    {
     "id": "layouts/lead-sheet-long-road/scan",
@@ -26980,14 +26980,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.873,
-    "ms_per_page": 1951,
+    "ms_per_page": 1986,
     "page_ms": [
-     1821
+     1856.8
     ],
-    "assemble_ms": 125,
-    "runtime_ms": 1951,
-    "wall_ms": 2473,
-    "peak_rss_mb": 297.4
+    "assemble_ms": 124.7,
+    "runtime_ms": 1986,
+    "wall_ms": 2500,
+    "peak_rss_mb": 301
    },
    {
     "id": "layouts/lead-sheet-long-road/scan-severe",
@@ -27001,14 +27001,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1998,
+    "ms_per_page": 1985,
     "page_ms": [
-     1889.3
+     1871.5
     ],
-    "assemble_ms": 104.8,
-    "runtime_ms": 1998,
-    "wall_ms": 2544,
-    "peak_rss_mb": 318.5
+    "assemble_ms": 109.1,
+    "runtime_ms": 1985,
+    "wall_ms": 2498,
+    "peak_rss_mb": 300
    },
    {
     "id": "layouts/melody-cello-elegy-2page/clean",
@@ -27022,15 +27022,15 @@
     ],
     "pages": 2,
     "mp_per_page": 3.869,
-    "ms_per_page": 1107,
+    "ms_per_page": 1136,
     "page_ms": [
-     941.9,
-     1145.1
+     910.7,
+     1232.1
     ],
-    "assemble_ms": 122.1,
-    "runtime_ms": 2214,
-    "wall_ms": 2722,
-    "peak_rss_mb": 319.5
+    "assemble_ms": 123.5,
+    "runtime_ms": 2271,
+    "wall_ms": 2773,
+    "peak_rss_mb": 323.8
    },
    {
     "id": "layouts/melody-cello-elegy-2page/scan",
@@ -27044,15 +27044,15 @@
     ],
     "pages": 2,
     "mp_per_page": 3.873,
-    "ms_per_page": 1343,
+    "ms_per_page": 1244,
     "page_ms": [
-     1096.8,
-     1446.4
+     1063,
+     1300.1
     ],
-    "assemble_ms": 136,
-    "runtime_ms": 2685,
-    "wall_ms": 3246,
-    "peak_rss_mb": 316.4
+    "assemble_ms": 118.5,
+    "runtime_ms": 2487,
+    "wall_ms": 3007,
+    "peak_rss_mb": 320.8
    },
    {
     "id": "layouts/melody-cello-elegy-2page/scan-severe",
@@ -27066,15 +27066,15 @@
     ],
     "pages": 2,
     "mp_per_page": 3.871,
-    "ms_per_page": 1351,
+    "ms_per_page": 1358,
     "page_ms": [
-     1061.4,
-     1484.5
+     1086.2,
+     1467.1
     ],
-    "assemble_ms": 152,
-    "runtime_ms": 2702,
-    "wall_ms": 3242,
-    "peak_rss_mb": 311
+    "assemble_ms": 157.8,
+    "runtime_ms": 2716,
+    "wall_ms": 3244,
+    "peak_rss_mb": 347.5
    },
    {
     "id": "layouts/melody-flute-air/clean",
@@ -27088,14 +27088,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1262,
+    "ms_per_page": 1216,
     "page_ms": [
-     1185.6
+     1142.3
     ],
-    "assemble_ms": 71.9,
-    "runtime_ms": 1262,
-    "wall_ms": 1790,
-    "peak_rss_mb": 276.4
+    "assemble_ms": 68.4,
+    "runtime_ms": 1216,
+    "wall_ms": 1737,
+    "peak_rss_mb": 263.5
    },
    {
     "id": "layouts/melody-flute-air/scan",
@@ -27109,14 +27109,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1400,
+    "ms_per_page": 1394,
     "page_ms": [
-     1321.7
+     1315
     ],
-    "assemble_ms": 73.8,
-    "runtime_ms": 1400,
-    "wall_ms": 1933,
-    "peak_rss_mb": 278.7
+    "assemble_ms": 74.4,
+    "runtime_ms": 1394,
+    "wall_ms": 1914,
+    "peak_rss_mb": 290
    },
    {
     "id": "layouts/melody-flute-air/scan-severe",
@@ -27130,14 +27130,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.697,
-    "ms_per_page": 2914,
+    "ms_per_page": 3047,
     "page_ms": [
-     2734
+     2868.5
     ],
-    "assemble_ms": 173.6,
-    "runtime_ms": 2914,
-    "wall_ms": 3456,
-    "peak_rss_mb": 402.6
+    "assemble_ms": 172.5,
+    "runtime_ms": 3047,
+    "wall_ms": 3571,
+    "peak_rss_mb": 410.8
    },
    {
     "id": "layouts/melody-lyrics-morning-song/clean",
@@ -27151,14 +27151,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1401,
+    "ms_per_page": 1466,
     "page_ms": [
-     1330.5
+     1398.8
     ],
-    "assemble_ms": 66.3,
-    "runtime_ms": 1401,
-    "wall_ms": 1929,
-    "peak_rss_mb": 268
+    "assemble_ms": 62,
+    "runtime_ms": 1466,
+    "wall_ms": 1988,
+    "peak_rss_mb": 293.8
    },
    {
     "id": "layouts/melody-lyrics-morning-song/scan",
@@ -27172,14 +27172,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1573,
+    "ms_per_page": 1575,
     "page_ms": [
-     1505.8
+     1508.8
     ],
-    "assemble_ms": 62.7,
-    "runtime_ms": 1573,
-    "wall_ms": 2096,
-    "peak_rss_mb": 282.8
+    "assemble_ms": 61.7,
+    "runtime_ms": 1575,
+    "wall_ms": 2087,
+    "peak_rss_mb": 275.3
    },
    {
     "id": "layouts/melody-lyrics-morning-song/scan-severe",
@@ -27193,14 +27193,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1552,
+    "ms_per_page": 1515,
     "page_ms": [
-     1456.4
+     1421.3
     ],
-    "assemble_ms": 91.3,
-    "runtime_ms": 1552,
-    "wall_ms": 2114,
-    "peak_rss_mb": 288.4
+    "assemble_ms": 88.6,
+    "runtime_ms": 1515,
+    "wall_ms": 2024,
+    "peak_rss_mb": 269.2
    },
    {
     "id": "layouts/orchestral-festive-march-9-staves/clean",
@@ -27214,15 +27214,15 @@
     ],
     "pages": 2,
     "mp_per_page": 3.869,
-    "ms_per_page": 3836,
+    "ms_per_page": 3821,
     "page_ms": [
-     2587,
-     4251.4
+     2546.4,
+     4292.2
     ],
-    "assemble_ms": 828.5,
-    "runtime_ms": 7671,
-    "wall_ms": 8231,
-    "peak_rss_mb": 507.9
+    "assemble_ms": 799,
+    "runtime_ms": 7641,
+    "wall_ms": 8193,
+    "peak_rss_mb": 501.9
    },
    {
     "id": "layouts/orchestral-festive-march-9-staves/scan",
@@ -27236,15 +27236,15 @@
     ],
     "pages": 2,
     "mp_per_page": 3.87,
-    "ms_per_page": 4388,
+    "ms_per_page": 4350,
     "page_ms": [
-     2989.1,
-     4851.2
+     2996.6,
+     4769.6
     ],
-    "assemble_ms": 930.8,
-    "runtime_ms": 8776,
-    "wall_ms": 9318,
-    "peak_rss_mb": 501.8
+    "assemble_ms": 928.7,
+    "runtime_ms": 8699,
+    "wall_ms": 9257,
+    "peak_rss_mb": 517.5
    },
    {
     "id": "layouts/orchestral-festive-march-9-staves/scan-severe",
@@ -27258,15 +27258,15 @@
     ],
     "pages": 2,
     "mp_per_page": 3.869,
-    "ms_per_page": 6609,
+    "ms_per_page": 6747,
     "page_ms": [
-     3476.5,
-     6909.4
+     3555.9,
+     7118.8
     ],
-    "assemble_ms": 2827.4,
-    "runtime_ms": 13217,
-    "wall_ms": 13765,
-    "peak_rss_mb": 595.3
+    "assemble_ms": 2814,
+    "runtime_ms": 13493,
+    "wall_ms": 14043,
+    "peak_rss_mb": 617
    },
    {
     "id": "layouts/organ-three-staves-chorale-prelude/clean",
@@ -27282,12 +27282,12 @@
     "mp_per_page": 3.869,
     "ms_per_page": 1851,
     "page_ms": [
-     1681.6
+     1695.1
     ],
-    "assemble_ms": 165.8,
+    "assemble_ms": 152.2,
     "runtime_ms": 1851,
-    "wall_ms": 2399,
-    "peak_rss_mb": 289.7
+    "wall_ms": 2367,
+    "peak_rss_mb": 287.4
    },
    {
     "id": "layouts/organ-three-staves-chorale-prelude/scan",
@@ -27301,14 +27301,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1849,
+    "ms_per_page": 1868,
     "page_ms": [
-     1700.3
+     1720
     ],
-    "assemble_ms": 144.8,
-    "runtime_ms": 1849,
+    "assemble_ms": 143.6,
+    "runtime_ms": 1868,
     "wall_ms": 2382,
-    "peak_rss_mb": 267.8
+    "peak_rss_mb": 267.4
    },
    {
     "id": "layouts/organ-three-staves-chorale-prelude/scan-severe",
@@ -27322,14 +27322,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 4401,
+    "ms_per_page": 4437,
     "page_ms": [
-     4195.9
+     4231.4
     ],
-    "assemble_ms": 200.5,
-    "runtime_ms": 4401,
-    "wall_ms": 4960,
-    "peak_rss_mb": 400.9
+    "assemble_ms": 199.3,
+    "runtime_ms": 4437,
+    "wall_ms": 4998,
+    "peak_rss_mb": 410.3
    },
    {
     "id": "layouts/piano-grand-staff-prelude/clean",
@@ -27343,14 +27343,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1446,
+    "ms_per_page": 1420,
     "page_ms": [
-     1323.8
+     1304.5
     ],
-    "assemble_ms": 117.1,
-    "runtime_ms": 1446,
-    "wall_ms": 1956,
-    "peak_rss_mb": 254.2
+    "assemble_ms": 110.5,
+    "runtime_ms": 1420,
+    "wall_ms": 1929,
+    "peak_rss_mb": 274.2
    },
    {
     "id": "layouts/piano-grand-staff-prelude/scan",
@@ -27364,14 +27364,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1540,
+    "ms_per_page": 1596,
     "page_ms": [
-     1426.3
+     1479.8
     ],
-    "assemble_ms": 110.6,
-    "runtime_ms": 1540,
-    "wall_ms": 2051,
-    "peak_rss_mb": 282.7
+    "assemble_ms": 112.7,
+    "runtime_ms": 1596,
+    "wall_ms": 2131,
+    "peak_rss_mb": 299.5
    },
    {
     "id": "layouts/piano-grand-staff-prelude/scan-severe",
@@ -27385,14 +27385,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1561,
+    "ms_per_page": 1591,
     "page_ms": [
-     1440.3
+     1471.7
     ],
-    "assemble_ms": 116.3,
-    "runtime_ms": 1561,
-    "wall_ms": 2100,
-    "peak_rss_mb": 285.2
+    "assemble_ms": 115.1,
+    "runtime_ms": 1591,
+    "wall_ms": 2108,
+    "peak_rss_mb": 275.4
    },
    {
     "id": "layouts/string-quartet-minuet/clean",
@@ -27406,14 +27406,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 3559,
+    "ms_per_page": 3564,
     "page_ms": [
-     3069.6
+     3073.1
     ],
-    "assemble_ms": 485.7,
-    "runtime_ms": 3559,
-    "wall_ms": 4086,
-    "peak_rss_mb": 375.5
+    "assemble_ms": 487.1,
+    "runtime_ms": 3564,
+    "wall_ms": 4113,
+    "peak_rss_mb": 390.4
    },
    {
     "id": "layouts/string-quartet-minuet/scan",
@@ -27427,14 +27427,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 4147,
+    "ms_per_page": 4423,
     "page_ms": [
-     3522.4
+     3807
     ],
-    "assemble_ms": 620.2,
-    "runtime_ms": 4147,
-    "wall_ms": 4711,
-    "peak_rss_mb": 378.8
+    "assemble_ms": 611.7,
+    "runtime_ms": 4423,
+    "wall_ms": 4972,
+    "peak_rss_mb": 420.7
    },
    {
     "id": "layouts/string-quartet-minuet/scan-severe",
@@ -27448,14 +27448,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 3863,
+    "ms_per_page": 4006,
     "page_ms": [
-     3276
+     3402.4
     ],
-    "assemble_ms": 582.6,
-    "runtime_ms": 3863,
-    "wall_ms": 4379,
-    "peak_rss_mb": 354.8
+    "assemble_ms": 600.1,
+    "runtime_ms": 4006,
+    "wall_ms": 4547,
+    "peak_rss_mb": 399.3
    },
    {
     "id": "layouts/two-voices-piano-song-without-words/clean",
@@ -27469,14 +27469,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1291,
+    "ms_per_page": 1413,
     "page_ms": [
-     1218.3
+     1338.2
     ],
-    "assemble_ms": 68.3,
-    "runtime_ms": 1291,
-    "wall_ms": 1803,
-    "peak_rss_mb": 264.9
+    "assemble_ms": 70.9,
+    "runtime_ms": 1413,
+    "wall_ms": 1946,
+    "peak_rss_mb": 255.6
    },
    {
     "id": "layouts/two-voices-piano-song-without-words/scan",
@@ -27490,14 +27490,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1507,
+    "ms_per_page": 1459,
     "page_ms": [
-     1414.8
+     1376.6
     ],
-    "assemble_ms": 88.7,
-    "runtime_ms": 1507,
-    "wall_ms": 2053,
-    "peak_rss_mb": 308.5
+    "assemble_ms": 78.1,
+    "runtime_ms": 1459,
+    "wall_ms": 1970,
+    "peak_rss_mb": 285.9
    },
    {
     "id": "layouts/two-voices-piano-song-without-words/scan-severe",
@@ -27511,14 +27511,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 3222,
+    "ms_per_page": 3121,
     "page_ms": [
-     3123.8
+     3022.4
     ],
-    "assemble_ms": 93.9,
-    "runtime_ms": 3222,
-    "wall_ms": 3760,
-    "peak_rss_mb": 360.8
+    "assemble_ms": 94.5,
+    "runtime_ms": 3121,
+    "wall_ms": 3654,
+    "peak_rss_mb": 377.2
    },
    {
     "id": "layouts/voice-piano-night-song/clean",
@@ -27532,14 +27532,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1799,
+    "ms_per_page": 1774,
     "page_ms": [
-     1651.2
+     1625.2
     ],
-    "assemble_ms": 144.3,
-    "runtime_ms": 1799,
-    "wall_ms": 2336,
-    "peak_rss_mb": 276.2
+    "assemble_ms": 144.4,
+    "runtime_ms": 1774,
+    "wall_ms": 2309,
+    "peak_rss_mb": 287.6
    },
    {
     "id": "layouts/voice-piano-night-song/scan",
@@ -27553,14 +27553,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.87,
-    "ms_per_page": 1919,
+    "ms_per_page": 1980,
     "page_ms": [
-     1760.1
+     1820.4
     ],
-    "assemble_ms": 155.1,
-    "runtime_ms": 1919,
-    "wall_ms": 2433,
-    "peak_rss_mb": 311.4
+    "assemble_ms": 154.8,
+    "runtime_ms": 1980,
+    "wall_ms": 2494,
+    "peak_rss_mb": 299
    },
    {
     "id": "layouts/voice-piano-night-song/scan-severe",
@@ -27574,14 +27574,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 4121,
+    "ms_per_page": 4062,
     "page_ms": [
-     3819.4
+     3760.5
     ],
-    "assemble_ms": 297.4,
-    "runtime_ms": 4121,
-    "wall_ms": 4667,
-    "peak_rss_mb": 372.4
+    "assemble_ms": 296.8,
+    "runtime_ms": 4062,
+    "wall_ms": 4596,
+    "peak_rss_mb": 404.4
    },
    {
     "id": "lyrics/lyr01-elisions-three-languages/clean",
@@ -27595,14 +27595,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1632,
+    "ms_per_page": 1631,
     "page_ms": [
      1573.4
     ],
-    "assemble_ms": 53.2,
-    "runtime_ms": 1632,
+    "assemble_ms": 51.7,
+    "runtime_ms": 1631,
     "wall_ms": 2167,
-    "peak_rss_mb": 285.5
+    "peak_rss_mb": 295.7
    },
    {
     "id": "lyrics/lyr01-elisions-three-languages/scan",
@@ -27616,14 +27616,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1732,
+    "ms_per_page": 1717,
     "page_ms": [
-     1675.4
+     1659.7
     ],
-    "assemble_ms": 51.8,
-    "runtime_ms": 1732,
-    "wall_ms": 2257,
-    "peak_rss_mb": 314.8
+    "assemble_ms": 53.3,
+    "runtime_ms": 1717,
+    "wall_ms": 2238,
+    "peak_rss_mb": 302.3
    },
    {
     "id": "lyrics/lyr01-elisions-three-languages/scan-severe",
@@ -27637,14 +27637,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1658,
+    "ms_per_page": 1698,
     "page_ms": [
-     1578.5
+     1616.5
     ],
-    "assemble_ms": 74,
-    "runtime_ms": 1658,
-    "wall_ms": 2205,
-    "peak_rss_mb": 306.2
+    "assemble_ms": 76.4,
+    "runtime_ms": 1698,
+    "wall_ms": 2239,
+    "peak_rss_mb": 286.6
    },
    {
     "id": "lyrics/lyr02-non-ascii-four-languages/clean",
@@ -27658,14 +27658,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1956,
+    "ms_per_page": 1930,
     "page_ms": [
-     1871.2
+     1858.7
     ],
-    "assemble_ms": 80.5,
-    "runtime_ms": 1956,
-    "wall_ms": 2499,
-    "peak_rss_mb": 289.3
+    "assemble_ms": 66.4,
+    "runtime_ms": 1930,
+    "wall_ms": 2459,
+    "peak_rss_mb": 286.1
    },
    {
     "id": "lyrics/lyr02-non-ascii-four-languages/scan",
@@ -27679,14 +27679,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 2007,
+    "ms_per_page": 2017,
     "page_ms": [
-     1919.6
+     1939.2
     ],
-    "assemble_ms": 82.5,
-    "runtime_ms": 2007,
-    "wall_ms": 2559,
-    "peak_rss_mb": 279
+    "assemble_ms": 73.5,
+    "runtime_ms": 2017,
+    "wall_ms": 2548,
+    "peak_rss_mb": 288.1
    },
    {
     "id": "lyrics/lyr02-non-ascii-four-languages/scan-severe",
@@ -27700,14 +27700,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.697,
-    "ms_per_page": 2189,
+    "ms_per_page": 2207,
     "page_ms": [
-     2137.6
+     2154
     ],
-    "assemble_ms": 46.8,
-    "runtime_ms": 2189,
-    "wall_ms": 2736,
-    "peak_rss_mb": 349.5
+    "assemble_ms": 46.7,
+    "runtime_ms": 2207,
+    "wall_ms": 2741,
+    "peak_rss_mb": 306.6
    },
    {
     "id": "marks/mk01-articulations-violin/clean",
@@ -27721,14 +27721,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1263,
+    "ms_per_page": 1219,
     "page_ms": [
-     1195.1
+     1142.5
     ],
-    "assemble_ms": 63.1,
-    "runtime_ms": 1263,
-    "wall_ms": 1801,
-    "peak_rss_mb": 271.6
+    "assemble_ms": 71.5,
+    "runtime_ms": 1219,
+    "wall_ms": 1736,
+    "peak_rss_mb": 269.3
    },
    {
     "id": "marks/mk01-articulations-violin/scan",
@@ -27742,14 +27742,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.958,
-    "ms_per_page": 1389,
+    "ms_per_page": 1462,
     "page_ms": [
-     1318.1
+     1384.3
     ],
-    "assemble_ms": 65.6,
-    "runtime_ms": 1389,
-    "wall_ms": 1901,
-    "peak_rss_mb": 310.5
+    "assemble_ms": 73.1,
+    "runtime_ms": 1462,
+    "wall_ms": 1990,
+    "peak_rss_mb": 273.5
    },
    {
     "id": "marks/mk01-articulations-violin/scan-severe",
@@ -27763,14 +27763,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.379,
-    "ms_per_page": 1485,
+    "ms_per_page": 1476,
     "page_ms": [
-     1407.7
+     1398.5
     ],
-    "assemble_ms": 67.8,
-    "runtime_ms": 1485,
-    "wall_ms": 2015,
-    "peak_rss_mb": 295.9
+    "assemble_ms": 71.9,
+    "runtime_ms": 1476,
+    "wall_ms": 1983,
+    "peak_rss_mb": 273.3
    },
    {
     "id": "marks/mk02-ornaments-fermatas-flute/clean",
@@ -27784,14 +27784,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1273,
+    "ms_per_page": 1214,
     "page_ms": [
-     1212.9
+     1160.5
     ],
-    "assemble_ms": 55.3,
-    "runtime_ms": 1273,
-    "wall_ms": 1806,
-    "peak_rss_mb": 256.3
+    "assemble_ms": 49.7,
+    "runtime_ms": 1214,
+    "wall_ms": 1721,
+    "peak_rss_mb": 279.1
    },
    {
     "id": "marks/mk02-ornaments-fermatas-flute/scan",
@@ -27805,14 +27805,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.003,
-    "ms_per_page": 1455,
+    "ms_per_page": 1416,
     "page_ms": [
-     1400.3
+     1361.4
     ],
-    "assemble_ms": 49.6,
-    "runtime_ms": 1455,
-    "wall_ms": 1993,
-    "peak_rss_mb": 286.4
+    "assemble_ms": 49,
+    "runtime_ms": 1416,
+    "wall_ms": 1918,
+    "peak_rss_mb": 272.9
    },
    {
     "id": "marks/mk02-ornaments-fermatas-flute/scan-severe",
@@ -27826,14 +27826,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.55,
-    "ms_per_page": 2811,
+    "ms_per_page": 2898,
     "page_ms": [
-     2706.7
+     2793.1
     ],
     "assemble_ms": 99.1,
-    "runtime_ms": 2811,
-    "wall_ms": 3345,
-    "peak_rss_mb": 422.3
+    "runtime_ms": 2898,
+    "wall_ms": 3433,
+    "peak_rss_mb": 388.7
    },
    {
     "id": "marks/mk03-dynamics-hairpins-cello/clean",
@@ -27847,14 +27847,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1388,
+    "ms_per_page": 1361,
     "page_ms": [
-     1297.3
+     1268.2
     ],
-    "assemble_ms": 87.5,
-    "runtime_ms": 1388,
-    "wall_ms": 1928,
-    "peak_rss_mb": 296.1
+    "assemble_ms": 88.5,
+    "runtime_ms": 1361,
+    "wall_ms": 1874,
+    "peak_rss_mb": 284.9
    },
    {
     "id": "marks/mk03-dynamics-hairpins-cello/scan",
@@ -27868,14 +27868,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.047,
-    "ms_per_page": 1567,
+    "ms_per_page": 1564,
     "page_ms": [
-     1472.3
+     1463.9
     ],
-    "assemble_ms": 89.7,
-    "runtime_ms": 1567,
-    "wall_ms": 2104,
-    "peak_rss_mb": 276.7
+    "assemble_ms": 95.7,
+    "runtime_ms": 1564,
+    "wall_ms": 2094,
+    "peak_rss_mb": 268.3
    },
    {
     "id": "marks/mk03-dynamics-hairpins-cello/scan-severe",
@@ -27889,14 +27889,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.444,
-    "ms_per_page": 2056,
+    "ms_per_page": 2092,
     "page_ms": [
-     1929.8
+     1966
     ],
-    "assemble_ms": 122,
-    "runtime_ms": 2056,
-    "wall_ms": 2599,
-    "peak_rss_mb": 295.8
+    "assemble_ms": 119.7,
+    "runtime_ms": 2092,
+    "wall_ms": 2609,
+    "peak_rss_mb": 332.6
    },
    {
     "id": "marks/mk04-piano-pedal-arpeggio-fingering/clean",
@@ -27910,14 +27910,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1735,
+    "ms_per_page": 1754,
     "page_ms": [
-     1597.1
+     1613.5
     ],
-    "assemble_ms": 132.8,
-    "runtime_ms": 1735,
-    "wall_ms": 2260,
-    "peak_rss_mb": 290.1
+    "assemble_ms": 136.8,
+    "runtime_ms": 1754,
+    "wall_ms": 2272,
+    "peak_rss_mb": 273.5
    },
    {
     "id": "marks/mk04-piano-pedal-arpeggio-fingering/scan",
@@ -27931,14 +27931,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.945,
-    "ms_per_page": 1901,
+    "ms_per_page": 1864,
     "page_ms": [
-     1756.4
+     1722.7
     ],
-    "assemble_ms": 140.2,
-    "runtime_ms": 1901,
-    "wall_ms": 2449,
-    "peak_rss_mb": 277.9
+    "assemble_ms": 137.2,
+    "runtime_ms": 1864,
+    "wall_ms": 2376,
+    "peak_rss_mb": 287.7
    },
    {
     "id": "marks/mk04-piano-pedal-arpeggio-fingering/scan-severe",
@@ -27952,14 +27952,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.23,
-    "ms_per_page": 1981,
+    "ms_per_page": 1984,
     "page_ms": [
-     1815.3
+     1814
     ],
-    "assemble_ms": 161.8,
-    "runtime_ms": 1981,
-    "wall_ms": 2524,
-    "peak_rss_mb": 313.2
+    "assemble_ms": 165.4,
+    "runtime_ms": 1984,
+    "wall_ms": 2492,
+    "peak_rss_mb": 312.1
    },
    {
     "id": "marks/mk05-tempo-text-rehearsal-oboe/clean",
@@ -27973,14 +27973,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1562,
+    "ms_per_page": 1549,
     "page_ms": [
-     1462
+     1453.1
     ],
-    "assemble_ms": 95.4,
-    "runtime_ms": 1562,
-    "wall_ms": 2087,
-    "peak_rss_mb": 276
+    "assemble_ms": 90.5,
+    "runtime_ms": 1549,
+    "wall_ms": 2055,
+    "peak_rss_mb": 293.4
    },
    {
     "id": "marks/mk05-tempo-text-rehearsal-oboe/scan",
@@ -27994,14 +27994,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.99,
-    "ms_per_page": 1731,
+    "ms_per_page": 1717,
     "page_ms": [
-     1628.9
+     1614.9
     ],
-    "assemble_ms": 97.7,
-    "runtime_ms": 1731,
-    "wall_ms": 2263,
-    "peak_rss_mb": 298.9
+    "assemble_ms": 96.5,
+    "runtime_ms": 1717,
+    "wall_ms": 2224,
+    "peak_rss_mb": 287.6
    },
    {
     "id": "marks/mk05-tempo-text-rehearsal-oboe/scan-severe",
@@ -28015,14 +28015,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.155,
-    "ms_per_page": 1786,
+    "ms_per_page": 1810,
     "page_ms": [
-     1621.1
+     1659.3
     ],
-    "assemble_ms": 159.6,
-    "runtime_ms": 1786,
-    "wall_ms": 2340,
-    "peak_rss_mb": 292.2
+    "assemble_ms": 145.4,
+    "runtime_ms": 1810,
+    "wall_ms": 2309,
+    "peak_rss_mb": 291.3
    },
    {
     "id": "marks/mk06-lead-sheet-chord-symbols/clean",
@@ -28036,14 +28036,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1560,
+    "ms_per_page": 1540,
     "page_ms": [
-     1454.7
+     1441.1
     ],
-    "assemble_ms": 100.8,
-    "runtime_ms": 1560,
-    "wall_ms": 2101,
-    "peak_rss_mb": 292.2
+    "assemble_ms": 94.8,
+    "runtime_ms": 1540,
+    "wall_ms": 2043,
+    "peak_rss_mb": 272.2
    },
    {
     "id": "marks/mk06-lead-sheet-chord-symbols/scan",
@@ -28057,14 +28057,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.018,
-    "ms_per_page": 1677,
+    "ms_per_page": 1740,
     "page_ms": [
-     1579.5
+     1642.1
     ],
-    "assemble_ms": 93.5,
-    "runtime_ms": 1677,
-    "wall_ms": 2199,
-    "peak_rss_mb": 318
+    "assemble_ms": 93,
+    "runtime_ms": 1740,
+    "wall_ms": 2263,
+    "peak_rss_mb": 287.3
    },
    {
     "id": "marks/mk06-lead-sheet-chord-symbols/scan-severe",
@@ -28078,14 +28078,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.083,
-    "ms_per_page": 3537,
+    "ms_per_page": 3482,
     "page_ms": [
-     3446
+     3391
     ],
-    "assemble_ms": 86.8,
-    "runtime_ms": 3537,
-    "wall_ms": 4063,
-    "peak_rss_mb": 342.7
+    "assemble_ms": 86.9,
+    "runtime_ms": 3482,
+    "wall_ms": 4016,
+    "peak_rss_mb": 351.2
    },
    {
     "id": "marks/mk07-vocalise-voice-piano/clean",
@@ -28099,14 +28099,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1808,
+    "ms_per_page": 1817,
     "page_ms": [
-     1658.5
+     1670.4
     ],
-    "assemble_ms": 146.3,
-    "runtime_ms": 1808,
-    "wall_ms": 2339,
-    "peak_rss_mb": 301.6
+    "assemble_ms": 142.1,
+    "runtime_ms": 1817,
+    "wall_ms": 2325,
+    "peak_rss_mb": 280.6
    },
    {
     "id": "marks/mk07-vocalise-voice-piano/scan",
@@ -28120,14 +28120,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.931,
-    "ms_per_page": 1898,
+    "ms_per_page": 1974,
     "page_ms": [
-     1753.5
+     1833.3
     ],
-    "assemble_ms": 140.4,
-    "runtime_ms": 1898,
-    "wall_ms": 2438,
-    "peak_rss_mb": 299.2
+    "assemble_ms": 137,
+    "runtime_ms": 1974,
+    "wall_ms": 2502,
+    "peak_rss_mb": 317.6
    },
    {
     "id": "marks/mk07-vocalise-voice-piano/scan-severe",
@@ -28141,14 +28141,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.305,
-    "ms_per_page": 2156,
+    "ms_per_page": 2114,
     "page_ms": [
-     1945.1
+     1900.6
     ],
-    "assemble_ms": 206.6,
-    "runtime_ms": 2156,
-    "wall_ms": 2717,
-    "peak_rss_mb": 325.6
+    "assemble_ms": 208,
+    "runtime_ms": 2114,
+    "wall_ms": 2620,
+    "peak_rss_mb": 321.9
    },
    {
     "id": "marks/mk08-string-quartet-marks/clean",
@@ -28162,14 +28162,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 2041,
+    "ms_per_page": 2078,
     "page_ms": [
-     1817.6
+     1861.5
     ],
-    "assemble_ms": 218.3,
-    "runtime_ms": 2041,
-    "wall_ms": 2570,
-    "peak_rss_mb": 333.9
+    "assemble_ms": 212.4,
+    "runtime_ms": 2078,
+    "wall_ms": 2600,
+    "peak_rss_mb": 334.9
    },
    {
     "id": "marks/mk08-string-quartet-marks/scan",
@@ -28183,14 +28183,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.972,
-    "ms_per_page": 2251,
+    "ms_per_page": 2317,
     "page_ms": [
-     2022.1
+     2088.1
     ],
-    "assemble_ms": 223.2,
-    "runtime_ms": 2251,
-    "wall_ms": 2800,
-    "peak_rss_mb": 329.3
+    "assemble_ms": 223.8,
+    "runtime_ms": 2317,
+    "wall_ms": 2824,
+    "peak_rss_mb": 324.1
    },
    {
     "id": "marks/mk08-string-quartet-marks/scan-severe",
@@ -28204,14 +28204,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.584,
-    "ms_per_page": 2432,
+    "ms_per_page": 2408,
     "page_ms": [
-     2066.6
+     2047.8
     ],
-    "assemble_ms": 359.6,
-    "runtime_ms": 2432,
-    "wall_ms": 2977,
-    "peak_rss_mb": 304.5
+    "assemble_ms": 355.3,
+    "runtime_ms": 2408,
+    "wall_ms": 2916,
+    "peak_rss_mb": 289.4
    },
    {
     "id": "marks/mk09-stacked-marks-viola/clean",
@@ -28225,14 +28225,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1488,
+    "ms_per_page": 1395,
     "page_ms": [
-     1435.6
+     1346.1
     ],
-    "assemble_ms": 47,
-    "runtime_ms": 1488,
-    "wall_ms": 2035,
-    "peak_rss_mb": 265.5
+    "assemble_ms": 44,
+    "runtime_ms": 1395,
+    "wall_ms": 1916,
+    "peak_rss_mb": 287.2
    },
    {
     "id": "marks/mk09-stacked-marks-viola/scan",
@@ -28246,14 +28246,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.002,
-    "ms_per_page": 1738,
+    "ms_per_page": 1659,
     "page_ms": [
-     1676.6
+     1599.6
     ],
-    "assemble_ms": 56.7,
-    "runtime_ms": 1738,
-    "wall_ms": 2291,
-    "peak_rss_mb": 312.9
+    "assemble_ms": 55.5,
+    "runtime_ms": 1659,
+    "wall_ms": 2172,
+    "peak_rss_mb": 292.7
    },
    {
     "id": "marks/mk09-stacked-marks-viola/scan-severe",
@@ -28267,14 +28267,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.413,
-    "ms_per_page": 1791,
+    "ms_per_page": 1776,
     "page_ms": [
-     1718.8
+     1707.4
     ],
-    "assemble_ms": 65.4,
-    "runtime_ms": 1791,
-    "wall_ms": 2353,
-    "peak_rss_mb": 364.6
+    "assemble_ms": 64.1,
+    "runtime_ms": 1776,
+    "wall_ms": 2295,
+    "peak_rss_mb": 361.5
    },
    {
     "id": "marks/mk10-piano-pedal-brackets/clean",
@@ -28288,14 +28288,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1459,
+    "ms_per_page": 1508,
     "page_ms": [
-     1323.4
+     1365.6
     ],
-    "assemble_ms": 131.7,
-    "runtime_ms": 1459,
-    "wall_ms": 1994,
-    "peak_rss_mb": 281.7
+    "assemble_ms": 137.9,
+    "runtime_ms": 1508,
+    "wall_ms": 2029,
+    "peak_rss_mb": 271.1
    },
    {
     "id": "marks/mk10-piano-pedal-brackets/scan",
@@ -28309,14 +28309,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.958,
-    "ms_per_page": 1575,
+    "ms_per_page": 1606,
     "page_ms": [
-     1439.1
+     1466.5
     ],
-    "assemble_ms": 130.8,
-    "runtime_ms": 1575,
-    "wall_ms": 2094,
-    "peak_rss_mb": 280.9
+    "assemble_ms": 135.5,
+    "runtime_ms": 1606,
+    "wall_ms": 2137,
+    "peak_rss_mb": 283.5
    },
    {
     "id": "marks/mk10-piano-pedal-brackets/scan-severe",
@@ -28330,14 +28330,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.161,
-    "ms_per_page": 1627,
+    "ms_per_page": 1674,
     "page_ms": [
-     1460.7
+     1509.3
     ],
-    "assemble_ms": 162.1,
-    "runtime_ms": 1627,
-    "wall_ms": 2146,
-    "peak_rss_mb": 315.5
+    "assemble_ms": 160,
+    "runtime_ms": 1674,
+    "wall_ms": 2179,
+    "peak_rss_mb": 301.4
    },
    {
     "id": "marks/mk11-violin-circled-rehearsal-numbers/clean",
@@ -28351,14 +28351,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1283,
+    "ms_per_page": 1248,
     "page_ms": [
-     1215.6
+     1180.6
     ],
-    "assemble_ms": 62.6,
-    "runtime_ms": 1283,
-    "wall_ms": 1812,
-    "peak_rss_mb": 269.5
+    "assemble_ms": 62.5,
+    "runtime_ms": 1248,
+    "wall_ms": 1756,
+    "peak_rss_mb": 253.3
    },
    {
     "id": "marks/mk11-violin-circled-rehearsal-numbers/scan",
@@ -28372,14 +28372,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.931,
-    "ms_per_page": 1417,
+    "ms_per_page": 1384,
     "page_ms": [
-     1341
+     1315.1
     ],
-    "assemble_ms": 70.3,
-    "runtime_ms": 1417,
-    "wall_ms": 1946,
-    "peak_rss_mb": 281.1
+    "assemble_ms": 63.5,
+    "runtime_ms": 1384,
+    "wall_ms": 1888,
+    "peak_rss_mb": 303.3
    },
    {
     "id": "marks/mk11-violin-circled-rehearsal-numbers/scan-severe",
@@ -28393,14 +28393,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.089,
-    "ms_per_page": 1415,
+    "ms_per_page": 1461,
     "page_ms": [
-     1331.7
+     1365.1
     ],
-    "assemble_ms": 79.9,
-    "runtime_ms": 1415,
-    "wall_ms": 1944,
-    "peak_rss_mb": 288.7
+    "assemble_ms": 90.2,
+    "runtime_ms": 1461,
+    "wall_ms": 1989,
+    "peak_rss_mb": 286.4
    },
    {
     "id": "notes/nt01-note-values/clean",
@@ -28414,14 +28414,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1402,
+    "ms_per_page": 1443,
     "page_ms": [
-     1290
+     1331.4
     ],
-    "assemble_ms": 107.9,
-    "runtime_ms": 1402,
-    "wall_ms": 1916,
-    "peak_rss_mb": 269
+    "assemble_ms": 107,
+    "runtime_ms": 1443,
+    "wall_ms": 1954,
+    "peak_rss_mb": 295.7
    },
    {
     "id": "notes/nt01-note-values/scan",
@@ -28435,14 +28435,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.974,
-    "ms_per_page": 1612,
+    "ms_per_page": 1590,
     "page_ms": [
-     1491.8
+     1479.1
     ],
-    "assemble_ms": 115,
-    "runtime_ms": 1612,
-    "wall_ms": 2146,
-    "peak_rss_mb": 293.9
+    "assemble_ms": 106.7,
+    "runtime_ms": 1590,
+    "wall_ms": 2112,
+    "peak_rss_mb": 298.2
    },
    {
     "id": "notes/nt01-note-values/scan-severe",
@@ -28456,14 +28456,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.217,
-    "ms_per_page": 1923,
+    "ms_per_page": 1890,
     "page_ms": [
-     1658.4
+     1624.9
     ],
-    "assemble_ms": 260,
-    "runtime_ms": 1923,
-    "wall_ms": 2452,
-    "peak_rss_mb": 289.5
+    "assemble_ms": 260.8,
+    "runtime_ms": 1890,
+    "wall_ms": 2429,
+    "peak_rss_mb": 273.9
    },
    {
     "id": "notes/nt02-dots/clean",
@@ -28477,14 +28477,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1412,
+    "ms_per_page": 1410,
     "page_ms": [
-     1302.2
+     1299.7
     ],
-    "assemble_ms": 104.5,
-    "runtime_ms": 1412,
-    "wall_ms": 1938,
-    "peak_rss_mb": 252.9
+    "assemble_ms": 105.5,
+    "runtime_ms": 1410,
+    "wall_ms": 1947,
+    "peak_rss_mb": 269.9
    },
    {
     "id": "notes/nt02-dots/scan",
@@ -28498,14 +28498,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.031,
-    "ms_per_page": 1511,
+    "ms_per_page": 1550,
     "page_ms": [
-     1400.3
+     1439.5
     ],
-    "assemble_ms": 105.2,
-    "runtime_ms": 1511,
-    "wall_ms": 2037,
-    "peak_rss_mb": 318.2
+    "assemble_ms": 105.1,
+    "runtime_ms": 1550,
+    "wall_ms": 2057,
+    "peak_rss_mb": 318
    },
    {
     "id": "notes/nt02-dots/scan-severe",
@@ -28519,14 +28519,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.312,
-    "ms_per_page": 1586,
+    "ms_per_page": 1606,
     "page_ms": [
-     1432.1
+     1444.1
     ],
-    "assemble_ms": 149.4,
-    "runtime_ms": 1586,
-    "wall_ms": 2131,
-    "peak_rss_mb": 313
+    "assemble_ms": 156.6,
+    "runtime_ms": 1606,
+    "wall_ms": 2124,
+    "peak_rss_mb": 279.3
    },
    {
     "id": "notes/nt03-chords/clean",
@@ -28540,14 +28540,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1488,
+    "ms_per_page": 1440,
     "page_ms": [
-     1391.1
+     1348.9
     ],
-    "assemble_ms": 92.3,
-    "runtime_ms": 1488,
-    "wall_ms": 2023,
-    "peak_rss_mb": 280.7
+    "assemble_ms": 86.3,
+    "runtime_ms": 1440,
+    "wall_ms": 1973,
+    "peak_rss_mb": 296.1
    },
    {
     "id": "notes/nt03-chords/scan",
@@ -28561,14 +28561,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.931,
-    "ms_per_page": 1526,
+    "ms_per_page": 1469,
     "page_ms": [
-     1439.6
+     1383.9
     ],
-    "assemble_ms": 81.4,
-    "runtime_ms": 1526,
-    "wall_ms": 2065,
-    "peak_rss_mb": 266.1
+    "assemble_ms": 79.9,
+    "runtime_ms": 1469,
+    "wall_ms": 2016,
+    "peak_rss_mb": 269.7
    },
    {
     "id": "notes/nt03-chords/scan-severe",
@@ -28582,14 +28582,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.55,
-    "ms_per_page": 1679,
+    "ms_per_page": 1668,
     "page_ms": [
-     1599.9
+     1589.5
     ],
-    "assemble_ms": 74.9,
-    "runtime_ms": 1679,
-    "wall_ms": 2218,
-    "peak_rss_mb": 299.7
+    "assemble_ms": 73.9,
+    "runtime_ms": 1668,
+    "wall_ms": 2232,
+    "peak_rss_mb": 322.8
    },
    {
     "id": "notes/nt04-beams/clean",
@@ -28603,14 +28603,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1443,
+    "ms_per_page": 1420,
     "page_ms": [
-     1326.5
+     1306.2
     ],
-    "assemble_ms": 111.8,
-    "runtime_ms": 1443,
-    "wall_ms": 1964,
-    "peak_rss_mb": 276.1
+    "assemble_ms": 108.3,
+    "runtime_ms": 1420,
+    "wall_ms": 1953,
+    "peak_rss_mb": 282.6
    },
    {
     "id": "notes/nt04-beams/scan",
@@ -28624,14 +28624,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.06,
-    "ms_per_page": 1658,
+    "ms_per_page": 1618,
     "page_ms": [
-     1503.4
+     1483.4
     ],
-    "assemble_ms": 148.3,
-    "runtime_ms": 1658,
-    "wall_ms": 2220,
-    "peak_rss_mb": 298.9
+    "assemble_ms": 130.7,
+    "runtime_ms": 1618,
+    "wall_ms": 2145,
+    "peak_rss_mb": 292.6
    },
    {
     "id": "notes/nt04-beams/scan-severe",
@@ -28645,14 +28645,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.132,
-    "ms_per_page": 1625,
+    "ms_per_page": 1642,
     "page_ms": [
-     1485.8
+     1500.1
     ],
-    "assemble_ms": 133.9,
-    "runtime_ms": 1625,
-    "wall_ms": 2154,
-    "peak_rss_mb": 307.8
+    "assemble_ms": 137,
+    "runtime_ms": 1642,
+    "wall_ms": 2167,
+    "peak_rss_mb": 305.1
    },
    {
     "id": "notes/nt05-flags-stems/clean",
@@ -28666,14 +28666,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1456,
+    "ms_per_page": 1446,
     "page_ms": [
-     1316.2
+     1312
     ],
-    "assemble_ms": 134.5,
-    "runtime_ms": 1456,
-    "wall_ms": 1999,
-    "peak_rss_mb": 273.1
+    "assemble_ms": 129.7,
+    "runtime_ms": 1446,
+    "wall_ms": 1964,
+    "peak_rss_mb": 267
    },
    {
     "id": "notes/nt05-flags-stems/scan",
@@ -28687,14 +28687,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.945,
-    "ms_per_page": 1587,
+    "ms_per_page": 1628,
     "page_ms": [
-     1443
+     1487.9
     ],
-    "assemble_ms": 138.8,
-    "runtime_ms": 1587,
-    "wall_ms": 2129,
-    "peak_rss_mb": 311.1
+    "assemble_ms": 136,
+    "runtime_ms": 1628,
+    "wall_ms": 2144,
+    "peak_rss_mb": 282.1
    },
    {
     "id": "notes/nt05-flags-stems/scan-severe",
@@ -28708,14 +28708,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.105,
-    "ms_per_page": 1581,
+    "ms_per_page": 1657,
     "page_ms": [
-     1450.3
+     1523.7
     ],
-    "assemble_ms": 126.6,
-    "runtime_ms": 1581,
-    "wall_ms": 2118,
-    "peak_rss_mb": 305.9
+    "assemble_ms": 129.3,
+    "runtime_ms": 1657,
+    "wall_ms": 2199,
+    "peak_rss_mb": 313.6
    },
    {
     "id": "notes/nt06-ledger-lines/clean",
@@ -28729,14 +28729,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1279,
+    "ms_per_page": 1306,
     "page_ms": [
-     1248.2
+     1270.8
     ],
-    "assemble_ms": 26.7,
-    "runtime_ms": 1279,
-    "wall_ms": 1815,
-    "peak_rss_mb": 278.9
+    "assemble_ms": 31.1,
+    "runtime_ms": 1306,
+    "wall_ms": 1824,
+    "peak_rss_mb": 270
    },
    {
     "id": "notes/nt06-ledger-lines/scan",
@@ -28750,14 +28750,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.003,
-    "ms_per_page": 1544,
+    "ms_per_page": 1464,
     "page_ms": [
-     1514.4
+     1436
     ],
-    "assemble_ms": 24.9,
-    "runtime_ms": 1544,
-    "wall_ms": 2073,
-    "peak_rss_mb": 280.9
+    "assemble_ms": 23.4,
+    "runtime_ms": 1464,
+    "wall_ms": 1996,
+    "peak_rss_mb": 279.6
    },
    {
     "id": "notes/nt06-ledger-lines/scan-severe",
@@ -28771,14 +28771,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.444,
-    "ms_per_page": 1541,
+    "ms_per_page": 1539,
     "page_ms": [
-     1513.5
+     1511.1
     ],
-    "assemble_ms": 23,
-    "runtime_ms": 1541,
+    "assemble_ms": 22.4,
+    "runtime_ms": 1539,
     "wall_ms": 2070,
-    "peak_rss_mb": 309.8
+    "peak_rss_mb": 321.6
    },
    {
     "id": "notes/nt07-grace-notes/clean",
@@ -28792,14 +28792,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1400,
+    "ms_per_page": 1434,
     "page_ms": [
-     1310
+     1342.6
     ],
-    "assemble_ms": 86.6,
-    "runtime_ms": 1400,
-    "wall_ms": 1926,
-    "peak_rss_mb": 278.1
+    "assemble_ms": 87.6,
+    "runtime_ms": 1434,
+    "wall_ms": 1959,
+    "peak_rss_mb": 248.6
    },
    {
     "id": "notes/nt07-grace-notes/scan",
@@ -28813,14 +28813,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.016,
-    "ms_per_page": 1578,
+    "ms_per_page": 1592,
     "page_ms": [
-     1483.3
+     1500.2
     ],
-    "assemble_ms": 89.6,
-    "runtime_ms": 1578,
-    "wall_ms": 2091,
-    "peak_rss_mb": 286.8
+    "assemble_ms": 87.8,
+    "runtime_ms": 1592,
+    "wall_ms": 2126,
+    "peak_rss_mb": 291.9
    },
    {
     "id": "notes/nt07-grace-notes/scan-severe",
@@ -28834,14 +28834,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.161,
-    "ms_per_page": 2126,
+    "ms_per_page": 2061,
     "page_ms": [
-     2013.2
+     1948.8
     ],
-    "assemble_ms": 108.1,
-    "runtime_ms": 2126,
-    "wall_ms": 2661,
-    "peak_rss_mb": 337.4
+    "assemble_ms": 107.9,
+    "runtime_ms": 2061,
+    "wall_ms": 2603,
+    "peak_rss_mb": 351.1
    },
    {
     "id": "notes/nt08-cue-notes/clean",
@@ -28855,14 +28855,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1195,
+    "ms_per_page": 1267,
     "page_ms": [
-     1144.9
+     1211.6
     ],
-    "assemble_ms": 46.5,
-    "runtime_ms": 1195,
-    "wall_ms": 1734,
-    "peak_rss_mb": 279.6
+    "assemble_ms": 51.6,
+    "runtime_ms": 1267,
+    "wall_ms": 1806,
+    "peak_rss_mb": 266.6
    },
    {
     "id": "notes/nt08-cue-notes/scan",
@@ -28876,14 +28876,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.989,
-    "ms_per_page": 1323,
+    "ms_per_page": 1353,
     "page_ms": [
-     1274.1
+     1292.8
     ],
-    "assemble_ms": 44.9,
-    "runtime_ms": 1323,
-    "wall_ms": 1860,
-    "peak_rss_mb": 274.9
+    "assemble_ms": 55.5,
+    "runtime_ms": 1353,
+    "wall_ms": 1902,
+    "peak_rss_mb": 297.8
    },
    {
     "id": "notes/nt08-cue-notes/scan-severe",
@@ -28897,14 +28897,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.189,
-    "ms_per_page": 1684,
+    "ms_per_page": 1733,
     "page_ms": [
-     1624.2
+     1668.1
     ],
-    "assemble_ms": 55.2,
-    "runtime_ms": 1684,
-    "wall_ms": 2220,
-    "peak_rss_mb": 347.7
+    "assemble_ms": 60.2,
+    "runtime_ms": 1733,
+    "wall_ms": 2278,
+    "peak_rss_mb": 338
    },
    {
     "id": "notes/nt09-tremolos/clean",
@@ -28918,14 +28918,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1286,
+    "ms_per_page": 1339,
     "page_ms": [
-     1216.2
+     1266.7
     ],
-    "assemble_ms": 65.3,
-    "runtime_ms": 1286,
-    "wall_ms": 1803,
-    "peak_rss_mb": 261
+    "assemble_ms": 67.8,
+    "runtime_ms": 1339,
+    "wall_ms": 1864,
+    "peak_rss_mb": 288.3
    },
    {
     "id": "notes/nt09-tremolos/scan",
@@ -28939,14 +28939,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.96,
-    "ms_per_page": 1417,
+    "ms_per_page": 1478,
     "page_ms": [
-     1338
+     1401.2
     ],
-    "assemble_ms": 75.3,
-    "runtime_ms": 1417,
-    "wall_ms": 1959,
-    "peak_rss_mb": 307.5
+    "assemble_ms": 72.3,
+    "runtime_ms": 1478,
+    "wall_ms": 1987,
+    "peak_rss_mb": 287.7
    },
    {
     "id": "notes/nt09-tremolos/scan-severe",
@@ -28960,14 +28960,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.734,
-    "ms_per_page": 5239,
+    "ms_per_page": 5437,
     "page_ms": [
-     4892.6
+     5087.3
     ],
-    "assemble_ms": 341.3,
-    "runtime_ms": 5239,
-    "wall_ms": 5788,
-    "peak_rss_mb": 549.1
+    "assemble_ms": 345.4,
+    "runtime_ms": 5437,
+    "wall_ms": 5989,
+    "peak_rss_mb": 492.4
    },
    {
     "id": "notes/nt10-piano-etude/clean",
@@ -28981,14 +28981,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1351,
+    "ms_per_page": 1448,
     "page_ms": [
-     1253.7
+     1359.2
     ],
-    "assemble_ms": 92.7,
-    "runtime_ms": 1351,
-    "wall_ms": 1900,
-    "peak_rss_mb": 285.1
+    "assemble_ms": 84.4,
+    "runtime_ms": 1448,
+    "wall_ms": 1987,
+    "peak_rss_mb": 270.8
    },
    {
     "id": "notes/nt10-piano-etude/scan",
@@ -29002,14 +29002,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.073,
-    "ms_per_page": 1515,
+    "ms_per_page": 1537,
     "page_ms": [
-     1423.3
+     1449.6
     ],
-    "assemble_ms": 87.6,
-    "runtime_ms": 1515,
-    "wall_ms": 2045,
-    "peak_rss_mb": 334.3
+    "assemble_ms": 83.5,
+    "runtime_ms": 1537,
+    "wall_ms": 2049,
+    "peak_rss_mb": 293.6
    },
    {
     "id": "notes/nt10-piano-etude/scan-severe",
@@ -29023,14 +29023,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.31,
-    "ms_per_page": 1597,
+    "ms_per_page": 1645,
     "page_ms": [
-     1509.2
+     1554.6
     ],
-    "assemble_ms": 83.8,
-    "runtime_ms": 1597,
-    "wall_ms": 2132,
-    "peak_rss_mb": 293.9
+    "assemble_ms": 86.2,
+    "runtime_ms": 1645,
+    "wall_ms": 2183,
+    "peak_rss_mb": 289.4
    },
    {
     "id": "percussion/perc01-parade-flute-snare-drumset/clean",
@@ -29044,14 +29044,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1663,
+    "ms_per_page": 1666,
     "page_ms": [
-     1538.5
+     1539.6
     ],
-    "assemble_ms": 120.5,
-    "runtime_ms": 1663,
-    "wall_ms": 2200,
-    "peak_rss_mb": 272.5
+    "assemble_ms": 121.9,
+    "runtime_ms": 1666,
+    "wall_ms": 2203,
+    "peak_rss_mb": 266.5
    },
    {
     "id": "percussion/perc01-parade-flute-snare-drumset/scan",
@@ -29065,14 +29065,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1794,
+    "ms_per_page": 1820,
     "page_ms": [
-     1662.9
+     1697.4
     ],
-    "assemble_ms": 126,
-    "runtime_ms": 1794,
-    "wall_ms": 2336,
-    "peak_rss_mb": 269.1
+    "assemble_ms": 118.1,
+    "runtime_ms": 1820,
+    "wall_ms": 2345,
+    "peak_rss_mb": 279.1
    },
    {
     "id": "percussion/perc01-parade-flute-snare-drumset/scan-severe",
@@ -29086,14 +29086,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1885,
+    "ms_per_page": 1869,
     "page_ms": [
-     1740.2
+     1718.8
     ],
-    "assemble_ms": 139.3,
-    "runtime_ms": 1885,
-    "wall_ms": 2440,
-    "peak_rss_mb": 280
+    "assemble_ms": 145.4,
+    "runtime_ms": 1869,
+    "wall_ms": 2407,
+    "peak_rss_mb": 285.7
    },
    {
     "id": "pitch/pitch-cov-accidentals-chords-piano/clean",
@@ -29107,14 +29107,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1417,
+    "ms_per_page": 1430,
     "page_ms": [
-     1316.9
+     1331.9
     ],
-    "assemble_ms": 94,
-    "runtime_ms": 1417,
-    "wall_ms": 1934,
-    "peak_rss_mb": 286.9
+    "assemble_ms": 92.7,
+    "runtime_ms": 1430,
+    "wall_ms": 1971,
+    "peak_rss_mb": 266.5
    },
    {
     "id": "pitch/pitch-cov-accidentals-chords-piano/scan",
@@ -29128,14 +29128,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.87,
-    "ms_per_page": 1515,
+    "ms_per_page": 1565,
     "page_ms": [
-     1392
+     1450.6
     ],
-    "assemble_ms": 118.8,
-    "runtime_ms": 1515,
-    "wall_ms": 2066,
-    "peak_rss_mb": 297
+    "assemble_ms": 109,
+    "runtime_ms": 1565,
+    "wall_ms": 2101,
+    "peak_rss_mb": 279.3
    },
    {
     "id": "pitch/pitch-cov-accidentals-chords-piano/scan-severe",
@@ -29149,14 +29149,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.23,
-    "ms_per_page": 1580,
+    "ms_per_page": 1636,
     "page_ms": [
-     1458.6
+     1514.4
     ],
-    "assemble_ms": 116.1,
-    "runtime_ms": 1580,
-    "wall_ms": 2104,
-    "peak_rss_mb": 281
+    "assemble_ms": 117,
+    "runtime_ms": 1636,
+    "wall_ms": 2164,
+    "peak_rss_mb": 275
    },
    {
     "id": "pitch/pitch-cov-accidentals-melody/clean",
@@ -29170,14 +29170,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1542,
+    "ms_per_page": 1494,
     "page_ms": [
-     1383.8
+     1349.6
     ],
-    "assemble_ms": 152.4,
-    "runtime_ms": 1542,
-    "wall_ms": 2083,
-    "peak_rss_mb": 287.4
+    "assemble_ms": 140.4,
+    "runtime_ms": 1494,
+    "wall_ms": 2023,
+    "peak_rss_mb": 264.6
    },
    {
     "id": "pitch/pitch-cov-accidentals-melody/scan",
@@ -29193,12 +29193,12 @@
     "mp_per_page": 3.869,
     "ms_per_page": 1668,
     "page_ms": [
-     1522.4
+     1508.1
     ],
-    "assemble_ms": 140.7,
+    "assemble_ms": 154.8,
     "runtime_ms": 1668,
-    "wall_ms": 2197,
-    "peak_rss_mb": 280.4
+    "wall_ms": 2213,
+    "peak_rss_mb": 266.6
    },
    {
     "id": "pitch/pitch-cov-accidentals-melody/scan-severe",
@@ -29212,14 +29212,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.591,
-    "ms_per_page": 1755,
+    "ms_per_page": 1736,
     "page_ms": [
-     1559.2
+     1540.4
     ],
-    "assemble_ms": 191.7,
-    "runtime_ms": 1755,
-    "wall_ms": 2284,
-    "peak_rss_mb": 293.6
+    "assemble_ms": 188.8,
+    "runtime_ms": 1736,
+    "wall_ms": 2241,
+    "peak_rss_mb": 277.4
    },
    {
     "id": "pitch/pitch-cov-clef-changes-piano/clean",
@@ -29233,14 +29233,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1432,
+    "ms_per_page": 1476,
     "page_ms": [
-     1318.5
+     1365.5
     ],
-    "assemble_ms": 107.3,
-    "runtime_ms": 1432,
-    "wall_ms": 1964,
-    "peak_rss_mb": 275
+    "assemble_ms": 105.1,
+    "runtime_ms": 1476,
+    "wall_ms": 2001,
+    "peak_rss_mb": 278.8
    },
    {
     "id": "pitch/pitch-cov-clef-changes-piano/scan",
@@ -29254,14 +29254,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.87,
-    "ms_per_page": 1778,
+    "ms_per_page": 1641,
     "page_ms": [
-     1653.8
+     1521.4
     ],
-    "assemble_ms": 118.9,
-    "runtime_ms": 1778,
-    "wall_ms": 2313,
-    "peak_rss_mb": 285.1
+    "assemble_ms": 114.4,
+    "runtime_ms": 1641,
+    "wall_ms": 2161,
+    "peak_rss_mb": 272.8
    },
    {
     "id": "pitch/pitch-cov-clef-changes-piano/scan-severe",
@@ -29275,14 +29275,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.31,
-    "ms_per_page": 7086,
+    "ms_per_page": 7404,
     "page_ms": [
-     7081.7
+     7398.7
     ],
-    "assemble_ms": 0.1,
-    "runtime_ms": 7086,
-    "wall_ms": 7618,
-    "peak_rss_mb": 349.5
+    "assemble_ms": 0,
+    "runtime_ms": 7404,
+    "wall_ms": 7931,
+    "peak_rss_mb": 360.3
    },
    {
     "id": "pitch/pitch-cov-clefs-all/clean",
@@ -29296,14 +29296,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1393,
+    "ms_per_page": 1424,
     "page_ms": [
-     1270.8
+     1293.1
     ],
-    "assemble_ms": 117.8,
-    "runtime_ms": 1393,
-    "wall_ms": 1908,
-    "peak_rss_mb": 270.8
+    "assemble_ms": 126.1,
+    "runtime_ms": 1424,
+    "wall_ms": 1975,
+    "peak_rss_mb": 279.9
    },
    {
     "id": "pitch/pitch-cov-clefs-all/scan",
@@ -29317,14 +29317,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1591,
+    "ms_per_page": 1554,
     "page_ms": [
-     1473.2
+     1421
     ],
-    "assemble_ms": 112.1,
-    "runtime_ms": 1591,
-    "wall_ms": 2130,
-    "peak_rss_mb": 292.5
+    "assemble_ms": 129.2,
+    "runtime_ms": 1554,
+    "wall_ms": 2108,
+    "peak_rss_mb": 277.3
    },
    {
     "id": "pitch/pitch-cov-clefs-all/scan-severe",
@@ -29338,14 +29338,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.8,
-    "ms_per_page": 2115,
+    "ms_per_page": 2183,
     "page_ms": [
-     1952.7
+     2001.9
     ],
-    "assemble_ms": 155.4,
-    "runtime_ms": 2115,
-    "wall_ms": 2639,
-    "peak_rss_mb": 329.4
+    "assemble_ms": 175.1,
+    "runtime_ms": 2183,
+    "wall_ms": 2737,
+    "peak_rss_mb": 342.1
    },
    {
     "id": "pitch/pitch-cov-clefs-quartet/clean",
@@ -29359,14 +29359,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1805,
+    "ms_per_page": 1916,
     "page_ms": [
-     1605.3
+     1713.8
     ],
-    "assemble_ms": 194.7,
-    "runtime_ms": 1805,
-    "wall_ms": 2327,
-    "peak_rss_mb": 301.6
+    "assemble_ms": 196.7,
+    "runtime_ms": 1916,
+    "wall_ms": 2432,
+    "peak_rss_mb": 290.1
    },
    {
     "id": "pitch/pitch-cov-clefs-quartet/scan",
@@ -29380,14 +29380,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1987,
+    "ms_per_page": 2013,
     "page_ms": [
-     1782.9
+     1799.3
     ],
-    "assemble_ms": 199.9,
-    "runtime_ms": 1987,
-    "wall_ms": 2517,
-    "peak_rss_mb": 267.7
+    "assemble_ms": 209.3,
+    "runtime_ms": 2013,
+    "wall_ms": 2571,
+    "peak_rss_mb": 286.1
    },
    {
     "id": "pitch/pitch-cov-clefs-quartet/scan-severe",
@@ -29401,14 +29401,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.697,
-    "ms_per_page": 2172,
+    "ms_per_page": 2227,
     "page_ms": [
-     1947.4
+     2002.7
     ],
-    "assemble_ms": 218.7,
-    "runtime_ms": 2172,
-    "wall_ms": 2714,
-    "peak_rss_mb": 325
+    "assemble_ms": 219.7,
+    "runtime_ms": 2227,
+    "wall_ms": 2743,
+    "peak_rss_mb": 331.6
    },
    {
     "id": "pitch/pitch-cov-key-changes-organ/clean",
@@ -29422,14 +29422,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1680,
+    "ms_per_page": 1788,
     "page_ms": [
-     1547.5
+     1640.8
     ],
-    "assemble_ms": 128.5,
-    "runtime_ms": 1680,
-    "wall_ms": 2218,
-    "peak_rss_mb": 275.4
+    "assemble_ms": 140.4,
+    "runtime_ms": 1788,
+    "wall_ms": 2324,
+    "peak_rss_mb": 280.4
    },
    {
     "id": "pitch/pitch-cov-key-changes-organ/scan",
@@ -29443,14 +29443,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1860,
+    "ms_per_page": 1861,
     "page_ms": [
-     1715.6
+     1716.8
     ],
-    "assemble_ms": 139.8,
-    "runtime_ms": 1860,
-    "wall_ms": 2386,
-    "peak_rss_mb": 295.9
+    "assemble_ms": 140.6,
+    "runtime_ms": 1861,
+    "wall_ms": 2388,
+    "peak_rss_mb": 298.6
    },
    {
     "id": "pitch/pitch-cov-key-changes-organ/scan-severe",
@@ -29464,14 +29464,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.871,
-    "ms_per_page": 2060,
+    "ms_per_page": 1980,
     "page_ms": [
-     1882.3
+     1821.3
     ],
-    "assemble_ms": 173.2,
-    "runtime_ms": 2060,
-    "wall_ms": 2643,
-    "peak_rss_mb": 292.1
+    "assemble_ms": 154.3,
+    "runtime_ms": 1980,
+    "wall_ms": 2525,
+    "peak_rss_mb": 307.2
    },
    {
     "id": "pitch/pitch-cov-keys-major-flats/clean",
@@ -29485,14 +29485,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1610,
+    "ms_per_page": 1630,
     "page_ms": [
-     1474.2
+     1494.7
     ],
-    "assemble_ms": 131.1,
-    "runtime_ms": 1610,
-    "wall_ms": 2150,
-    "peak_rss_mb": 270.4
+    "assemble_ms": 130,
+    "runtime_ms": 1630,
+    "wall_ms": 2167,
+    "peak_rss_mb": 275.9
    },
    {
     "id": "pitch/pitch-cov-keys-major-flats/scan",
@@ -29506,14 +29506,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1732,
+    "ms_per_page": 1770,
     "page_ms": [
-     1585.4
+     1624.8
     ],
-    "assemble_ms": 141.7,
-    "runtime_ms": 1732,
-    "wall_ms": 2242,
-    "peak_rss_mb": 269.5
+    "assemble_ms": 139.8,
+    "runtime_ms": 1770,
+    "wall_ms": 2296,
+    "peak_rss_mb": 292.8
    },
    {
     "id": "pitch/pitch-cov-keys-major-flats/scan-severe",
@@ -29527,14 +29527,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.442,
-    "ms_per_page": 2137,
+    "ms_per_page": 2225,
     "page_ms": [
-     1891.9
+     1979.4
     ],
-    "assemble_ms": 240,
-    "runtime_ms": 2137,
-    "wall_ms": 2671,
-    "peak_rss_mb": 304.4
+    "assemble_ms": 240.8,
+    "runtime_ms": 2225,
+    "wall_ms": 2762,
+    "peak_rss_mb": 303.4
    },
    {
     "id": "pitch/pitch-cov-keys-major-sharps/clean",
@@ -29548,14 +29548,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1424,
+    "ms_per_page": 1473,
     "page_ms": [
-     1310.2
+     1360.3
     ],
-    "assemble_ms": 108.1,
-    "runtime_ms": 1424,
-    "wall_ms": 1959,
-    "peak_rss_mb": 282.9
+    "assemble_ms": 108.8,
+    "runtime_ms": 1473,
+    "wall_ms": 2013,
+    "peak_rss_mb": 290.9
    },
    {
     "id": "pitch/pitch-cov-keys-major-sharps/scan",
@@ -29569,14 +29569,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1648,
+    "ms_per_page": 1684,
     "page_ms": [
-     1516.7
+     1537.5
     ],
-    "assemble_ms": 125.4,
-    "runtime_ms": 1648,
-    "wall_ms": 2181,
-    "peak_rss_mb": 303.1
+    "assemble_ms": 141.7,
+    "runtime_ms": 1684,
+    "wall_ms": 2222,
+    "peak_rss_mb": 264.3
    },
    {
     "id": "pitch/pitch-cov-keys-major-sharps/scan-severe",
@@ -29590,14 +29590,14 @@
     ],
     "pages": 1,
     "mp_per_page": 5.153,
-    "ms_per_page": 2236,
+    "ms_per_page": 2274,
     "page_ms": [
-     2064.4
+     2110
     ],
-    "assemble_ms": 166.2,
-    "runtime_ms": 2236,
-    "wall_ms": 2761,
-    "peak_rss_mb": 319.7
+    "assemble_ms": 158.9,
+    "runtime_ms": 2274,
+    "wall_ms": 2822,
+    "peak_rss_mb": 359.7
    },
    {
     "id": "pitch/pitch-cov-keys-minor-flats/clean",
@@ -29611,14 +29611,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1508,
+    "ms_per_page": 1427,
     "page_ms": [
-     1408.7
+     1327.7
     ],
-    "assemble_ms": 94.5,
-    "runtime_ms": 1508,
-    "wall_ms": 2046,
-    "peak_rss_mb": 281.6
+    "assemble_ms": 94.2,
+    "runtime_ms": 1427,
+    "wall_ms": 1958,
+    "peak_rss_mb": 289.8
    },
    {
     "id": "pitch/pitch-cov-keys-minor-flats/scan",
@@ -29632,14 +29632,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1618,
+    "ms_per_page": 1616,
     "page_ms": [
-     1481
+     1490
     ],
-    "assemble_ms": 132.3,
-    "runtime_ms": 1618,
-    "wall_ms": 2152,
-    "peak_rss_mb": 266.8
+    "assemble_ms": 122.4,
+    "runtime_ms": 1616,
+    "wall_ms": 2162,
+    "peak_rss_mb": 288.2
    },
    {
     "id": "pitch/pitch-cov-keys-minor-flats/scan-severe",
@@ -29653,14 +29653,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.051,
-    "ms_per_page": 1644,
+    "ms_per_page": 1705,
     "page_ms": [
-     1509.7
+     1575.9
     ],
-    "assemble_ms": 129.9,
-    "runtime_ms": 1644,
-    "wall_ms": 2179,
-    "peak_rss_mb": 313.9
+    "assemble_ms": 123.5,
+    "runtime_ms": 1705,
+    "wall_ms": 2210,
+    "peak_rss_mb": 279.1
    },
    {
     "id": "pitch/pitch-cov-keys-minor-sharps/clean",
@@ -29674,14 +29674,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1451,
+    "ms_per_page": 1432,
     "page_ms": [
-     1350.8
+     1329.3
     ],
-    "assemble_ms": 95.4,
-    "runtime_ms": 1451,
-    "wall_ms": 1987,
-    "peak_rss_mb": 280.9
+    "assemble_ms": 97.2,
+    "runtime_ms": 1432,
+    "wall_ms": 1935,
+    "peak_rss_mb": 286.7
    },
    {
     "id": "pitch/pitch-cov-keys-minor-sharps/scan",
@@ -29695,14 +29695,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.87,
-    "ms_per_page": 1580,
+    "ms_per_page": 1499,
     "page_ms": [
-     1477.4
+     1395.9
     ],
-    "assemble_ms": 97,
-    "runtime_ms": 1580,
-    "wall_ms": 2119,
-    "peak_rss_mb": 287.7
+    "assemble_ms": 97.5,
+    "runtime_ms": 1499,
+    "wall_ms": 2014,
+    "peak_rss_mb": 312.6
    },
    {
     "id": "pitch/pitch-cov-keys-minor-sharps/scan-severe",
@@ -29716,14 +29716,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.168,
-    "ms_per_page": 2299,
+    "ms_per_page": 2366,
     "page_ms": [
-     2157.1
+     2225.3
     ],
-    "assemble_ms": 136.4,
-    "runtime_ms": 2299,
-    "wall_ms": 2820,
-    "peak_rss_mb": 298
+    "assemble_ms": 135.4,
+    "runtime_ms": 2366,
+    "wall_ms": 2887,
+    "peak_rss_mb": 315.6
    },
    {
     "id": "pitch/pitch-cov-ottava-ledger-melody/clean",
@@ -29737,14 +29737,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1205,
+    "ms_per_page": 1248,
     "page_ms": [
-     1166
+     1206
     ],
-    "assemble_ms": 33,
-    "runtime_ms": 1205,
-    "wall_ms": 1720,
-    "peak_rss_mb": 272
+    "assemble_ms": 36.7,
+    "runtime_ms": 1248,
+    "wall_ms": 1770,
+    "peak_rss_mb": 266
    },
    {
     "id": "pitch/pitch-cov-ottava-ledger-melody/scan",
@@ -29758,14 +29758,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.87,
-    "ms_per_page": 1349,
+    "ms_per_page": 1371,
     "page_ms": [
-     1309.4
+     1336.1
     ],
-    "assemble_ms": 35.4,
-    "runtime_ms": 1349,
-    "wall_ms": 1863,
-    "peak_rss_mb": 308.8
+    "assemble_ms": 31.7,
+    "runtime_ms": 1371,
+    "wall_ms": 1884,
+    "peak_rss_mb": 280.9
    },
    {
     "id": "pitch/pitch-cov-ottava-ledger-melody/scan-severe",
@@ -29779,14 +29779,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.56,
-    "ms_per_page": 1863,
+    "ms_per_page": 1897,
     "page_ms": [
-     1806.8
+     1841.9
     ],
-    "assemble_ms": 51.5,
-    "runtime_ms": 1863,
-    "wall_ms": 2380,
-    "peak_rss_mb": 364.3
+    "assemble_ms": 51.2,
+    "runtime_ms": 1897,
+    "wall_ms": 2431,
+    "peak_rss_mb": 338
    },
    {
     "id": "pitch/pitch-cov-ottava-piano/clean",
@@ -29800,14 +29800,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1582,
+    "ms_per_page": 1514,
     "page_ms": [
-     1499.2
+     1435
     ],
-    "assemble_ms": 77.8,
-    "runtime_ms": 1582,
-    "wall_ms": 2118,
-    "peak_rss_mb": 275
+    "assemble_ms": 73.1,
+    "runtime_ms": 1514,
+    "wall_ms": 2027,
+    "peak_rss_mb": 279.9
    },
    {
     "id": "pitch/pitch-cov-ottava-piano/scan",
@@ -29821,14 +29821,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1591,
+    "ms_per_page": 1579,
     "page_ms": [
-     1510.2
+     1493.2
     ],
-    "assemble_ms": 77.1,
-    "runtime_ms": 1591,
-    "wall_ms": 2124,
-    "peak_rss_mb": 290.4
+    "assemble_ms": 82.2,
+    "runtime_ms": 1579,
+    "wall_ms": 2107,
+    "peak_rss_mb": 274
    },
    {
     "id": "pitch/pitch-cov-ottava-piano/scan-severe",
@@ -29842,14 +29842,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.871,
-    "ms_per_page": 1921,
+    "ms_per_page": 1968,
     "page_ms": [
-     1833.1
+     1880.2
     ],
-    "assemble_ms": 83.9,
-    "runtime_ms": 1921,
-    "wall_ms": 2457,
-    "peak_rss_mb": 303.5
+    "assemble_ms": 83.7,
+    "runtime_ms": 1968,
+    "wall_ms": 2514,
+    "peak_rss_mb": 295.8
    },
    {
     "id": "rests/rst01-rest-values/clean",
@@ -29863,14 +29863,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1437,
+    "ms_per_page": 1510,
     "page_ms": [
-     1307
+     1374.9
     ],
-    "assemble_ms": 124.7,
-    "runtime_ms": 1437,
-    "wall_ms": 1964,
-    "peak_rss_mb": 278.1
+    "assemble_ms": 130.8,
+    "runtime_ms": 1510,
+    "wall_ms": 2036,
+    "peak_rss_mb": 263.3
    },
    {
     "id": "rests/rst01-rest-values/scan",
@@ -29884,14 +29884,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.958,
-    "ms_per_page": 1913,
+    "ms_per_page": 1746,
     "page_ms": [
-     1725.2
+     1566
     ],
-    "assemble_ms": 182,
-    "runtime_ms": 1913,
-    "wall_ms": 2443,
-    "peak_rss_mb": 312.6
+    "assemble_ms": 175.6,
+    "runtime_ms": 1746,
+    "wall_ms": 2290,
+    "peak_rss_mb": 278.5
    },
    {
     "id": "rests/rst01-rest-values/scan-severe",
@@ -29905,14 +29905,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.327,
-    "ms_per_page": 2191,
+    "ms_per_page": 2229,
     "page_ms": [
-     1892.7
+     1929.2
     ],
-    "assemble_ms": 293.2,
-    "runtime_ms": 2191,
-    "wall_ms": 2725,
-    "peak_rss_mb": 378.4
+    "assemble_ms": 295.4,
+    "runtime_ms": 2229,
+    "wall_ms": 2769,
+    "peak_rss_mb": 386.7
    },
    {
     "id": "rests/rst02-dotted-rests/clean",
@@ -29926,14 +29926,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1660,
+    "ms_per_page": 1600,
     "page_ms": [
-     1463.6
+     1425.4
     ],
-    "assemble_ms": 191.7,
-    "runtime_ms": 1660,
-    "wall_ms": 2189,
-    "peak_rss_mb": 281.7
+    "assemble_ms": 169.6,
+    "runtime_ms": 1600,
+    "wall_ms": 2132,
+    "peak_rss_mb": 269.6
    },
    {
     "id": "rests/rst02-dotted-rests/scan",
@@ -29947,14 +29947,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.002,
-    "ms_per_page": 1715,
+    "ms_per_page": 1666,
     "page_ms": [
-     1539.5
+     1485.3
     ],
-    "assemble_ms": 170.8,
-    "runtime_ms": 1715,
-    "wall_ms": 2257,
-    "peak_rss_mb": 304.3
+    "assemble_ms": 175.2,
+    "runtime_ms": 1666,
+    "wall_ms": 2175,
+    "peak_rss_mb": 289
    },
    {
     "id": "rests/rst02-dotted-rests/scan-severe",
@@ -29968,14 +29968,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.217,
-    "ms_per_page": 1878,
+    "ms_per_page": 1897,
     "page_ms": [
-     1623
+     1642.8
     ],
-    "assemble_ms": 250.1,
-    "runtime_ms": 1878,
-    "wall_ms": 2421,
-    "peak_rss_mb": 285.3
+    "assemble_ms": 249.5,
+    "runtime_ms": 1897,
+    "wall_ms": 2415,
+    "peak_rss_mb": 281.3
    },
    {
     "id": "rests/rst03-whole-bar-rests-simple/clean",
@@ -29989,14 +29989,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1453,
+    "ms_per_page": 1426,
     "page_ms": [
-     1343.2
+     1317
     ],
-    "assemble_ms": 104.7,
-    "runtime_ms": 1453,
-    "wall_ms": 1983,
-    "peak_rss_mb": 270.3
+    "assemble_ms": 103.9,
+    "runtime_ms": 1426,
+    "wall_ms": 1955,
+    "peak_rss_mb": 271
    },
    {
     "id": "rests/rst03-whole-bar-rests-simple/scan",
@@ -30010,14 +30010,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.031,
-    "ms_per_page": 1581,
+    "ms_per_page": 1554,
     "page_ms": [
-     1469.5
+     1436.6
     ],
-    "assemble_ms": 107.8,
-    "runtime_ms": 1581,
-    "wall_ms": 2103,
-    "peak_rss_mb": 316.3
+    "assemble_ms": 112.9,
+    "runtime_ms": 1554,
+    "wall_ms": 2064,
+    "peak_rss_mb": 284.8
    },
    {
     "id": "rests/rst03-whole-bar-rests-simple/scan-severe",
@@ -30031,14 +30031,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.411,
-    "ms_per_page": 2849,
+    "ms_per_page": 2919,
     "page_ms": [
-     2669
+     2740.5
     ],
-    "assemble_ms": 174.9,
-    "runtime_ms": 2849,
-    "wall_ms": 3377,
-    "peak_rss_mb": 440.8
+    "assemble_ms": 173.6,
+    "runtime_ms": 2919,
+    "wall_ms": 3474,
+    "peak_rss_mb": 392.5
    },
    {
     "id": "rests/rst04-whole-bar-rests-compound/clean",
@@ -30052,14 +30052,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1451,
+    "ms_per_page": 1486,
     "page_ms": [
-     1311.7
+     1341.2
     ],
-    "assemble_ms": 135,
-    "runtime_ms": 1451,
-    "wall_ms": 1966,
-    "peak_rss_mb": 282.9
+    "assemble_ms": 140.5,
+    "runtime_ms": 1486,
+    "wall_ms": 2007,
+    "peak_rss_mb": 268.4
    },
    {
     "id": "rests/rst04-whole-bar-rests-compound/scan",
@@ -30073,14 +30073,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.931,
-    "ms_per_page": 1525,
+    "ms_per_page": 1536,
     "page_ms": [
-     1393.5
+     1412.6
     ],
-    "assemble_ms": 126.3,
-    "runtime_ms": 1525,
-    "wall_ms": 2056,
-    "peak_rss_mb": 285.9
+    "assemble_ms": 118.3,
+    "runtime_ms": 1536,
+    "wall_ms": 2059,
+    "peak_rss_mb": 272.2
    },
    {
     "id": "rests/rst04-whole-bar-rests-compound/scan-severe",
@@ -30094,14 +30094,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.442,
-    "ms_per_page": 2443,
+    "ms_per_page": 2460,
     "page_ms": [
-     2249
+     2271.3
     ],
-    "assemble_ms": 188.4,
-    "runtime_ms": 2443,
-    "wall_ms": 2993,
-    "peak_rss_mb": 372.7
+    "assemble_ms": 183.7,
+    "runtime_ms": 2460,
+    "wall_ms": 2991,
+    "peak_rss_mb": 315
    },
    {
     "id": "rests/rst05-multibar-rests/clean",
@@ -30115,14 +30115,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1537,
+    "ms_per_page": 1566,
     "page_ms": [
-     1407.5
+     1439.3
     ],
-    "assemble_ms": 125.1,
-    "runtime_ms": 1537,
-    "wall_ms": 2055,
-    "peak_rss_mb": 290.3
+    "assemble_ms": 122.6,
+    "runtime_ms": 1566,
+    "wall_ms": 2088,
+    "peak_rss_mb": 275.4
    },
    {
     "id": "rests/rst05-multibar-rests/scan",
@@ -30136,14 +30136,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.945,
-    "ms_per_page": 1778,
+    "ms_per_page": 1755,
     "page_ms": [
-     1629.1
+     1614.3
     ],
-    "assemble_ms": 144.2,
-    "runtime_ms": 1778,
-    "wall_ms": 2318,
-    "peak_rss_mb": 286.8
+    "assemble_ms": 135.2,
+    "runtime_ms": 1755,
+    "wall_ms": 2298,
+    "peak_rss_mb": 314.8
    },
    {
     "id": "rests/rst05-multibar-rests/scan-severe",
@@ -30157,14 +30157,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.303,
-    "ms_per_page": 1688,
+    "ms_per_page": 1951,
     "page_ms": [
-     1611.7
+     1832.4
     ],
-    "assemble_ms": 72.1,
-    "runtime_ms": 1688,
-    "wall_ms": 2239,
-    "peak_rss_mb": 330.8
+    "assemble_ms": 112.7,
+    "runtime_ms": 1951,
+    "wall_ms": 2495,
+    "peak_rss_mb": 312
    },
    {
     "id": "rests/rst06-two-voice-rests/clean",
@@ -30178,14 +30178,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1320,
+    "ms_per_page": 1352,
     "page_ms": [
-     1235.6
+     1276.7
     ],
-    "assemble_ms": 80.2,
-    "runtime_ms": 1320,
-    "wall_ms": 1861,
-    "peak_rss_mb": 290.8
+    "assemble_ms": 69.8,
+    "runtime_ms": 1352,
+    "wall_ms": 1887,
+    "peak_rss_mb": 279.1
    },
    {
     "id": "rests/rst06-two-voice-rests/scan",
@@ -30199,14 +30199,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.989,
-    "ms_per_page": 1457,
+    "ms_per_page": 1505,
     "page_ms": [
-     1384.5
+     1432.4
     ],
-    "assemble_ms": 68.2,
-    "runtime_ms": 1457,
-    "wall_ms": 1988,
-    "peak_rss_mb": 299.6
+    "assemble_ms": 67.2,
+    "runtime_ms": 1505,
+    "wall_ms": 2045,
+    "peak_rss_mb": 280.1
    },
    {
     "id": "rests/rst06-two-voice-rests/scan-severe",
@@ -30220,14 +30220,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.55,
-    "ms_per_page": 1540,
+    "ms_per_page": 1627,
     "page_ms": [
-     1466.9
+     1537.2
     ],
-    "assemble_ms": 67.5,
-    "runtime_ms": 1540,
-    "wall_ms": 2077,
-    "peak_rss_mb": 288.1
+    "assemble_ms": 84.3,
+    "runtime_ms": 1627,
+    "wall_ms": 2190,
+    "peak_rss_mb": 318.9
    },
    {
     "id": "rests/rst07-piano-rests/clean",
@@ -30241,14 +30241,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1613,
+    "ms_per_page": 1727,
     "page_ms": [
-     1440.6
+     1554.3
     ],
-    "assemble_ms": 167.6,
-    "runtime_ms": 1613,
-    "wall_ms": 2153,
-    "peak_rss_mb": 273.9
+    "assemble_ms": 168.2,
+    "runtime_ms": 1727,
+    "wall_ms": 2270,
+    "peak_rss_mb": 255.9
    },
    {
     "id": "rests/rst07-piano-rests/scan",
@@ -30262,14 +30262,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.976,
-    "ms_per_page": 1710,
+    "ms_per_page": 1733,
     "page_ms": [
-     1528.8
+     1553.1
     ],
-    "assemble_ms": 177.4,
-    "runtime_ms": 1710,
-    "wall_ms": 2245,
-    "peak_rss_mb": 285.2
+    "assemble_ms": 174.6,
+    "runtime_ms": 1733,
+    "wall_ms": 2248,
+    "peak_rss_mb": 271.8
    },
    {
     "id": "rests/rst07-piano-rests/scan-severe",
@@ -30283,14 +30283,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.39,
-    "ms_per_page": 1886,
+    "ms_per_page": 1902,
     "page_ms": [
-     1657.1
+     1672.5
     ],
-    "assemble_ms": 222.9,
-    "runtime_ms": 1886,
-    "wall_ms": 2436,
-    "peak_rss_mb": 318.6
+    "assemble_ms": 223.5,
+    "runtime_ms": 1902,
+    "wall_ms": 2422,
+    "peak_rss_mb": 290.5
    },
    {
     "id": "rests/rst08-tuplet-beam-rests/clean",
@@ -30304,14 +30304,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1645,
+    "ms_per_page": 1690,
     "page_ms": [
-     1540.2
+     1577.6
     ],
-    "assemble_ms": 100.8,
-    "runtime_ms": 1645,
-    "wall_ms": 2169,
-    "peak_rss_mb": 277.9
+    "assemble_ms": 108.5,
+    "runtime_ms": 1690,
+    "wall_ms": 2250,
+    "peak_rss_mb": 270.8
    },
    {
     "id": "rests/rst08-tuplet-beam-rests/scan",
@@ -30325,14 +30325,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.918,
-    "ms_per_page": 1829,
+    "ms_per_page": 1830,
     "page_ms": [
-     1692
+     1711.6
     ],
-    "assemble_ms": 132.6,
-    "runtime_ms": 1829,
-    "wall_ms": 2377,
-    "peak_rss_mb": 330.8
+    "assemble_ms": 112.4,
+    "runtime_ms": 1830,
+    "wall_ms": 2350,
+    "peak_rss_mb": 276.9
    },
    {
     "id": "rests/rst08-tuplet-beam-rests/scan-severe",
@@ -30346,14 +30346,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.277,
-    "ms_per_page": 18668,
+    "ms_per_page": 8333,
     "page_ms": [
-     18662.3
+     8306
     ],
-    "assemble_ms": 0,
-    "runtime_ms": 18668,
-    "wall_ms": 19265,
-    "peak_rss_mb": 626.7
+    "assemble_ms": 20.4,
+    "runtime_ms": 8333,
+    "wall_ms": 8905,
+    "peak_rss_mb": 573.2
    },
    {
     "id": "rests/rst09-quartet-rests/clean",
@@ -30367,14 +30367,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 3165,
+    "ms_per_page": 3121,
     "page_ms": [
-     2848.3
+     2784.2
     ],
-    "assemble_ms": 311.6,
-    "runtime_ms": 3165,
-    "wall_ms": 3711,
-    "peak_rss_mb": 415.5
+    "assemble_ms": 331.4,
+    "runtime_ms": 3121,
+    "wall_ms": 3669,
+    "peak_rss_mb": 364.5
    },
    {
     "id": "rests/rst09-quartet-rests/scan",
@@ -30388,14 +30388,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.016,
-    "ms_per_page": 3429,
+    "ms_per_page": 3454,
     "page_ms": [
-     3098.6
+     3146
     ],
-    "assemble_ms": 325.8,
-    "runtime_ms": 3429,
-    "wall_ms": 3975,
-    "peak_rss_mb": 396.1
+    "assemble_ms": 302.4,
+    "runtime_ms": 3454,
+    "wall_ms": 3989,
+    "peak_rss_mb": 372
    },
    {
     "id": "rests/rst09-quartet-rests/scan-severe",
@@ -30409,14 +30409,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.187,
-    "ms_per_page": 3591,
+    "ms_per_page": 3767,
     "page_ms": [
-     3210.3
+     3388.2
     ],
-    "assemble_ms": 374.9,
-    "runtime_ms": 3591,
-    "wall_ms": 4118,
-    "peak_rss_mb": 401
+    "assemble_ms": 373.9,
+    "runtime_ms": 3767,
+    "wall_ms": 4284,
+    "peak_rss_mb": 403.4
    },
    {
     "id": "structure/str01-double-final-barlines/clean",
@@ -30430,14 +30430,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1400,
+    "ms_per_page": 1409,
     "page_ms": [
-     1275.5
+     1272.5
     ],
-    "assemble_ms": 118.2,
-    "runtime_ms": 1400,
-    "wall_ms": 1937,
-    "peak_rss_mb": 287.4
+    "assemble_ms": 131.4,
+    "runtime_ms": 1409,
+    "wall_ms": 1940,
+    "peak_rss_mb": 263.7
    },
    {
     "id": "structure/str01-double-final-barlines/scan",
@@ -30451,14 +30451,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1488,
+    "ms_per_page": 1676,
     "page_ms": [
-     1376.8
+     1558.9
     ],
-    "assemble_ms": 107.5,
-    "runtime_ms": 1488,
-    "wall_ms": 2025,
-    "peak_rss_mb": 297.8
+    "assemble_ms": 113.1,
+    "runtime_ms": 1676,
+    "wall_ms": 2213,
+    "peak_rss_mb": 281.3
    },
    {
     "id": "structure/str01-double-final-barlines/scan-severe",
@@ -30472,14 +30472,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1442,
+    "ms_per_page": 1487,
     "page_ms": [
-     1336.9
+     1382.1
     ],
-    "assemble_ms": 100.8,
-    "runtime_ms": 1442,
-    "wall_ms": 1982,
-    "peak_rss_mb": 287
+    "assemble_ms": 100.3,
+    "runtime_ms": 1487,
+    "wall_ms": 2007,
+    "peak_rss_mb": 297.3
    },
    {
     "id": "structure/str02-repeat-signs-piano/clean",
@@ -30493,14 +30493,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1586,
+    "ms_per_page": 1766,
     "page_ms": [
-     1384.6
+     1565.4
     ],
-    "assemble_ms": 196.3,
-    "runtime_ms": 1586,
-    "wall_ms": 2093,
-    "peak_rss_mb": 303.1
+    "assemble_ms": 196.7,
+    "runtime_ms": 1766,
+    "wall_ms": 2297,
+    "peak_rss_mb": 291.9
    },
    {
     "id": "structure/str02-repeat-signs-piano/scan",
@@ -30514,14 +30514,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.87,
-    "ms_per_page": 1763,
+    "ms_per_page": 1790,
     "page_ms": [
-     1557.9
+     1576.2
     ],
-    "assemble_ms": 200,
-    "runtime_ms": 1763,
-    "wall_ms": 2315,
-    "peak_rss_mb": 297.1
+    "assemble_ms": 209,
+    "runtime_ms": 1790,
+    "wall_ms": 2305,
+    "peak_rss_mb": 303.2
    },
    {
     "id": "structure/str02-repeat-signs-piano/scan-severe",
@@ -30535,14 +30535,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.697,
-    "ms_per_page": 3031,
+    "ms_per_page": 3282,
     "page_ms": [
-     2808.6
+     3072.9
     ],
-    "assemble_ms": 216.5,
-    "runtime_ms": 3031,
-    "wall_ms": 3580,
-    "peak_rss_mb": 404.9
+    "assemble_ms": 204.3,
+    "runtime_ms": 3282,
+    "wall_ms": 3817,
+    "peak_rss_mb": 374.4
    },
    {
     "id": "structure/str03-voltas-string-quartet/clean",
@@ -30556,14 +30556,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 4677,
+    "ms_per_page": 4726,
     "page_ms": [
-     3746.3
+     3800.9
     ],
-    "assemble_ms": 927.3,
-    "runtime_ms": 4677,
-    "wall_ms": 5211,
-    "peak_rss_mb": 377.9
+    "assemble_ms": 919,
+    "runtime_ms": 4726,
+    "wall_ms": 5249,
+    "peak_rss_mb": 413.8
    },
    {
     "id": "structure/str03-voltas-string-quartet/scan",
@@ -30577,14 +30577,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 5198,
+    "ms_per_page": 5401,
     "page_ms": [
-     4152.1
+     4358.1
     ],
-    "assemble_ms": 1042,
-    "runtime_ms": 5198,
-    "wall_ms": 5740,
-    "peak_rss_mb": 373.2
+    "assemble_ms": 1038.7,
+    "runtime_ms": 5401,
+    "wall_ms": 5920,
+    "peak_rss_mb": 417.2
    },
    {
     "id": "structure/str03-voltas-string-quartet/scan-severe",
@@ -30598,14 +30598,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 6830,
+    "ms_per_page": 7025,
     "page_ms": [
-     4927.8
+     5109.6
     ],
-    "assemble_ms": 1896.7,
-    "runtime_ms": 6830,
-    "wall_ms": 7379,
-    "peak_rss_mb": 421.3
+    "assemble_ms": 1910.6,
+    "runtime_ms": 7025,
+    "wall_ms": 7581,
+    "peak_rss_mb": 448.8
    },
    {
     "id": "structure/str04-segno-coda-ds/clean",
@@ -30619,14 +30619,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1549,
+    "ms_per_page": 1566,
     "page_ms": [
-     1421.1
+     1443.5
     ],
-    "assemble_ms": 122.6,
-    "runtime_ms": 1549,
-    "wall_ms": 2086,
-    "peak_rss_mb": 269.9
+    "assemble_ms": 118.8,
+    "runtime_ms": 1566,
+    "wall_ms": 2080,
+    "peak_rss_mb": 265.3
    },
    {
     "id": "structure/str04-segno-coda-ds/scan",
@@ -30640,14 +30640,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1702,
+    "ms_per_page": 1705,
     "page_ms": [
-     1574.5
+     1572
     ],
-    "assemble_ms": 121.7,
-    "runtime_ms": 1702,
-    "wall_ms": 2223,
-    "peak_rss_mb": 304.4
+    "assemble_ms": 128.9,
+    "runtime_ms": 1705,
+    "wall_ms": 2232,
+    "peak_rss_mb": 266.1
    },
    {
     "id": "structure/str04-segno-coda-ds/scan-severe",
@@ -30661,14 +30661,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.871,
-    "ms_per_page": 1661,
+    "ms_per_page": 1705,
     "page_ms": [
-     1497.6
+     1540.2
     ],
-    "assemble_ms": 159.2,
-    "runtime_ms": 1661,
-    "wall_ms": 2204,
-    "peak_rss_mb": 295.3
+    "assemble_ms": 158.9,
+    "runtime_ms": 1705,
+    "wall_ms": 2215,
+    "peak_rss_mb": 298
    },
    {
     "id": "structure/str05-fine-dc-al-fine-piano/clean",
@@ -30682,14 +30682,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1734,
+    "ms_per_page": 1768,
     "page_ms": [
-     1566.8
+     1600.8
     ],
-    "assemble_ms": 162.6,
-    "runtime_ms": 1734,
-    "wall_ms": 2265,
-    "peak_rss_mb": 304.3
+    "assemble_ms": 161.7,
+    "runtime_ms": 1768,
+    "wall_ms": 2302,
+    "peak_rss_mb": 293.9
    },
    {
     "id": "structure/str05-fine-dc-al-fine-piano/scan",
@@ -30703,14 +30703,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1826,
+    "ms_per_page": 1920,
     "page_ms": [
-     1663.7
+     1749.5
     ],
-    "assemble_ms": 156.9,
-    "runtime_ms": 1826,
-    "wall_ms": 2359,
-    "peak_rss_mb": 312.5
+    "assemble_ms": 165.8,
+    "runtime_ms": 1920,
+    "wall_ms": 2461,
+    "peak_rss_mb": 320.6
    },
    {
     "id": "structure/str05-fine-dc-al-fine-piano/scan-severe",
@@ -30724,14 +30724,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.867,
-    "ms_per_page": 3807,
+    "ms_per_page": 3907,
     "page_ms": [
-     3706.4
+     3815.6
     ],
-    "assemble_ms": 96.2,
-    "runtime_ms": 3807,
-    "wall_ms": 4372,
-    "peak_rss_mb": 392
+    "assemble_ms": 87.2,
+    "runtime_ms": 3907,
+    "wall_ms": 4435,
+    "peak_rss_mb": 380.9
    },
    {
     "id": "structure/str06-breaks-two-pages-song/clean",
@@ -30745,15 +30745,15 @@
     ],
     "pages": 2,
     "mp_per_page": 3.869,
-    "ms_per_page": 2940,
+    "ms_per_page": 2808,
     "page_ms": [
-     2273.8,
-     3248.8
+     2290.8,
+     2977.2
     ],
-    "assemble_ms": 353.6,
-    "runtime_ms": 5880,
-    "wall_ms": 6449,
-    "peak_rss_mb": 502
+    "assemble_ms": 343,
+    "runtime_ms": 5616,
+    "wall_ms": 6159,
+    "peak_rss_mb": 483.6
    },
    {
     "id": "structure/str06-breaks-two-pages-song/scan",
@@ -30767,15 +30767,15 @@
     ],
     "pages": 2,
     "mp_per_page": 3.869,
-    "ms_per_page": 3124,
+    "ms_per_page": 3224,
     "page_ms": [
-     2488.1,
-     3445.4
+     2630.1,
+     3488.8
     ],
-    "assemble_ms": 309.9,
-    "runtime_ms": 6247,
-    "wall_ms": 6828,
-    "peak_rss_mb": 513
+    "assemble_ms": 323.7,
+    "runtime_ms": 6447,
+    "wall_ms": 7017,
+    "peak_rss_mb": 522.8
    },
    {
     "id": "structure/str06-breaks-two-pages-song/scan-severe",
@@ -30789,14 +30789,14 @@
     ],
     "pages": 1,
     "mp_per_page": 7.742,
-    "ms_per_page": 11477,
+    "ms_per_page": 11408,
     "page_ms": [
-     11094.2
+     11028.4
     ],
-    "assemble_ms": 375.7,
-    "runtime_ms": 11477,
-    "wall_ms": 12041,
-    "peak_rss_mb": 617.5
+    "assemble_ms": 370.9,
+    "runtime_ms": 11408,
+    "wall_ms": 11982,
+    "peak_rss_mb": 679.2
    },
    {
     "id": "structure/str07-orchestral-five-pages/clean",
@@ -30810,18 +30810,18 @@
     ],
     "pages": 5,
     "mp_per_page": 3.869,
-    "ms_per_page": 3714,
+    "ms_per_page": 3824,
     "page_ms": [
-     2478.7,
-     2726,
-     2541.2,
-     2406.3,
-     5704.5
+     2627,
+     2887.6,
+     2658.3,
+     2482.8,
+     5761.9
     ],
-    "assemble_ms": 2710.9,
-    "runtime_ms": 18572,
-    "wall_ms": 19132,
-    "peak_rss_mb": 566.3
+    "assemble_ms": 2695.4,
+    "runtime_ms": 19118,
+    "wall_ms": 19675,
+    "peak_rss_mb": 583.9
    },
    {
     "id": "structure/str07-orchestral-five-pages/scan",
@@ -30835,18 +30835,18 @@
     ],
     "pages": 5,
     "mp_per_page": 3.869,
-    "ms_per_page": 4105,
+    "ms_per_page": 4227,
     "page_ms": [
-     2609,
-     3065.9,
-     2758.5,
-     2626.8,
-     6340.9
+     2687.2,
+     3101.5,
+     2881.1,
+     2720.6,
+     6582.3
     ],
-    "assemble_ms": 3119.5,
-    "runtime_ms": 20525,
-    "wall_ms": 21102,
-    "peak_rss_mb": 591.8
+    "assemble_ms": 3158.7,
+    "runtime_ms": 21136,
+    "wall_ms": 21709,
+    "peak_rss_mb": 561.8
    },
    {
     "id": "structure/str07-orchestral-five-pages/scan-severe",
@@ -30860,18 +30860,18 @@
     ],
     "pages": 5,
     "mp_per_page": 3.869,
-    "ms_per_page": 5228,
+    "ms_per_page": 5284,
     "page_ms": [
-     2869.1,
-     3955.5,
-     3204.8,
-     4112.8,
-     7798.5
+     2970.8,
+     3444.2,
+     3096.1,
+     4862.1,
+     7856.4
     ],
-    "assemble_ms": 4194.1,
-    "runtime_ms": 26139,
-    "wall_ms": 26726,
-    "peak_rss_mb": 626.9
+    "assemble_ms": 4187.8,
+    "runtime_ms": 26422,
+    "wall_ms": 27009,
+    "peak_rss_mb": 653.5
    },
    {
     "id": "structure/str08-variations-twelve-pages-piano/clean",
@@ -30885,25 +30885,25 @@
     ],
     "pages": 12,
     "mp_per_page": 3.869,
-    "ms_per_page": 1364,
+    "ms_per_page": 1444,
     "page_ms": [
-     1118.1,
-     1260.5,
-     944.8,
-     942.9,
-     917.2,
-     815.5,
-     848.2,
-     905.9,
-     987,
-     871,
-     873.4,
-     3527.8
+     1166.6,
+     1270.5,
+     1221,
+     964.7,
+     950.5,
+     1065.8,
+     909,
+     972.6,
+     1050.8,
+     924.7,
+     918.3,
+     3569.1
     ],
-    "assemble_ms": 2345.2,
-    "runtime_ms": 16362,
-    "wall_ms": 16913,
-    "peak_rss_mb": 497.9
+    "assemble_ms": 2333.4,
+    "runtime_ms": 17322,
+    "wall_ms": 17893,
+    "peak_rss_mb": 456.4
    },
    {
     "id": "structure/str08-variations-twelve-pages-piano/scan",
@@ -30917,25 +30917,25 @@
     ],
     "pages": 12,
     "mp_per_page": 3.869,
-    "ms_per_page": 1588,
+    "ms_per_page": 1631,
     "page_ms": [
-     1179.3,
-     1361.4,
-     1321.3,
-     1137,
-     1110.1,
-     1072.2,
-     1058.7,
-     1187.7,
-     1200.9,
-     1046.2,
-     1035.5,
-     3823.2
+     1241.4,
+     1559.1,
+     1153.7,
+     1154.8,
+     1134,
+     1194.3,
+     1103.4,
+     1211.7,
+     1187.5,
+     1086.7,
+     1116.4,
+     3937.9
     ],
-    "assemble_ms": 2517.4,
-    "runtime_ms": 19056,
-    "wall_ms": 19621,
-    "peak_rss_mb": 489.8
+    "assemble_ms": 2481.9,
+    "runtime_ms": 19567,
+    "wall_ms": 20132,
+    "peak_rss_mb": 526.3
    },
    {
     "id": "structure/str08-variations-twelve-pages-piano/scan-severe",
@@ -30949,25 +30949,25 @@
     ],
     "pages": 12,
     "mp_per_page": 3.869,
-    "ms_per_page": 1641,
+    "ms_per_page": 1632,
     "page_ms": [
-     1206,
-     1407.2,
-     1236.7,
-     1302.8,
-     1088.1,
-     1443.2,
-     1107.9,
-     1145.7,
-     1166.7,
-     1036,
-     1006.7,
-     3949
+     1286.2,
+     1360.2,
+     1116.5,
+     1097.8,
+     1091,
+     1407,
+     1055.4,
+     1168.5,
+     1183.2,
+     1228.5,
+     986.4,
+     3941.9
     ],
-    "assemble_ms": 2586.6,
-    "runtime_ms": 19687,
-    "wall_ms": 20252,
-    "peak_rss_mb": 521.2
+    "assemble_ms": 2652.6,
+    "runtime_ms": 19580,
+    "wall_ms": 20165,
+    "peak_rss_mb": 551.7
    },
    {
     "id": "time/t01-simple-meters/clean",
@@ -30981,14 +30981,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1540,
+    "ms_per_page": 1654,
     "page_ms": [
-     1339.7
+     1436.4
     ],
-    "assemble_ms": 194.4,
-    "runtime_ms": 1540,
-    "wall_ms": 2056,
-    "peak_rss_mb": 274
+    "assemble_ms": 212.7,
+    "runtime_ms": 1654,
+    "wall_ms": 2206,
+    "peak_rss_mb": 264.3
    },
    {
     "id": "time/t01-simple-meters/scan",
@@ -31002,14 +31002,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.958,
-    "ms_per_page": 1746,
+    "ms_per_page": 1767,
     "page_ms": [
-     1539.4
+     1557
     ],
-    "assemble_ms": 202.5,
-    "runtime_ms": 1746,
-    "wall_ms": 2277,
-    "peak_rss_mb": 290.6
+    "assemble_ms": 205.4,
+    "runtime_ms": 1767,
+    "wall_ms": 2294,
+    "peak_rss_mb": 305.5
    },
    {
     "id": "time/t01-simple-meters/scan-severe",
@@ -31023,14 +31023,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.449,
-    "ms_per_page": 1982,
+    "ms_per_page": 2028,
     "page_ms": [
-     1632.1
+     1680.1
     ],
-    "assemble_ms": 345.6,
-    "runtime_ms": 1982,
-    "wall_ms": 2525,
-    "peak_rss_mb": 300
+    "assemble_ms": 342.5,
+    "runtime_ms": 2028,
+    "wall_ms": 2555,
+    "peak_rss_mb": 280.2
    },
    {
     "id": "time/t02-compound-irregular/clean",
@@ -31044,14 +31044,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1745,
+    "ms_per_page": 1642,
     "page_ms": [
-     1531.9
+     1436.4
     ],
-    "assemble_ms": 208.8,
-    "runtime_ms": 1745,
-    "wall_ms": 2287,
-    "peak_rss_mb": 263.6
+    "assemble_ms": 201.5,
+    "runtime_ms": 1642,
+    "wall_ms": 2157,
+    "peak_rss_mb": 264.8
    },
    {
     "id": "time/t02-compound-irregular/scan",
@@ -31065,14 +31065,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.003,
-    "ms_per_page": 1823,
+    "ms_per_page": 1795,
     "page_ms": [
-     1611.3
+     1588.6
     ],
-    "assemble_ms": 207.5,
-    "runtime_ms": 1823,
-    "wall_ms": 2362,
-    "peak_rss_mb": 275.2
+    "assemble_ms": 201,
+    "runtime_ms": 1795,
+    "wall_ms": 2317,
+    "peak_rss_mb": 287.2
    },
    {
     "id": "time/t02-compound-irregular/scan-severe",
@@ -31086,14 +31086,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.546,
-    "ms_per_page": 1943,
+    "ms_per_page": 2055,
     "page_ms": [
-     1739.2
+     1841.9
     ],
-    "assemble_ms": 198.3,
-    "runtime_ms": 1943,
-    "wall_ms": 2484,
-    "peak_rss_mb": 297.5
+    "assemble_ms": 207.3,
+    "runtime_ms": 2055,
+    "wall_ms": 2590,
+    "peak_rss_mb": 311
    },
    {
     "id": "time/t03-common-cut-piano/clean",
@@ -31107,14 +31107,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1687,
+    "ms_per_page": 1695,
     "page_ms": [
-     1443.7
+     1459
     ],
-    "assemble_ms": 237.8,
-    "runtime_ms": 1687,
-    "wall_ms": 2226,
-    "peak_rss_mb": 274.1
+    "assemble_ms": 231.8,
+    "runtime_ms": 1695,
+    "wall_ms": 2227,
+    "peak_rss_mb": 300.2
    },
    {
     "id": "time/t03-common-cut-piano/scan",
@@ -31128,14 +31128,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.031,
-    "ms_per_page": 1816,
+    "ms_per_page": 1835,
     "page_ms": [
-     1570
+     1587.7
     ],
-    "assemble_ms": 241.9,
-    "runtime_ms": 1816,
-    "wall_ms": 2343,
-    "peak_rss_mb": 317.3
+    "assemble_ms": 241.8,
+    "runtime_ms": 1835,
+    "wall_ms": 2362,
+    "peak_rss_mb": 275.7
    },
    {
     "id": "time/t03-common-cut-piano/scan-severe",
@@ -31149,14 +31149,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.864,
-    "ms_per_page": 2092,
+    "ms_per_page": 2086,
     "page_ms": [
-     1821.3
+     1812.6
     ],
-    "assemble_ms": 263.5,
-    "runtime_ms": 2092,
-    "wall_ms": 2638,
-    "peak_rss_mb": 292.3
+    "assemble_ms": 269.2,
+    "runtime_ms": 2086,
+    "wall_ms": 2608,
+    "peak_rss_mb": 342.9
    },
    {
     "id": "time/t04-pickup-song/clean",
@@ -31170,14 +31170,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1625,
+    "ms_per_page": 1590,
     "page_ms": [
-     1505.3
+     1475.1
     ],
-    "assemble_ms": 114.7,
-    "runtime_ms": 1625,
-    "wall_ms": 2167,
-    "peak_rss_mb": 289.1
+    "assemble_ms": 110,
+    "runtime_ms": 1590,
+    "wall_ms": 2134,
+    "peak_rss_mb": 271.8
    },
    {
     "id": "time/t04-pickup-song/scan",
@@ -31191,14 +31191,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.931,
-    "ms_per_page": 1722,
+    "ms_per_page": 1715,
     "page_ms": [
-     1612.9
+     1609.5
     ],
-    "assemble_ms": 105,
-    "runtime_ms": 1722,
-    "wall_ms": 2263,
-    "peak_rss_mb": 276.7
+    "assemble_ms": 101.1,
+    "runtime_ms": 1715,
+    "wall_ms": 2237,
+    "peak_rss_mb": 274
    },
    {
     "id": "time/t04-pickup-song/scan-severe",
@@ -31212,14 +31212,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.31,
-    "ms_per_page": 1762,
+    "ms_per_page": 1774,
     "page_ms": [
-     1648.9
+     1657.4
     ],
-    "assemble_ms": 108.2,
-    "runtime_ms": 1762,
-    "wall_ms": 2297,
-    "peak_rss_mb": 303.4
+    "assemble_ms": 110.2,
+    "runtime_ms": 1774,
+    "wall_ms": 2305,
+    "peak_rss_mb": 286.7
    },
    {
     "id": "time/t05-triplets-duplets/clean",
@@ -31233,14 +31233,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1530,
+    "ms_per_page": 1521,
     "page_ms": [
-     1347.8
+     1361.7
     ],
-    "assemble_ms": 177.7,
-    "runtime_ms": 1530,
-    "wall_ms": 2083,
-    "peak_rss_mb": 254.3
+    "assemble_ms": 155.9,
+    "runtime_ms": 1521,
+    "wall_ms": 2024,
+    "peak_rss_mb": 257.1
    },
    {
     "id": "time/t05-triplets-duplets/scan",
@@ -31254,14 +31254,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.073,
-    "ms_per_page": 1815,
+    "ms_per_page": 1712,
     "page_ms": [
-     1645.6
+     1550
     ],
-    "assemble_ms": 164.5,
-    "runtime_ms": 1815,
-    "wall_ms": 2350,
-    "peak_rss_mb": 282.1
+    "assemble_ms": 157.1,
+    "runtime_ms": 1712,
+    "wall_ms": 2227,
+    "peak_rss_mb": 280.8
    },
    {
     "id": "time/t05-triplets-duplets/scan-severe",
@@ -31275,14 +31275,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.234,
-    "ms_per_page": 2220,
+    "ms_per_page": 2219,
     "page_ms": [
-     2035.7
+     2033.7
     ],
-    "assemble_ms": 179.2,
-    "runtime_ms": 2220,
-    "wall_ms": 2747,
-    "peak_rss_mb": 312
+    "assemble_ms": 181.4,
+    "runtime_ms": 2219,
+    "wall_ms": 2779,
+    "peak_rss_mb": 321.5
    },
    {
     "id": "time/t06-quint-sext-sept/clean",
@@ -31296,14 +31296,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1200,
+    "ms_per_page": 1159,
     "page_ms": [
-     1150.3
+     1112.7
     ],
-    "assemble_ms": 44.3,
-    "runtime_ms": 1200,
-    "wall_ms": 1744,
-    "peak_rss_mb": 257.3
+    "assemble_ms": 41.7,
+    "runtime_ms": 1159,
+    "wall_ms": 1666,
+    "peak_rss_mb": 279.7
    },
    {
     "id": "time/t06-quint-sext-sept/scan",
@@ -31317,14 +31317,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.972,
-    "ms_per_page": 1336,
+    "ms_per_page": 1380,
     "page_ms": [
-     1283
+     1325.1
     ],
-    "assemble_ms": 48.7,
-    "runtime_ms": 1336,
-    "wall_ms": 1899,
-    "peak_rss_mb": 280.9
+    "assemble_ms": 50.6,
+    "runtime_ms": 1380,
+    "wall_ms": 1910,
+    "peak_rss_mb": 275
    },
    {
     "id": "time/t06-quint-sext-sept/scan-severe",
@@ -31338,14 +31338,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.582,
-    "ms_per_page": 1560,
+    "ms_per_page": 1508,
     "page_ms": [
-     1483.7
+     1432.2
     ],
-    "assemble_ms": 70.7,
-    "runtime_ms": 1560,
-    "wall_ms": 2089,
-    "peak_rss_mb": 295.5
+    "assemble_ms": 71,
+    "runtime_ms": 1508,
+    "wall_ms": 2078,
+    "peak_rss_mb": 312.3
    },
    {
     "id": "time/t07-nested-tuplets/clean",
@@ -31359,14 +31359,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1232,
+    "ms_per_page": 1283,
     "page_ms": [
-     1158.3
+     1208.5
     ],
-    "assemble_ms": 68.8,
-    "runtime_ms": 1232,
-    "wall_ms": 1759,
-    "peak_rss_mb": 282.5
+    "assemble_ms": 70.4,
+    "runtime_ms": 1283,
+    "wall_ms": 1838,
+    "peak_rss_mb": 279.7
    },
    {
     "id": "time/t07-nested-tuplets/scan",
@@ -31380,14 +31380,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.918,
-    "ms_per_page": 1446,
+    "ms_per_page": 1416,
     "page_ms": [
-     1368.3
+     1336.8
     ],
-    "assemble_ms": 72.9,
-    "runtime_ms": 1446,
-    "wall_ms": 1970,
-    "peak_rss_mb": 298.9
+    "assemble_ms": 75.1,
+    "runtime_ms": 1416,
+    "wall_ms": 1925,
+    "peak_rss_mb": 276.2
    },
    {
     "id": "time/t07-nested-tuplets/scan-severe",
@@ -31401,14 +31401,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.727,
-    "ms_per_page": 1582,
+    "ms_per_page": 1672,
     "page_ms": [
-     1492.3
+     1580.3
     ],
-    "assemble_ms": 83.9,
-    "runtime_ms": 1582,
-    "wall_ms": 2104,
-    "peak_rss_mb": 320.1
+    "assemble_ms": 86.9,
+    "runtime_ms": 1672,
+    "wall_ms": 2221,
+    "peak_rss_mb": 294.4
    },
    {
     "id": "time/t08-ties-systems-pages/clean",
@@ -31422,15 +31422,15 @@
     ],
     "pages": 2,
     "mp_per_page": 3.869,
-    "ms_per_page": 1328,
+    "ms_per_page": 1255,
     "page_ms": [
-     1056.7,
-     1447.3
+     1038.3,
+     1324.2
     ],
-    "assemble_ms": 146.4,
-    "runtime_ms": 2655,
-    "wall_ms": 3216,
-    "peak_rss_mb": 321.2
+    "assemble_ms": 142,
+    "runtime_ms": 2509,
+    "wall_ms": 3021,
+    "peak_rss_mb": 303
    },
    {
     "id": "time/t08-ties-systems-pages/scan",
@@ -31444,15 +31444,15 @@
     ],
     "pages": 2,
     "mp_per_page": 3.969,
-    "ms_per_page": 1390,
+    "ms_per_page": 1456,
     "page_ms": [
-     1140.9,
-     1455.1
+     1240.4,
+     1495
     ],
-    "assemble_ms": 179.3,
-    "runtime_ms": 2780,
-    "wall_ms": 3295,
-    "peak_rss_mb": 336.8
+    "assemble_ms": 171,
+    "runtime_ms": 2911,
+    "wall_ms": 3513,
+    "peak_rss_mb": 349.1
    },
    {
     "id": "time/t08-ties-systems-pages/scan-severe",
@@ -31466,14 +31466,14 @@
     ],
     "pages": 1,
     "mp_per_page": 9.314,
-    "ms_per_page": 4905,
+    "ms_per_page": 4922,
     "page_ms": [
-     4746.3
+     4765
     ],
-    "assemble_ms": 148.6,
-    "runtime_ms": 4905,
-    "wall_ms": 5451,
-    "peak_rss_mb": 465.3
+    "assemble_ms": 148,
+    "runtime_ms": 4922,
+    "wall_ms": 5477,
+    "peak_rss_mb": 471.2
    },
    {
     "id": "time/t09-two-voices-guitar/clean",
@@ -31487,14 +31487,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 1225,
+    "ms_per_page": 1253,
     "page_ms": [
-     1145.8
+     1171.3
     ],
-    "assemble_ms": 74.6,
-    "runtime_ms": 1225,
-    "wall_ms": 1737,
-    "peak_rss_mb": 257.4
+    "assemble_ms": 76.1,
+    "runtime_ms": 1253,
+    "wall_ms": 1770,
+    "peak_rss_mb": 261.4
    },
    {
     "id": "time/t09-two-voices-guitar/scan",
@@ -31508,14 +31508,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.016,
-    "ms_per_page": 1359,
+    "ms_per_page": 1471,
     "page_ms": [
-     1280.6
+     1392.3
     ],
-    "assemble_ms": 73.2,
-    "runtime_ms": 1359,
-    "wall_ms": 1869,
-    "peak_rss_mb": 275
+    "assemble_ms": 73.9,
+    "runtime_ms": 1471,
+    "wall_ms": 2014,
+    "peak_rss_mb": 261.9
    },
    {
     "id": "time/t09-two-voices-guitar/scan-severe",
@@ -31529,14 +31529,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.442,
-    "ms_per_page": 2014,
+    "ms_per_page": 2461,
     "page_ms": [
-     1902.7
+     2343.5
     ],
-    "assemble_ms": 106.7,
-    "runtime_ms": 2014,
-    "wall_ms": 2561,
-    "peak_rss_mb": 325.7
+    "assemble_ms": 111.7,
+    "runtime_ms": 2461,
+    "wall_ms": 3013,
+    "peak_rss_mb": 334.8
    },
    {
     "id": "time/t10-quartet-meters/clean",
@@ -31550,14 +31550,14 @@
     ],
     "pages": 1,
     "mp_per_page": 3.869,
-    "ms_per_page": 2070,
+    "ms_per_page": 2193,
     "page_ms": [
-     1726.7
+     1847.6
     ],
-    "assemble_ms": 338.3,
-    "runtime_ms": 2070,
-    "wall_ms": 2606,
-    "peak_rss_mb": 289.2
+    "assemble_ms": 340.2,
+    "runtime_ms": 2193,
+    "wall_ms": 2743,
+    "peak_rss_mb": 297.9
    },
    {
     "id": "time/t10-quartet-meters/scan",
@@ -31571,14 +31571,14 @@
     ],
     "pages": 1,
     "mp_per_page": 4.003,
-    "ms_per_page": 2361,
+    "ms_per_page": 2294,
     "page_ms": [
-     1977.1
+     1927.7
     ],
-    "assemble_ms": 378.7,
-    "runtime_ms": 2361,
-    "wall_ms": 2912,
-    "peak_rss_mb": 298.9
+    "assemble_ms": 361.8,
+    "runtime_ms": 2294,
+    "wall_ms": 2823,
+    "peak_rss_mb": 289.8
    },
    {
     "id": "time/t10-quartet-meters/scan-severe",
@@ -31592,13 +31592,13 @@
     ],
     "pages": 1,
     "mp_per_page": 4.555,
-    "ms_per_page": 2190,
+    "ms_per_page": 2237,
     "page_ms": [
-     1898.2
+     1943
     ],
-    "assemble_ms": 286.2,
-    "runtime_ms": 2190,
-    "wall_ms": 2726,
+    "assemble_ms": 287.8,
+    "runtime_ms": 2237,
+    "wall_ms": 2771,
     "peak_rss_mb": 308.7
    }
   ]

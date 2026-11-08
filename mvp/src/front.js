@@ -12,6 +12,7 @@ const { detectStems } = require('./stems');
 const { detectBarlines } = require('./barlines');
 const { rotateGray, makeGray } = require('./image');
 const { precleanPage, clefScore } = require('./cv');
+const { inferStaves } = require('./staffinfer');
 
 function resample(g, f) {
   const w = Math.max(1, Math.round(g.width * f)), h = Math.max(1, Math.round(g.height * f));
@@ -341,6 +342,16 @@ function* frontSteps(gray0, opts = {}) {
     const d = detectDashedStaves(ctx.B, ctx.sp.lt);
     if (d.staves.length >= 2) { ctx.staves = d.staves; ctx.sp = Object.assign({}, ctx.sp, { ss: d.ss }); }
   }
+  // staff lines washed out or partly missing: staves inferred from what remains of the music
+  // (staffinfer.js: partial staves extended over their glyphs, treble clefs outside every staff)
+  // (not on a pre-cleaned page that found no staff: front() then reads the plain page, and infers there)
+  if (opts.infer !== false && !(precleaned && !ctx.staves.length)) {
+    const inf = inferStaves(ctx.B, ctx.staves, { dashed: (b) => detectDashedStaves(b, ctx.sp.lt) });
+    if (inf) {
+      ctx.staves = inf.staves;
+      if (inf.added === inf.staves.length) ctx.sp = Object.assign({}, ctx.sp, { ss: inf.ss, lt: Math.max(1, Math.min(ctx.sp.lt, 0.15 * inf.ss)) });
+    }
+  }
   let { gray, B, L0, sp, ltL, scale, skew, staves } = ctx;
   if (!staves.length) {
     warnings.push('No staves found on this page.');
@@ -397,7 +408,8 @@ function* frontSteps(gray0, opts = {}) {
     if (c && !heads.some(o => o.staff === c.staff && o.p === c.p && Math.abs(o.x - c.x) < 0.6 * c.sp)) hs.push(c);
   }
   const chords = chordStems(L, hs, { minLen: 1.5, sides: true });
-  hs = hs.filter(h => (h.stemDir !== 0 || h.kind === 'hollow') && !(h.chord && h.chord.accidental));
+  // (on a staff inferred from washed-out music the stems faded with the lines: filled heads stay)
+  hs = hs.filter(h => (h.stemDir !== 0 || h.kind === 'hollow' || staves[h.staff].inferred) && !(h.chord && h.chord.accidental));
   hs = hs.filter(h => !atStemTip(h, hs, L, ltL));
   hs = hs.filter(h => !accidentalBefore(h, chords, L, R));
   const barlines = detectBarlines(R, staves, hs, sp.ss);

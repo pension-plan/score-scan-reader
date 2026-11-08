@@ -2,6 +2,27 @@
 
 Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
 
+## Update: staves where the lines are washed out (L38)
+
+Three severe pages lose their staff lines: `rst08-tuplet-beam-rests` (none left: the row profile over a staff is flat, 241
+against a 242 background; no staff found, 0.367), `rst05-multibar-rests` (lines in pieces: system 1 found from x = 891,
+system 3 only over 405–977, system 5 not at all) and the hymn-descant severe page 2. New `staffinfer.js`, called by
+`front.js` after the line finders, works from what remains of the music:
+- treble clefs on the left of the page (a faded clef's hook, body and tail dot are joined first) that match the G clef
+  template clearly better than F and C (≥ 0.38 and 0.2 above both);
+- a clef left of the staff it belongs to, or outside every staff, starts the work: the dashed-line finder's staves then
+  extend partial ones or stand where none was (a clef in their band, or a gap that fits the page's system spacing); a
+  partial staff starts at its clef; with no staff at all, the clef's box gives the lines (Bravura's G clef is 7.25
+  spaces tall and reaches 1.78 above the top line) and the staff runs right over the glyphs in its band;
+- a staff under 60 % of the page's longest also asks the dashed finder; two-up spreads are left alone;
+- on an inferred staff the faded stems are gone too, so filled heads without a stem are kept there.
+
+A/B (no OCR): coverage +0.0009 per item (`rst05` severe 0.626 → 0.739, `rst08` severe 0.367 → 0.538), challenge
++0.0001 (hymn-descant severe +0.019), benchmark unchanged; no item down. `rst05` severe now has all five staves;
+`rest-multibar` severe 0 → 1 of 9: the H-bars are found, but the page's barlines are still missing, so most of them
+share a bar with notes (measure splitting, with structure). `voice-piano-night-song` severe is not a staff problem:
+all nine staves are found; its loss is elsewhere.
+
 ## Update: 32nd and 64th rests whose hooks read as heads (rest gaps)
 
 On scans a 32nd or 64th rest often carries two or three "heads" (its hooks), not one, and `rests.js` only asked the
