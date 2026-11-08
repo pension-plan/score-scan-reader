@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.30.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.29.0...score-scan-reader-v0.30.0) (2026-11-08)
+
+
+### Features
+
+* **heads:** heads fused with their accidentals, parenthesised courtesy signs ([6b891a8](https://github.com/pension-plan/score-scan-reader/commit/6b891a86b87cc072ea4cc2a4c34cfba23a4783f7))
+* **lyrics:** opt-in stanzasAsVerses sets stanzas printed below the music as verses (L5b) ([959bcac](https://github.com/pension-plan/score-scan-reader/commit/959bcacc77b546aa054968c0da6b2370b5f0d74c))
+* **ui:** option to set stanzas printed below the music as verses (L5b) ([a942ffe](https://github.com/pension-plan/score-scan-reader/commit/a942ffeec7652ea5ca8f2bd2ea36bc5890e13747))
+
+
+### Bug Fixes
+
+* **front:** grace notes keep their short stems next to a chord ([84d0451](https://github.com/pension-plan/score-scan-reader/commit/84d0451e380314a2088b8419aaf12700149404bb))
+* **meter:** worn signatures chosen by bar contents; courtesy signatures after a courtesy key; bar counts across pages ([c03021c](https://github.com/pension-plan/score-scan-reader/commit/c03021c364cd8d04c0de18f50e0ee026c698cab9))
+* **ocr:** second-pass reader no longer asks for ita.special-words ([18e3f41](https://github.com/pension-plan/score-scan-reader/commit/18e3f4160d647bbac584f077ffbb9484599f7dc9))
+* **systems:** staves regrouped into equal systems when their joining lines were lost; spreads with a staff traced across the gutter ([5dc261f](https://github.com/pension-plan/score-scan-reader/commit/5dc261f1bfcb959908fb6931ee53cdb827be5d9d))
+* **text:** D.S./D.C. before 'al Coda' recovered; part labels with merged-word components; concurrent text OCR ([b36a858](https://github.com/pension-plan/score-scan-reader/commit/b36a858a956cefd0bebac96688f3cbfa447737b4))
+
+
+### Performance Improvements
+
+* **load:** conversion starts while OCR loads; split Tesseract core; notation library lazy ([34dad95](https://github.com/pension-plan/score-scan-reader/commit/34dad9520848fc66f7a2169ee1e589f0e17b9aff))
+
 ## [0.29.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.28.1...score-scan-reader-v0.29.0) (2026-11-08)
 
 
