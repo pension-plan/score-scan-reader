@@ -1,6 +1,6 @@
 # Coverage matrix: symbols, layouts, performance
 
-Generated 2026-11-08 11:32 UTC by `tools/coverage.mjs` from `mvp/work/eval-coverage.json` (eval 2026-11-08 11:32, app source hash `e10a5fe0169d`, OCR on, raster 200 dpi).
+Generated 2026-11-08 12:04 UTC by `tools/coverage.mjs` from `mvp/work/eval-coverage.json` (eval 2026-11-08 12:04, app source hash `9af296ce847b`, OCR on, raster 200 dpi).
 Corpus: `corpus/coverage` — 81 items, 243 scored PDFs (clean, scan, scan-severe). Every item is a short LilyPond engraving with exact MusicXML truth and a `meta.json` listing its symbols, layout and per-symbol counts.
 
 Regenerate:
@@ -20,31 +20,31 @@ node tools/coverage.mjs --eval mvp/work/eval-coverage.json [--perf mvp/work/eval
 - **Status** (from the `scan` input, the typical 200–300 dpi scan): supported ≥ 0.8, partial 0.2–0.8, unsupported < 0.2 or the element is never emitted. Semantic tags whose MusicXML element exists but is never written (e.g. `<octave-shift>`, `<multiple-rest>`) are capped at partial.
 - **Confusion** (on `clean.pdf`): false notes (app notes that match no truth note) per truth note in the measures holding the symbol, minus the same rate in the other measures (all items' rate when the symbol is in every measure). *confused* = excess > 0.05 and at least 3 surplus false notes; *unclear* = excess > 0.05 on fewer than 10 truth notes; otherwise *not confused*: the app may drop the mark, but it does not turn it into extra notes. It matters most for marks the app does not output.
 
-**Totals:** 37 supported, 48 partial, 69 unsupported, 30 not measurable, 0 taxonomy tags without items yet.
+**Totals:** 29 supported, 45 partial, 80 unsupported, 30 not measurable, 0 taxonomy tags without items yet.
 
 ## Symbols: notes
 
 | Tag | Occurrences | Items | Emitted | Accuracy clean | Accuracy scan | Accuracy scan-severe | Read | Status | Confusion | Check |
 |---|---:|---:|---:|---:|---:|---:|---:|---|---|---|
-| `note-breve` | 4 | 2 | 0 | 0% (0/4) | 0% (0/4) | 0% (0/4) | 75% | **unsupported** | not confused (+0.03) | duration of the aligned note (sem) |
+| `note-breve` | 4 | 2 | 0 | 0% (0/4) | 0% (0/4) | 0% (0/4) | 75% | **unsupported** | unclear (+0.06) | duration of the aligned note (sem) |
 | `note-whole` | 163 | 37 | 134 | 57% (108/188) | 46% (87/188) | 33% (62/188) | 61% | partial | not confused (-0.03) | duration of the aligned note (sem) |
-| `note-half` | 1351 | 75 | 1338 | 84% (1240/1471) | 79% (1161/1471) | 41% (610/1471) | 91% | partial | not confused (-0.05) | duration of the aligned note (sem) |
-| `note-quarter` | 4025 | 80 | 4496 | 91% (4043/4426) | 91% (4025/4426) | 74% (3267/4426) | 94% | supported | not confused (-0.12) | duration of the aligned note (sem) |
-| `note-8th` | 1526 | 61 | 1632 | 79% (1266/1608) | 77% (1241/1608) | 65% (1052/1608) | 84% | partial | not confused (-0.01) | duration of the aligned note (sem) |
-| `note-16th` | 651 | 22 | 745 | 79% (517/651) | 80% (521/651) | 69% (451/651) | 89% | supported | not confused (+0.01) | duration of the aligned note (sem) |
-| `note-32nd` | 113 | 10 | 10 | 10% (11/113) | 13% (15/113) | 4% (4/113) | 81% | **unsupported** | not confused (-0.02) | duration of the aligned note (sem) |
-| `note-64th` | 71 | 5 | 0 | 0% (0/71) | 0% (0/71) | 0% (0/71) | 76% | **unsupported** | not confused (+0.05) | duration of the aligned note (sem) |
-| `dot` | 295 | 49 | 345 | 74% (220/299) | 73% (218/299) | 54% (162/299) | 88% | partial | **confused** (+0.09) | <dot/> count + duration |
-| `double-dot` | 15 | 4 | 5 | 27% (4/15) | 27% (4/15) | 7% (1/15) | 93% | partial | **confused** (+0.17) | <dot/> count + duration |
-| `chord` | 608 | 29 | 1630 | 90% (1491/1666) | 88% (1461/1666) | 70% (1159/1666) | 90% | supported | not confused (-0.01) | element on the aligned note |
-| `beam` | 703 | 56 | 0 | 0% (0/2064) | 0% (0/2064) | 0% (0/2064) | 86% | **unsupported** — element never emitted | not confused (-0.00) | element on the aligned note |
-| `flag` | 308 | 31 | 1538 | 61% (187/308) | 62% (190/308) | 48% (147/308) | 77% | partial | not confused (+0.01) | duration of the flagged note (sem) |
-| `stem-up` | 2653 | 67 | 2663 | 90% (2392/2653) | 88% (2344/2653) | 75% (2002/2653) | 89% | supported | not confused (-0.13) | element on the aligned note |
-| `stem-down` | 4155 | 72 | 3911 | 91% (3789/4155) | 90% (3741/4155) | 77% (3199/4155) | 91% | supported | not confused (-0.27) | element on the aligned note |
-| `ledger-above` | 601 | 58 | 567 | 91% (545/601) | 87% (521/601) | 79% (472/601) | 87% | supported | not confused (-0.03) | pitch (sem) |
-| `ledger-below` | 374 | 45 | 350 | 90% (335/374) | 89% (331/374) | 76% (285/374) | 89% | supported | not confused (-0.02) | pitch (sem) |
-| `grace` | 58 | 2 | 8 | 45% (26/58) | 10% (6/58) | 3% (2/58) | 10% | **unsupported** | not confused (-0.08) | <grace/> note, same pitch, aligned measure |
-| `grace-slash` | 16 | 2 | 0 | 0% (0/16) | 0% (0/16) | 0% (0/16) | 19% | **unsupported** | not confused (-0.07) | <grace slash="yes"/> |
+| `note-half` | 1351 | 75 | 1337 | 84% (1239/1471) | 79% (1161/1471) | 41% (610/1471) | 91% | partial | not confused (-0.04) | duration of the aligned note (sem) |
+| `note-quarter` | 4025 | 80 | 4500 | 91% (4042/4426) | 91% (4032/4426) | 74% (3273/4426) | 94% | supported | not confused (-0.12) | duration of the aligned note (sem) |
+| `note-8th` | 1526 | 61 | 1633 | 79% (1265/1608) | 77% (1241/1608) | 65% (1053/1608) | 84% | partial | not confused (-0.00) | duration of the aligned note (sem) |
+| `note-16th` | 651 | 22 | 635 | 80% (519/651) | 80% (521/651) | 69% (451/651) | 88% | supported | not confused (+0.01) | duration of the aligned note (sem) |
+| `note-32nd` | 113 | 10 | 97 | 77% (87/113) | 79% (89/113) | 43% (49/113) | 88% | partial | not confused (-0.02) | duration of the aligned note (sem) |
+| `note-64th` | 71 | 5 | 32 | 32% (23/71) | 39% (28/71) | 6% (4/71) | 76% | partial | **confused** (+0.07) | duration of the aligned note (sem) |
+| `dot` | 295 | 49 | 345 | 74% (222/299) | 74% (221/299) | 55% (163/299) | 89% | partial | **confused** (+0.09) | <dot/> count + duration |
+| `double-dot` | 15 | 4 | 5 | 27% (4/15) | 27% (4/15) | 7% (1/15) | 93% | partial | **confused** (+0.19) | <dot/> count + duration |
+| `chord` | 608 | 29 | 1630 | 90% (1491/1666) | 88% (1464/1666) | 70% (1159/1666) | 90% | supported | not confused (-0.01) | element on the aligned note |
+| `beam` | 703 | 56 | 0 | 0% (0/2064) | 0% (0/2064) | 0% (0/2064) | 86% | **unsupported** — element never emitted | not confused (+0.00) | element on the aligned note |
+| `flag` | 308 | 31 | 1548 | 60% (186/308) | 62% (192/308) | 48% (148/308) | 80% | partial | not confused (+0.01) | duration of the flagged note (sem) |
+| `stem-up` | 2653 | 67 | 2665 | 90% (2391/2653) | 89% (2348/2653) | 75% (2002/2653) | 89% | supported | not confused (-0.13) | element on the aligned note |
+| `stem-down` | 4155 | 72 | 3923 | 91% (3798/4155) | 90% (3752/4155) | 77% (3211/4155) | 92% | supported | not confused (-0.25) | element on the aligned note |
+| `ledger-above` | 601 | 58 | 572 | 91% (547/601) | 88% (529/601) | 79% (476/601) | 88% | supported | not confused (-0.03) | pitch (sem) |
+| `ledger-below` | 374 | 45 | 350 | 90% (335/374) | 89% (331/374) | 76% (286/374) | 89% | supported | not confused (-0.02) | pitch (sem) |
+| `grace` | 58 | 2 | 8 | 45% (26/58) | 10% (6/58) | 3% (2/58) | 10% | **unsupported** | not confused (-0.04) | <grace/> note, same pitch, aligned measure |
+| `grace-slash` | 16 | 2 | 0 | 0% (0/16) | 0% (0/16) | 0% (0/16) | 19% | **unsupported** | not confused (-0.03) | <grace slash="yes"/> |
 | `cue-note` | 24 | 1 | 0 | 0% (0/24) | 0% (0/24) | 0% (0/24) | 0% | **unsupported** — element never emitted | unclear (+0.40) | <cue/> note, same pitch, aligned measure |
 | `tremolo` | 35 | 1 | 0 | 0% (0/35) | 0% (0/35) | 0% (0/35) | 31% | **unsupported** — element never emitted | not confused (-0.84) | element on the aligned note |
 
@@ -55,9 +55,9 @@ node tools/coverage.mjs --eval mvp/work/eval-coverage.json [--perf mvp/work/eval
 | `rest-breve` | 2 | 1 | 0 | 0% (0/2) | 0% (0/2) | 0% (0/2) | 100% | **unsupported** — low n (2) | – | aligned rest with the same duration (sem) |
 | `rest-whole` | 3 | 1 | 2 | 100% (3/3) | 100% (3/3) | 100% (3/3) | 100% | supported | not confused (-0.63) | aligned rest with the same duration (sem) |
 | `rest-half` | 36 | 15 | 30 | 75% (27/36) | 67% (24/36) | 56% (20/36) | 75% | partial | not confused (+0.03) | aligned rest with the same duration (sem) |
-| `rest-quarter` | 183 | 33 | 137 | 75% (137/183) | 70% (129/183) | 43% (79/183) | 75% | partial | **confused** (+0.07) | aligned rest with the same duration (sem) |
-| `rest-8th` | 124 | 16 | 114 | 77% (96/124) | 81% (100/124) | 66% (82/124) | 92% | supported | not confused (-0.01) | aligned rest with the same duration (sem) |
-| `rest-16th` | 60 | 7 | 59 | 65% (39/60) | 67% (40/60) | 42% (25/60) | 92% | partial | not confused (-0.01) | aligned rest with the same duration (sem) |
+| `rest-quarter` | 183 | 33 | 137 | 75% (138/183) | 70% (129/183) | 43% (79/183) | 76% | partial | **confused** (+0.07) | aligned rest with the same duration (sem) |
+| `rest-8th` | 124 | 16 | 114 | 77% (96/124) | 81% (100/124) | 65% (81/124) | 92% | supported | not confused (-0.00) | aligned rest with the same duration (sem) |
+| `rest-16th` | 60 | 7 | 60 | 65% (39/60) | 67% (40/60) | 42% (25/60) | 92% | partial | not confused (-0.01) | aligned rest with the same duration (sem) |
 | `rest-32nd` | 22 | 4 | 15 | 86% (19/22) | 64% (14/22) | 14% (3/22) | 73% | partial | **confused** (+0.31) | aligned rest with the same duration (sem) |
 | `rest-64th` | 10 | 1 | 1 | 60% (6/10) | 10% (1/10) | 0% (0/10) | 30% | **unsupported** | **confused** (+0.47) | aligned rest with the same duration (sem) |
 | `rest-dotted` | 30 | 6 | 27 | 80% (24/30) | 87% (26/30) | 50% (15/30) | 93% | supported | **confused** (+0.18) | aligned rest with the same duration (sem) |
@@ -110,7 +110,7 @@ node tools/coverage.mjs --eval mvp/work/eval-coverage.json [--perf mvp/work/eval
 
 | Tag | Occurrences | Items | Emitted | Accuracy clean | Accuracy scan | Accuracy scan-severe | Read | Status | Confusion | Check |
 |---|---:|---:|---:|---:|---:|---:|---:|---|---|---|
-| `time-2-4` | 14 | 9 | 4 | 45% (5/11) | 36% (4/11) | 36% (4/11) | – | partial | **confused** (+0.12) | same clef/key/time at the aligned measure (+-1) |
+| `time-2-4` | 14 | 9 | 4 | 45% (5/11) | 36% (4/11) | 36% (4/11) | – | partial | **confused** (+0.11) | same clef/key/time at the aligned measure (+-1) |
 | `time-3-4` | 38 | 25 | 29 | 55% (16/29) | 55% (16/29) | 55% (16/29) | – | partial | not confused (-0.01) | same clef/key/time at the aligned measure (+-1) |
 | `time-4-4` | 69 | 54 | 91 | 73% (45/62) | 69% (43/62) | 66% (41/62) | – | partial | not confused (-0.00) | same clef/key/time at the aligned measure (+-1) |
 | `time-2-2` | 4 | 2 | 0 | 0% (0/4) | 0% (0/4) | 0% (0/4) | – | **unsupported** — element never emitted | not confused (-0.07) | same clef/key/time at the aligned measure (+-1) |
@@ -123,18 +123,18 @@ node tools/coverage.mjs --eval mvp/work/eval-coverage.json [--perf mvp/work/eval
 | `time-7-8` | 7 | 3 | 0 | 0% (0/4) | 0% (0/4) | 0% (0/4) | – | **unsupported** — element never emitted | not confused (-0.48) | same clef/key/time at the aligned measure (+-1) |
 | `time-common` | 11 | 6 | 0 | 0% (0/8) | 0% (0/8) | 0% (0/8) | – | **unsupported** — element never emitted | not confused (-0.00) | same clef/key/time at the aligned measure (+-1) |
 | `time-cut` | 10 | 5 | 0 | 0% (0/7) | 0% (0/7) | 0% (0/7) | – | **unsupported** — element never emitted | not confused (-0.31) | same clef/key/time at the aligned measure (+-1) |
-| `time-change` | 110 | 20 | 0 | 0% (0/89) | 0% (0/89) | 0% (0/89) | – | **unsupported** — element never emitted | not confused (-0.03) | same clef/key/time at the aligned measure (+-1) |
+| `time-change` | 110 | 20 | 0 | 0% (0/89) | 0% (0/89) | 0% (0/89) | – | **unsupported** — element never emitted | not confused (-0.02) | same clef/key/time at the aligned measure (+-1) |
 | `pickup` | 9 | 9 | 7 | 67% (6/9) | 67% (6/9) | 67% (6/9) | – | partial | not confused (-0.03) | first measure has the pickup length (sem) |
 | `tuplet-3` | 76 | 8 | 168 | 67% (133/200) | 67% (133/200) | 40% (80/200) | 93% | partial | not confused (-0.01) | duration + <time-modification> ratio |
 | `tuplet-2` | 15 | 6 | 0 | 0% (0/27) | 0% (0/27) | 0% (0/27) | 85% | **unsupported** — element never emitted | **confused** (+0.06) | duration + <time-modification> ratio |
 | `tuplet-5` | 10 | 4 | 29 | 45% (20/44) | 45% (20/44) | 34% (15/44) | 95% | partial | not confused (-0.12) | duration + <time-modification> ratio |
 | `tuplet-6` | 6 | 2 | 24 | 67% (24/36) | 67% (24/36) | 44% (16/36) | 89% | partial | not confused (-0.06) | duration + <time-modification> ratio |
-| `tuplet-7` | 5 | 2 | 21 | 40% (14/35) | 40% (14/35) | 40% (14/35) | 100% | partial | not confused (-0.05) | duration + <time-modification> ratio |
+| `tuplet-7` | 5 | 2 | 21 | 60% (21/35) | 60% (21/35) | 40% (14/35) | 100% | partial | not confused (-0.05) | duration + <time-modification> ratio |
 | `tuplet-nested` | 8 | 1 | 0 | 0% (0/26) | 0% (0/26) | 0% (0/26) | 100% | **unsupported** — element never emitted | not confused (-1.00) | duration + <time-modification> |
-| `tie` | 79 | 14 | 13 | 10% (8/79) | 8% (6/79) | 6% (5/79) | 94% | **unsupported** | **confused** (+0.05) | element on the aligned note |
+| `tie` | 79 | 14 | 9 | 8% (6/79) | 6% (5/79) | 5% (4/79) | 94% | **unsupported** | **confused** (+0.05) | element on the aligned note |
 | `tie-across-system` | 46 | 11 | 0 | 0% (0/46) | 2% (1/46) | 2% (1/46) | 93% | **unsupported** — element never emitted | not confused (+0.02) | element on the aligned note |
 | `x-time-3-8` | 1 | 1 | 1 | 100% (1/1) | 100% (1/1) | 0% (0/1) | – | supported — low n (1) | not confused (-0.60) | same clef/key/time at the aligned measure (+-1) |
-| `x-time-4-2` | 4 | 3 | 0 | 0% (0/4) | 0% (0/4) | 0% (0/4) | – | **unsupported** — element never emitted | not confused (-0.12) | same clef/key/time at the aligned measure (+-1) |
+| `x-time-4-2` | 4 | 3 | 0 | 0% (0/4) | 0% (0/4) | 0% (0/4) | – | **unsupported** — element never emitted | not confused (-0.10) | same clef/key/time at the aligned measure (+-1) |
 | `x-time-6-4` | 1 | 1 | 0 | 0% (0/1) | 0% (0/1) | 0% (0/1) | – | **unsupported** — low n (1) | not confused (-0.89) | same clef/key/time at the aligned measure (+-1) |
 | `x-tuplet-4` | 2 | 2 | 0 | 0% (0/8) | 0% (0/8) | 0% (0/8) | 100% | **unsupported** — element never emitted | not confused (-0.16) | duration + <time-modification> ratio |
 
@@ -142,40 +142,40 @@ node tools/coverage.mjs --eval mvp/work/eval-coverage.json [--perf mvp/work/eval
 
 | Tag | Occurrences | Items | Emitted | Accuracy clean | Accuracy scan | Accuracy scan-severe | Read | Status | Confusion | Check |
 |---|---:|---:|---:|---:|---:|---:|---:|---|---|---|
-| `slur` | 100 | 20 | 27 | 18% (18/100) | 15% (15/100) | 11% (11/100) | 81% | **unsupported** | not confused (+0.04) | element on the aligned note |
+| `slur` | 100 | 20 | 10 | 1% (1/100) | 1% (1/100) | 3% (3/100) | 81% | **unsupported** | not confused (+0.05) | element on the aligned note |
 | `staccato` | 78 | 7 | 0 | 0% (0/78) | 0% (0/78) | 0% (0/78) | 99% | **unsupported** — element never emitted | not confused (-0.08) | element on the aligned note |
 | `staccatissimo` | 9 | 2 | 0 | 0% (0/9) | 0% (0/9) | 0% (0/9) | 89% | **unsupported** — element never emitted | not confused (-0.01) | element on the aligned note |
 | `accent` | 43 | 8 | 0 | 0% (0/43) | 0% (0/43) | 0% (0/43) | 79% | **unsupported** — element never emitted | **confused** (+0.13) | element on the aligned note |
 | `tenuto` | 37 | 6 | 0 | 0% (0/37) | 0% (0/37) | 0% (0/37) | 97% | **unsupported** — element never emitted | not confused (-0.07) | element on the aligned note |
 | `marcato` | 23 | 3 | 0 | 0% (0/23) | 0% (0/23) | 0% (0/23) | 87% | **unsupported** — element never emitted | not confused (+0.04) | element on the aligned note |
-| `fermata` | 130 | 32 | 0 | 0% (0/130) | 0% (0/130) | 0% (0/130) | 86% | **unsupported** — element never emitted | not confused (-0.04) | element on the aligned note |
+| `fermata` | 130 | 32 | 39 | 23% (30/130) | 28% (36/130) | 6% (8/130) | 86% | partial | not confused (-0.04) | element on the aligned note |
 | `trill` | 9 | 3 | 0 | 0% (0/9) | 0% (0/9) | 0% (0/9) | 100% | **unsupported** — element never emitted | not confused (-0.04) | element on the aligned note |
 | `mordent` | 5 | 2 | 0 | 0% (0/10) | 0% (0/10) | 0% (0/10) | 100% | **unsupported** — element never emitted | not confused (+0.05) | element on the aligned note |
 | `turn` | 5 | 2 | 0 | 0% (0/7) | 0% (0/7) | 0% (0/7) | 100% | **unsupported** — element never emitted | not confused (+0.06) | element on the aligned note |
 | `arpeggio` | 24 | 3 | 0 | 0% (0/68) | 0% (0/68) | 0% (0/68) | 88% | **unsupported** — element never emitted | not confused (-0.04) | element on the aligned note |
 | `breath` | 8 | 4 | 0 | 0% (0/8) | 0% (0/8) | 0% (0/8) | 100% | **unsupported** — element never emitted | not confused (-0.02) | element on the aligned note |
-| `dyn-pp` | 8 | 5 | 8 | 75% (6/8) | 75% (6/8) | 50% (4/8) | – | partial | not confused (-0.03) | same element/value at the aligned measure (+-1) |
-| `dyn-p` | 43 | 19 | 33 | 58% (25/43) | 77% (33/43) | 42% (18/43) | – | partial | **confused** (+0.13) | same element/value at the aligned measure (+-1) |
-| `dyn-mp` | 13 | 9 | 15 | 85% (11/13) | 100% (13/13) | 23% (3/13) | – | supported | **confused** (+0.13) | same element/value at the aligned measure (+-1) |
-| `dyn-mf` | 54 | 25 | 29 | 87% (47/54) | 43% (23/54) | 31% (17/54) | – | partial | not confused (-0.00) | same element/value at the aligned measure (+-1) |
-| `dyn-f` | 56 | 18 | 43 | 77% (43/56) | 77% (43/56) | 63% (35/56) | – | partial | not confused (+0.03) | same element/value at the aligned measure (+-1) |
-| `dyn-ff` | 16 | 5 | 14 | 75% (12/16) | 88% (14/16) | 81% (13/16) | – | supported | **confused** (+0.10) | same element/value at the aligned measure (+-1) |
-| `dyn-sfz` | 6 | 3 | 3 | 67% (4/6) | 50% (3/6) | 17% (1/6) | – | partial | not confused (-0.04) | same element/value at the aligned measure (+-1) |
-| `hairpin-cresc` | 43 | 18 | 37 | 86% (37/43) | 86% (37/43) | 26% (11/43) | – | supported | not confused (-0.02) | same element/value at the aligned measure (+-1) |
-| `hairpin-dim` | 31 | 15 | 28 | 84% (26/31) | 84% (26/31) | 19% (6/31) | – | supported | not confused (-0.05) | same element/value at the aligned measure (+-1) |
+| `dyn-pp` | 8 | 5 | 0 | 0% (0/8) | 0% (0/8) | 0% (0/8) | – | **unsupported** — element never emitted | not confused (-0.03) | same element/value at the aligned measure (+-1) |
+| `dyn-p` | 43 | 19 | 0 | 0% (0/43) | 0% (0/43) | 0% (0/43) | – | **unsupported** — element never emitted | **confused** (+0.13) | same element/value at the aligned measure (+-1) |
+| `dyn-mp` | 13 | 9 | 0 | 0% (0/13) | 0% (0/13) | 0% (0/13) | – | **unsupported** — element never emitted | **confused** (+0.13) | same element/value at the aligned measure (+-1) |
+| `dyn-mf` | 54 | 25 | 0 | 0% (0/54) | 0% (0/54) | 0% (0/54) | – | **unsupported** — element never emitted | not confused (-0.00) | same element/value at the aligned measure (+-1) |
+| `dyn-f` | 56 | 18 | 0 | 0% (0/56) | 0% (0/56) | 0% (0/56) | – | **unsupported** — element never emitted | not confused (+0.03) | same element/value at the aligned measure (+-1) |
+| `dyn-ff` | 16 | 5 | 0 | 0% (0/16) | 0% (0/16) | 0% (0/16) | – | **unsupported** — element never emitted | **confused** (+0.10) | same element/value at the aligned measure (+-1) |
+| `dyn-sfz` | 6 | 3 | 0 | 0% (0/6) | 0% (0/6) | 0% (0/6) | – | **unsupported** — element never emitted | not confused (-0.04) | same element/value at the aligned measure (+-1) |
+| `hairpin-cresc` | 43 | 18 | 1 | 5% (2/43) | 2% (1/43) | 0% (0/43) | – | **unsupported** | not confused (-0.02) | same element/value at the aligned measure (+-1) |
+| `hairpin-dim` | 31 | 15 | 1 | 3% (1/31) | 3% (1/31) | 0% (0/31) | – | **unsupported** | not confused (-0.05) | same element/value at the aligned measure (+-1) |
 | `pedal` | 28 | 5 | 0 | 0% (0/28) | 0% (0/28) | 0% (0/28) | – | **unsupported** — element never emitted | **confused** (+0.08) | same element/value at the aligned measure (+-1) |
 | `fingering` | 112 | 3 | 0 | 0% (0/112) | 0% (0/112) | 0% (0/112) | 89% | **unsupported** — element never emitted | not confused (-0.04) | element on the aligned note |
-| `text-expression` | 45 | 11 | 7 | 14% (5/35) | 20% (7/35) | 17% (6/35) | – | partial | not confused (+0.02) | same element/value at the aligned measure (+-1) |
-| `tempo-mark` | 59 | 53 | 39 | 53% (36/68) | 54% (37/68) | 32% (22/68) | – | partial | not confused (+0.03) | same element/value at the aligned measure (+-1) |
+| `text-expression` | 45 | 11 | 2 | 0% (0/35) | 6% (2/35) | 3% (1/35) | – | **unsupported** | not confused (+0.02) | same element/value at the aligned measure (+-1) |
+| `tempo-mark` | 59 | 53 | 15 | 18% (12/68) | 22% (15/68) | 15% (10/68) | – | partial | not confused (+0.03) | same element/value at the aligned measure (+-1) |
 | `metronome` | 36 | 33 | 0 | 0% (0/36) | 0% (0/36) | 0% (0/36) | – | **unsupported** — element never emitted | **confused** (+0.07) | same element/value at the aligned measure (+-1) |
 | `rehearsal-mark` | 16 | 6 | 0 | 0% (0/16) | 0% (0/16) | 0% (0/16) | – | **unsupported** — element never emitted | not confused (+0.02) | same element/value at the aligned measure (+-1) |
 | `chord-symbol` | 61 | 2 | 0 | 0% (0/61) | 0% (0/61) | 0% (0/61) | – | **unsupported** — element never emitted | not confused (-0.05) | same element/value at the aligned measure (+-1) |
 | `x-artic-detached-legato` | 4 | 1 | 0 | 0% (0/4) | 0% (0/4) | 0% (0/4) | 100% | **unsupported** — element never emitted | not confused (+0.00) | element on the aligned note |
-| `x-dyn-fff` | 1 | 1 | 0 | 100% (1/1) | 0% (0/1) | 0% (0/1) | – | **unsupported** — low n (1) | not confused (-0.02) | same element/value at the aligned measure (+-1) |
-| `x-dyn-fp` | 1 | 1 | 1 | 100% (1/1) | 100% (1/1) | 0% (0/1) | – | supported — low n (1) | not confused (-0.03) | same element/value at the aligned measure (+-1) |
-| `x-dyn-fz` | 1 | 1 | 1 | 100% (1/1) | 100% (1/1) | 0% (0/1) | – | supported — low n (1) | not confused (-0.02) | same element/value at the aligned measure (+-1) |
-| `x-dyn-ppp` | 1 | 1 | 0 | 100% (1/1) | 0% (0/1) | 100% (1/1) | – | **unsupported** — low n (1) | not confused (-0.02) | same element/value at the aligned measure (+-1) |
-| `x-dyn-sf` | 3 | 2 | 3 | 100% (3/3) | 100% (3/3) | 33% (1/3) | – | supported | not confused (-0.03) | same element/value at the aligned measure (+-1) |
+| `x-dyn-fff` | 1 | 1 | 0 | 0% (0/1) | 0% (0/1) | 0% (0/1) | – | **unsupported** — element never emitted; low n (1) | not confused (-0.02) | same element/value at the aligned measure (+-1) |
+| `x-dyn-fp` | 1 | 1 | 0 | 0% (0/1) | 0% (0/1) | 0% (0/1) | – | **unsupported** — element never emitted; low n (1) | not confused (-0.03) | same element/value at the aligned measure (+-1) |
+| `x-dyn-fz` | 1 | 1 | 0 | 0% (0/1) | 0% (0/1) | 0% (0/1) | – | **unsupported** — element never emitted; low n (1) | not confused (-0.02) | same element/value at the aligned measure (+-1) |
+| `x-dyn-ppp` | 1 | 1 | 0 | 0% (0/1) | 0% (0/1) | 0% (0/1) | – | **unsupported** — element never emitted; low n (1) | not confused (-0.02) | same element/value at the aligned measure (+-1) |
+| `x-dyn-sf` | 3 | 2 | 0 | 0% (0/3) | 0% (0/3) | 0% (0/3) | – | **unsupported** — element never emitted | not confused (-0.03) | same element/value at the aligned measure (+-1) |
 | `x-dyn-sfp` | 1 | 1 | 0 | 0% (0/1) | 0% (0/1) | 0% (0/1) | – | **unsupported** — element never emitted; low n (1) | not confused (-0.02) | same element/value at the aligned measure (+-1) |
 
 ## Symbols: structure
@@ -190,9 +190,9 @@ node tools/coverage.mjs --eval mvp/work/eval-coverage.json [--perf mvp/work/eval
 | `volta-2` | 8 | 5 | 0 | 0% (0/8) | 0% (0/8) | 0% (0/8) | – | **unsupported** — element never emitted | not confused (-0.02) | same element/value at the aligned measure (+-1) |
 | `segno` | 2 | 2 | 0 | 0% (0/2) | 0% (0/2) | 0% (0/2) | – | **unsupported** — element never emitted; low n (2) | not confused (-0.03) | same element/value at the aligned measure (+-1) |
 | `coda` | 4 | 2 | 0 | 0% (0/4) | 0% (0/4) | 0% (0/4) | – | **unsupported** — element never emitted | not confused (-0.04) | same element/value at the aligned measure (+-1) |
-| `dc` | 2 | 2 | 1 | 50% (1/2) | 50% (1/2) | 50% (1/2) | – | partial — low n (2) | **confused** (+0.20) | same element/value at the aligned measure (+-1) |
-| `ds` | 2 | 2 | 2 | 100% (2/2) | 100% (2/2) | 50% (1/2) | – | supported — low n (2) | not confused (+0.09) | same element/value at the aligned measure (+-1) |
-| `fine` | 2 | 2 | 1 | 100% (2/2) | 50% (1/2) | 50% (1/2) | – | partial — low n (2) | not confused (-0.01) | same element/value at the aligned measure (+-1) |
+| `dc` | 2 | 2 | 0 | 0% (0/2) | 0% (0/2) | 0% (0/2) | – | **unsupported** — element never emitted; low n (2) | **confused** (+0.20) | same element/value at the aligned measure (+-1) |
+| `ds` | 2 | 2 | 1 | 50% (1/2) | 50% (1/2) | 50% (1/2) | – | partial — low n (2) | not confused (+0.09) | same element/value at the aligned measure (+-1) |
+| `fine` | 2 | 2 | 1 | 50% (1/2) | 50% (1/2) | 0% (0/2) | – | partial — low n (2) | not confused (-0.01) | same element/value at the aligned measure (+-1) |
 | `system-break` | 226 | 80 | 0 | 0% (0/226) | 0% (0/226) | 0% (0/226) | – | **unsupported** — element never emitted | not confused (-0.02) | same element/value at the aligned measure (+-1) |
 | `page-break` | 19 | 6 | 0 | 0% (0/19) | 0% (0/19) | 0% (0/19) | – | **unsupported** — element never emitted | not confused (+0.02) | same element/value at the aligned measure (+-1) |
 | `multi-page` | 22 | 6 | 0 | 96% (1837/1908) | 94% (1800/1908) | 89% (1699/1908) | – | supported | not confused (+0.02) | pitch recall of the notes on pages 2+ (sem) |
@@ -254,9 +254,9 @@ Layout score = mean of part-count match (exact), part-name score and the share o
 
 | Layout | Items | Layout score clean | Layout score scan | Layout score scan-severe | Part count ok | Names | Right part | Split violations | Aggregate | Status |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| `melody` | 32 | 97% | 96% | 88% | 100% | 88% | 100% | 0 | 0.863 | supported |
+| `melody` | 32 | 97% | 96% | 88% | 100% | 88% | 100% | 0 | 0.868 | supported |
 | `melody-lyrics` | 4 | 100% | 100% | 100% | 100% | 100% | 100% | 0 | 0.933 | supported |
-| `piano` | 16 | 100% | 100% | 88% | 100% | 100% | 100% | 0 | 0.931 | supported |
+| `piano` | 16 | 100% | 100% | 88% | 100% | 100% | 100% | 0 | 0.933 | supported |
 | `voice-piano` | 3 | 100% | 100% | 77% | 100% | 100% | 100% | 0 | 0.953 | supported |
 | `choir-closed-satb` | 1 | 100% | 100% | 100% | 100% | 100% | 100% | 0 | 0.989 | supported |
 | `choir-open-satb` | 1 | 100% | 100% | 100% | 100% | 100% | 99% | 0 | 0.925 | supported |
@@ -276,125 +276,125 @@ Layout score = mean of part-count match (exact), part-name score and the share o
 
 ## Performance
 
-Source: `mvp/work/eval-coverage.json` (all coverage items, no perf family yet; 243 PDFs; raster 200 dpi, OCR on, 8 parallel jobs on 192 CPUs, load average 30.4 at the start). Times are the converter (`convert()`) in a Node child process, per page; peak memory is the child's peak RSS (`maxRSS`), including Node itself (~50 MB) and the OCR engine when OCR is on. With a fixed raster dpi the source scan dpi changes image quality, not pixel count; use `--dpi native` (raster at the scan resolution) or `--dpi app` (browser app: 2300 px wide) to measure the dpi effect.
+Source: `mvp/work/eval-coverage.json` (all coverage items, no perf family yet; 243 PDFs; raster 200 dpi, OCR on, 8 parallel jobs on 192 CPUs, load average 30.7 at the start). Times are the converter (`convert()`) in a Node child process, per page; peak memory is the child's peak RSS (`maxRSS`), including Node itself (~50 MB) and the OCR engine when OCR is on. With a fixed raster dpi the source scan dpi changes image quality, not pixel count; use `--dpi native` (raster at the scan resolution) or `--dpi app` (browser app: 2300 px wide) to measure the dpi effect.
 
 **By source scan dpi**
 
 | Scan dpi | PDFs | MP/page | ms/page (median) | ms/page (max) | peak MB (median) | peak MB (max) |
 |---|---:|---:|---:|---:|---:|---:|
-| 100 | 4 | 4.582 | 1821 | 3863 | 274 | 312.6 |
-| 110 | 2 | 4.555 | 2037 | 2037 | 256.6 | 256.6 |
-| 120 | 8 | 3.869 | 2012 | 3831 | 265.9 | 539.8 |
-| 150 | 40 | 4.31 | 2214 | 17247 | 267 | 648.6 |
-| 200 | 43 | 4.002 | 1980 | 4466 | 254.2 | 735.6 |
-| 240 | 3 | 3.873 | 2641 | 2955 | 247.2 | 283.1 |
-| 250 | 17 | 3.87 | 1910 | 4256 | 247.3 | 498.9 |
-| 300 | 126 | 3.869 | 1745 | 4306 | 238.3 | 650.9 |
+| 100 | 4 | 4.582 | 1818 | 3833 | 278.4 | 313.1 |
+| 110 | 2 | 4.555 | 2010 | 2010 | 259 | 259 |
+| 120 | 8 | 3.869 | 2033 | 4009 | 247.1 | 562.1 |
+| 150 | 40 | 4.31 | 2223 | 17168 | 269.4 | 629.9 |
+| 200 | 43 | 4.002 | 1905 | 4315 | 255.4 | 747.8 |
+| 240 | 3 | 3.873 | 2645 | 2859 | 245.8 | 274.4 |
+| 250 | 17 | 3.87 | 1885 | 4246 | 251.9 | 519.7 |
+| 300 | 126 | 3.869 | 1727 | 4295 | 240.2 | 687.6 |
 
 **By page size**
 
 | Page size | PDFs | MP/page | ms/page (median) | ms/page (max) | peak MB (median) | peak MB (max) |
 |---|---:|---:|---:|---:|---:|---:|
-| ~A3 landscape | 1 | 9.314 | 3004 | 3004 | 395.5 | 395.5 |
-| ~A4 | 37 | 4.277 | 1859 | 17247 | 251.5 | 550.1 |
-| ~B4 | 19 | 4.697 | 2093 | 6941 | 281.2 | 515.1 |
-| A3 landscape | 1 | 7.742 | 11326 | 11326 | 561.4 | 561.4 |
-| A4 | 184 | 3.869 | 1782 | 4466 | 241.1 | 735.6 |
-| A4 landscape | 1 | 3.871 | 2416 | 2416 | 267 | 267 |
+| ~A3 landscape | 1 | 9.314 | 2971 | 2971 | 397 | 397 |
+| ~A4 | 37 | 4.277 | 1830 | 17168 | 251.7 | 542.7 |
+| ~B4 | 19 | 4.697 | 2079 | 6913 | 294.5 | 506 |
+| A3 landscape | 1 | 7.742 | 11261 | 11261 | 629.9 | 629.9 |
+| A4 | 184 | 3.869 | 1773 | 4315 | 242.8 | 747.8 |
+| A4 landscape | 1 | 3.871 | 2424 | 2424 | 269.4 | 269.4 |
 
 **By page count**
 
 | Pages | PDFs | MP/page | ms/page (median) | ms/page (max) | peak MB (median) | peak MB (max) |
 |---|---:|---:|---:|---:|---:|---:|
-| 1 | 227 | 3.869 | 1859 | 17247 | 242.3 | 561.4 |
-| 2 | 10 | 3.869 | 2953 | 3831 | 445.2 | 539.8 |
-| 5 | 3 | 3.869 | 3231 | 3527 | 650.9 | 735.6 |
-| 12 | 3 | 3.869 | 1426 | 1432 | 648.6 | 673.1 |
+| 1 | 227 | 3.869 | 1839 | 17168 | 244.7 | 629.9 |
+| 2 | 10 | 3.869 | 2972 | 4009 | 441.7 | 562.1 |
+| 5 | 3 | 3.869 | 3052 | 3533 | 687.6 | 747.8 |
+| 12 | 3 | 3.869 | 1442 | 1468 | 619.5 | 664.4 |
 
-**Linear fits.** ms per page = -1402.7 + **896.27 ms per megapixel** × MP per page (n=243, R²=0.098). Peak MB = 215.9 + 11.7 MB per megapixel × total MP (n=243, R²=0.477). Overall: 542 ms of conversion per megapixel.
+**Linear fits.** ms per page = -1369.7 + **885.58 ms per megapixel** × MP per page (n=243, R²=0.097). Peak MB = 217.5 + 11.7 MB per megapixel × total MP (n=243, R²=0.456). Overall: 540 ms of conversion per megapixel.
 
 ## Items
 
 | Item | Layout | Aggregate clean | Aggregate scan | Aggregate scan-severe | Parts (expected → scan) | ms/page | peak MB |
 |---|---|---:|---:|---:|---|---:|---:|
-| `layouts/choir-closed-satb-light-of-morning` | choir-closed-satb | 0.982 | 0.989 | 0.986 | 4 → 4 | 2119 | 228 |
-| `layouts/choir-open-satb-gloria` | choir-open-satb | 0.916 | 0.925 | 0.879 | 4 → 4 | 2721 | 254 |
-| `layouts/choir-piano-song-of-rejoicing` | choir-piano | 0.999 | 0.997 | 0.969 | 5 → 5 | 3715 | 319 |
-| `layouts/choir-sab-summer-song` | choir-sab | 0.984 | 0.996 | 0.328 | 3 → 3 | 2641 | 228 |
-| `layouts/choir-ssaa-winter-night` | choir-ssaa | 0.990 | 0.985 | 0.982 | 4 → 4 | 2068 | 247 |
-| `layouts/choir-ttbb-evening-bells` | choir-ttbb | 1.000 | 1.000 | 0.348 | 4 → 4 | 2118 | 227 |
-| `layouts/cross-staff-piano-arpeggio-study` | cross-staff | 0.874 | 0.874 | 0.799 | 1 → 1 | 1607 | 229 |
-| `layouts/divisi-choir-bright-new-day` | divisi | 0.988 | 0.988 | 0.942 | 4 → 4 | 4256 | 294 |
-| `layouts/divisi-strings-lament` | divisi | 0.971 | 0.950 | 0.938 | 4 → 4 | 2081 | 253 |
-| `layouts/hymnal-stanzas-light-of-ages` | hymnal-stanzas | 1.000 | 0.999 | 0.996 | 4 → 4 | 3276 | 279 |
-| `layouts/lead-sheet-long-road` | lead-sheet | 0.888 | 0.920 | 0.840 | 1 → 1 | 2955 | 247 |
-| `layouts/melody-cello-elegy-2page` | melody | 0.886 | 0.843 | 0.713 | 1 → 1 | 1381 | 283 |
-| `layouts/melody-flute-air` | melody | 0.959 | 0.968 | 0.961 | 1 → 1 | 1522 | 254 |
-| `layouts/melody-lyrics-morning-song` | melody-lyrics | 1.000 | 1.000 | 0.938 | 1 → 1 | 2117 | 227 |
-| `layouts/orchestral-festive-march-9-staves` | orchestral | 0.972 | 0.957 | 0.896 | 9 → 9 | 3553 | 499 |
-| `layouts/organ-three-staves-chorale-prelude` | organ | 0.985 | 0.946 | 0.770 | 1 → 1 | 2172 | 233 |
-| `layouts/piano-grand-staff-prelude` | piano | 0.896 | 0.942 | 0.928 | 1 → 1 | 1621 | 238 |
-| `layouts/string-quartet-minuet` | string-quartet | 0.777 | 0.986 | 0.774 | 4 → 4 | 3520 | 327 |
-| `layouts/two-voices-piano-song-without-words` | two-voices-one-staff-instrument | 0.996 | 0.996 | 0.723 | 1 → 1 | 1631 | 234 |
-| `layouts/voice-piano-night-song` | voice-piano | 0.972 | 0.922 | 0.459 | 2 → 2 | 2165 | 255 |
-| `lyrics/lyr01-elisions-three-languages` | melody-lyrics | 0.919 | 0.976 | 0.888 | 1 → 1 | 2591 | 237 |
-| `lyrics/lyr02-non-ascii-four-languages` | melody-lyrics | 0.825 | 0.832 | 0.815 | 1 → 1 | 3058 | 263 |
-| `marks/mk01-articulations-violin` | melody | 0.974 | 0.974 | 0.967 | 1 → 1 | 1557 | 221 |
-| `marks/mk02-ornaments-fermatas-flute` | melody | 0.951 | 0.958 | 0.959 | 1 → 1 | 1554 | 232 |
-| `marks/mk03-dynamics-hairpins-cello` | melody | 0.978 | 0.967 | 0.775 | 1 → 1 | 1697 | 239 |
-| `marks/mk04-piano-pedal-arpeggio-fingering` | piano | 0.938 | 0.921 | 0.841 | 1 → 1 | 2245 | 239 |
-| `marks/mk05-tempo-text-rehearsal-oboe` | melody | 0.752 | 0.940 | 0.723 | 1 → 1 | 2066 | 261 |
-| `marks/mk06-lead-sheet-chord-symbols` | lead-sheet | 0.970 | 0.960 | 0.836 | 1 → 1 | 2119 | 231 |
-| `marks/mk07-vocalise-voice-piano` | voice-piano | 0.980 | 1.000 | 0.904 | 2 → 2 | 2137 | 257 |
-| `marks/mk08-string-quartet-marks` | string-quartet | 0.979 | 0.977 | 0.907 | 4 → 4 | 2157 | 259 |
-| `marks/mk09-stacked-marks-viola` | melody | 0.935 | 0.920 | 0.895 | 1 → 1 | 2149 | 245 |
-| `notes/nt01-note-values` | melody | 0.822 | 0.827 | 0.660 | 1 → 1 | 1724 | 258 |
-| `notes/nt02-dots` | melody | 0.863 | 0.842 | 0.797 | 1 → 1 | 1777 | 221 |
-| `notes/nt03-chords` | piano | 0.912 | 0.856 | 0.894 | 1 → 1 | 1688 | 249 |
-| `notes/nt04-beams` | melody | 0.900 | 0.918 | 0.916 | 1 → 1 | 1805 | 238 |
-| `notes/nt05-flags-stems` | melody | 0.834 | 0.847 | 0.762 | 1 → 1 | 1704 | 243 |
-| `notes/nt06-ledger-lines` | piano | 0.946 | 0.946 | 0.946 | 1 → 1 | 1745 | 238 |
-| `notes/nt07-grace-notes` | melody | 0.971 | 0.755 | 0.730 | 1 → 1 | 1788 | 233 |
-| `notes/nt08-cue-notes` | melody | 0.936 | 0.946 | 0.947 | 1 → 1 | 1588 | 265 |
-| `notes/nt09-tremolos` | piano | 0.709 | 0.709 | 0.630 | 1 → 1 | 1670 | 240 |
-| `notes/nt10-piano-etude` | piano | 0.951 | 0.941 | 0.914 | 1 → 1 | 1700 | 241 |
-| `percussion/perc01-parade-flute-snare-drumset` | percussion-none | 0.646 | 0.628 | 0.634 | 3 → 2 | 1901 | 234 |
-| `pitch/pitch-cov-accidentals-chords-piano` | piano | 0.955 | 0.945 | 0.860 | 1 → 1 | 1709 | 237 |
-| `pitch/pitch-cov-accidentals-melody` | melody | 0.857 | 0.927 | 0.843 | 1 → 1 | 1769 | 215 |
-| `pitch/pitch-cov-clef-changes-piano` | piano | 0.945 | 1.000 | 0.367 | 1 → 1 | 1596 | 246 |
-| `pitch/pitch-cov-clefs-all` | melody | 0.736 | 0.730 | 0.733 | 1 → 1 | 1646 | 240 |
-| `pitch/pitch-cov-clefs-quartet` | string-quartet | 0.769 | 0.955 | 0.756 | 4 → 4 | 1882 | 226 |
-| `pitch/pitch-cov-key-changes-organ` | organ | 0.978 | 0.974 | 0.803 | 1 → 1 | 1805 | 261 |
-| `pitch/pitch-cov-keys-major-flats` | piano | 0.997 | 0.997 | 0.676 | 1 → 1 | 1676 | 243 |
-| `pitch/pitch-cov-keys-major-sharps` | melody | 0.992 | 0.911 | 0.941 | 1 → 1 | 1666 | 240 |
-| `pitch/pitch-cov-keys-minor-flats` | melody | 0.967 | 0.971 | 0.885 | 1 → 1 | 1768 | 248 |
-| `pitch/pitch-cov-keys-minor-sharps` | melody | 0.604 | 0.541 | 0.557 | 1 → 1 | 2248 | 257 |
-| `pitch/pitch-cov-ottava-ledger-melody` | melody | 0.838 | 0.838 | 0.838 | 1 → 1 | 1676 | 237 |
-| `pitch/pitch-cov-ottava-piano` | piano | 0.809 | 0.795 | 0.803 | 1 → 1 | 1913 | 230 |
-| `rests/rst01-rest-values` | melody | 0.823 | 0.757 | 0.684 | 1 → 1 | 1676 | 249 |
-| `rests/rst02-dotted-rests` | melody | 0.858 | 0.887 | 0.747 | 1 → 1 | 1736 | 261 |
-| `rests/rst03-whole-bar-rests-simple` | melody | 0.768 | 0.777 | 0.701 | 1 → 1 | 1752 | 230 |
-| `rests/rst04-whole-bar-rests-compound` | melody | 0.767 | 0.760 | 0.853 | 1 → 1 | 1717 | 256 |
-| `rests/rst05-multibar-rests` | melody | 0.849 | 0.728 | 0.620 | 1 → 1 | 1926 | 235 |
-| `rests/rst06-two-voice-rests` | two-voices-one-staff-instrument | 0.856 | 0.858 | 0.840 | 1 → 1 | 1803 | 230 |
-| `rests/rst07-piano-rests` | piano | 0.927 | 0.910 | 0.886 | 1 → 1 | 1792 | 236 |
-| `rests/rst08-tuplet-beam-rests` | melody | 0.846 | 0.827 | 0.367 | 1 → 1 | 2203 | 232 |
-| `rests/rst09-quartet-rests` | string-quartet | 0.990 | 0.976 | 0.924 | 4 → 4 | 3286 | 327 |
-| `structure/str01-double-final-barlines` | melody | 1.000 | 1.000 | 0.953 | 1 → 1 | 1563 | 229 |
-| `structure/str02-repeat-signs-piano` | piano | 0.988 | 0.990 | 0.980 | 1 → 1 | 1568 | 234 |
-| `structure/str03-voltas-string-quartet` | string-quartet | 0.983 | 0.980 | 0.466 | 4 → 4 | 3255 | 350 |
-| `structure/str04-segno-coda-ds` | melody | 0.882 | 0.883 | 0.909 | 1 → 1 | 1944 | 226 |
-| `structure/str05-fine-dc-al-fine-piano` | piano | 1.000 | 1.000 | 0.481 | 1 → 1 | 1932 | 256 |
-| `structure/str06-breaks-two-pages-song` | voice-piano | 0.972 | 0.938 | 0.838 | 2 → 2 | 3520 | 507 |
-| `structure/str07-orchestral-five-pages` | orchestral | 0.982 | 0.975 | 0.957 | 7 → 7 | 2983 | 601 |
-| `structure/str08-variations-twelve-pages-piano` | piano | 0.983 | 0.974 | 0.962 | 1 → 1 | 1432 | 673 |
-| `time/t01-simple-meters` | melody | 0.833 | 0.881 | 0.851 | 1 → 1 | 1627 | 225 |
-| `time/t02-compound-irregular` | melody | 0.897 | 0.898 | 0.909 | 1 → 1 | 1757 | 244 |
-| `time/t03-common-cut-piano` | piano | 0.959 | 0.974 | 0.928 | 1 → 1 | 1669 | 225 |
-| `time/t04-pickup-song` | melody-lyrics | 0.916 | 0.923 | 0.936 | 1 → 1 | 2175 | 226 |
-| `time/t05-triplets-duplets` | melody | 0.817 | 0.839 | 0.787 | 1 → 1 | 1767 | 238 |
-| `time/t06-quint-sext-sept` | melody | 0.971 | 0.968 | 0.914 | 1 → 1 | 1575 | 220 |
-| `time/t07-nested-tuplets` | melody | 0.808 | 0.802 | 0.826 | 1 → 1 | 1562 | 260 |
-| `time/t08-ties-systems-pages` | piano | 0.978 | 0.990 | 0.404 | 1 → 1 | 1612 | 297 |
-| `time/t09-two-voices-guitar` | two-voices-one-staff-instrument | 0.906 | 0.906 | 0.765 | 1 → 1 | 1584 | 242 |
-| `time/t10-quartet-meters` | string-quartet | 0.868 | 0.854 | 0.620 | 4 → 4 | 1910 | 256 |
+| `layouts/choir-closed-satb-light-of-morning` | choir-closed-satb | 0.982 | 0.989 | 0.986 | 4 → 4 | 2067 | 253 |
+| `layouts/choir-open-satb-gloria` | choir-open-satb | 0.916 | 0.925 | 0.879 | 4 → 4 | 2674 | 267 |
+| `layouts/choir-piano-song-of-rejoicing` | choir-piano | 0.999 | 0.997 | 0.969 | 5 → 5 | 3800 | 322 |
+| `layouts/choir-sab-summer-song` | choir-sab | 0.984 | 0.996 | 0.328 | 3 → 3 | 2645 | 246 |
+| `layouts/choir-ssaa-winter-night` | choir-ssaa | 0.990 | 0.985 | 0.982 | 4 → 4 | 2089 | 241 |
+| `layouts/choir-ttbb-evening-bells` | choir-ttbb | 1.000 | 1.000 | 0.348 | 4 → 4 | 2107 | 248 |
+| `layouts/cross-staff-piano-arpeggio-study` | cross-staff | 0.874 | 0.874 | 0.799 | 1 → 1 | 1598 | 217 |
+| `layouts/divisi-choir-bright-new-day` | divisi | 0.988 | 0.988 | 0.942 | 4 → 4 | 4246 | 298 |
+| `layouts/divisi-strings-lament` | divisi | 0.971 | 0.950 | 0.938 | 4 → 4 | 2056 | 232 |
+| `layouts/hymnal-stanzas-light-of-ages` | hymnal-stanzas | 1.000 | 0.999 | 0.996 | 4 → 4 | 3247 | 253 |
+| `layouts/lead-sheet-long-road` | lead-sheet | 0.888 | 0.920 | 0.840 | 1 → 1 | 2859 | 232 |
+| `layouts/melody-cello-elegy-2page` | melody | 0.886 | 0.843 | 0.713 | 1 → 1 | 1380 | 274 |
+| `layouts/melody-flute-air` | melody | 0.959 | 0.968 | 0.961 | 1 → 1 | 1512 | 237 |
+| `layouts/melody-lyrics-morning-song` | melody-lyrics | 1.000 | 1.000 | 0.938 | 1 → 1 | 2113 | 225 |
+| `layouts/orchestral-festive-march-9-staves` | orchestral | 0.972 | 0.957 | 0.896 | 9 → 9 | 3531 | 520 |
+| `layouts/organ-three-staves-chorale-prelude` | organ | 0.985 | 0.946 | 0.770 | 1 → 1 | 2148 | 245 |
+| `layouts/piano-grand-staff-prelude` | piano | 0.896 | 0.942 | 0.928 | 1 → 1 | 1579 | 231 |
+| `layouts/string-quartet-minuet` | string-quartet | 0.777 | 0.986 | 0.774 | 4 → 4 | 3540 | 349 |
+| `layouts/two-voices-piano-song-without-words` | two-voices-one-staff-instrument | 0.996 | 0.996 | 0.723 | 1 → 1 | 1621 | 223 |
+| `layouts/voice-piano-night-song` | voice-piano | 0.972 | 0.922 | 0.459 | 2 → 2 | 2162 | 252 |
+| `lyrics/lyr01-elisions-three-languages` | melody-lyrics | 0.919 | 0.976 | 0.888 | 1 → 1 | 2620 | 224 |
+| `lyrics/lyr02-non-ascii-four-languages` | melody-lyrics | 0.825 | 0.832 | 0.815 | 1 → 1 | 3080 | 242 |
+| `marks/mk01-articulations-violin` | melody | 0.974 | 0.974 | 0.967 | 1 → 1 | 1585 | 226 |
+| `marks/mk02-ornaments-fermatas-flute` | melody | 0.951 | 0.958 | 0.959 | 1 → 1 | 1523 | 249 |
+| `marks/mk03-dynamics-hairpins-cello` | melody | 0.978 | 0.967 | 0.775 | 1 → 1 | 1725 | 265 |
+| `marks/mk04-piano-pedal-arpeggio-fingering` | piano | 0.938 | 0.921 | 0.841 | 1 → 1 | 2271 | 243 |
+| `marks/mk05-tempo-text-rehearsal-oboe` | melody | 0.752 | 0.940 | 0.723 | 1 → 1 | 2135 | 225 |
+| `marks/mk06-lead-sheet-chord-symbols` | lead-sheet | 0.970 | 0.960 | 0.836 | 1 → 1 | 2122 | 235 |
+| `marks/mk07-vocalise-voice-piano` | voice-piano | 0.980 | 1.000 | 0.904 | 2 → 2 | 2111 | 255 |
+| `marks/mk08-string-quartet-marks` | string-quartet | 0.979 | 0.977 | 0.907 | 4 → 4 | 2209 | 270 |
+| `marks/mk09-stacked-marks-viola` | melody | 0.935 | 0.920 | 0.895 | 1 → 1 | 2072 | 266 |
+| `notes/nt01-note-values` | melody | 0.881 | 0.906 | 0.660 | 1 → 1 | 1758 | 258 |
+| `notes/nt02-dots` | melody | 0.894 | 0.878 | 0.846 | 1 → 1 | 1699 | 261 |
+| `notes/nt03-chords` | piano | 0.912 | 0.856 | 0.894 | 1 → 1 | 1647 | 216 |
+| `notes/nt04-beams` | melody | 0.935 | 0.938 | 0.941 | 1 → 1 | 1808 | 245 |
+| `notes/nt05-flags-stems` | melody | 0.834 | 0.847 | 0.762 | 1 → 1 | 1702 | 221 |
+| `notes/nt06-ledger-lines` | piano | 0.946 | 0.946 | 0.946 | 1 → 1 | 1736 | 238 |
+| `notes/nt07-grace-notes` | melody | 0.971 | 0.755 | 0.730 | 1 → 1 | 1771 | 257 |
+| `notes/nt08-cue-notes` | melody | 0.936 | 0.946 | 0.947 | 1 → 1 | 1611 | 242 |
+| `notes/nt09-tremolos` | piano | 0.709 | 0.709 | 0.630 | 1 → 1 | 1652 | 230 |
+| `notes/nt10-piano-etude` | piano | 0.986 | 0.981 | 0.949 | 1 → 1 | 1669 | 235 |
+| `percussion/perc01-parade-flute-snare-drumset` | percussion-none | 0.646 | 0.628 | 0.634 | 3 → 2 | 1928 | 248 |
+| `pitch/pitch-cov-accidentals-chords-piano` | piano | 0.955 | 0.945 | 0.860 | 1 → 1 | 1685 | 228 |
+| `pitch/pitch-cov-accidentals-melody` | melody | 0.857 | 0.927 | 0.843 | 1 → 1 | 1773 | 248 |
+| `pitch/pitch-cov-clef-changes-piano` | piano | 0.945 | 1.000 | 0.367 | 1 → 1 | 1614 | 222 |
+| `pitch/pitch-cov-clefs-all` | melody | 0.736 | 0.730 | 0.733 | 1 → 1 | 1673 | 236 |
+| `pitch/pitch-cov-clefs-quartet` | string-quartet | 0.769 | 0.955 | 0.756 | 4 → 4 | 1880 | 223 |
+| `pitch/pitch-cov-key-changes-organ` | organ | 0.978 | 0.974 | 0.803 | 1 → 1 | 1832 | 273 |
+| `pitch/pitch-cov-keys-major-flats` | piano | 0.997 | 0.997 | 0.676 | 1 → 1 | 1672 | 242 |
+| `pitch/pitch-cov-keys-major-sharps` | melody | 0.992 | 0.911 | 0.941 | 1 → 1 | 1679 | 227 |
+| `pitch/pitch-cov-keys-minor-flats` | melody | 0.967 | 0.971 | 0.885 | 1 → 1 | 1780 | 229 |
+| `pitch/pitch-cov-keys-minor-sharps` | melody | 0.604 | 0.541 | 0.557 | 1 → 1 | 2252 | 243 |
+| `pitch/pitch-cov-ottava-ledger-melody` | melody | 0.838 | 0.838 | 0.838 | 1 → 1 | 1662 | 252 |
+| `pitch/pitch-cov-ottava-piano` | piano | 0.809 | 0.795 | 0.803 | 1 → 1 | 1898 | 231 |
+| `rests/rst01-rest-values` | melody | 0.823 | 0.757 | 0.684 | 1 → 1 | 1644 | 234 |
+| `rests/rst02-dotted-rests` | melody | 0.858 | 0.887 | 0.747 | 1 → 1 | 1740 | 216 |
+| `rests/rst03-whole-bar-rests-simple` | melody | 0.768 | 0.777 | 0.701 | 1 → 1 | 1759 | 235 |
+| `rests/rst04-whole-bar-rests-compound` | melody | 0.767 | 0.760 | 0.853 | 1 → 1 | 1676 | 255 |
+| `rests/rst05-multibar-rests` | melody | 0.849 | 0.728 | 0.620 | 1 → 1 | 1839 | 242 |
+| `rests/rst06-two-voice-rests` | two-voices-one-staff-instrument | 0.856 | 0.858 | 0.840 | 1 → 1 | 1835 | 224 |
+| `rests/rst07-piano-rests` | piano | 0.927 | 0.910 | 0.886 | 1 → 1 | 1752 | 246 |
+| `rests/rst08-tuplet-beam-rests` | melody | 0.852 | 0.839 | 0.367 | 1 → 1 | 2211 | 249 |
+| `rests/rst09-quartet-rests` | string-quartet | 0.990 | 0.976 | 0.924 | 4 → 4 | 3321 | 330 |
+| `structure/str01-double-final-barlines` | melody | 1.000 | 1.000 | 0.953 | 1 → 1 | 1562 | 243 |
+| `structure/str02-repeat-signs-piano` | piano | 0.988 | 0.990 | 0.980 | 1 → 1 | 1585 | 256 |
+| `structure/str03-voltas-string-quartet` | string-quartet | 0.983 | 0.980 | 0.466 | 4 → 4 | 3191 | 352 |
+| `structure/str04-segno-coda-ds` | melody | 0.882 | 0.883 | 0.909 | 1 → 1 | 1882 | 242 |
+| `structure/str05-fine-dc-al-fine-piano` | piano | 1.000 | 1.000 | 0.481 | 1 → 1 | 1956 | 257 |
+| `structure/str06-breaks-two-pages-song` | voice-piano | 0.972 | 0.938 | 0.838 | 2 → 2 | 3219 | 509 |
+| `structure/str07-orchestral-five-pages` | orchestral | 0.982 | 0.975 | 0.957 | 7 → 7 | 2884 | 588 |
+| `structure/str08-variations-twelve-pages-piano` | piano | 0.983 | 0.974 | 0.962 | 1 → 1 | 1468 | 664 |
+| `time/t01-simple-meters` | melody | 0.833 | 0.881 | 0.851 | 1 → 1 | 1561 | 226 |
+| `time/t02-compound-irregular` | melody | 0.897 | 0.898 | 0.909 | 1 → 1 | 1756 | 229 |
+| `time/t03-common-cut-piano` | piano | 0.959 | 0.974 | 0.928 | 1 → 1 | 1659 | 228 |
+| `time/t04-pickup-song` | melody-lyrics | 0.916 | 0.923 | 0.936 | 1 → 1 | 2069 | 244 |
+| `time/t05-triplets-duplets` | melody | 0.817 | 0.839 | 0.787 | 1 → 1 | 1727 | 232 |
+| `time/t06-quint-sext-sept` | melody | 0.971 | 0.968 | 0.917 | 1 → 1 | 1568 | 220 |
+| `time/t07-nested-tuplets` | melody | 0.808 | 0.802 | 0.826 | 1 → 1 | 1522 | 229 |
+| `time/t08-ties-systems-pages` | piano | 0.978 | 0.990 | 0.404 | 1 → 1 | 1456 | 321 |
+| `time/t09-two-voices-guitar` | two-voices-one-staff-instrument | 0.906 | 0.906 | 0.765 | 1 → 1 | 1529 | 245 |
+| `time/t10-quartet-meters` | string-quartet | 0.868 | 0.854 | 0.620 | 4 → 4 | 1885 | 262 |

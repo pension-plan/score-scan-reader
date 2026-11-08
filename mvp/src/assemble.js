@@ -6,9 +6,9 @@ const { detectRests } = require('./rests');
 const { fallbackAccidental } = require('./cv');
 const { labelComponents } = require('./cc');
 
-// divisions per quarter: 840 = 8 * 3 * 5 * 7 keeps 32nds and 3-, 5-, 6- and
+// divisions per quarter: 1680 = 16 * 3 * 5 * 7 keeps 64ths and 3-, 5-, 6- and
 // 7-tuplets whole numbers
-const DIV = 840;
+const DIV = 1680;
 const SHARP_ORDER = ['F', 'C', 'G', 'D', 'A', 'E', 'B'];
 const FLAT_ORDER = ['B', 'E', 'A', 'D', 'G', 'C', 'F'];
 
@@ -826,13 +826,27 @@ function countBeams(R, x, tip, dir, sp, cap = 0.9 * sp) {
   for (const side of [-1, 1]) {
     const nx = Math.round(x + side * 0.15 * sp);
     for (const off of [0.45, 0.7]) {
-      const bars = tipRuns(R, Math.round(x + side * off * sp), nx, tip, dir, sp).filter(r => r.linked && r.len >= 0.22 * sp && r.len <= cap);
+      const cx = Math.round(x + side * off * sp);
+      const bars = tipRuns(R, cx, nx, tip, dir, sp).filter(r => r.linked && r.len >= 0.22 * sp && r.len <= cap);
       if (!bars.length) continue;
       const thick = Math.max(...bars.map(r => r.len));
-      best = Math.max(best, bars.filter(r => r.len >= 0.5 * thick).length);
+      const strong = bars.filter(r => r.len >= 0.5 * thick);
+      let n = strong.length;
+      // a stack of three or four beams (32nds, 64ths) runs past the 1.6 spaces searched: further
+      // beams count when they follow at the same gap and thickness as the first two
+      if (n >= 2 && n < 4) {
+        const gap0 = strong[1].a - strong[0].b, len0 = (strong[0].len + strong[1].len) / 2;
+        let last = strong[n - 1];
+        const far = tipRuns(R, cx, nx, tip, dir, sp, 3.2).filter(r => r.linked && r.a > last.b);
+        for (const r of far) {
+          if (n >= 4 || Math.abs((r.a - last.b) - gap0) > 0.12 * sp || Math.abs(r.len - len0) > 0.25 * len0) break;
+          n++; last = r;
+        }
+      }
+      best = Math.max(best, n);
     }
   }
-  return Math.min(3, best);
+  return Math.min(4, best);
 }
 
 // A beam at a stem tip runs on sideways (a space and more beside the stem, at
@@ -1223,7 +1237,8 @@ function markTuplets(R, comps, s, sp, items, groups) {
     const equal = its.every(it => Math.abs(it.q - minq) < 1e-6);
     const actual = U === 3 ? 3 : equal && TUPLET[U] ? U : 0;
     if (!actual) return;
-    const normal = TUPLET[actual];
+    // quintuplets / septuplets of 32nds span a beat (5:8, 7:8), not half of one
+    const normal = (actual === 5 || actual === 7) && minq * TUPLET[actual] < 0.75 ? 2 * TUPLET[actual] : TUPLET[actual];
     for (const it of its) {
       claimed.add(it);
       for (const h of it.heads) if (!h.dur.tuplet) h.dur = { q: h.dur.q * normal / actual, dots: h.dur.dots, tuplet: { actual, normal } };

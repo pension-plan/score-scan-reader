@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 22:38 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 22:40 AEDT.
 
 ## Events
 
@@ -115,6 +115,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 22:27 | Shipped 2b560bc (textsym, release merged): ties, slurs and grace notes written to MusicXML; nothing else changed on any set; regressions clean. textsym next: tie recall and grace heads on scans, then L25 lyrics. |
 | 22:33 | User asked whether 'mf' is understood. Checked: MusicXML has <dynamics><mf/> (bar 7, LH) and <f/> (bar 9); playback maps mf to velocity 80 and f to 96, but the default is also 80 (so the first mf is inaudible), marks apply to the whole part not per staff, and no <sound dynamics> is written. Playback agent resumed to fix all three and show the current dynamic in the transport. |
 | 22:38 | Shipped d4757fc (opencv, release merged): double sharps/flats via templates; coverage 0.7818 to 0.7821 (35 up), challenge 0.8277 to 0.8278, benchmark unchanged; COVERAGE.md regenerated. opencv next: L23 (stacked whole notes, half-note hollow/filled, 32nd/64th flags, dots). |
+| 22:40 | User: tempo not picked up (Flight of the Bumblebee, 'Vivace ♩ = 144' read as Header + 'Lyricist: 144', metronome glyph unrecognised). textsym given priority: metronome-mark recognition, tempo-line classification, <metronome> + <sound tempo> in MusicXML, overlay label; also empty bar-number labels. |
 
 ## Accuracy by round
 

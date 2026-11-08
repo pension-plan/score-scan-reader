@@ -2,6 +2,24 @@
 
 Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
 
+## Update: 32nd and 64th notes (L23, part 1)
+
+`assemble.js`: `countBeams` searched beams over 1.6 spaces from the stem tip and capped the count at 3, and the
+divisions per quarter (840) could not express a 64th. 32nds were read as 16ths, 64ths as 16ths or 8ths
+(truth stems by duration log on the notes family: 32nd → 1 of 86 right, 64th → 0 of 42). Now the count within 1.6
+spaces is kept as it was, and beams beyond it count only when they continue the stack at the same gap (±0.12
+space) and thickness (±25 %) as the first two, up to four; `DIV` = 1680; quintuplets / septuplets of 32nds take
+the 5:8 / 7:8 ratio (a beat), not 5:4 / 7:4 (only reachable now that 32nds are read).
+
+Coverage (no OCR, per tag, clean / scan / severe; `spike/opencv/results/r9-*.txt`): `note-32nd` **40 / 42 / 21 →
+394 / 403 / 370 of 709**, `note-64th` **0 → 69 / 66 / 33 of 123**, `note-quarter` +226 / +238 / +158 (bars that
+add up), `tuplet-7` 68 → 75, `rest-32nd` +3; down: `rest-64th` 16 / 7 → 11 / 3 of 30, `note-8th` scan −8,
+`note-half` severe −3. Aggregates: coverage 0.7821 → 0.7843 (duration +0.010; 44 items up, 4 down:
+`perf-piano-a4-150dpi` severe −0.029, `perf-piano-a4-600dpi` severe −0.028, `perf-piano-letter-300dpi` scan
+−0.020, `perf-piano-a4-100dpi` severe −0.002 — the same pieces' clean and other variants gain up to +0.030; their
+64ths are now read, and the alignment of the rest of those degraded pages shifts); challenge 0.8278 → 0.8282 (9 up,
+4 down by at most 0.0045); benchmark with OCR 0.9499 → 0.9500.
+
 ## Update: double sharps and double flats from templates (L24)
 
 `cv.js` `fallbackAccidental`, asked by `assemble.js` `headAccidental` only when the classical accidental reader finds
