@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.18.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.17.0...score-scan-reader-v0.18.0) (2026-11-08)
+
+
+### Features
+
+* bar-number fix pass limited to clean single-barline corrections (opt-in) ([888d6ab](https://github.com/pension-plan/score-scan-reader/commit/888d6ab14bd299c3f34eeb3af5baf9bc65ae6881))
+* **staves:** fallback finder for staff lines broken into dashes ([e97dbde](https://github.com/pension-plan/score-scan-reader/commit/e97dbdee16ffba243cae06f05fa70bf60d671c46))
+
 ## [0.17.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.16.0...score-scan-reader-v0.17.0) (2026-11-08)
 
 
