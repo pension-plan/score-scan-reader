@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.4.0...score-scan-reader-v0.5.0) (2026-11-08)
+
+
+### Features
+
+* **app:** Maple Leaf Rag as the default sample; ship round 2 (aggregate 0.925, real scans 0.907) ([f9f5855](https://github.com/pension-plan/score-scan-reader/commit/f9f585536bf0c5e83bcb975d9b2681158e4d8093))
+
 ## [0.4.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.3.0...score-scan-reader-v0.4.0) (2026-11-08)
 
 
