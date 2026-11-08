@@ -418,10 +418,10 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
       parts.push({ ...nm(1), kind: 'vocal', src: [{ staff: v.staff, voice: 2 }], layout: `Staff ${v.staff + 1}, stems down (split from a shared staff)` });
       notes.push(`Staff ${v.staff + 1}: two voices on one staff, split by stem direction into ${parts[parts.length - 2].name} and ${parts[parts.length - 1].name}.`);
     } else if (v.small && v.descant) {
-      parts.push({ ...nm(0), kind: 'vocal', src: [{ staff: v.staff, voice: 'chordal' }], layout: `Staff ${v.staff + 1} (small staff above the choir: a descant)` });
+      parts.push({ ...nm(0), kind: 'vocal', small: true, src: [{ staff: v.staff, voice: 'chordal' }], layout: `Staff ${v.staff + 1} (small staff above the choir: a descant)` });
       notes.push(`Staff ${v.staff + 1}: a small staff above the choir, read as a descant part of its own (rests where the systems leave it out).`);
     } else if (v.small) {
-      parts.push({ ...nm(0), kind: 'instrument', src: [{ staff: v.staff, voice: 'chordal' }], layout: `Staff ${v.staff + 1} (small staff: a separate instrument)` });
+      parts.push({ ...nm(0), kind: 'instrument', small: true, src: [{ staff: v.staff, voice: 'chordal' }], layout: `Staff ${v.staff + 1} (small staff: a separate instrument)` });
       notes.push(`Staff ${v.staff + 1}: printed smaller than the staves below it, read as a separate instrument part (not part of the piano's grand staff).`);
     } else parts.push({ ...nm(0), kind: 'vocal', src: [{ staff: v.staff, voice: 'chordal' }], layout: `Staff ${v.staff + 1}` });
   }
@@ -825,10 +825,22 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   // streams written per part: one per source staff; a keyboard part also has
   // an optional second voice on each staff (L17), empty unless that staff
   // shows two rhythms at once in a bar. p.src stays the staff list.
+  // layout staves where cue-size heads (heads.js h.small) are a minority of
+  // the heads: cue notes in a part. A staff of small heads only is a small
+  // staff (a descant) or a percussion staff, not cues
+  const cueStaves = new Set();
+  {
+    const n = new Map();
+    systems.forEach(sy => sy.staves.forEach((st, k) => st.chords.forEach(c => c.heads.forEach(h => { const a = n.get(k) || [0, 0]; a[0]++; if (h.small) a[1]++; n.set(k, a); }))));
+    for (const [k, [all, sm]] of n) if (sm > 0 && sm < 0.4 * all) cueStaves.add(k);
+  }
   parts.forEach(p => {
     const multi = p.src.length > 1;
     p.streams = p.src.map((s, k) => ({ ...s, staffNo: k + 1, vno: multi ? 1 + 4 * k : 1 }));
     if (p.kind === 'keyboard') p.src.forEach((s, k) => p.streams.push({ staff: s.staff, voice: 'kb2', staffNo: k + 1, vno: 2 + 4 * k, optional: true }));
+    // cue notes printed over another voice's rests (L11): an optional second
+    // voice of a one-staff part whose staff shows cue-size heads, filled below
+    else if (p.src.length === 1 && cueStaves.has(p.src[0].staff)) p.streams.push({ staff: p.src[0].staff, voice: 'cue', staffNo: 1, vno: 2, optional: true });
   });
   let kbSplit = 0;
   const segEv = segs.map(m => {
@@ -843,7 +855,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
         if (src.voice === 'kb2') return c.kb ? c.kb[2] : [];
         if (c.kb) return c.kb[1];
       }
-      if (src.voice === 'kb2') return [];
+      if (src.voice === 'kb2' || src.voice === 'cue') return [];
       if (src.voice === 1 || src.voice === 2) {
         c.split ||= splitTwoVoices(c.chordal, s.st.space, !!trust[src.staff]);
         return mergeRests(c.split[src.voice], rs, src.voice, s.st.space);
@@ -873,7 +885,35 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
         if (!evs.some(x => !x.rest && x.heads && x.heads.length && x.heads.every(small))) return;
         const out = [];
         let pend = [];
-        const isGrace = (i) => { const x = evs[i]; return !x.rest && !x.forward && x.heads && x.heads.length && x.heads.every(small) && x.q <= 0.5; };
+        const sm = (x) => !x.rest && !x.forward && x.heads && x.heads.length && x.heads.every(small);
+        // cue notes: small notes that keep their values, written as <cue/>:
+        // small notes in a bar with a rest (printed over the rest), or a run
+        // of three or more (or with a quarter or longer) that no full-size note
+        // follows. Small notes right before a full-size note in a bar without
+        // rests are grace notes (nt07)
+        const restBar = evs.some(x => x.rest), cueOK = cueStaves.has(parts[pi].streams[k] && parts[pi].streams[k].staff);
+        for (let i = 0; i < evs.length;) {
+          if (!sm(evs[i])) { i++; continue; }
+          let j = i; while (j < evs.length && sm(evs[j])) j++;
+          const beforeNote = j < evs.length && !evs[j].rest && !evs[j].forward && evs[j].heads && evs[j].heads.length;
+          if (cueOK && (restBar || (!beforeNote && (j - i >= 3 || evs.slice(i, j).some(x => x.q >= 1))))) for (let k2 = i; k2 < j; k2++) evs[k2].cue = true;
+          i = j;
+        }
+        // over rests the cue notes are a voice of their own (the rest stays in
+        // the main voice): moved to the part's cue stream, after a forward to
+        // where the first of them stands in the bar
+        const ck = parts[pi].streams.findIndex(st => st.voice === 'cue');
+        if (ck >= 0 && ck !== k && restBar && evs.some(x => x.cue)) {
+          const cues = evs.filter(x => x.cue), main = evs.filter(x => !x.cue);
+          const at = main.filter(x => x.x != null && x.x < cues[0].x).reduce((a, x) => a + x.q, 0);
+          streams[ck] = (at > 0 ? [{ forward: true, q: at }] : []).concat(cues);
+          evs = main;
+          streams[k] = main;
+        }
+        // (a small note right before a full-size one is a grace note whatever
+        // value it was read with: its flag or slash is often lost)
+        const fullNext = (i) => { for (let j = i + 1; j < evs.length; j++) { if (sm(evs[j])) continue; return !evs[j].rest && !evs[j].forward && !!(evs[j].heads && evs[j].heads.length); } return false; };
+        const isGrace = (i) => { const x = evs[i]; return sm(x) && !x.cue && (x.q <= 0.5 || fullNext(i)); };
         for (let i = 0; i < evs.length; i++) {
           const x = evs[i];
           if (isGrace(i)) {
@@ -1461,6 +1501,28 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   {
     const nRep = unitBars.filter(b => b.right && b.right.repeat).length, nVol = unitBars.filter(b => b.left && b.left.ending).length;
     if (nRep || nVol) warnings.push(`Read from the page: ${[nRep && `${nRep} repeat sign${nRep > 1 ? 's' : ''}`, nVol && `${nVol} volta bracket${nVol > 1 ? 's' : ''}`].filter(Boolean).join(', ')}.`);
+  }
+  // cue by duplication (L11): a bar of a small sung staff (a descant) whose
+  // notes all sound with another part, onset for onset and
+  // pitch for pitch, is that part's line printed as a cue ("melody"), not
+  // sung by the small staff: written as <cue/>. Two or more notes needed.
+  {
+    const onsets = (evs) => { let t = 0; const out = []; for (const e of evs || []) { if (!e.rest && !e.forward && e.heads && e.heads.length) out.push({ e, t }); t += e.q; } return out; };
+    const dOf = (pi, e) => { const h = e.heads[0]; return pitchOf(h.clef || clefs[parts[pi].src[0].staff], h.p, {}, {}).d; };
+    let nCue = 0;
+    parts.forEach((p, pi) => {
+      if (!p.small || p.kind !== 'vocal') return;
+      partMeasures[pi].forEach((m, mi) => {
+        const mine = onsets(m && m[0] && m[0].events).filter(o => !o.e.cue);
+        if (mine.length < 2) return;
+        const dup = parts.some((q, qi) => qi !== pi && q.kind !== 'keyboard' && (() => {
+          const theirs = onsets(partMeasures[qi][mi] && partMeasures[qi][mi][0] && partMeasures[qi][mi][0].events);
+          return mine.every(o => theirs.some(r => Math.abs(r.t - o.t) < 1e-6 && dOf(qi, r.e) === dOf(pi, o.e)));
+        })());
+        if (dup) { mine.forEach(o => { o.e.cue = true; }); nCue += mine.length; }
+      });
+    });
+    if (nCue) warnings.push(`${nCue} notes of a small staff double another part's line exactly: written as cue notes.`);
   }
   const xml = toMusicXML({ parts, partMeasures, fifths, kAlt, time, unitTime, unitBars, unitMulti, clefs, measures, credits, unitSys, title: read.head.title, head: read.head, dirs: read.dirs });
   const nNotes = partMeasures.map(pm => pm.reduce((a, m) => a + m.reduce((b, s) => b + s.events.filter(e => !e.rest && !e.forward).length, 0), 0));
@@ -2485,8 +2547,8 @@ function toMusicXML({ parts, partMeasures, fifths, kAlt, time, unitTime, unitBar
             }
             const what = perc ? `<unpitched><display-step>${pk.step}</display-step><display-octave>${pk.octave}</display-octave></unpitched>`
               : `<pitch><step>${pt.step}</step>${pt.alter ? `<alter>${pt.alter}</alter>` : ''}<octave>${pt.octave}</octave></pitch>`;
-            L.push(`      <note>${hi > 0 ? '<chord/>' : ''}${what}` +
-              `<duration>${dur}</duration>${tie}${perc ? `<instrument id="${p.id}-${kit.id}"/>` : ''}<voice>${voice}</voice>${typeXML}${perc ? '' : acc}${tmod}${stem}${perc && h.xHead ? '<notehead>x</notehead>' : ''}${staffTag}${beamOf[ei] ? `<beam number="1">${beamOf[ei]}</beam>` : ''}${tied}${lyr}</note>`);
+            L.push(`      <note>${e.cue ? '<cue/>' : ''}${hi > 0 ? '<chord/>' : ''}${what}` +
+              `<duration>${dur}</duration>${e.cue ? '' : tie}${perc ? `<instrument id="${p.id}-${kit.id}"/>` : ''}<voice>${voice}</voice>${typeXML}${perc ? '' : acc}${tmod}${stem}${perc && h.xHead ? '<notehead>x</notehead>' : ''}${staffTag}${beamOf[ei] ? `<beam number="1">${beamOf[ei]}</beam>` : ''}${tied}${lyr}</note>`);
           });
         }
       });

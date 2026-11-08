@@ -298,7 +298,10 @@ function detectHeads(B, R, staves, ss, lt, opts = {}) {
   const headH = hts.length >= 8 ? hts[hts.length >> 1] : 1, thick = headH > 1.15;
   for (const c of comps) {
     const bw = c.x1 - c.x0 + 1, bh = c.y1 - c.y0 + 1;
-    if (bw < 0.8 * ss || bh < 0.5 * ss) continue;
+    // cue-size heads (about 0.7 of a head: a cue part over rests, small grace notes) are smaller
+    // than the opening leaves of a full head; kept when solid, and marked small
+    const small = bw < 0.8 * ss && bw >= 0.55 * ss && bh >= 0.45 * ss && bh <= 0.75 * ss && c.area >= 0.85 * bw * bh;
+    if (!small && (bw < 0.8 * ss || bh < 0.5 * ss)) continue;
     const cx = (c.x0 + c.x1) / 2, cy = (c.y0 + c.y1) / 2;
     const sp0 = staffPos(staves, cx, cy);
     if (!sp0 || Math.abs(sp0.p) > 16) continue;
@@ -367,14 +370,14 @@ function detectHeads(B, R, staves, ss, lt, opts = {}) {
         // middle: its inside is then read just above and below the line
         const hollow = core < 0.5 && coreB < 0.75;
         // on a ledger line the core test cannot see the inside: decided for the page below
-        const ledgerInk = !hollow && Math.abs(p) >= 6 && p % 2 === 0 ? ledgerInkOf(R, xm, ycen, sp, lt) : null;
+        const ledgerInk = !hollow && !small && Math.abs(p) >= 6 && p % 2 === 0 ? ledgerInkOf(R, xm, ycen, sp, lt) : null;
         const wid = xb - xa;
-        if (wid < 0.75 * sp) continue;
+        if (wid < 0.75 * sp && !small) continue;
         // a hole walled by two long verticals (barline + stem, two stems) and
         // closed by staff lines is not a head: a head has at most one stem
         if (hollow && twoTallWalls(R, xa, xb, ycen, sp)) continue;
         heads.push({ x: xm, y: ycen, staff: ps.st.index, p, sp, kind: hollow ? 'hollow' : 'filled', ledgerInk, score: 1, w: wid, blob: c.id,
-          x0: Math.round(xa), x1: Math.round(xb) });
+          x0: Math.round(xa), x1: Math.round(xb), ...(small ? { small: true } : {}) });
       }
     }
   }
@@ -388,16 +391,24 @@ function detectHeads(B, R, staves, ss, lt, opts = {}) {
   // self-calibrated width floor: engravings differ in head proportions
   // (LilyPond ~1.3 spaces, some 1900s hymnals ~1.0), so the floor follows the
   // page's median head width, within [0.78, 0.9] spaces
-  const rel = heads.map(h => h.w / h.sp).sort((a, b) => a - b);
+  const rel = heads.filter(h => !h.small).map(h => h.w / h.sp).sort((a, b) => a - b);
   const headW = rel.length >= 8 ? rel[rel.length >> 1] : 1.3;
   const minW = Math.min(0.9, Math.max(0.78, 0.8 * headW));
   // dedupe
   heads.sort((a, b) => a.x - b.x);
   const out = [];
   for (const h of heads) {
-    if (h.w < minW * h.sp) continue;
+    if (h.small || h.w < minW * h.sp) continue;
     if (!out.some(o => o.staff === h.staff && o.p === h.p && Math.abs(o.x - h.x) < 0.6 * h.sp)) out.push(h);
   }
+  // cue-size heads after the full-size ones, clear of them (a small blob beside a head is a piece of
+  // an accidental, a dot or a flag)
+  // only on pages whose full heads are clearly wider (modern engravings, about 1.2
+  // spaces and up): on narrow-headed old prints a worn full head reads as small
+  if (headW >= 1.12) for (const h of heads) {
+    if (h.small && !out.some(o => o.staff === h.staff && Math.abs(o.p - h.p) <= 8 && Math.abs(o.x - h.x) < 1.2 * h.sp)) out.push(h);
+  }
+  out.sort((a, b) => a.x - b.x);
   return { heads: out, beams, opened: O, headW, stacked };
 }
 

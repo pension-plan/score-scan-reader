@@ -1338,6 +1338,18 @@ amen-small: scan 0.567 to 0.768, mild 0.522 to 0.779 (parts 0.71 to 0.99); befor
 descant were one part and S/A/T/B shifted by a staff on page 2. The descant's cue-size notes in its first bars are
 still read as sung notes.
 
+**Cue notes (L11).** heads.js keeps solid heads of 0.55-0.8 of a staff space as cue-size heads (`h.small`),
+only on pages whose full heads are clearly wider (median at least 1.12 spaces; on narrow-headed old prints a worn
+head reads as small) and only with a stem of their own (front.js). In score.js a run of small notes is cue
+(written `<cue/>`, no `<tie>` element, which the schema does not allow on cues) on a staff where small heads are
+a minority (a staff of small heads only is a small staff or percussion), when the bar has a rest, or when no
+full-size note follows a run of three or more; small notes right before a full-size note in a bar without rests
+are grace notes whatever value was read (nt07). Cue notes in a bar with a rest go to a second voice of the part
+(an optional stream, a forward to where they start), so the rest stays in voice 1 (nt08). A bar of a small sung
+staff (descant) whose notes all sound with another part, onset and pitch, is that part's line printed as a cue
+(hymn-descant bars 11-13). Coverage with OCR 0.9216 to 0.9218 (nt07 scan +0.033, severe +0.029, nt08 scan
++0.018); hymn-descant scan 0.768 to 0.776, mild 0.779 to 0.785; challenge and benchmark unchanged.
+
 **Instrument names without labels (L9).** When no voice name is read, no underlay is found and some
 staff has an instrument name or a C clef, the unnamed staves are instruments: four single staves in G, G,
 C3, F clefs are named Violin I, Violin II, Viola, Violoncello; an alto-clef staff is a Viola; two

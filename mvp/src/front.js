@@ -432,6 +432,8 @@ function* frontSteps(gray0, opts = {}) {
   const chords = chordStems(L, hs, { minLen: 1.5, sides: true });
   // (on a staff inferred from washed-out music the stems faded with the lines: filled heads stay)
   hs = hs.filter(h => (h.stemDir !== 0 || h.kind === 'hollow' || staves[h.staff].inferred) && !(h.chord && h.chord.accidental));
+  // cue-size heads (heads.js h.small) only with a stem of their own: a dot, a letter or a stray blob has none
+  hs = hs.filter(h => !h.small || Math.max(h.stem ? h.stem.up : 0, h.stem ? h.stem.down : 0) >= 1.8);
   // (an x head of a drum kit sits at a snare's stem end by design)
   hs = hs.filter(h => h.xHead || !atStemTip(h, hs, L, ltL));
   hs = hs.filter(h => !accidentalBefore(h, chords, L, R));
