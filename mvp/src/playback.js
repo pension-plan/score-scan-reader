@@ -136,7 +136,10 @@ const BEATQ = { maxima: 32, long: 16, breve: 8, whole: 4, half: 2, quarter: 1, e
 // dynamics -> velocity
 const DYN_VEL = { pppppp: 8, ppppp: 12, pppp: 18, ppp: 26, pp: 38, p: 52, mp: 66, mf: 80, f: 96, ff: 110, fff: 120, ffff: 124, fffff: 126, ffffff: 127 };
 const ACCENT_DYN = { sf: 18, sfz: 20, sffz: 24, fz: 18, rfz: 14, rf: 12, sfp: 18, sfpp: 18, fp: 14, sfzp: 20 };
-const DEFAULT_VEL = 80;
+// before the first marking: between mp and mf, so a first mf is still heard as a change
+const DEFAULT_VEL = 72;
+// <sound dynamics> for a marking: % of the default forte (MusicXML; MuseScore reads velocity = dynamics x 90 / 100)
+const soundDynamics = (v) => { const x = DYN_VEL[String(v || '').toLowerCase()]; return x == null ? null : Math.round((x * 10000) / 90) / 100; };
 
 // --------------------------------------------------------------- events ---
 const STEP = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
@@ -172,7 +175,7 @@ function readMeasure(meas, st) {
           else if (c.name === 'coda') marks.push({ kind: 'coda', q: off });
         }
       }
-      const snd = kid(el, 'sound'); if (snd) marks.push({ kind: 'sound', q: off, a: snd.attrs });
+      const snd = kid(el, 'sound'); if (snd) marks.push({ kind: 'sound', q: off, staff, a: snd.attrs });
     } else if (el.name === 'sound') marks.push({ kind: 'sound', q: cur, a: el.attrs });
     else if (el.name === 'barline') {
       const loc = el.attrs.location || 'right';
@@ -396,6 +399,7 @@ function events(xml, opts = {}) {
   measures.forEach((m) => { m.t0 = secAt(m.q0); m.t1 = secAt(m.q1); });
 
   // notes per part, with dynamics, wedges, ties and grace timing
+  const shown = []; // dynamic markings as written, for the player's display: {q, part, staff, v}
   const outParts = parts.map((p, pi) => {
     const notes = [];
     const dynPts = []; // {q, vel} step changes
@@ -409,33 +413,41 @@ function events(xml, opts = {}) {
         const q = pm.q0 + Math.min(k.q || 0, info[pm.src].len);
         if (k.kind === 'dyn') {
           const v = k.v.toLowerCase();
-          if (DYN_VEL[v] != null) dynPts.push({ q, vel: DYN_VEL[v] });
-          else if (ACCENT_DYN[v] != null) { accents.push({ q, add: ACCENT_DYN[v] }); if (v === 'fp' || v === 'sfp' || v === 'sfzp') dynPts.push({ q: q + 0.25, vel: DYN_VEL.p }); if (v === 'sfpp') dynPts.push({ q: q + 0.25, vel: DYN_VEL.pp }); }
-        } else if (k.kind === 'sound' && k.a.dynamics != null && +k.a.dynamics >= 0) dynPts.push({ q, vel: Math.max(1, Math.min(127, Math.round((+k.a.dynamics * 90) / 100))), weak: true });
+          const staff = k.staff || 0;
+          if (DYN_VEL[v] != null || ACCENT_DYN[v] != null) shown.push({ q, part: pi, staff, v });
+          if (DYN_VEL[v] != null) dynPts.push({ q, vel: DYN_VEL[v], staff });
+          else if (ACCENT_DYN[v] != null) { accents.push({ q, add: ACCENT_DYN[v], staff }); if (v === 'fp' || v === 'sfp' || v === 'sfzp') dynPts.push({ q: q + 0.25, vel: DYN_VEL.p, staff }); if (v === 'sfpp') dynPts.push({ q: q + 0.25, vel: DYN_VEL.pp, staff }); }
+        } else if (k.kind === 'sound' && k.a.dynamics != null && +k.a.dynamics >= 0) dynPts.push({ q, vel: Math.max(1, Math.min(127, Math.round((+k.a.dynamics * 90) / 100))), weak: true, staff: k.staff || 0 });
         else if (k.kind === 'wedge') {
-          if (k.v === 'crescendo' || k.v === 'diminuendo') openW = { q0: q, dir: k.v === 'crescendo' ? 1 : -1 };
-          else if (k.v === 'stop' && openW) { wedges.push({ q0: openW.q0, q1: Math.max(q, openW.q0 + 0.25), dir: openW.dir }); openW = null; }
+          if (k.v === 'crescendo' || k.v === 'diminuendo') openW = { q0: q, dir: k.v === 'crescendo' ? 1 : -1, staff: k.staff || 0 };
+          else if (k.v === 'stop' && openW) { wedges.push({ q0: openW.q0, q1: Math.max(q, openW.q0 + 0.25), dir: openW.dir, staff: openW.staff }); openW = null; }
         } else if (k.kind === 'words') {
           if (/^\s*(cresc|crescendo|poco a poco cresc)/i.test(k.v)) openWords = { q0: q, dir: 1 };
           else if (/^\s*(dim|decresc|diminuendo|morendo|smorz)/i.test(k.v)) openWords = { q0: q, dir: -1 };
-          if (openWords && openWords.q0 === q) wedges.push({ q0: q, q1: Math.min(totalQ, q + 2 * info[pm.src].len), dir: openWords.dir, words: true });
+          if (openWords && openWords.q0 === q) wedges.push({ q0: q, q1: Math.min(totalQ, q + 2 * info[pm.src].len), dir: openWords.dir, words: true, staff: k.staff || 0 });
         }
       }
       for (const n of ms.notes) notes.push({ ...n, q: pm.q0 + n.q, m: idx });
     });
-    if (openW) wedges.push({ q0: openW.q0, q1: Math.min(totalQ, openW.q0 + 4), dir: openW.dir });
+    if (openW) wedges.push({ q0: openW.q0, q1: Math.min(totalQ, openW.q0 + 4), dir: openW.dir, staff: openW.staff });
     dynPts.sort((a, b) => a.q - b.q);
-    const baseVel = (q) => { let v = DEFAULT_VEL; for (const d of dynPts) { if (d.q > q + EPS) break; v = d.vel; } return v; };
-    const nextDyn = (q, within) => dynPts.find((d) => d.q > q - EPS && d.q <= within + EPS);
-    const velAt = (q) => {
-      let v = baseVel(q);
+    // Staff scope in a multi-staff part (piano): a mark with no <staff>, or marks on one
+    // staff only, apply to the whole part (a mark under the left hand means both hands);
+    // when two or more staves carry their own marks, each staff follows its own.
+    const marked = new Set(dynPts.concat(wedges, accents).map((d) => d.staff).filter((x) => x > 0));
+    const perStaff = marked.size >= 2;
+    const on = (d, staff) => !perStaff || !d.staff || d.staff === staff;
+    const baseVel = (q, staff) => { let v = DEFAULT_VEL; for (const d of dynPts) { if (d.q > q + EPS) break; if (on(d, staff)) v = d.vel; } return v; };
+    const nextDyn = (q, within, staff) => dynPts.find((d) => d.q > q - EPS && d.q <= within + EPS && on(d, staff));
+    const velAt = (q, staff) => {
+      let v = baseVel(q, staff);
       for (const w of wedges) {
-        if (q < w.q0 - EPS || q > w.q1 + 4) continue;
-        const from = baseVel(w.q0);
-        const nd = nextDyn(w.q1, w.q1 + 2.5);
+        if (!on(w, staff) || q < w.q0 - EPS || q > w.q1 + 4) continue;
+        const from = baseVel(w.q0, staff);
+        const nd = nextDyn(w.q1, w.q1 + 2.5, staff);
         const to = nd && Math.sign(nd.vel - from) === w.dir ? nd.vel : Math.max(20, Math.min(124, from + 18 * w.dir));
         if (q <= w.q1 + EPS) { if (!nd || nd.q > q + EPS) v = from + (to - from) * ((q - w.q0) / Math.max(EPS, w.q1 - w.q0)); }
-        else if (!nd || nd.q > q + EPS) { if (baseVel(q) === from) v = to; }
+        else if (!nd || nd.q > q + EPS) { if (baseVel(q, staff) === from) v = to; }
       }
       return v;
     };
@@ -474,15 +486,15 @@ function events(xml, opts = {}) {
       let dq = n.dq;
       if (n.stacc) dq *= 0.5; else if (n.staccatissimo) dq *= 0.3; else if (!n.tenuto && !n.graceOf && p.family !== 'organ') dq = Math.max(dq - Math.min(0.06, dq * 0.1), dq * 0.9);
       const t1 = secAt(n.q + dq);
-      let vel = velAt(n.q) + (n.accent || 0);
-      for (const a of accents) if (Math.abs(a.q - n.q) < 0.05) vel += a.add;
+      let vel = velAt(n.q, n.staff) + (n.accent || 0);
+      for (const a of accents) if (Math.abs(a.q - n.q) < 0.05 && on(a, n.staff)) vel += a.add;
       if (n.dyn != null) vel = (n.dyn * 90) / 100;
       if (n.graceOf) vel *= 0.85;
       return { part: pi, staff: n.staff, voice: n.voice, midi: n.midi, q: n.q, dq: n.dq, t: t0, d: Math.max(0.02, t1 - t0), vel: Math.max(1, Math.min(127, Math.round(vel))),
         line: n.line, lines: n.lines || [n.line], m: n.m, grace: !!n.graceOf };
     });
     out.sort((a, b) => a.t - b.t || a.midi - b.midi);
-    return { id: p.id, name: p.name, program: p.program, family: p.family, channel: p.channel, volume: p.volume, pan: p.pan, notes: out };
+    return { id: p.id, name: p.name, program: p.program, family: p.family, channel: p.channel, volume: p.volume, pan: p.pan, perStaffDynamics: perStaff, notes: out };
   });
 
   // metronome beats (compound meters beat in dotted quarters)
@@ -495,7 +507,8 @@ function events(xml, opts = {}) {
   });
   const timeSigs = [];
   measures.forEach((pm) => { const r = info[pm.src], l = timeSigs[timeSigs.length - 1]; if (!l || l.beats !== r.beats || l.beatType !== r.beatType) timeSigs.push({ q: pm.q0, beats: r.beats, beatType: r.beatType }); });
-  return { title, parts: outParts, measures, tempos, beats, timeSigs, quarters: totalQ, duration: secAt(totalQ), secAt, order, startBpm: tempos.length ? tempos[0].bpm : defaultBpm };
+  const dynamics = shown.sort((a, b) => a.q - b.q).map((d) => ({ ...d, t: secAt(d.q) }));
+  return { title, parts: outParts, measures, tempos, beats, timeSigs, dynamics, quarters: totalQ, duration: secAt(totalQ), secAt, order, startBpm: tempos.length ? tempos[0].bpm : defaultBpm };
 }
 function mergeSpans(sp) {
   const s = sp.slice().sort((a, b) => a[0] - b[0]), out = [];
@@ -589,4 +602,4 @@ function readSMF(bytes) {
   return { format, ppq, tracks };
 }
 
-module.exports = { parseXML, events, gmFor, gmFamily, instrumentXML, channelFor, panFor, writeSMF, readSMF, tempoFromWords, firstTempo, GM, DYN_VEL, PPQ };
+module.exports = { parseXML, events, soundDynamics, DEFAULT_VEL, gmFor, gmFamily, instrumentXML, channelFor, panFor, writeSMF, readSMF, tempoFromWords, firstTempo, GM, DYN_VEL, PPQ };

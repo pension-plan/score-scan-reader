@@ -82,6 +82,15 @@ const srv = http.createServer((req, res) => {
         if (sheet) await sheet.screenshot({ path: path.join(OUT, `${key}-preview.png`) });
         const plate = await page.$('#pages');
         if (plate) await plate.screenshot({ path: path.join(OUT, `${key}-scan.png`) });
+        // the dynamic in force shows in the transport (the rag: mf from bar 7, f from bar 9)
+        if (sample === 'rag') {
+          const dyn = await page.evaluate(() => { const s = window.__player, d = s.model.dynamics; if (!d.length) return null; window.ScorePlayer.seek(d[0].t + 0.05); return { want: d[0].v, shown: document.getElementById('pbDyn').textContent, hidden: document.getElementById('pbDyn').hidden }; });
+          run.dynamic = dyn;
+          if (dyn && (dyn.hidden || dyn.shown !== dyn.want)) fail(`${key}: dynamic shown "${dyn.shown}", expected "${dyn.want}"`);
+          if (dyn) await (await page.$('#pb')).screenshot({ path: path.join(OUT, `${key}-dynamic.png`) });
+          await page.evaluate(() => window.ScorePlayer.play());
+          await page.waitForTimeout(200);
+        }
         // Space pauses (focus on the page body)
         await page.evaluate(() => document.activeElement && document.activeElement.blur());
         await page.keyboard.press('Space');

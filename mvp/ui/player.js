@@ -153,6 +153,7 @@
           <input type="range" id="pbPos" min="0" max="1" step="0.01" value="0" disabled>
           <div class="pb-ticks" id="pbTicks" aria-hidden="true"></div>
         </div>
+        <output class="pb-dyn" id="pbDyn" for="pbPos" title="The dynamic marking in force (as played)" hidden></output>
         <output class="pb-time" id="pbTime" for="pbPos">Bar 1 · 0:00 / 0:00</output>
       </div>
       <div class="pb-row pb-opts">
@@ -405,6 +406,27 @@
     const txt = `Bar ${m ? m.number : 1} · ${fmtT(p / st.scale)} / ${fmtT(total)}`;
     $('pbTime').textContent = txt;
     r.setAttribute('aria-valuetext', txt);
+    showDyn(p);
+  }
+  // the marking in force at p: one word when every part (staff) agrees, else per part
+  function showDyn(p) {
+    const el = $('pbDyn'), m = st.model;
+    if (!el || !m) return;
+    const cur = new Map();
+    for (const d of m.dynamics || []) {
+      if (d.t > p + 1e-3) break;
+      const per = m.parts[d.part] && m.parts[d.part].perStaffDynamics;
+      const key = d.part + (per && d.staff ? ':' + d.staff : '');
+      if (!per || !d.staff) for (const k of [...cur.keys()]) if (k === String(d.part) || k.startsWith(d.part + ':')) cur.delete(k);
+      cur.set(key, d.v);
+    }
+    el.hidden = !(m.dynamics || []).length;
+    const vals = [...new Set(cur.values())];
+    let txt = '';
+    if (!cur.size) txt = 'no marking yet';
+    else if (vals.length === 1) txt = vals[0];
+    else txt = [...cur].slice(0, 4).map(([k, v]) => { const [pi, sf] = k.split(':'); const nm = m.parts[pi].name; return `${sf ? (sf === '1' ? 'RH' : sf === '2' ? 'LH' : 'staff ' + sf) : nm.length > 3 ? nm.slice(0, 1) : nm} ${v}`; }).join(' · ');
+    if (el.textContent !== txt) { el.textContent = txt; el.setAttribute('aria-label', `Dynamic: ${txt}`); }
   }
   function frame() {
     if (!st.playing) return;

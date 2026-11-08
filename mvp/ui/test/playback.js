@@ -91,6 +91,35 @@ const notes = (m) => m.parts.flatMap((p) => p.notes);
   const st = notes(m)[5];
   ok(st.d < 0.35, 'staccato shortens');
 }
+// ---- default loudness below mf; staff scope of dynamics in a two-staff part; <sound dynamics>
+{
+  const sc = (body) => `<?xml version="1.0"?>\n<score-partwise version="4.0"><part-list><score-part id="P1"><part-name>Piano</part-name></score-part></part-list>\n<part id="P1">\n<measure number="1"><attributes><divisions>4</divisions><staves>2</staves><time><beats>4</beats><beat-type>4</beat-type></time></attributes>${body}</measure>\n</part>\n</score-partwise>\n`;
+  const rh = (s) => `<note><pitch><step>${s}</step><octave>5</octave></pitch><duration>4</duration><voice>1</voice><staff>1</staff></note>`;
+  const lh = (s) => `<note><pitch><step>${s}</step><octave>3</octave></pitch><duration>4</duration><voice>5</voice><staff>2</staff></note>`;
+  const dyn = (v, staff, snd) => `<direction><direction-type><dynamics><${v}/></dynamics></direction-type>${staff ? `<staff>${staff}</staff>` : ''}${snd ? `<sound dynamics="${P.soundDynamics(v)}"/>` : ''}</direction>`;
+  const back = '<backup><duration>16</duration></backup>';
+  const vel = (m, staff) => m.parts[0].notes.filter((x) => x.staff === staff).sort((a, b) => a.q - b.q).map((x) => x.vel);
+  ok(P.DEFAULT_VEL < P.DYN_VEL.mf && P.DEFAULT_VEL > P.DYN_VEL.mp, 'unmarked loudness sits between mp and mf');
+  // a first mf is a change, from its onset on
+  const a = P.events(sc(rh('C') + rh('D') + dyn('mf') + rh('E') + rh('F')));
+  ok(vel(a, 1).join() === [P.DEFAULT_VEL, P.DEFAULT_VEL, P.DYN_VEL.mf, P.DYN_VEL.mf].join(), `first mf takes effect at its onset (${vel(a, 1)})`);
+  // a mark under the left hand only: both hands
+  const b = P.events(sc(rh('C') + rh('D') + rh('E') + rh('F') + back + dyn('mf', 2) + lh('C') + lh('D') + lh('E') + lh('F')));
+  ok(vel(b, 1)[0] === P.DYN_VEL.mf && vel(b, 2)[0] === P.DYN_VEL.mf && !b.parts[0].perStaffDynamics, 'marks on one staff apply to the whole part');
+  // each hand marked: per staff
+  const c = P.events(sc(dyn('f', 1) + rh('C') + rh('D') + rh('E') + rh('F') + back + dyn('p', 2) + lh('C') + lh('D') + lh('E') + lh('F')));
+  ok(vel(c, 1)[0] === P.DYN_VEL.f && vel(c, 2)[0] === P.DYN_VEL.p && c.parts[0].perStaffDynamics, `both staves marked: each follows its own (${vel(c, 1)[0]}/${vel(c, 2)[0]})`);
+  // a mark with no <staff> still reaches both staves when they have their own marks too
+  const d = P.events(sc(dyn('f', 1) + rh('C') + dyn('pp') + rh('D') + rh('E') + rh('F') + back + dyn('p', 2) + lh('C') + lh('D') + lh('E') + lh('F')));
+  ok(vel(d, 1)[1] === P.DYN_VEL.pp && vel(d, 2)[1] === P.DYN_VEL.pp, 'a mark without <staff> applies to every staff');
+  // <sound dynamics>: the MuseScore convention, and it reads back to the same velocity
+  ok(P.soundDynamics('mf') === 88.89 && P.soundDynamics('p') === 57.78 && P.soundDynamics('ff') === 122.22 && P.soundDynamics('sfz') === null, 'sound dynamics = velocity x 100 / 90');
+  const e = P.events(sc(dyn('p', 1, true) + rh('C') + rh('D') + rh('E') + rh('F')));
+  ok(vel(e, 1)[0] === P.DYN_VEL.p, 'dynamics + sound dynamics agree');
+  const f = P.events(sc('<direction><direction-type><words>espr.</words></direction-type><sound dynamics="106.67"/></direction>' + rh('C') + rh('D') + rh('E') + rh('F')));
+  ok(vel(f, 1)[0] === P.DYN_VEL.f, '<sound dynamics> alone sets the velocity');
+  ok(c.dynamics.length === 2 && c.dynamics[0].v === 'f' && c.dynamics[1].staff === 2, 'markings listed for the display');
+}
 // ---- repeats, voltas, D.C. al Fine, D.S. al Coda
 {
   const L = (inner) => `<barline location="left">${inner}</barline>`, R = (inner) => `<barline location="right">${inner}</barline>`;
