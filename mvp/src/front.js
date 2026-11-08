@@ -222,7 +222,12 @@ function findStaves(c) {
   }
   const spL = estimateStaffSpace(L0);
   const sB = detectStaves(B, sp.ss, sp.lt), sL = detectStaves(L0, spL.ss, spL.lt);
-  const staves = mergeStaffSets([sB, sL], L0, Math.max(sp.lt, spL.lt), sp.ss);
+  // small staves (a solo or cue part printed over a piano score, about three
+  // quarters of the page's staff space) fall outside the spacing the finder
+  // follows at low resolution: searched again at that spacing, kept only when
+  // clearly smaller than the page's staves and at least 40 % of its width
+  const sS = detectStaves(B, 0.75 * sp.ss, sp.lt).filter(st => st.space < 0.85 * sp.ss && st.space > 0.55 * sp.ss && st.right - st.left >= 0.4 * B.width);
+  const staves = mergeStaffSets([sB, sL, sS], L0, Math.max(sp.lt, spL.lt), sp.ss);
   let ltL = sp.lt;
   if (staves.filter(st => sL.includes(st)).length > staves.length / 2 && sB.length < staves.length) {
     sp = { ...sp, ss: spL.ss }; ltL = Math.max(sp.lt, spL.lt);

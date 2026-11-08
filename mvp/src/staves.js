@@ -591,7 +591,10 @@ function regularSystems(staves, sys) {
   const n = staves.length;
   if (sys.length < 3 || sys.filter(g => g.length === 1).length < 2 || sys.every(g => g.length === sys[0].length)) return sys;
   const xc = (k) => (Math.max(staves[k].left, staves[k + 1].left) + Math.min(staves[k].right, staves[k + 1].right)) / 2;
-  const gap = Array.from({ length: n - 1 }, (_, k) => (staves[k + 1].yAt(0, xc(k)) - staves[k].yAt(4, xc(k))) / staves[k].space);
+  // in the page's median staff space (small solo staves over a piano score
+  // would otherwise count their gaps larger)
+  const sps = staves.map(s => s.space).sort((a, b) => a - b), sp = sps[sps.length >> 1];
+  const gap = Array.from({ length: n - 1 }, (_, k) => (staves[k + 1].yAt(0, xc(k)) - staves[k].yAt(4, xc(k))) / sp);
   const linked = new Set();
   sys.forEach(g => g.slice(1).forEach(k => linked.add(k - 1)));
   const maxG = Math.max(...sys.map(g => g.length));

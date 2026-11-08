@@ -1252,7 +1252,11 @@ staff count and is at least the largest group) where every link already found st
 smallest gap between blocks is more than 1.08 times the largest gap inside one; the page is then assembled
 again. It runs after the dewarp decision because unequal systems are what sends a curled page to be
 dewarped (regrouping first cost nocturne-cross-staff 0.057). anthem-satb-closed-piano-4-pages severe 0.211
-to 0.593, scan 0.646 to 0.720; nothing dropped. A bottom treble/bass pair of a taller score
+to 0.593, scan 0.646 to 0.720; nothing dropped. Gaps are measured in the page's median staff space. Small staves (a solo or cue part
+printed over a piano score at about three quarters of the page's staff space) fall outside the spacing the
+staff finder follows on low-resolution copies: `front.js findStaves` searches the main binary again at 0.75
+of the staff space and keeps staves of 0.55-0.85 of it spanning at least 40 % of the page (trio-minuet
+severe 0.700 to 0.830, parts 0.54 to 0.95; about +5 % time per page). A bottom treble/bass pair of a taller score
 with full chords (three heads on a stem) and no text is an accompaniment even when its joined barlines were
 not seen (voice + piano on a faded copy).
 
