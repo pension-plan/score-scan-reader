@@ -1396,7 +1396,10 @@ function cutAccidental(R, comps, hd, minX = -Infinity, reach = 1.9) {
     const cs = labelComponents(img).comps.filter(c => c.area >= 4 && c.x0 > 0 && c.x1 < w - 1 && c.y1 < h - 1 && (c.y0 > 0 || top < 2.0))
       .map(c => ({ ...c, x0: c.x0 + x0, x1: c.x1 + x0, y0: c.y0 + y0, y1: c.y1 + y0 }));
     const g = accidentalGlyph(R, cs, hd, minX, reach);
-    if (g) return g;
+    // (a sign standing apart on the page, cut here by the window's top, is not one joined to the
+    // stroke: a chord's natural for the head above is no sharp for this one)
+    if (g && !comps.some(c => c.x1 - c.x0 < 1.6 * sp && (Math.min(c.x1, g.x1) - Math.max(c.x0, g.x0) + 1) * (Math.min(c.y1, g.y1) - Math.max(c.y0, g.y0) + 1) >=
+      0.8 * (g.x1 - g.x0 + 1) * (g.y1 - g.y0 + 1) && Math.min(c.x1, g.x1) >= Math.max(c.x0, g.x0) && Math.min(c.y1, g.y1) >= Math.max(c.y0, g.y0))) return g;
   }
   return null;
 }
