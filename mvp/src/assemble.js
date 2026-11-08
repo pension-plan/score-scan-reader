@@ -133,7 +133,7 @@ function classifyBin(img, sp) {
     let n = 0, sy = 0, top = hgt;
     const xs = st[0].x1 + Math.max(2, Math.round(0.2 * sp)); // clear of the stem's ragged edge
     for (let y = 0; y < hgt; y++) for (let x = xs; x < wid; x++) if (img.data[y * wid + x]) { n++; sy += y; if (y < top) top = y; }
-    if (n >= 0.08 * sp * sp && top > 0.25 * hgt && sy / n > 0.55 * hgt) return 'flat';
+    if (n >= 0.08 * sp * sp && top > 0.25 * hgt && sy / n > 0.5 * hgt) return 'flat';
   }
   return null;
 }
@@ -510,6 +510,29 @@ function analyseHeader(R, comps, st, limitX, trace) {
       if (r.clef) { ({ clef, clefOct, clefEnd } = r); near = near.concat(det); }
     }
   }
+  if (!clef) {
+    // an old-style bass clef broken into small pieces still shows the F
+    // clef's two dots, one above and one below the fourth line, with the
+    // clef's body to their left
+    const dot = (c) => { const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1; return w >= 0.2 * sp && w <= 0.7 * sp && h >= 0.2 * sp && h <= 0.7 * sp && c.area >= 0.4 * w * h; };
+    const cy = (c) => (c.y0 + c.y1) / 2, cx = (c) => (c.x0 + c.x1) / 2;
+    const dots = near.filter(c => dot(c) && c.x0 >= left + 1.2 * sp && c.x0 <= left + 4.5 * sp);
+    const up = dots.filter(c => Math.abs(cy(c) - (lineY(0) + 0.5 * sp)) <= 0.3 * sp), dn = dots.filter(c => Math.abs(cy(c) - (lineY(0) + 1.5 * sp)) <= 0.3 * sp);
+    for (const a of up) {
+      const b = dn.find(d => Math.abs(cx(d) - cx(a)) <= 0.3 * sp);
+      if (!b) continue;
+      if (Math.max(a.area, b.area) > 2.5 * Math.min(a.area, b.area)) continue; // a pair of dots alike
+      // the body: substantial ink just left of the dots, from the top line
+      // down past the middle of the staff
+      const body = near.filter(c => c !== a && c !== b && c.x0 < a.x0 - 0.3 * sp && c.x1 <= a.x1 + 0.2 * sp && c.x1 >= a.x0 - 2.5 * sp && c.x0 >= left - 0.5 * sp && c.y0 > lineY(0) - 1.0 * sp && c.y1 < lineY(4) + 1.0 * sp);
+      if (!body.length) continue;
+      const bb = boxOf(body), ink = body.reduce((t, c) => t + c.area, 0);
+      if (bb.y1 - bb.y0 < 1.5 * sp || bb.y1 - bb.y0 > 4.6 * sp || bb.x1 - bb.x0 < 1.0 * sp || bb.x1 - bb.x0 > 3.5 * sp ||
+        bb.y0 > lineY(0) + 0.6 * sp || bb.y1 < lineY(1) + 0.5 * sp || ink < 0.8 * sp * sp) continue;
+      clef = 'F'; clefOct = 0; clefEnd = Math.max(a.x1, b.x1);
+      break;
+    }
+  }
   // glyphs after the clef, ignoring text well above / below the staff
   const cand = near.filter(c => c.x0 > clefEnd + 0.05 * sp && c.area >= 0.04 * sp * sp &&
     (c.y0 + c.y1) / 2 > lineY(0) - 1.6 * sp && (c.y0 + c.y1) / 2 < lineY(4) + 1.6 * sp).sort((a, b) => a.x0 - b.x0);
@@ -533,10 +556,25 @@ function analyseHeader(R, comps, st, limitX, trace) {
     // (the glyph is left as it was otherwise: it may be the time signature)
     const fits = (c, tol) => !far && (c.kind === 'sharp' || c.kind === 'flat') && (kind === null || kind === c.kind) && n < 7 &&
       kcs.some(kc => Math.abs(accPos(st, c, c.kind, sp) - kc[c.kind][n]) <= tol);
+    if (!k && g.parts && g.parts.length > 1) {
+      // closely set signs grouped together (a flat's stem cut off by
+      // staff-line removal overlapping the sign before it): when one piece
+      // reads as a sign on its own, the pieces go on separately
+      const ps = g.parts.slice().sort((a, b) => a.x0 - b.x0);
+      // (a time signature's digits are not split)
+      if (!far && ps.some(p => classifyAccidental(R, p, sp)) && !isTimeSig(R, st, g, sp)) {
+        glyphs.splice(gi, 1, ...ps.map(p => ({ parts: [p], x0: p.x0, y0: p.y0, x1: p.x1, y1: p.y1 })));
+        g = glyphs[gi];
+        if ((g.x1 - g.x0) < 0.25 * sp && (g.y1 - g.y0) < 0.4 * sp) continue;
+        k = classifyAccidental(R, g, sp);
+      }
+    }
     if (!k && (g.y1 - g.y0) < 4 * sp) {
-      // a sign broken in two by noise: this piece and the next together
+      // a sign broken in two by noise or staff-line removal (a flat's stem
+      // and bowl): this piece and the next together
       const nx = glyphs[gi + 1];
-      if (nx && !nx.kind && nx.x0 - g.x1 <= 0.3 * sp && Math.max(g.x1, nx.x1) - g.x0 <= 1.5 * sp) {
+      const stem = g.x1 - g.x0 + 1 <= 0.45 * sp && g.y1 - g.y0 + 1 >= 1.4 * sp;
+      if (nx && !nx.kind && nx.x0 - g.x1 <= (stem ? 0.45 : 0.3) * sp && Math.max(g.x1, nx.x1) - g.x0 <= 1.5 * sp) {
         const u = { parts: (g.parts || [g]).concat(nx.parts || [nx]) };
         Object.assign(u, boxOf(u.parts));
         u.kind = classifyAccidental(R, u, sp);
@@ -642,7 +680,11 @@ function keyChangeAt(R, comps, st, xStart, xLimit, clef, sp, heads) {
     (c.y0 + c.y1) / 2 > lineY(0) - 1.6 * sp && (c.y0 + c.y1) / 2 < lineY(4) + 1.6 * sp).sort((a, b) => a.x0 - b.x0);
   const glyphs = groupGlyphs(cand, sp);
   const kc = keyPosFor(clef);
+  // 'heads' found on the signs themselves are no notes beside them
+  const onGlyph = (h) => glyphs.some(g => h.x >= g.x0 - 0.2 * sp && h.x <= g.x1 + 0.2 * sp && h.y >= g.y0 - 0.2 * sp && h.y <= g.y1 + 0.2 * sp);
+  heads = heads.filter(h => h.x > xStart && h.x < xLimit + 2 * sp && !onGlyph(h));
   let nat = 0, kind = null, n = 0, end = xStart, lastX = -Infinity, near = 0;
+  const signs = [];
   for (let gi = 0; gi < glyphs.length; gi++) {
     let g = glyphs[gi];
     if ((g.x1 - g.x0) < 0.25 * sp && (g.y1 - g.y0) < 0.4 * sp) continue;
@@ -655,14 +697,15 @@ function keyChangeAt(R, comps, st, xStart, xLimit, clef, sp, heads) {
     if (!k || g.x0 - lastX < 0.45 * sp) break; // stacked signs: a chord's accidentals
     const yc = k === 'flat' ? g.y1 - 0.55 * sp : (g.y0 + g.y1) / 2;
     if (heads.some(h => h.x > g.x1 && h.x - g.x1 < 1.6 * sp && Math.abs(h.y - yc) < 0.6 * sp)) near++;
-    if (k === 'natural' && kind === null) { nat++; end = g.x1; lastX = g.x0; continue; }
+    if (k === 'natural' && kind === null) { nat++; end = g.x1; lastX = g.x0; signs.push(g); continue; }
     if ((k === 'sharp' || k === 'flat') && (kind === null || kind === k) && n < 7 && Math.abs(accPos(st, g, k, sp) - kc[k][n]) <= 1.0) {
-      kind = k; n++; end = g.x1; lastX = g.x0; continue;
+      kind = k; n++; end = g.x1; lastX = g.x0; signs.push(g); continue;
     }
     break;
   }
   if (near > 1) return null;
-  if (n >= 2 || (nat >= 1 && n >= 1) || (nat >= 2 && n === 0)) return { fifths: kind === 'flat' ? -n : n, end };
+  // box: the signs ('heads' found on them are not notes)
+  if (n >= 2 || (nat >= 1 && n >= 1) || (nat >= 2 && n === 0)) return { fifths: kind === 'flat' ? -n : n, end, box: boxOf(signs) };
   return null;
 }
 
@@ -686,10 +729,36 @@ function staffChanges(R, comps, s, sp, barX) {
   for (const bx of barX) {
     if (bx < xa || bx > xb - 1.5 * sp) continue;
     const k = keyChangeAt(R, comps, st, bx + 0.2 * sp, Math.min(xb, bx + 16 * sp), clefAt(bx), sp, heads);
-    if (k) changes.push({ x: k.end, fifths: k.fifths });
+    if (k) changes.push({ x: k.end, fifths: k.fifths, box: k.box });
   }
   changes.sort((a, b) => a.x - b.x);
   return changes;
+}
+
+// A clef or key change read on one system that the next system's staff
+// opens with (the change carried over the line break) confirms that staff's
+// header: its heads carry the clef / key in force explicitly (h.clef /
+// h.fifths), as heads after a change do, so a header read on one system
+// only is not overruled by the piece's most common clef / key.
+function carryChanges(systems) {
+  for (let i = 1; i < systems.length; i++) {
+    const prev = systems[i - 1].staves, cur = systems[i].staves;
+    if (prev.length !== cur.length) continue;
+    cur.forEach((s, k) => {
+      const p = prev[k], ch = p.changes || [];
+      const lastKey = ch.filter(c => c.fifths != null).pop(), lastClef = ch.filter(c => c.clef).pop();
+      const keyOk = lastKey && lastKey.fifths === s.hdr.fifths;
+      const clefOk = lastClef && lastClef.clef === s.hdr.clef && !s.hdr.clefGuessed;
+      if (!keyOk && !clefOk) return;
+      for (const c of s.chords) {
+        const a = attrsAt(s, c.x);
+        for (const h of c.heads) {
+          if (keyOk && h.fifths == null) h.fifths = a.fifths;
+          if (clefOk && !h.clef) h.clef = a.clef;
+        }
+      }
+    });
+  }
 }
 
 // clef and key in force at x on staff s
@@ -841,10 +910,17 @@ function hasDot(R, hd) {
         tot++; if (yy >= 0 && yy < h && xx < w && data[yy * w + xx]) n++;
       }
       if (n > 0.6 * tot) {
-        // isolated: nothing directly above/below (not a stem / head)
+        // isolated: nothing directly above/below (not a stem / head), and
+        // not run on sideways (the bar of a sharp between its strokes)
         const above = data[Math.round(yc - 0.55 * sp) * w + Math.round(x + 0.15 * sp)];
         const below = data[Math.round(yc + 0.55 * sp) * w + Math.round(x + 0.15 * sp)];
-        if (!above && !below) return true;
+        if (above || below) continue;
+        // the patch's own row of ink, followed out both ways
+        const yy = Math.round(yc);
+        let l = Math.round(x + 0.15 * sp), r = l;
+        while (l > 0 && data[yy * w + l - 1] && r - l < 2 * sp) l--;
+        while (r < w - 1 && data[yy * w + r + 1] && r - l < 2 * sp) r++;
+        if (r - l + 1 <= 0.75 * sp) return true;
       }
     }
   }
@@ -940,9 +1016,11 @@ const hooked = (c, sp) => c.y1 - c.y0 + 1 >= 0.4 * sp;
 // no glyph close beside it at its height: a lyric syllable or a word is a
 // row of letters, a tuplet number stands alone (bracket halves aside)
 function isolated(n, comps, sp, R) {
-  const h = n.y1 - n.y0 + 1;
+  const h = n.y1 - n.y0 + 1, e = 0.25 * sp;
+  // a small piece inside the number's own box is a bit of it broken off
+  const piece = (c) => c.area < 0.5 * n.area && c.x0 >= n.x0 - e && c.x1 <= n.x1 + e && c.y0 >= n.y0 - e && c.y1 <= n.y1 + e;
   return !comps.some(c => c !== n && c.area >= 0.04 * sp * sp && (c.x1 - c.x0) < 3 * sp && !bracketLike(c, sp, R) &&
-    c.y1 > n.y0 + 0.25 * h && c.y0 < n.y1 - 0.25 * h && c.x1 >= n.x0 - 0.45 * sp && c.x0 <= n.x1 + 0.45 * sp);
+    c.y1 > n.y0 + 0.25 * h && c.y0 < n.y1 - 0.25 * h && c.x1 >= n.x0 - 0.45 * sp && c.x0 <= n.x1 + 0.45 * sp && !piece(c));
 }
 
 // the stem a head's duration was read from: 1 up, -1 down
@@ -974,7 +1052,7 @@ function stemsUnder(R, beamY, dir, xa, xb, sp) {
 // Beamed groups of a staff: stems whose tips touch one component (the beam).
 // A stem inside a group's span that ends at its beam but read no beam (cut
 // stem, faint beam) is a beamed note too: its value is read again at the beam.
-function beamGroups(R, labels, s, sp, cap) {
+function beamGroups(R, labels, s, sp, cap, compById) {
   const W = R.width;
   const items = [];
   for (const c of s.chords) {
@@ -984,16 +1062,32 @@ function beamGroups(R, labels, s, sp, cap) {
       const x = dir === 1 ? c.upX : c.downX, tip = dir === 1 ? c.upEnd : c.downEnd;
       if (!(x >= 0) || tip == null || !(dir === 1 ? c.up : c.down)) continue;
       // the component at the stem tip (beam, flag or the stem itself)
-      let lab = 0;
+      let lab = 0, tipY = tip;
       for (let r = 0; r <= 3 && !lab; r++) for (let dy = -r; dy <= r && !lab; dy++) for (let dx = -r; dx <= r && !lab; dx++) {
         const xx = Math.round(x + dx), yy = Math.round(tip + dy);
         if (xx >= 0 && yy >= 0 && xx < W && yy < R.height && R.data[yy * W + xx]) lab = labels[yy * W + xx];
       }
-      items.push({ dir, x, tipY: tip, q: heads[0].dur.q, heads, lab });
+      // a stem run on across a small gap into a tuplet number (or a
+      // dynamic) ends in that glyph: its beam is the ink just before it
+      const tc = lab && compById && compById.get(lab);
+      if (tc && tc.x1 - tc.x0 < 1.6 * sp && tc.y1 - tc.y0 < 2 * sp) {
+        for (let k = 1; k <= 1.5 * sp; k++) {
+          const yy = Math.round(tip - dir * k);
+          if (yy < 0 || yy >= R.height) break;
+          let l2 = 0;
+          for (let dx = -1; dx <= 1 && !l2; dx++) { const xx = Math.round(x + dx); if (xx >= 0 && xx < W && R.data[yy * W + xx] && labels[yy * W + xx] !== lab) l2 = labels[yy * W + xx]; }
+          if (l2) {
+            const c2 = compById.get(l2);
+            if (c2 && c2.x1 - c2.x0 >= 1.6 * sp) { lab = l2; tipY = yy; }
+            break;
+          }
+        }
+      }
+      items.push({ dir, x, tipY, q: heads[0].dur.q, heads, lab });
     }
   }
   const byLab = new Map();
-  for (const it of items) if (it.lab && it.q <= 0.5 + 1e-6) {
+  for (const it of items) if (it.lab && it.q < 1 - 1e-6) {
     const k = it.lab + ':' + it.dir;
     if (!byLab.has(k)) byLab.set(k, []);
     byLab.get(k).push(it);
@@ -1035,9 +1129,25 @@ function beamGroups(R, labels, s, sp, cap) {
     };
     g.x0 = walk(g[0].x, -1); g.x1 = walk(g[g.length - 1].x, 1);
     for (const it of items) {
-      if (inGroup.has(it) || it.dir !== dir || it.x <= g.x0 - 0.2 * sp || it.x >= g.x1 + 0.2 * sp || it.q < 1 - 1e-6) continue;
+      if (inGroup.has(it) || it.dir !== dir || it.x <= g.x0 - 0.2 * sp || it.x >= g.x1 + 0.2 * sp) continue;
       if (it.heads.some(h => h.kind === 'hollow')) continue;
       const by = g.beamY(it.x);
+      if (it.q < 1 - 1e-6) {
+        // read its beam already, but on a piece of the beam cut off by
+        // staff-line removal: a member of the group as it is; a stem run on
+        // past the beam (into a tuplet number over it) is read again there
+        const over = dir * (by - it.tipY);
+        if (Math.abs(it.tipY - by) <= 0.8 * sp) { inGroup.add(it); g.push(it); }
+        else if (over > 0 && over <= 2.5 * sp) {
+          const nb = countBeams(R, it.x, by, dir, sp, cap);
+          if (!nb) continue;
+          const q = 1 / Math.pow(2, nb);
+          for (const h of it.heads) h.dur = { q: h.dur.dots ? q * 1.5 : q, dots: h.dur.dots };
+          it.q = it.heads[0].dur.q; it.tipY = by;
+          inGroup.add(it); g.push(it);
+        }
+        continue;
+      }
       // the stem stops short of the beam or runs into it
       if (Math.abs(it.tipY - by) > 2.5 * sp) continue;
       const nb = countBeams(R, it.x, by, dir, sp, cap);
@@ -1061,7 +1171,9 @@ function markTuplets(R, comps, s, sp, items, groups) {
   const xm = (st.left + st.right) / 2, y0 = st.yAt(0, xm), y4 = st.yAt(4, xm);
   // candidate numbers near this staff, not on a real notehead (a stemless
   // 'hollow head' found on a number is the number)
-  const nums = comps.filter(c => c.x0 > s.hdr.end && c.y1 > y0 - 7 * sp && c.y0 < y4 + 7 * sp && digitLike(c, sp) &&
+  // (notes high on ledger lines carry their numbers further out)
+  const yLo = Math.min(y0 - 7 * sp, ...items.map(it => it.tipY - 4 * sp)), yHi = Math.max(y4 + 7 * sp, ...items.map(it => it.tipY + 4 * sp));
+  const nums = comps.filter(c => c.x0 > s.hdr.end && c.y1 > yLo && c.y0 < yHi && digitLike(c, sp) &&
     !allHeads.some(h => h.stemDir !== 0 && Math.abs(h.x - (c.x0 + c.x1) / 2) < 0.6 * sp && Math.abs(h.y - (c.y0 + c.y1) / 2) < 0.6 * sp) &&
     isolated(c, comps, sp, R));
   if (!nums.length) return;
@@ -1078,8 +1190,20 @@ function markTuplets(R, comps, s, sp, items, groups) {
   const tryTuplet = (its, n, total) => {
     its = its.filter(it => !claimed.has(it));
     if (!its.length) return;
-    const minq = Math.min(...its.map(it => it.q));
-    const u = its.reduce((a, it) => a + it.q, 0) / minq;
+    let minq = Math.min(...its.map(it => it.q));
+    let u = its.reduce((a, it) => a + it.q, 0) / minq;
+    if (Math.abs(u - Math.round(u)) > 0.01 && its.length === 3 && (!total || total === 3)) {
+      // three notes of one value, one with a dot read on it (a speck or a
+      // bit of the number): the dot is false, the three are a triplet
+      const base = its.map(it => (it.heads[0].dur.dots ? it.q / 1.5 : it.q));
+      if (base.every(b => Math.abs(b - base[0]) < 1e-6)) {
+        for (const it of its) if (it.heads[0].dur.dots) {
+          for (const h of it.heads) h.dur = { q: base[0], dots: 0 };
+          it.q = base[0];
+        }
+        minq = base[0]; u = 3;
+      }
+    }
     if (Math.abs(u - Math.round(u)) > 0.01) return;
     let U = Math.round(u) + Math.max(0, (total || 0) - its.length);
     // three notes under one bracket, one of them read with a beam too few or
@@ -1184,6 +1308,18 @@ function headAccidental(R, comps, hd, minX = -Infinity, reach = 1.9) {
   let best = null, bd = Infinity;
   // single components first; merged groups only add flats cut in two
   const cands = near.concat(groupGlyphs(near, sp).filter(g => g.parts.length > 1));
+  // a flat's stem and bowl cut apart by staff-line removal, paired directly
+  // (a chord's staggered flats overlap, so grouping runs them all together)
+  for (const a of near) {
+    const ah = a.y1 - a.y0 + 1;
+    if (a.x1 - a.x0 + 1 > 0.45 * sp || ah < 1.4 * sp) continue;
+    for (const b of near) {
+      // (the bowl is wide: the cut right stroke of a natural is not)
+      if (b === a || b.x0 < a.x0 + 1 || b.x0 - a.x1 > 0.4 * sp || b.x1 - a.x0 + 1 > 1.25 * sp || b.y1 - b.y0 + 1 > 1.5 * sp || b.x1 - b.x0 + 1 < 0.4 * sp ||
+        b.y0 < a.y0 + 0.3 * ah || b.y1 > a.y1 + 0.5 * sp) continue;
+      cands.push({ parts: [a, b], ...boxOf([a, b]) });
+    }
+  }
   for (const g of cands) {
     const k = classifyAccidental(R, g, sp);
     if (!k) continue;
@@ -1203,6 +1339,7 @@ function assemblePage(fr, pageIndex = 0) {
   const R = fr.R;
   const { labels, comps: allComps } = labelComponents(R);
   const comps = allComps.filter(c => c.area >= 4);
+  const compById = new Map(allComps.map(c => [c.id, c]));
   const warnings = [];
   const systems = [];
   // how thick a single beam may be on this page
@@ -1229,7 +1366,7 @@ function assemblePage(fr, pageIndex = 0) {
       for (const c of music) for (const h of c.heads) if (!h.dur) h.dur = headDuration(R, h, c, dctx);
       try {
         const sp = st.space || fr.ss;
-        const { items, groups } = beamGroups(R, labels, s, sp, cap);
+        const { items, groups } = beamGroups(R, labels, s, sp, cap, compById);
         markTuplets(R, comps, s, sp, items, groups);
       } catch (e) { warnings.push(`Beam / tuplet reading failed on a staff (${e.message}).`); }
       return s;
@@ -1255,11 +1392,14 @@ function assemblePage(fr, pageIndex = 0) {
           const onClef = (h) => boxes.some(b => h.x > b.x0 - 0.2 * sp && h.x < b.x1 + 0.2 * sp && h.y > b.y0 && h.y < b.y1);
           s.chords = s.chords.map(c => (c.heads.some(onClef) ? { ...c, heads: c.heads.filter(h => !onClef(h)) } : c)).filter(c => c.heads.length);
         }
+        // a staff that changes key holds its own keys throughout: the
+        // header's before the change as well (not the piece's usual key)
+        const keyed = s.changes.some(ch => ch.fifths != null);
         if (s.changes.length) for (const c of s.chords) {
           const a = attrsAt(s, c.x);
           for (const h of c.heads) {
             if (a.clef !== s.hdr.clef) h.clef = a.clef;
-            if (a.fifths !== s.hdr.fifths) h.fifths = a.fifths;
+            if (keyed || a.fifths !== s.hdr.fifths) h.fifths = a.fifths;
           }
         }
       } catch (e) { warnings.push(`Clef / key change reading failed on a staff (${e.message}).`); s.changes = []; }
@@ -1277,6 +1417,7 @@ function assemblePage(fr, pageIndex = 0) {
     }
     systems.push({ staves, measures, index: systems.length, page: pageIndex });
   }
+  carryChanges(systems);
   return { systems, warnings, comps };
 }
 
@@ -1310,4 +1451,4 @@ function staffMeasureEvents(fr, R, comps, s, xa, xb) {
   return v;
 }
 
-module.exports = { assemblePage, staffMeasureEvents, pitchOf, keyAlters, attrsAt, DIV, median, headDuration, _analyseHeader: analyseHeader, _compIndex: compIndex, _strokes: strokes, _classifyAccidental: classifyAccidental, _crossBands: crossBands, _glyphImage: glyphImage, _splitSharps: splitSharps, _detachedNear: detachedNear, _readClef: readClef, _beamCap: beamCap, _blobSign: blobSign, _splitSigns: splitSigns };
+module.exports = { assemblePage, staffMeasureEvents, pitchOf, keyAlters, attrsAt, DIV, median, headDuration, _analyseHeader: analyseHeader, _compIndex: compIndex, _strokes: strokes, _classifyAccidental: classifyAccidental, _crossBands: crossBands, _glyphImage: glyphImage, _splitSharps: splitSharps, _detachedNear: detachedNear, _readClef: readClef, _beamCap: beamCap, _blobSign: blobSign, _splitSigns: splitSigns, _headAccidental: headAccidental, _groupGlyphs: groupGlyphs };

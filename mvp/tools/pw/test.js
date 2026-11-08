@@ -1,8 +1,9 @@
 // Browser smoke test of dist/index.html under the artifact CSP.
 //   node tools/pw/test.js            (port from $PW_PORT, else a free port)
-// Loads the page at 1280 and 400 px, in light and dark colour schemes; the sample
-// converts on load. Fails (exit 1) on console errors, page errors, no result,
-// horizontal scroll, or no rendered notation. Screenshots go to work/shot<w>[-dark].png.
+// Loads the page at 1280 and 400 px, in light and dark colour schemes; the default
+// sample (the Maple Leaf Rag) converts on load. Fails (exit 1) on console errors, page
+// errors, no result, a default sample other than the rag or the rag split into more
+// than one part, horizontal scroll, or no rendered notation. Screenshots go to work/shot<w>[-dark].png.
 const http = require('http'), fs = require('fs'), path = require('path');
 const { chromium } = require('playwright');
 const DIST = path.join(__dirname, '../../dist');
@@ -42,6 +43,9 @@ const srv = http.createServer((req, res) => {
         out['bg' + tag] = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
         const r = out['result' + tag];
         if (!r || !(r.parts && r.parts.length)) out.failures.push(tag + ': sample produced no parts');
+        // the page opens on the Maple Leaf Rag: one piano part, its grand staff never split
+        else if (r.file !== 'sample-maple-leaf-rag.pdf') out.failures.push(tag + ': default sample is ' + r.file + ', not the Maple Leaf Rag');
+        else if (r.parts.length !== 1) out.failures.push(tag + ': the rag came out as ' + r.parts.length + ' parts (' + r.parts.join(', ') + '), not one piano part');
         if (out['hscroll' + tag]) out.failures.push(tag + ': horizontal scroll');
         if (!/^[1-9]/.test(out['osmd' + tag])) out.failures.push(tag + ': notation preview did not render');
         await page.screenshot({ path: path.join(WORK, `shot${width}${scheme === 'dark' ? '-dark' : ''}.png`), fullPage: width === 1280 });

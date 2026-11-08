@@ -17,7 +17,7 @@ You are improving a LIVE browser app that converts SCANNED sheet-music PDFs (ima
 Code: ${MVP}/src/*.js (pure-JS pipeline: image, binarize, skew, staffspace, staves, staffremoval, cc, stems, barlines, heads, front, assemble, lyrics, score, omr), UI ${MVP}/ui/, build: node ${MVP}/tools/build.js → ${MVP}/dist/index.html (+ dist/assets: tesseract worker/core/eng.traineddata.gz, sample-st-anselm.pdf). Node runner: node ${MVP}/tools/run.js page.pgm out.musicxml [--no-ocr]. Browser test: node ${MVP}/tools/pw/test.js (Playwright, CSP-simulated). Existing scorers: ${MVP}/tools/headeval.js, ${MVP}/tools/score_cmp.py.
 Test data: ${ROOT}/corpus/synthetic/<id>/ (scan.pdf + truth.musicxml, LilyPond-engraved then degraded) and ${ROOT}/corpus/real/<id>/ (real 1867–1923 public-domain scans; some have truth.musicxml). Other agents may still be writing corpus/ and spike/ — read only; also ${ROOT}/docs/research-*.md, ${ROOT}/docs/spike-*.md if present, ${ROOT}/docs/SDD.md.
 Artifact constraints for dist/index.html (do not break): no doctype/html/head/body tags; scripts only pinned from cdnjs/jsdelivr/unpkg; all wasm/worker/traineddata loaded by RELATIVE path from assets/ (fetched as text → blob: URLs); no alert/confirm/prompt/print/downloads; theme tokens light+dark; works at 400px without horizontal scroll; each asset <= 15MB.
-Eval harness: ${MVP}/tools/eval.mjs — run with: node ${MVP}/tools/eval.mjs --out <file> [--only id,...] [--no-ocr]. CHALLENGE SET: if ${ROOT}/corpus/challenge/manifest.json exists, also run eval with --set challenge (edge cases: voices, rhythm, pitch, lyrics, layout, scan damage extremes; see corpus/challenge/README.md) and use its failures to prioritise; the default 19-item benchmark remains the regression gate. Write your eval output ONLY to ${MVP}/work/eval-r${R}-<yourkey>.json (other agents run it concurrently).
+Eval harness: ${MVP}/tools/eval.mjs — run with: node ${MVP}/tools/eval.mjs --out <file> [--only id,...] [--no-ocr]. COVERAGE SUITE: run node ${ROOT}/mvp/tools/eval.mjs --set coverage and node ${ROOT}/tools/coverage.mjs to see per-symbol support (docs/COVERAGE.md); raise the tags you own. CHALLENGE SET: if ${ROOT}/corpus/challenge/manifest.json exists, also run eval with --set challenge (edge cases: voices, rhythm, pitch, lyrics, layout, scan damage extremes; see corpus/challenge/README.md) and use its failures to prioritise; the default 19-item benchmark remains the regression gate. Write your eval output ONLY to ${MVP}/work/eval-r${R}-<yourkey>.json (other agents run it concurrently).
 `
 const LIMITS = [
   { id: 'L1', text: 'Hollow noteheads sometimes missed (main source of rhythm errors)', owner: 'heads' },
@@ -43,6 +43,13 @@ const LIMITS = [
   { id: 'L16', text: 'Mid-piece key and time-signature changes not written; C clefs (alto/tenor) not read', owner: 'symbols + score' },
   { id: 'L17', text: 'Two voices inside one part (piano right hand, divisi on one staff of an open score) merged into chords: emit separate <voice>s within the part', owner: 'score' },
   { id: 'L18', text: 'A bracketed instrument pair (violin + cello) read as a piano grand staff; organ pedal staff becomes a separate part: use brace vs bracket and part labels', owner: 'score' },
+  { id: 'L20', text: 'Ties never written (5 of 79), incl. across systems (coverage suite)', owner: 'symbols + score' },
+  { id: 'L21', text: 'Only 2/4 3/4 4/4 written: C, cut, 2/2, 3/2, 6/8, 9/8, 12/8, 5/4, 5/8, 7/8, time changes missing', owner: 'symbols + score' },
+  { id: 'L22', text: 'Beams, slurs, fermatas, dynamics, hairpins, articulations, repeats, endings never written to MusicXML', owner: 'score (MusicXML) + symbols' },
+  { id: 'L23', text: 'Half/whole notes, dots, 32nd/64th partial (note-half 76%, note-whole 46%, dot 69% with false notes, note-32nd 11%)', owner: 'heads + symbols' },
+  { id: 'L24', text: 'Keys of 4+ accidentals and courtesy accidentals weak (key-s4 25%, s6/s7 0%, courtesy 22%)', owner: 'symbols' },
+  { id: 'L25', text: 'Lyrics: non-ASCII and elisions 0%, extenders 58%, multi-verse 73%', owner: 'lyrics' },
+  { id: 'L26', text: 'Memory grows ~46 MB per page (40-page book 2.2 GB peak)', owner: 'ui + score' },
   { id: 'L5b', text: 'Stanza text printed below the last system is dropped for SATB (OCR it; attach as extra verses when syllable counts fit the melody, else keep as <credit>/words text)', owner: 'lyrics + score' },
 ]
 const LIMIT_TEXT = LIMITS.map(l => `${l.id} [${l.owner}]: ${l.text}`).join('\n')

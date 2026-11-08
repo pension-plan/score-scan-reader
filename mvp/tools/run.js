@@ -1,7 +1,9 @@
-// node tools/run.js page.pgm [out.musicxml] [--no-ocr]
+// node tools/run.js page.pgm [out.musicxml] [--no-ocr] [--ml]
+// OCR uses the app's languages (lyrics.js OCR_CONFIG); --ml adds the copista-2m detector
+// (src/ml.js, onnxruntime-node; ORT_NODE overrides its path) as the app does when it is on.
 const fs = require('fs'), path = require('path');
 const { readGray } = require('../src/image');
-const { convert } = require('../src/omr');
+const omr = require('../src/omr');
 const T = path.join(__dirname, '../../spike/ocr/node_modules/tesseract.js');
 (async () => {
   const g = readGray(process.argv[2]);
@@ -9,8 +11,9 @@ const T = path.join(__dirname, '../../spike/ocr/node_modules/tesseract.js');
   if (!process.argv.includes('--no-ocr')) {
     const { createWorker } = require(T);
     const { PNG } = require('pngjs');
-    worker = await createWorker('eng', 1, { langPath: path.join(__dirname, '../dist/assets'), gzip: true, cacheMethod: 'none' });
-    await worker.setParameters({ tessedit_pageseg_mode: '7', user_defined_dpi: '300' });
+    const cfg = require('../src/lyrics').OCR_CONFIG;
+    worker = await createWorker(cfg.langs, cfg.oem, { langPath: path.join(__dirname, '../dist/assets'), gzip: true, cacheMethod: 'none' });
+    await worker.setParameters(cfg.params);
     ocr = async (img) => {
       const png = new PNG({ width: img.width, height: img.height });
       for (let i = 0; i < img.data.length; i++) { png.data[i*4]=png.data[i*4+1]=png.data[i*4+2]=img.data[i]; png.data[i*4+3]=255; }
@@ -21,7 +24,15 @@ const T = path.join(__dirname, '../../spike/ocr/node_modules/tesseract.js');
     };
   }
   const t0 = Date.now();
-  const r = await convert([g], { ocr });
+  let r;
+  if (process.argv.includes('--ml')) {
+    const ml = require('../src/ml');
+    const det = await ml.createNodeDetector({ ortPath: process.env.ORT_NODE || path.join(__dirname, '../../spike/ml/node_modules/onnxruntime-node') });
+    const c = ml.wrapConverter(omr.createConverter({ ocr }), det.detect, {});
+    await c.addPage(g, 0, 1);
+    r = c.finish();
+    await det.release();
+  } else r = await omr.convert([g], { ocr });
   if (worker) await worker.terminate();
   console.log('ms', Date.now() - t0);
   console.log('parts', r.score.parts.map((p, i) => p.name + ':' + r.score.nNotes[i]).join(' '), 'measures', r.score.measures, 'key', r.score.fifths, 'time', r.score.time);

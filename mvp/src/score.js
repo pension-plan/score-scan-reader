@@ -151,7 +151,7 @@ function parseLabel(text) {
       if (hit && !(cur && MOD.test(w) && w === 'solo')) {
         const abbrev = w.length <= 3 && hit[1] !== null && w !== 'alt' && w !== 'pf';
         const shown = abbrev ? hit[1] : w0.replace(/[.,]+$/, '');
-        cur = { name: shown.charAt(0).toUpperCase() + shown.slice(1), kind: hit[2], abbrev, canon: hit[1] };
+        cur = { name: shown.charAt(0).toUpperCase() + shown.slice(1), kind: hit[2], abbrev, canon: hit[1], letter: w.length === 1 };
         out.push(cur);
         continue;
       }
@@ -240,10 +240,18 @@ function chooseLayout(systems, lyricsBySystem = {}, opts = {}) {
       kb = nSt === 2 && !underlay && (chordal || (ocr && !anyLyrics));
     }
     if (small[k] || small[k + 1]) kb = false;
+    // a lone one-letter voice name ("a": OCR of a brace, a clef fragment or a
+    // misread instrument name) on a pair already read as keyboard, with chords
+    // on one of its staves and no text under any staff, is noise, not a
+    // singer: it does not split the grand staff (L6). Two single-line staves
+    // may be two instruments (L18), so there the name still counts.
+    const own = ownNames(k, ['vocal', 'instrument']).concat(ownNames(k + 1, ['vocal', 'instrument']));
+    const texture = Math.max(stats[k].f2 + stats[k].f3, stats[k + 1].f2 + stats[k + 1].f3) >= 0.1;
+    const noise = kb && texture && !anyLyrics && own.length === 1 && own[0].letter;
     // printed names overrule: one keyboard name across the pair joins it; a
     // staff with its own voice or instrument name is not half of a grand staff
     if (labels[k].some(l => l.span && l.span.includes(k + 1) && l.names.some(n => n.kind === 'keyboard'))) kb = true;
-    else if (ownNames(k, ['vocal', 'instrument']).length || ownNames(k + 1, ['vocal', 'instrument']).length) kb = false;
+    else if (own.length && !noise) kb = false;
     link.push(kb);
   }
   // organ: a pedal staff (bass clef, no text, no name of its own) under a

@@ -20,6 +20,8 @@ spike/ml/dl/
 spike/ml/out/
 spike/ml/ortweb/
 spike/ml/scans/
+spike/*/vendor/
+spike/opencv/node_modules/
 corpus/**/_work/
 corpus/**/_logs/
 probe/

@@ -3,7 +3,12 @@
 //
 //   node tools/eval.mjs --out work/eval-r1-<key>.json [--only id,...] [--no-ocr] [--jobs N]
 //                       [--src dir] [--dpi 200|native|app] [--timeout sec]
-//                       [--set synthetic|real|challenge|coverage]
+//                       [--set synthetic|real|challenge|coverage] [--ml] [--ocr-lang eng|app|<langs>]
+//
+// --ml wraps each conversion with the optional copista-2m detector (src/ml.js wrapConverter,
+// onnxruntime-node; ORT_NODE overrides its path), as the app does when the detector is on.
+// --ocr-lang picks the Tesseract languages: eng (default), app (lyrics.js OCR_CONFIG, what the
+// page ships: eng+deu) or an explicit list such as eng+deu.
 //
 // Items: every corpus/{synthetic,real}/<id>/ holding scan.pdf + truth.musicxml (the default
 // benchmark). --set challenge instead scores corpus/challenge/<category>/<id>/: every scan*.pdf
@@ -55,7 +60,7 @@ const require = createRequire(import.meta.url);
 
 // ---------------------------------------------------------------- args
 function parseArgs(argv) {
-  const a = { out: null, only: null, ocr: true, jobs: 0, src: path.join(MVP, 'src'), dpi: 200, timeout: 0, set: null, child: null, quiet: false };
+  const a = { out: null, only: null, ocr: true, jobs: 0, src: path.join(MVP, 'src'), dpi: 200, timeout: 0, set: null, child: null, quiet: false, ml: false, ocrLang: 'eng' };
   for (let i = 0; i < argv.length; i++) {
     const k = argv[i];
     const v = () => argv[++i];
@@ -68,6 +73,8 @@ function parseArgs(argv) {
     else if (k === '--timeout') a.timeout = +v();
     else if (k === '--set') a.set = v();
     else if (k === '--quiet') a.quiet = true;
+    else if (k === '--ml') a.ml = true;
+    else if (k === '--ocr-lang') a.ocrLang = v();
     else if (k === '--child') a.child = v();
     else if (k === '-h' || k === '--help') { const L = fs.readFileSync(__filename, 'utf8').split('\n'); let e = 1; while (e < L.length && L[e].startsWith('//')) e++; console.log(L.slice(1, e).join('\n')); process.exit(0); }
     else throw new Error('unknown arg ' + k);
@@ -82,14 +89,27 @@ async function childMain(specPath) {
   const spec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
   const req = createRequire(path.join(spec.src, 'x.js'));
   const { readGray } = req(path.join(spec.src, 'image.js'));
-  const { convert } = req(path.join(spec.src, 'omr.js'));
+  const omr = req(path.join(spec.src, 'omr.js'));
+  let convert = omr.convert;
+  if (spec.ml) {
+    // the app's ML path: omr.createConverter wrapped by ml.wrapConverter, pages in order
+    const ml = req(path.join(spec.src, 'ml.js'));
+    const det = await ml.createNodeDetector({ assets: path.join(MVP, 'assets-src/ml'), ortPath: process.env.ORT_NODE || path.join(ROOT, 'spike/ml/node_modules/onnxruntime-node') });
+    convert = async (pgs, o) => {
+      const c = ml.wrapConverter(omr.createConverter(o), det.detect, {});
+      for (let i = 0; i < pgs.length; i++) await c.addPage(pgs[i], i, pgs.length);
+      return c.finish();
+    };
+  }
   const pages = spec.pages.map(p => readGray(p));
   let ocr = null, worker = null;
   if (spec.ocr) {
     const { createWorker } = require(path.join(ROOT, 'spike/ocr/node_modules/tesseract.js'));
     const { PNG } = require('pngjs');
-    worker = await createWorker('eng', 1, { langPath: path.join(MVP, 'dist/assets'), gzip: true, cacheMethod: 'none' });
-    await worker.setParameters({ tessedit_pageseg_mode: '7', user_defined_dpi: '300' });
+    const lang = spec.ocrLang || 'eng';
+    const cfg = lang === 'app' ? req(path.join(spec.src, 'lyrics.js')).OCR_CONFIG : null;
+    worker = await createWorker(cfg ? cfg.langs : lang, cfg && cfg.oem != null ? cfg.oem : 1, { langPath: path.join(MVP, 'dist/assets'), gzip: true, cacheMethod: 'none' });
+    await worker.setParameters(cfg && cfg.params ? cfg.params : { tessedit_pageseg_mode: '7', user_defined_dpi: '300' });
     ocr = async (img) => {
       const png = new PNG({ width: img.width, height: img.height });
       for (let i = 0; i < img.data.length; i++) { png.data[i * 4] = png.data[i * 4 + 1] = png.data[i * 4 + 2] = img.data[i]; png.data[i * 4 + 3] = 255; }
@@ -540,7 +560,7 @@ async function main() {
   const schema = findSchema();
   const t0 = Date.now();
   const log = (...m) => { if (!args.quiet) console.error(...m); };
-  log(`eval: ${items.length} items, jobs=${jobs}, ocr=${args.ocr}, dpi=${args.dpi}, src=${args.src}, schema=${schema || 'none (well-formedness only)'}`);
+  log(`eval: ${items.length} items, jobs=${jobs}, ocr=${args.ocr}${args.ocr ? ' (' + args.ocrLang + ')' : ''}${args.ml ? ', ml=on' : ''}, dpi=${args.dpi}, src=${args.src}, schema=${schema || 'none (well-formedness only)'}`);
 
   const results0 = await pool(items, jobs, async (it) => {
     const res = { id: it.id, set: it.set, crash: 0 };
@@ -558,7 +578,7 @@ async function main() {
       const metaOut = path.join(outDir, it.key + '.meta.json');
       const specPath = path.join(outDir, it.key + '.spec.json');
       for (const f of [xmlOut, metaOut]) fs.rmSync(f, { force: true });
-      fs.writeFileSync(specPath, JSON.stringify({ src: args.src, pages, ocr: args.ocr, xmlOut, metaOut }));
+      fs.writeFileSync(specPath, JSON.stringify({ src: args.src, pages, ocr: args.ocr, ocrLang: args.ocrLang, ml: args.ml, xmlOut, metaOut }));
       const tChild = Date.now();
       const r = await run(process.execPath, ['--max-old-space-size=8192', __filename, '--child', specPath], { timeoutMs: args.timeout * 1000, cwd: MVP, trackRss: true });
       res.child_ms = Date.now() - tChild;
@@ -645,7 +665,7 @@ async function main() {
   }
   const report = {
     when: new Date().toISOString(), wall_s: Math.round((Date.now() - t0) / 100) / 10,
-    config: { ocr: args.ocr, dpi: args.dpi, jobs, src: args.src, src_hash: srcHash(args.src), schema, weights: W, outputs: outDir, ...(chal.length ? { set: 'challenge' } : {}), ...(cov.length ? { set: 'coverage', coverage_dir: COVERAGE, cpus: os.cpus().length, loadavg: os.loadavg().map(x => +x.toFixed(1)) } : {}) },
+    config: { ocr: args.ocr, ...(args.ocr ? { ocr_lang: args.ocrLang } : {}), ...(args.ml ? { ml: true } : {}), dpi: args.dpi, jobs, src: args.src, src_hash: srcHash(args.src), schema, weights: W, outputs: outDir, ...(chal.length ? { set: 'challenge' } : {}), ...(cov.length ? { set: 'coverage', coverage_dir: COVERAGE, cpus: os.cpus().length, loadavg: os.loadavg().map(x => +x.toFixed(1)) } : {}) },
     summary, items: results, ...(skipped.length ? { skipped } : {}),
   };
   fs.writeFileSync(args.out, JSON.stringify(report, null, 1));
