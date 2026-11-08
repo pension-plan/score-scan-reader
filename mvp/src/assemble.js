@@ -1343,7 +1343,19 @@ function keyAlters(fifths) {
 // Find an accidental left of a head; returns 'sharp'|'flat'|'natural'|null
 function headAccidental(R, comps, hd, minX = -Infinity, reach = 1.9) {
   const g = accidentalGlyph(R, comps, hd, minX, reach) || fallbackAccidental(R, comps, hd, minX, reach);
+  if (g && parenthesised(comps, g, hd)) hd.accParen = true;
   return g ? g.kind : null;
+}
+
+// A courtesy sign in parentheses: a thin curved stroke about as tall as the sign's middle on
+// each side of it, level with the head, the right one between the sign and the head
+function parenthesised(comps, g, hd) {
+  const sp = hd.sp;
+  const paren = (c) => c.x1 - c.x0 + 1 <= 0.55 * sp && c.y1 - c.y0 + 1 >= 1.1 * sp && c.y1 - c.y0 + 1 <= 3 * sp &&
+    Math.abs((c.y0 + c.y1) / 2 - hd.y) <= 0.6 * sp;
+  const left = comps.some(c => paren(c) && c.x1 < g.x0 + 1 && c.x1 >= g.x0 - 0.6 * sp);
+  const right = comps.some(c => paren(c) && c.x0 > g.x1 - 1 && c.x0 <= g.x1 + 0.6 * sp && c.x1 <= hd.x - 0.3 * sp);
+  return left && right;
 }
 
 // headAccidental's sign with its box ({kind, x0, y0, x1, y1}), or null
