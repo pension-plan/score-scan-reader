@@ -278,47 +278,66 @@ function placeRests(evs, rests, gap) {
   return out;
 }
 
-// Cheapest set of at most two duration edits that makes a voice fill the
-// measure: missed / extra augmentation dot, missed / extra flag or beam
-// (halve / double). Ties go to edits that keep onsets in step with the other
-// voices. Returns {events, ok}.
+// Cheapest set of duration edits that makes a voice fill the measure exactly:
+// a missed / extra augmentation dot, a missed / extra flag or beam (halve /
+// double) or, in an over-full measure, a false notehead dropped. A dynamic
+// programme over the events and the time reached so far; an edit that puts a
+// note's onset out of step with a voice printed at the same x (simultaneous
+// notes are vertically aligned) costs extra. Returns {events, ok}.
+function searchRepair(evs, target, anchors, sp, over) {
+  const U = DIV, T = Math.round(target * U);
+  const near = evs.map(e => (e.rest || e.x == null) ? null : anchors.filter(a => Math.abs(a.x - e.x) <= 0.8 * sp).map(a => Math.round(a.t * U)));
+  const opts = evs.map(e => {
+    const q = e.q, d = e.dots || 0, o = [[q, 0]];
+    if (!e.rest) {
+      if (!d) o.push([q * 1.5, 1.0]);
+      if (d === 1) o.push([q / 1.5, 1.2]);
+      o.push([q / 2, 1.5]);
+      if (q * 2 <= 4 + EPS) o.push([q * 2, 1.6]);
+      // a note that took a syllable is printed for sure: dropping it costs more
+      if (over) o.push([0, e.lyrics ? 3.5 : 1.8]);
+    }
+    return o.filter(([nq]) => nq === 0 || qToType(nq)).map(([nq, c]) => [Math.round(nq * U), nq, c]);
+  });
+  const layers = [new Map([[0, { c: 0, from: 0, q: null }]])];
+  for (let i = 0; i < evs.length; i++) {
+    const cur = layers[i], nxt = new Map();
+    for (const [t, st] of cur) {
+      const nr = near[i];
+      for (const [du, nq, c] of opts[i]) {
+        const t2 = t + du;
+        if (t2 > T) continue;
+        const cost = st.c + c + (du > 0 && nr && nr.length && !nr.includes(t) ? 2 : 0);
+        const p = nxt.get(t2);
+        if (!p || cost < p.c - 1e-9) nxt.set(t2, { c: cost, from: t, q: nq });
+      }
+    }
+    layers.push(nxt);
+  }
+  const end = layers[evs.length].get(T);
+  if (!end) return null;
+  const qs = new Array(evs.length);
+  for (let i = evs.length, t = T; i > 0; i--) { const st = layers[i].get(t); qs[i - 1] = st.q; t = st.from; }
+  return { cost: end.c, qs };
+}
+
 function repairStream(evs, target, anchors, sp) {
   const sum = qsum(evs), diff = target - sum;
-  const cands = [];
-  evs.forEach((e, i) => {
-    if (e.rest) return;
-    const q = e.q, dots = e.dots || 0;
-    const opts = [];
-    if (!dots) opts.push([q * 1.5, 1.0]);
-    if (dots === 1) opts.push([q / 1.5, 1.2]);
-    opts.push([q / 2, 1.5]);
-    if (q * 2 <= 4 + EPS) opts.push([q * 2, 1.6]);
-    for (const [nq, c] of opts) if (qToType(nq)) cands.push({ i, nq, d: nq - q, c });
-    // an extra note (a false notehead) in an over-full measure
-    if (diff < 0) cands.push({ i, nq: 0, d: -q, c: 1.8, drop: true });
-  });
-  const apply = (edits) => evs.map((e, i) => {
-    const ed = edits.find(x => x.i === i);
-    if (!ed) return e;
-    if (ed.drop) return null;
-    e.q = ed.nq; e.dots = qToType(ed.nq).dots;
-    return e;
-  }).filter(Boolean);
   const base = anchorMisses(evs, anchors, sp);
-  let best = null;
-  const consider = (edits, c) => {
-    const trial = evs.map((e, i) => { const ed = edits.find(x => x.i === i); return ed ? (ed.drop ? null : { ...e, q: ed.nq }) : e; }).filter(Boolean);
-    const cost = c + 2 * anchorMisses(trial, anchors, sp);
-    if (!best || cost < best.cost) best = { edits, cost };
-  };
-  for (const a of cands) if (Math.abs(a.d - diff) < EPS) consider([a], a.c);
-  for (let x = 0; x < cands.length; x++) for (let y = x + 1; y < cands.length; y++) {
-    const a = cands[x], b = cands[y];
-    if (a.i !== b.i && Math.abs(a.d + b.d - diff) < EPS) consider([a, b], a.c + b.c);
-  }
-  // leaving a gap costs about as much as two edits
+  const best = searchRepair(evs, target, anchors, sp, diff < -EPS);
+  // leaving a gap costs about as much as two edits; an over-full bar must be
+  // fixed, so a little more is spent there before squeezing it
   const gapCost = 2.6 + 2 * base;
-  if (best && best.cost < gapCost) return { events: apply(best.edits), ok: true };
+  if (best && best.cost < gapCost + (diff < -EPS ? 1.2 : 0)) {
+    const out = [];
+    evs.forEach((e, i) => {
+      const nq = best.qs[i];
+      if (nq === 0) return;
+      if (Math.abs(nq - e.q) > EPS) { e.q = nq; e.dots = qToType(nq).dots; }
+      out.push(e);
+    });
+    return { events: out, ok: true };
+  }
   if (diff > EPS) return { events: evs.concat([{ forward: true, q: diff }]), ok: false };
   // still over-full: shorten the longest values (drop a dot, else halve) until
   // the voice fits, so every note read is kept; pad any small gap left over

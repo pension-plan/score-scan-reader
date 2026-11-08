@@ -459,7 +459,26 @@ function hasDot(R, hd) {
   return false;
 }
 
-function headDuration(R, hd, chord) {
+// Augmentation dot as a component: a small round blob right of the head,
+// in a space (not on a staff line), within a space above / below the head.
+function dotBlob(hd, ctx) {
+  const sp = hd.sp, st = ctx.st;
+  for (const c of ctx.dots) {
+    if (c.x0 < hd.x + 0.55 * sp || c.x0 > hd.x + 2.0 * sp || c.y1 < hd.y - 0.9 * sp || c.y0 > hd.y + 0.9 * sp) continue;
+    const cx = (c.x0 + c.x1) / 2, cy = (c.y0 + c.y1) / 2;
+    if (Math.abs(cy - hd.y) > 0.85 * sp) continue;
+    if (st) {
+      // distance to the nearest staff or ledger line position
+      const y0 = st.yAt(0, cx), y4 = st.yAt(4, cx), gap = (y4 - y0) / 4;
+      const k = Math.round((cy - y0) / gap);
+      if (Math.abs(cy - (y0 + k * gap)) < 0.22 * gap) continue;
+    }
+    return true;
+  }
+  return false;
+}
+
+function headDuration(R, hd, chord, ctx) {
   const sp = hd.sp;
   let q;
   const dir = hd.stemDir;
@@ -474,7 +493,9 @@ function headDuration(R, hd, chord) {
       q = q / Math.pow(2, nb);
     }
   }
-  const dot = hasDot(R, hd);
+  // the pixel test misses dots off the head's estimated height; the blob
+  // test misses dots run into other ink: either will do
+  const dot = hasDot(R, hd) || (!!ctx && dotBlob(hd, ctx));
   return { q: dot ? q * 1.5 : q, dots: dot ? 1 : 0 };
 }
 
@@ -768,7 +789,14 @@ function assemblePage(fr, pageIndex = 0) {
       const music = chords.filter(c => c.x > hdr.end);
       const s = { st, si, chords: music, hdr };
       // durations read once here: tuplets rescale whole groups
-      for (const c of music) for (const h of c.heads) if (!h.dur) h.dur = headDuration(R, h, c);
+      const spS = st.space || fr.ss;
+      // dot-sized round blobs near this staff
+      const ya = st.yAt(0, st.left) - 6 * spS, yb = st.yAt(4, st.left) + 6 * spS;
+      const dots = comps.filter(c => c.y1 > ya && c.y0 < yb && c.x0 > hdr.end && (c.x1 - c.x0 + 1) >= 0.2 * spS && (c.x1 - c.x0 + 1) <= 0.8 * spS &&
+        (c.y1 - c.y0 + 1) >= 0.2 * spS && (c.y1 - c.y0 + 1) <= 0.8 * spS && c.area >= 0.08 * spS * spS &&
+        c.area >= 0.45 * (c.x1 - c.x0 + 1) * (c.y1 - c.y0 + 1) && Math.max(c.x1 - c.x0 + 1, c.y1 - c.y0 + 1) <= 1.8 * Math.min(c.x1 - c.x0 + 1, c.y1 - c.y0 + 1));
+      const dctx = { st, dots };
+      for (const c of music) for (const h of c.heads) if (!h.dur) h.dur = headDuration(R, h, c, dctx);
       try {
         const sp = st.space || fr.ss;
         const { items, groups } = beamGroups(R, labels, s, sp);
