@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.12.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.11.0...score-scan-reader-v0.12.0) (2026-11-08)
+
+
+### Features
+
+* recognise text, dynamics and instrument names ([6ed273c](https://github.com/pension-plan/score-scan-reader/commit/6ed273ca31997609e3a520666c336d6444d9791f))
+
 ## [0.11.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.10.0...score-scan-reader-v0.11.0) (2026-11-08)
 
 
