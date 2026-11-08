@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 17:36 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 17:38 AEDT.
 
 ## Events
 
@@ -61,6 +61,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 17:36 | Round 2 integrated (0.925 overall, real scans 0.907) and shipped as v0.5.0 at 17:36 AEDT together with Maple Leaf Rag as the default sample. Regression test against 0.4.0 running. |
 | 17:36 | User asked for synthetic tests covering every symbol and layout plus performance: coverage suite workflow started (8 generators by symbol family and layout, per-symbol support matrix, speed and memory by dpi and page count). |
 | 17:36 | Round 3 started: 6 owners including the copista-2m ML integration, working on 24 tracked limits including the L19 regressions and beamed 16ths. |
+| 17:38 | Release 0.5.0 regression-tested against 0.4.0: no regression. Benchmark 0.919 → 0.925 (pitch +0.013, real scans +0.005); challenge 0.784 → 0.789, 16 items better, none worse, schema-valid 99.5% → 100%. |
 
 ## Accuracy by round
 
@@ -164,22 +165,22 @@ Every agent started for this build, including stopped runs. Outcomes are on the 
 | Run 6 | Fix | fix:r2:lyrics | done | 16:21 | 16:41 | 20 | 109 |
 | Run 6 | Fix | fix:r2:ui | done | 16:21 | 16:45 | 24 | 87 |
 | Run 6 | Integrate | integrate:r2 | done | 17:12 | 17:34 | 22 | 93 |
-| Run 7 | Harness | harness:coverage | run | 17:34 |  | 2 | 30 |
-| Run 7 | Generate | gen:notes | run | 17:34 |  | 2 | 25 |
-| Run 7 | Generate | gen:rests | run | 17:34 |  | 2 | 29 |
-| Run 7 | Generate | gen:pitch | run | 17:34 |  | 1 | 17 |
-| Run 7 | Generate | gen:time | run | 17:34 |  | 1 | 15 |
-| Run 7 | Generate | gen:marks | run | 17:34 |  | 2 | 22 |
-| Run 7 | Generate | gen:structure | run | 17:34 |  | 2 | 22 |
-| Run 7 | Generate | gen:layouts | run | 17:34 |  | 2 | 24 |
-| Run 7 | Generate | gen:perf | run | 17:34 |  | 2 | 21 |
-| Run 8 | Fix | fix:r3:heads | run | 17:36 |  | 0 | 2 |
-| Run 8 | Fix | fix:r3:symbols | run | 17:36 |  | 0 | 2 |
-| Run 8 | Fix | fix:r3:score | run | 17:36 |  | 0 | 2 |
-| Run 8 | Fix | fix:r3:lyrics | run | 17:36 |  | 0 | 1 |
-| Run 8 | Fix | fix:r3:ui | run | 17:36 |  | 0 | 3 |
-| Run 8 | Fix | fix:r3:ml | run | 17:36 |  | 0 | 1 |
+| Run 7 | Harness | harness:coverage | run | 17:34 |  | 4 | 37 |
+| Run 7 | Generate | gen:notes | run | 17:34 |  | 4 | 32 |
+| Run 7 | Generate | gen:rests | run | 17:34 |  | 4 | 37 |
+| Run 7 | Generate | gen:pitch | run | 17:34 |  | 4 | 28 |
+| Run 7 | Generate | gen:time | run | 17:34 |  | 4 | 24 |
+| Run 7 | Generate | gen:marks | run | 17:34 |  | 4 | 29 |
+| Run 7 | Generate | gen:structure | run | 17:34 |  | 4 | 28 |
+| Run 7 | Generate | gen:layouts | run | 17:34 |  | 4 | 30 |
+| Run 7 | Generate | gen:perf | run | 17:34 |  | 4 | 26 |
+| Run 8 | Fix | fix:r3:heads | run | 17:36 |  | 2 | 26 |
+| Run 8 | Fix | fix:r3:symbols | run | 17:36 |  | 2 | 21 |
+| Run 8 | Fix | fix:r3:score | run | 17:36 |  | 2 | 24 |
+| Run 8 | Fix | fix:r3:lyrics | run | 17:36 |  | 2 | 25 |
+| Run 8 | Fix | fix:r3:ui | run | 17:36 |  | 2 | 15 |
+| Run 8 | Fix | fix:r3:ml | run | 17:36 |  | 2 | 23 |
 | Side | ML demo | copista-2m demo page for GitHub Pages | done | 16:38 | 16:41 | 3 | 21 |
 | Side | Fast track | First version build (mvp/) | done | 15:19 | 15:29 | 10 | 69 |
-| Side | Hotfix | Rests fix (L3a, user-reported) | run | 17:33 |  | 3 | 47 |
+| Side | Hotfix | Rests fix (L3a, user-reported) | run | 17:33 |  | 5 | 62 |
 | Side | Fast track | Software design document | done | 15:20 | 15:22 | 2 | 16 |

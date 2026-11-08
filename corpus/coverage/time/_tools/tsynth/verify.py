@@ -355,7 +355,9 @@ def compare_music21(score: Score, truth_path: str):
                     continue
                 pitches = [p.midi for p in (n.pitches if isinstance(n, chord.Chord) else [n.pitch])]
                 tup = n.duration.tuplets
-                ratio = (tup[0].numberNotesActual, tup[0].numberNotesNormal) if tup else (1, 1)
+                ratio = (1, 1)
+                for t_ in tup:      # nested tuplets: product of all levels
+                    ratio = (ratio[0] * t_.numberNotesActual, ratio[1] * t_.numberNotesNormal)
                 notes.append((off, tuple(sorted(pitches)), ql, bool(n.duration.isGrace), ratio))
                 if isinstance(n, chord.Chord):
                     for nn in n.notes:
@@ -372,6 +374,34 @@ def compare_music21(score: Score, truth_path: str):
         ok &= all(x['ok'] for x in r.values())
     rep['ok'] = ok
     return rep
+
+
+def compare_brackets(score: Score, events_path: str):
+    """coverage/time: printed tuplet brackets (LilyPond stencil callback in dump.ly) vs the
+    bracket="yes"/"no" written in the truth (multiset of (onset, actual, normal, visible))."""
+    from .mxl import tuplet_groups
+    ev = parse_events(events_path)
+    got = []
+    for r in ev.get('tuplets', []):
+        if r['kind'] == 'bracket':
+            a = r['args']
+            got.append((r['t'], int(a[0]), int(a[1]), int(a[2])))
+    exp = []
+    offs = score.measure_offsets()
+    for p in score.parts:
+        for v in p.voices:
+            for i, mdict in enumerate(p.measures):
+                evs = mdict.get(v.key, [])
+                ts, t = [], offs[i]
+                for e in evs:
+                    ts.append(t)
+                    t += e.dur
+                for g in tuplet_groups(evs):
+                    if evs[g['start']].tuplet_hidden:
+                        continue
+                    a, n = g['ratio']
+                    exp.append((ts[g['start']], a, n, 1 if g['bracket'] == 'yes' else 0))
+    return _diff(exp, got, limit=20)
 
 
 def xsd_validate(path):

@@ -1,4 +1,11 @@
-"""Truth-vs-engraving verification for the rhythm challenge corpus.
+"""Truth-vs-engraving verification (coverage/notes copy of corpus/challenge/rhythm/_tools/rsynth/verify.py).
+
+Added for the notes family: every Stem and NoteHead grob of the final layout (dump.ly logs them
+from after-line-breaking, attributed to their Voice) is compared with the model: stem direction,
+duration log, beamed or not, number of beams/beamlets on each side of the stem, stem-tremolo
+strokes, heads per stem; per head the staff position (ledger lines), head duration log and font
+size (cue -4, grace -3); every printed accidental (Staff acknowledger) is compared with the
+accidentals written to the truth.
 
 1. LilyPond is run with an event-dump engraver (dump.ly).  Every note / rest /
    multi-measure rest / tie / beam / slur / articulation / lyric syllable /
@@ -56,11 +63,29 @@ def _fr(x):
     return F(x)
 
 
+def parse_grobs(path):
+    """GROB lines -> {voice id: [('stem'|'head', t, g, ...)]}  (t, g in quarters)"""
+    out = {}
+    for line in open(path, encoding='utf-8', errors='replace'):
+        f = line.rstrip('\n').split('\t')
+        if not f or f[0] != 'GROB':
+            continue
+        vid, t, g, kind = f[1], F(f[2]) * 4, F(f[3]) * 4, f[4]
+        a = f[5:]
+        if kind == 'stem':
+            rec = ('stem', t, g, int(a[0]), int(a[1]), int(a[2]), int(a[3]), int(a[4]), int(a[5]), int(a[6]))
+        else:
+            fs = float(a[2])
+            rec = ('head', t, g, int(a[0]), int(a[1]), int(round(fs)))
+        out.setdefault(vid, []).append(rec)
+    return out
+
+
 def parse_events(path):
     out = {}
     for line in open(path, encoding='utf-8', errors='replace'):
         f = line.rstrip('\n').split('\t')
-        if len(f) < 7:
+        if len(f) < 7 or f[0] == 'GROB':
             continue
         ctype, cid, mom, gr, bar, mpos, kind = f[:7]
         args = f[7:]
@@ -103,6 +128,12 @@ def dump_records(recs):
             out.append((k, t))
         elif k == 'timesig':
             out.append(('timesig', t, int(a[0]), int(a[1]), a[2]))
+        elif k == 'tremolo':
+            out.append(('tremolo', t, g, int(a[0])))
+        elif k == 'tremspan':
+            out.append(('tremspan', t, g, int(a[0])))
+        elif k == 'accidental':
+            out.append(('accidental', t, g, int(a[0]), F(a[2])))
     return out
 
 
@@ -153,6 +184,8 @@ def expected_voice(score: Score, part, vkey):
                     out.append(('slur', t, g, 1))
                 if ev.fermata:
                     out.append(('artic', t, g, 'fermata'))
+                if ev.trem:
+                    out.append(('tremolo', t, g, ev.trem))
                 for a in ev.artic:
                     out.append(('artic', t, g, a))
                 if not ev.grace and not ev.multirest_cont:
@@ -211,7 +244,7 @@ def compare_engraving(score: Score, layout: dict, events_path: str):
             name = vname(p.id, v.key)
             exp, pos = expected_voice(score, p, v.key)
             recs = ev.get(name, [])
-            got = [r for r in dump_records(recs) if r[0] not in ('lyric', 'hyphen', 'extender', 'timesig')]
+            got = [r for r in dump_records(recs) if r[0] not in ('lyric', 'hyphen', 'extender', 'timesig', 'tremspan')]
             d = _diff(exp, got)
             rep['voices'][name] = d
             ok &= d['ok']
@@ -377,3 +410,105 @@ def compare_music21(score: Score, truth_path: str):
 def xsd_validate(path):
     rc, out, err = run(['xmllint', '--noout', '--schema', XSD, path], timeout=120)
     return {'ok': rc == 0, 'message': (err.strip().splitlines() or [''])[-1][:300]}
+
+
+# ---------------------------------------------------------------- coverage/notes: grob-level checks
+
+HEAD_LOG = {'breve': -1, 'whole': 0, 'half': 1}
+ALTER_Q = {-2: F(-1), -1: F(-1, 2), 0: F(0), 1: F(1, 2), 2: F(1)}
+
+
+def staff_ids(layout):
+    m = {}
+    for g in layout['groups']:
+        for st in g['staves']:
+            for pv in st['voices']:
+                m[tuple(pv)] = st['id']
+    return m
+
+
+def expected_grobs(score: Score, part, vkey):
+    """model -> ([stem tuples], [head tuples]) in the format of parse_grobs"""
+    from .model import has_stem, single_trem_marks
+    from .mxl import beam_elements, beam_side_counts, TREM_MARKS
+    stems, heads = [], []
+    offs = score.measure_offsets()
+    for i, mdict in enumerate(part.measures):
+        t = offs[i]
+        evs = mdict.get(vkey, [])
+        beams = beam_elements(evs)
+        for k, ev in enumerate(evs):
+            g = grace_offsets(evs, k) if ev.grace else F(0)
+            if ev.kind == 'note':
+                fs = -3 if ev.grace else (-4 if ev.cue else 0)
+                for pos in ev.positions:
+                    heads.append(('head', t, g, pos, HEAD_LOG.get(ev.dtype, 2), fs))
+                if has_stem(ev):
+                    if ev.trem2:
+                        marks = TREM_MARKS[int(ev.trem2_sub)]
+                        beamed, (lc, rc) = 1, ((0, marks) if ev.trem2 == 'start' else (marks, 0))
+                    elif k in beams:
+                        beamed, (lc, rc) = 1, beam_side_counts(beams[k])
+                    else:
+                        beamed, lc, rc = 0, 0, 0
+                    stems.append(('stem', t, g, 1 if ev.stem == 'up' else -1, LOG[ev.dtype], beamed, lc, rc,
+                                  single_trem_marks(ev), len(ev.pitches)))
+            t += ev.dur
+    return stems, heads
+
+
+def compare_grobs(score: Score, events_path: str):
+    from .model import has_stem
+    got = parse_grobs(events_path)
+    rep = {'stems': {}, 'heads': {}}
+    ok = True
+    for p in score.parts:
+        for v in p.voices:
+            name = vname(p.id, v.key)
+            es, eh = expected_grobs(score, p, v.key)
+            recs = got.get(name, [])
+            # stems: whole notes / breves have invisible stems in LilyPond; rests inside beams have
+            # stems without heads -> compare only stems with heads and duration log >= 1
+            gs = [r for r in recs if r[0] == 'stem' and r[9] > 0 and r[4] >= 1]
+            gh = [r for r in recs if r[0] == 'head']
+            d1 = _diff(es, gs)
+            d2 = _diff(eh, gh)
+            rep['stems'][name] = d1
+            rep['heads'][name] = d2
+            ok &= d1['ok'] and d2['ok']
+    rep['ok'] = ok
+    return rep
+
+
+def expected_accidentals(score: Score, layout):
+    from .mxl import key_alters, staff_accidentals
+    ids = staff_ids(layout)
+    offs = score.measure_offsets()
+    out = []
+    for p in score.parts:
+        for i, m in enumerate(p.measures):
+            fifths, _ = score.current_key(i)
+            res = staff_accidentals(score, p, m, i, key_alters(fifths))
+            for v in p.voices:
+                t = offs[i]
+                evs = m.get(v.key, [])
+                for k, ev in enumerate(evs):
+                    g = grace_offsets(evs, k) if ev.grace else F(0)
+                    if ev.kind == 'note':
+                        for pit in ev.pitches:
+                            if (id(ev), pit) in res:
+                                out.append((ids[(p.id, v.key)], t, g, midi(pit), ALTER_Q[pit[1]]))
+                    t += ev.dur
+    return out
+
+
+def compare_accidentals(score: Score, layout, events_path: str):
+    ev = parse_events(events_path)
+    exp = expected_accidentals(score, layout)
+    got = []
+    for sid in set(staff_ids(layout).values()):
+        for r in dump_records(ev.get(sid, [])):
+            if r[0] == 'accidental':
+                got.append((sid,) + r[1:])
+    d = _diff(exp, got)
+    return d

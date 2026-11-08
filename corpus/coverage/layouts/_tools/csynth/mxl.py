@@ -245,7 +245,14 @@ def write_musicxml(score: Score, path: str, software='layout-challenge corpus bu
                     pos = F(0)
                 first_voice = False
                 role = roles.get(v.key, 0)
+                hq = []
+                if p.id == marks_pid and v is order[0]:
+                    hq = sorted((F(o), sym) for (hi, o, sym) in score.harmonies if hi == i)
                 for ev in evs:
+                    while hq and hq[0][0] <= pos and ev.kind != 'clef':
+                        if hq[0][0] != pos:
+                            raise ValueError(f'harmony at {hq[0][0]} not on an event onset in measure {i + 1}')
+                        w(harmony_xml(hq.pop(0)[1], f'<staff>{1}</staff>' if p.staves > 1 else ''))
                     st_num = (ev.staff or v.staff) if p.staves > 1 else None
                     if ev.kind == 'clef':
                         w('      <attributes>')
@@ -274,9 +281,11 @@ def write_musicxml(score: Score, path: str, software='layout-challenge corpus bu
                         _note(w, ev, None, False, d, v.key, st_num, role, None, True)
                     else:
                         for k, pit in enumerate(ev.pitches):
-                            acc = _accidental(pit, ev, acc_state[st_num or 1], kalt)
-                            _note(w, ev, pit, k > 0, d, v.key, st_num, role, acc, k == 0)
+                            acc = ev.acc.get(pit)
+                            _note(w, ev, pit, k > 0, d, v.key, st_num, role, acc, k == 0, k)
                     pos += ev.dur
+                if hq:
+                    raise ValueError(f'unplaced harmonies in measure {i + 1}: {hq}')
             if p.id == marks_pid:
                 for mk in mi.end_marks:
                     w(mark_xml(mk, mk.get('staff', top_staff)))
@@ -320,7 +329,7 @@ def _accidental(pit, ev, state, kalt):
     return None
 
 
-def _note(w, ev, pit, chord, d, voice, staff, role, acc, first):
+def _note(w, ev, pit, chord, d, voice, staff, role, acc, first, k=0):
     po = ' print-object="no"' if ev.hidden else ''
     w(f'      <note{po}>')
     if ev.cue:
@@ -352,14 +361,13 @@ def _note(w, ev, pit, chord, d, voice, staff, role, acc, first):
     if ev.tuplet:
         w(f'        <time-modification><actual-notes>{ev.tuplet[0]}</actual-notes>'
           f'<normal-notes>{ev.tuplet[1]}</normal-notes></time-modification>')
-    if ev.kind == 'note' and ev.stem:
-        w(f'        <stem>{ev.stem}</stem>')
-    elif ev.kind == 'note' and role in (1, 3):
-        w('        <stem>up</stem>')
-    elif ev.kind == 'note' and role in (2, 4):
-        w('        <stem>down</stem>')
+    if ev.kind == 'note' and ev.stem_dir:
+        w(f'        <stem>{ev.stem_dir}</stem>')
     if staff:
         w(f'        <staff>{staff}</staff>')
+    if ev.kind == 'note':
+        for lev in sorted(ev.beams):
+            w(f'        <beam number="{lev}">{ev.beams[lev]}</beam>')
     nots = []
     if tie_stop:
         nots.append('<tied type="stop"/>')
@@ -376,8 +384,17 @@ def _note(w, ev, pit, chord, d, voice, staff, role, acc, first):
             nots.append('<tuplet type="stop"/>')
         if ev.fermata:
             nots.append('<fermata type="upright"/>')
-        if ev.artic:
-            nots.append('<articulations>' + ''.join(f'<{a}/>' for a in ev.artic) + '</articulations>')
+        if ev.ornaments:
+            nots.append('<ornaments>' + ''.join(f'<{o}/>' for o in ev.ornaments) + '</ornaments>')
+        arts = [('<strong-accent type="up"/>' if a == 'strong-accent' else f'<{a}/>') for a in ev.artic]
+        if ev.breath:
+            arts.append('<breath-mark/>')
+        if arts:
+            nots.append('<articulations>' + ''.join(arts) + '</articulations>')
+    if ev.kind == 'note' and k < len(ev.fingering) and ev.fingering[k]:
+        nots.append(f'<technical><fingering>{ev.fingering[k]}</fingering></technical>')
+    if ev.kind == 'note' and ev.arpeggio and len(ev.pitches) > 1:
+        nots.append('<arpeggiate/>')
     if nots:
         w('        <notations>' + ''.join(nots) + '</notations>')
     if first and ev.kind == 'note':
@@ -387,3 +404,28 @@ def _note(w, ev, pit, chord, d, voice, staff, role, acc, first):
             w(f'        <lyric number="{num}"><syllabic>{ly.syllabic}</syllabic>'
               f'<text>{escape(ly.text)}</text>{ext}</lyric>')
     w('      </note>')
+
+
+HKIND = {'': ('major', ''), 'm': ('minor', 'm'), '7': ('dominant', '7'), 'm7': ('minor-seventh', 'm7'),
+         'maj7': ('major-seventh', 'maj7'), 'sus4': ('suspended-fourth', 'sus4'), 'dim': ('diminished', 'dim'),
+         '6': ('major-sixth', '6'), 'm6': ('minor-sixth', 'm6'), '9': ('dominant-ninth', '9')}
+
+
+def harmony_xml(sym, staff=''):
+    import re as _re
+    m = _re.match(r'^(?P<r>[A-G])(?P<ra>#|b)?(?P<q>maj7|m7|m6|m|dim|sus4|7|6|9)?(?:/(?P<b>[A-G])(?P<ba>#|b)?)?$', sym)
+    if not m:
+        raise ValueError(sym)
+    al = {'#': 1, 'b': -1, None: 0}
+    r = f'<root><root-step>{m.group("r")}</root-step>'
+    if al[m.group('ra')]:
+        r += f'<root-alter>{al[m.group("ra")]}</root-alter>'
+    r += '</root>'
+    kind, text = HKIND[m.group('q') or '']
+    r += f'<kind text="{text}">{kind}</kind>'
+    if m.group('b'):
+        r += f'<bass><bass-step>{m.group("b")}</bass-step>'
+        if al[m.group('ba')]:
+            r += f'<bass-alter>{al[m.group("ba")]}</bass-alter>'
+        r += '</bass>'
+    return f'      <harmony print-frame="no">{r}{staff}</harmony>'

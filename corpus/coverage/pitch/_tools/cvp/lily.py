@@ -328,7 +328,7 @@ class LilyWriter:
             with_.append(x)
         if self.o.get('instrument'):
             for g in ('Accidental', 'AccidentalCautionary', 'Clef', 'KeySignature', 'KeyCancellation',
-                      'OttavaBracket'):
+                      'OttavaBracket', 'Stem', 'NoteHead', 'ClefModifier', 'TimeSignature', 'BarLine'):
                 with_.append(f"\\override {g}.after-line-breaking = #(pk-logger '{g} \"{st['id']}\")")
             with_.append('\\override NoteHead.color = #pk-nh-color')
         w = (' \\with { ' + ' '.join(with_) + ' }') if with_ else ''
@@ -416,6 +416,9 @@ class LilyWriter:
                 L.append('    >>')
         L.append('  >>')
         L.append('  \\layout {')
+        ost = o.get('ottava_style')
+        if ost == 'ordinals':
+            L.append("    \\context { \\Staff ottavationMarkups = #'((2 . \"15ma\") (1 . \"8va\") (-1 . \"8vb\") (-2 . \"15mb\")) }")
         for x in o.get('layout_extra', []):
             L.append('    ' + x)
         L.append('  }')
@@ -435,6 +438,9 @@ INSTR_SCM = r"""
          (ev (and (ly:grob? nh) (ly:grob-property nh 'cause)))
          (p (and (ly:stream-event? ev) (ly:event-property ev 'pitch))))
     (if (ly:pitch? p) (list (ly:pitch-octave p) (ly:pitch-notename p) (ly:pitch-alteration p)) #f)))
+#(define (pk-head-pitch h)
+  (let* ((ev (event-cause h)) (p (and ev (ly:event-property ev 'pitch))))
+    (if (ly:pitch? p) (list (ly:pitch-octave p) (ly:pitch-notename p) (ly:pitch-alteration p)) #f)))
 #(define (pk-logger tag staffname)
   (let ((orig (assoc-get 'after-line-breaking (assoc-get tag all-grob-descriptions))))
    (lambda (grob)
@@ -448,7 +454,22 @@ INSTR_SCM = r"""
                 (ly:grob-property grob 'restore-first #f) (ly:grob-property grob 'parenthesized #f)))
         ((Clef) (list (ly:grob-property grob 'glyph-name) (ly:grob-property grob 'staff-position) (ly:item-break-dir grob)))
         ((KeySignature KeyCancellation) (list (ly:grob-property grob 'alteration-alist) (ly:item-break-dir grob)))
-        ((OttavaBracket) (list (pk-when (ly:spanner-bound grob RIGHT))))
+        ((OttavaBracket) (list (pk-when (ly:spanner-bound grob RIGHT)) (markup->string (ly:grob-property grob 'text))
+                               (ly:grob-property grob 'direction)))
+        ((Stem) (let* ((ha (ly:grob-object grob 'note-heads))
+                       (heads (if (ly:grob-array? ha) (ly:grob-array->list ha) '()))
+                       (fl (ly:grob-object grob 'flag))
+                       (bm (ly:grob-property grob 'beaming #f)))
+                  (list (ly:grob-property grob 'direction) (ly:grob-property grob 'duration-log)
+                        (if (pair? bm) (list (or (car bm) '()) (or (cdr bm) '())) #f)
+                        (and (ly:grob? fl) (grob::is-live? fl))
+                        (map pk-head-pitch heads))))
+        ((NoteHead) (list (pk-head-pitch grob) (ly:grob-property grob 'staff-position)))
+        ((ClefModifier) (list (markup->string (ly:grob-property grob 'text)) (ly:grob-property grob 'direction #f)
+                              (ly:item-break-dir grob)))
+        ((TimeSignature) (let ((fr (ly:grob-property grob 'fraction)))
+                           (list (car fr) (cdr fr) (ly:grob-property grob 'style) (ly:item-break-dir grob))))
+        ((BarLine) (list (ly:grob-property grob 'glyph-name) (ly:item-break-dir grob)))
         (else '())))))))
 #(define (pk-nh-color grob)
   (let* ((ev (event-cause grob))

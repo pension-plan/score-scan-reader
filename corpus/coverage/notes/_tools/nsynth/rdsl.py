@@ -1,4 +1,11 @@
-"""Rhythm DSL: LilyPond-like note text (absolute pitch) -> score model.
+"""Notes-coverage DSL (copy of corpus/challenge/rhythm/_tools/rsynth/rdsl.py, extended):
+LilyPond-like note text (absolute pitch) -> score model.
+
+Extensions: \\stemUp \\stemDown \\stemNeutral (sticky, as in LilyPond; graces keep stems up),
+  note suffix :8 :16 :32 (single-note tremolo), \\trem N { a16 b16 } (two-note tremolo =
+  \\repeat tremolo N), \\sb (secondary beams break after the previous note),
+  ^"text" (words above the note, '_' -> space), \\hookF / \\hookB before a note (beamlet direction),
+  voice option cue=True (all notes of that voice are cue notes).
 
 Voice text tokens (whitespace separated; chords <c' e'> may contain spaces):
   |                         bar line (all voices must have the same number of bars and
@@ -19,7 +26,7 @@ from __future__ import annotations
 import re
 from fractions import Fraction as F
 
-from .model import Event, MeasureInfo, Part, Score, VoiceDef, display_ql, renumber
+from .model import Event, MeasureInfo, Part, Score, VoiceDef, display_ql, ql_to_type, renumber
 
 DUR_TYPE = {'\\breve': 'breve', '1': 'whole', '2': 'half', '4': 'quarter', '8': 'eighth', '16': '16th',
             '32': '32nd', '64': '64th'}
@@ -32,6 +39,8 @@ KEYS_MAJ = {'c': 0, 'g': 1, 'd': 2, 'a': 3, 'e': 4, 'b': 5, 'fis': 6, 'cis': 7, 
 KEYS_MIN = {'a': 0, 'e': 1, 'b': 2, 'fis': 3, 'cis': 4, 'gis': 5, 'dis': 6, 'ais': 7, 'd': -1, 'g': -2, 'c': -3,
             'f': -4, 'bes': -5, 'ees': -6, 'aes': -7}
 SUFFIXES = [':h', '\\fermata', '~', '[', ']', '(', ')', '-.', '->', '--']
+TREM = re.compile(r'^:(8|16|32|64)')
+WORDS = re.compile(r'^\^"([^"]*)"')
 DYN = re.compile(r'^\\(ppp|pp|p|mp|mf|ff|fff|f|sfz|sf)(?![a-z])')
 GRACE_KW = {'\\grace': 'grace', '\\sgrace': 'slashed', '\\acc': 'acciaccatura', '\\app': 'appoggiatura'}
 
@@ -69,6 +78,8 @@ def parse_voice(text):
     stack = []            # ('tuplet', ratio, hidden, start_idx) | ('grace', kind, start_idx)
     single_grace = None   # grace kind applying to the next note token only
     pending_grace_stop = False
+    forced_stem = None    # \stemUp / \stemDown state
+    pending_hook = None
     i = 0
 
     def close_measure():
@@ -85,6 +96,24 @@ def parse_voice(text):
             close_measure()
             continue
         if tk == '\\partial':     # informational only: a short first bar is a pickup
+            continue
+        if tk in ('\\stemUp', '\\stemDown', '\\stemNeutral'):
+            forced_stem = {'\\stemUp': 'up', '\\stemDown': 'down', '\\stemNeutral': None}[tk]
+            continue
+        if tk in ('\\hookF', '\\hookB'):
+            pending_hook = 'forward' if tk == '\\hookF' else 'backward'
+            continue
+        if tk == '\\sb':
+            prev = [e for e in cur['events'] if e.kind in ('note', 'rest')]
+            if not prev:
+                raise ValueError('\\sb without a previous note')
+            prev[-1].sub_break = True
+            continue
+        if tk == '\\trem':
+            n = int(toks[i])
+            assert toks[i + 1] == '{', 'trem needs {'
+            i += 2
+            stack.append(('trem', n, len(cur['events'])))
             continue
         if tk == '\\time':
             spec = toks[i]
@@ -131,6 +160,22 @@ def parse_voice(text):
             if top[0] == 'tuplet':
                 evs[0].tuplet_start = True
                 evs[-1].tuplet_stop = True
+            elif top[0] == 'trem':
+                if len(evs) != 2 or any(e.kind != 'note' for e in evs) or evs[0].dtype != evs[1].dtype \
+                        or evs[0].dots or evs[1].dots:
+                    raise ValueError('\\trem needs exactly two notes of equal plain value')
+                total = top[1] * (evs[0].dur + evs[1].dur)
+                tt = ql_to_type(total)
+                if tt is None:
+                    raise ValueError(f'two-note tremolo total {total} not a plain value')
+                sub = [k for k, v in DUR_TYPE.items() if v == evs[0].dtype][0]
+                for e, role in zip(evs, ('start', 'stop')):
+                    e.dtype, e.dots = tt
+                    e.tuplet = (2, 1)
+                    e.dur = total / 2
+                    e.trem2 = role
+                    e.trem2_reps = top[1]
+                    e.trem2_sub = sub
             else:
                 if top[1] in ('acciaccatura', 'appoggiatura'):
                     evs[0].grace_slur_start = True
@@ -161,6 +206,8 @@ def parse_voice(text):
         hidden = False
         in_grace = None
         for fr in stack:
+            if fr[0] == 'trem':
+                continue
             if fr[0] == 'tuplet':
                 if tup is not None:
                     raise ValueError('nested tuplets not supported')
@@ -186,6 +233,10 @@ def parse_voice(text):
                 cur['events'].append(Event('rest', base, measure_rest=True, multirest_cont=True))
             continue
         ev = Event('rest' if p == 'r' else 'note', dur, dtype=dtype, dots=nd)
+        if p != 'r' and forced_stem and not in_grace:
+            ev.stem, ev.stem_forced = forced_stem, True
+        if pending_hook:
+            ev.hook, pending_hook = pending_hook, None
         if tup:
             ev.tuplet, ev.tuplet_hidden = tup, hidden
         if p.startswith('<'):
@@ -230,6 +281,17 @@ def _suffixes(ev, suf, tk):
             ev.dynamics.append(m.group(1))
             s = s[m.end():]
             continue
+        m = WORDS.match(s)
+        if m:
+            ev.words = m.group(1).replace('_', ' ')
+            s = s[m.end():]
+            continue
+        if not s.startswith(':h'):
+            m = TREM.match(s)
+            if m:
+                ev.trem = int(m.group(1))
+                s = s[m.end():]
+                continue
         for x in SUFFIXES:
             if s.startswith(x):
                 if x == ':h':
@@ -322,11 +384,16 @@ def build_score(spec):
         part = Part(id=p['id'], name=p['name'], abbr=p.get('abbr', ''), instrument=p.get('instrument', 'voice'),
                     staves=p.get('staves', 1), clefs=list(p.get('clefs', ['treble'])))
         part.voices = [VoiceDef(v['key'], v.get('staff', 1)) for v in p['voices']]
+        cue_keys = {v['key'] for v in p['voices'] if v.get('cue')}
         part.measures = [dict() for _ in range(nm)]
         for a, b, m in parsed:
             if a == p['id']:
                 for i in range(nm):
                     part.measures[i][b] = m[i]['events']
+                    if b in cue_keys:
+                        for e in m[i]['events']:
+                            if e.kind == 'note':
+                                e.cue = True
         sc.parts.append(part)
     # forced breaks
     systems = spec.get('systems')

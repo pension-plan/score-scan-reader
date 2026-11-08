@@ -1,5 +1,6 @@
-"""[rhythm-challenge copy of corpus/synthetic/_tools/synth/model.py, extended with grace notes,
-explicit beams, hidden tuplets, multi-measure rests, rehearsal marks/words and forced breaks]
+"""[coverage/notes copy of corpus/challenge/rhythm/_tools/rsynth/model.py (itself a copy of
+corpus/synthetic/_tools/synth/model.py), extended with explicit stem directions, staff positions /
+ledger lines, cue notes, single- and two-note tremolos, secondary-beam breaks and note words]
 
 Internal score model shared by the MusicXML writer (ground truth) and the
 LilyPond writer (engraving).  Both outputs are generated from the same model so
@@ -102,6 +103,18 @@ class Event:
     multirest: int = 0             # >0 on the first measure-rest of a multi-measure rest block (block length)
     multirest_cont: bool = False   # measure rest inside a multi-measure rest block (not first)
     multirest_hbar: bool = False   # force H-bar style (LilyPond default: church-rest symbols up to 10 bars)
+    # --- coverage/notes extensions
+    stem: Optional[str] = None     # 'up' | 'down' (None for whole/breve); filled by assign_stems()
+    stem_forced: bool = False      # direction given explicitly in the source (\stemUp / \stemDown)
+    cue: bool = False              # cue-size note (truth <cue/> + <type size="cue">)
+    trem: int = 0                  # single-note tremolo: LilyPond subdivision (8, 16, 32) or 0
+    trem2: Optional[str] = None    # two-note tremolo: 'start' | 'stop'
+    trem2_reps: int = 0            # \repeat tremolo <n> (on the start note)
+    trem2_sub: str = ''            # duration of the notes inside the repeat body ('16', '32')
+    sub_break: bool = False        # secondary beams (level >= 2) break after this note
+    hook: Optional[str] = None     # beamlet direction override: 'forward' | 'backward'
+    words: Optional[str] = None    # text printed above this note (e.g. cue instrument name)
+    positions: List[int] = field(default_factory=list)   # staff position per pitch (0 = middle line)
 
     @property
     def is_note(self):
@@ -564,3 +577,116 @@ def sanitize_ties(score: Score):
                     prev = ev
             if prev is not None:
                 prev.tie_start = set()
+
+
+# ---------------------------------------------------------------- coverage/notes: stems, positions, ledgers
+
+CLEF_MIDDLE = {'treble': ('B', 4), 'bass': ('D', 3), 'alto': ('C', 4), 'tenor': ('A', 3), 'soprano': ('G', 4),
+               'mezzosoprano': ('E', 4), 'baritone': ('F', 3), 'varbaritone': ('F', 3),
+               'treble_8': ('B', 3), 'treble^8': ('B', 5), 'bass_8': ('D', 2), 'bass^8': ('D', 4)}
+NBEAMS = {'eighth': 1, '16th': 2, '32nd': 3, '64th': 4, '128th': 5}
+TREM_MARKS = {8: 1, 16: 2, 32: 3, 64: 4}
+
+
+def dnum(step, octv):
+    return octv * 7 + STEPS.index(step)
+
+
+def staff_position(p: Pitch, clef: str) -> int:
+    ms, mo = CLEF_MIDDLE[clef]
+    return dnum(p[0], p[2]) - dnum(ms, mo)
+
+
+def ledgers(pos: int) -> int:
+    """>0: ledger lines above the staff, <0: below, 0: none (5-line staff, middle line = 0)"""
+    if pos >= 6:
+        return (pos - 4) // 2
+    if pos <= -6:
+        return -((-pos - 4) // 2)
+    return 0
+
+
+def single_trem_marks(ev) -> int:
+    """number of tremolo strokes LilyPond draws for c4:16 etc. (beams of the subdivision minus the
+    note's own beams/flags)"""
+    if not ev.trem:
+        return 0
+    sub = {8: 1, 16: 2, 32: 3, 64: 4}[ev.trem]
+    own = NBEAMS.get(ev.dtype, 0)
+    return sub - own
+
+
+def stem_rule(positions):
+    """standard rule: the head farthest from the middle line decides; middle line -> down"""
+    up = max(positions)
+    down = -min(positions)
+    return 'down' if up >= down else 'up'
+
+
+def has_stem(ev) -> bool:
+    return ev.kind == 'note' and ev.dtype not in ('whole', 'breve')
+
+
+def assign_positions_and_stems(score: Score):
+    """fill ev.positions for every note (from the clef in force on the voice's staff) and give every
+    stemmed note an explicit direction: forced ones are kept, graces go up, a voice in polyphony
+    follows its role (voiceOne/Three up, Two/Four down), otherwise the standard rule is applied to
+    the whole beam group / two-note tremolo pair / single event."""
+    from .mxl import beam_groups   # local import: mxl imports model
+    for p in score.parts:
+        clef_by_staff = {s + 1: c for s, c in enumerate(p.clefs)}
+        cur_clef = {}
+        for v in p.voices:
+            cur_clef[v.key] = clef_by_staff[v.staff]
+        for i, m in enumerate(p.measures):
+            # roles per staff in this measure
+            roles = {}
+            for s in range(1, p.staves + 1):
+                vk = [(v.key, m.get(v.key, [])) for v in p.voices if v.staff == s]
+                roles.update(staff_roles(vk))
+            for v in p.voices:
+                evs = m.get(v.key, [])
+                for ev in evs:
+                    if ev.kind == 'clef':
+                        cur_clef[v.key] = ev.clef
+                        continue
+                    if ev.kind == 'note':
+                        ev.positions = [staff_position(pit, cur_clef[v.key]) for pit in ev.pitches]
+                role = roles.get(v.key, 0)
+                # units sharing one direction
+                units = []
+                done = set()
+                for g in beam_groups(evs):
+                    u = [k for k in g if evs[k].kind == 'note']
+                    units.append(u)
+                    done.update(u)
+                k = 0
+                while k < len(evs):
+                    ev = evs[k]
+                    if ev.kind == 'note' and k not in done:
+                        if ev.trem2 == 'start':
+                            units.append([k, k + 1])
+                            done.update((k, k + 1))
+                        else:
+                            units.append([k])
+                            done.add(k)
+                    k += 1
+                for u in units:
+                    evu = [evs[k] for k in u]
+                    if not any(has_stem(e) for e in evu):
+                        continue
+                    forced = {e.stem for e in evu if e.stem_forced and has_stem(e) and not e.grace}
+                    if len(forced) > 1:
+                        raise ValueError(f'{p.id} m{i} voice {v.key}: mixed forced stems in one beam/tremolo unit')
+                    if evu[0].grace:
+                        d = 'up'
+                    elif forced:
+                        d = forced.pop()
+                    elif role in (1, 3):
+                        d = 'up'
+                    elif role in (2, 4):
+                        d = 'down'
+                    else:
+                        d = stem_rule([q for e in evu for q in e.positions])
+                    for e in evu:
+                        e.stem = d if has_stem(e) else None

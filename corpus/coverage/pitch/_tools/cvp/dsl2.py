@@ -133,22 +133,26 @@ def parse_voice(text):
 
 
 def build(parts, time=(4, 4), key=(0, 'major'), time_symbol=None):
-    """parts: list of dicts {id, name, abbr, clef, music, instrument}; every part one voice '1'.
+    """parts: list of dicts {id, name, abbr, clef, music, instrument} or, for a multi-staff part (piano,
+    organ), {id, name, abbr, clefs: [..], staves: [music, music, ..], instrument}: one voice per staff
+    (keys '1', '5', '9').
     Returns Score; directives (key/bar/brk) merged across parts."""
     parsed = []
     dirs = {}
     for spec in parts:
-        meas, d = parse_voice(spec['music'])
-        parsed.append(meas)
-        for mi, dd in d.items():
-            for k, v in dd.items():
-                if mi in dirs and k in dirs[mi] and dirs[mi][k] != v:
-                    raise ValueError(f'conflicting directive {k} in measure {mi}')
-                dirs.setdefault(mi, {})[k] = v
+        musics = spec['staves'] if 'staves' in spec else [spec['music']]
+        for mus in musics:
+            meas, d = parse_voice(mus)
+            parsed.append(meas)
+            for mi, dd in d.items():
+                for k, v in dd.items():
+                    if mi in dirs and k in dirs[mi] and dirs[mi][k] != v:
+                        raise ValueError(f'conflicting directive {k} in measure {mi}')
+                    dirs.setdefault(mi, {})[k] = v
     nm = len(parsed[0])
-    for spec, meas in zip(parts, parsed):
+    for meas in parsed:
         if len(meas) != nm:
-            raise ValueError(f"part {spec['id']}: {len(meas)} measures, expected {nm}")
+            raise ValueError(f"a staff has {len(meas)} measures, expected {nm}")
     nominal = F(time[0] * 4, time[1])
     sc = Score()
     for i in range(nm):
@@ -172,12 +176,18 @@ def build(parts, time=(4, 4), key=(0, 'major'), time_symbol=None):
         sc.measures.append(mi)
     if not sc.measures[-1].right_bar:
         sc.measures[-1].right_bar = 'final'
-    for spec, meas in zip(parts, parsed):
+    k = 0
+    for spec in parts:
+        nst = len(spec['staves']) if 'staves' in spec else 1
         p = Part(id=spec['id'], name=spec.get('name', ''), abbr=spec.get('abbr', ''),
-                 instrument=spec.get('instrument', 'voice'), clefs=[spec.get('clef', 'treble')])
-        p.voices = [VoiceDef('1', 1)]
+                 instrument=spec.get('instrument', 'voice'), staves=nst,
+                 clefs=list(spec['clefs']) if 'clefs' in spec else [spec.get('clef', 'treble')])
+        keys = ['1', '5', '9'][:nst] if nst > 1 else ['1']
+        p.voices = [VoiceDef(vk, j + 1) for j, vk in enumerate(keys)]
+        stv = parsed[k:k + nst]
+        k += nst
         for i in range(nm):
-            p.measures.append({'1': meas[i]})
+            p.measures.append({vk: stv[j][i] for j, vk in enumerate(keys)})
         sc.parts.append(p)
     renumber(sc)
     return sc

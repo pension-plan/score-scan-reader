@@ -112,7 +112,7 @@ def mark_xml(mk, staff):
     return f'      <direction placement="{place}">{body}{st}{sound or ""}</direction>'
 
 
-def write_musicxml(score: Score, path: str, software='layout-challenge corpus builder', date='2026-11-08'):
+def write_musicxml(score: Score, path: str, software='coverage corpus builder (structure family)', date='2026-11-08'):
     div = divisions_for(score)
     out = []
     w = out.append
@@ -360,6 +360,9 @@ def _note(w, ev, pit, chord, d, voice, staff, role, acc, first):
         w('        <stem>down</stem>')
     if staff:
         w(f'        <staff>{staff}</staff>')
+    if first and ev.kind == 'note' and not ev.cue:
+        for lev, val in ev.beams:
+            w(f'        <beam number="{lev}">{val}</beam>')
     nots = []
     if tie_stop:
         nots.append('<tied type="stop"/>')

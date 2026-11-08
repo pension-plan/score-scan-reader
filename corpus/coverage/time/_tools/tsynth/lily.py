@@ -1,6 +1,7 @@
 """Internal model + staff layout -> LilyPond source (absolute pitch).
 
-Rhythm-challenge copy of corpus/synthetic/_tools/synth/lily.py, extended with grace
+coverage/time copy of corpus/challenge/rhythm/_tools/rsynth/lily.py (nested \\tuplet groups).
+The rhythm copy extended corpus/synthetic/_tools/synth/lily.py with grace
 notes, explicit beams (\\autoBeamOff + [ ]), hidden tuplets, multi-measure rests,
 rehearsal marks / tempo words, forced system/page breaks and named Lyrics contexts
 (used by the event-dump verification)."""
@@ -233,9 +234,10 @@ class LilyWriter:
         return '\n    '.join(out)
 
     def events_ly(self, evs):
+        """coverage/time: tuplet groups may nest (Event.tup_levels / tup_starts / tup_stops)."""
+        from .model import display_ql, ql_to_type
         out = []
-        in_tup = False
-        tup_ratio = None
+        open_ = []          # ratios of the currently open \tuplet groups, outer -> inner
         k = 0
         while k < len(evs):
             ev = evs[k]
@@ -244,9 +246,8 @@ class LilyWriter:
                 k += 1
                 continue
             if ev.kind == 'space':
-                if in_tup:
-                    out.append('}')
-                    in_tup = False
+                out.extend('}' * len(open_))
+                open_ = []
                 out.append('s' + frac_whole(ev.dur))
                 k += 1
                 continue
@@ -262,13 +263,19 @@ class LilyWriter:
                     out.append(f'{cmd} {{ ' + ' '.join(grp) + ' }')
                 k = j
                 continue
-            if ev.tuplet and (not in_tup or ev.tuplet != tup_ratio or ev.tuplet_start):
-                if in_tup:
-                    out.append('}')
-                a, n = ev.tuplet
+            levels = list(ev.tup_levels) if ev.tuplet else []
+            starts = set(ev.tup_starts)
+            c = 0
+            while c < len(open_) and c < len(levels) and open_[c] == levels[c] and c not in starts:
+                c += 1
+            out.extend('}' * (len(open_) - c))
+            open_ = open_[:c]
+            for L in range(c, len(levels)):
+                a, n = levels[L]
                 span = ''
-                if not ev.tuplet_start:
-                    from .model import display_ql, ql_to_type
+                if L not in starts:
+                    if len(levels) > 1:
+                        raise ValueError('nested tuplet group continued without start')
                     sp = display_ql(ev.dtype, 0) * n
                     t = ql_to_type(sp)
                     if t:
@@ -276,17 +283,15 @@ class LilyWriter:
                 if ev.tuplet_hidden:
                     out.append('\\once \\omit TupletNumber \\once \\omit TupletBracket')
                 out.append(f'\\tuplet {a}/{n}{span} {{')
-                in_tup, tup_ratio = True, ev.tuplet
-            elif not ev.tuplet and in_tup:
-                out.append('}')
-                in_tup = False
+                open_.append(levels[L])
             out.append(self.event_ly(ev))
-            if ev.tuplet and ev.tuplet_stop and in_tup:
+            for L in sorted(ev.tup_stops, reverse=True):
+                if L != len(open_) - 1:
+                    raise ValueError(f'tuplet stop level {L} with open {open_}')
                 out.append('}')
-                in_tup = False
+                open_.pop()
             k += 1
-        if in_tup:
-            out.append('}')
+        out.extend('}' * len(open_))
         return out
 
     def event_ly(self, ev):

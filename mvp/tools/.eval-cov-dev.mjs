@@ -613,9 +613,24 @@ async function main() {
     summary.by_category = groupBy(chal, 'category');
     summary.by_variant = groupBy(chal, 'variant');
   }
+  const cov = results.filter(r => r.set === 'coverage');
+  if (cov.length) {
+    const groupBy = (rs, k) => { const g = {}; for (const r of rs) (g[r[k]] ||= []).push(r); return Object.fromEntries(Object.keys(g).sort().map(x => [x, summarize(g[x])])); };
+    const med = a => { const b = a.filter(x => x != null).sort((x, y) => x - y); return b.length ? b[b.length >> 1] : null; };
+    const ok = cov.filter(r => !r.crash);
+    summary.coverage = summarize(cov);
+    summary.coverage_aggregate = summary.coverage.aggregate;
+    summary.by_family = groupBy(cov, 'family');
+    summary.by_variant = groupBy(cov, 'variant');
+    summary.perf = {
+      n: ok.length, jobs, ms_per_page_median: med(ok.map(r => r.ms_per_page)), ms_per_page_max: Math.max(0, ...ok.map(r => r.ms_per_page || 0)),
+      peak_rss_mb_median: med(cov.map(r => r.peak_rss_mb)), peak_rss_mb_max: Math.max(0, ...cov.map(r => r.peak_rss_mb || 0)),
+      ms_per_megapixel: (() => { const mp = ok.reduce((s, r) => s + (r.megapixels || 0), 0); return mp ? Math.round(ok.reduce((s, r) => s + (r.megapixels ? r.runtime_ms : 0), 0) / mp) : null; })(),
+    };
+  }
   const report = {
     when: new Date().toISOString(), wall_s: Math.round((Date.now() - t0) / 100) / 10,
-    config: { ocr: args.ocr, dpi: args.dpi, jobs, src: args.src, src_hash: srcHash(args.src), schema, weights: W, outputs: outDir, ...(chal.length ? { set: 'challenge' } : {}) },
+    config: { ocr: args.ocr, dpi: args.dpi, jobs, src: args.src, src_hash: srcHash(args.src), schema, weights: W, outputs: outDir, ...(chal.length ? { set: 'challenge' } : {}), ...(cov.length ? { set: 'coverage', coverage_dir: COVERAGE, cpus: os.cpus().length, loadavg: os.loadavg().map(x => +x.toFixed(1)) } : {}) },
     summary, items: results,
   };
   fs.writeFileSync(args.out, JSON.stringify(report, null, 1));
@@ -623,21 +638,24 @@ async function main() {
   // compact table
   const pad = (s, n) => String(s).padEnd(n).slice(0, n);
   const f = x => x == null ? '  -  ' : x.toFixed(3);
-  const IW = chal.length ? Math.max(38, ...results.map(r => r.id.length)) : 38;
-  const rows = [`${pad('item', IW)} ${pad('set', 4)}  agg   pitch  dur   rests lyric parts xml   parts(T/P) notes(T/P)  sec  crash`];
+  const IW = chal.length || cov.length ? Math.max(38, ...results.map(r => r.id.length)) : 38;
+  const rows = [`${pad('item', IW)} ${pad('set', 4)}  agg   pitch  dur   rests lyric parts xml   parts(T/P) notes(T/P)  sec  crash${cov.length ? '  pg  ms/pg   MP    MB' : ''}`];
   for (const r of results) {
     const pd = r.parts_detail || {}, c = r.counts || {};
-    rows.push(`${pad(r.id, IW)} ${pad(r.set.slice(0, 4), 4)}  ${f(r.aggregate)} ${f(r.pitch)} ${f(r.duration)} ${f(r.rests)} ${f(r.lyrics)} ${f(r.parts)} ${f(r.xml_valid)} ${pad(`${pd.truth ?? '-'}/${pd.ours ?? '-'}`, 10)} ${pad(`${c.tp ?? '-'}/${c.pp ?? '-'}`, 11)} ${pad(((r.runtime_ms || 0) / 1000).toFixed(1), 5)} ${r.crash ? 'X' : ''}`);
+    const perf = cov.length ? `  ${pad(r.pagesN ?? '-', 3)} ${pad(r.ms_per_page ?? '-', 7)} ${pad(r.megapixels != null ? r.megapixels.toFixed(1) : '-', 5)} ${pad(r.peak_rss_mb != null ? Math.round(r.peak_rss_mb) : '-', 5)}` : '';
+    rows.push(`${pad(r.id, IW)} ${pad(r.set.slice(0, 4), 4)}  ${f(r.aggregate)} ${f(r.pitch)} ${f(r.duration)} ${f(r.rests)} ${f(r.lyrics)} ${f(r.parts)} ${f(r.xml_valid)} ${pad(`${pd.truth ?? '-'}/${pd.ours ?? '-'}`, 10)} ${pad(`${c.tp ?? '-'}/${c.pp ?? '-'}`, 11)} ${pad(((r.runtime_ms || 0) / 1000).toFixed(1), 5)} ${cov.length ? (r.crash ? 'X' : ' ') + perf : (r.crash ? 'X' : '')}`);
   }
   rows.push('-'.repeat(IW + 82));
   const groups = [['ALL', summary.all], ['synthetic', summary.synthetic], ['real', summary.real]];
   if (chal.length) for (const k of ['by_category', 'by_variant']) for (const [g, s] of Object.entries(summary[k])) groups.push([g, s]);
+  if (cov.length) for (const k of ['by_family', 'by_variant']) for (const [g, s] of Object.entries(summary[k])) groups.push([g, s]);
   for (const [name, s] of groups) {
     if (!s.n) continue;
     rows.push(`${pad(`${name} (n=${s.n})`, IW)} ${pad('', 4)}  ${f(s.aggregate)} ${f(s.pitch)} ${f(s.duration)} ${f(s.rests)} ${f(s.lyrics)} ${f(s.parts)} ${f(s.xml_valid)} crashes=${s.crashes} mean_runtime=${(s.runtime_ms_mean / 1000).toFixed(1)}s`);
   }
   console.log(rows.join('\n'));
   if (chal.length) console.log(`challenge_aggregate=${f(summary.challenge_aggregate)} ${Object.entries(summary.by_category).map(([k, s]) => `${k}=${f(s.aggregate)}`).join(' ')} crashes=${summary.challenge.crashes}  -> ${args.out}  (${report.wall_s}s)`);
+  else if (cov.length) console.log(`coverage_aggregate=${f(summary.coverage_aggregate)} ${Object.entries(summary.by_family).map(([k, s]) => `${k}=${f(s.aggregate)}`).join(' ')} crashes=${summary.coverage.crashes} ms/page(median)=${summary.perf.ms_per_page_median} peakMB(max)=${summary.perf.peak_rss_mb_max}  -> ${args.out}  (${report.wall_s}s)`);
   else console.log(`aggregate=${f(summary.aggregate)} synthetic=${f(summary.synthetic_aggregate)} real_scan_aggregate=${f(summary.real_scan_aggregate)}  -> ${args.out}  (${report.wall_s}s)`);
 }
 

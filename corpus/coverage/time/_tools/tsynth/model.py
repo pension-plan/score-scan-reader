@@ -1,5 +1,5 @@
-"""[rhythm-challenge copy of corpus/synthetic/_tools/synth/model.py, extended with grace notes,
-explicit beams, hidden tuplets, multi-measure rests, rehearsal marks/words and forced breaks]
+"""[coverage/time copy of corpus/challenge/rhythm/_tools/rsynth/model.py (itself extended from
+corpus/synthetic/_tools/synth/model.py); adds nested tuplets: Event.tup_levels / tup_starts / tup_stops]
 
 Internal score model shared by the MusicXML writer (ground truth) and the
 LilyPond writer (engraving).  Both outputs are generated from the same model so
@@ -102,6 +102,12 @@ class Event:
     multirest: int = 0             # >0 on the first measure-rest of a multi-measure rest block (block length)
     multirest_cont: bool = False   # measure rest inside a multi-measure rest block (not first)
     multirest_hbar: bool = False   # force H-bar style (LilyPond default: church-rest symbols up to 10 bars)
+    # --- coverage/time extension: nested tuplets.  tuplet = product ratio of all levels;
+    # tup_levels = [(actual, normal), ...] outer -> inner; tup_starts / tup_stops = level indices
+    # whose group starts / stops on this event.
+    tup_levels: List[Tuple[int, int]] = field(default_factory=list)
+    tup_starts: List[int] = field(default_factory=list)
+    tup_stops: List[int] = field(default_factory=list)
 
     @property
     def is_note(self):

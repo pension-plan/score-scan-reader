@@ -1,6 +1,4 @@
-"""Small SATB voice-leading solver (copied from corpus/synthetic/_tools/synth/harmonize.py and
-extended: ger6 / it6 / dim7 / aug chord qualities with correct enharmonic spelling, and
-configurable voice ranges so it can also voice TTBB).
+"""Small SATB voice-leading solver for self-authored hymn harmonisations.
 
 Given a soprano line and one chord symbol per soprano attack, choose alto,
 tenor and bass notes (homophonic rhythm) by dynamic programming, penalising
@@ -16,7 +14,7 @@ import re
 
 from .model import STEP_PC, STEPS, midi
 
-CH = re.compile(r'^(?P<r>[A-G])(?P<ra>#|b)?(?P<q>m7|maj7|m|dim7|dim|7|sus4|ger6|it6|aug)?(?:/(?P<b>[A-G])(?P<ba>#|b)?)?$')
+CH = re.compile(r'^(?P<r>[A-G])(?P<ra>#|b)?(?P<q>m7|maj7|m|dim|7|sus4)?(?:/(?P<b>[A-G])(?P<ba>#|b)?)?$')
 
 
 def _spell(root, semis, letters):
@@ -33,37 +31,26 @@ def chord_tones(sym):
         raise ValueError(sym)
     root = (m.group('r'), {'#': 1, 'b': -1, None: 0}[m.group('ra')])
     q = m.group('q') or ''
-    third = 3 if q in ('m', 'm7', 'dim', 'dim7') else 4
+    third = 3 if q in ('m', 'm7', 'dim') else 4
     if q == 'sus4':
         third = 5
-    fifth = 6 if q in ('dim', 'dim7') else (8 if q == 'aug' else 7)
+    fifth = 6 if q == 'dim' else 7
     tones = [root, _spell(root, third, 3 if q == 'sus4' else 2), _spell(root, fifth, 4)]
     if q in ('7', 'm7'):
         tones.append(_spell(root, 10, 6))
     if q == 'maj7':
         tones.append(_spell(root, 11, 6))
-    if q == 'dim7':
-        tones.append(_spell(root, 9, 6))
-    if q == 'ger6':          # b6 - 1 - b3 - #4 above the bass:  Cb Eb Gb A  (in Eb)
-        tones.append(_spell(root, 10, 5))
-    if q == 'it6':
-        tones = [tones[0], tones[1], _spell(root, 10, 5)]
     bass = root
     if m.group('b'):
         bass = (m.group('b'), {'#': 1, 'b': -1, None: 0}[m.group('ba')])
     return tones, bass, q
 
 
-RANGES = {'a': (55, 74), 't': (48, 69), 'b': (40, 62), 'ca': 65, 'ct': 57}
-TTBB = {'a': (46, 67), 't': (41, 62), 'b': (36, 57), 'ca': 57, 'ct': 51}
-
-
 def pc(t):
     return (STEP_PC[t[0]] + t[1]) % 12
 
 
-def candidates(tones, bass, sop, quality, lead_pc, R=None):
-    R = R or RANGES
+def candidates(tones, bass, sop, quality, lead_pc):
     tpcs = [pc(t) for t in tones]
     by_pc = {pc(t): t for t in tones}
     s_m = midi(sop)
@@ -75,9 +62,9 @@ def candidates(tones, bass, sop, quality, lead_pc, R=None):
             if lo <= midi(p) <= hi:
                 res.append(p)
         return res
-    B = pitches_in(bass, *R['b'])
-    T_all = [p for t in tones for p in pitches_in(t, *R['t'])]
-    A_all = [p for t in tones for p in pitches_in(t, *R['a'])]
+    B = pitches_in(bass, 40, 62)
+    T_all = [p for t in tones for p in pitches_in(t, 48, 69)]
+    A_all = [p for t in tones for p in pitches_in(t, 55, 74)]
     for b in B:
         for t in T_all:
             if not (midi(b) <= midi(t) and midi(t) - midi(b) <= 19):
@@ -93,7 +80,7 @@ def candidates(tones, bass, sop, quality, lead_pc, R=None):
                     continue
                 cost = 0
                 if tpcs[2] not in pcs:
-                    cost += 6 if quality in ('ger6', 'dim7') else 1.5
+                    cost += 1.5
                 cnt = {x: pcs.count(x) for x in set(pcs)}
                 if cnt.get(tpcs[1], 0) > 1 and quality in ('',):
                     cost += 2.5
@@ -106,7 +93,7 @@ def candidates(tones, bass, sop, quality, lead_pc, R=None):
                 if midi(t) == midi(a):
                     cost += 2
                 # prefer close-ish spacing centred voices
-                cost += abs(midi(a) - R['ca']) * 0.05 + abs(midi(t) - R['ct']) * 0.05
+                cost += abs(midi(a) - 65) * 0.05 + abs(midi(t) - 57) * 0.05
                 out.append(((b, t, a), cost))
     return out
 
@@ -157,7 +144,7 @@ def transition(v1, s1, v2, s2):
     return cost
 
 
-def harmonize(sop_measures, chords, tonic_pc, ranges=None):
+def harmonize(sop_measures, chords, tonic_pc):
     """sop_measures: list of measures (list of Events) for soprano.
     chords: list of chord symbols, one per soprano note event (including tie
     continuations, use '~').  Returns (alto, tenor, bass) measure lists."""
@@ -174,7 +161,7 @@ def harmonize(sop_measures, chords, tonic_pc, ranges=None):
         if sym == '-':
             sym = prev_sym
         tones, bass, q = chord_tones(sym)
-        cands = candidates(tones, bass, ev.pitches[0], q, lead_pc, ranges)
+        cands = candidates(tones, bass, ev.pitches[0], q, lead_pc)
         if not cands:
             raise ValueError(f'no voicing for {sym} under {ev.pitches[0]}')
         steps.append(cands)

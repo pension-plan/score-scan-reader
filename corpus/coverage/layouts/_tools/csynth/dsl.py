@@ -20,8 +20,8 @@ from fractions import Fraction as F
 
 from .model import Event, MeasureInfo, Part, Score, VoiceDef, display_ql, renumber
 
-DUR_TYPE = {'1': 'whole', '2': 'half', '4': 'quarter', '8': 'eighth', '16': '16th', '32': '32nd'}
-TOK = re.compile(r"^(?P<p>(?:<[^>]+>)|[a-g](?:isis|eses|is|es|s)?[',]*|r|s|R)(?P<d>16|32|1|2|4|8)?(?P<dots>\.*)(?P<suf>.*)$")
+DUR_TYPE = {'1': 'whole', '2': 'half', '4': 'quarter', '8': 'eighth', '16': '16th', '32': '32nd', '64': '64th'}
+TOK = re.compile(r"^(?P<p>(?:<[^>]+>)|[a-g](?:isis|eses|is|es|s)?[',]*|r|s|R)(?P<d>16|32|64|1|2|4|8)?(?P<dots>\.*)(?P<suf>.*)$")
 PIT = re.compile(r"^(?P<s>[a-g])(?P<a>isis|eses|is|es|s)?(?P<o>[',]*)$")
 ACC = {None: 0, 'is': 1, 'es': -1, 's': -1, 'isis': 2, 'eses': -2}
 WORDS = re.compile(r'([\^_])(!?)"([^"]*)"')
@@ -120,6 +120,23 @@ def parse_voice(text, time=(4, 4)):
         if '\\fermata' in suf:
             ev.fermata = True
             suf = suf.replace('\\fermata', '')
+        for orn, tag in (('\\trill', 'trill-mark'), ('\\mordent', 'mordent'), ('\\turn', 'turn')):
+            if orn in suf:
+                ev.ornaments.append(tag)
+                suf = suf.replace(orn, '')
+        if '\\arpeggio' in suf:
+            ev.arpeggio = True
+            suf = suf.replace('\\arpeggio', '')
+        if '\\breathe' in suf:
+            ev.breath = True
+            suf = suf.replace('\\breathe', '')
+        for fg in re.findall(r'-(\d)', suf):
+            ev.fingering.append(int(fg))
+        suf = re.sub(r'-\d', '', suf)
+        if '-^' in suf:
+            ev.artic.append('strong-accent')
+        if '-!' in suf:
+            ev.artic.append('staccatissimo')
         for k in re.findall(r'\\sustain(On|Off)', suf):
             ev.pedal.append('start' if k == 'On' else 'stop')
         suf = re.sub(r'\\sustain(On|Off)', '', suf)
@@ -145,7 +162,7 @@ def parse_voice(text, time=(4, 4)):
             ev.beam = '['
         if ']' in suf:
             ev.beam = ']'
-        rest = re.sub(r'-\.|->|--|[~()\[\]]', '', suf)
+        rest = re.sub(r'-\.|->|--|-\^|-!|[~()\[\]]', '', suf)
         if rest.strip():
             raise ValueError(f'unparsed suffix {rest!r} in token {tk!r}')
         cur.append(ev)

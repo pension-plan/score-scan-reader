@@ -1,4 +1,5 @@
-"""Rhythm DSL: LilyPond-like note text (absolute pitch) -> score model.
+"""[coverage/time copy of challenge/rhythm rsynth/rdsl.py; nested \\tuplet groups allowed]
+Rhythm DSL: LilyPond-like note text (absolute pitch) -> score model.
 
 Voice text tokens (whitespace separated; chords <c' e'> may contain spaces):
   |                         bar line (all voices must have the same number of bars and
@@ -129,8 +130,11 @@ def parse_voice(text):
             if not evs:
                 raise ValueError('empty group')
             if top[0] == 'tuplet':
+                lvl = sum(1 for fr in stack if fr[0] == 'tuplet')     # depth of the closed group
                 evs[0].tuplet_start = True
                 evs[-1].tuplet_stop = True
+                evs[0].tup_starts.append(lvl)
+                evs[-1].tup_stops.append(lvl)
             else:
                 if top[1] in ('acciaccatura', 'appoggiatura'):
                     evs[0].grace_slur_start = True
@@ -160,13 +164,20 @@ def parse_voice(text):
         tup = None
         hidden = False
         in_grace = None
+        levels = []
         for fr in stack:
             if fr[0] == 'tuplet':
-                if tup is not None:
-                    raise ValueError('nested tuplets not supported')
-                tup, hidden = fr[1], fr[2]
+                levels.append(fr[1])
+                hidden = hidden or fr[2]
             else:
                 in_grace = fr[1]
+        if levels:
+            a_, n_ = 1, 1
+            for a0, n0 in levels:
+                a_, n_ = a_ * a0, n_ * n0
+            tup = (a_, n_)
+            if len(levels) > 1 and hidden:
+                raise ValueError('hidden nested tuplets not supported')
         if single_grace:
             in_grace, single_grace_now = single_grace, True
         else:
@@ -188,6 +199,7 @@ def parse_voice(text):
         ev = Event('rest' if p == 'r' else 'note', dur, dtype=dtype, dots=nd)
         if tup:
             ev.tuplet, ev.tuplet_hidden = tup, hidden
+            ev.tup_levels = list(levels)
         if p.startswith('<'):
             for x in p[1:-1].split():
                 pit, tie = parse_pitch(x)

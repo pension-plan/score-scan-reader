@@ -17,6 +17,9 @@ from fractions import Fraction as F
 from .acc import key_cancel_steps, layout_staves, simulate
 from .model import STEPS
 
+CLEF_MOD = {'treble_8': -1, 'treble^8': 1, 'bass_8': -1}
+OTT_TEXT = {'ordinals': {1: '8va', -1: '8vb', 2: '15ma', -2: '15mb'},
+            'numbers': {1: '8', -1: '8', 2: '15', -2: '15'}}
 CLEF_GLYPH = {'treble': ('clefs.G', -2), 'treble_8': ('clefs.G', -2), 'treble^8': ('clefs.G', -2),
               'bass': ('clefs.F', 2), 'bass_8': ('clefs.F', 2), 'alto': ('clefs.C', 0), 'tenor': ('clefs.C', 2),
               'soprano': ('clefs.C', -4), 'mezzosoprano': ('clefs.C', -2), 'baritone': ('clefs.C', 4)}
@@ -89,7 +92,7 @@ def _alist_fifths(al):
     return None
 
 
-def check(score, layout, rows):
+def check(score, layout, rows, ottava_style='numbers'):
     res = {'ok': True, 'problems': []}
     offs = score.measure_offsets()
     staves = layout_staves(layout)
@@ -134,14 +137,16 @@ def check(score, layout, rows):
     clef_res = {}
     for sid, voices in staves:
         st = next(s for g in layout['groups'] for s in g['staves'] if s['id'] == sid)
-        want = [(F(0), CLEF_GLYPH[st['clef']])]
+        def cg(name):
+            return CLEF_GLYPH[name] + (CLEF_MOD.get(name, 0),)
+        want = [(F(0), cg(st['clef']))]
         for pid, vk in voices:
             t = F(0)
             for i, m in enumerate(score.part(pid).measures):
                 t = offs[i]
                 for ev in m.get(vk, []):
                     if ev.kind == 'clef':
-                        c = (t, CLEF_GLYPH[ev.clef])
+                        c = (t, cg(ev.clef))
                         if c not in want:
                             want.append(c)
                     t += ev.dur
@@ -150,14 +155,19 @@ def check(score, layout, rows):
         for w_ in want:
             if not seq or seq[-1][1] != w_[1]:
                 seq.append(w_)
-        gl = sorted({(F(r['when']) * 4, (r['data'][0].replace('_change', ''), int(r['data'][1])))
+        mods = {(F(r['when']) * 4, int(r['data'][2])): (int(r['data'][1]) if r['data'][0] == '8' else 99)
+                for r in rows if r['tag'] == 'ClefModifier' and r['staff'] == sid}
+        gl = sorted({(F(r['when']) * 4, (r['data'][0].replace('_change', ''), int(r['data'][1]),
+                                         mods.get((F(r['when']) * 4, int(r['data'][2])), 0)))
                      for r in rows if r['tag'] == 'Clef' and r['staff'] == sid and r['data'][2] != -1},
                     key=lambda x: x[0])
         gseq = []
         for g in gl:
             if not gseq or gseq[-1][1] != g[1]:
                 gseq.append(g)
-        clef_res[sid] = {'expected_changes': len(seq) - 1, 'rendered_changes': len(gseq) - 1}
+        clef_res[sid] = {'expected_changes': len(seq) - 1, 'rendered_changes': len(gseq) - 1,
+                         'sequence': [f'{t}:{c[0]}@{c[1]}{"^8" if c[2] == 1 else "_8" if c[2] == -1 else ""}'
+                                      for t, c in gseq]}
         if [(t, c) for t, c in seq] != [(t, c) for t, c in gseq]:
             res['ok'] = False
             res['problems'].append(f'clef sequence mismatch on {sid}: exp {seq} got {gseq}')
@@ -216,19 +226,161 @@ def check(score, layout, rows):
                     elif ev.kind in ('note', 'rest') and cur is not None:
                         last_note = t
                     t += ev.dur
-        pieces = sorted((F(r['when']) * 4, F(r['data'][0]) * 4) for r in rows
+        pieces = sorted((F(r['when']) * 4, F(r['data'][0]) * 4, r['data'][1], int(r['data'][2])) for r in rows
                         if r['tag'] == 'OttavaBracket' and r['staff'] == sid)
         merged = []
-        for a, b in pieces:
+        for a, b, txt, dr in pieces:
             if merged and a <= merged[-1][1]:
-                merged[-1] = (merged[-1][0], max(merged[-1][1], b))
+                merged[-1] = (merged[-1][0], max(merged[-1][1], b), merged[-1][2], merged[-1][3])
             else:
-                merged.append((a, b))
-        wsp = sorted((a, b) for a, b, _n in spans)
-        ott_res[sid] = {'expected': [f'{a}-{b}' for a, b in wsp], 'rendered': [f'{a}-{b}' for a, b in merged],
+                merged.append((a, b, txt, dr))
+        tt = OTT_TEXT[ottava_style]
+        wsp = sorted((a, b, tt[n], 1 if n > 0 else -1) for a, b, n in spans)
+        ott_res[sid] = {'expected': [f'{a}-{b}:{t}{"^" if d > 0 else "_"}' for a, b, t, d in wsp],
+                        'rendered': [f'{a}-{b}:{t}{"^" if d > 0 else "_"}' for a, b, t, d in merged],
                         'pieces': len(pieces)}
         if wsp != merged:
             res['ok'] = False
             res['problems'].append(f'ottava mismatch on {sid}: exp {wsp} got {merged}')
     res['ottava'] = ott_res
+
+    # ---------------- time signatures (statements, not courtesy copies at line ends)
+    wts = []
+    for i, mi in enumerate(score.measures):
+        if mi.time or i == 0:
+            (tn, td), sym = score.current_time(i)
+            wts.append((offs[i], tn, td, sym in ('common', 'cut') and (tn, td) in ((4, 4), (2, 2))))
+    ts_res = {}
+    for sid, _v in staves:
+        got = {}
+        for r in rows:
+            if r['tag'] == 'TimeSignature' and r['staff'] == sid and r['data'][3] != -1:
+                n, d, style = int(r['data'][0]), int(r['data'][1]), r['data'][2]
+                got[F(r['when']) * 4] = (n, d, style == 'C' and (n, d) in ((4, 4), (2, 2)))
+        seq = []
+        for t in sorted(got):
+            if not seq or seq[-1][1:] != got[t]:
+                seq.append((t,) + got[t])
+        ts_res[sid] = [f'{t}:{n}/{d}{"(sym)" if y else ""}' for t, n, d, y in seq]
+        if seq != wts:
+            res['ok'] = False
+            res['problems'].append(f'time signature mismatch on {sid}: exp {wts} got {seq}')
+    res['time_signatures'] = ts_res
+
+    # ---------------- double / final barlines
+    ends = [offs[i] + mi.dur for i, mi in enumerate(score.measures)]
+    wbar = sorted((ends[i], {'double': '||', 'final': '|.'}[mi.right_bar]) for i, mi in enumerate(score.measures)
+                  if mi.right_bar in ('double', 'final'))
+    bl_res = {}
+    for sid, _v in staves:
+        got = sorted({(F(r['when']) * 4, r['data'][0]) for r in rows
+                      if r['tag'] == 'BarLine' and r['staff'] == sid and r['data'][1] != 1
+                      and r['data'][0] in ('||', '|.')})
+        bl_res[sid] = len(got)
+        if got != wbar:
+            res['ok'] = False
+            res['problems'].append(f'barline mismatch on {sid}: exp {wbar} got {got}')
+    res['barlines'] = bl_res
     return res
+
+
+# --------------------------------------------------------------- stems / beams / noteheads
+
+def _side(x):
+    if x is False or x is None:
+        return set()
+    return {int(v) for v in x}
+
+
+def annotate_stems(score, layout, rows):
+    """Copy the engraved stem direction and beaming of every note event into the model
+    (ev.stem, ev.beams).  Returns a report; raises on any unmatched note or stem."""
+    offs = score.measure_offsets()
+    staves = layout_staves(layout)
+    stems = {}
+    for r in rows:
+        if r['tag'] != 'Stem':
+            continue
+        dr, dlog, beaming, flag, heads = r['data']
+        heads = [h for h in heads if h is not False]
+        if not heads:
+            continue          # rest stem placeholder
+        key = (r['staff'], F(r['when']) * 4, frozenset(_pitch(h) for h in heads))
+        if key in stems:
+            raise RuntimeError(f'duplicate stem {key}')
+        stems[key] = {'dir': int(dr), 'dlog': int(dlog),
+                      'L': _side(beaming[0]) if beaming else set(), 'R': _side(beaming[1]) if beaming else set(),
+                      'beamed': bool(beaming), 'flag': bool(flag), 'used': False}
+    rep = {'stems': 0, 'up': 0, 'down': 0, 'beamed': 0, 'flags': 0, 'beam_groups': 0}
+    for sid, voices in staves:
+        for pid, vk in voices:
+            seq = []
+            for i, m in enumerate(score.part(pid).measures):
+                t = offs[i]
+                for ev in m.get(vk, []):
+                    if ev.kind == 'note':
+                        seq.append((t, ev))
+                    t += ev.dur
+            recs = []
+            for t, ev in seq:
+                ev.stem, ev.beams = None, {}
+                st = stems.get((sid, t, frozenset(ev.pitches)))
+                if st is None:
+                    raise RuntimeError(f'no stem logged for {sid} {pid}:{vk} t={t} {ev.pitches}')
+                st['used'] = True
+                recs.append((ev, st))
+            for k, (ev, st) in enumerate(recs):
+                if st['dlog'] >= 1:
+                    ev.stem = 'up' if st['dir'] > 0 else 'down'
+                    rep['stems'] += 1
+                    rep[ev.stem] += 1
+                if st['flag']:
+                    rep['flags'] += 1
+                    if st['beamed'] or ev.dtype not in ('eighth', '16th', '32nd', '64th'):
+                        raise RuntimeError(f'unexpected flag {sid} {ev.pitches}')
+                if not st['beamed']:
+                    if ev.dtype in ('eighth', '16th', '32nd', '64th') and not st['flag']:
+                        raise RuntimeError(f'short note without flag or beam {sid} {ev.pitches}')
+                    continue
+                rep['beamed'] += 1
+                prv = recs[k - 1][1] if k > 0 else None
+                nxt = recs[k + 1][1] if k + 1 < len(recs) else None
+                for lv in sorted(st['L'] | st['R']):
+                    if lv < 0:
+                        raise RuntimeError(f'negative beam index (knee) {sid} {ev.pitches}')
+                    inl, inr = lv in st['L'], lv in st['R']
+                    if inl and inr:
+                        v = 'continue'
+                    elif inr:
+                        v = 'begin' if (nxt and lv in nxt['L']) else 'forward hook'
+                    else:
+                        v = 'end' if (prv and lv in prv['R']) else 'backward hook'
+                    ev.beams[lv + 1] = v
+                if ev.beams.get(1) == 'begin':
+                    rep['beam_groups'] += 1
+            # sanity: level-1 beams well formed
+            open_ = False
+            for ev, st in recs:
+                b = ev.beams.get(1)
+                if b == 'begin':
+                    assert not open_, ('beam begin inside beam', sid)
+                    open_ = True
+                elif b in ('continue', 'end'):
+                    assert open_, ('beam continue/end outside beam', sid, ev.pitches)
+                    open_ = b == 'continue'
+                elif st['beamed']:
+                    raise RuntimeError(f'beamed stem without level-1 beam {sid} {ev.pitches}')
+            assert not open_, ('unterminated beam', sid)
+    unused = [k for k, v in stems.items() if not v['used']]
+    if unused:
+        raise RuntimeError(f'stems not matched to the model: {unused[:5]}')
+    return rep
+
+
+def notehead_positions(rows):
+    """(staff, onset, pitch) -> engraved staff-position (half spaces from the middle line)"""
+    out = {}
+    for r in rows:
+        if r['tag'] == 'NoteHead' and r['data'][0] is not False:
+            out[(r['staff'], F(r['when']) * 4, _pitch(r['data'][0]))] = int(r['data'][1])
+    return out

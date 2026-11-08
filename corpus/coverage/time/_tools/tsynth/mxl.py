@@ -1,6 +1,8 @@
 """Internal model -> MusicXML 4.0 partwise (ground truth).
 
-Rhythm-challenge copy of corpus/synthetic/_tools/synth/mxl.py, extended with:
+coverage/time copy of corpus/challenge/rhythm/_tools/rsynth/mxl.py (nested tuplets: time-modification =
+product of all levels, one numbered <tuplet> per level with tuplet-actual/tuplet-normal for nested groups,
+bracket per level by LilyPond's rule).  The rhythm copy extended corpus/synthetic/_tools/synth/mxl.py with:
   * explicit <beam> elements (levels 1..n, begin/continue/end/forward hook/backward hook)
     computed from the model's beam groups (the engraving uses exactly these groups:
     \\autoBeamOff + manual [ ]); beams are written on notes only, a rest inside a beam
@@ -125,6 +127,54 @@ def beam_elements(evs):
 
 def _rest_between(evs, a, b):
     return any(evs[j].kind == 'rest' for j in range(a + 1, b))
+
+
+def tuplet_groups(evs):
+    """coverage/time: every tuplet group of a voice-measure (all nesting levels).
+    -> list of dict(level, ratio, start, stop, members, nested, unit=(type, dots), bracket)."""
+    from .model import display_ql, ql_to_type
+    groups, open_ = [], {}
+    for k, ev in enumerate(evs):
+        if ev.kind not in ('note', 'rest') or not ev.tup_levels:
+            continue
+        for L in sorted(ev.tup_starts):
+            open_[L] = {'level': L, 'ratio': ev.tup_levels[L], 'start': k, 'members': []}
+        for L, g in open_.items():
+            g['members'].append(k)
+        for L in sorted(ev.tup_stops, reverse=True):
+            g = open_.pop(L)
+            g['stop'] = k
+            groups.append(g)
+    if open_:
+        raise ValueError(f'unterminated tuplet group {open_}')
+    bgroups = beam_groups(evs)
+    for g in groups:
+        L = g['level']
+        a, n = g['ratio']
+        tot = F(0)
+        for k in g['members']:
+            ev = evs[k]
+            d = display_ql(ev.dtype, ev.dots)
+            for a2, n2 in ev.tup_levels[L + 1:]:
+                d = d * n2 / a2
+            tot += d
+        unit = ql_to_type(tot / a)
+        if unit is None:
+            raise ValueError(f'tuplet unit not expressible: {tot}/{a}')
+        g['unit'] = unit
+        g['nested'] = L > 0 or any(len(evs[k].tup_levels) > L + 1 for k in g['members'])
+        # LilyPond 2.24 Tuplet_bracket::print: bracket omitted when the first and last note
+        # columns of the tuplet have stems on one beam whose first/last stems are exactly
+        # those notes (equally long); rests have no stem -> bracket printed.
+        first, last = evs[g['start']], evs[g['stop']]
+        hidden = False
+        if first.kind == 'note' and last.kind == 'note':
+            for bg in bgroups:
+                notes = [k for k in bg if evs[k].kind == 'note']
+                if notes and notes[0] == g['start'] and notes[-1] == g['stop']:
+                    hidden = True
+        g['bracket'] = 'no' if hidden else 'yes'
+    return groups
 
 
 def tuplet_brackets(evs):
@@ -315,7 +365,10 @@ def write_musicxml(score: Score, path: str, software='rhythm challenge corpus bu
                 staff_attr = v.staff if p.staves > 1 else None
                 role = roles.get(v.key, 0)
                 beams = beam_elements(evs)
-                brackets = tuplet_brackets(evs)
+                brackets = {}
+                for g in tuplet_groups(evs):
+                    brackets.setdefault(g['start'], {'starts': [], 'stops': []})['starts'].append(g)
+                    brackets.setdefault(g['stop'], {'starts': [], 'stops': []})['stops'].append(g)
                 for k, ev in enumerate(evs):
                     if ev.kind == 'clef':
                         w('      <attributes>')
@@ -415,13 +468,23 @@ def _note(w, ev, pit, chord, d, voice, staff, role, acc, first, beams, bracket):
             nots.append('<slur type="start" number="1"/>')
         if ev.grace_slur_start:
             nots.append('<slur type="start" number="2"/>')
-        if ev.tuplet and ev.tuplet_start:
+        tinfo = bracket or {'starts': [], 'stops': []}
+        for g in sorted(tinfo['stops'], key=lambda g: -g['level']):
+            nots.append(f'<tuplet type="stop" number="{g["level"] + 1}"/>')
+        for g in sorted(tinfo['starts'], key=lambda g: g['level']):
+            num = g['level'] + 1
             if ev.tuplet_hidden:
-                nots.append('<tuplet type="start" bracket="no" show-number="none"/>')
+                nots.append(f'<tuplet type="start" number="{num}" bracket="no" show-number="none"/>')
+            elif g['nested']:
+                ut, ud = g['unit']
+                dots = '<tuplet-dot/>' * ud
+                a, n = g['ratio']
+                nots.append(f'<tuplet type="start" number="{num}" bracket="{g["bracket"]}">'
+                            f'<tuplet-actual><tuplet-number>{a}</tuplet-number><tuplet-type>{ut}</tuplet-type>{dots}'
+                            f'</tuplet-actual><tuplet-normal><tuplet-number>{n}</tuplet-number>'
+                            f'<tuplet-type>{ut}</tuplet-type>{dots}</tuplet-normal></tuplet>')
             else:
-                nots.append(f'<tuplet type="start" bracket="{bracket or "yes"}"/>')
-        if ev.tuplet and ev.tuplet_stop:
-            nots.append('<tuplet type="stop"/>')
+                nots.append(f'<tuplet type="start" number="{num}" bracket="{g["bracket"]}"/>')
         if ev.fermata:
             nots.append('<fermata type="upright"/>')
         if ev.artic:

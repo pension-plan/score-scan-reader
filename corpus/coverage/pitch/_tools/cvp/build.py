@@ -1,4 +1,6 @@
-"""Build one pitch-challenge item:
+"""Build one coverage-suite item (pitch family).  Derived from corpus/challenge/pitch/_tools/pk/build.py.
+Order: engraving + instrumented twin first, then the engraved stems/beams are copied into the model,
+then the truth is written and checked.  Original description:
   model -> truth.musicxml (MusicXML 4.0, XSD-validated with xmllint)
         -> engraving.ly (custom LilyPond writer) -> vector PDF + MIDI
   checks: (1) LilyPond MIDI (one track per Voice) == truth (onset, pitch) multiset, read
@@ -31,12 +33,16 @@ from .lily import LilyWriter
 from .midicheck import compare, read_midi
 from .model import STEP_PC, check, compute_extenders, fix_unbalanced_slurs, sanitize_ties, voices_with_lyrics
 from .mxl import write_musicxml
-from .rendercheck import check as render_check, parse_log
+from .rendercheck import annotate_stems, check as render_check, notehead_positions, parse_log
+from .counts import CONVENTIONS, count_truth
+from .acc import layout_staves
 
-CAT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))   # corpus/challenge/pitch
+CAT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))   # corpus/coverage/pitch
 XSD = '/Users/d.sloane/music/mvp/work/schema/musicxml.xsd'
-CC0_NOTE = ('Composition, engraving, rasterisation and damage simulation produced for the pitch challenge corpus '
-            '(corpus/challenge/pitch/_tools); dedicated to the public domain (CC0 1.0).')
+CC0_NOTE = ('Composition, engraving, rasterisation and damage simulation produced for the OMR coverage suite '
+            '(corpus/coverage/pitch/_tools, derived from corpus/challenge/pitch/_tools); dedicated to the public '
+            'domain (CC0 1.0).')
+VENV_PY = '/Users/d.sloane/music/.venv/bin/python'
 
 
 def run(cmd, cwd=None, timeout=900):
@@ -155,6 +161,19 @@ def image_only(pdf):
             'image_only': not font_lines and n_imgs == pages and not txt.strip()}
 
 
+
+def music21_check(path):
+    code = ('import sys, music21\n'
+            's = music21.converter.parse(sys.argv[1], format="musicxml")\n'
+            'n = len(s.recurse().notes); r = len(s.recurse().getElementsByClass("Rest"))\n'
+            'print(len(s.parts), n, r)\n')
+    rc, out, err = run([VENV_PY, '-c', code, path], timeout=300)
+    if rc != 0:
+        return {'ok': False, 'error': err[-800:]}
+    a = out.split()
+    return {'ok': True, 'parts': int(a[0]), 'notes_and_chords': int(a[1]), 'rests': int(a[2])}
+
+
 def build_item(item: dict, keep_work=False):
     t0 = time.time()
     iid = item['id']
@@ -172,13 +191,8 @@ def build_item(item: dict, keep_work=False):
         fix_unbalanced_slurs(score)
         compute_extenders(score)
         check(score)
-        truth = os.path.join(outdir, 'truth.musicxml')
-        write_musicxml(score, truth)
-        rc, out, err = run(['xmllint', '--noout', '--nonet', '--schema', XSD, truth])
-        log['xsd_valid'] = rc == 0
-        if rc != 0:
-            raise RuntimeError('XSD validation failed: ' + err[-1500:])
-        # engraving (clean) + instrumented twin
+        ost = opts.get('ottava_style', 'numbers')
+        # ---- engraving (clean) + instrumented twin
         ly = os.path.join(workdir, 'engraving.ly')
         open(ly, 'w', encoding='utf-8').write(LilyWriter(score, layout, opts).document())
         rc, warns, pdf, mid, _err = lilypond(ly, workdir)
@@ -189,10 +203,31 @@ def build_item(item: dict, keep_work=False):
         rci, warns_i, pdf_i, _mid_i, err_i = lilypond(lyi, workdir)
         if rci != 0:
             raise RuntimeError('instrumented lilypond failed: ' + err_i[-3000:])
-        bad_warn = [w for w in warns if 'barcheck' in w or 'error' in w or 'bar check' in w]
         log['warnings'] = warns[:30]
-        if bad_warn:
-            raise RuntimeError(f'bar-check warnings: {bad_warn[:5]}')
+        if warns:
+            raise RuntimeError(f'lilypond warnings: {warns[:5]}')
+        rows = parse_log(err_i)
+        rchk = render_check(score, layout, rows, ost)
+        log['render_check'] = rchk
+        if not rchk['ok']:
+            raise RuntimeError(f'render check failed: {json.dumps(rchk, default=str)[:4000]}')
+        # every system break is explicit -> <print new-system> in the truth is exact
+        exp_ls = [1] + [i + 1 for i, m in enumerate(score.measures) if m.brk and i > 0]
+        if rchk['line_start_measures'] != exp_ls:
+            raise RuntimeError(f'system starts {rchk["line_start_measures"]} != explicit breaks {exp_ls}')
+        stem_rep = annotate_stems(score, layout, rows)
+        log['stems'] = stem_rep
+        # ---- truth
+        truth = os.path.join(outdir, 'truth.musicxml')
+        write_musicxml(score, truth)
+        rc, out, err = run(['xmllint', '--noout', '--nonet', '--schema', XSD, truth])
+        log['xsd_valid'] = rc == 0
+        if rc != 0:
+            raise RuntimeError('XSD validation failed: ' + err[-1500:])
+        m21 = music21_check(truth)
+        log['music21'] = m21
+        if not m21['ok']:
+            raise RuntimeError('music21 parse failed: ' + m21['error'])
         # (1) MIDI vs model and vs truth file
         cmp_model = compare(score, mid)
         got = midi_attacks(mid)
@@ -204,12 +239,46 @@ def build_item(item: dict, keep_work=False):
         log['midi_vs_truth_file'] = cmp_truth
         if not cmp_model['ok'] or not cmp_truth['ok']:
             raise RuntimeError(f'MIDI mismatch: model {cmp_model} truth {cmp_truth}')
-        # (2) render log
-        rows = parse_log(err_i)
-        rchk = render_check(score, layout, rows)
-        log['render_check'] = rchk
-        if not rchk['ok']:
-            raise RuntimeError(f'render check failed: {json.dumps(rchk, default=str)[:4000]}')
+        # (2) counts from the truth file + cross-checks against the engraving log
+        counts, positions = count_truth(truth)
+        sid_of = {}
+        for sid, voices in layout_staves(layout):
+            for pid, vk in voices:
+                sid_of[(pid, score.part(pid).voice(vk).staff)] = sid
+        nh = notehead_positions(rows)
+        pos_bad = []
+        npos = 0
+        for (pid, st, onset, pit), sp in positions.items():
+            k = (sid_of[(pid, st)], onset, pit)
+            npos += 1
+            if nh.get(k) != sp:
+                pos_bad.append(f'{k}: truth {sp} engraved {nh.get(k)}')
+        if pos_bad or npos != len(nh):
+            raise RuntimeError(f'notehead staff positions differ ({npos} truth / {len(nh)} engraved): {pos_bad[:8]}')
+        acc = rchk['accidentals']
+        n_acc = sum(v for k, v in counts.items() if k.startswith('acc-') and k != 'acc-courtesy') + \
+            counts.get('x-acc-natural-sharp', 0) + counts.get('x-acc-natural-flat', 0)
+        xchk = {
+            'accidentals_truth_vs_printed': [n_acc, acc['printed']],
+            'double_accidentals_truth_vs_printed': [counts.get('acc-double-sharp', 0) + counts.get('acc-double-flat', 0),
+                                                    acc['double']],
+            'extra_naturals_truth_vs_printed': [counts.get('x-acc-natural-sharp', 0) + counts.get('x-acc-natural-flat', 0),
+                                                acc['extra_natural']],
+            'parenthesized_truth_vs_printed': [counts.get('x-acc-courtesy-paren', 0), acc['parenthesized']],
+            'stems_up_truth_vs_engraved': [counts.get('stem-up', 0), stem_rep['up']],
+            'stems_down_truth_vs_engraved': [counts.get('stem-down', 0), stem_rep['down']],
+            'flags_truth_vs_engraved': [counts.get('flag', 0), stem_rep['flags']],
+            'beam_groups_truth_vs_engraved': [counts.get('beam', 0), stem_rep['beam_groups']],
+            'clef_changes_truth_vs_engraved': [counts.get('clef-change', 0),
+                                               sum(v['rendered_changes'] for v in rchk['clefs'].values())],
+            'system_breaks_truth_vs_engraved': [counts.get('system-break', 0) + counts.get('page-break', 0),
+                                                rchk['systems'] - 1],
+            'noteheads_with_positions_checked': [npos, len(nh)],
+        }
+        bad = {k: v for k, v in xchk.items() if v[0] != v[1]}
+        log['cross_checks'] = xchk
+        if bad:
+            raise RuntimeError(f'truth counts differ from the engraving: {bad}')
         # (3) lyrics
         log['lyric_text_found'] = lyric_text_check(score, pdf)
         if log['lyric_text_found'] is not None and log['lyric_text_found'] < 1.0:
@@ -225,6 +294,11 @@ def build_item(item: dict, keep_work=False):
         # clean raster
         clean_dpi = 300
         cpages = render_gray(pdf, clean_dpi, workdir)
+        exp_pages = 1 + sum(1 for m in score.measures if m.brk == 'page')
+        if len(cpages) != exp_pages:
+            raise RuntimeError(f'{len(cpages)} pages engraved, {exp_pages} expected from explicit page breaks')
+        if len(cpages) > 1:
+            counts['multi-page'] = 1
         S.save_pdf([Image.fromarray(p) for p in cpages], clean_dpi, os.path.join(outdir, 'clean.pdf'), fmt='png')
         # damaged files
         ss_pt = opts.get('staff_size', 20) / 4.0
@@ -247,7 +321,8 @@ def build_item(item: dict, keep_work=False):
                 raise RuntimeError(f'{fname} is not image-only: {io_}')
             files[fname] = io_
             degr[fname] = {
-                'dpi': dpi, 'seed': spec['seed'], 'color': {'RGB': 'rgb', 'L': 'gray', '1': 'bilevel'}[mode],
+                'dpi': dpi, 'seed': spec['seed'], 'level': spec.get('level', ''),
+                'color': {'RGB': 'rgb', 'L': 'gray', '1': 'bilevel'}[mode],
                 'encoding': 'png (1-bit)' if mode == '1' else ('png' if fmt == 'png' else
                                                                 f'jpeg q{spec.get("jpeg", 75)}'
                                                                 + (f' x{spec.get("jpeg_passes")} passes'
@@ -255,74 +330,56 @@ def build_item(item: dict, keep_work=False):
                 'pages_in_pdf': io_['pages'], 'pixel_size': [imgs[0].size[0], imgs[0].size[1]],
                 'summary': spec.get('summary', ''),
                 'ops': spec['ops'],
+                'generator': 'corpus/coverage/pitch/_tools/cvp/scanfx.py run_pipeline(seed)',
             }
             if plog.get('pencil'):
                 degr[fname]['pencil_marks'] = plog['pencil']
             if plog.get('crop_px'):
                 degr[fname]['crop_px_LRTB'] = plog['crop_px']
         log['files'] = files
-        # metadata
-        parts = [p.name for p in score.parts]
-        notes = item['expected_notes']
-        # accidentals that differ between the engraved shared staves and the split parts
-        from .acc import layout_staves, part_staves, simulate, acc_value
-        d_part, _ = simulate(score, part_staves(score))
-        d_staff, _ = simulate(score, layout_staves(layout), set(m - 1 for m in rchk['line_start_measures']))
-        mnum = {}
-        offs = score.measure_offsets()
-        def where(d):
-            i = max(k for k, o in enumerate(offs) if o <= d['onset'])
-            beat = d['onset'] - offs[i]
-            return score.measures[i].number, float(beat) + 1
-        pname = {}
-        for p in score.parts:
-            for m in p.measures:
-                for evs in m.values():
-                    for ev in evs:
-                        pname[id(ev)] = p.name
-        diffs = []
-        for k in sorted(set(d_part) | set(d_staff), key=lambda k: (d_part.get(k) or d_staff.get(k))['onset']):
-            a, b = d_part.get(k), d_staff.get(k)
-            va = acc_value(a) if a else None
-            vb = acc_value(b) if b else None
-            if va != vb or (a and b and a['paren'] != b['paren']):
-                d = a or b
-                bar, beat = where(d)
-                st, al, oc = d['pitch']
-                diffs.append({'bar': bar, 'beat': beat, 'part': pname.get(k[0]),
-                              'pitch': f'{st}{"#" * al if al > 0 else "b" * -al}{oc}',
-                              'split_part_shows': va, 'engraved_shared_staff_shows': vb})
+        counts = dict(sorted(counts.items()))
+        missing_focus = [t for t in item['focus'] if not counts.get(t)]
+        if missing_focus:
+            raise RuntimeError(f'focus tags absent from truth: {missing_focus}')
         meta = {
-            'id': iid, 'category': 'pitch', 'title': item['title'],
-            'edge_cases': item['edge_cases'],
+            'id': iid, 'family': 'pitch', 'title': item['title'],
+            'symbols': sorted(k for k, v in counts.items() if v),
+            'focus': item['focus'],
+            'layout': item['layout'],
             'expected': {
-                'parts': parts,
+                'parts': [p.name for p in score.parts],
                 'must_not_split': item.get('must_not_split', False),
-                'shared_staves': item.get('shared_staves', []),
-                'lyrics': [{'part': score.part(pid).name, 'verses': len(vs)} for pid, vk, vs in voices_with_lyrics(score)],
-                'notes': notes,
+                'staves': sum(p.staves for p in score.parts),
+                'notes': item['expected_notes'],
             },
-            'shared_staff_accidental_differences': diffs,
-            'courtesy_accidentals': item.get('courtesy_report', []),
-            'truth_limitations': item.get('truth_limitations', []),
+            'counts': counts,
+            'count_conventions': CONVENTIONS,
             'degradations': degr,
-            'dpi': {k: v['dpi'] for k, v in degr.items()},
-            'clean_pdf': {'dpi': clean_dpi, 'note': 'undamaged 300 dpi grey raster of the LilyPond engraving (image only)'},
-            'license': item['license'],
-            'source': item['source'],
-            'measures': len(score.measures), 'pages': len(cpages),
-            'layout': item.get('layout_desc', ''),
+            'dpi': dict({'clean.pdf': clean_dpi}, **{k: v['dpi'] for k, v in degr.items()}),
+            'pages': len(cpages),
+            'measures': len(score.measures),
+            'systems': rchk['systems'],
+            'license': 'CC0',
+            'notes': item.get('truth_notes', []),
+            'engraving': {'engraver': 'GNU LilyPond 2.24.3', 'paper': opts.get('paper', 'a4'),
+                          'staff_size_pt': opts.get('staff_size', 20), 'ottava_style': ost,
+                          'layout_desc': item.get('layout_desc', '')},
             'validation': {
                 'xsd_valid': True,
+                'music21': m21,
                 'midi_attacks_match_truth_file': True,
                 'attacks': cmp_truth['n_truth'],
                 'printed_accidentals_match': True,
                 'accidentals': {k: v for k, v in rchk['accidentals'].items() if k not in ('missing', 'extra', 'different')},
                 'clefs': rchk['clefs'], 'keys': rchk['keys'], 'ottava': rchk['ottava'],
-                'systems': rchk['systems'], 'line_start_measures': rchk['line_start_measures'],
-                'lyric_text_found_in_engraving': log['lyric_text_found'],
+                'time_signatures': rchk['time_signatures'],
+                'line_start_measures': rchk['line_start_measures'],
+                'stems_beams_from_engraving': stem_rep,
+                'truth_vs_engraving_cross_checks': xchk,
+                'twin_layout_diff': log['twin_layout_diff'],
                 'scan_files_image_only': {k: v['image_only'] for k, v in files.items()},
             },
+            'source': item.get('source', 'composed for this corpus'),
             'files': ['engraving.ly', 'truth.musicxml', 'clean.pdf'] + list(item['damage'].keys()) +
                      ['meta.json', 'ATTRIBUTION.txt'],
         }

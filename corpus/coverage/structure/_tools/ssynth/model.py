@@ -98,6 +98,7 @@ class Event:
     wedge: List[str] = field(default_factory=list)     # 'crescendo' | 'diminuendo' | 'stop'
     hidden: bool = False           # rest printed nowhere (staff removed from that system)
     stem: Optional[str] = None     # explicit stem direction 'up' | 'down' (engraving + truth)
+    beams: list = field(default_factory=list)   # [(level, 'begin'|'continue'|'end'|'forward hook'|...)] truth
 
     @property
     def is_note(self):

@@ -49,7 +49,7 @@ def divisions_for(score: Score):
     return d
 
 
-def write_musicxml(score: Score, path: str, software='challenge corpus builder (pitch)', date='2026-11-08'):
+def write_musicxml(score: Score, path: str, software='coverage corpus builder (pitch family)', date='2026-11-08'):
     div = divisions_for(score)
     acc_dec, _tls = simulate(score, part_staves(score))
     out = []
@@ -106,10 +106,15 @@ def write_musicxml(score: Score, path: str, software='challenge corpus builder (
         for v in p.voices:
             vnum[v.key] = v.key
         clefs_now = list(p.clefs)
+        ott_size = {}
         for i, m in enumerate(p.measures):
             mi = score.measures[i]
             attrs = f' implicit="yes"' if mi.implicit else ''
             w(f'    <measure number="{mi.number}"{attrs}>')
+            if i > 0 and mi.brk == 'page':
+                w('      <print new-page="yes"/>')
+            elif i > 0 and mi.brk == 'line':
+                w('      <print new-system="yes"/>')
             fifths, mode = score.current_key(i)
             # attributes
             a = []
@@ -153,8 +158,6 @@ def write_musicxml(score: Score, path: str, software='challenge corpus builder (
             first_voice = True
             for v in order:
                 evs = list(m.get(v.key, []))
-                if i == 0:
-                    ott_size = {}
                 filled = sum((e.dur for e in evs), F(0))
                 if filled < mi.dur:
                     from .model import Event as _Ev
@@ -268,12 +271,17 @@ def _note(w, ev, pit, chord, d, voice, staff, role, acc, first):
     if ev.tuplet:
         w(f'        <time-modification><actual-notes>{ev.tuplet[0]}</actual-notes>'
           f'<normal-notes>{ev.tuplet[1]}</normal-notes></time-modification>')
-    if ev.kind == 'note' and role in (1, 3):
+    if ev.kind == 'note' and ev.stem:
+        w(f'        <stem>{ev.stem}</stem>')
+    elif ev.kind == 'note' and role in (1, 3):
         w('        <stem>up</stem>')
     elif ev.kind == 'note' and role in (2, 4):
         w('        <stem>down</stem>')
     if staff:
         w(f'        <staff>{staff}</staff>')
+    if first and ev.kind == 'note':
+        for lvl in sorted(ev.beams):
+            w(f'        <beam number="{lvl}">{ev.beams[lvl]}</beam>')
     nots = []
     if tie_stop:
         nots.append('<tied type="stop"/>')

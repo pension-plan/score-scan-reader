@@ -23,7 +23,10 @@ KEY_MAJ = {0: 'c', 1: 'g', 2: 'd', 3: 'a', 4: 'e', 5: 'b', 6: 'fis', 7: 'cis', -
 KEY_MIN = {0: 'a', 1: 'e', 2: 'b', 3: 'fis', 4: 'cis', 5: 'gis', 6: 'dis', 7: 'ais', -1: 'd', -2: 'g',
            -3: 'c', -4: 'f', -5: 'bes', -6: 'ees', -7: 'aes'}
 ROLE_CMD = {0: '\\oneVoice', 1: '\\voiceOne', 2: '\\voiceTwo', 3: '\\voiceThree', 4: '\\voiceFour'}
-ARTIC = {'staccato': '-.', 'accent': '->', 'tenuto': '--'}
+ARTIC = {'staccato': '-.', 'accent': '->', 'tenuto': '--', 'strong-accent': '-^', 'staccatissimo': '-!'}
+ORN = {'trill-mark': '\\trill', 'mordent': '\\mordent', 'turn': '\\turn'}
+CHORD_LY = {'': '', 'm': ':m', '7': ':7', 'm7': ':m7', 'maj7': ':maj7', 'sus4': ':sus4', 'dim': ':dim',
+            '6': ':6', 'm6': ':m6', '9': ':9'}
 WEDGE = {'crescendo': '\\<', 'diminuendo': '\\>', 'stop': '\\!'}
 UNIT = {'quarter': '4', 'half': '2', 'eighth': '8'}
 
@@ -216,8 +219,7 @@ class LilyWriter:
         self._stem = None
         if lyrics_voice:
             out.append("\\set melismaBusyProperties = #'()")
-        if self.o.get('auto_beam_off_vocal') and part.instrument == 'voice':
-            out.append('\\autoBeamOff')
+        out.append('\\autoBeamOff')
         prev_role = None
         for i in range(a, b):
             mi = s.measures[i]
@@ -247,6 +249,7 @@ class LilyWriter:
             if role is not None and role != prev_role:
                 line.append(ROLE_CMD[role])
                 prev_role = role
+                self._stem = '?'
             evs = part.measures[i].get(vkey, [])
             tot = sum((x.dur for x in evs), F(0))
             self._allow_R = (e['reset'] is None and e['partial'] is None and
@@ -286,10 +289,10 @@ class LilyWriter:
             if want != self._cur_staff:
                 out.append(f'\\change Staff = "{self._ids[(self._pid, want)]}"')
                 self._cur_staff = want
-            # explicit stems
-            if ev.kind == 'note' and ev.stem != self._stem:
-                out.append({'up': '\\stemUp', 'down': '\\stemDown', None: '\\stemNeutral'}[ev.stem])
-                self._stem = ev.stem
+            # explicit stems (decided by notation.prepare for every stemmed note)
+            if ev.kind == 'note' and ev.stem_dir and ev.stem_dir != self._stem:
+                out.append({'up': '\\stemUp', 'down': '\\stemDown'}[ev.stem_dir])
+                self._stem = ev.stem_dir
             # cue size
             if ev.cue and not self._cue:
                 out.append('\\set fontSize = #-4')
@@ -338,19 +341,27 @@ class LilyWriter:
             s = pitch_ly(p) + dur_ly(ev)
             if p in ev.tie_start:
                 s += '~'
+            for fg in ev.fingering:
+                s += f'-{fg}'
         else:
             all_tied = ev.tie_start and all(p in ev.tie_start for p in ev.pitches)
             inner = []
-            for p in ev.pitches:
+            for k, p in enumerate(ev.pitches):
                 t = pitch_ly(p)
                 if p in ev.tie_start and not all_tied:
                     t += '~'
+                if k < len(ev.fingering) and ev.fingering[k]:
+                    t += f'-{ev.fingering[k]}'
                 inner.append(t)
             s = '<' + ' '.join(inner) + '>' + dur_ly(ev)
             if all_tied:
                 s += '~'
+        if ev.arpeggio:
+            s += '\\arpeggio'
         for a in ev.artic:
-            s += ARTIC.get(a, '')
+            s += ARTIC[a]
+        for o in ev.ornaments:
+            s += ORN[o]
         if ev.fermata:
             s += '\\fermata'
         for wd in ev.wedge:
@@ -371,6 +382,8 @@ class LilyWriter:
             s += ')'
         if ev.slur_start:
             s += '('
+        if ev.breath:
+            s += ' \\breathe'
         return s
 
     # ------------------------------------------------------------------ lyrics
@@ -408,6 +421,28 @@ class LilyWriter:
         if cur:
             lines.append(' '.join(cur))
         return '\n      '.join(lines)
+
+    # ------------------------------------------------------------------ chord symbols
+    def chordnames(self, seg_idx):
+        s = self.s
+        seg = self.segments[seg_idx]
+        offs = s.measure_offsets()
+        a, b = seg['start'], seg['end']
+        hs = sorted((offs[i] + F(o), sym) for i, o, sym in s.harmonies if a <= i < b)
+        if not hs:
+            return ''
+        end = offs[b - 1] + s.measures[b - 1].dur
+        toks = []
+        pos = offs[a]
+        for k, (t, sym) in enumerate(hs):
+            if t > pos:
+                toks.append('s' + frac_whole(t - pos))
+            nxt = hs[k + 1][0] if k + 1 < len(hs) else end
+            toks.append(chord_mode(sym, nxt - t))
+            pos = nxt
+        extra = self.o.get('chordnames_with', [])
+        w = (' \\with { ' + ' '.join(extra) + ' }') if extra else ''
+        return '    \\new ChordNames' + w + ' \\chordmode { ' + ' '.join(toks) + ' }'
 
     # ------------------------------------------------------------------ document
     def staff_ly(self, seg_idx, st, ind):
@@ -461,7 +496,7 @@ class LilyWriter:
                         continue
                     stanza = ''
                     w = f' \\with {{ {align} = "{st["id"]}" }}' if align else ''
-                    out.append(f'{ind}\\new Lyrics{w} \\lyricsto "{vname(pid, vk)}" {{ {stanza}\n      {toks}\n{ind}}}')
+                    out.append(f'{ind}\\new Lyrics = "lyr{st["id"]}x{vn}"{w} \\lyricsto "{vname(pid, vk)}" {{ {stanza}\n      {toks}\n{ind}}}')
         return out
 
     def document(self):
@@ -492,6 +527,9 @@ class LilyWriter:
             self._master_done = False
             L.append('\\score {')
             L.append('  <<')
+            chn = self.chordnames(si)
+            if chn:
+                L.append(chn)
             for g in seg['groups']:
                 gt = g.get('type')
                 ind = '    '
@@ -525,3 +563,18 @@ class LilyWriter:
         for x in o.get('after_markup', []):
             L.append(x)
         return '\n'.join(L) + '\n'
+
+
+def chord_mode(sym, dur):
+    """'Bb7/D' -> LilyPond chordmode token with duration dur (quarters)"""
+    from .harmonize import CH
+    import re as _re
+    m = _re.match(r'^(?P<r>[A-G])(?P<ra>#|b)?(?P<q>maj7|m7|m6|m|dim|sus4|7|6|9)?(?:/(?P<b>[A-G])(?P<ba>#|b)?)?$', sym)
+    if not m:
+        raise ValueError(sym)
+    def nm(step, a):
+        return step.lower() + {'#': 'is', 'b': 'es', None: ''}[a]
+    t = nm(m.group('r'), m.group('ra')) + frac_whole(dur) + CHORD_LY[m.group('q') or '']
+    if m.group('b'):
+        t += '/' + nm(m.group('b'), m.group('ba'))
+    return t

@@ -1,6 +1,7 @@
 'use strict';
 // Notation assembly: per system and staff -> clef, key, measures, durations,
 // voices; then the part layout (closed-score split vs grand staff) for the page.
+const { detectRests } = require('./rests');
 const { labelComponents } = require('./cc');
 
 // divisions per quarter: 840 = 8 * 3 * 5 * 7 keeps 32nds and 3-, 5-, 6- and
@@ -1044,7 +1045,9 @@ function assemblePage(fr, pageIndex = 0) {
     const measures = [];
     for (let m = 0; m + 1 < bounds.length; m++) {
       const xa = bounds[m], xb = bounds[m + 1];
-      const has = staves.some(s => s.chords.some(c => c.x > xa && c.x < xb));
+      // a bar of rests is a measure too (whole-bar and multi-bar rests)
+      const has = staves.some(s => s.chords.some(c => c.x > xa && c.x < xb)) ||
+        (xb - xa >= 4 * fr.ss && staves.some(s => detectRests({ R, comps, s, xa, xb }).some(r => r.bars || r.q >= 1)));
       if (has) measures.push([xa, xb]);
     }
     systems.push({ staves, measures, index: systems.length, page: pageIndex });

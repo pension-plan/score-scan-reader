@@ -54,6 +54,10 @@ def vname(pid, vkey):
     return f'v{pid}x{vkey}'
 
 
+def lyrics_name(pid, vkey, verse):
+    return f'L{pid}x{vkey}x{verse}'
+
+
 def words_markup(text, style):
     if style == 'bold':
         return f'\\markup {{ \\bold {lq(text)} }}'
@@ -216,8 +220,7 @@ class LilyWriter:
         self._stem = None
         if lyrics_voice:
             out.append("\\set melismaBusyProperties = #'()")
-        if self.o.get('auto_beam_off_vocal') and part.instrument == 'voice':
-            out.append('\\autoBeamOff')
+        out.append('\\autoBeamOff')
         prev_role = None
         for i in range(a, b):
             mi = s.measures[i]
@@ -461,7 +464,8 @@ class LilyWriter:
                         continue
                     stanza = ''
                     w = f' \\with {{ {align} = "{st["id"]}" }}' if align else ''
-                    out.append(f'{ind}\\new Lyrics{w} \\lyricsto "{vname(pid, vk)}" {{ {stanza}\n      {toks}\n{ind}}}')
+                    out.append(f'{ind}\\new Lyrics = "{lyrics_name(pid, vk, vn)}"{w} \\lyricsto "{vname(pid, vk)}" '
+                               f'{{ {stanza}\n      {toks}\n{ind}}}')
         return out
 
     def document(self):

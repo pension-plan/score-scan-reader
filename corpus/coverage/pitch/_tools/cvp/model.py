@@ -93,6 +93,8 @@ class Event:
     ottava: int = 0                # for kind == ottava: 1 = 8va, -1 = 8vb, 2 = 15ma, 0 = end
     force_acc: set = field(default_factory=set)   # pitches with a forced (reminder) accidental  (ly: !)
     caut_acc: set = field(default_factory=set)    # pitches with a parenthesised cautionary accidental (ly: ?)
+    stem: Optional[str] = None     # 'up' | 'down' as engraved (filled from the instrumented render)
+    beams: Dict[int, str] = field(default_factory=dict)   # level -> begin|continue|end|forward hook|backward hook
 
     @property
     def is_note(self):

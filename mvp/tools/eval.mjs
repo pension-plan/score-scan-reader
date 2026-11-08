@@ -2,16 +2,27 @@
 // OMR evaluation harness: scan.pdf -> v1 pipeline -> MusicXML, scored against truth.musicxml.
 //
 //   node tools/eval.mjs --out work/eval-r1-<key>.json [--only id,...] [--no-ocr] [--jobs N]
-//                       [--src dir] [--dpi 200] [--timeout sec] [--set synthetic|real|challenge]
+//                       [--src dir] [--dpi 200|native|app] [--timeout sec]
+//                       [--set synthetic|real|challenge|coverage]
 //
 // Items: every corpus/{synthetic,real}/<id>/ holding scan.pdf + truth.musicxml (the default
 // benchmark). --set challenge instead scores corpus/challenge/<category>/<id>/: every scan*.pdf
 // (scan, scan-mild, scan-severe) is a separate item with id <category>/<id>/<variant>, scored
 // against that folder's truth.musicxml; --only takes ids or prefixes (category, category/id).
 // Challenge reports add summary.by_category and summary.by_variant.
+// --set coverage scores corpus/coverage/<family>/<id>/ (the synthetic symbol/layout coverage
+// suite; COVERAGE_DIR overrides the root): clean.pdf and every scan*.pdf is an item with id
+// <family>/<id>/<variant>; folders without meta.json + truth.musicxml (still being written)
+// are skipped. Coverage reports add summary.by_family, summary.by_variant and summary.perf;
+// tools/coverage.mjs turns them into the per-symbol support matrix (docs/COVERAGE.md).
 // Pages are rasterised once (pdftoppm -gray -r DPI) into work/cache/ (atomic, shared
-// between concurrent runs). Each item runs in its own child process (parallel pool).
+// between concurrent runs). --dpi native rasterises each PDF at the resolution of its
+// embedded scan image (pdfimages -list); --dpi app mimics the browser app (pages scaled to
+// 2300 px wide). Each item runs in its own child process (parallel pool).
 // Produced MusicXML lands in <out minus .json>.out/<set>__<id>.musicxml.
+// Performance, per item: wall_ms (raster + child), runtime_ms (convert), page_ms[] (per page,
+// from the converter's progress events) and assemble_ms, ms_per_page, raster px/megapixels,
+// peak_rss_mb (child maxRSS; /proc VmHWM poll as fallback for crashed/timed-out children).
 //
 // Metrics, all in [0,1] per item (higher is better):
 //   pitch     F1 of pitch-correct notes on a per-part sequence alignment (measure+onset aware,
@@ -53,7 +64,7 @@ function parseArgs(argv) {
     else if (k === '--no-ocr') a.ocr = false;
     else if (k === '--jobs' || k === '-j') a.jobs = +v();
     else if (k === '--src') a.src = path.resolve(v());
-    else if (k === '--dpi') a.dpi = +v();
+    else if (k === '--dpi') { const x = v(); a.dpi = x === 'native' || x === 'app' ? x : +x; if (!(a.dpi === 'native' || a.dpi === 'app' || a.dpi > 0)) throw new Error('--dpi takes a number, native or app'); }
     else if (k === '--timeout') a.timeout = +v();
     else if (k === '--set') a.set = v();
     else if (k === '--quiet') a.quiet = true;
@@ -67,6 +78,7 @@ function parseArgs(argv) {
 
 // ---------------------------------------------------------------- child mode
 async function childMain(specPath) {
+  const tChild = performance.now();
   const spec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
   const req = createRequire(path.join(spec.src, 'x.js'));
   const { readGray } = req(path.join(spec.src, 'image.js'));
@@ -87,15 +99,30 @@ async function childMain(specPath) {
       return words;
     };
   }
-  const t0 = Date.now();
-  const r = await convert(pages, { ocr });
-  const ms = Date.now() - t0;
+  // timing only: page i starts at its first progress event, assembly at the 'parts' stage
+  const pageStart = [], perf = { assembleAt: null };
+  const onProgress = (_m, info) => {
+    if (!info) return;
+    const now = performance.now();
+    if (info.stage === 'parts') { if (perf.assembleAt == null) perf.assembleAt = now; }
+    else if (Number.isInteger(info.page) && pageStart[info.page] == null) pageStart[info.page] = now;
+  };
+  const t0 = Date.now(), p0 = performance.now();
+  const r = await convert(pages, { ocr, onProgress });
+  const ms = Date.now() - t0, p1 = performance.now();
   if (worker) await worker.terminate();
+  const ends = pages.map((_, i) => { for (let k = i + 1; k < pages.length; k++) if (pageStart[k] != null) return pageStart[k]; return perf.assembleAt ?? p1; });
+  const page_ms = pages.map((_, i) => Math.round((ends[i] - (pageStart[i] ?? (i ? ends[i - 1] : p0))) * 10) / 10);
   fs.writeFileSync(spec.xmlOut, (r.score && r.score.xml) || '');
   fs.writeFileSync(spec.metaOut, JSON.stringify({
     ms, warnings: r.warnings || [],
     parts: ((r.score && r.score.parts) || []).map((p, i) => ({ name: p.name, notes: r.score.nNotes ? r.score.nNotes[i] : null })),
     measures: r.score && r.score.measures, fifths: r.score && r.score.fifths, time: r.score && r.score.time,
+    perf: {
+      page_ms, assemble_ms: perf.assembleAt == null ? null : Math.round((p1 - perf.assembleAt) * 10) / 10,
+      px: pages.map(p => [p.width, p.height]), load_ms: Math.round(p0 - tChild),
+      max_rss_mb: Math.round(process.resourceUsage().maxRSS / 1024 * 10) / 10,
+    },
   }));
 }
 
@@ -125,8 +152,54 @@ function listChallengeItems(args) {
   return items;
 }
 
+// coverage suite: corpus/coverage/<family>/<id>/{clean,scan,scan-severe,...}.pdf; only complete
+// folders (meta.json + truth.musicxml; generators write meta last) are listed
+const COVERAGE = process.env.COVERAGE_DIR ? path.resolve(process.env.COVERAGE_DIR) : path.join(CORPUS, 'coverage');
+const COV_RANK = { clean: 0, scan: 1, 'scan-mild': 2, 'scan-severe': 3 };
+function listCoverageItems(args) {
+  const items = [];
+  if (!fs.existsSync(COVERAGE)) return items;
+  const only = args.only && args.only.map(o => o.replace(/^coverage\//, '').replace(/\/+$/, ''));
+  const rank = v => COV_RANK[v] ?? 9;
+  const isDir = p => { try { return fs.statSync(p).isDirectory(); } catch { return false; } };
+  for (const fam of fs.readdirSync(COVERAGE).sort()) {
+    const fdir = path.join(COVERAGE, fam);
+    if (fam.startsWith('_') || fam.startsWith('.') || !isDir(fdir)) continue;
+    for (const id of fs.readdirSync(fdir).sort()) {
+      const d = path.join(fdir, id), truth = path.join(d, 'truth.musicxml'), meta = path.join(d, 'meta.json');
+      if (id.startsWith('_') || id.startsWith('.') || !isDir(d) || !fs.existsSync(truth) || !fs.existsSync(meta)) continue;
+      const variants = fs.readdirSync(d).filter(f => /^(clean|scan[^/]*)\.pdf$/.test(f) && fs.statSync(path.join(d, f)).size > 0)
+        .map(f => f.slice(0, -4)).sort((a, b) => rank(a) - rank(b) || a.localeCompare(b));
+      for (const variant of variants) {
+        const cid = `${fam}/${id}/${variant}`;
+        if (only && !only.some(o => cid === o || cid.startsWith(o + '/'))) continue;
+        items.push({ set: 'coverage', id: cid, family: fam, item: id, variant, dir: d, pdf: path.join(d, variant + '.pdf'), truth, meta, key: `coverage__${fam}__${id}__${variant}` });
+      }
+    }
+  }
+  return items;
+}
+
+// pdfinfo / pdfimages facts about the input PDF (coverage perf table)
+async function pdfFacts(pdf) {
+  const o = {};
+  const info = await run('pdfinfo', ['-f', '1', '-l', '1', pdf]);
+  const pg = info.out.match(/^Pages:\s+(\d+)/m); if (pg) o.pdf_pages = +pg[1];
+  const sz = info.out.match(/^Page\s+1 size:\s+([\d.]+) x ([\d.]+) pts/m); if (sz) o.page_pts = [+(+sz[1]).toFixed(1), +(+sz[2]).toFixed(1)];
+  o.src_ppi = await nativeDpi(pdf);
+  return o;
+}
+async function nativeDpi(pdf) {
+  const r = await run('pdfimages', ['-list', pdf]);
+  const ppi = r.out.split('\n').slice(2).map(l => l.trim().split(/\s+/)).filter(c => c.length >= 14 && c[2] === 'image').map(c => Math.round(+c[12])).filter(x => x > 0);
+  if (!ppi.length) return null;
+  const cnt = {}; for (const x of ppi) cnt[x] = (cnt[x] || 0) + 1;
+  return +Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a])[0];
+}
+
 function listItems(args) {
   if (args.set === 'challenge') return listChallengeItems(args);
+  if (args.set === 'coverage') return listCoverageItems(args);
   const items = [];
   for (const set of ['synthetic', 'real']) {
     if (args.set && args.set !== set) continue;
@@ -152,8 +225,16 @@ function run(cmd, argv, opts = {}) {
     p.stderr.on('data', d => { err += d; if (err.length > 4e6) err = err.slice(-2e6); });
     let timer = null, timedOut = false;
     if (opts.timeoutMs) timer = setTimeout(() => { timedOut = true; p.kill('SIGKILL'); }, opts.timeoutMs);
-    p.on('close', (code, signal) => { if (timer) clearTimeout(timer); resolve({ code, signal, out, err, timedOut }); });
-    p.on('error', e => { if (timer) clearTimeout(timer); resolve({ code: -1, out, err: String(e), timedOut }); });
+    // peak resident memory of the child (Linux VmHWM), polled; survives timeouts and crashes
+    let hwmKb = 0, poll = null;
+    if (opts.trackRss && p.pid && fs.existsSync('/proc/self/status')) {
+      const sample = () => { try { const m = fs.readFileSync(`/proc/${p.pid}/status`, 'utf8').match(/^VmHWM:\s+(\d+)/m); if (m) hwmKb = Math.max(hwmKb, +m[1]); } catch {} };
+      poll = setInterval(sample, 200);
+      p.on('exit', sample);
+    }
+    const done = () => { if (timer) clearTimeout(timer); if (poll) clearInterval(poll); };
+    p.on('close', (code, signal) => { done(); resolve({ code, signal, out, err, timedOut, hwmKb }); });
+    p.on('error', e => { done(); resolve({ code: -1, out, err: String(e), timedOut, hwmKb }); });
   });
 }
 
@@ -161,13 +242,15 @@ async function rasterize(item, dpi) {
   const st = fs.statSync(item.pdf);
   const stamp = `${st.size}:${Math.floor(st.mtimeMs)}:${dpi}`;
   const dir = path.join(CACHE, `${item.key}__r${dpi}`);
+  // 'app': same raster size as the browser app (pdf.js page scaled to 2300 px wide)
+  const res = dpi === 'app' ? ['-scale-to-x', '2300', '-scale-to-y', '-1'] : ['-r', String(dpi)];
   const pagesIn = d => fs.readdirSync(d).filter(f => f.endsWith('.pgm')).sort((a, b) => parseInt(a.match(/(\d+)\.pgm$/)[1]) - parseInt(b.match(/(\d+)\.pgm$/)[1])).map(f => path.join(d, f));
   try {
     if (fs.readFileSync(path.join(dir, 'stamp.txt'), 'utf8') === stamp) { const p = pagesIn(dir); if (p.length) return p; }
   } catch {}
   fs.mkdirSync(CACHE, { recursive: true });
   const tmp = fs.mkdtempSync(path.join(CACHE, `.tmp-${item.key}-`));
-  const r = await run('pdftoppm', ['-gray', '-r', String(dpi), item.pdf, path.join(tmp, 'p')]);
+  const r = await run('pdftoppm', ['-gray', ...res, item.pdf, path.join(tmp, 'p')]);
   if (r.code !== 0) { fs.rmSync(tmp, { recursive: true, force: true }); throw new Error('pdftoppm failed: ' + r.err.slice(0, 300)); }
   fs.writeFileSync(path.join(tmp, 'stamp.txt'), stamp);
   try {
@@ -455,16 +538,24 @@ async function main() {
   const results = await pool(items, jobs, async (it) => {
     const res = { id: it.id, set: it.set, crash: 0 };
     if (it.set === 'challenge') Object.assign(res, { category: it.category, item: it.item, variant: it.variant });
+    if (it.set === 'coverage') Object.assign(res, { family: it.family, item: it.item, variant: it.variant, key: it.key });
     const tStart = Date.now();
     try {
-      const pages = await rasterize(it, args.dpi);
+      if (it.set === 'coverage') Object.assign(res, await pdfFacts(it.pdf));
+      const dpi = args.dpi === 'native' ? (res.src_ppi || await nativeDpi(it.pdf) || 300) : args.dpi;
+      if (typeof args.dpi !== 'number') res.raster_dpi = dpi;
+      const pages = await rasterize(it, dpi);
+      res.raster_ms = Date.now() - tStart;
       res.pagesN = pages.length;
       const xmlOut = path.join(outDir, it.key + '.musicxml');
       const metaOut = path.join(outDir, it.key + '.meta.json');
       const specPath = path.join(outDir, it.key + '.spec.json');
       for (const f of [xmlOut, metaOut]) fs.rmSync(f, { force: true });
       fs.writeFileSync(specPath, JSON.stringify({ src: args.src, pages, ocr: args.ocr, xmlOut, metaOut }));
-      const r = await run(process.execPath, ['--max-old-space-size=8192', __filename, '--child', specPath], { timeoutMs: args.timeout * 1000, cwd: MVP });
+      const tChild = Date.now();
+      const r = await run(process.execPath, ['--max-old-space-size=8192', __filename, '--child', specPath], { timeoutMs: args.timeout * 1000, cwd: MVP, trackRss: true });
+      res.child_ms = Date.now() - tChild;
+      if (r.hwmKb) res.peak_rss_mb = Math.round(r.hwmKb / 1024 * 10) / 10;
       fs.writeFileSync(path.join(outDir, it.key + '.log'), `exit=${r.code} signal=${r.signal} timedOut=${r.timedOut}\n--- stdout\n${r.out}\n--- stderr\n${r.err}`);
       res.wall_ms = Date.now() - tStart;
       if (r.code !== 0 || !fs.existsSync(metaOut)) {
@@ -473,6 +564,13 @@ async function main() {
       } else {
         const meta = JSON.parse(fs.readFileSync(metaOut, 'utf8'));
         res.runtime_ms = meta.ms; res.warnings = meta.warnings;
+        const pf = meta.perf;
+        if (pf) {
+          res.page_ms = pf.page_ms; res.assemble_ms = pf.assemble_ms; res.load_ms = pf.load_ms; res.px = pf.px;
+          res.megapixels = +(pf.px.reduce((s, [w, h]) => s + w * h, 0) / 1e6).toFixed(3);
+          if (pf.max_rss_mb) res.peak_rss_mb = Math.max(pf.max_rss_mb, res.peak_rss_mb || 0);
+        }
+        if (res.pagesN) res.ms_per_page = Math.round(meta.ms / res.pagesN);
       }
       res.xml = await xmlValid(xmlOut, schema);
       res.xml_valid = res.crash ? 0 : res.xml.score;
@@ -515,9 +613,24 @@ async function main() {
     summary.by_category = groupBy(chal, 'category');
     summary.by_variant = groupBy(chal, 'variant');
   }
+  const cov = results.filter(r => r.set === 'coverage');
+  if (cov.length) {
+    const groupBy = (rs, k) => { const g = {}; for (const r of rs) (g[r[k]] ||= []).push(r); return Object.fromEntries(Object.keys(g).sort().map(x => [x, summarize(g[x])])); };
+    const med = a => { const b = a.filter(x => x != null).sort((x, y) => x - y); return b.length ? b[b.length >> 1] : null; };
+    const ok = cov.filter(r => !r.crash);
+    summary.coverage = summarize(cov);
+    summary.coverage_aggregate = summary.coverage.aggregate;
+    summary.by_family = groupBy(cov, 'family');
+    summary.by_variant = groupBy(cov, 'variant');
+    summary.perf = {
+      n: ok.length, jobs, ms_per_page_median: med(ok.map(r => r.ms_per_page)), ms_per_page_max: Math.max(0, ...ok.map(r => r.ms_per_page || 0)),
+      peak_rss_mb_median: med(cov.map(r => r.peak_rss_mb)), peak_rss_mb_max: Math.max(0, ...cov.map(r => r.peak_rss_mb || 0)),
+      ms_per_megapixel: (() => { const mp = ok.reduce((s, r) => s + (r.megapixels || 0), 0); return mp ? Math.round(ok.reduce((s, r) => s + (r.megapixels ? r.runtime_ms : 0), 0) / mp) : null; })(),
+    };
+  }
   const report = {
     when: new Date().toISOString(), wall_s: Math.round((Date.now() - t0) / 100) / 10,
-    config: { ocr: args.ocr, dpi: args.dpi, jobs, src: args.src, src_hash: srcHash(args.src), schema, weights: W, outputs: outDir, ...(chal.length ? { set: 'challenge' } : {}) },
+    config: { ocr: args.ocr, dpi: args.dpi, jobs, src: args.src, src_hash: srcHash(args.src), schema, weights: W, outputs: outDir, ...(chal.length ? { set: 'challenge' } : {}), ...(cov.length ? { set: 'coverage', coverage_dir: COVERAGE, cpus: os.cpus().length, loadavg: os.loadavg().map(x => +x.toFixed(1)) } : {}) },
     summary, items: results,
   };
   fs.writeFileSync(args.out, JSON.stringify(report, null, 1));
@@ -525,21 +638,24 @@ async function main() {
   // compact table
   const pad = (s, n) => String(s).padEnd(n).slice(0, n);
   const f = x => x == null ? '  -  ' : x.toFixed(3);
-  const IW = chal.length ? Math.max(38, ...results.map(r => r.id.length)) : 38;
-  const rows = [`${pad('item', IW)} ${pad('set', 4)}  agg   pitch  dur   rests lyric parts xml   parts(T/P) notes(T/P)  sec  crash`];
+  const IW = chal.length || cov.length ? Math.max(38, ...results.map(r => r.id.length)) : 38;
+  const rows = [`${pad('item', IW)} ${pad('set', 4)}  agg   pitch  dur   rests lyric parts xml   parts(T/P) notes(T/P)  sec  crash${cov.length ? '  pg  ms/pg   MP    MB' : ''}`];
   for (const r of results) {
     const pd = r.parts_detail || {}, c = r.counts || {};
-    rows.push(`${pad(r.id, IW)} ${pad(r.set.slice(0, 4), 4)}  ${f(r.aggregate)} ${f(r.pitch)} ${f(r.duration)} ${f(r.rests)} ${f(r.lyrics)} ${f(r.parts)} ${f(r.xml_valid)} ${pad(`${pd.truth ?? '-'}/${pd.ours ?? '-'}`, 10)} ${pad(`${c.tp ?? '-'}/${c.pp ?? '-'}`, 11)} ${pad(((r.runtime_ms || 0) / 1000).toFixed(1), 5)} ${r.crash ? 'X' : ''}`);
+    const perf = cov.length ? `  ${pad(r.pagesN ?? '-', 3)} ${pad(r.ms_per_page ?? '-', 7)} ${pad(r.megapixels != null ? r.megapixels.toFixed(1) : '-', 5)} ${pad(r.peak_rss_mb != null ? Math.round(r.peak_rss_mb) : '-', 5)}` : '';
+    rows.push(`${pad(r.id, IW)} ${pad(r.set.slice(0, 4), 4)}  ${f(r.aggregate)} ${f(r.pitch)} ${f(r.duration)} ${f(r.rests)} ${f(r.lyrics)} ${f(r.parts)} ${f(r.xml_valid)} ${pad(`${pd.truth ?? '-'}/${pd.ours ?? '-'}`, 10)} ${pad(`${c.tp ?? '-'}/${c.pp ?? '-'}`, 11)} ${pad(((r.runtime_ms || 0) / 1000).toFixed(1), 5)} ${cov.length ? (r.crash ? 'X' : ' ') + perf : (r.crash ? 'X' : '')}`);
   }
   rows.push('-'.repeat(IW + 82));
   const groups = [['ALL', summary.all], ['synthetic', summary.synthetic], ['real', summary.real]];
   if (chal.length) for (const k of ['by_category', 'by_variant']) for (const [g, s] of Object.entries(summary[k])) groups.push([g, s]);
+  if (cov.length) for (const k of ['by_family', 'by_variant']) for (const [g, s] of Object.entries(summary[k])) groups.push([g, s]);
   for (const [name, s] of groups) {
     if (!s.n) continue;
     rows.push(`${pad(`${name} (n=${s.n})`, IW)} ${pad('', 4)}  ${f(s.aggregate)} ${f(s.pitch)} ${f(s.duration)} ${f(s.rests)} ${f(s.lyrics)} ${f(s.parts)} ${f(s.xml_valid)} crashes=${s.crashes} mean_runtime=${(s.runtime_ms_mean / 1000).toFixed(1)}s`);
   }
   console.log(rows.join('\n'));
   if (chal.length) console.log(`challenge_aggregate=${f(summary.challenge_aggregate)} ${Object.entries(summary.by_category).map(([k, s]) => `${k}=${f(s.aggregate)}`).join(' ')} crashes=${summary.challenge.crashes}  -> ${args.out}  (${report.wall_s}s)`);
+  else if (cov.length) console.log(`coverage_aggregate=${f(summary.coverage_aggregate)} ${Object.entries(summary.by_family).map(([k, s]) => `${k}=${f(s.aggregate)}`).join(' ')} crashes=${summary.coverage.crashes} ms/page(median)=${summary.perf.ms_per_page_median} peakMB(max)=${summary.perf.peak_rss_mb_max}  -> ${args.out}  (${report.wall_s}s)`);
   else console.log(`aggregate=${f(summary.aggregate)} synthetic=${f(summary.synthetic_aggregate)} real_scan_aggregate=${f(summary.real_scan_aggregate)}  -> ${args.out}  (${report.wall_s}s)`);
 }
 

@@ -377,3 +377,126 @@ def compare_music21(score: Score, truth_path: str):
 def xsd_validate(path):
     rc, out, err = run(['xmllint', '--noout', '--schema', XSD, path], timeout=120)
     return {'ok': rc == 0, 'message': (err.strip().splitlines() or [''])[-1][:300]}
+
+
+# ---------------------------------------------------------------- coverage/rests: layout read-back
+# Base Y extents (staff spaces, relative to the middle staff line) of LilyPond 2.24 rest glyphs at
+# their normal position (staff-position 0); measured with the Emmentaler font.  A rest drawn at
+# staff-position p must have extents base + p/2 (one bound may grow by a ledger line outside the staff).
+REST_BASE = {-1: (0.0, 1.0), 0: (0.375, 1.0), 1: (0.0, 0.625), 2: (-1.25, 1.5625), 3: (-1.05, 0.82),
+             4: (-2.05, 0.82), 5: (-2.05, 1.82), 6: (-3.05, 1.82)}
+MMR_BASE = {'whole': (0.375, 1.0), 'breve': (0.0, 1.0)}
+
+
+def _num(x):
+    return None if x in ('?', '()', '') else float(x)
+
+
+def layout_records(events_path):
+    rests, stems = {}, {}
+    for line in open(events_path, encoding='utf-8', errors='replace'):
+        f = line.rstrip('\n').split('\t')
+        if len(f) < 8 or f[6] not in ('restpos', 'mmrestpos', 'stem'):
+            continue
+        key = (f[1], F(f[2]) * 4, F(f[3]) * 4)
+        if f[6] == 'stem':
+            log, d = _num(f[7]), _num(f[8])
+            if log is not None and log >= 1:
+                stems.setdefault(key, []).append(int(d))
+        elif f[6] == 'restpos':
+            rests.setdefault(key, []).append(('rest', int(_num(f[7])), _num(f[8]), _num(f[9]), _num(f[10])))
+        else:
+            rests.setdefault(key, []).append(('mmrest', None, _num(f[7]), _num(f[8]), _num(f[9])))
+    return rests, stems
+
+
+def expected_rest_positions(score: Score):
+    """(voice name, onset, 0) -> (kind, log, expected staff position, measure index, event)"""
+    from .model import active_voices, clef_at, clef_timeline, staff_pos
+    tl = clef_timeline(score)
+    out = {}
+    problems = []
+    offs = score.measure_offsets()
+    for p in score.parts:
+        for v in p.voices:
+            for i, mm in enumerate(p.measures):
+                t = offs[i]
+                for k, ev in enumerate(mm.get(v.key, [])):
+                    if ev.kind == 'rest' and not ev.multirest_cont:
+                        clef = clef_at(tl, p.id, v.staff, t, k)
+                        pos = staff_pos(ev.display, clef) if ev.display is not None else 0
+                        if ev.display is None and len(active_voices(score, p, v.staff, i)) > 1:
+                            problems.append(f'{p.id}/{v.key} m{i + 1} t={t}: rest in a multi-voice measure '
+                                            'without explicit position')
+                        kind = 'mmrest' if ev.measure_rest else 'rest'
+                        log = None if ev.measure_rest else LOG[ev.dtype]
+                        out[(vname(p.id, v.key), t, F(0))] = (kind, log, pos, i, ev)
+                    t += ev.dur
+    return out, problems
+
+
+def check_rest_layout(score: Score, events_path: str):
+    rests, _ = layout_records(events_path)
+    exp, problems = expected_rest_positions(score)
+    bad = list(problems)
+    n_ok = 0
+    for key, (kind, log, pos, i, ev) in exp.items():
+        got = rests.get(key, [])
+        if len(got) != 1:
+            bad.append(f'{key}: {len(got)} engraved rest grobs')
+            continue
+        gk, glog, gpos, lo, hi = got[0]
+        if gk != kind or (kind == 'rest' and glog != log):
+            bad.append(f'{key}: engraved {gk}/{glog}, truth {kind}/{log}')
+            continue
+        if gpos is None:
+            gpos = 0.0
+        if abs(gpos - pos) > 1e-6:
+            bad.append(f'{key}: staff-position {gpos} != {pos}')
+            continue
+        if kind == 'rest':
+            base = REST_BASE[log]
+        elif ev.multirest > 1:
+            base = None            # church-rest / H-bar block: glyph depends on the bar count
+        else:
+            base = MMR_BASE['breve' if ev.dur >= 8 else 'whole']
+        if base is not None and lo is not None:
+            if not (abs(lo - (base[0] + pos / 2)) < 0.02 or abs(hi - (base[1] + pos / 2)) < 0.02):
+                bad.append(f'{key}: extent {lo:.3f}..{hi:.3f} != base {base} + {pos}/2')
+                continue
+        n_ok += 1
+    extra = [k for k in rests if k not in exp]
+    for k in extra:
+        bad.append(f'{k}: engraved rest not in truth')
+    return {'ok': not bad, 'rests_checked': len(exp), 'rests_ok': n_ok,
+            'explicit_positions': sum(1 for x in exp.values() if x[4].display is not None),
+            'problems': bad[:20]}
+
+
+def assign_stems(score: Score, events_path: str):
+    """set Event.stem from the engraved Stem grobs (notes of half value or shorter)"""
+    _, stems = layout_records(events_path)
+    offs = score.measure_offsets()
+    used = set()
+    missing = []
+    n = 0
+    for p in score.parts:
+        for v in p.voices:
+            for i, mm in enumerate(p.measures):
+                t = offs[i]
+                evs = mm.get(v.key, [])
+                for k, ev in enumerate(evs):
+                    if ev.kind == 'note' and ev.dtype not in ('whole', 'breve'):
+                        g = grace_offsets(evs, k) if ev.grace else F(0)
+                        key = (vname(p.id, v.key), t, g)
+                        d = stems.get(key)
+                        if not d or len(d) != 1:
+                            missing.append(str(key) + f' {d}')
+                            ev.stem = None
+                        else:
+                            ev.stem = 'up' if d[0] > 0 else 'down'
+                            used.add(key)
+                            n += 1
+                    t += ev.dur
+    extra = [str(k) for k in stems if k not in used]
+    return {'ok': not missing and not extra, 'stems': n, 'missing': missing[:10], 'extra': extra[:10]}

@@ -1,5 +1,10 @@
 """Internal model + staff layout -> LilyPond source (absolute pitch).
 
+coverage/notes copy of corpus/challenge/rhythm/_tools/rsynth/lily.py, extended with explicit stem
+directions for every stemmed note (\\stemUp / \\stemDown whenever the direction changes), single-note
+tremolos (c4:16), two-note tremolos (\\repeat tremolo), secondary-beam breaks
+(stemRightBeamCount / stemLeftBeamCount), CueVoice contexts and words above notes.
+
 Rhythm-challenge copy of corpus/synthetic/_tools/synth/lily.py, extended with grace
 notes, explicit beams (\\autoBeamOff + [ ]), hidden tuplets, multi-measure rests,
 rehearsal marks / tempo words, forced system/page breaks and named Lyrics contexts
@@ -177,6 +182,8 @@ class LilyWriter:
         if self.o.get('stem_cmd'):
             out.append(self.o['stem_cmd'])
         prev_role = None
+        self._stem = None
+        self._left1 = False
         for i, mi in enumerate(s.measures):
             e = plan[i]
             line = []
@@ -206,6 +213,7 @@ class LilyWriter:
             if role is not None and role != prev_role:
                 line.append(ROLE_CMD[role])
                 prev_role = role
+                self._stem = '?'      # role commands change Stem.direction: re-state it
             evs = part.measures[i].get(vkey, [])
             if any(ev.multirest_cont for ev in evs):
                 assert not line or all(x.startswith('\\voice') or x == '\\oneVoice' for x in line), (i, line)
@@ -262,6 +270,22 @@ class LilyWriter:
                     out.append(f'{cmd} {{ ' + ' '.join(grp) + ' }')
                 k = j
                 continue
+            if ev.kind == 'note' and ev.stem and ev.stem != self._stem:
+                out.append('\\stemUp' if ev.stem == 'up' else '\\stemDown')
+                self._stem = ev.stem
+            if ev.trem2 == 'start':
+                nxt = evs[k + 1]
+                assert nxt.trem2 == 'stop'
+                out.append(f'\\repeat tremolo {ev.trem2_reps} {{ ' + self.trem_note_ly(ev) + ' ' +
+                           self.trem_note_ly(nxt) + ' }')
+                k += 2
+                continue
+            if self._left1 and ev.kind in ('note', 'rest'):
+                out.append('\\set stemLeftBeamCount = #1')
+                self._left1 = False
+            if ev.sub_break:
+                out.append('\\set stemRightBeamCount = #1')
+                self._left1 = True
             if ev.tuplet and (not in_tup or ev.tuplet != tup_ratio or ev.tuplet_start):
                 if in_tup:
                     out.append('}')
@@ -325,10 +349,14 @@ class LilyWriter:
             s = '<' + ' '.join(inner) + '>' + dur_ly(ev)
             if all_tied:
                 s += '~'
+        if ev.trem:
+            s += f':{ev.trem}'
         if ev.beam_start:
             s += '['
         if ev.beam_stop:
             s += ']'
+        if ev.words:
+            s += '^' + lq(ev.words)
         for a in ev.artic:
             s += ARTIC.get(a, '')
         if ev.fermata:
@@ -340,6 +368,11 @@ class LilyWriter:
         if ev.slur_start:
             s += '('
         return s
+
+    def trem_note_ly(self, ev):
+        if len(ev.pitches) == 1:
+            return pitch_ly(ev.pitches[0]) + ev.trem2_sub
+        return '<' + ' '.join(pitch_ly(p) for p in ev.pitches) + '>' + ev.trem2_sub
 
     # ------------------------------------------------------------------ lyrics
     def lyric_tokens(self, pid, vkey, verse):
@@ -391,7 +424,9 @@ class LilyWriter:
             master = not self._master_done
             self._master_done = True
             mus = self.voice_music(pid, vk, voices, (pid, vk) in lyr_voices, master=master, staff_first=(j == 0))
-            out.append(f'{ind}    \\new Voice = "{vname(pid, vk)}" {{\n    {mus}\n{ind}    }}')
+            is_cue = any(ev.cue for m in self.s.part(pid).measures for ev in m.get(vk, []))
+            ctx = 'CueVoice' if is_cue else 'Voice'
+            out.append(f'{ind}    \\new {ctx} = "{vname(pid, vk)}" {{\n    {mus}\n{ind}    }}')
         if len(voices) > 1:
             out.append(f'{ind}  >>')
         out.append(f'{ind}}}')

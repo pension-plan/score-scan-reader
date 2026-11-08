@@ -1,5 +1,11 @@
 """Internal model -> MusicXML 4.0 partwise (ground truth).
 
+coverage/notes copy of corpus/challenge/rhythm/_tools/rsynth/mxl.py, extended with: <stem> on every
+stemmed note (the direction the engraving is forced to use), <cue/> + <type size="cue">,
+<ornaments><tremolo type="single|start|stop">, words above notes, and beam levels that follow the
+engraving across rests (a rest inside a beam carries the levels of its own value) and at
+secondary-beam breaks.
+
 Rhythm-challenge copy of corpus/synthetic/_tools/synth/mxl.py, extended with:
   * explicit <beam> elements (levels 1..n, begin/continue/end/forward hook/backward hook)
     computed from the model's beam groups (the engraving uses exactly these groups:
@@ -19,7 +25,7 @@ import math
 from fractions import Fraction as F
 from xml.sax.saxutils import escape
 
-from .model import STEPS, Event, Score, staff_roles
+from .model import STEPS, Event, Score, single_trem_marks, staff_roles
 
 CLEF_XML = {
     'treble': ('G', 2, 0), 'treble_8': ('G', 2, -1), 'treble^8': ('G', 2, 1),
@@ -32,6 +38,7 @@ ACC_NAME = {-2: 'flat-flat', -1: 'flat', 0: 'natural', 1: 'sharp', 2: 'double-sh
 BAR_STYLE = {'final': 'light-heavy', 'double': 'light-light', 'repeat-end': 'light-heavy',
              'dashed': 'dashed'}
 NBEAMS = {'eighth': 1, '16th': 2, '32nd': 3, '64th': 4, '128th': 5}
+TREM_MARKS = {8: 1, 16: 2, 32: 3, 64: 4}
 
 
 def key_alters(fifths):
@@ -91,25 +98,31 @@ def beam_groups(evs):
 
 
 def beam_elements(evs):
-    """dict event-index -> list of (level, status) for notes in beam groups."""
+    """dict event-index -> list of (level, status) for the notes of manual beam groups.
+    Members of a group are its notes and rests; level 1 joins all members; level L >= 2 joins two
+    neighbouring members when both have >= L beams (a rest counts with the beams of its value, as
+    LilyPond draws secondary beams over a rest of the same value) and no secondary break
+    (ev.sub_break) separates them.  Unjoined levels are hooks (forward on the first member,
+    backward otherwise, unless ev.hook says otherwise).  Rests carry no <beam> element."""
     out = {}
     for g in beam_groups(evs):
-        notes = [k for k in g if evs[k].kind == 'note']
-        nb = {k: NBEAMS.get(evs[k].dtype, 0) for k in notes}
-        for pos, k in enumerate(notes):
+        mem = [k for k in g if evs[k].kind in ('note', 'rest')]
+        nb = {k: NBEAMS.get(evs[k].dtype, 0) for k in mem}
+
+        def joined(a, b, lvl):
+            if lvl == 1:
+                return True
+            if nb[a] < lvl or nb[b] < lvl:
+                return False
+            return not evs[a].sub_break
+
+        for pos, k in enumerate(mem):
+            if evs[k].kind != 'note':
+                continue
             els = []
             for lvl in range(1, nb[k] + 1):
-                if lvl == 1:
-                    if pos == 0:
-                        st = 'begin'
-                    elif pos == len(notes) - 1:
-                        st = 'end'
-                    else:
-                        st = 'continue'
-                    els.append((1, st))
-                    continue
-                left = pos > 0 and nb[notes[pos - 1]] >= lvl and not _rest_between(evs, notes[pos - 1], k)
-                right = pos < len(notes) - 1 and nb[notes[pos + 1]] >= lvl and not _rest_between(evs, k, notes[pos + 1])
+                left = pos > 0 and joined(mem[pos - 1], k, lvl)
+                right = pos < len(mem) - 1 and joined(k, mem[pos + 1], lvl)
                 if left and right:
                     st = 'continue'
                 elif right:
@@ -117,14 +130,18 @@ def beam_elements(evs):
                 elif left:
                     st = 'end'
                 else:
-                    st = 'forward hook' if pos == 0 else 'backward hook'
+                    h = evs[k].hook or ('forward' if pos == 0 else 'backward')
+                    st = h + ' hook'
                 els.append((lvl, st))
             out[k] = els
     return out
 
 
-def _rest_between(evs, a, b):
-    return any(evs[j].kind == 'rest' for j in range(a + 1, b))
+def beam_side_counts(els):
+    """(left, right) number of beams/beamlets attached to the stem for a list of (level, status)"""
+    left = sum(1 for _, st in els if st in ('continue', 'end', 'backward hook'))
+    right = sum(1 for _, st in els if st in ('continue', 'begin', 'forward hook'))
+    return left, right
 
 
 def tuplet_brackets(evs):
@@ -195,7 +212,7 @@ def staff_accidentals(score, p, m, mi_index, kalt):
 
 # ---------------------------------------------------------------- writer
 
-def write_musicxml(score: Score, path: str, software='rhythm challenge corpus builder', date='2026-11-08'):
+def write_musicxml(score: Score, path: str, software='coverage/notes corpus builder (LilyPond-verified)', date='2026-11-08'):
     div = divisions_for(score)
     out = []
     w = out.append
@@ -328,6 +345,10 @@ def write_musicxml(score: Score, path: str, software='rhythm challenge corpus bu
                         w(f'      <forward><duration>{d}</duration><voice>{v.key}</voice>{st}</forward>')
                         pos += ev.dur
                         continue
+                    if ev.words:
+                        st = f'<staff>{staff_attr}</staff>' if staff_attr else ''
+                        w(f'      <direction placement="above"><direction-type><words>{escape(ev.words)}</words>'
+                          f'</direction-type><voice>{v.key}</voice>{st}</direction>')
                     for dyn in ev.dynamics:
                         st = f'<staff>{staff_attr}</staff>' if staff_attr else ''
                         w(f'      <direction placement="below"><direction-type><dynamics><{dyn}/></dynamics>'
@@ -366,6 +387,8 @@ def _note(w, ev, pit, chord, d, voice, staff, role, acc, first, beams, bracket):
     w('      <note>')
     if ev.grace:
         w('        <grace slash="yes"/>' if ev.grace in ('acciaccatura', 'slashed') else '        <grace/>')
+    if ev.cue:
+        w('        <cue/>')
     if chord:
         w('        <chord/>')
     if ev.kind == 'rest':
@@ -376,15 +399,16 @@ def _note(w, ev, pit, chord, d, voice, staff, role, acc, first, beams, bracket):
         w(f'        <pitch><step>{step}</step>{al}<octave>{octv}</octave></pitch>')
     if not ev.grace:
         w(f'        <duration>{d}</duration>')
-    tie_stop = pit is not None and pit in ev.tie_stop
-    tie_start = pit is not None and pit in ev.tie_start
+    tie_stop = pit is not None and pit in ev.tie_stop and not ev.cue
+    tie_start = pit is not None and pit in ev.tie_start and not ev.cue
     if tie_stop:
         w('        <tie type="stop"/>')
     if tie_start:
         w('        <tie type="start"/>')
     w(f'        <voice>{voice}</voice>')
     if not ev.measure_rest and ev.dtype:
-        w(f'        <type>{ev.dtype}</type>')
+        sz = ' size="cue"' if ev.cue else ''
+        w(f'        <type{sz}>{ev.dtype}</type>')
         for _ in range(ev.dots):
             w('        <dot/>')
     if acc:
@@ -392,10 +416,8 @@ def _note(w, ev, pit, chord, d, voice, staff, role, acc, first, beams, bracket):
     if ev.tuplet:
         w(f'        <time-modification><actual-notes>{ev.tuplet[0]}</actual-notes>'
           f'<normal-notes>{ev.tuplet[1]}</normal-notes></time-modification>')
-    if ev.kind == 'note' and role in (1, 3):
-        w('        <stem>up</stem>')
-    elif ev.kind == 'note' and role in (2, 4):
-        w('        <stem>down</stem>')
+    if ev.kind == 'note' and ev.stem:
+        w(f'        <stem>{ev.stem}</stem>')
     if staff:
         w(f'        <staff>{staff}</staff>')
     if ev.kind == 'note':
@@ -426,6 +448,11 @@ def _note(w, ev, pit, chord, d, voice, staff, role, acc, first, beams, bracket):
             nots.append('<fermata type="upright"/>')
         if ev.artic:
             nots.append('<articulations>' + ''.join(f'<{a}/>' for a in ev.artic) + '</articulations>')
+        if ev.trem:
+            nots.append(f'<ornaments><tremolo type="single">{single_trem_marks(ev)}</tremolo></ornaments>')
+        if ev.trem2:
+            marks = TREM_MARKS[int(ev.trem2_sub)]
+            nots.append(f'<ornaments><tremolo type="{ev.trem2}">{marks}</tremolo></ornaments>')
     if nots:
         w('        <notations>' + ''.join(nots) + '</notations>')
     if first and ev.kind == 'note' and not ev.grace:

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from fractions import Fraction as F
 
-from .model import Score, lyric_verses, staff_roles
+from .model import Score, clef_at, clef_timeline, lyric_verses, staff_pos, staff_roles
 
 ACC = {0: '', 1: 'is', -1: 'es', 2: 'isis', -2: 'eses'}
 DUR = {'breve': '\\breve', 'whole': '1', 'half': '2', 'quarter': '4', 'eighth': '8',
@@ -101,6 +101,7 @@ class LilyWriter:
         self.layout = layout
         self.o = opts
         self._master_done = False
+        self.clefs = clef_timeline(score)
 
     # ------------------------------------------------------------------ voices
     def timing_plan(self):
@@ -213,7 +214,7 @@ class LilyWriter:
             tot = sum((x.dur for x in evs), F(0))
             nm_ = len(s.measures)
             self._allow_R = e['reset'] is None and (i + 1 >= nm_ or plan[i + 1]['reset'] is None)
-            line.extend(self.events_ly(evs))
+            line.extend(self.events_ly(evs, pid, part.voice(vkey).staff, s.measure_offsets()[i]))
             if tot < mi.dur:
                 line.append('s' + frac_whole(mi.dur - tot))
             blk = max([ev.multirest for ev in evs] + [1])
@@ -232,13 +233,21 @@ class LilyWriter:
             out.append(' '.join(line))
         return '\n    '.join(out)
 
-    def events_ly(self, evs):
+    def events_ly(self, evs, pid=None, staff=None, t0=None):
         out = []
         in_tup = False
         tup_ratio = None
         k = 0
+        onsets = []
+        t = t0
+        for e in evs:
+            onsets.append(t)
+            if t is not None:
+                t += e.dur
+        self._ctx = (pid, staff)
         while k < len(evs):
             ev = evs[k]
+            self._cur = (onsets[k], k)
             if ev.kind == 'clef':
                 out.append(f'\\clef "{ev.clef}"')
                 k += 1
@@ -289,19 +298,31 @@ class LilyWriter:
             out.append('}')
         return out
 
+    def mmr_pos(self, ev):
+        pid, staff = self._ctx
+        t, k = self._cur
+        clef = clef_at(self.clefs, pid, staff, t, k)
+        return staff_pos(ev.display, clef)
+
     def event_ly(self, ev):
         if ev.kind == 'rest':
+            rn = 'r' if ev.display is None else pitch_ly(ev.display)
+            rx = '' if ev.display is None else '\\rest'
             if ev.measure_rest and ev.multirest > 1:
                 s = 'R' + ly_dur_of_ql(ev.dur) + f'*{ev.multirest}'
                 if ev.multirest_hbar:
                     s = '\\once \\override MultiMeasureRest.expand-limit = #1 ' + s
+                if ev.display is not None:
+                    s = f'\\once \\override MultiMeasureRest.staff-position = #{self.mmr_pos(ev)} ' + s
             elif ev.measure_rest and getattr(self, '_allow_R', True):
                 s = 'R' + ly_dur_of_ql(ev.dur)
+                if ev.display is not None:
+                    s = f'\\once \\override MultiMeasureRest.staff-position = #{self.mmr_pos(ev)} ' + s
             elif ev.measure_rest:
                 from .model import split_plain
-                s = ' '.join('r' + DUR[t] + '.' * d for t, d, _ in split_plain(ev.dur))
+                s = ' '.join(rn + DUR[t] + '.' * d + rx for t, d, _ in split_plain(ev.dur))
             else:
-                s = 'r' + dur_ly(ev)
+                s = rn + dur_ly(ev) + rx
             if ev.fermata:
                 s += '\\fermata'
             if ev.beam_start:

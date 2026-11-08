@@ -104,6 +104,14 @@ function readDigit(R, c) {
   if (w < 0.42 * h) return 1;
   const hs = holes(R, c);
   if (hs.length >= 2) return 8;
+  // a 1 is a full-height stem (with a flag and a foot in bold type)
+  if (!hs.length) {
+    for (let x = c.x0 + Math.floor(0.25 * w); x <= c.x0 + Math.ceil(0.75 * w); x++) {
+      let n = 0;
+      for (let y = c.y0; y <= c.y1; y++) n += R.data[y * R.width + x] ? 1 : 0;
+      if (n >= 0.85 * h) return 1;
+    }
+  }
   if (hs.length === 1) {
     const y = hs[0].cy;
     if (y > 0.55) return 6;
@@ -121,7 +129,17 @@ function readDigit(R, c) {
     for (let i = Math.floor(f0 * h); i < Math.max(Math.floor(f0 * h) + 1, Math.floor(f1 * h)); i++) if (rows[i] && rows[i].a >= 0) { s += (rows[i].a - c.x0) / w; k++; }
     return k ? s / k : 1;
   };
-  const topW = span(0, 0.15), botW = span(0.85, 1);
+  // densest row near the top / bottom (the flat bar of a 7 / a 2)
+  const solid = (f0, f1) => {
+    let m = 0;
+    for (let y = c.y0 + Math.floor(f0 * h); y <= c.y0 + Math.min(h - 1, Math.ceil(f1 * h)); y++) {
+      let n = 0;
+      for (let x = c.x0; x <= c.x1; x++) n += R.data[y * R.width + x] ? 1 : 0;
+      m = Math.max(m, n / w);
+    }
+    return m;
+  };
+  const topW = Math.max(span(0, 0.15), solid(0, 0.2)), botW = solid(0.8, 1);
   if (topW > 0.8 && botW < 0.5) return 7;
   if (botW > 0.8) return 2;
   if (topW > 0.75 && left(0.1, 0.4) < 0.3) return 5;
@@ -138,6 +156,10 @@ function readNumber(R, comps, st, sp, x0, x1) {
     return xc > x0 && xc < x1 && c.y1 < y0 - 0.2 * sp && c.y0 > y0 - 5 * sp && h >= 1.2 && h <= 2.8;
   }).sort((a, b) => a.x0 - b.x0);
   if (!ds.length) return 0;
+  // the number is the row of digits nearest the staff (a tempo mark or
+  // rehearsal letter may stand higher)
+  const low = ds.reduce((a, b) => (b.y1 > a.y1 ? b : a));
+  ds.splice(0, ds.length, ...ds.filter(c => Math.min(c.y1, low.y1) - Math.max(c.y0, low.y0) >= 0.5 * (low.y1 - low.y0)));
   const glyphs = [];
   for (const c of ds) {
     const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1;
@@ -191,7 +213,7 @@ function detectRests({ R, comps, s, xa, xb, debug }) {
       const rows = rowProfile(R, c);
       let run = 0, best = 0, mid = 0;
       rows.forEach((r, i) => {
-        if (r.a >= 0 && r.b - r.a + 1 >= 0.85 * (c.x1 - c.x0 + 1) && r.runs <= 2) { run++; if (run > best) { best = run; mid = i - run / 2; } } else run = 0;
+        if (r.a >= 0 && r.b - r.a + 1 >= 0.85 * (c.x1 - c.x0 + 1) && r.runs === 1) { run++; if (run > best) { best = run; mid = i - run / 2; } } else run = 0;
       });
       const pos = (c.y0 + mid - st.yAt(0, f.xc)) / sp;
       if (best >= 0.3 * sp && best <= 1.1 * sp && Math.abs(pos - 2) < 0.6) {
@@ -212,7 +234,7 @@ function detectRests({ R, comps, s, xa, xb, debug }) {
     if (debug) debug('cand', Math.round(f.xc), Math.round(c.y0), 'w', f.w.toFixed(2), 'h', f.h.toFixed(2), 'top', f.top.toFixed(2), 'fill', f.fill.toFixed(2), '->', kind);
     if (!kind) continue;
     // a glyph directly left of a notehead at its height is an accidental
-    if (q <= 1 && heads.some(hd => hd.x - c.x1 >= -0.2 * sp && hd.x - c.x1 <= 1.5 * sp && hd.y >= c.y0 - 0.3 * sp && hd.y <= c.y1 + 0.3 * sp)) continue;
+    if (q <= 1 && f.h < 3.4 && heads.some(hd => hd.x - c.x1 >= -0.2 * sp && hd.x - c.x1 <= 1.5 * sp && hd.y >= c.y0 - 0.3 * sp && hd.y <= c.y1 + 0.3 * sp)) continue;
     // a time signature: two glyphs stacked on the staff
     if (kind !== 'multi' && near.some(o => o !== c && Math.abs((o.x0 + o.x1) / 2 - f.xc) < 0.4 * sp && (o.y1 - o.y0) >= 1.2 * sp &&
       (o.y0 > c.y1 ? o.y0 - c.y1 : c.y0 - o.y1) >= -1 && (o.y0 > c.y1 ? o.y0 - c.y1 : c.y0 - o.y1) < 0.5 * sp)) continue;
@@ -235,3 +257,49 @@ function detectRests({ R, comps, s, xa, xb, debug }) {
 }
 
 module.exports = { detectRests, readNumber, _features: features, _rowProfile: rowProfile };
+
+// Put the rests read on a staff into one voice's events of a measure
+// segment, at their x positions. voice 1 / 2 (two voices on a staff) take
+// the raised / lowered rests, any other stream every rest that does not
+// stand at one of its notes (a rest in the other voice). A voice with no
+// notes takes its block rests as one whole-bar rest event (q 0, sized to
+// the bar later; glyphs lists what it stands for, multi-bar rests).
+function mergeRests(evs, rests, voice, sp) {
+  if (!rests.length) return evs;
+  let rs = rests;
+  if (voice === 1) rs = rs.filter(r => r.pos <= 2.4);
+  else if (voice === 2) rs = rs.filter(r => r.pos >= 1.6);
+  rs = rs.filter(r => !evs.some(e => !e.rest && e.x != null && Math.abs(e.x - r.x) < 0.8 * sp));
+  if (!rs.length) return evs;
+  const notes = evs.some(e => !e.rest);
+  if (!notes && rs.some(r => r.bars)) {
+    const bars = rs.filter(r => r.bars);
+    return [{ rest: true, glyph: true, q: 0, dots: 0, x: bars[0].x, bar: true, glyphs: bars.map(r => ({ kind: r.kind, multi: r.multi })) }];
+  }
+  // block rests other than a whole rest only stand alone in a bar
+  rs = rs.filter(r => !r.bars || r.kind === 'whole');
+  // one rest per column (two voices resting together)
+  const col = [];
+  for (const r of rs) {
+    const o = col.find(c => Math.abs(c.x - r.x) < 0.8 * sp);
+    if (!o) col.push(r); else if (r.q < o.q) col[col.indexOf(o)] = r;
+  }
+  const out = evs.slice();
+  for (const r of col) {
+    let k = out.findIndex(e => e.x != null && e.x > r.x);
+    if (k < 0) k = out.length;
+    out.splice(k, 0, { rest: true, glyph: true, q: r.q, dots: r.dots, x: r.x });
+  }
+  return out;
+}
+
+// bars a whole-bar rest event stands for (mLen: bar length in quarters)
+function restBars(e, mLen) {
+  if (!e.glyphs) return 1;
+  let n = 0;
+  for (const g of e.glyphs) n += g.kind === 'multi' ? g.multi || 1 : g.kind === 'long' ? (mLen >= 8 ? 2 : 4) : g.kind === 'breve' ? (mLen >= 8 ? 1 : 2) : 1;
+  return Math.max(1, n);
+}
+
+module.exports.mergeRests = mergeRests;
+module.exports.restBars = restBars;

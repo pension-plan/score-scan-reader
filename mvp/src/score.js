@@ -2,6 +2,7 @@
 // Page assemblies -> parts (closed-score split / grand staff / single), time
 // signature inference, per-measure rhythm repair, lyrics alignment, MusicXML.
 const { staffMeasureEvents, pitchOf, keyAlters, DIV } = require('./assemble');
+const { detectRests, mergeRests, restBars } = require('./rests');
 
 const COLORS = ['#d1495b', '#edae49', '#00798c', '#30638e', '#7b5ea7', '#3a7d44'];
 
@@ -338,64 +339,6 @@ function anchorMisses(evs, anchors, sp) {
   return miss;
 }
 
-// Rest glyphs printed in a voice's measure (the note detector does not report
-// rests). Components of the staff-removed page inside the staff band that are
-// not part of a note, not an accidental just before a note and shaped like a
-// whole / half block, a quarter squiggle or an eighth hook. {x, q} sorted by x.
-function findRests(seg, s, voice) {
-  const st = s.st, sp = st.space, xa = seg.xa, xb = seg.xb;
-  const xMin = Math.max(xa, (s.hdr && s.hdr.end) || -1e9) + 0.3 * sp;
-  const heads = [];
-  for (const c of s.chords) if (c.x > xa - 2 * sp && c.x < xb + 2 * sp) for (const h of c.heads) heads.push(h);
-  const out = [];
-  for (const c of seg.sy.comps || []) {
-    if (c.x0 < xMin || c.x1 > xb - 0.3 * sp) continue;
-    const xc = (c.x0 + c.x1) / 2, y0 = st.yAt(0, xc);
-    const top = (c.y0 - y0) / sp, bot = (c.y1 - y0) / sp, cy = (top + bot) / 2;
-    if (top < -0.6 || bot > 4.6) continue;
-    const h = (c.y1 - c.y0 + 1) / sp, w = (c.x1 - c.x0 + 1) / sp, fill = c.area / ((c.x1 - c.x0 + 1) * (c.y1 - c.y0 + 1));
-    let q = 0;
-    if (h >= 0.35 && h <= 0.95 && w >= 0.9 && w <= 1.9 && fill >= 0.6 && top >= 0.6 && bot <= 2.6) q = top < 1.3 ? 4 : 2;
-    else if (h >= 2.3 && h <= 3.4 && w >= 0.6 && w <= 1.4 && fill >= 0.25 && fill <= 0.65 && cy >= 0.9 && cy <= 3.1) q = 1;
-    else if (h >= 1.4 && h < 2.3 && w >= 0.6 && w <= 1.3 && fill >= 0.2 && fill <= 0.6 && cy >= 0.7 && cy <= 3.3) q = 0.5;
-    if (!q) continue;
-    // part of a note (head, stem, flag) or an accidental in front of one
-    if (heads.some(hd => hd.x + 0.7 * sp >= c.x0 && hd.x - 0.7 * sp <= c.x1 && hd.y + 0.6 * sp >= c.y0 && hd.y - 0.6 * sp <= c.y1)) continue;
-    if (heads.some(hd => hd.x - c.x1 >= 0 && hd.x - c.x1 <= 3.0 * sp && hd.y >= c.y0 - 0.3 * sp && hd.y <= c.y1 + 0.3 * sp)) continue;
-    // two voices on a staff: rests of the upper voice are raised, of the lower lowered
-    if (voice === 1 && cy > 2.4) continue;
-    if (voice === 2 && cy < 1.6) continue;
-    out.push({ x: xc, q });
-  }
-  return out.sort((a, b) => a.x - b.x);
-}
-
-// Put found rests into a voice that falls short of the measure, at their x
-// position; their lengths come from their shapes when those add up to the
-// gap, otherwise the gap is shared out. Returns null when that does not fit.
-function placeRests(evs, rests, gap) {
-  if (!rests.length) return null;
-  let qs = rests.map(r => r.q);
-  const tot = qs.reduce((a, b) => a + b, 0);
-  if (Math.abs(tot - gap) > EPS) {
-    if (rests.length === 1) qs = [gap];
-    else if (qToType(gap / rests.length)) qs = rests.map(() => gap / rests.length);
-    else return null;
-  }
-  const add = [];
-  rests.forEach((r, i) => {
-    const parts = qToType(qs[i]) ? [qs[i]] : restsFor(qs[i]);
-    for (const q of parts) add.push({ rest: true, q, dots: qToType(q) ? qToType(q).dots : 0, x: r.x });
-  });
-  const out = evs.slice();
-  for (const r of add) {
-    let k = out.findIndex(e => e.x != null && e.x > r.x);
-    if (k < 0) k = out.length;
-    out.splice(k, 0, r);
-  }
-  return out;
-}
-
 // Cheapest set of duration edits that makes a voice fill the measure exactly:
 // a missed / extra augmentation dot, a missed / extra flag or beam (halve /
 // double) or, in an over-full measure, a false notehead dropped. A dynamic
@@ -568,7 +511,8 @@ const valueOk = (e, q) => !!(qToType(q) || (tupletOf(e) && qToType(q * tupletOf(
 
 function qToType(q) {
   const table = [[4, 'whole', 0], [3, 'half', 1], [2, 'half', 0], [1.5, 'quarter', 1], [1, 'quarter', 0], [0.75, 'eighth', 1],
-    [0.5, 'eighth', 0], [0.375, '16th', 1], [0.25, '16th', 0], [0.125, '32nd', 0], [6, 'whole', 1]];
+    [0.5, 'eighth', 0], [0.375, '16th', 1], [0.25, '16th', 0], [0.125, '32nd', 0], [6, 'whole', 1],
+    [0.1875, '32nd', 1], [0.0625, '64th', 0], [3.5, 'half', 2], [1.75, 'quarter', 2], [0.875, 'eighth', 2], [0.4375, '16th', 2]];
   for (const [v, t, d] of table) if (Math.abs(v - q) < 1e-6) return { type: t, dots: d };
   return null;
 }
@@ -598,17 +542,20 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   for (const sy of systems) for (const [xa, xb] of sy.measures) segs.push({ sy, xa, xb });
   // stems are trusted on a staff when up and down stems are seen together on it
   const trust = layout.stats.map(st => st.mix >= 0.25);
+  // rests printed on each staff (rests.js) go into every voice at their x
+  // position, so rhythm repair counts them
   const segEv = segs.map(m => {
-    const cache = {};
+    const cache = {}, restCache = {};
     return parts.map(p => p.src.map(src => {
       const s = m.sy.staves[src.staff];
       if (!s) return [];
       const c = (cache[src.staff] ||= staffMeasureEvents(m.sy.fr, m.sy.fr.R, m.sy.comps, s, m.xa, m.xb));
+      const rs = (restCache[src.staff] ||= m.sy.fr.R ? detectRests({ R: m.sy.fr.R, comps: m.sy.comps || [], s, xa: m.xa, xb: m.xb }) : []);
       if (src.voice === 1 || src.voice === 2) {
         c.split ||= splitTwoVoices(c.chordal, s.st.space, !!trust[src.staff]);
-        return c.split[src.voice];
+        return mergeRests(c.split[src.voice], rs, src.voice, s.st.space);
       }
-      return c[src.voice] || [];
+      return mergeRests(c[src.voice] || [], rs, src.voice, s.st.space);
     }));
   });
   // length of each segment: the most common stream total (a stream that lost
@@ -835,6 +782,12 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
       return;
     }
     units.push({ m, streams: byPart, split: false });
+    // a multi-bar rest (or church rests) in a bar with no notes: one bar each
+    const barRests = byPart.flatMap(sts => sts.flatMap(st => st.events));
+    if (barRests.length && barRests.every(e => e.bar)) {
+      const n = Math.max(...barRests.map(e => restBars(e, mLen)));
+      for (let k = 1; k < n; k++) units.push({ m, streams: byPart.map(sts => sts.map(st => ({ staff: st.staff, events: [] }))), split: false });
+    }
   });
   const partMeasures = parts.map(() => []);
   units.forEach((u, mi) => {
@@ -849,23 +802,6 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     const edge = mi === 0 || mi === units.length - 1;
     if (edge && ms > 1e-6 && ms < mLen - 1e-6 && agree >= Math.max(2, 0.5 * nz.length)) target = ms;
     else if (edge && ms > 1e-6 && ms < mLen - 1e-6 && nz.length === 1) target = ms;
-    // rests printed in the voices of a measure (looked up only when needed)
-    const restCache = new Map();
-    const restsOf = (st) => {
-      if (u.split || m.segs.some(si => segs[si].sy !== segs[m.segs[0]].sy)) return [];
-      if (!restCache.has(st)) {
-        const s0 = segs[m.segs[0]], seg = { ...s0, xb: segs[m.segs[m.segs.length - 1]].xb }, sv = seg.sy.staves[st.staff];
-        restCache.set(st, sv ? findRests(seg, sv, parts[st.pi].src[st.k].voice) : []);
-      }
-      return restCache.get(st);
-    };
-    // a short opening bar whose voices show printed rests that fill it up is
-    // a full bar starting with rests, not a pickup
-    if (mi === 0 && target < mLen - 1e-6) {
-      const short = streams.filter((st, i) => sums[i] > 1e-6 && sums[i] < mLen - 1e-6);
-      const filled = short.filter(st => restsOf(st).length && placeRests(st.events, restsOf(st), mLen - qsum(st.events))).length;
-      if (filled && filled >= 0.5 * short.length) target = mLen;
-    }
     const implicit = mi === 0 && target < mLen - 1e-6;
     const sp = (m.sy.staves[0] && m.sy.staves[0].st.space) || 16;
     const anchors = [];
@@ -878,20 +814,19 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
       let evs = st.events;
       if (sums[i] <= 1e-6) evs = [{ rest: true, q: target, dots: 0, whole: true }];
       else if (Math.abs(sums[i] - target) > 1e-6) {
-        let placed = null;
-        if (sums[i] < target) placed = placeRests(evs, restsOf(st), target - sums[i]);
-        if (placed) { evs = placed; restsFound++; }
-        else {
-          const r = repairStream(evs, target, anchors.filter(a => a.i !== i), sp);
-          evs = r.events;
-          if (r.ok) repaired++; else mismatch++;
-        }
+        const r = repairStream(evs, target, anchors.filter(a => a.i !== i), sp);
+        evs = r.events;
+        if (r.ok) repaired++; else mismatch++;
       }
+      if (evs.some(e => e.glyph && !e.bar)) restsFound++;
+      // a gap left in a voice is shown as rests (a <forward> would leave a
+      // hole in the notation)
+      if (!process.env.NOFWD && evs.some(e => e.forward)) evs = evs.flatMap(e => (e.forward ? restsFor(e.q).map(q => ({ rest: true, q, dots: qToType(q) ? qToType(q).dots : 0 })) : [e]));
       (partMeasures[st.pi][mi] ||= [])[st.k] = { staff: st.staff, events: evs, implicit };
     });
   });
   if (splitBars) warnings.push(`${splitBars} barlines were missing on the page; bars were split by their contents.`);
-  if (restsFound) warnings.push(`${restsFound} voice-measures completed with rests read from the page.`);
+  if (restsFound) warnings.push(`Rests read from the page in ${restsFound} voice-measures.`);
   if (repaired) warnings.push(`${repaired} voice-measures repaired to fit ${time.beats}/${time.type} (likely misread dots, flags or beams).`);
   if (mismatch) warnings.push(`${mismatch} voice-measures still did not add up to ${time.beats}/${time.type}; gaps left empty, notes past the barline cut.`);
   // stanzas printed after the music (lyrics.js readStanzas -> fr.stanzas) are

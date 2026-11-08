@@ -195,7 +195,7 @@ def staff_accidentals(score, p, m, mi_index, kalt):
 
 # ---------------------------------------------------------------- writer
 
-def write_musicxml(score: Score, path: str, software='rhythm challenge corpus builder', date='2026-11-08'):
+def write_musicxml(score: Score, path: str, software='OMR coverage corpus builder (rests family)', date='2026-11-08'):
     div = divisions_for(score)
     out = []
     w = out.append
@@ -369,7 +369,12 @@ def _note(w, ev, pit, chord, d, voice, staff, role, acc, first, beams, bracket):
     if chord:
         w('        <chord/>')
     if ev.kind == 'rest':
-        w('        <rest measure="yes"/>' if ev.measure_rest else '        <rest/>')
+        ma = ' measure="yes"' if ev.measure_rest else ''
+        if ev.display is not None:
+            w(f'        <rest{ma}><display-step>{ev.display[0]}</display-step>'
+              f'<display-octave>{ev.display[2]}</display-octave></rest>')
+        else:
+            w(f'        <rest{ma}/>')
     else:
         step, alter, octv = pit
         al = f'<alter>{alter}</alter>' if alter else ''
@@ -392,7 +397,11 @@ def _note(w, ev, pit, chord, d, voice, staff, role, acc, first, beams, bracket):
     if ev.tuplet:
         w(f'        <time-modification><actual-notes>{ev.tuplet[0]}</actual-notes>'
           f'<normal-notes>{ev.tuplet[1]}</normal-notes></time-modification>')
-    if ev.kind == 'note' and role in (1, 3):
+    if ev.kind == 'note' and ev.stem:
+        w(f'        <stem>{ev.stem}</stem>')
+    elif ev.kind == 'note' and ev.dtype in ('whole', 'breve'):
+        pass                      # no stem drawn
+    elif ev.kind == 'note' and role in (1, 3):
         w('        <stem>up</stem>')
     elif ev.kind == 'note' and role in (2, 4):
         w('        <stem>down</stem>')
