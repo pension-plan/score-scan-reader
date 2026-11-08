@@ -7,11 +7,43 @@
 </head>
 <body>
 <div class="ssr-verbar" role="note" aria-label="Version" style="font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:6px max(16px,env(safe-area-inset-right,0px)) 6px max(16px,env(safe-area-inset-left,0px));border-bottom:1px solid rgba(127,127,127,.35);display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline;overflow-wrap:anywhere">
-<span>Version <a class="ssr-rel-link" href="https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.2.0" style="color:inherit"><b class="ssr-rel-ver">v0.2.0</b></a><span class="ssr-ahead"></span></span>
+<span>Version <a class="ssr-rel-link" href="https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.3.0" style="color:inherit"><b class="ssr-rel-ver">v0.3.0</b></a><span class="ssr-ahead"></span></span>
 <span class="ssr-rel-age" style="opacity:.8"></span>
-<span style="opacity:.8">build <a href="https://github.com/pension-plan/score-scan-reader/commit/663c80b" style="color:inherit">663c80b</a> <span class="ssr-build-age"></span></span>
+<span style="opacity:.8">build <a href="https://github.com/pension-plan/score-scan-reader/commit/20100ec" style="color:inherit">20100ec</a> <span class="ssr-build-age"></span></span>
 <span class="ssr-newer"></span>
 </div>
+<style>.ssr-cl a{color:inherit}.ssr-cl h3{font-size:15px;margin:10px 0 4px}.ssr-cl ul{margin:4px 0;padding-left:20px}</style>
+<details class="ssr-changes" open style="font:14px/1.5 system-ui,-apple-system,'Segoe UI',sans-serif;margin:0;padding:8px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));border-bottom:1px solid rgba(127,127,127,.35);overflow-wrap:anywhere">
+<summary style="cursor:pointer;font-weight:600">What's new <span style="font-weight:400;opacity:.8">· engine: plain-JavaScript recognition pipeline (the copista-2m ML detector is not in this app yet; try it in the <a href="../ml-demo/" style="color:inherit">ML demo</a>)</span></summary>
+<div class="ssr-cl" style="max-width:72ch;font-size:13px"><h3>v0.3.0 · 2026-11-08</h3>
+<h3>Features</h3>
+<ul>
+<li><strong>demo:</strong> copista-2m ML detector demo on GitHub Pages (/ml-demo/) (<a href="https://github.com/pension-plan/score-scan-reader/commit/f81215705b45ebf5eddec196e321f79a38214b54">f812157</a>)</li>
+<li><strong>lyrics:</strong> split multi-note words, port strips line detector, read part labels and stanzas (round 2) (<a href="https://github.com/pension-plan/score-scan-reader/commit/e1c2221d1252d6013fc434d9b4f4b842f82ec299">e1c2221</a>)</li>
+<li><strong>parts:</strong> lyric-to-voice assignment, melisma extenders, printed part names, stanza credits (round 2) (<a href="https://github.com/pension-plan/score-scan-reader/commit/20100ecc2601edcff2152ce46c833efc3a279a36">20100ec</a>)</li>
+<li><strong>site:</strong> release footer on every Pages page with version, release age (AEDT) and build commit (<a href="https://github.com/pension-plan/score-scan-reader/commit/663c80ba9bca6d9ca84651f7d24b630f8f96f06e">663c80b</a>)</li>
+<li><strong>site:</strong> version bar at the top of every Pages page, including commits ahead of the release (<a href="https://github.com/pension-plan/score-scan-reader/commit/e9c5c3a496824152553373539c6ba1e83a0d44ca">e9c5c3a</a>)</li>
+<li><strong>ui:</strong> read up to 40 pages page by page in a Web Worker with progress and Stop (round 2) (<a href="https://github.com/pension-plan/score-scan-reader/commit/56859ef146641e92e608e058541078b44eb34bd6">56859ef</a>)</li>
+</ul>
+
+<details><summary style="cursor:pointer">Earlier releases</summary><h3>v0.2.0 · 2026-11-08</h3>
+<h3>Features</h3>
+<ul>
+<li><strong>heads:</strong> ledger-line check, faint-staff detection, hollow-head recovery, wide-blob splitting (round 1) (<a href="https://github.com/pension-plan/score-scan-reader/commit/177e0e8a66cc9e6b177c3892357283430a1168c6">177e0e8</a>)</li>
+<li><strong>lyrics:</strong> wider word gaps, junk-row rejection, verse numbers and cross-system hyphens (round 1) (<a href="https://github.com/pension-plan/score-scan-reader/commit/aca893fc0a15a4ba476a1fa5bf510b21189c7204">aca893f</a>)</li>
+<li><strong>parts:</strong> barline-based piano detection, clef-based part names, per-measure rhythm repair, rest detection (round 1) (<a href="https://github.com/pension-plan/score-scan-reader/commit/bcfb9e0172e393b43a5dcaca25a5f6845f06739f">bcfb9e0</a>)</li>
+<li>publish the app, status page and docs on GitHub Pages (<a href="https://github.com/pension-plan/score-scan-reader/commit/ee204e443022c8a53504d5cc074cefc30a614ed8">ee204e4</a>)</li>
+<li>score scan reader v1, eval harness, corpora, design docs, CI and release-please (<a href="https://github.com/pension-plan/score-scan-reader/commit/ccbb2b618d918d8ce8e801e34e6f8ba5c80474ca">ccbb2b6</a>)</li>
+<li>ship fix-forward round 1 (aggregate 0.589 -&gt; 0.884) (<a href="https://github.com/pension-plan/score-scan-reader/commit/d9c3916d3827ffef4a7d87a9166dad5015f0568c">d9c3916</a>)</li>
+<li><strong>symbols:</strong> header parsing for clef/key/time, robust accidentals, treble-8vb clef (round 1) (<a href="https://github.com/pension-plan/score-scan-reader/commit/799037052709bb86f8329a92e50ee9ec45309095">7990370</a>)</li>
+</ul>
+<h3>Bug Fixes</h3>
+<ul>
+<li><strong>ci:</strong> use Playwright&#39;s bundled Chromium when the local cached build is absent (<a href="https://github.com/pension-plan/score-scan-reader/commit/7d39275a17a355b71dd54fe3c466fcbe5c391822">7d39275</a>)</li>
+</ul>
+</details>
+<p style="opacity:.8">Full history: <a href="https://github.com/pension-plan/score-scan-reader/blob/main/CHANGELOG.md" style="color:inherit">CHANGELOG.md</a> · <a href="https://github.com/pension-plan/score-scan-reader/releases" style="color:inherit">all releases and downloads</a></p></div>
+</details>
 <style>
 /* Layout: a proof sheet. The scan is the engraved plate on the left, marked up in
    proof-pencil blue; the right margin carries the engraver's notes (parts, lyrics,
@@ -1776,8 +1808,8 @@ function turn(g, quarter) {
   return out;
 }
 
-// Gray page -> binary, staff space, deskew and staves for one mode.
-function prepare(gray, mode) {
+// Gray page -> binary, staff space and deskew for one mode.
+function clean(gray, mode) {
   const bin = (g) => binarize(mode.blur ? boxBlur(g, mode.blur) : g, mode.denoise === false ? { denoise: false } : {});
   let bz = bin(gray);
   let sp = estimateStaffSpace(bz.binary);
@@ -1798,8 +1830,14 @@ function prepare(gray, mode) {
   let B = bz.binary;
   sp = estimateStaffSpace(B);
   if (mode.despeckle && bz.info.noise > 12) { B = despeckle(B, Math.max(2, Math.round(0.02 * sp.ss * sp.ss))); sp = estimateStaffSpace(B); }
-  // staves on the main binary and on a lenient one (faint / thin-ruled scans
-  // lose staff lines in B); keep the better-supported staff where they clash
+  return { gray, bz, B, sp, scale, skew, mode: mode.name };
+}
+
+// Staves on the main binary and on a lenient one (faint / thin-ruled scans
+// lose staff lines in B); the better-supported staff is kept where they clash.
+function findStaves(c) {
+  const { bz, B } = c;
+  let { sp } = c;
   const L0 = threshold(bz.gray, Math.min(235, (bz.info.threshold || 180) + 35));
   const spL = estimateStaffSpace(L0);
   const sB = detectStaves(B, sp.ss, sp.lt), sL = detectStaves(L0, spL.ss, spL.lt);
@@ -1808,8 +1846,10 @@ function prepare(gray, mode) {
   if (staves.filter(st => sL.includes(st)).length > staves.length / 2 && sB.length < staves.length) {
     sp = { ...sp, ss: spL.ss }; ltL = Math.max(sp.lt, spL.lt);
   }
-  return { gray, bz, B, L0, sp, ltL, scale, skew, staves, mode: mode.name };
+  return Object.assign(c, { L0, sp, ltL, staves });
 }
+
+const prepare = (gray, mode) => findStaves(clean(gray, mode));
 
 function transpose(b) {
   const { width: w, height: h, data } = b;
@@ -1852,14 +1892,16 @@ function invertedShare(R, staves) {
   return n ? inv / n : 0;
 }
 
-// Staged front end.  Yields the stage about to run ('clean', 'staves',
+// Staged front end.  Yields the stage about to run ('cleanup', 'staves',
 // 'notes') so a caller can report progress and let the page repaint between
-// stages; returns the result.  front() below runs it in one go.
+// stages; returns the result.  front() below runs it in one go, reporting
+// each stage to opts.onStage(stage) and opts.onProgress(message, { stage }).
 function* frontSteps(gray0, opts = {}) {
   const warnings = [];
-  yield 'clean';
-  let ctx = prepare(gray0, (opts.mode && MODES.find(m => m.name === opts.mode)) || MODES[0]);
+  yield 'cleanup';
+  let ctx = clean(gray0, (opts.mode && MODES.find(m => m.name === opts.mode)) || MODES[0]);
   yield 'staves';
+  findStaves(ctx);
   let quarter = 0;
   if (!ctx.staves.length && !opts.mode) {
     // fail over: other binarizations, then the page turned a quarter.  Only
@@ -1881,7 +1923,8 @@ function* frontSteps(gray0, opts = {}) {
   let { gray, B, L0, sp, ltL, scale, skew, staves } = ctx;
   if (!staves.length) {
     warnings.push('No staves found on this page.');
-    return { gray, B, R: B, scale, skew, ss: sp.ss, lt: sp.lt, staves: [], systems: [], heads: [], beams: [], barlines: [], warnings, orientation: 0, mode: ctx.mode };
+    // orientation left unset: nothing settled it, a caller may still try turns
+    return { gray, B, R: B, scale, skew, ss: sp.ss, lt: sp.lt, staves: [], systems: [], heads: [], beams: [], barlines: [], warnings, mode: ctx.mode };
   }
   let R = removeStaffLines(B, staves, sp.lt).binary;
   if (opts.orient !== false && invertedShare(R, staves) >= 0.6) {
@@ -1930,10 +1973,16 @@ function* frontSteps(gray0, opts = {}) {
     orientation: (quarter % 4) * 90, mode: ctx.mode };
 }
 
+const STAGE_TEXT = { cleanup: 'cleaning up the scan', staves: 'finding staves', notes: 'finding notes' };
+
 function front(gray, opts = {}) {
   const it = frontSteps(gray, opts);
   let r = it.next();
-  while (!r.done) { if (opts.onStage) opts.onStage(r.value); r = it.next(); }
+  while (!r.done) {
+    if (opts.onStage) opts.onStage(r.value);
+    if (opts.onProgress) opts.onProgress(STAGE_TEXT[r.value] || r.value, { stage: r.value });
+    r = it.next();
+  }
   return r.value;
 }
 
@@ -4999,10 +5048,18 @@ function clefXML(c, n) {
 
 function toMusicXML({ parts, partMeasures, fifths, kAlt, time, clefs, title, credits, unitSys }) {
   // each system's own clef where it was read (a staff can change clef from
-  // one system to the next), else the clef most systems show
+  // one system to the next), else the clef most systems show. A clef read on
+  // one system only is more often a misread (or a header clef cancelled at
+  // once by a change the reader does not see) than a real change, so a
+  // system's clef counts only when that staff shows it on two systems or more.
+  const seenClef = {};
+  for (const sy of new Set(unitSys || [])) if (sy) sy.staves.forEach((st, k) => {
+    if (!st.hdr.clefGuessed && st.hdr.clef) { const key = k + ':' + st.hdr.clef; seenClef[key] = (seenClef[key] || 0) + 1; }
+  });
   const clefAt = (mi, staff) => {
     const sy = unitSys && unitSys[mi], st = sy && sy.staves[staff];
-    return (st && !st.hdr.clefGuessed && st.hdr.clef) || clefs[staff] || 'G';
+    if (st && !st.hdr.clefGuessed && st.hdr.clef && (seenClef[staff + ':' + st.hdr.clef] || 0) >= 2) return st.hdr.clef;
+    return clefs[staff] || 'G';
   };
   // Accidentals on a shared staff bind every voice on it for the rest of the
   // bar (a split Alto keeps the natural the Soprano printed): per measure and
@@ -7129,11 +7186,11 @@ if (typeof module !== 'undefined' && module.exports) module.exports = __omrSessi
 
 
 <div id="ssr-release" style="font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));border-top:1px solid rgba(127,127,127,.35);opacity:.85;text-align:center;overflow-wrap:anywhere">
-<a class="ssr-rel-link" href="https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.2.0" style="color:inherit"><b class="ssr-rel-ver">v0.2.0</b></a><span class="ssr-ahead"></span> · <span class="ssr-rel-age"></span> · page built from <a href="https://github.com/pension-plan/score-scan-reader/commit/663c80b" style="color:inherit">663c80b</a> <span class="ssr-build-age"></span><span class="ssr-newer"></span>
+<a class="ssr-rel-link" href="https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.3.0" style="color:inherit"><b class="ssr-rel-ver">v0.3.0</b></a><span class="ssr-ahead"></span> · <span class="ssr-rel-age"></span> · page built from <a href="https://github.com/pension-plan/score-scan-reader/commit/20100ec" style="color:inherit">20100ec</a> <span class="ssr-build-age"></span><span class="ssr-newer"></span>
 </div>
 <script>
 (function () {
-  var B = {"version":"0.2.0","tag":"score-scan-reader-v0.2.0","releasedAt":"2026-11-08T05:37:15Z","releaseUrl":"https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.2.0","ahead":8,"commit":"663c80b","builtAt":"2026-11-08T05:57:51.596Z"};
+  var B = {"version":"0.3.0","tag":"score-scan-reader-v0.3.0","releasedAt":"2026-11-08T06:02:26Z","releaseUrl":"https://github.com/pension-plan/score-scan-reader/releases/tag/score-scan-reader-v0.3.0","ahead":0,"commit":"20100ec","builtAt":"2026-11-08T06:04:45.238Z"};
   var rel = { ver: B.version, tag: B.tag, at: B.releasedAt, url: B.releaseUrl }, newer = null;
   function ago(iso) {
     var s = Math.max(0, (Date.now() - Date.parse(iso)) / 1000);

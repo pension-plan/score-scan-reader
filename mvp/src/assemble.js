@@ -179,6 +179,7 @@ function groupGlyphs(cs, sp) {
 function clefBase(clef) {
   if (clef === 'F') return 22;
   if (clef === 'G8') return 27;
+  if (clef === 'G8va') return 41;
   if (/^C[1-5]$/.test(clef || '')) return 28 - 2 * (+clef[1] - 3);
   return 34;
 }
@@ -413,6 +414,138 @@ function analyseHeader(R, comps, st, limitX, trace) {
     break;
   }
   return { clef: clef === 'G' && clefOct === -1 ? 'G8' : clef, clefOct, fifths: kind === 'flat' ? -n : n, end: end + 0.2 * sp, keyN: n, time, mid: lineY(2) };
+}
+
+// ------------------------------------------------- changes inside a staff ---
+// Clef and key changes after the staff start.  s.changes lists them in x
+// order ({x, clef} / {x, fifths}); heads after a change carry h.clef /
+// h.fifths when those differ from the staff header (attrsAt gives both).
+
+// count of separate ink runs down column x of a glyph image
+function crossings(img, x) {
+  let n = 0, on = false;
+  for (let y = 0; y < img.height; y++) { const v = img.data[y * img.width + x]; if (v && !on) n++; on = !!v; }
+  return n;
+}
+
+// a clef printed inside the staff (usually smaller than at the start)
+function clefChangeAt(R, near, c0, st, sp, heads) {
+  const xm = (c0.x0 + c0.x1) / 2, lineY = (k) => st.yAt(k, xm);
+  const yTop = lineY(0) - 3.5 * sp, yBot = lineY(4) + 3.5 * sp;
+  const parts = [c0];
+  let cb = boxOf(parts), grew = true;
+  while (grew) {
+    grew = false;
+    for (const c of near) {
+      if (parts.includes(c) || c.x0 > cb.x1 - 0.1 * sp || c.x1 < cb.x0 + 0.1 * sp || (c.x1 - c.x0) > 3 * sp) continue;
+      if (c.y0 < yTop || c.y1 > yBot || c.y0 > cb.y1 + 0.5 * sp || c.y1 < cb.y0 - 0.5 * sp) continue;
+      parts.push(c); cb = boxOf(parts); grew = true;
+    }
+  }
+  const w = (cb.x1 - cb.x0 + 1) / sp, hgt = (cb.y1 - cb.y0) / sp;
+  const top = (cb.y0 - lineY(0)) / sp, bot = (cb.y1 - lineY(4)) / sp;
+  // a real note (a head with a stem) inside the box: not a clef
+  const inBox = heads.filter(h => h.x > cb.x0 && h.x < cb.x1 && h.y > cb.y0 && h.y < cb.y1);
+  const stemmedIn = inBox.some(h => h.stemDir !== 0);
+  // a clef's loops pass for hollow heads; black heads with stems are notes
+  if (inBox.filter(h => h.stemDir !== 0 && h.kind !== 'hollow').length > inBox.filter(h => h.kind === 'hollow').length) return null;
+  const area = parts.reduce((a, c) => a + c.area, 0), fill = area / ((cb.x1 - cb.x0 + 1) * (cb.y1 - cb.y0 + 1));
+  let clef = null;
+  // G: its tail ends about a space below the staff (a small clef) or up to
+  // two (a full-size one); a chord's lowest note or a stem reaches elsewhere
+  const gTail = hgt < 7 ? bot > 0.5 && bot < 1.3 && top > -2.1 && top < -0.5 : bot > 0.8 && bot < 2.3 && top > -3.0 && top < -1.0;
+  if (hgt > 4.2 && hgt < 8.5 && w > 1.2 && w < 3.0 && gTail && fill > 0.22 && fill < 0.6) {
+    // G clef: its loops cross the middle column several times
+    const img = glyphImage(R, { ...cb, parts });
+    const mx = Math.round(img.width / 2);
+    let run = 0;
+    for (let x = 0; x < img.width; x++) { let r = 0; for (let y = 0; y < img.height; y++) { if (img.data[y * img.width + x]) { r++; if (r > run) run = r; } else r = 0; } }
+    // and no column holds a long straight run (a stem with flags does)
+    if (Math.max(crossings(img, mx), crossings(img, Math.max(0, mx - 2)), crossings(img, Math.min(img.width - 1, mx + 2))) >= 5 && run < 0.6 * img.height) {
+      clef = 'G';
+      // a small 8 over / under it: an octave higher / lower
+      const eight = (above) => near.find(c => !parts.includes(c) && c.x0 >= cb.x0 - 0.3 * sp && c.x1 <= cb.x1 + 0.3 * sp &&
+        (c.y1 - c.y0) > 0.4 * sp && (c.y1 - c.y0) < 1.4 * sp && (c.x1 - c.x0) > 0.25 * sp && (c.x1 - c.x0) < 1.0 * sp &&
+        (above ? c.y1 < cb.y0 + 0.2 * sp && c.y1 > cb.y0 - 1.0 * sp : c.y0 > cb.y1 - 0.2 * sp && c.y0 < cb.y1 + 1.0 * sp));
+      if (eight(true)) clef = 'G8va'; else if (eight(false)) clef = 'G8';
+    }
+  } else if (!stemmedIn && hgt > 1.8 && hgt < 3.6 && w > 1.0 && w < 2.6 && top > -0.7 && top < 0.8 && fill > 0.2) {
+    // F clef: needs its two dots
+    const dots = near.filter(c => c.x0 > cb.x1 - 0.2 * sp && c.x0 < cb.x1 + 0.8 * sp && (c.x1 - c.x0) < 0.6 * sp && (c.y1 - c.y0) < 0.6 * sp &&
+      c.y0 > lineY(0) - 0.3 * sp && c.y1 < lineY(2) + 0.3 * sp);
+    if (dots.length === 2 && Math.abs(dots[0].x0 - dots[1].x0) < 0.4 * sp) { clef = 'F'; cb = boxOf(parts.concat(dots)); }
+  }
+  // (C clefs inside a staff are not read: a sharp or natural looks too alike)
+  return clef ? { clef, box: cb } : null;
+}
+
+// a key signature right after a barline: cancelling naturals and / or the
+// new signs in key-signature order, spread out left to right
+function keyChangeAt(R, comps, st, xStart, xLimit, clef, sp, heads) {
+  const lineY = (k) => st.yAt(k, xStart + 2 * sp);
+  const cand = comps.filter(c => c.x0 > xStart && c.x0 < xLimit && c.area >= 0.04 * sp * sp &&
+    (c.y0 + c.y1) / 2 > lineY(0) - 1.6 * sp && (c.y0 + c.y1) / 2 < lineY(4) + 1.6 * sp).sort((a, b) => a.x0 - b.x0);
+  const glyphs = groupGlyphs(cand, sp);
+  const kc = keyPosFor(clef);
+  let nat = 0, kind = null, n = 0, end = xStart, lastX = -Infinity, near = 0;
+  for (let gi = 0; gi < glyphs.length; gi++) {
+    let g = glyphs[gi];
+    if ((g.x1 - g.x0) < 0.25 * sp && (g.y1 - g.y0) < 0.4 * sp) continue;
+    if (g.x0 - end > 1.6 * sp) break;
+    let k = classifyAccidental(R, g, sp);
+    if (!k && kind !== 'flat') {
+      const pieces = splitSharps(R, g, sp);
+      if (pieces) { glyphs.splice(gi, 1, ...pieces); g = glyphs[gi]; k = g.kind; }
+    }
+    if (!k || g.x0 - lastX < 0.45 * sp) break; // stacked signs: a chord's accidentals
+    const yc = k === 'flat' ? g.y1 - 0.55 * sp : (g.y0 + g.y1) / 2;
+    if (heads.some(h => h.x > g.x1 && h.x - g.x1 < 1.6 * sp && Math.abs(h.y - yc) < 0.6 * sp)) near++;
+    if (k === 'natural' && kind === null) { nat++; end = g.x1; lastX = g.x0; continue; }
+    if ((k === 'sharp' || k === 'flat') && (kind === null || kind === k) && n < 7 && Math.abs(accPos(st, g, k, sp) - kc[k][n]) <= 1.0) {
+      kind = k; n++; end = g.x1; lastX = g.x0; continue;
+    }
+    break;
+  }
+  if (near > 1) return null;
+  if (n >= 2 || (nat >= 1 && n >= 1) || (nat >= 2 && n === 0)) return { fifths: kind === 'flat' ? -n : n, end };
+  return null;
+}
+
+function staffChanges(R, comps, s, sp, barX) {
+  const st = s.st, heads = s.chords.flatMap(c => c.heads);
+  const xa = s.hdr.end + 0.5 * sp, xb = st.right - 0.3 * sp;
+  const xm = (st.left + st.right) / 2, y0 = st.yAt(0, xm), y4 = st.yAt(4, xm);
+  const near = comps.filter(c => c.x1 > xa && c.x0 < xb && c.y1 > y0 - 4 * sp && c.y0 < y4 + 4 * sp);
+  const changes = [];
+  // clefs: tall glyphs centred on the staff
+  for (const c0 of near) {
+    const h = (c0.y1 - c0.y0) / sp, cy = (c0.y0 + c0.y1) / 2;
+    if (h < 1.8 || (c0.x1 - c0.x0) > 3 * sp || cy < st.yAt(0, c0.x0) - 1.5 * sp || cy > st.yAt(4, c0.x0) + 1.5 * sp) continue;
+    if (changes.some(ch => ch.box && c0.x0 <= ch.box.x1 && c0.x1 >= ch.box.x0)) continue;
+    const r = clefChangeAt(R, near, c0, st, sp, heads);
+    if (r) changes.push({ x: r.box.x1, clef: r.clef, box: r.box });
+  }
+  changes.sort((a, b) => a.x - b.x);
+  // keys: after barlines, read with the clef in force there
+  const clefAt = (x) => { let c = s.hdr.clef; for (const ch of changes) if (ch.clef && ch.x <= x) c = ch.clef; return c; };
+  for (const bx of barX) {
+    if (bx < xa || bx > xb - 1.5 * sp) continue;
+    const k = keyChangeAt(R, comps, st, bx + 0.2 * sp, Math.min(xb, bx + 16 * sp), clefAt(bx), sp, heads);
+    if (k) changes.push({ x: k.end, fifths: k.fifths });
+  }
+  changes.sort((a, b) => a.x - b.x);
+  return changes;
+}
+
+// clef and key in force at x on staff s
+function attrsAt(s, x) {
+  let clef = s.hdr.clef, fifths = s.hdr.fifths;
+  for (const ch of s.changes || []) {
+    if (ch.x > x) break;
+    if (ch.clef) clef = ch.clef;
+    if (ch.fifths != null) fifths = ch.fifths;
+  }
+  return { clef, fifths };
 }
 
 // --------------------------------------------------------------- duration ---
@@ -833,6 +966,26 @@ function assemblePage(fr, pageIndex = 0) {
         s.hdr.clefGuessed = true;
       }
     });
+    // clef / key changes inside the staves
+    for (const s of staves) {
+      try {
+        const sp = s.st.space || fr.ss;
+        s.changes = staffChanges(R, comps, s, sp, barX);
+        const boxes = s.changes.filter(ch => ch.box).map(ch => ch.box);
+        // 'heads' found on a clef glyph are not notes
+        if (boxes.length) {
+          const onClef = (h) => boxes.some(b => h.x > b.x0 - 0.2 * sp && h.x < b.x1 + 0.2 * sp && h.y > b.y0 && h.y < b.y1);
+          s.chords = s.chords.map(c => (c.heads.some(onClef) ? { ...c, heads: c.heads.filter(h => !onClef(h)) } : c)).filter(c => c.heads.length);
+        }
+        if (s.changes.length) for (const c of s.chords) {
+          const a = attrsAt(s, c.x);
+          for (const h of c.heads) {
+            if (a.clef !== s.hdr.clef) h.clef = a.clef;
+            if (a.fifths !== s.hdr.fifths) h.fifths = a.fifths;
+          }
+        }
+      } catch (e) { warnings.push(`Clef / key change reading failed on a staff (${e.message}).`); s.changes = []; }
+    }
     // measure boundaries
     const left = Math.min(...staves.map(s => s.st.left)), right = Math.max(...staves.map(s => s.st.right));
     const bounds = [left, ...barX.filter(x => x > left + 2 * fr.ss && x < right - 0.8 * fr.ss), right + 1];
@@ -874,4 +1027,4 @@ function staffMeasureEvents(fr, R, comps, s, xa, xb) {
   return v;
 }
 
-module.exports = { assemblePage, staffMeasureEvents, pitchOf, keyAlters, DIV, median, headDuration, _analyseHeader: analyseHeader, _compIndex: compIndex, _strokes: strokes, _classifyAccidental: classifyAccidental, _crossBands: crossBands, _glyphImage: glyphImage, _splitSharps: splitSharps, _detachedNear: detachedNear, _readClef: readClef };
+module.exports = { assemblePage, staffMeasureEvents, pitchOf, keyAlters, attrsAt, DIV, median, headDuration, _analyseHeader: analyseHeader, _compIndex: compIndex, _strokes: strokes, _classifyAccidental: classifyAccidental, _crossBands: crossBands, _glyphImage: glyphImage, _splitSharps: splitSharps, _detachedNear: detachedNear, _readClef: readClef };

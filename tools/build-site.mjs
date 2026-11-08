@@ -190,12 +190,31 @@ console.log(`site/ built: app, status, ${docs.length} docs`);
 })();
 </script>
 `;
+  // /app/ only: which engine the page runs, and the changelog of recent releases
+  // (CHANGELOG.md is written by release-please; Pages rebuilds on each release merge)
+  let changes = '';
+  const clPath = path.join(ROOT, 'CHANGELOG.md');
+  if (fs.existsSync(clPath)) {
+    const secs = fs.readFileSync(clPath, 'utf8').split(/^(?=## \[)/m).filter((x) => x.startsWith('## ['));
+    const sec = (x) => marked.parse(x.replace(/^## \[([^\]]+)\]\([^)]*\) \(([^)]*)\)/, '### v$1 · $2'));
+    const latest = secs[0] ? sec(secs[0]) : '';
+    const older = secs.slice(1, 6).map(sec).join('');
+    changes = `
+<style>.ssr-cl a{color:inherit}.ssr-cl h3{font-size:15px;margin:10px 0 4px}.ssr-cl ul{margin:4px 0;padding-left:20px}</style>
+<details class="ssr-changes" open style="font:14px/1.5 system-ui,-apple-system,'Segoe UI',sans-serif;margin:0;padding:8px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));border-bottom:1px solid rgba(127,127,127,.35);overflow-wrap:anywhere">
+<summary style="cursor:pointer;font-weight:600">What's new <span style="font-weight:400;opacity:.8">· engine: plain-JavaScript recognition pipeline (the copista-2m ML detector is not in this app yet; try it in the <a href="../ml-demo/" style="color:inherit">ML demo</a>)</span></summary>
+<div class="ssr-cl" style="max-width:72ch;font-size:13px">${latest}
+${older ? `<details><summary style="cursor:pointer">Earlier releases</summary>${older}</details>` : ''}
+<p style="opacity:.8">Full history: <a href="${REPO}/blob/main/CHANGELOG.md" style="color:inherit">CHANGELOG.md</a> · <a href="${REPO}/releases" style="color:inherit">all releases and downloads</a></p></div>
+</details>`;
+  }
   const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]);
   let n = 0;
   for (const f of walk(OUT).filter((f) => f.endsWith('.html'))) {
     let s = fs.readFileSync(f, 'utf8');
     if (s.includes('ssr-verbar')) continue;
-    s = /<body[^>]*>/i.test(s) ? s.replace(/<body[^>]*>/i, (m) => m + bar) : bar + s;
+    const top = bar + (path.relative(OUT, f) === path.join('app', 'index.html') ? changes : '');
+    s = /<body[^>]*>/i.test(s) ? s.replace(/<body[^>]*>/i, (m) => m + top) : top + s;
     s = /<\/body>/i.test(s) ? s.replace(/<\/body>(?![\s\S]*<\/body>)/i, footer + '</body>') : s + footer;
     fs.writeFileSync(f, s); n++;
   }
