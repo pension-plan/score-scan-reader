@@ -50,7 +50,8 @@ const run = (label, src) => {
   const a = ['mvp/tools/eval.mjs', '--out', out, '--jobs', jobs, '--quiet'];
   if (src) a.push('--src', src);
   if (set !== 'default') a.push('--set', set);
-  if (!ocr) a.push('--no-ocr');
+  // with OCR, read text as the page does (eng+deu plus the lazy second pass), not eval's eng-only default
+  if (!ocr) a.push('--no-ocr'); else a.push('--ocr-lang', opt('--ocr-lang', 'app'));
   const r = spawnSync(process.execPath, a, { cwd: ROOT, stdio: ['ignore', 'ignore', 'inherit'] });
   if (r.status !== 0 && !fs.existsSync(out)) { console.error(`eval failed for ${label}`); process.exit(2); }
   return JSON.parse(fs.readFileSync(out, 'utf8'));
