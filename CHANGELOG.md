@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.38.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.37.1...score-scan-reader-v0.38.0) (2026-11-08)
+
+
+### Features
+
+* **staves:** staves inferred where the lines are washed out ([e3bbe67](https://github.com/pension-plan/score-scan-reader/commit/e3bbe67665dcc36759f234f2de8af0167f66c7eb))
+* **staves:** staves inferred where the lines are washed out ([92cf0ac](https://github.com/pension-plan/score-scan-reader/commit/92cf0accf0b590e1f08f193bbabc65d13482e622))
+
 ## [0.37.1](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.37.0...score-scan-reader-v0.37.1) (2026-11-08)
 
 
