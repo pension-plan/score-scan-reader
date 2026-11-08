@@ -1244,7 +1244,15 @@ pair's evidence is returned as `layout.evid` for debugging. A two-page book spre
 staves split into a left and a right group; a left-page staff traced up to one staff space into the gutter's
 shadow no longer hides the gutter (skewed photocopies: satb-open-divisi-midpiece severe 0.386 to 0.698,
 pitch-enharmonic-song-2page severe 0.171 to 0.525; before, the spread's staves were grouped into 7- and
-4-staff systems). A bottom treble/bass pair of a taller score
+4-staff systems). One or two staves traced straight across the gutter (two facing staves at one height joined) no
+longer hide the spread either. When a page's systems still come out as runs of one or two staves after
+the dewarp decision (`omr.js analyse`; the joining lines lost on a faint copy: 8 staves of SATB + piano read
+as 1,1,2,1,1,2), `staves.js regularSystems()` regroups them into equal blocks of p staves (p divides the
+staff count and is at least the largest group) where every link already found stays inside a block and the
+smallest gap between blocks is more than 1.08 times the largest gap inside one; the page is then assembled
+again. It runs after the dewarp decision because unequal systems are what sends a curled page to be
+dewarped (regrouping first cost nocturne-cross-staff 0.057). anthem-satb-closed-piano-4-pages severe 0.211
+to 0.593, scan 0.646 to 0.720; nothing dropped. A bottom treble/bass pair of a taller score
 with full chords (three heads on a stem) and no text is an accompaniment even when its joined barlines were
 not seen (voice + piano on a faded copy).
 

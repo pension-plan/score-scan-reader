@@ -578,4 +578,38 @@ function detectDashedStaves(bin, lt, opts = {}) {
   return { staves: out, ss };
 }
 
-module.exports = { detectDashedStaves, detectStaves, groupSystems, thinLineMask, mergeStaffSets, lineCoverage, bridgeRows };
+// Systems whose joining lines were lost (faint photocopies) come out of
+// groupSystems as runs of one or two staves: 8 staves of two SATB + piano
+// systems read as [1, 1, 2, 1, 1, 2]. When two or more systems are single
+// staves and the groups differ in size, the page is regrouped into equal
+// blocks of p staves (p divides the staff count, at least the largest group)
+// where every link groupSystems found stays inside a block and every gap
+// between blocks is wider than every gap inside one (in staff spaces, at the
+// page centre). Of the p that qualify, the one with the clearest gap wins.
+// Returns the new groups (and sets staves[k].system), or the old ones.
+function regularSystems(staves, sys) {
+  const n = staves.length;
+  if (sys.length < 3 || sys.filter(g => g.length === 1).length < 2 || sys.every(g => g.length === sys[0].length)) return sys;
+  const xc = (k) => (Math.max(staves[k].left, staves[k + 1].left) + Math.min(staves[k].right, staves[k + 1].right)) / 2;
+  const gap = Array.from({ length: n - 1 }, (_, k) => (staves[k + 1].yAt(0, xc(k)) - staves[k].yAt(4, xc(k))) / staves[k].space);
+  const linked = new Set();
+  sys.forEach(g => g.slice(1).forEach(k => linked.add(k - 1)));
+  const maxG = Math.max(...sys.map(g => g.length));
+  let best = null;
+  for (let p = Math.max(2, maxG); p <= n / 2; p++) {
+    if (n % p) continue;
+    let inside = 0, between = Infinity, ok = true;
+    for (let k = 0; k < n - 1; k++) {
+      if ((k + 1) % p) inside = Math.max(inside, gap[k]);
+      else { between = Math.min(between, gap[k]); if (linked.has(k)) ok = false; }
+    }
+    const margin = between / Math.max(1e-6, inside);
+    if (ok && margin > 1.08 && (!best || margin > best.margin)) best = { p, margin };
+  }
+  if (!best) return sys;
+  const out = Array.from({ length: n / best.p }, (_, i) => Array.from({ length: best.p }, (_, t) => i * best.p + t));
+  out.forEach((g, i) => g.forEach(k => { staves[k].system = i; }));
+  return out;
+}
+
+module.exports = { regularSystems, detectDashedStaves, detectStaves, groupSystems, thinLineMask, mergeStaffSets, lineCoverage, bridgeRows };

@@ -14,6 +14,7 @@ const { pageMarks } = require('./symbols');
 const { buildScore } = require('./score');
 const { makeGray, keepPacked } = require('./image');
 const { readHeaders, dewarpReading } = require('./cv');
+const { regularSystems } = require('./staves');
 
 // gray page turned clockwise by quarter turns (1, 2 or 3)
 function turnGray(g, turns) {
@@ -44,6 +45,10 @@ function analyse(gray, idx, frOpts, dewarp = true) {
   // not a two-up spread or one of its halves (the gutter's curl misleads it there)
   const dw = dewarp && spreadGutter(fr) == null && dewarpReading(fr, asm, (g) => { const f = front(g, Object.assign({}, frOpts, { preclean: false })); return f.staves.length ? { fr: f, asm: assemblePage(f, idx) } : null; });
   if (dw) ({ fr, asm } = dw);
+  // systems still split into runs of one or two staves (joining lines lost on
+  // a faint copy): regrouped into equal blocks where the gaps say so (staves.js)
+  const reg = regularSystems(fr.staves, fr.systems);
+  if (reg !== fr.systems) { fr.systems = reg; asm = assemblePage(fr, idx); }
   let n = 0, read = 0;
   for (const sy of asm.systems) for (const s of sy.staves) { n++; if (!s.hdr.clefGuessed) read++; }
   // header glyphs the parse left unread (time-signature numbers, unread clefs): template
@@ -81,9 +86,12 @@ function analyseOriented(gray, idx, frOpts) {
 // Two-up spread: the staves fall into a left and a right column that do not
 // overlap, each narrower than 60% of the sheet. Returns the gutter x or null.
 function spreadGutter(fr) {
-  const st = fr.staves.slice().sort((a, b) => a.left - b.left);
-  if (st.length < 4) return null;
   const W = fr.gray.width;
+  // one or two staves traced straight across the gutter (two staves of the
+  // facing pages at one height joined into one) do not hide the spread
+  const wide = fr.staves.filter(s => s.right - s.left > 0.75 * W);
+  const st = fr.staves.filter(s => !wide.includes(s)).sort((a, b) => a.left - b.left);
+  if (st.length < 4 || wide.length > 2) return null;
   for (let i = 2; i <= st.length - 2; i++) {
     const L = st.slice(0, i), R = st.slice(i);
     const lr = Math.max(...L.map(s => s.right)), rl = Math.min(...R.map(s => s.left));

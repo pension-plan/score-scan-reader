@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 02:27 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 02:28 AEDT.
 
 ## Events
 
@@ -144,6 +144,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 02:10 | textsym 15ec03e (release merged): pedal bracket lines, circled rehearsal numbers (92/88/66%), bar numbers read 298 to 308 of 332 on challenge scans, false elisions fixed; two new coverage items (mk10, mk11). Next: synthetic alphabet/chord items for shape templates, D.S., trio labels, concurrent text reads, merged lyric words. |
 | 02:25 | 6b891a8 (opencv: heads fused with accidentals; courtesy accidentals 2/5/5 to 9/9/8 of 9, sharps 53/62/37 to 77/75/49 of 82) fails the element gate in isolation: challenge grace 287 to 251 (scores slightly up, none down). Release held; opencv checking whether the lost graces were false positives. Also: 18e3f41 fixed the ita.special-words console error; b36a858 D.S. recovery, trio part labels, concurrent text OCR (benchmark 0.951 to 0.954); 959bcac stanzasAsVerses option (L5b). A push.sh autostash conflict left WIP staged; textsym restored it, nothing lost. |
 | 02:27 | e739a27: mvp/dist/index.html no longer tracked (L32). Release held pending opencv's answer on the 6b891a8 grace drop (84d0451 may be its fix). |
+| 02:28 | perf 34dad95: load-time work (phone first render 48.9 to 15.8 s, result 54.5 to 48.8 s, desktop 4.13 to 3.99 s; output unchanged). push.sh lock b40e518 (L33). uiux a942ffe stanza toggle live (sets 0 stanzas on the examples; voices fixing). perf next: progressive first result (L34). |
 
 ## Accuracy by round
 
@@ -203,6 +204,8 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | L30 | Concurrent regression runs wrote to the same output paths, so one run could report another run element counts (structure saw lyric 2050 to 1346, tie 119 to 26 that were not real) | Integration (regression tooling) | Resolved (c7607e2) | Outputs and --head checkouts tagged with the process id; base checkout extracted atomically; paths printed to stderr. |
 | L31 | A pathless push.sh run committed every agent uncommitted work (d176663) | Integration (push tooling) | Resolved (a0b334a) | Reverted by f7861d5 (net change verified); push.sh now refuses to run without paths unless PUSH_ALL=1. |
 | L32 | Agents committed different builds of mvp/dist/index.html, which conflicted during push.sh rebases (an autostash conflict once left everyone uncommitted work staged) | Integration (build artefacts) | Resolved (e739a27) | mvp/dist/index.html untracked; CI, Pages and the release workflow build it; mvp/dist/assets still tracked. |
+| L33 | Two push.sh runs (and a manual rebase) interleaved in the shared tree and orphaned a commit (recovered as c03021c) | Integration (push tooling) | Resolved (b40e518) | push.sh holds a flock for its whole run; agents told to do manual git only in private worktrees. |
+| L34 | On a slow phone the first result takes ~49 s, bound by the ~7 MB the first conversion needs (OCR models ~4 MB) | Performance (load) | Partial (34dad95) | 34dad95: conversion starts while OCR loads, split Tesseract core, lazy OSMD; page 1 renders at 15.8 s instead of 48.9 s; result 54.5 to 48.8 s. Next: progressive result (notes before OCR). |
 
 ## Runs
 
