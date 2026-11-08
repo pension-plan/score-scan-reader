@@ -14,6 +14,10 @@
 // 0.005, the real-scan aggregate by more than 0.01, the crash count rises, or
 // any single item drops by more than 0.05. Policy: ship first, then run this
 // after every push (CI does it too) and fix forward.
+//
+// With --ocr each side also reads with its own OCR models: mvp/dist/assets/*.traineddata.gz of
+// that ref (git archive, next to its src; eval.mjs --lang-path), so a model change is gated like a
+// code change. Without --head the head side reads the working tree's models.
 import { execFileSync, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -45,20 +49,35 @@ if (!fs.existsSync(path.join(baseSrc, 'omr.js'))) {
   fs.rmSync(tmp, { recursive: true, force: true });
 }
 
-const run = (label, src) => {
+// the OCR models of a ref (mvp/dist/assets/*.traineddata.gz) next to its src, so a model change is
+// scored like a code change; a ref without them reads with the working tree's
+function extractModels(ref, dir) {
+  if (fs.existsSync(path.join(dir, 'eng.traineddata.gz'))) return dir;
+  const tmp = `${dir}.${RUN}`;
+  fs.mkdirSync(tmp, { recursive: true });
+  const r = spawnSync('git', ['archive', ref, '--', ':(glob)mvp/dist/assets/*.traineddata.gz'], { cwd: ROOT, maxBuffer: 1 << 28 });
+  if (r.status === 0 && r.stdout.length) spawnSync('tar', ['-x', '-C', tmp, '--strip-components=3'], { input: r.stdout });
+  if (!fs.existsSync(path.join(tmp, 'eng.traineddata.gz'))) { fs.rmSync(tmp, { recursive: true, force: true }); return null; }
+  try { fs.renameSync(tmp, dir); } catch (e) { fs.rmSync(tmp, { recursive: true, force: true }); /* another run got there first */ }
+  return dir;
+}
+const baseModels = ocr ? extractModels(base, path.join(work, 'tessdata')) : null;
+
+const run = (label, src, models) => {
   const out = path.join(ROOT, `mvp/work/regress-${label}-${set}${ocr ? '-ocr' : ''}-${RUN}.json`);
   const a = ['mvp/tools/eval.mjs', '--out', out, '--jobs', jobs, '--quiet'];
   if (src) a.push('--src', src);
   if (set !== 'default') a.push('--set', set);
   // with OCR, read text as the page does (eng+deu plus the lazy second pass), not eval's eng-only default
   if (!ocr) a.push('--no-ocr'); else a.push('--ocr-lang', opt('--ocr-lang', 'app'));
+  if (ocr && models) a.push('--lang-path', models);
   const r = spawnSync(process.execPath, a, { cwd: ROOT, stdio: ['ignore', 'ignore', 'inherit'] });
   if (r.status !== 0 && !fs.existsSync(out)) { console.error(`eval failed for ${label}`); process.exit(2); }
   return JSON.parse(fs.readFileSync(out, 'utf8'));
 };
 
 const headRef = opt('--head', null);
-let headSrc = null;
+let headSrc = null, headModels = null;
 if (headRef) {
   const hw = path.join(ROOT, 'mvp/work/regress', 'head-' + headRef.replace(/[^\w.-]/g, '_') + '-' + RUN);
   headSrc = path.join(hw, 'src');
@@ -66,10 +85,11 @@ if (headRef) {
   fs.mkdirSync(hw, { recursive: true });
   const tar = execFileSync('git', ['archive', headRef, 'mvp/src'], { cwd: ROOT, maxBuffer: 1 << 28 });
   spawnSync('tar', ['-x', '-C', hw, '--strip-components=1'], { input: tar });
+  if (ocr) headModels = extractModels(headRef, path.join(hw, 'tessdata'));
 } else if (git('status', '--porcelain', '--', 'mvp/src')) {
   console.error('warning: mvp/src has uncommitted changes (possibly other agents\' work); they are scored as head. Use --head <ref> to score a commit.');
 }
-const A = run(base, baseSrc), B = run('head', headSrc);
+const A = run(base, baseSrc, baseModels), B = run('head', headSrc, headModels);
 if (headSrc) fs.rmSync(path.dirname(headSrc), { recursive: true, force: true });
 console.error(`outputs: mvp/work/regress-{${base},head}-${set}${ocr ? '-ocr' : ''}-${RUN}.{json,out}`);
 const head = headRef ? git('rev-parse', '--short', headRef) : git('rev-parse', '--short', 'HEAD') + (git('status', '--porcelain', '--', 'mvp/src') ? '+wip' : '');

@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 04:20 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 04:23 AEDT.
 
 ## Events
 
@@ -167,6 +167,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 04:17 | structure: lost ties in 5a3a8cc were all false; 5 real fermatas lost (attached to a false note) — re-attach queued. New fhs.js tool: false heads from text/marks now under 1%; >85% of unmatched notes are wrong pitches (L37). Next: H-bar barlines, fermata re-attach, wrong-pitch cause table and fix. |
 | 04:19 | voices bb3cbf9 (release merged): descant/partial staves become their own part; L11 scan 0.567 to 0.768. Cue notes to opencv; voices next: extender-line detector. |
 | 04:20 | structure: rst05 severe H-bars not detected upstream (nothing shipped). opencv 4468b51 rests (64th on scans 10 to 22 of 30); cue notes need a <cue/> writer (structure, with opencv's head patch). opencv next: staff finder for washed-out lines (L38). |
+| 04:23 | perf 94364c0: German OCR model fast (-0.48 MB). regress --ocr now uses the app's OCR languages (abf02ac); asset swaps still not A/B-gated — perf to extract traineddata from refs too. |
 
 ## Accuracy by round
 
@@ -227,7 +228,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | L31 | A pathless push.sh run committed every agent uncommitted work (d176663) | Integration (push tooling) | Resolved (a0b334a) | Reverted by f7861d5 (net change verified); push.sh now refuses to run without paths unless PUSH_ALL=1. |
 | L32 | Agents committed different builds of mvp/dist/index.html, which conflicted during push.sh rebases (an autostash conflict once left everyone uncommitted work staged) | Integration (build artefacts) | Resolved (e739a27) | mvp/dist/index.html untracked; CI, Pages and the release workflow build it; mvp/dist/assets still tracked. |
 | L33 | Two push.sh runs (and a manual rebase) interleaved in the shared tree and orphaned a commit (recovered as c03021c) | Integration (push tooling) | Resolved (b40e518) | push.sh holds a flock for its whole run; agents told to do manual git only in private worktrees. |
-| L34 | On a slow phone the first result takes ~49 s, bound by the ~7 MB the first conversion needs (OCR models ~4 MB) | Performance (load) | Partial (34dad95) | 34dad95: conversion starts while OCR loads, split Tesseract core, lazy OSMD; page 1 renders at 15.8 s instead of 48.9 s; result 54.5 to 48.8 s. Next: progressive result (notes before OCR). 031a2cf/f04634e: progressive result (deferText): notes shown at ~19 s instead of 45.6 s on the phone profile; complete result ~48.5 s (OCR download-bound); output identical. Next: smaller OCR models if identical. |
+| L34 | On a slow phone the first result takes ~49 s, bound by the ~7 MB the first conversion needs (OCR models ~4 MB) | Performance (load) | Partial (34dad95) | 34dad95: conversion starts while OCR loads, split Tesseract core, lazy OSMD; page 1 renders at 15.8 s instead of 48.9 s; result 54.5 to 48.8 s. Next: progressive result (notes before OCR). 031a2cf/f04634e: progressive result (deferText): notes shown at ~19 s instead of 45.6 s on the phone profile; complete result ~48.5 s (OCR download-bound); output identical. Next: smaller OCR models if identical. 94364c0: German OCR model now tessdata_fast (1.33 to 0.85 MB, ~3 s less on Fast 3G); bench lyrics 0.9314 to 0.9331, challenge lyrics 0.9473 to 0.9472, one item -0.073 (being checked). English fast rejected (4 items down >0.05). |
 | L35 | Whole-file copies from private worktrees based on an older main reverted newer work on main three times (411aade, f091328, d176663 sweep) | Integration (push tooling) | Resolved (9e5c95a) | push.sh requires PUSH_BASE for code paths and three-way merges (base->copy, base->HEAD), refusing on conflict; tested with a 15-commit-stale score.js: merge = HEAD + the new line. Extended to docs/*.md and README.md after 06fc092 replaced SDD.md from an older base (restored f401938). |
 | L36 | Lyric OCR on old print garbles words (haupt1867: I ler-zens Ci-ran-de for Herzens Grunde, T ob for Lob; demdithiglich for demuthiglich) | Lyrics (OCR) | Queued | Lexicon-based, hyphen-aware post-correction with OCR-confusion costs, queued for textsym after the ML task. |
 | L37 | Wrong-pitch notes are the largest error source: over 85% of unmatched notes are stemmed heads in the staff at the wrong pitch (coverage 4.2% of truth notes, challenge 5.8%); text and marks now cause under 1% | Pitch (clef/key/accidental/ledger) | Open | structure fhs.js (LCS alignment per item) measured it; next: classify wrong pitches by cause and fix the top one. |
