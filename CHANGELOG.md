@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.31.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.30.1...score-scan-reader-v0.31.0) (2026-11-08)
+
+
+### Features
+
+* **cv:** key signatures read slot by slot with templates ([7246b54](https://github.com/pension-plan/score-scan-reader/commit/7246b542767cd388d686b3e874b8efa5ccbf1ec8))
+* **score:** courtesy accidentals written as cautionary ([18a59f4](https://github.com/pension-plan/score-scan-reader/commit/18a59f4817cfa26b302287e9231b343760783dda))
+
 ## [0.30.1](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.30.0...score-scan-reader-v0.30.1) (2026-11-08)
 
 

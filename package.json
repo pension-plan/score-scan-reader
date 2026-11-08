@@ -1,6 +1,6 @@
 {
   "name": "score-scan-reader",
-  "version": "0.30.1",
+  "version": "0.31.0",
   "private": true,
   "description": "Scanned sheet-music PDFs to MusicXML 4.0 in the browser: lyrics kept, closed-score SATB split into parts, piano kept whole.",
   "license": "MIT",
