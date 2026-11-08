@@ -1057,6 +1057,35 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   const topVocal = vocalStaves.length ? Math.min(...vocalStaves) : -1;
   const splitStaves = parts.filter(p => p.kind !== 'keyboard' && p.src[0].voice === 2).map(p => p.src[0].staff);
   const lowestSplit = splitStaves.length ? Math.max(...splitStaves) : -1;
+  // melisma evidence (L4b): the slurs and ties text.js read, per page staff
+  // (the staff nearest the curve's two ends). A note under a curve, after the
+  // curve's first note, continues the syllable before it: no new syllable is
+  // set there unless nothing else fits, and only such a note (or a printed
+  // extender line) lets a syllable carry an extender over the notes after it
+  const curves = new Map();
+  const curvesOf = (fr) => {
+    if (curves.has(fr)) return curves.get(fr);
+    const by = new Map(), m = fr && fr._marks && fr._marks.marks;
+    for (const c of (m && m.slurs) || []) {
+      if (!c.ends) continue;
+      const ym = (c.ends[0][1] + c.ends[1][1]) / 2;
+      let best = null, bd = Infinity;
+      for (const st of fr.staves || []) {
+        const sp = st.space || fr.ss, t = st.yAt(0, c.ends[0][0]) - 3 * sp, b = st.yAt(4, c.ends[0][0]) + 3 * sp;
+        const d = ym < t ? t - ym : ym > b ? ym - b : 0;
+        if (d < bd) { bd = d; best = st; }
+      }
+      if (!best || bd > 0) continue;
+      if (!by.has(best.index)) by.set(best.index, []);
+      by.get(best.index).push([c.ends[0][0], c.ends[1][0]]);
+    }
+    curves.set(fr, by);
+    return by;
+  };
+  const slurred = (sy, e) => {
+    const h = e.heads[0], sp = h.sp || (sy.fr && sy.fr.ss) || 16;
+    return (curvesOf(sy.fr).get(h.staff) || []).some(([x0, x1]) => e.x > x0 + 0.6 * sp && e.x <= x1 + 0.6 * sp);
+  };
   const lines = [];
   for (const sy of systems) {
     const lyr = lyricsBySystem[sy.page + ':' + sy.index];
@@ -1064,7 +1093,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     const sp = sy.staves[0] ? sy.staves[0].st.space : 16;
     const evCache = {};
     // sung notes of a part in this system (rests never take a syllable)
-    const evOf = (pi) => (evCache[pi] ||= segs.flatMap((sg, si) => (sg.sy === sy ? segEv[si][pi][0] : [])).filter(e => !e.rest && !e.forward && e.heads && e.heads.length));
+    const evOf = (pi) => (evCache[pi] ||= segs.flatMap((sg, si) => (sg.sy === sy ? segEv[si][pi][0] : [])).filter(e => !e.rest && !e.forward && e.heads && e.heads.length).map(e => { e.slurCont = slurred(sy, e); return e; }));
     const fitOf = (v) => parts.map((p, pi) => ({ p, pi })).filter(({ p }) => p.kind !== 'keyboard' && p.src[0].staff === v.band)
       .map(c => { const evs = evOf(c.pi); return { ...c, evs, fit: lyricFit(v.syllables, evs, sp), soft: softFit(v.syllables, evs, sp) }; });
     const sysLines = lyr.filter(v => v.syllables && v.syllables.length && !v.stanza).map(v => ({ sy, v, sp, cands: fitOf(v) })).filter(L => L.cands.length);
@@ -1123,21 +1152,19 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     for (const c of take) alignSyllables(v, c.evs, sp, L.sy && L.sy.comps, L.sy && L.sy.fr && L.sy.fr.R);
     v.used = take.map(c => c.p.name).join(', ');
   }
-  // a melisma inferred from notes left without a syllable (no extender line
-  // read) where letters are printed in the verse's own text row under one of
-  // those notes is a syllable OCR missed, not a melisma: no extender (L4b)
+  // a melisma inferred from notes left without a syllable, with nothing on
+  // the page to mark it (no extender line, tie, slur or beam over them), is
+  // kept only when another verse sung on the same note leaves those notes
+  // without a syllable too: melismas are shared by the verses of a strophic
+  // song, while a syllable OCR missed is missed in one verse only (L4b). A
+  // note with one verse keeps it (nothing to compare with)
   for (const L of lines) for (const ml of L.v.melismas || []) {
-    const v = L.v, comps = L.sy.comps;
-    if (ml.printed || !comps || v.y == null || v.y1 == null) continue;
-    const { evs, b, last, num } = ml, sp = L.sp, rowH = v.y1 - v.y;
-    const own = (c, q) => q && q.x0 != null && c.x1 >= q.x0 - 0.2 * sp && c.x0 <= q.x1 + 0.2 * sp;
-    let letters = false;
-    for (let t = b + 1; t <= last && !letters; t++) {
-      const x = evs[t].x;
-      letters = comps.some(c => c.x1 >= x - 0.6 * sp && c.x0 <= x + 0.6 * sp && c.y0 >= v.y - 0.25 * rowH && c.y1 <= v.y1 + 0.25 * rowH &&
-        c.y1 - c.y0 + 1 >= 0.35 * rowH && c.x1 - c.x0 + 1 <= 3 * sp && !own(c, ml.s) && !own(c, ml.next));
-    }
-    if (!letters) continue;
+    if (ml.printed || ml.held) continue;
+    const { evs, b, last, num } = ml;
+    const others = Object.keys(evs[b].lyrics || {}).filter(n => n !== String(num));
+    if (!others.length) continue;
+    const shared = others.some(n => { for (let t = b + 1; t <= last; t++) if (evs[t].lyrics && evs[t].lyrics[n]) return false; return true; });
+    if (shared) continue;
     if (evs[b].lyrics && evs[b].lyrics[num]) delete evs[b].lyrics[num].extend;
     if (evs[last].lyrExt) delete evs[last].lyrExt[num];
   }
@@ -1540,7 +1567,7 @@ function alignSyllables(verse, evs, sp, comps, R) {
   const syl = verse.syllables, n = syl.length, m = evs.length;
   if (!n || !m) return;
   const SKIP_EV = 0.15, DROP_SYL = 2.2;
-  const cost = (i, j) => (evs[j].tieStop ? Infinity : Math.min(3, sylDist(syl[i], evs[j].x, sp) / sp));
+  const cost = (i, j) => (evs[j].tieStop ? Infinity : Math.min(3, sylDist(syl[i], evs[j].x, sp) / sp) + (evs[j].slurCont ? 0.8 : 0));
   // D[i][j]: best cost using syllables < i and onsets < j
   const W = m + 1;
   const D = new Float64Array((n + 1) * W).fill(Infinity), T = new Uint8Array((n + 1) * W);
@@ -1584,9 +1611,22 @@ function alignSyllables(verse, evs, sp, comps, R) {
     if (ext && s.extendTo != null) while (last > b && evs[last].x > s.extendTo + 1.0 * sp) last--;
     if (last <= b || (last - b > 6 && !ext)) return;
     for (let t = b + 1; t <= last; t++) if (evs[t].lyrics && evs[t].lyrics[num]) return;
+    // without a printed extender line, only a tie or slur over the following
+    // notes, or a beam joining them to the syllable's note, says they are a
+    // melisma (else a syllable was missed there)
+    const beamOf = (e) => e.heads && e.heads[0] && e.heads[0].beam;
+    // an extender line the row reader did not report: a thin horizontal
+    // stroke low in the verse's own row, starting just after the syllable
+    const line = !ext && comps && s.x1 != null && verse.y != null && verse.y1 != null && comps.some(c => {
+      const w = c.x1 - c.x0 + 1, h = c.y1 - c.y0 + 1;
+      return w >= 0.8 * sp && h <= 0.35 * sp && w >= 4 * h && c.x0 >= s.x1 - 0.3 * sp && c.x0 <= s.x1 + 1.5 * sp &&
+        c.y0 >= verse.y + 0.45 * (verse.y1 - verse.y) && c.y1 <= verse.y1 + 0.4 * sp;
+    });
+    let held = !!ext || line;
+    for (let t = b + 1; t <= last && !held; t++) held = !!(evs[t].slurCont || evs[t].tieStop || (beamOf(evs[t]) && beamOf(evs[t]) === beamOf(evs[t - 1])));
     evs[b].lyrics[num].extend = true;
     (evs[last].lyrExt ||= {})[num] = true;
-    (verse.melismas ||= []).push({ evs, b, last, num, printed: !!ext, s, next: k + 1 < placed.length ? syl[placed[k + 1][0]] : null });
+    (verse.melismas ||= []).push({ evs, b, last, num, printed: !!ext, held, s, next: k + 1 < placed.length ? syl[placed[k + 1][0]] : null });
   });
 }
 

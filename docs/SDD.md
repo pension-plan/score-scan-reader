@@ -1007,15 +1007,19 @@ repeat), each line under its own note row; golden1923-america 1 of 2 (the other 
 against truth-underlaid.musicxml: lyrics 0.667 → 0.979 (scan), 0.664 → 0.931 (scan-mild); severe reads no
 stanzas. `score.stanzas = { printed, set }` tells the page whether to offer the option.
 
-A melisma inferred from notes left without a syllable (no extender line seen in print) is dropped when letters
-are printed in the verse's own text row under one of those notes (outside the syllable's own box and the next
-one's): the gap is a syllable OCR missed, not a melisma (L4b). Measured on the benchmark with OCR: extenders 166
-before, 164 after, against 126 in truth. The rest of the excess is not this rule's: golden1923-america's truth
-carries no extenders at all (21 of ours), and text set under both voices of a staff (L7) doubles its extenders
-(bwv3-6: 25 against 11). Two stricter rules were measured and rejected: dropping the melisma whenever another verse
-has a syllable on those notes (166 to 119, but it removed true melismas of verses with different syllable counts:
-aloha-oe-full-score 18 to 9 against 20, foster 10 to 4 against 8), and treating a syllable that reaches over the
-next note as two merged syllables (166 to 95; melisma syllables are left-aligned and often do reach over).
+Melismas (L4b). Slurs and ties read on the page (text.js curves, assigned to the staff nearest their ends)
+mark the notes under a curve after its first note as continuing a syllable: alignment charges 0.8 for setting a
+new syllable there. A syllable followed by notes without one gets an extender when the page marks the melisma:
+an extender line (reported by the row reader, or a thin stroke low in the verse's row starting just after the
+syllable), a tie or slur over those notes, or a beam joining them to the syllable's note. Without such a mark the
+extender is kept only when another verse sung on the same note also leaves those notes without a syllable
+(melismas are shared by a strophic song's verses; a syllable OCR missed is missed in one verse); a note with one
+verse keeps it. Benchmark with OCR: extenders 164 to 156 against 126 in truth (sum of per-item differences 54 to
+50); challenge with OCR 1556 to 1533 against 1816 (433 from 434); lyric scores unchanged. Requiring a printed
+mark alone, as first specified, gave 95 on the benchmark and 975 on the challenge (extender lines on degraded
+copies are mostly not found), so the verse comparison stands in for the missing marks. Most of the remaining
+benchmark excess is not alignment: golden1923-america's truth has no extenders (13 of ours) and text set under
+both voices of a staff (L7) doubles them (bwv3-6 25 against 11).
 
 ## 8. UI design
 
