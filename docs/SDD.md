@@ -1394,7 +1394,13 @@ passes on benchmark (0.951) and challenge (0.831).
   (two circles, M and W, not detected). A chord-symbol candidate whose glyphs all read (C ... B, m, 2-9,
   sus, Δ, °, ø, +, ♯, ♭, /) and parse as a chord is a chord without OCR; OCR reads the rest.
   Coverage chord-symbol without OCR 0 to 84 / 85 / 48% (with OCR it was 56 / 52 / 46%).
-Not done: words OCR merges without a hyphen ("lonssans", "noble", "Andring").
+- Two words OCR ran together under two or more notes ("lonssans"): a common word of three letters or
+  more (English, German, French, Spanish, Italian, Latin, Czech function words) at the token's start or
+  end, the rest three letters or more, is cut off as its own word (two words, no hyphen): "lons sans".
+  Shorter pieces are left alone (they are too often syllables of one word: "be-fore", "no-ble").
+  Coverage lyrics: lyr02 0.873 to 0.887 (clean), choir-closed-satb-light-of-morning 0.911 to 0.964; no
+  item down.
+Not done: merged words without a common word in them ("Andring").
 
 **Overlay colours.** Text `--ov-text` #5e35b1, bar numbers `--ov-barno` #263238, dynamics and hairpins
 `--ov-dyn` #0277bd, slurs / ties / fermatas `--ov-slur` #f06292, braces and brackets `--ov-brace`

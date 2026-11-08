@@ -764,7 +764,46 @@ function splitSyllable(s, voices, lang, r, hyphens) {
   const tgt = [];
   const k = inside.length;
   for (let m = 0; m + 1 < k; m++) tgt.push({ x: inside[m + 1] - r * (inside[m + 1] - inside[m]) });
+  // two words run together ("lonssans"): a common word at the token's start or end,
+  // with two notes under it, is cut off as its own word
+  const wb = wordSplit(s, lang);
+  if (wb) return wb;
   return cutAt(s, tgt, lang, inside);
+}
+
+// Two words OCR ran together ("lonssans" for "lons sans"): a common word of three letters
+// or more at the token's start or end (the rest three or more letters with a vowel) is its
+// own word: the token is cut there into two words (no hyphen between them)
+const COMMON_WORDS = new Set(('an and as at be by for from he her his in is it me my no not of on or our so the thee they thou thy to up us we who with ye you your ' +
+  'auf aus bei das dein dem den der des die du ein eine er es fur für hat ich ihr im ist ja mein mit nach nicht nun und uns von was wie wir wo zu zum zur ' +
+  'au aux ce de des du elle en est et il je la le les lui ma me mon ne nous on ou par pas pour qui que sa sans se ses son sur ta te ton tu un une vous ' +
+  'al con del el es las lo los mi por su sus una ' +
+  'che chi da di gli ma ne non per si ' +
+  'ad cum deo nos qui quae ' +
+  'do je na nad po se si ve za ze').split(' '));
+function wordSplit(s, lang) {
+  const text = s.text, letters = [];
+  for (let i = 0; i < text.length; i++) if (/\p{L}/u.test(text[i])) letters.push(i);
+  const low = letters.map(i => text[i].toLowerCase()).join('');
+  if (low.length < 5) return null;
+  let best = null;
+  for (let j = 2; j <= low.length - 2; j++) {
+    const left = low.slice(0, j), right = low.slice(j);
+    const vowel = (w) => /[aeiouyäöüàâéèêëîïôùûáíóúåæøœ]/.test(w);
+    if (!vowel(left) || !vowel(right)) continue;
+    // a common word of three letters or more, the rest three or more: shorter pieces are too
+    // often syllables of one word ("be-fore", "no-ble", "in-to")
+    if (left.length < 3 || right.length < 3) continue;
+    const w = COMMON_WORDS.has(right) ? right.length : COMMON_WORDS.has(left) ? left.length : 0;
+    if (w >= 3 && (!best || w > best.w)) best = { j, w };
+  }
+  if (!best) return null;
+  const cw = (s.x1 - s.x0) / text.length, cut = letters[best.j];
+  const first = s.syllabic === 'middle' || s.syllabic === 'end', last = s.syllabic === 'begin' || s.syllabic === 'middle';
+  const a = { ...s, text: text.slice(0, cut), x0: s.x0, x1: s.x0 + cut * cw, split: true, syllabic: first ? 'end' : 'single' };
+  const b = { ...s, text: text.slice(cut), x0: s.x0 + cut * cw, x1: s.x1, split: true, syllabic: last ? 'begin' : 'single' };
+  a.x = (a.x0 + a.x1) / 2; b.x = (b.x0 + b.x1) / 2;
+  return [a, b];
 }
 
 // cut a token at k-1 syllable breaks nearest the target x positions; pieces
