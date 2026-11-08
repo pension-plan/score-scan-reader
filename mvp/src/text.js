@@ -484,6 +484,29 @@ const ROLE_LABEL = {
   header: 'Header', footer: 'Footer', page: 'Page', copyright: 'Copyright', text: 'Text', chord: 'Chord',
 };
 
+// A fermata's arch and dot: component c is an arch (its ends reach well below its top in the
+// middle, or above its bottom when inverted) whose dot (a small round blob, from comps) stands
+// centred under (over) the middle of it. Returns the dot, or null.
+function fermataArc(R, c, sp, comps) {
+  const img = glyphImage(R, c), W = img.width, H = img.height;
+  const first = (x, down) => { if (down) { for (let y = 0; y < H; y++) if (img.data[y * W + x]) return y; } else { for (let y = H - 1; y >= 0; y--) if (img.data[y * W + x]) return y; } return -1; };
+  const cols = (f0, f1) => { const v = []; for (let x = Math.round(f0 * (W - 1)); x <= Math.round(f1 * (W - 1)); x++) v.push(x); return v; };
+  const mean = (a) => a.reduce((p, q) => p + q, 0) / Math.max(1, a.length);
+  for (const up of [true, false]) {
+    // upright: top edge high in the middle, low at the ends; inverted: the mirror
+    const mid = mean(cols(0.4, 0.6).map(x => first(x, up)).filter(y => y >= 0));
+    const ends = mean(cols(0, 0.1).concat(cols(0.9, 1)).map(x => first(x, up)).filter(y => y >= 0));
+    const arched = up ? ends - mid >= 0.45 * H : mid - ends >= 0.45 * H;
+    if (!arched) continue;
+    const cx = (c.x0 + c.x1) / 2;
+    const dot = comps.find(d => d !== c && d.x1 - d.x0 + 1 >= 0.3 * sp && d.x1 - d.x0 + 1 <= 0.8 * sp && d.y1 - d.y0 + 1 >= 0.3 * sp && d.y1 - d.y0 + 1 <= 0.8 * sp &&
+      d.area >= 0.5 * (d.x1 - d.x0 + 1) * (d.y1 - d.y0 + 1) && Math.abs((d.x0 + d.x1) / 2 - cx) <= 0.2 * (c.x1 - c.x0 + 1) &&
+      (up ? (d.y0 + d.y1) / 2 > c.y0 + 0.3 * H && (d.y0 + d.y1) / 2 < c.y1 + 0.6 * sp : (d.y0 + d.y1) / 2 < c.y1 - 0.3 * H && (d.y0 + d.y1) / 2 > c.y0 - 0.6 * sp));
+    if (dot) return dot;
+  }
+  return null;
+}
+
 // Sort leftover components (symbols.js) into marks.
 // left: [{x0,y0,x1,y1,area}], fr / asm as front() and assemblePage() left them.
 function classifyMarks(fr, asm, left) {
@@ -628,6 +651,12 @@ function classifyMarks(fr, asm, left) {
       } else if (tip && w >= 0.4 * sp) kind = 'brace';
       out.braces.push({ box: [c.x0, c.y0, c.x1, c.y1], kind, span });
       continue;
+    }
+    // a fermata with a bold arc (thicker in the middle than a slur, so not slurLike): an arch two
+    // to three spaces wide with a dot under (over, inverted) its middle
+    if (w >= 1.6 * sp && w <= 3.4 * sp && h >= 0.8 * sp && h <= 2.2 * sp && !fermataDots.has(c)) {
+      const fd = fermataArc(R, c, sp, left);
+      if (fd) { out.fermatas.push({ box: [Math.min(c.x0, fd.x0), Math.min(c.y0, fd.y0), Math.max(c.x1, fd.x1), Math.max(c.y1, fd.y1)], sys: n ? n.sys : -1, k: n ? n.k : -1 }); fermataDots.add(fd); continue; }
     }
     if (slurLike(R, c, sp)) {
       // a short arc with a dot inside its bow: a fermata
