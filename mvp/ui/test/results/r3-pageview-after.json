@@ -1,0 +1,281 @@
+{
+ "pages": 12,
+ "meanColoured": 0.974,
+ "meanOnSheet": 0.994,
+ "failing": [],
+ "rows": [
+  {
+   "id": "agrace-satb-spread",
+   "cache": "challenge__degradation__agrace-satb-spread__scan__r200",
+   "secs": 4.352,
+   "parts": [
+    "Soprano",
+    "Alto",
+    "Tenor",
+    "Bass"
+   ],
+   "pages": [
+    {
+     "page": 1,
+     "heads": 144,
+     "coloured": 0.993,
+     "inBounds": 1,
+     "onSheet": 1,
+     "orientation": 0,
+     "mode": "default",
+     "spread": 0,
+     "caption": [
+      "Straightened by 1.0°."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "andantino-piano-spread",
+   "cache": "challenge__degradation__andantino-piano-spread__scan__r200",
+   "secs": 3.188,
+   "parts": [
+    "Piano"
+   ],
+   "pages": [
+    {
+     "page": 1,
+     "heads": 139,
+     "coloured": 0.971,
+     "inBounds": 1,
+     "onSheet": 1,
+     "orientation": 0,
+     "mode": "default",
+     "spread": 0,
+     "caption": [
+      "Straightened by 1.0°."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "twinkle-piano2p-spread",
+   "cache": "challenge__degradation__twinkle-piano2p-spread__scan__r200",
+   "secs": 5.209,
+   "parts": [
+    "Piano"
+   ],
+   "pages": [
+    {
+     "page": 1,
+     "heads": 218,
+     "coloured": 0.986,
+     "inBounds": 1,
+     "onSheet": 0.931,
+     "orientation": 0,
+     "mode": "default",
+     "spread": 2,
+     "caption": [
+      "Two book pages side by side: the left page was read first, then the right.",
+      "Straightened by 1.0°."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "wind-melody-spread",
+   "cache": "challenge__degradation__wind-melody-spread__scan__r200",
+   "secs": 2.954,
+   "parts": [
+    "Voice"
+   ],
+   "pages": [
+    {
+     "page": 1,
+     "heads": 26,
+     "coloured": 1,
+     "inBounds": 1,
+     "onSheet": 1,
+     "orientation": 0,
+     "mode": "default",
+     "spread": 0,
+     "caption": [
+      "Straightened by 1.0°."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "agrace-satb-rot90",
+   "cache": "challenge__degradation__agrace-satb-rot90__scan__r200",
+   "secs": 3.699,
+   "parts": [
+    "Soprano",
+    "Alto",
+    "Tenor",
+    "Bass"
+   ],
+   "pages": [
+    {
+     "page": 1,
+     "heads": 151,
+     "coloured": 0.954,
+     "inBounds": 1,
+     "onSheet": 1,
+     "orientation": 270,
+     "mode": "default",
+     "spread": 0,
+     "caption": [
+      "The scan was on its side; it was read turned a quarter anticlockwise.",
+      "Straightened by 0.8°."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "agrace-satb-rot180",
+   "cache": "challenge__degradation__agrace-satb-rot180__scan__r200",
+   "secs": 1.956,
+   "parts": [
+    "Soprano",
+    "Alto",
+    "Tenor",
+    "Bass"
+   ],
+   "pages": [
+    {
+     "page": 1,
+     "heads": 152,
+     "coloured": 0.947,
+     "inBounds": 1,
+     "onSheet": 1,
+     "orientation": 180,
+     "mode": "default",
+     "spread": 0,
+     "caption": [
+      "The scan was upside down; it was read turned the right way up.",
+      "Straightened by 1.2°."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "agrace-satb-halftone",
+   "cache": "challenge__degradation__agrace-satb-halftone__scan__r200",
+   "secs": 1.012,
+   "parts": [
+    "Soprano",
+    "Alto",
+    "Tenor",
+    "Bass"
+   ],
+   "pages": [
+    {
+     "page": 1,
+     "heads": 147,
+     "coloured": 0.932,
+     "inBounds": 1,
+     "onSheet": 1,
+     "orientation": 0,
+     "mode": "default",
+     "spread": 0,
+     "caption": []
+    }
+   ]
+  },
+  {
+   "id": "twinkle-piano2p-rot90",
+   "cache": "challenge__degradation__twinkle-piano2p-rot90__scan__r200",
+   "secs": 4.322,
+   "parts": [
+    "Piano"
+   ],
+   "pages": [
+    {
+     "page": 1,
+     "heads": 70,
+     "coloured": 0.943,
+     "inBounds": 1,
+     "onSheet": 1,
+     "orientation": 270,
+     "mode": "default",
+     "spread": 0,
+     "caption": [
+      "The scan was on its side; it was read turned a quarter anticlockwise.",
+      "Straightened by 0.8°."
+     ]
+    },
+    {
+     "page": 2,
+     "heads": 150,
+     "coloured": 1,
+     "inBounds": 1,
+     "onSheet": 1,
+     "orientation": 270,
+     "mode": "default",
+     "spread": 0,
+     "caption": [
+      "The scan was on its side; it was read turned a quarter anticlockwise.",
+      "Straightened by 0.8°."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "methodist1905-st-anselm",
+   "cache": "real__methodist1905-st-anselm__r200",
+   "secs": 1.644,
+   "parts": [
+    "Soprano",
+    "Alto",
+    "Tenor",
+    "Bass"
+   ],
+   "pages": [
+    {
+     "page": 1,
+     "heads": 208,
+     "coloured": 0.981,
+     "inBounds": 1,
+     "onSheet": 1,
+     "orientation": 0,
+     "mode": "default",
+     "spread": 0,
+     "caption": []
+    }
+   ]
+  },
+  {
+   "id": "beach-prayer-ssaa-piano",
+   "cache": "synthetic__beach-prayer-ssaa-piano__r200",
+   "secs": 5.286,
+   "parts": [
+    "Soprano I",
+    "Soprano II",
+    "Alto I",
+    "Alto II",
+    "Piano"
+   ],
+   "pages": [
+    {
+     "page": 1,
+     "heads": 442,
+     "coloured": 0.993,
+     "inBounds": 1,
+     "onSheet": 1,
+     "orientation": 0,
+     "mode": "default",
+     "spread": 0,
+     "caption": []
+    },
+    {
+     "page": 2,
+     "heads": 131,
+     "coloured": 0.992,
+     "inBounds": 1,
+     "onSheet": 1,
+     "orientation": 0,
+     "mode": "default",
+     "spread": 0,
+     "caption": []
+    }
+   ]
+  }
+ ],
+ "ok": true
+}

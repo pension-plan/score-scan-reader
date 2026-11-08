@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 18:15 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 18:16 AEDT.
 
 ## Events
 
@@ -75,6 +75,7 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 18:08 | Round 3 voices owner finished: two voices inside piano parts (L17 resolved), small instrument staves above a piano kept as separate parts (L18 partial), key changes carried across systems, single-staff pieces no longer wrongly split. Live tree: benchmark 0.946 (pitch 0.940, duration 0.910, rests 0.800, real scans 0.922); challenge 0.898. |
 | 18:14 | Release 0.7.0 (18:09 AEDT) and regression test: benchmark no regression (0.925 → 0.946, rests 0.436 → 0.800, real scans 0.907 → 0.922); challenge 0.788 → 0.802 with 18 items better and 3 severe scans worse, added to L19. |
 | 18:15 | Round 3 noteheads owner finished: benchmark 0.935 → 0.946, challenge 0.891 → 0.899; Maple Leaf Rag 0.897 → 0.955; thin-photocopy pages that found no staves now read. A duplicate copy of this agent (started by mistake when I messaged it) wrote a regressing change in a scratch folder; it never reached the live code. |
+| 18:16 | Round 3 ML owner finished: copista-2m integrated as a correction pass over the app’s own reading; benchmark 0.942 → 0.957, real scans 0.922 → 0.943, challenge 0.802 → 0.814, Maple Leaf Rag 0.907 → 0.928. Shipped as an option; turning it on by default needs a small UI change, left to the round 3 integrator. |
 
 ## Accuracy by round
 
@@ -131,7 +132,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | Run 5 | Challenge test set (edge cases + scan damage) | done | 7 of 7 |  |
 | Run 3 | Max-parallel main workflow (research) | stopped | 7 of 10 | Stopped at 16:30 AEDT once all 7 research items returned, as planned; its 3 design-proposal agents had just started and were stopped with it. The full rebuild was replaced by fix-forward rounds on v1. |
 | Run 6 | Fix-forward round 2 (shipped 0.925 as v0.5.0) | done | 6 of 6 |  |
-| Run 7 | Fix-forward round 3 (6 owners incl. ML) | running | 1 of 6 |  |
+| Run 7 | Fix-forward round 3 (6 owners incl. ML) | running | 2 of 6 |  |
 | Run 8 | Coverage suite (every symbol and layout + speed) | running | 9 of 10 |  |
 | Side | Agents launched directly from the session | running | 3 of 6 |  |
 
@@ -182,8 +183,8 @@ Every agent started for this build, including stopped runs. Outcomes are on the 
 | Run 7 | Fix | fix:r3:heads | run | 17:36 |  | 39 | 187 |
 | Run 7 | Fix | fix:r3:symbols | run | 17:36 |  | 37 | 147 |
 | Run 7 | Fix | fix:r3:score | run | 17:36 |  | 31 | 134 |
-| Run 7 | Fix | fix:r3:lyrics | run | 17:36 |  | 39 | 141 |
-| Run 7 | Fix | fix:r3:ui | run | 17:36 |  | 23 | 91 |
+| Run 7 | Fix | fix:r3:lyrics | run | 17:36 |  | 39 | 142 |
+| Run 7 | Fix | fix:r3:ui | done | 17:36 | 17:59 | 23 | 91 |
 | Run 7 | Fix | fix:r3:ml | done | 17:36 | 18:08 | 32 | 192 |
 | Run 8 | Harness | harness:coverage | done | 17:34 | 17:50 | 16 | 98 |
 | Run 8 | Generate | gen:notes | done | 17:34 | 17:44 | 10 | 76 |
@@ -194,9 +195,9 @@ Every agent started for this build, including stopped runs. Outcomes are on the 
 | Run 8 | Generate | gen:structure | done | 17:34 | 17:53 | 19 | 95 |
 | Run 8 | Generate | gen:layouts | done | 17:34 | 17:56 | 22 | 131 |
 | Run 8 | Generate | gen:perf | done | 17:34 | 18:05 | 31 | 92 |
-| Run 8 | Baseline | validate+baseline | run | 18:05 |  | 10 | 73 |
-| Side | Fast track | a5575cc38e20927a6 | run | 18:07 |  | 7 | 18 |
-| Side | Fast track | ae52f1cf560b35868 | run | 18:15 |  | 0 | 5 |
+| Run 8 | Baseline | validate+baseline | run | 18:05 |  | 11 | 94 |
+| Side | Fast track | a5575cc38e20927a6 | run | 18:07 |  | 8 | 19 |
+| Side | Fast track | ae52f1cf560b35868 | run | 18:15 |  | 1 | 14 |
 | Side | ML demo | copista-2m demo page for GitHub Pages | done | 16:38 | 16:41 | 3 | 21 |
 | Side | Fast track | First version build (mvp/) | done | 15:19 | 15:29 | 10 | 69 |
 | Side | Hotfix | Rests fix (L3a, user-reported) | run | 17:33 |  | 35 | 179 |

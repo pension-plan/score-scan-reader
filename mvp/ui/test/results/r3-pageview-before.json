@@ -1,0 +1,226 @@
+{
+ "pages": 12,
+ "meanColoured": 0.916,
+ "meanOnSheet": 1,
+ "failing": [
+  "twinkle-piano2p-spread p1: coloured 0.314, on sheet 1"
+ ],
+ "rows": [
+  {
+   "id": "agrace-satb-spread",
+   "cache": "challenge__degradation__agrace-satb-spread__scan__r200",
+   "secs": 3.411,
+   "parts": [
+    "Soprano",
+    "Alto",
+    "Tenor",
+    "Bass"
+   ],
+   "pages": [
+    {
+     "page": 1,
+     "heads": 145,
+     "coloured": 0.986,
+     "inBounds": 1,
+     "onSheet": 1,
+     "spread": 0
+    }
+   ]
+  },
+  {
+   "id": "andantino-piano-spread",
+   "cache": "challenge__degradation__andantino-piano-spread__scan__r200",
+   "secs": 3.49,
+   "parts": [
+    "Piano"
+   ],
+   "pages": [
+    {
+     "page": 1,
+     "heads": 143,
+     "coloured": 0.951,
+     "inBounds": 1,
+     "onSheet": 1,
+     "spread": 0
+    }
+   ]
+  },
+  {
+   "id": "twinkle-piano2p-spread",
+   "cache": "challenge__degradation__twinkle-piano2p-spread__scan__r200",
+   "secs": 7.755,
+   "parts": [
+    "Piano"
+   ],
+   "pages": [
+    {
+     "page": 1,
+     "heads": 207,
+     "coloured": 0.314,
+     "inBounds": 1,
+     "onSheet": 1,
+     "spread": 0
+    }
+   ]
+  },
+  {
+   "id": "wind-melody-spread",
+   "cache": "challenge__degradation__wind-melody-spread__scan__r200",
+   "secs": 3.108,
+   "parts": [
+    "Voice"
+   ],
+   "pages": [
+    {
+     "page": 1,
+     "heads": 26,
+     "coloured": 1,
+     "inBounds": 1,
+     "onSheet": 1,
+     "spread": 0
+    }
+   ]
+  },
+  {
+   "id": "agrace-satb-rot90",
+   "cache": "challenge__degradation__agrace-satb-rot90__scan__r200",
+   "secs": 3.657,
+   "parts": [
+    "Soprano",
+    "Alto",
+    "Tenor",
+    "Bass"
+   ],
+   "pages": [
+    {
+     "page": 1,
+     "heads": 151,
+     "coloured": 0.954,
+     "inBounds": 1,
+     "onSheet": 1,
+     "spread": 0
+    }
+   ]
+  },
+  {
+   "id": "agrace-satb-rot180",
+   "cache": "challenge__degradation__agrace-satb-rot180__scan__r200",
+   "secs": 1.862,
+   "parts": [
+    "Soprano",
+    "Alto",
+    "Tenor",
+    "Bass"
+   ],
+   "pages": [
+    {
+     "page": 1,
+     "heads": 152,
+     "coloured": 0.947,
+     "inBounds": 1,
+     "onSheet": 1,
+     "spread": 0
+    }
+   ]
+  },
+  {
+   "id": "agrace-satb-halftone",
+   "cache": "challenge__degradation__agrace-satb-halftone__scan__r200",
+   "secs": 0.986,
+   "parts": [
+    "Soprano",
+    "Alto",
+    "Tenor",
+    "Bass"
+   ],
+   "pages": [
+    {
+     "page": 1,
+     "heads": 148,
+     "coloured": 0.932,
+     "inBounds": 1,
+     "onSheet": 1,
+     "spread": 0
+    }
+   ]
+  },
+  {
+   "id": "twinkle-piano2p-rot90",
+   "cache": "challenge__degradation__twinkle-piano2p-rot90__scan__r200",
+   "secs": 4.091,
+   "parts": [
+    "Piano"
+   ],
+   "pages": [
+    {
+     "page": 1,
+     "heads": 70,
+     "coloured": 0.943,
+     "inBounds": 1,
+     "onSheet": 1,
+     "spread": 0
+    },
+    {
+     "page": 2,
+     "heads": 159,
+     "coloured": 1,
+     "inBounds": 1,
+     "onSheet": 1,
+     "spread": 0
+    }
+   ]
+  },
+  {
+   "id": "methodist1905-st-anselm",
+   "cache": "real__methodist1905-st-anselm__r200",
+   "secs": 1.713,
+   "parts": [
+    "Soprano",
+    "Alto",
+    "Tenor",
+    "Bass"
+   ],
+   "pages": [
+    {
+     "page": 1,
+     "heads": 209,
+     "coloured": 0.981,
+     "inBounds": 1,
+     "onSheet": 1,
+     "spread": 0
+    }
+   ]
+  },
+  {
+   "id": "beach-prayer-ssaa-piano",
+   "cache": "synthetic__beach-prayer-ssaa-piano__r200",
+   "secs": 5.74,
+   "parts": [
+    "Soprano I",
+    "Soprano II",
+    "Alto I",
+    "Alto II",
+    "Piano"
+   ],
+   "pages": [
+    {
+     "page": 1,
+     "heads": 441,
+     "coloured": 0.993,
+     "inBounds": 1,
+     "onSheet": 1,
+     "spread": 0
+    },
+    {
+     "page": 2,
+     "heads": 131,
+     "coloured": 0.992,
+     "inBounds": 1,
+     "onSheet": 1,
+     "spread": 0
+    }
+   ]
+  }
+ ],
+ "ok": false
+}

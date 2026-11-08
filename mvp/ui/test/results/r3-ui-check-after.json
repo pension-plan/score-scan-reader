@@ -1,0 +1,340 @@
+{
+ "html": "dist/index.html",
+ "score": 1,
+ "passed": 41,
+ "total": 41,
+ "checks": {
+  "1280: converts sample, no console errors": {
+   "pass": true,
+   "detail": []
+  },
+  "1280: no horizontal page scroll": {
+   "pass": true
+  },
+  "1280: notation preview drawn": {
+   "pass": true
+  },
+  "sample: Maple Leaf Rag converts on load as one piano part": {
+   "pass": true,
+   "detail": {
+    "file": "sample-maple-leaf-rag.pdf",
+    "parts": [
+     "Piano"
+    ]
+   }
+  },
+  "hidden attribute: every [hidden] element is display:none by the page CSS": {
+   "pass": true,
+   "detail": []
+  },
+  "engine: recognition runs in a Web Worker": {
+   "pass": true,
+   "detail": "worker"
+  },
+  "pages: one-page scan reports its page and hides the page strip": {
+   "pass": true,
+   "detail": {
+    "engine": "worker",
+    "pages": {
+     "total": 1,
+     "n": 1,
+     "read": 1,
+     "states": [
+      "done"
+     ]
+    },
+    "nav": true
+   }
+  },
+  "stepper: nav[aria-label] > ol with 7 steps": {
+   "pass": true,
+   "detail": 7
+  },
+  "stepper: every step complete/skipped at end, with result facts": {
+   "pass": true,
+   "detail": [
+    "complete",
+    "complete",
+    "complete",
+    "complete",
+    "complete",
+    "complete",
+    "complete"
+   ]
+  },
+  "stepper: state read aloud (sr-only), separators aria-hidden": {
+   "pass": true
+  },
+  "stepper: at least 4 distinct stages painted as current during the run": {
+   "pass": true,
+   "detail": [
+    "Render",
+    "Clean up",
+    "Staves",
+    "Notes",
+    "Lyrics",
+    "Parts",
+    "MusicXML"
+   ]
+  },
+  "parts: each part states the staff it came from": {
+   "pass": true,
+   "detail": [
+    "Kept together as one 2-staff part: staves 1 and 2 (treble + bass)"
+   ]
+  },
+  "parts: summary line (parts, staves, key, time, measures)": {
+   "pass": true
+  },
+  "code block: line-number gutter (not selectable) + header": {
+   "pass": true,
+   "detail": {
+    "gutter": 441,
+    "first": "1",
+    "lines": 442,
+    "full": 64514,
+    "x": 64514,
+    "sel": "none",
+    "label": true,
+    "aligned": true
+   }
+  },
+  "code block: gutter rows line up with code rows": {
+   "pass": true,
+   "detail": {
+    "gutter": 441,
+    "first": "1",
+    "lines": 442,
+    "full": 64514,
+    "x": 64514,
+    "sel": "none",
+    "label": true,
+    "aligned": true
+   }
+  },
+  "code block: hidden textarea keeps the full MusicXML": {
+   "pass": true
+  },
+  "copy: writes full text, label flips to Copied then back": {
+   "pass": true,
+   "detail": {
+    "label": "Copied",
+    "clip": 64514,
+    "x": 64514,
+    "after": "Copy"
+   }
+  },
+  "copy: fallback selects full text and says Ctrl/Cmd+C": {
+   "pass": true,
+   "detail": {
+    "visible": true,
+    "selected": 64514,
+    "x": 64514,
+    "msg": "This page cannot reach the clipboard. The full text is selected: press Ctrl+C (Cmd+C on a Mac)."
+   }
+  },
+  "overlay: toggle button (aria-pressed) hides and shows the markup": {
+   "pass": true,
+   "detail": {
+    "before": {
+     "p": "true",
+     "v": "visible"
+    },
+    "after": {
+     "p": "false",
+     "v": "hidden"
+    }
+   }
+  },
+  "overlay: legend names parts with distinct marker shapes": {
+   "pass": true
+  },
+  "dropzone: drag-depth counter keeps \"over\" while crossing children": {
+   "pass": true,
+   "detail": {
+    "mid": {
+     "over": true,
+     "title": "Drop it here",
+     "live": "Release to convert"
+    },
+    "endOver": false,
+    "endTitle": "The sample rag converted"
+   }
+  },
+  "dropzone: hidden file input opened by a visible button": {
+   "pass": true
+  },
+  "dropzone: dropping a PDF converts it; title and file row report it": {
+   "pass": true,
+   "detail": {
+    "title": "dropped-hymn.pdf converted",
+    "file": "dropped-hymn.pdf",
+    "tick": true
+   }
+  },
+  "sample: St. Anselm button gives four parts with lyrics": {
+   "pass": true,
+   "detail": {
+    "parts": [
+     "Soprano",
+     "Alto",
+     "Tenor",
+     "Bass"
+    ],
+    "lyrics": 4,
+    "ocrLangs": "eng+deu",
+    "secs": 10.62,
+    "verses": 1
+   }
+  },
+  "ocr: reads with the pipeline language set (eng+deu)": {
+   "pass": true,
+   "detail": "eng+deu"
+  },
+  "spread: page caption says two book pages were read": {
+   "pass": true,
+   "detail": {
+    "notes": [
+     "Two book pages side by side: the left page was read first, then the right.",
+     "Straightened by 1.0°."
+    ],
+    "heads": 216,
+    "coloured": 0.986,
+    "clean": "2-up split · deskewed 1.0°"
+   }
+  },
+  "spread: at least 90% of drawn heads carry a part colour": {
+   "pass": true,
+   "detail": {
+    "notes": [
+     "Two book pages side by side: the left page was read first, then the right.",
+     "Straightened by 1.0°."
+    ],
+    "heads": 216,
+    "coloured": 0.986,
+    "clean": "2-up split · deskewed 1.0°"
+   }
+  },
+  "keyboard: main controls are focusable buttons": {
+   "pass": true
+  },
+  "status: aria-live progress region": {
+   "pass": true
+  },
+  "light: token contrast (text 4.5:1, graphics 3:1)": {
+   "pass": true,
+   "detail": []
+  },
+  "400: converts sample, no console errors": {
+   "pass": true,
+   "detail": []
+  },
+  "400: no horizontal page scroll": {
+   "pass": true
+  },
+  "400: notation preview drawn": {
+   "pass": true
+  },
+  "400: stepper fits; only the current step title is shown": {
+   "pass": true,
+   "detail": {
+    "cap": true,
+    "titleW": 1,
+    "stepW": true
+   }
+  },
+  "400d: converts sample, no console errors": {
+   "pass": true,
+   "detail": []
+  },
+  "400d: no horizontal page scroll": {
+   "pass": true
+  },
+  "400d: notation preview drawn": {
+   "pass": true
+  },
+  "1280d: converts sample, no console errors": {
+   "pass": true,
+   "detail": []
+  },
+  "1280d: no horizontal page scroll": {
+   "pass": true
+  },
+  "1280d: notation preview drawn": {
+   "pass": true
+  },
+  "dark: token contrast (text 4.5:1, graphics 3:1)": {
+   "pass": true,
+   "detail": []
+  }
+ },
+ "info": {
+  "secs1280": 7.484,
+  "parts1280": [
+   "Piano"
+  ],
+  "stepTitles": [
+   "Render, completed",
+   "Clean up, completed",
+   "Staves, completed",
+   "Notes, completed",
+   "Lyrics, completed",
+   "Parts, completed",
+   "MusicXML, completed"
+  ],
+  "stepDetails": [
+   "1 page",
+   "deskewed 0.3°",
+   "8 staves · 4 systems",
+   "347 heads",
+   "no lyric lines",
+   "1 part · 22 bars",
+   "442 lines"
+  ],
+  "paintLog": [
+   "Render",
+   "Clean up",
+   "Staves",
+   "Notes",
+   "Lyrics",
+   "Parts",
+   "MusicXML"
+  ],
+  "provenance": [
+   "Kept together as one 2-staff part: staves 1 and 2 (treble + bass)"
+  ],
+  "hymn": {
+   "parts": [
+    "Soprano",
+    "Alto",
+    "Tenor",
+    "Bass"
+   ],
+   "lyrics": 4,
+   "ocrLangs": "eng+deu",
+   "secs": 10.62,
+   "verses": 1
+  },
+  "spread": {
+   "notes": [
+    "Two book pages side by side: the left page was read first, then the right.",
+    "Straightened by 1.0°."
+   ],
+   "heads": 216,
+   "coloured": 0.986,
+   "clean": "2-up split · deskewed 1.0°"
+  },
+  "secs400": 5.758,
+  "parts400": [
+   "Piano"
+  ],
+  "secs400d": 5.156,
+  "parts400d": [
+   "Piano"
+  ],
+  "secs1280d": 6.224,
+  "parts1280d": [
+   "Piano"
+  ]
+ }
+}
