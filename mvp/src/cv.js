@@ -435,6 +435,191 @@ function wrapConverter(conv, getCv, opts = {}) {
   });
 }
 
+// ---------------------------------------------------------------- pre-clean of degraded scans
+// front() calls precleanPage(gray) before binarisation. A cheap page-quality check (plain JS,
+// about 25 ms) decides which repairs the page needs; a page that looks clean is returned as the
+// same object, so clean pages go through the pipeline exactly as before and OpenCV is never
+// loaded for them. Repairs (OpenCV.js, loaded synchronously on first need: front() is
+// synchronous):
+//   flatten    stained, yellowed or heavily damaged paper: divide by a background estimated with
+//              a large grey closing (gain capped, so a dark surround is not turned into texture)
+//   descreen   halftone screens: Gaussian low-pass before thresholding
+//   thin       thick photocopies (strokes fattened, heads filled in): grow the paper by 1-3 px,
+//              until the staff lines are about a tenth of a space thick
+//   close      thin photocopies whose strokes fell apart into loose dots: grow the ink by 1 px
+//   sharpen    heavy blur: unsharp mask
+// Phone shots, noise and JPEG are left alone: every repair tried on them measured worse.
+// docs/spike-opencv.md has the per-class measurements behind the thresholds.
+const { estimateStaffSpace } = require('./staffspace');
+
+function pageQuality(g) {
+  const { width: w, height: h, data } = g, n = w * h;
+  const hist = new Float64Array(256);
+  for (let i = 0; i < n; i++) hist[data[i]]++;
+  let sum = 0; for (let v = 0; v < 256; v++) sum += v * hist[v];
+  let wB = 0, sB = 0, best = 0, thr = 128;
+  for (let v = 0; v < 256; v++) {
+    wB += hist[v]; if (!wB || wB === n) continue; sB += v * hist[v];
+    const b = wB * (n - wB) * (sB / wB - (sum - sB) / (n - wB)) ** 2;
+    if (b > best) { best = b; thr = v; }
+  }
+  let mid = 0, dark = 0, acc1 = 0, p1 = 0;
+  for (let v = 61; v < 200; v++) mid += hist[v];
+  for (let v = 0; v <= 60; v++) dark += hist[v];
+  for (let v = 0; v < 256; v++) { acc1 += hist[v]; if (acc1 >= 0.01 * n) { p1 = v; break; } }
+  // paper per 32 px cell: its 90th percentile, and the spread of the pixels near it
+  const CS = 32, bg = [], sd = [], cellH = new Uint32Array(256);
+  for (let cy = 0; cy < h; cy += CS) for (let cx = 0; cx < w; cx += CS) {
+    cellH.fill(0); let cnt = 0;
+    for (let y = cy; y < Math.min(h, cy + CS); y += 2) for (let x = cx; x < Math.min(w, cx + CS); x += 2) { cellH[data[y * w + x]]++; cnt++; }
+    let acc = 0, p90 = 255; for (let v = 0; v < 256; v++) { acc += cellH[v]; if (acc >= 0.9 * cnt) { p90 = v; break; } }
+    bg.push(p90);
+    let s1 = 0, s2 = 0, m = 0; for (let v = Math.max(0, p90 - 70); v < 256; v++) { s1 += v * cellH[v]; s2 += v * v * cellH[v]; m += cellH[v]; }
+    sd.push(m ? Math.sqrt(Math.max(0, s2 / m - (s1 / m) ** 2)) : 0);
+  }
+  const pct = (a, p) => { const s = a.slice().sort((x, y) => x - y); return s[Math.min(s.length - 1, Math.floor(p * s.length))]; };
+  // isolated dark pixels (all 8 neighbours light), per megapixel
+  let speck = 0;
+  for (let y = 1; y < h - 1; y++) for (let x = 1; x < w - 1; x++) {
+    const i = y * w + x; if (data[i] > thr) continue;
+    if (data[i - 1] > thr && data[i + 1] > thr && data[i - w] > thr && data[i + w] > thr && data[i - w - 1] > thr && data[i - w + 1] > thr && data[i + w - 1] > thr && data[i + w + 1] > thr) speck++;
+  }
+  const bin = { width: w, height: h, data: new Uint8Array(n) };
+  for (let i = 0; i < n; i++) bin.data[i] = data[i] <= thr ? 1 : 0;
+  const sp = estimateStaffSpace(bin);
+  // blur: inked pixels that are only mid-grey, and how light the darkest 1 % of the page is
+  return { thr, mid: mid / n, midShare: mid / Math.max(1, mid + dark), p1, bgLow: (255 - pct(bg, 0.5)) / 255, bgUneven: (pct(bg, 0.95) - pct(bg, 0.05)) / 255, bgStd: pct(sd, 0.5),
+    speck: speck / (n / 1e6), ss: sp.ss, lt: sp.lt, ltss: sp.ss > 0 ? sp.lt / sp.ss : 0 };
+}
+
+// which repairs a page needs, from its quality (empty: leave the page alone)
+function precleanPlan(q, force) {
+  if (force) return force.split(',').filter(Boolean);
+  const ops = [];
+  const binary = q.bgStd < 0.5 && q.mid < 0.03;
+  if (binary) {
+    // photocopies: fattened strokes are thinned; thin ones broken into loose dots are rejoined
+    // (a binary page with thousands of specks is noise, which rejoining would only grow)
+    if (q.ltss > 0.16) ops.push('thin');
+    else if (q.speck > 300 && q.speck < 2000) ops.push('close');
+    return ops;
+  }
+  if (q.speck > 25000 && q.bgStd > 4) return ['descreen'];
+  // stained / yellowed paper, heavy combined damage (not phone shots: the binariser handles their
+  // shading better, and flattening their dark surround adds texture)
+  if (q.mid > 0.15 && ((q.bgUneven < 0.4 && q.bgLow > 0.12 && q.midShare > 0.8) || q.bgStd > 6.8)) ops.push('flatten');
+  // heavy blur: nearly no ink pixel is dark any more
+  if (!ops.length && q.midShare > 0.94 && q.p1 > 100) ops.push('sharpen');
+  return ops;
+}
+
+// ---- OpenCV, loaded synchronously: node reads the file; a Web Worker fetches it with a
+// synchronous XHR and runs it from a blob: URL (the artifact CSP allows blob: scripts). The
+// embedded wasm is compiled with new WebAssembly.Module (synchronous; allowed in workers and
+// node, not on a page's main thread, where the pre-clean is skipped). The patched build reads
+// its module arguments from globalThis.__opencvModuleArgs.
+let cvSync, cvTried = false;
+const CV_FILE = 'opencv-4.10.0-noeval.js';
+function wasmArgs(text) {
+  const m = /data:application\/octet-stream;base64,([A-Za-z0-9+/=]+)/.exec(text);
+  if (!m) throw new Error('no embedded wasm');
+  const bytes = typeof Buffer !== 'undefined' ? Buffer.from(m[1], 'base64') : Uint8Array.from(atob(m[1]), c => c.charCodeAt(0));
+  return { instantiateWasm(imports, ok) { const mod = new WebAssembly.Module(bytes); const inst = new WebAssembly.Instance(mod, imports); ok(inst, mod); return inst.exports; } };
+}
+function loadCvSync() {
+  if (cvTried) return cvSync;
+  cvTried = true;
+  try {
+    const g = typeof globalThis !== 'undefined' ? globalThis : self;
+    if (typeof window === 'undefined' && typeof importScripts !== 'function' && typeof require === 'function' && typeof process !== 'undefined' && process.versions && process.versions.node) {
+      const fs = require('fs'), path = require('path');
+      const tries = [process.env.OPENCV_JS, path.join(__dirname, '../dist/assets', CV_FILE), path.join(__dirname, '../assets-src/opencv', CV_FILE)].filter(Boolean);
+      const f = tries.find(p => fs.existsSync(p));
+      if (!f) return (cvSync = null);
+      g.__opencvModuleArgs = wasmArgs(fs.readFileSync(f, 'utf8'));
+      cvSync = require(f);
+    } else if (typeof importScripts === 'function' && typeof XMLHttpRequest !== 'undefined') {
+      const base = g.OMR_ASSET_BASE || 'assets/';
+      const x = new XMLHttpRequest();
+      x.open('GET', base + CV_FILE, false); x.send();
+      if (x.status !== 200 && x.status !== 0) return (cvSync = null);
+      g.__opencvModuleArgs = wasmArgs(x.responseText);
+      importScripts(URL.createObjectURL(new Blob([x.responseText], { type: 'text/javascript' })));
+      cvSync = g.cv;
+    } else return (cvSync = null);
+    if (cvSync && typeof cvSync.then === 'function') delete cvSync.then;
+    if (!cvSync || !cvSync.Mat) cvSync = null;
+  } catch (e) { cvSync = null; }
+  return cvSync;
+}
+
+function applyOps(cv, gray, ops, q) {
+  const { width: w, height: h } = gray;
+  let m = new cv.Mat(h, w, cv.CV_8U); m.data.set(gray.data);
+  const swap = (o) => { m.delete(); m = o; };
+  const ss = q.ss > 4 ? q.ss : 16;
+  for (const op of ops) {
+    if (op === 'flatten') {
+      // paper estimate: grey closing (ink is darker than the paper around it) on a 4x smaller
+      // copy, smoothed, back to full size; the page is divided by it
+      const sm = new cv.Mat(), bg = new cv.Mat(), up = new cv.Mat(), o = new cv.Mat();
+      cv.resize(m, sm, new cv.Size(Math.max(1, w >> 2), Math.max(1, h >> 2)), 0, 0, cv.INTER_AREA);
+      const k = Math.max(3, Math.round(ss * 0.8) | 1);
+      const se = cv.getStructuringElement(cv.MORPH_ELLIPSE, new cv.Size(k, k));
+      cv.morphologyEx(sm, bg, cv.MORPH_CLOSE, se);
+      cv.GaussianBlur(bg, bg, new cv.Size(0, 0), k / 2);
+      cv.resize(bg, up, new cv.Size(w, h), 0, 0, cv.INTER_LINEAR);
+      // the gain is capped (x2.5 at most): off the paper (a dark table around a photographed page)
+      // division would only amplify noise into texture
+      const bv = Array.from(bg.data).sort((x, y) => x - y), floor = 0.4 * bv[Math.floor(0.95 * (bv.length - 1))];
+      const U = up.data; for (let i = 0; i < U.length; i++) if (U[i] < floor) U[i] = floor;
+      cv.divide(m, up, o, 255);
+      se.delete(); sm.delete(); bg.delete(); up.delete(); swap(o);
+    } else if (op === 'descreen') {
+      const o = new cv.Mat(); cv.GaussianBlur(m, o, new cv.Size(0, 0), Math.max(1, ss / 14)); swap(o);
+    } else if (op === 'thin') {
+      // thicken the paper by one pixel: strokes thin, filled-in heads open up again
+      // as many passes as bring the staff-line thickness back to about a tenth of a space
+      const n = Math.max(1, Math.min(3, Math.round((q.lt - 0.11 * ss) / 2)));
+      const o = new cv.Mat(), se = cv.getStructuringElement(cv.MORPH_RECT, new cv.Size(3, 3));
+      cv.dilate(m, o, se, new cv.Point(-1, -1), n); se.delete(); swap(o);
+    } else if (op === 'sharpen') {
+      const bl = new cv.Mat(), o = new cv.Mat();
+      cv.GaussianBlur(m, bl, new cv.Size(0, 0), Math.max(1, ss / 5));
+      cv.addWeighted(m, 3.0, bl, -2.0, 0, o);
+      bl.delete(); swap(o);
+    } else if (op === 'close') {
+      // thin photocopies: rejoin broken strokes
+      const o = new cv.Mat(), se = cv.getStructuringElement(cv.MORPH_RECT, new cv.Size(2, 2));
+      cv.erode(m, o, se); se.delete(); swap(o);
+    }
+  }
+  const out = { width: w, height: h, data: new Uint8Array(m.data) };
+  m.delete();
+  return out;
+}
+
+const precleanStats = { pages: 0, cleaned: 0, ms: 0, ops: {} };
+// gray page -> the same page (clean, or OpenCV unavailable) or a repaired copy
+function precleanPage(gray, opts = {}) {
+  const env = typeof process !== 'undefined' && process.env ? process.env : {};
+  if (opts.preclean === false || env.OMR_PRECLEAN === 'off') return gray;
+  if (!gray || !gray.data || gray.width < 64 || gray.height < 64) return gray;
+  const t0 = Date.now();
+  precleanStats.pages++;
+  const q = pageQuality(gray);
+  const ops = precleanPlan(q, env.OMR_PRECLEAN_OPS);
+  if (!ops.length) return gray;
+  const cv = loadCvSync();
+  if (!cv) return gray;
+  let out = gray;
+  try { out = applyOps(cv, gray, ops, q); } catch (e) { return gray; }
+  precleanStats.cleaned++; precleanStats.ms += Date.now() - t0;
+  for (const o of ops) precleanStats.ops[o] = (precleanStats.ops[o] || 0) + 1;
+  out.preclean = ops;
+  return out;
+}
+
 const BANK = {"digit-0":[43,48,"AAD8AwAAAPx/AAAA+P8PAADwH/8BAMB/8D8AAP8B/wMA/g/wPwDwP4D/AcD/AfwfAP8HwP8B/D8A/h/g/wHw/4D/BwD/D/w/APh/4P8BwP+D/w8A/j/8fwDw/+H/A4D/D/8fAPz//H8AwP/n/wMA/j//HwDw//n/AID/z/8HAPx//j8A4P/z/wEA/5//DwD4//x/AMD/5/8HAP4//z8A+P/x/wHA/4f/DwD+P/x/APD/wf8DgP8H/h8A/D/g/wHw/wH/D4D/B/B/APw/gP8H8P8A+D+A/wOA/wP+DwD8H/B/AID/wf8BAPi//wcAgP//DwAA+P8/AAAA/j8AAACAfwAA"],"digit-1":[29,48,"APh/AID/HwD4/wMA/38A4P8PAP7/AcD/PwD8/weA//8A+P8fAP//A/D/fwD+/w/A//8B/P8/gO//B/j8/wCf/x/w8f8DPv5/4MP/Dzz4/4EH/z944P8HD/z/AID/HwDw/wMA/n8AwP8PAPj/AQD/PwDg/wcA/P8AgP8fAPD/AwD+fwDA/w8A+P8BAP8/AOD/BwD8/wCA/x8A8P8DAP9/APD/P8D//x/8//8D//9/"],"digit-2":[40,50,"AAAAAAAA8P8PAAD+/38AgB/A/wHABwD/A+ADAP8P8AMA/h/4BwD+H/wPAPw//D8A/H/+fwD8f/7/APx//v8A/P/+/wD8//7/APz//v8A/P/+/wD+//z/AP7//P8A/v/4fwD/f/B/AP9/4D+A/z+AD4D/HwAAwP8PAADg/wcAAPD/AQAA+H8AAAD8DwAAAP4BAACAfwAAAMAfAAAA8AcAAAD4AQAAAPwAAGAA/x4AYID//wNwwP//H3DA////fOD///9/8P///z/w////P/j///8/+P///x/8////H/zH//8P/gD//wd+APz/Az4A+P8BHADAfwAIAAAAAA=="],"digit-3":[38,48,"AMA/AAAA/v8AAPD//wAA//D/AOAP4P8A/AHwf4B/APg/4H8A/g/8fwD/B/8fwP/B/w/wf/D/A/w//P8A/w//P8D/gf8P8H/g/wH+H/B/gP8H+A/w/wBwAPwfAADA/wMAAPw/AADg/wEAgP8/AADw/z8AAPj/fwAAAP9/AAAA/z8AAAD/HwAAwP8P8AHg/wP/AfD/4f8A/H/8fwD/H/8fwP/v/wfw//v/Afx//v8A/5//H8D/5/8H8P/5/wD+P/w/gP8P/w/w/4H/Af4/4P/A/wfw////APD//w8A8P9/AADg/wMA"],"digit-4":[42,49,"AAAAAAAAAP//AAAA/v8DAAD4/wcAAOD/HwAAgP8/AAAA/n8AAAD4/wEAAPD/AwAAwP8HAAAA/x8cAAD8P3gAAPh/8AEA4P/gBwCA/4MfAAD/B38AAPwP/gEA+B/8BwDgf/gfAMD/8H8AAP/B/wEA/oP/BwD4B/8fAPAf/H8AwD/w/wGAf8D/BwD+AP8fAPwB/H8A+APw/wHgB8D/B8APAP8fgB8A/H8A///////9//////f/////n/////8/AADw/wEAAMD/BwAAAP8fAAAA/H8AAADw/wEAAMD/BwAAAP8fAAAA/n8AAAD8/wMAAP7/fwAA/P//AwDw//8PAMD//x8A"],"digit-5":[37,48,"AAAAAAD+//8f4P///wP8//9/gP///w/w////AP7//x/A////Afj//x8A////AeD//w8APPgHAIAHAAAA8AAAAAAeAAAAwAEAAAA4AAAAAAf+fwDg+P8/APz//w+AP/D/B/gD+P8BHwD8P+ABAP8PGADg/wMAAPh/AAAA/x8AAMD/A/4A+H/wfwD/H/4f4P/j/wP8f/7/gP/P/x/w//n/A/4//3/A/+f/D/j//P+B/4//H/D/8f8B/h/8H+D/g/8B/D/gH+D/A/wH/j8A////A4D//z8A4P//AADA/wMA"],"digit-6":[39,48,"AAD4AwAAwP8fAAD4wz8AAP/APwDAP+A/APgP+D8A/gP+HwD/Af8fwP/A/w/wP+D/B/gf8P8B/g/4/wD/B/h/wP8D/B/g/wD8B/h/APgA/D8AAAD+HwAAAP8PAADA/wf4AOD/g/8B8P/x/wP4//3/B/z///8H/v/H/wf//8D/h/9/wP/H/x/g/+P/D+D/8/8D8P/x/wH4//j/APx//H8A/H/+PwD+P/4fAP8P/w+A/4f/B8D/g/8D4P+B/wH4f8D/APw/wP8A/g/Af4D/B+B/wP8BwD/wfwDAP/wfAMD//wMAgP9/AAAA/wMA"],"digit-7":[39,48,"APADAAAA/g8AXMD/HwBu8P8fgHf8/x/A+///H/D9//8f+P7//z9+/////7//////3//////nn/////MD////+QD+/388AP7/Px4A/P8fBwD854cDAPDxwwEAAPxgAAAAfiAAAIA/AAAA4A8AAAD4BwAAAP4BAACA/wAAAOA/AAAA+B8AAAD+DwAAgP8DAADg/wEAAPj/AAAA/j8AAID/HwAAwP8PAADw/wMAAPz/AQAA/v8AAID/fwAAwP8/AADw/x8AAPj/BwAA/v8DAAD//wEAgP//AADA/38AAOD/PwAA8P8fAAB4gAcA"],"digit-8":[39,50,"AAA/AAAA+P8HAID//w8A8D/wHwD8A8A/AH8AgB/AHwCAH/APAIAf/AMAwA/+AQDAB/8BAOCH/wAA8MN/AAD48X8AAPzw/wAAPvj/AIAf/P8D4A/+/wf4A///H/4A////f4D///8PgP///wOA////B4D///8HgP///wcA////B4D///8H4P///wf8+f//Az/w///BD+D///EDwP///ACA/39+AAD/vx8AAP/fDwAA/+8DAID/8wEAgP/5AQDA//wAAOB/fgAA8B9+AAD4Dz8AAP4DPwAA/wB/AMB/AP8A+A8A/4f/AwD+/38AAPz/DwAA4H8AAA=="],"digit-9":[39,48,"AMA/AAAA/v8BAMD//wcA+D/8BwD+D/wHgP8H/AfA/wH+B/D/AP4H/D8A/wP+H4D/A/8PwP/B/wfg/+H/A+D/8P8B8P/4/wD4f/x/AP4//j8A/z//H4D/H/8PwP+P/w/g/8f/B/j/w/8H/v/B/wf//8D/5/9/4P///z/A/3//H8D/j/8PgP/B/wcAAOD/AwAA8P8BAAD4/wAAAPw/AD8A/h/AfwD/D/A/gP8D/D/A/wH/H/B/gP8P+D/A/wf8D+D/A/4D8P+B/wH4f8B/APgf8B8A/A/4BwD8A/4AAPzDPwAA+P8DAADgPwAA"],"time-C":[41,50,"AAAAAAAAAP4HAAAA/38AAID/gAcAwH8AHADAfwBwAMA/AOABwH8AwAfAfwDAD8B/APA/gP8A8H+A/wHw/4H/AfD/A/8D4P8H/gfA/w/+B4D/H/wPAP8//B8A/n/4PwD8f/B/APD/4P8A4P/g/wGA/8D/AwB8gP8HAAAA/w8AAAD+HwAAAPw/AAAA+H8AAADw/wAAAOD/AQAAnP8DAAA4/wcAAHD+HwAA4Pw/AADA8X8AAIDj/wAAAMP/AwAAB/8HAAAO/g8AAA74PwAAHOB/AAAcwP8BADwA/wcAPAD8HwA8APB/AD4AwP8DPwAA/v8fAAD4/w8AAID/AwAAAAAAAAA="],"time-cut":[41,70,"AAAOAAAAABwAAAAAOAAAAABwAAAAAOAAAAAAwAEAAACAAwAAAAAHAAAAAA4AAAAAHAAAAAB4AAAAAPg/AAAA/v8DAAD/Bx4AAP8HcACA/wfAA4D/D4APgP8fAB8A/zkAfwD/ccD/AP/j4P8D/sPB/wf+h8P/D/wPh/8f/B8O/z/4Hxz+f/A/OPz/8H9w+P/h/+Dw/8H/wcH/g/+DA/+D/wcH/AP/Dw7AAP4fHAAA/D84AAD4f3AAAPD/4AAA4P/BAQDA/4MDAID/BwcAcP4PDgDg/B8cAMD5fzgAgPP/cAAAx//hAACG/8MBAA7+jwMAHPwfBwAY8D8OADjg/xwAMID/OQBwAP5/AHAA+P8AeADg/wH8AID/B34AAP7/fwAA8P8/AACA/w8AAAB8AAAAAHAAAAAA4AAAAADAAQAAAIADAAAAAAcAAAAADgAAAAAcAAAAADgAAAAAcAAAAADgAAAAAAAAAAA="],"clef-G":[66,170,"AAAAAAAAAAAAAAAAAPAAAAAAAAAA4AcAAAAAAADAPwAAAAAAAID/AQAAAAAAAP8PAAAAAAAA/j8AAAAAAAD8/wEAAAAAAPD/BwAAAAAA4P8/AAAAAACA//8AAAAAAAD//wcAAAAAAP7/HwAAAAAA+P//AAAAAADg//8DAAAAAMD//w8AAAAAAP8HfgAAAAAA/AfwAQAAAAD4D4AHAAAAAOAfAB4AAAAAgH8AcAAAAAAA/gDAAwAAAAD8AQAPAAAAAPAHADwAAAAAwA8A8AAAAAAAPwDAAwAAAAB8AAAPAAAAAPgBAD4AAAAA4AcA+AAAAACAHwDgAwAAAAA+AIAPAAAAAPgAAD8AAAAA4AMA/AAAAACADwD4AwAAAAA+AOAHAAAAAPgAwB8AAAAA4AOAfwAAAACABwD+AQAAAAAeAPwHAAAAAHgA+A8AAAAA4AHwPwAAAACAB+D/AAAAAAAewP8BAAAAAHiA/wcAAAAA4AH/DwAAAAAAD/4/AAAAAAA8/P8AAAAAAPD4/wEAAAAAwPP/BwAAAAAA//8PAAAAAAD8/x8AAAAAAPD/fwAAAAAAwP//AAAAAACA//8BAAAAAAD//wcAAAAAAP7/DwAAAAAA/v8fAAAAAAD8/z8AAAAAAPj//wAAAAAA8P//AQAAAADg//8DAAAAAMD//wcAAAAAgP//DwAAAAAA//8fAAAAAAD+/z8AAAAAAPz/fwAAAAAA+P//AQAAAADw//8HAAAAAOD//zwAAAAAgP//8QAAAAAA///BAwAAAAD+/wMPAAAAAPz/BzwAAAAA+P8P8AEAAADg/x+ABwAAAMD/PwAeAAAAgP9/AHgAAAAA/v8A4AEAAAD8/wGABwAAAPD/AwA+AAAA4P8HAPAAAACA/w8AwAMAAAD/HwCA/w8AAPw/AAD//wMA+H8AgP//PwDg/wEA////AYD/AwD///8fAP8HAP7///8A/B8A/P///wfwPwD4////P8B/APD/////gP8B4P////8H/geA/////z/4DwD//////+A/APz/////h/8A+P/z4P8f/gHg/8MD/v/4B4D/Aw/w/+MfAP4HPAD/j38A/A/gAfg//gHwH4AHwP/5B8A/AB4A/+cfAP8AeAD4nz8A/AHgAcB//gHwB4AHAP/xB4AfADwA/McfAH4A8ADgH38A+AHAA4B/+AHgBwAPAP7hBwAfADwA+Ic/AHwA8ADgD/wA4AOAB4A/8AOADwAeAP6AHwB8AHgA+AN+AOAD4AHgB/ADAB+AB8AfgA8A+AEeAD8AfgCAD/AA/gDwAwB4wAP4AYAfAAAAD/ADAPwAAAA84AcA4AcAAPDADwAAfwAAwIMfAAD4BwAAnj8AAIB/AAD4fwAAAPgPAOB/AAAAwP8f8P8AAAAA/P//fwAAAACA////AAAAAADA/+8DAAAAAAAAAA8AAAAAAAAAPAAAAAAAAADwAAAAAAAAAMADAAAAAAAAAB8AAAAAAAAAeAAAAAAAAADgAQAAAAAAAIAHAAAAAAAAAB4AAAAAAAAAeAAAAAAAAADgAQAAAAAAAIAPAAAAAAAAADwAAAAA/gMA8AAAAAD8PwDAAwAAAPj/AQAPAAAA8P8HADwAAADg/z8A8AAAAID//wDAAwAAAP//BwAPAAAA/P8fADwAAADw/38A8AAAAMD//wHAAwAAAP//BwAPAAAA/P8fADwAAADw/38A+AAAAMD//wDgAQAAAP//A4AHAAAA/P8HAB8AAADg/w8APAAAAID/DwD4AAAAAPwPAPABAAAA8A8A4AcAAACAPwDADwAAAAD8AeAfAAAAAOA/8D8AAAAAAP7/PwAAAAAA8P8/AAAAAAAA/B8AAAAAAAAAAAAAAAA="],"clef-F":[67,87,"AAAAAAAAAAAAAID/BwAAAAAAwP//AwAAAADA//9/AAAAAID/4P8PAAAAAP4A8P8BAAAA+AAA/h8AAADgAwDg/wEAAIAHAAD+HwAAAB4AAPD/AcAH+AAAAP8fgH/gAwAA8P8B/AcPAACA/w/wP3wAAAD4/4D/4QMAAMD/B/yPHwAAAP5/4H/8AAAA4P8D/uP/HwAA/z/wj///AQD4/wE+/P8/AMD/DwDg//8BAP5/AAD//x8A4P8HAPj//wAA/z8AwP//DwD4/wEA/v9/AMD/DwDw//8DAP5/AAD//x8A8P8DAPj//wCA/x8AwP//BwD8/wAA/P8/AOD/BwDg//8AAP8/AAD+/wcA+P8BAPD/HwDA/w8AAP9/AAD+f8AH8P8BAPD/A38A/gcAgP8f/AcAAAAA/P/wPwAAAADg/4P/AQAAAID/H/wPAAAAAPz/4H8AAAAA4P8H/gMAAAAA/x/gDwAAAAD4/wA+AAAAAMD/BwAAAAAAAP8/AAAAAAAA+P8AAAAAAADA/wcAAAAAAAD+HwAAAAAAAPj/AAAAAAAAwP8DAAAAAAAA/h8AAAAAAAD4fwAAAAAAAMD/AwAAAAAAAP8PAAAAAAAA+H8AAAAAAADg/wEAAAAAAAD/BwAAAAAAAPw/AAAAAAAA4P8AAAAAAACA/wMAAAAAAAD+DwAAAAAAAPA/AAAAAAAAwP8AAAAAAAAA/wcAAAAAAAD8HwAAAAAAAOA/AAAAAAAAgP8AAAAAAAAA/gMAAAAAAAD4DwAAAAAAAOA/AAAAAAAAgP8AAAAAAAAA/gEAAAAAAAD4BwAAAAAAAOAfAAAAAAAAwD8AAAAAAAAA/wAAAAAAAAD8AwAAAAAAAPgHAAAAAAAA4A8AAAAAAACAPwAAAAAAAAB/AAAAAAAAAP4AAAAAAAAA+AMAAAAAAADwBwAAAAAAAOAPAAAAAAAAAB8AAAAAAAAAGAAAAAAAAAAA"],"clef-C":[67,98,"AAAAAAAAAADwf8AAAP4/AMD/Aw8A/v8PAP4feAD4//8B8P/AA/AH+D+A/wcewAcA/wf8P/AAPwDwf+D/gQf4AwD/B/8PPOB/APA/+H/gAf8HgP/D/wMP/H8A/D/+H3jg/wPA//H/wAP/PwD+n/8HHvj/AfD//D/wwP8PgP/v/4EH/n8A/H//Dzzg/wHg//t/4AH/DwD///8DD/A/APj//x94AP8AwP///8ADwAEA/v//Bx4AAADw//8/8AAAAID///+BBwAAAPz//w88AAAA4P//f+ABAAAA////Aw8AAAD4//8feAAAAMD/9//AAwAAAP6//wcegAEA8P/9P/AAHACA/+//gQfwAAD8P/8PPIAPAOD/+X/gAXwAAP/H/wMP4AMA/D/+H3iAPwDg//D/wAP8AwD/h/8HHuAfAPwf/D/wgP8B8H/g/4EH/D/A/wH/Dzzw////A/h/4IH///8PwP8DD/7//x8A/h94+H/wDwDw/8Dj/wEAAID/B/7/DwAAAPw/8P8/AAAA4P+B//8BAAAA/w/8/wcAAAD4f+D/PwAAAMD/A///AwAAAP4f+P8fAAAA8P/A//8BAACA/wce/w8AAAD8P/Dw/8AfAOD/gQf///8PAP8PPPD///8B+H/gAf///z/A/wMP+H+A/wP+H3jA/wD4P/D/wAP8A4D/g/8HHuAfAPg//D/wAH8AwP/h/4EH8AEA/h//DzyADwDg//l/4AF8AAD/z/8DD+ABAPh//h94AA4AwP/3/8ADMAAA/r//Bx4AAADw//0/8AAAAID/7/+BBwAAAPz//w88AAAA4P//f+ABAAAA////Aw8AAAD4//8feAAAAMD////AAwAAAP7//wceAA4A8P//P/AA/gGA////gQf4HwD8//8PPOD/AeD//3/gAf8PAP/f/wMP/P8A+P/+H3jg/wfA//f/wAP/PwD+n/8HHvj/AfD//D/wwP8HwP/j/4EH/j8A/h//Dzzg/wDwf/h/4AH/A8D/wf8DD/AHAP4P/h94gB8A+D/w/8AD+ADgf4D/Bx6AP8D/Afw/8ADw//8D4P+BBwD//wcA/g8YAMD/BwAAAAAAAAAAAAA="],"rest-quarter":[26,72,"EAAA4AEAgA8AAH4AAPABAMAPAAB+AADwAwDAHwAA/gAA+AcAwD8AAP8AAPwHAOA/AID/AQD+DwD4fwDg/wGA/w8A/38A/P8B8P8D4P8PgP8fAP8/AP7/APz/Afj/B+D/D8D/PwD/fwD8/wHg/weA/w8A/D8A4P8AAP8DAPgPAOA/AAD/AAD4AwDAHwAAfwAA+AEAwA8AAH8A8PwB8P8P4P9/wP//A///D/7/f/j///P//9///3//P4D/fwDg/wCA/wEA/gcA8B8AgH8AAP4BAPAHAIA/AAD8AADgBwAAPwAA+AEAwAcAABwA"],"rest-8th":[24,41,"8AEA+ANg/Afw/g94/w98/x9+/x9///8///8//v8//P8f+D8f8AcfAAAfAIAPAIAPAIAPAMAPAMAHAMAHAOAHAOADAOADAPADAPADAPgBAPgBAPgBAPwAAPwAAPwAAP4AAH4AAH4AAH8AAD8AAD8AAD8AgD8AgB8AAA8A"],"rest-16th":[31,65,"APgAAAD/ATjA/wEO4P+AB/j/4AP8f/gB/j9/AP//P4D//x+A//8PgP//A4D/8QEAP/gAAAB8AAAAHwAAgA8AAMAHAADwAQAA+AAAAHwAAAAeAACADwAAwAcAAOAD8AH4AP4DfID/Az/A/4EP8P/BB/j/8AP8f/wA/v9/AP7/PwD//w8A//8HAP/3AwB++AEAAHwAAAA/AACAHwAAwAcAAPADAAD4AQAAfAAAAD8AAIAfAADADwAA8AMAAPgBAAD8AAAAPwAAgB8AAMAPAADwAwAA+AEAAPwAAAA/AACAHwAAwA8AAPAHAAD4AQAA/AAAAH8AAIAfAACABwAA"],"rest-32nd":[35,89,"AIAPAAAA/gA4APgP4AHg/4AHgP8PPgD8f/gB4P/zDwD//z8A+P//AYD//w8A+P9/AID/8wEA8AMPAAAAfAAAAOADAAAADwAAAHgAAADgAwAAAB8AAAB4AAAAwAMAAAAfAAAA+AAAAMAHAHwAHgD4B/gA4H/AB4D/Bz4A/D/wAOD/wwcA/58/APj//wHA//8PAPz/PwDg//8BAPyfDwCAD3wAAADwAQAAgA8AAAB8AAAA4AMAAIAfAAAAfAAAAOADAAAAHwAAAPwAAADgAwAAAB8A8AH4AOA/4AeA/wM/APwf+ADw/8EHgP8PPwD8f/wB4P//BwD+/z8A8P//AQD//w8A8H9+AAD+8AEAAIAPAAAAfgAAAPADAACADwAAAHwAAADwAwAAgB8AAAD8AAAA4AMAAIAfAAAA/AAAAOAHAAAAHwAAAPwAAADgBwAAAD8AAAD4AQAA4AcAAAA/AAAA+AEAAMAPAAAAPwAAAPgBAADADwAAAH4AAAD4AwAAwA8AAAA8AAAA"],"rest-64th":[41,114,"AAAAAAAAAMAHAAAA4D8AAwDg/wAHAMD/AQ8AwP8HHwCA/w8/AAD/nz8AAP7/fwAA/P//AADw//8BAMD//wEAAP/HAwAA+IEHAAAAgA8AAAAADwAAAAAeAAAAADwAAAAAfAAAAAB4AAAAAPAAAAAA4AEAAADgAwAAAMAHAAAAgAcAAB+ADwCA/wAfAID/AT4AAP8HPAAA/x98AAD+P/wAAPx//AEA+P//AQDw//8DAMD//wcAAP//DwAA/J8PAADgDx8AAAAAPgAAAAB8AAAAAPgAAAAA+AAAAADwAQAAAOADAAAAwAcAAADABwAAAIAPAAAAAB8AAAAAPgAA/AA+AAD8A3wAAPwP+AAA/D/wAQD4f/ADAPD/8QMA4P/zBwDA//8PAID//x8AAP7/HwAA/P8/AADgf34AAAA/fAAAAAD4AAAAAPABAAAA8AMAAADgBwAAAMAHAAAAgA8AAACAHwAAAAA/AAAAAD4AAAAAfAAA8AH8AADwB/gBAPAf8AEA8H/gAwDw/+EHAOD/ww8AwP/HDwCA//8fAAD//z8AAPz/fwAA8P//AADA//8AAAB++AEAAADwAwAAAOAHAAAA4AcAAADADwAAAIAfAAAAAD8AAAAAPwAAAAB+AAAAAPwAAAAA+AEAAAD4AQAAAPADAAAA4AcAAADADwAAAMAPAAAAgB8AAAAAPwAAAAB+AAAAAP4AAAAA/AAAAAD4AQAAAPADAAAA8AcAAADgBwAAAMAPAAAAwB8AAACAHwAAAAA/AAAAADwAAAAA"],"acc-sharp":[25,68,"AAAAAAAOAAAcAAA4AABwABzgADjAAXCAA+AAB8ABDoADHAAHOAAOcAAc4AA4wD9wgH/ggP/Agf+B4/8D//8H/v8P//+f//+f//8P//8P/v8P/H8c+D848B9w4B/gwD3AAXCAA+AABsABDoADHAAHOAAOcAwc4B84wD9wwH/gwP/A4f+B//+D///H///P///H//+D//8D//8H/h8O/A8c+Ac48A9wYBzgADjAAXCAA+AAB8ABDoADHAAHOAAOcAAc4AA4wAFwAADgAADAAQCAAwAAAAAA"],"acc-flat":[23,60,"AAAADgCABwDAAwDgAQDwAAB4AAA8AAAeAAAPAIAHAMADAOABAPAAAHgAADwAAB4AAA8AgAcAwAMA4AEA8AAAeAAAPAAAHgAADwCABwDAAwDggQ/w8B94/D/8/z/+/x//4Z8/4M8P8OcD8PcA+HsA/DwAfh4APw+AnwfgxwPw4wH88AB+eIAfPOAHHvgBD36Ahx/A9wfg/wDgPwDwDwD4AQB8AAAeAAADAAAAAAA="],"acc-natural":[16,66,"BgAPAA8ADwAPAA8ADwAPAA8ADwAPAA8ADwAPAA8AD8AP+I/////////////////////////wH/AP8A/wD/AP8A/wD/AP8A/wD/AP+A/+j/////////////////////////9/8A/wA/AA8ADwAPAA8ADwAPAA8ADwAPAA8ADwAPAA4AAA"],"head-filled":[30,24,"AAB/AAD8fwDA/38A/P8/gP//D/D//wf+///B//9/8P//H/7//8f////x//8//P//j////+P//3/4//8P/v//g///f+D//wfw//8A/P8fAP7/AQD+HwAAfgAA"],"head-half":[29,25,"AMA/AAD/PwD4/w/A//8D/D/4wP8AHvwHgMN/AHD8AwCOHwDA+QEAPB8AwOcBAHweAMDPAwD8OADgHwcA/uEA8D8cgP8DB/w/4PP/A/j/HwD+/wAA/wEAAAAAAA=="],"flag-8th-up":[27,79,"DAAAcAAAgAcAADwAAOABAAAPAAD4AADABwAAPgAA8AEAgB8AAPwAAOAHAAB/AAD4AwDAPwAA/gEA8B8AgP8AAPwPAOB/AAD/BwD4PwDA/wMA/h8AwP8BAPgfAID/AAD4DwCAfwAA+AcAgH8AAPgDAIA/AAD8AQDAHwAA/AAA4A8AAH4AAOADAAA/AADwAQCAHwAA+AAAwAcAAHwAAOADAAAeAADwAAAADwAAeAAAwAMAAB4AAPAAAAAPAAB4AADAAwAAHgAA8AAAgAcAADwAAOABAAAPAAB4AADAAwAAHgAA8AAAwAMAAB4AAPAAAIAHAAA8AADwAQCABwAAPAAA8AEAgA8AADgAAIAA"],"flag-8th-down":[30,80,"AAAAAAAA4AAAAHgAAAAeAACABwAA4AMAAPgAAAA8AAAADwAAwAMAAPABAAB4AAAAHgAAgAcAAOABAAB4AAAAHgAAgAcAAOABAAB4AAAAHgAAgAcAAOABAAB4AAAAHwAAwAcAAPABAAA8AACADwAA4AMAAPgAAAAeAADABwAA8AEAAD4AAIAPAADgAwAAfAAAAB8AAOADAAD4AAAAHwAA4AcAAPwAAAA/AADgBwAA/AEAgD8AAPAPAAD+AQDAPwAA/A8AgP8BAPh/AMD/DwD8/wEA/38AwP8PAPD/AQD8PwAA/w8AwP8BAPA/AAD8DwAA/wEAwH8AAPAPAAD8AwAAfwAAwA8AAPADAAD8AAAAHwAAwAcAAPABAAA8AAAADwAAwAMAAHAAAAAAAAAA"]};
 
-module.exports = { createNodeCv, createBrowserCv, createJsCv, wrapConverter, refineEntry, readTime, readClefAt, readRest, makeApi, moduleReady };
+module.exports = { precleanPage, pageQuality, precleanPlan, precleanStats, createNodeCv, createBrowserCv, createJsCv, wrapConverter, refineEntry, readTime, readClefAt, readRest, makeApi, moduleReady };

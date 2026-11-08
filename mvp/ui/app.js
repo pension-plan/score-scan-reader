@@ -356,7 +356,8 @@
   let workerSrcURL = null;
   function workerURL() {
     if (!workerSrcURL) {
-      const src = `${__omrBundle.toString()}\n__omrBundle();\nconst Sess=(${__omrSessionModule.toString()})();\nSess.workerMain(self, self.omrRequire);\n`;
+      // OMR_ASSET_BASE: a blob: worker cannot resolve relative URLs; src/cv.js loads OpenCV.js from it
+      const src = `self.OMR_ASSET_BASE=${JSON.stringify(new URL('assets/', location.href).href)};\n${__omrBundle.toString()}\n__omrBundle();\nconst Sess=(${__omrSessionModule.toString()})();\nSess.workerMain(self, self.omrRequire);\n`;
       workerSrcURL = URL.createObjectURL(new Blob([src], { type: 'text/javascript' }));
     }
     return workerSrcURL;

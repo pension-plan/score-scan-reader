@@ -11,6 +11,7 @@ const { threshold } = require('./binarize');
 const { detectStems } = require('./stems');
 const { detectBarlines } = require('./barlines');
 const { rotateGray, makeGray } = require('./image');
+const { precleanPage } = require('./cv');
 
 function resample(g, f) {
   const w = Math.max(1, Math.round(g.width * f)), h = Math.max(1, Math.round(g.height * f));
@@ -222,6 +223,9 @@ function invertedShare(R, staves) {
 // each stage to opts.onStage(stage) and opts.onProgress(message, { stage }).
 function* frontSteps(gray0, opts = {}) {
   const warnings = [];
+  // degraded scans are repaired first (src/cv.js, OpenCV); a page that looks clean comes back
+  // unchanged (the same object), so clean pages are read exactly as before
+  gray0 = precleanPage(gray0, opts);
   yield 'cleanup';
   let ctx = clean(gray0, (opts.mode && MODES.find(m => m.name === opts.mode)) || MODES[0]);
   yield 'staves';

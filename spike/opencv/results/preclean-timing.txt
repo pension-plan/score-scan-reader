@@ -1,0 +1,8 @@
+andantino-piano-clean__scan: quality 68 ms, plan -, total 45 ms
+andantino-piano-photocopy-thick__scan: quality 36 ms, plan thin, total 224 ms
+agrace-satb-photocopy-thin__scan-severe: quality 46 ms, plan close, total 44 ms
+andantino-piano-blur__scan-severe: quality 36 ms, plan sharpen, total 234 ms
+andantino-piano-halftone__scan: quality 31 ms, plan descreen, total 88 ms
+andantino-piano-combo__scan-severe: quality 37 ms, plan flatten, total 238 ms
+andantino-piano-yellowed__scan-severe: quality 30 ms, plan flatten, total 168 ms
+andantino-piano-phone__scan-severe: quality 33 ms, plan -, total 36 ms

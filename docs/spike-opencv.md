@@ -1,6 +1,70 @@
 # Spike: OpenCV.js as a fallback symbol identifier
 
-Date: 2026-11-08. Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
+Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
+
+## Update: OpenCV pre-clean for degraded scans (shipped)
+
+Scope extension: OpenCV now runs as a **pre-clean stage before binarisation**, only on pages a cheap
+quality check calls degraded. This supersedes the "do not add OpenCV.js" verdict below for this use; the
+symbol-reader findings in sections 1–7 still hold.
+
+**How it works** (`mvp/src/cv.js`, hook `mvp/src/front.js` `frontSteps`):
+- `pageQuality(gray)` in plain JS (30–70 ms per page) measures: share of mid-grey pixels (`mid`), mid-grey share of inked
+  pixels (`midShare`), lightest-1 % level (`p1`), paper darkness and unevenness from 32 px cells (`bgLow`,
+  `bgUneven`), paper texture (`bgStd`), isolated specks per Mpx (`speck`), staff-line thickness / staff space (`ltss`).
+- `precleanPlan(q)` picks repairs; an empty plan returns **the same gray object**, so clean pages are read exactly as
+  before and OpenCV is never loaded for them (verified: the clean class and every unaffected item are unchanged).
+- Otherwise OpenCV.js (patched 4.10.0, self-hosted `dist/assets/opencv-4.10.0-noeval.js`) is loaded **synchronously**
+  (front() is synchronous): node reads the file; the recognition Web Worker uses a synchronous XHR + `blob:`
+  `importScripts`, and the embedded wasm is compiled with `new WebAssembly.Module` through `instantiateWasm`
+  (the patch makes the UMD wrapper read `globalThis.__opencvModuleArgs`). On a page's main thread (worker
+  unavailable) the pre-clean is skipped. `OMR_PRECLEAN=off` disables it (node).
+
+| repair | when (plan rule) | OpenCV ops |
+|---|---|---|
+| `thin` | binary page (`bgStd` < 0.5, `mid` < 0.03), `ltss` > 0.16 (thick photocopy) | `dilate` 3×3 (paper grows) × n, n = round((lt − 0.11·ss)/2) clamped 1–3 |
+| `close` | binary page, 300 < `speck` < 2000 (thin photocopy broken into dots) | `erode` 2×2 (ink grows 1 px) |
+| `descreen` | `speck` > 25000 and `bgStd` > 4 (halftone screen) | `GaussianBlur` σ = ss/14 |
+| `flatten` | `mid` > 0.15 and (`bgUneven` < 0.4, `bgLow` > 0.12, `midShare` > 0.8 — yellowed/stained) or `bgStd` > 6.8 (combined damage) | 4× `resize`, `morphologyEx` CLOSE (ellipse 0.8·ss), `GaussianBlur`, `resize` back, gain capped at 2.5×, `divide` |
+| `sharpen` | `midShare` > 0.94 and `p1` > 100 (heavy blur) | unsharp mask: `GaussianBlur` σ = ss/5, `addWeighted` 3, −2 |
+
+**Per class, challenge degradation set** (aggregate, `eval.mjs --set challenge --no-ocr --jobs 8`, same src snapshot,
+`OMR_PRECLEAN=off` vs on; `spike/opencv/results/preclean-perclass.txt`):
+
+| class | ops used | all | scan | scan-mild | scan-severe |
+|---|---|---|---|---|---|
+| photocopy-thick | thin | 0.681 → **0.816** | 0.756 → 0.868 | 0.831 → 0.888 | 0.456 → **0.691** |
+| blur | sharpen (severe only) | 0.754 → **0.839** | = | = | 0.542 → **0.796** |
+| combo | flatten (severe) | 0.804 → **0.855** | = | = | 0.669 → **0.823** |
+| halftone | descreen | 0.813 → **0.855** | 0.842 → 0.873 | 0.786 → 0.854 | 0.811 → 0.839 |
+| yellowed | flatten (severe) | 0.859 → 0.868 | = | = | 0.809 → 0.838 |
+| photocopy-thin | close (severe) | 0.806 → 0.815 | = | = | 0.668 → 0.695 |
+| clean, bleed, book, crop, highdpi, holes-staple, jpeg, lowdpi, noise, phone, rot90/180, scale, skew, spread, stain-pencil | none | unchanged | | | |
+
+Whole challenge set: **0.8091 → 0.8212** (+0.0121; pitch +0.023, duration +0.023, rests +0.013); degradation
+0.8493 → 0.8651, pitch category +0.007, lyrics +0.0045, rhythm +0.0043, layout and voices unchanged; scan-severe
+0.7354 → 0.7623. Largest item drop −0.009 (`agrace-satb-photocopy-thick/scan-severe`), 46 items up.
+Benchmark **with OCR**: **0.9480 → 0.9496**, real scans 0.9256 → **0.9295**, synthetic 0.9519 → 0.9531, no item down
+(`golden1923-america` +0.012 flatten, `bach-bwv3-6` +0.011 flatten, `bach-bwv166-6` +0.010 thin).
+
+Named limits: the severe photocopies improve (`andantino` thick severe 0.616 → 0.854, `wind-melody` thick severe
+0.351 → 0.711, `agrace` thin severe 0.595 → 0.657; `agrace` thick severe stays at 0.25). **Not helped**: L11
+`hymn-descant-cue-notes-amen-small` severe (0.113; its staff lines are broken into dashes — a 1×ss horizontal
+closing was tried and did not help), L19 `satb-closed-lyrics-both-staves-de` severe (0.545) and phone shots
+(`andantino-piano-phone` severe 0.576): flattening phone shots measured worse (class 0.824 → 0.771 even with the
+gain cap), so phone pages are left alone; dewarping was not attempted.
+
+What was tried and rejected (`results/preclean-trials.txt`, 12 items per class): 3×3 / 5×5 **median** destroys 1–2 px
+staff lines (halftone 0.813 → 0.643, noise 0.869 → 0.473); **despeckle** (drop tiny components) erases the dotted staff
+lines of thin photocopies (0.806 → 0.690); a second thinning pass ruins mild thick photocopies (mild 0.888 → 0.254),
+hence the thickness-driven pass count; descreen on random noise is slightly worse (0.869 → 0.865); flatten without the
+gain cap turns a photographed page's dark surround into texture (phone severe 0.708 → 0.448).
+
+**Cost.** Asset: `opencv-4.10.0-noeval.js` 10,376,412 B (≈3.4 MB gzip), plus licence and notice (dist/assets total
+49.9 MB of 64 MB). Node: quality check 30–70 ms per page; OpenCV load ≈170 ms once; repairs 40–240 ms per degraded page
+(`results/preclean-timing.txt`). Headless Chromium, CSP blob worker (`spike/opencv/probe/browser-preclean.js`): the
+first degraded page costs ≈1.1 s extra (sync fetch of 10 MB, wasm compile, then the repair); clean pages cost only the
+quality check; results match node exactly (same plans, staves and heads).
 
 ## Recommendation (TL;DR)
 

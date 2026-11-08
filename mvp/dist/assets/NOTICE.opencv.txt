@@ -1,0 +1,9 @@
+OpenCV.js 4.10.0 (npm @techstark/opencv-js 4.10.0-release.1), Apache License 2.0.
+Copyright the OpenCV authors and contributors; packaging by TechStark.
+
+Modified for this app (Apache-2.0 section 4b): spike/opencv/tools/patch-noeval.js rewrites the
+embind code generators (createNamedFunction, craftInvokerFunction, makeDynCaller,
+__emval_get_method_caller) as closures, so the build runs under a Content Security Policy
+without 'unsafe-eval', and lets the UMD wrapper take module arguments from
+globalThis.__opencvModuleArgs (used to initialise the embedded wasm synchronously).
+No other change. Used by src/cv.js to pre-clean degraded scans.

@@ -1,0 +1,57 @@
+n 365 aggregate 0.8091 -> 0.8212 (+0.0121) | pitch 0.8731 -> 0.8962 (+0.0231) | duration 0.8407 -> 0.8635 (+0.0228) | rests 0.7587 -> 0.7713 (+0.0126) | parts 0.932 -> 0.9351 (+0.0031) | lyrics 0.463 -> 0.463 (+0.0000) | xml_valid 1 -> 1 (+0.0000) | crashes 0 -> 0 (+0.0000) | runtime_ms_mean 2541 -> 2265 (-276)
+  by_variant scan           n=123 agg 0.8377 -> 0.8436 (+0.0059)  dur 0.8909->0.9054 pitch 0.9228->0.932 rests 0.8027->0.8212
+  by_variant scan-mild      n=123 agg 0.8517 -> 0.8558 (+0.0041)  dur 0.9245->0.9353 pitch 0.9419->0.9479 rests 0.8664->0.8864
+  by_variant scan-severe    n=119 agg 0.7354 -> 0.7623 (+0.0269)  dur 0.7021->0.7459 pitch 0.7507->0.8059 rests 0.602->0.6006
+  by_category degradation    n=251 agg 0.8493 -> 0.8651 (+0.0158)  dur 0.8861->0.9161 pitch 0.9128->0.9428 rests 0.8457->0.8572
+  by_category layout         n=21 agg 0.7103 -> 0.7103 (+0.0000)  dur 0.6696->0.6696 pitch 0.6788->0.6788 rests 0.3271->0.3271
+  by_category lyrics         n=24 agg 0.7143 -> 0.7188 (+0.0045)  dur 0.8311->0.8375 pitch 0.887->0.8968 rests 0.6795->0.6795
+  by_category pitch          n=24 agg 0.6938 -> 0.7007 (+0.0069)  dur 0.7268->0.7441 pitch 0.7064->0.718 rests 0.5094->0.5697
+  by_category rhythm         n=24 agg 0.8097 -> 0.814 (+0.0043)  dur 0.6943->0.6963 pitch 0.8355->0.8486 rests 0.7388->0.7403
+  by_category voices         n=21 agg 0.6668 -> 0.6698 (+0.0030)  dur 0.7773->0.7852 pitch 0.8108->0.8151 rests 0.5492->0.5595
+items changed: 46/365; first time signature right: off 333/365, on 342/365
+  -0.0087 degradation/agrace-satb-photocopy-thick/scan-severe  agg 0.25611978338260055->0.24737885013258734 dur 0.2119815668202765->0.13414634146341464 time 2/4->2/4 (truth 3/4)
+  -0.0081 degradation/agrace-satb-halftone/scan-severe  agg 0.6783249158249157->0.6702500413975824 dur 0.6397306397306397->0.6666666666666666 time 3/4->3/4 (truth 3/4)
+  -0.0042 degradation/twinkle-piano2p-halftone/scan  agg 0.9923076923076922->0.9881118881118881 dur 0.965034965034965->0.951048951048951 time 4/4->4/4 (truth 4/4)
+  +0.0055 degradation/andantino-piano-photocopy-thin/scan-severe  agg 0.783595367742925->0.7890667739340306 dur 0.5084745762711864->0.504424778761062 time 2/4->3/4 (truth 4/4)
+  +0.0083 degradation/andantino-piano-yellowed/scan-severe  agg 0.9326402158030797->0.9409018704823356 dur 0.8083623693379791->0.8166089965397924 time 4/4->4/4 (truth 4/4)
+  +0.0131 degradation/wind-melody-photocopy-thick/scan-mild  agg 0.7653061224489796->0.7784313725490196 dur 0.8571428571428571->0.9803921568627451 time 3/4->3/4 (truth 3/4)
+  +0.0143 degradation/wind-melody-yellowed/scan-severe  agg 0.6709090909090909->0.6851851851851852 dur 0.6545454545454545->0.7037037037037037 time 3/4->3/4 (truth 3/4)
+  +0.0151 degradation/andantino-piano-halftone/scan  agg 0.9612121212121213->0.9762655992465269 dur 0.8727272727272727->0.9032258064516129 time 4/4->4/4 (truth 4/4)
+  +0.0171 degradation/wind-melody-combo/scan-severe  agg 0.6813953488372092->0.6985 dur 0.7906976744186046->0.68 time 3/4->3/4 (truth 3/4)
+  +0.0202 pitch/pitch-satb-chromatic-closed/scan-severe  agg 0.7607598022146389->0.780941196825679 dur 0.8670520231213873->0.9504373177842566 time 4/4->4/4 (truth 4/4)
+  +0.0245 degradation/agrace-satb-yellowed/scan-severe  agg 0.730989898989899->0.7555352026677938 dur 0.86->0.9139072847682119 time 3/4->3/4 (truth 3/4)
+  +0.0275 voices/ttbb-treble8-a2-unis/scan  agg 0.7258114115211302->0.7533455437558811 dur 0.8235294117647058->0.8901734104046243 time 4/4->4/4 (truth 4/4)
+  +0.0307 lyrics/lyr04-veni-latin-italic-en/scan-severe  agg 0.37008403361344544->0.40080285459411236 dur 0.08571428571428572->0.13559322033898305 time 2/4->3/8 (truth 4/4)
+  +0.0312 degradation/andantino-piano-halftone/scan-severe  agg 0.9160789221821394->0.9472467532467531 dur 0.7612456747404844->0.8071428571428572 time 4/4->4/4 (truth 4/4)
+  +0.0346 degradation/twinkle-piano2p-photocopy-thick/scan-mild  agg 0.9635071090047392->0.9981395348837209 dur 0.8672985781990521->0.9906976744186047 time 4/4->4/4 (truth 4/4)
+  +0.0354 degradation/twinkle-piano2p-halftone/scan-mild  agg 0.9514093738758239->0.9867749419953596 dur 0.8655256723716381->0.9373549883990719 time 4/4->4/4 (truth 4/4)
+  +0.0364 voices/satb-closed-ties-solo-amen-chords/scan  agg 0.7118567291285086->0.7482905982905983 dur 0.794392523364486->0.8942307692307693 time 4/4->4/4 (truth 2/2)
+  +0.0392 degradation/andantino-piano-photocopy-thick/scan-mild  agg 0.9421523410202656->0.98133472367049 dur 0.8296296296296296->0.9285714285714286 time 4/4->4/4 (truth 4/4)
+  +0.0406 degradation/twinkle-piano2p-photocopy-thin/scan-severe  agg 0.6085283575795909->0.6491717171717172 dur 0.05734767025089606->0.2222222222222222 time 4/4->4/4 (truth 4/4)
+  +0.0409 degradation/twinkle-piano2p-photocopy-thick/scan  agg 0.9418604651162791->0.9827906976744186 dur 0.813953488372093->0.9209302325581395 time 4/4->4/4 (truth 4/4)
+  +0.0425 degradation/wind-melody-halftone/scan-severe  agg 0.7255319148936171->0.7679999999999999 dur 0.723404255319149->0.84 time 3/4->3/4 (truth 3/4)
+  +0.0435 degradation/wind-melody-photocopy-thick/scan  agg 0.7244897959183673->0.7679999999999999 dur 0.6530612244897959->0.84 time 3/4->3/4 (truth 3/4)
+  +0.0436 degradation/twinkle-piano2p-halftone/scan-severe  agg 0.9249999999999999->0.9685579196217494 dur 0.7594339622641509->0.8888888888888888 time 4/4->4/4 (truth 4/4)
+  +0.0618 degradation/agrace-satb-photocopy-thin/scan-severe  agg 0.5952188552188552->0.6570460680517803 dur 0.5333333333333333->0.6867924528301886 time 3/4->3/4 (truth 3/4)
+  +0.0646 pitch/pitch-keysig-odyssey/scan-severe  agg 0.6337629414610547->0.6983382363795484 dur 0.47384615384615386->0.6517571884984026 time 4/4->4/4 (truth 4/4)
+  +0.0663 degradation/twinkle-piano2p-yellowed/scan-severe  agg 0.903304401125182->0.9696111929615582 dur 0.7297921478060047->0.8995433789954338 time 4/4->4/4 (truth 4/4)
+  +0.0685 degradation/wind-melody-halftone/scan-mild  agg 0.6914893617021277->0.76 dur 0.5531914893617021->0.8 time 3/4->3/4 (truth 3/4)
+  +0.0785 lyrics/lyr02-abendlied-6-stanzas-de/scan-severe  agg 0.6951000344317494->0.7735590923610792 dur 0.8121212121212121->0.9162011173184358 time 4/4->4/4 (truth 4/4)
+  +0.0802 degradation/andantino-piano-halftone/scan-mild  agg 0.8872960777507809->0.9675077405347071 dur 0.7388059701492538->0.8754448398576512 time 4/4->4/4 (truth 4/4)
+  +0.0814 pitch/pitch-accidental-storm/scan  agg 0.8117517517517517->0.8931451612903226 dur 0.7407407407407407->0.8958333333333334 time 4/4->4/4 (truth 4/4)
+  +0.0881 degradation/agrace-satb-halftone/scan-mild  agg 0.6150187011555346->0.7031321619556914 dur 0.6237288135593221->0.7857142857142857 time 3/4->3/4 (truth 3/4)
+  +0.1019 degradation/twinkle-piano2p-combo/scan-severe  agg 0.8314651493598862->0.9333274189394155 dur 0.5789473684210527->0.8076009501187649 time 4/4->4/4 (truth 4/4)
+  +0.1025 degradation/andantino-piano-combo/scan-severe  agg 0.8075655172413793->0.9100827555356744 dur 0.568->0.7680608365019012 time 4/4->4/4 (truth 4/4)
+  +0.1046 rhythm/rh05-graces-fermatas/scan-severe  agg 0.7348780381255878->0.8394683327876605 dur 0.610738255033557->0.6598639455782312 time 4/4->4/4 (truth 4/4)
+  +0.1106 degradation/twinkle-piano2p-blur/scan-severe  agg 0.8545604719764012->0.9651270207852193 dur 0.6194690265486725->0.8637413394919169 time 3/4->4/4 (truth 4/4)
+  +0.1150 degradation/agrace-satb-halftone/scan  agg 0.6217594638385624->0.7367656034578816 dur 0.4246575342465753->0.8441558441558441 time 2/4->3/4 (truth 3/4)
+  +0.1373 degradation/andantino-piano-photocopy-thick/scan  agg 0.8442299139261701->0.9815016845820631 dur 0.6810035842293907->0.9130434782608695 time 4/4->4/4 (truth 4/4)
+  +0.1383 degradation/agrace-satb-photocopy-thick/scan-mild  agg 0.6542902400854994->0.7925675675675675 dur 0.6341463414634146->0.9932432432432432 time 3/4->3/4 (truth 3/4)
+  +0.2284 degradation/agrace-satb-photocopy-thick/scan  agg 0.5124569402228977->0.7408298332696958 dur 0.3617021276595745->0.865979381443299 time 2/4->3/4 (truth 3/4)
+  +0.2375 degradation/andantino-piano-photocopy-thick/scan-severe  agg 0.6162754303599375->0.8537734556910012 dur 0.2222222222222222->0.738255033557047 time 2/4->4/4 (truth 4/4)
+  +0.2715 degradation/wind-melody-blur/scan-severe  agg 0.4529411764705883->0.7244897959183673 dur 0.23529411764705882->0.6530612244897959 time 3/8->3/4 (truth 3/4)
+  +0.3101 degradation/andantino-piano-blur/scan-severe  agg 0.6117708480316072->0.9218585858585858 dur 0.22105263157894736->0.6981818181818182 time 3/4->4/4 (truth 4/4)
+  +0.3256 degradation/agrace-satb-blur/scan-severe  agg 0.2484848484848485->0.574040622923348 dur 0.13529411764705881->0.3373493975903614 time 2/4->2/4 (truth 3/4)
+  +0.3534 degradation/twinkle-piano2p-photocopy-thick/scan-severe  agg 0.5986303395110619->0.9520278392913634 dur 0.2841121495327103->0.8394495412844036 time 3/4->4/4 (truth 4/4)
+  +0.3600 degradation/wind-melody-photocopy-thick/scan-severe  agg 0.3513513513513513->0.7113207547169812 dur 0.21621621621621623->0.6415094339622641 time 4/4->3/4 (truth 3/4)
+  +0.3929 degradation/agrace-satb-combo/scan-severe  agg 0.3575586161665847->0.7504320078546882 dur 0.18691588785046728->0.9484536082474226 time 2/4->3/4 (truth 3/4)
