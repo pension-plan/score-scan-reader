@@ -2,6 +2,27 @@
 
 Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
 
+## Update: position errors, thick heads split in two (±1–2 steps)
+
+Heads one or two staff steps off (wp.py: 325 + 144 on the challenge set) are mostly on severe scans (359 of 468). On
+`organ-chorale-3-staves-landscape` severe, head centres measured against the staff grid fell at ±0.6 of a step in
+pairs at the same x: one head read as two, a step apart. `detectHeads` cuts a tall blob into
+`round(height / 0.95 space)` heads (a stack of thirds); heavy scans thicken a single head to about 1.5 spaces, which
+rounds to 2. The page's typical head height is now measured first (the median over blobs a head wide and up to a head
+and a half tall); when it is over 1.15 spaces, the extra thickness is taken off before counting. Clean pages are
+unchanged (an ungated version that always discounted 0.25 space cost `t03` 0.09 and `mk10` 0.05 on clean pages).
+Challenge (wp.py): position errors 325 → 278, wrong pitches 1,615 → 1,523, extras 1,653 → 1,486, missing about the
+same. A/B (no OCR): challenge +0.0011 (`lyr06-amazing-grace-textblock` severe 0.240 → 0.561, organ-chorale severe
++0.069; worst `agrace-satb-photocopy-thick` severe −0.046), coverage +0.0033 (`choir-ttbb-evening-bells` severe
+0.271 → 0.754, `str03` severe 0.666 → 0.909), benchmark +0.0011 (real scans 0.813 → 0.818).
+
+Parked, for later: heads found from stems. A stem 2.5–6 spaces tall with no head at its end gets the filled and half
+head templates tried there, with the stem's columns masked. Meant for broken hollow heads (a dotted staff line
+crossing the outline leaves a 16 px opening fillHoles cannot close: `twinkle-piano2p-photocopy-thin` severe, 156 of 215
+notes missing) and faded heads whose stems break (`variations-piano-12-pages` severe). On twinkle it does not separate
+yet (best 0.45 against about 0.25 elsewhere, and some missed heads' stems are not candidates). The prototype is
+`scratchpad/sf/stemheads.js`.
+
 ## Update: key signatures on blurred severe scans
 
 `pitch-keysig-odyssey` severe (structure traced it to `readKeySig`): blurred flats match the natural template about as

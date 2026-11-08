@@ -288,6 +288,14 @@ function detectHeads(B, R, staves, ss, lt, opts = {}) {
   const { labels, comps } = labelComponents(O);
   const IR = integral(R), IB = integral(B);
   const heads = [], beams = [], stacked = [];
+  // the page's typical head height (blobs a head wide, up to a head and a half tall), in spaces
+  const hts = [];
+  for (const c of comps) {
+    const bw = c.x1 - c.x0 + 1, bh = c.y1 - c.y0 + 1;
+    if (bw >= 0.9 * ss && bw <= 1.6 * ss && bh >= 0.7 * ss && bh <= 1.6 * ss && c.area >= 0.6 * bw * bh) hts.push(bh / ss);
+  }
+  hts.sort((a, b) => a - b);
+  const headH = hts.length >= 8 ? hts[hts.length >> 1] : 1, thick = headH > 1.15;
   for (const c of comps) {
     const bw = c.x1 - c.x0 + 1, bh = c.y1 - c.y0 + 1;
     if (bw < 0.8 * ss || bh < 0.5 * ss) continue;
@@ -325,7 +333,9 @@ function detectHeads(B, R, staves, ss, lt, opts = {}) {
       }
       if (ya < 0) continue;
       const hh = yb - ya + 1;
-      const k = Math.max(1, Math.round(hh / (0.95 * sp)));
+      // heads stacked a third apart; on a page whose heads come out thick (heavy scans, the page's
+      // typical head over 1.15 spaces tall) a single head reaches 1.5 spaces and is still one
+      const k = Math.max(1, thick ? Math.round((hh - (headH - 1) * sp) / (0.95 * sp)) : Math.round(hh / (0.95 * sp)));
       if (k > 4) continue;
       const step = hh / k;
       // a stack of hollow heads (whole- / half-note chord): equal steps put centres on the
