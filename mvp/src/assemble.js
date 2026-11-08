@@ -94,7 +94,7 @@ function classifyAccidental(R, g, sp) {
     let n = 0, sy = 0, top = hgt;
     const xs = st[0].x1 + Math.max(2, Math.round(0.2 * sp)); // clear of the stem's ragged edge
     for (let y = 0; y < hgt; y++) for (let x = xs; x < wid; x++) if (img.data[y * wid + x]) { n++; sy += y; if (y < top) top = y; }
-    if (n >= 0.08 * sp * sp && top > 0.4 * hgt && sy / n > 0.6 * hgt) return 'flat';
+    if (n >= 0.08 * sp * sp && top > 0.25 * hgt && sy / n > 0.55 * hgt) return 'flat';
   }
   return null;
 }
