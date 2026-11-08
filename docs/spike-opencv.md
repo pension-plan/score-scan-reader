@@ -2,6 +2,29 @@
 
 Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
 
+## Update: key signatures read slot by slot (L24 severe scans, L2 old engraving)
+
+The component parse in \`assemble.js\` misses key signature signs that touch something: a flat fused with the treble
+clef (\`golden1923-auld-lang-syne\` system 1 read no key), four flats run together on a bass staff (the same page,
+system 5, read 0 for A-flat major), sharps cut by a shadow on a curled severe scan (4 read as 1), flats filled solid
+on heavy severe prints, and the narrow flats of old engravings. \`cv.js\` \`readKeySig\` (called from \`readHeaders\`,
+\`assemble.js\` untouched) reads the signature slot by slot. Signs stand at fixed positions for each clef (sharps
+F C G D A E B, flats B E A D G C F; treble, bass and alto clefs), so for each next sign it takes the best match of
+the Bravura sharp (or flat) template in a window at that slot's height, 0.6–1.7 spaces right of the previous one
+(the first may overlap the clef's end). A slot counts at score ≥ 0.42 when it beats noteheads by 0.05 and digits
+(time signatures; a solid flat looks like a 4), naturals and the other accidental at all. The result only ever adds
+signs: it replaces the parse when it finds more of the same kind, or (first sign ≥ 0.55) when the parse found none.
+Then the header end moves past the last sign, and heads read on the signs are dropped.
+
+On the five real scans of L2 it agrees with every key the parse already had right, and fixes both auld-lang-syne
+misses. golden1923-america, methodist1905 st-anselm and tappan-dennis, and haupt1867 were already right at every
+system start, so L2 there is down to mid-piece key changes. A/B on the same source (no OCR): coverage +0.0012 per
+item, no item down (\`perf-piano-a4-300dpi\` severe +0.058, \`keys-minor-sharps\` severe +0.057); challenge +0.0005, no
+item down (\`pitch-ttbb-enharmonic-keys\` severe 0.473 → 0.622); benchmark unchanged. Coverage per tag (OCR, severe):
+\`key-s1\` 13 → 14 of 16, \`key-f7\` 0 → 1 of 2, \`key-change\` 15 → 16 of 34. \`key-0\` 35 → 34: the upside-down
+\`keys-minor-sharps\` severe page, which is read wrongly either way (front.js does not turn it; raised with the
+structure agent).
+
 ## Update: heads beside accidentals, courtesy accidentals (L24)
 
 Courtesy accidentals were not misread signs: the notes they stand before were lost. On `pitch-cov-accidentals-melody`
