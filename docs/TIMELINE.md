@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 13:37 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 13:56 AEDT.
 
 ## Events
 
@@ -206,6 +206,9 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 13:02 | faded shipped b60737b and finished; faded and descreen stopped. Waiting on CI for the next release. |
 | 13:13 | Release 0.47.0 merged (7fee92f) after main b60737b was all green: faded staff ends join, spread gutter split. |
 | 13:37 | Found that CI's challenge gate scores only 111 of 365 items (the 254 damage PDFs are gitignored and rebuilt locally), so the damaged-scan work in 0.45-0.47 was gated only locally. Agent cigate: rebuild the damage PDFs in CI and gate all 365. bardrift: rebased on 0.47.0, running the full gates. |
+| 13:44 | bardrift shipped 2f84578: printed bar numbers set each run's bar count (barSpans, on by default). Bar drift on long severe scans +6-7% down to +2%; clean and scan copies within 0.3%; exact-bar precision for dynamics 0.34 to 0.89, fermatas 0.46 to 0.89, octave lines 0.50 to 0.98; perf aggregate -0.0005; runtime +7%. Open: var-16 half-note chord systems, last system unfixed, worn 7/4 head drop in meter.js. Agent stopped. |
+| 13:49 | User paused development. All finished agent work is on main. cigate held (not pushed): damage-PDF rebuild is deterministic (needs --nodate, XSD path fix, missing-pieces rebuild); full challenge gate ~24 min in one job, so the plan is 2 parallel shards plus skipping eval's load wait when CI=true. 362 of 365 items are gateable in CI (organ-chorale-3-staves-landscape is licence-restricted). |
+| 13:56 | Release 0.47.1 merged (3cc5523) after 2f84578 was all green: bar counts from printed bar numbers. Development paused. |
 
 ## Accuracy by round
 

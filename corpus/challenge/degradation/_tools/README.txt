@@ -3,6 +3,10 @@ Degradation-extremes challenge set (corpus/challenge/degradation/<id>/, manifest
 Rebuild everything (parallel, ~40 s on 192 cores):
   /Users/d.sloane/music/.venv/bin/python corpus/challenge/degradation/_tools/run.py [--pieces] [id-substring ...]
   (DEG_THUMBS=<dir> also writes JPEG previews of every damaged file for visual QA)
+  (DEG_JOBS=<n> caps the worker processes; default min(96, CPUs))
+  Needs lilypond, fonts-texgyre, img2pdf, poppler-utils, libxml2-utils and requirements.txt.
+  The output is deterministic: the damaged PDFs are byte-identical between runs. The PDFs are
+  not in git; CI rebuilds them (cached on the _tools sources) for the challenge-gate jobs.
 
 4 simple source pieces (pieces.py) x 21-22 damage types (variants.py) = 85 items.  Every item
 of a piece shares the same truth.musicxml / engraving.ly (built once into ../_pieces/<piece>/ by

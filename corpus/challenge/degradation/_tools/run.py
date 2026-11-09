@@ -32,6 +32,7 @@ from variants import PIECE_IDS, catalogue  # noqa: E402
 
 OUT = os.path.dirname(HERE)                       # corpus/challenge/degradation
 THUMBS = os.environ.get('DEG_THUMBS')             # optional preview dir (QA only)
+JOBS = int(os.environ.get('DEG_JOBS') or min(96, os.cpu_count() or 1))   # worker processes
 FACING = os.path.join(PIECE_DIR, '_facing', 'facing.pdf')
 # reverse side used for bleed-through: (piece, page) per page of each piece
 REVERSE = {'hymn': [('piano', 0)], 'melody': [('hymn', 0)], 'piano': [('piano2p', 0)],
@@ -122,7 +123,7 @@ def do_file(task):
             chk = image_only(out)
             if THUMBS:
                 im = imgs[0]
-                im = im.convert('RGB') if im.mode in ('1', 'L') else im
+                im = im.convert('RGB') if im.mode in ('1', 'L') else im.copy()   # thumbnail() works in place
                 im.thumbnail((700, 700))
                 im.save(os.path.join(THUMBS, f'{iid}--{fname}.jpg'), quality=85)
             return {'id': iid, 'file': fname, 'ok': chk['image_only'], 'check': chk, 'spec': spec, 'seed': seed,
@@ -255,7 +256,8 @@ TRUTH_SCOPE = ('truth.musicxml (MusicXML 4.0 partwise, XSD-valid) encodes parts/
 
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith('--')]
-    if '--pieces' in sys.argv or not all(os.path.exists(os.path.join(PIECE_DIR, k, 'validation.json')) for k in PIECES):
+    if '--pieces' in sys.argv or not all(os.path.exists(os.path.join(PIECE_DIR, k, f)) for k in PIECES
+                                                    for f in ('validation.json', 'engraving.pdf')):
         for k in PIECES:
             v = build_piece(k)
             print('piece', k, 'OK' if v['ok'] else 'FAIL')
@@ -293,7 +295,7 @@ def main():
     tasks.sort(key=lambda t: -t[2]['dpi'])
     results = {}
     t0 = time.time()
-    with ProcessPoolExecutor(max_workers=min(96, len(tasks) + len(ctasks))) as ex:
+    with ProcessPoolExecutor(max_workers=min(JOBS, len(tasks) + len(ctasks))) as ex:
         futs = [ex.submit(do_file, t) for t in tasks] + [ex.submit(do_clean, t) for t in ctasks]
         for fu in as_completed(futs):
             r = fu.result()

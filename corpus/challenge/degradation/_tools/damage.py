@@ -946,7 +946,7 @@ def save_pdf(images, dpi, path, out):
                 fn = os.path.join(td, f'p{k:03d}.png')
                 im.save(fn, 'PNG', dpi=(dpi, dpi), optimize=True)
             files.append(fn)
-        subprocess.run(['img2pdf', '--imgsize', f'{dpi}dpi', '-o', path] + files, check=True, capture_output=True,
+        subprocess.run(['img2pdf', '--nodate', '--imgsize', f'{dpi}dpi', '-o', path] + files, check=True, capture_output=True,
                        timeout=600)
 
 

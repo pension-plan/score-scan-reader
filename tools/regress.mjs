@@ -2,7 +2,10 @@
 // Regression check: score the current pipeline and a released version on the same
 // corpus with the same options, and report what got worse.
 //
-//   node tools/regress.mjs [--base <tag>] [--head <ref>] [--set default|challenge] [--ocr] [--jobs N] [--out file.md]
+//   node tools/regress.mjs [--base <tag>] [--head <ref>] [--set default|challenge] [--ocr] [--jobs N] [--shard k/n] [--out file.md]
+//
+// --shard k/n scores every n-th item only (eval.mjs --shard), for CI jobs that split a set between
+// them; each shard is checked against the same thresholds.
 //
 // --head scores a committed ref (git archive, like the base) instead of the working tree's
 // mvp/src. Several agents share this working tree, so without --head the head side also
@@ -33,6 +36,7 @@ if (!base) { console.error('no release tag found'); process.exit(2); }
 const set = opt('--set', 'default');
 const ocr = argv.includes('--ocr');
 const jobs = opt('--jobs', '8');
+const shard = opt('--shard', null);
 const work = path.join(ROOT, 'mvp/work/regress', base);
 const baseSrc = path.join(work, 'src');
 
@@ -68,6 +72,7 @@ const run = (label, src, models) => {
   const a = ['mvp/tools/eval.mjs', '--out', out, '--jobs', jobs, '--quiet'];
   if (src) a.push('--src', src);
   if (set !== 'default') a.push('--set', set);
+  if (shard) a.push('--shard', shard);
   // with OCR, read text as the page does (eng+deu plus the lazy second pass), not eval's eng-only default
   if (!ocr) a.push('--no-ocr'); else a.push('--ocr-lang', opt('--ocr-lang', 'app'));
   if (ocr && models) a.push('--lang-path', models);
@@ -97,7 +102,7 @@ const sA = A.summary, sB = B.summary;
 const f = (v) => (typeof v === 'number' ? v.toFixed(3) : '–');
 const d = (a, b) => (typeof a === 'number' && typeof b === 'number' ? (b - a >= 0 ? '+' : '') + (b - a).toFixed(3) : '');
 const L = [];
-L.push(`## Regression check: ${head} vs ${base} (${set === 'default' ? 'benchmark' : set}, ${ocr ? 'with' : 'without'} OCR)`);
+L.push(`## Regression check: ${head} vs ${base} (${set === 'default' ? 'benchmark' : set}${shard ? `, shard ${shard}` : ''}, ${ocr ? 'with' : 'without'} OCR)`);
 L.push('');
 L.push(`| Metric | ${base} | ${head} | Change |`);
 L.push('|---|---|---|---|');

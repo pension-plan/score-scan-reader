@@ -1,0 +1,4 @@
+# python packages for run.py (CI installs these; pinned so the damage renders stay byte-identical)
+numpy==2.5.4
+pillow==13.0.0
+music21==10.5.2

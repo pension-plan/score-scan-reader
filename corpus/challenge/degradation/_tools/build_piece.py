@@ -30,7 +30,7 @@ from synth.mxl import write_musicxml  # noqa: E402
 
 from pieces import PIECES  # noqa: E402
 
-XSD = '/Users/d.sloane/music/mvp/work/schema/musicxml.xsd'
+XSD = os.path.join(HERE, '..', '..', '..', '..', 'mvp', 'work', 'schema', 'musicxml.xsd')
 PIECE_DIR = os.path.join(os.path.dirname(HERE), '_pieces')
 
 

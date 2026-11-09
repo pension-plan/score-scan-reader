@@ -4,8 +4,10 @@
 //   node tools/eval.mjs --out work/eval-r1-<key>.json [--only id,...] [--no-ocr] [--jobs N]
 //                       [--src dir] [--dpi 200|native|app] [--timeout sec]
 //                       [--set synthetic|real|challenge|coverage] [--ml] [--ocr-lang eng|app|<langs>]
-//                       [--ocr-workers N] [--lang-path dir]
+//                       [--ocr-workers N] [--lang-path dir] [--shard k/n]
 //
+// --shard k/n keeps every n-th item (sorted by id, starting with the k-th; k = 1..n), so n CI jobs
+// together score the whole set.
 // --ml-opts '<json>' implies --ml and passes options to wrapConverter (kinds, add, remove...).
 // --ml wraps each conversion with the optional copista-2m detector (src/ml.js wrapConverter,
 // onnxruntime-node; ORT_NODE overrides its path), as the app does when the detector is on.
@@ -70,6 +72,7 @@ function parseArgs(argv) {
     const v = () => argv[++i];
     if (k === '--out') a.out = path.resolve(v());
     else if (k === '--only') a.only = v().split(',').map(s => s.trim()).filter(Boolean);
+    else if (k === '--shard') { const m = /^(\d+)\/(\d+)$/.exec(v() || ''); a.shard = m && [+m[1], +m[2]]; if (!a.shard || a.shard[0] < 1 || a.shard[0] > a.shard[1]) throw new Error('--shard takes k/n with 1 <= k <= n'); }
     else if (k === '--no-ocr') a.ocr = false;
     else if (k === '--jobs' || k === '-j') a.jobs = +v();
     else if (k === '--src') a.src = path.resolve(v());
@@ -612,13 +615,18 @@ async function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.child) return childMain(args.child);
   if (!args.out) throw new Error('--out <file.json> is required');
-  const items = listItems(args);
+  let items = listItems(args);
+  if (args.shard) {
+    const [k, n] = args.shard, keep = new Set(items.map(it => it.key).sort().filter((_, i) => i % n === k - 1));
+    items = items.filter(it => keep.has(it.key));
+  }
   if (!items.length) throw new Error('no corpus items with scan.pdf + truth.musicxml' + (args.only ? ' matching --only' : ''));
   // shared host: never more than OMR_MAX_JOBS (default 16) child processes, and while the
-  // machine is over 90% busy (load1 > 0.9 x CPUs) wait before starting heavy work
+  // machine is over 90% busy (load1 > 0.9 x CPUs) wait before starting heavy work (not in CI:
+  // the runner is ours alone, and the previous step's load would only delay this one)
   const CAP = Math.max(1, +(process.env.OMR_MAX_JOBS || 16));
   const jobs = Math.min(CAP, items.length, args.jobs > 0 ? args.jobs : CAP);
-  for (let w = 0; w < 30 && os.loadavg()[0] > 0.9 * os.cpus().length; w++) {
+  for (let w = 0; w < 30 && !process.env.CI && os.loadavg()[0] > 0.9 * os.cpus().length; w++) {
     if (w === 0) console.error(`eval: host over 90% busy (load ${os.loadavg()[0].toFixed(0)}), waiting up to 5 min before starting`);
     await new Promise((r) => setTimeout(r, 10000));
   }

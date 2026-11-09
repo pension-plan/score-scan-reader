@@ -28,19 +28,14 @@ jobs:
       - name: Score against the test corpus (no OCR)
         run: npm test
       # Regression gates against the last release (ship first, then test): the benchmark read with
-      # OCR as the page reads (eng+deu and the second pass, each side with its own OCR models) and
-      # the challenge set without OCR. Either fails the job on a regression (aggregate, any item,
-      # crashes, or notation elements no longer written); both reports go to the job summary.
+      # OCR as the page reads (eng+deu and the second pass, each side with its own OCR models) here,
+      # the challenge set without OCR in the challenge-gate jobs below. Either fails on a regression
+      # (aggregate, any item, crashes, or notation elements no longer written); the reports go to
+      # the job summary.
       - name: Regression gate - benchmark with OCR
         run: |
           s=0; node tools/regress.mjs --ocr --jobs 4 --out mvp/work/regress-ci-ocr.md || s=$?
           [ -f mvp/work/regress-ci-ocr.md ] && cat mvp/work/regress-ci-ocr.md >> "$GITHUB_STEP_SUMMARY"
-          exit $s
-      - name: Regression gate - challenge set
-        if: ${{ !cancelled() }}
-        run: |
-          s=0; node tools/regress.mjs --set challenge --jobs 4 --out mvp/work/regress-ci-challenge.md || s=$?
-          [ -f mvp/work/regress-ci-challenge.md ] && cat mvp/work/regress-ci-challenge.md >> "$GITHUB_STEP_SUMMARY"
           exit $s
       - name: Browser test (Chromium)
         run: |
@@ -54,3 +49,68 @@ jobs:
             mvp/dist/
             mvp/work/eval-ci.json
             mvp/work/regress-ci-*.md
+
+  # The challenge set without OCR, split into shards that run beside build-and-test. Its scan-damage
+  # PDFs (corpus/challenge/degradation, ~300 MB) are not in git: they are rebuilt here (cached on
+  # the generator sources), and both sides of the check read them from this checkout.
+  challenge-gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0   # release tags, for the regression check
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Install system tools (pdftoppm, xmllint)
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils libxml2-utils
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Restore the damaged scans
+        id: scans
+        uses: actions/cache/restore@v6
+        with:
+          path: corpus/challenge/degradation/**/*.pdf
+          key: challenge-degradation-${{ runner.os }}-${{ hashFiles('corpus/challenge/degradation/_tools/**', 'corpus/challenge/degradation/_pieces/_facing/facing.ly') }}
+      - name: Rebuild the damaged scans
+        if: steps.scans.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get install -y --no-install-recommends lilypond fonts-texgyre img2pdf
+          python3 -m venv "$RUNNER_TEMP/deg"
+          "$RUNNER_TEMP/deg/bin/pip" install --quiet -r corpus/challenge/degradation/_tools/requirements.txt
+          "$RUNNER_TEMP/deg/bin/python" corpus/challenge/degradation/_tools/run.py
+      - name: Save the damaged scans
+        if: steps.scans.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        continue-on-error: true   # another shard may have saved the same key first
+        with:
+          path: corpus/challenge/degradation/**/*.pdf
+          key: ${{ steps.scans.outputs.cache-primary-key }}
+      - name: Check every damaged scan is present
+        run: |
+          node -e '
+            const fs = require("fs"), dir = "corpus/challenge/degradation";
+            const missing = [];
+            for (const id of fs.readdirSync(dir)) {
+              const meta = `${dir}/${id}/meta.json`;
+              if (!fs.existsSync(meta)) continue;
+              for (const f of Object.keys(JSON.parse(fs.readFileSync(meta, "utf8")).degradations || {}))
+                if (!fs.existsSync(`${dir}/${id}/${f}`)) missing.push(`${id}/${f}`);
+            }
+            if (missing.length) { console.error("missing:", missing.join(" ")); process.exit(1); }'
+      - name: Regression gate - challenge set (shard ${{ matrix.shard }}/3)
+        run: |
+          out=mvp/work/regress-ci-challenge-${{ matrix.shard }}.md
+          s=0; node tools/regress.mjs --set challenge --shard ${{ matrix.shard }}/3 --jobs 4 --out $out || s=$?
+          [ -f $out ] && cat $out >> "$GITHUB_STEP_SUMMARY"
+          exit $s
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: score-scan-reader-ci-challenge-${{ matrix.shard }}
+          path: mvp/work/regress-ci-challenge-${{ matrix.shard }}.md

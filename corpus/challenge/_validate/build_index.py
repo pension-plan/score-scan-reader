@@ -225,6 +225,9 @@ def main():
     w('.venv/bin/python corpus/challenge/_validate/build_index.py')
     w('```\n')
     w('Each generator only writes inside its own category folder. Rebuilding is deterministic (fixed seeds).\n')
+    w('The degradation PDFs are not in git (`.gitignore`); CI rebuilds them with `degradation/_tools/run.py` (cached on its '
+      'sources) so the challenge gate scores all items. `layout/organ-chorale-3-staves-landscape` is restricted and is '
+      'not in CI.\n')
 
     w('## Evaluation\n')
     w('```sh\ncd /Users/d.sloane/music/mvp')
