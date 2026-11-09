@@ -115,6 +115,43 @@ function accidentalBefore(h, chords, L, R) {
     h.p >= Math.min(...d.heads.map(o => o.p)) - 1 && h.p <= Math.max(...d.heads.map(o => o.p)) + 1);
 }
 
+// A stem that a thin photocopy left as a column of loose dots: the stem search (heads.js chordStems,
+// on the staff-removed lenient binary) loses it, as line removal takes the dots on the staff lines and
+// the gaps between the rest run longer than it bridges. A chord of filled heads found without a stem
+// gets one here when a column beside it (right going up, left going down) has ink on most of its rows
+// off the staff lines over 0.6-3 spaces from the head, and the columns half a space either side of it
+// have next to none (speckle and lettering inked both).
+function dottedStem(c, B, staves, lt) {
+  if (c.up || c.down || c.accidental || !c.heads.every(h => h.kind === 'filled' && !h.small)) return;
+  const { width: w, height: H, data } = B, sp = c.heads[0].sp, st = staves[c.staff];
+  const top = c.heads[0], bot = c.heads[c.heads.length - 1];
+  const onLine = (x, y) => { for (let k = 0; k < 5; k++) if (Math.abs(y - st.yAt(k, x)) <= lt / 2 + 1.5) return true; return false; };
+  const ink = (x, y) => x >= 0 && x < w && y >= 0 && y < H && data[y * w + x];
+  let best = null;
+  for (const dir of [1, -1]) {
+    const h = dir === 1 ? top : bot, xs = c.xs;
+    const xa = dir === 1 ? Math.max(...xs) + 0.2 * sp : Math.min(...xs) - 0.85 * sp, xb = dir === 1 ? Math.max(...xs) + 0.85 * sp : Math.min(...xs) - 0.2 * sp;
+    for (let x = Math.round(xa); x <= Math.round(xb); x++) {
+      let n = 0, on = 0, off = 0, far = 0;
+      for (let d = Math.round(0.6 * sp); d <= Math.round(3.0 * sp); d++) {
+        const y = Math.round(h.y - dir * d);
+        if (y < 0 || y >= H || onLine(x, y)) continue;
+        n++;
+        if (ink(x, y) || ink(x + 1, y)) { on++; far = d; }
+        if (ink(x - Math.round(0.5 * sp), y) || ink(x + Math.round(0.5 * sp), y)) off++;
+      }
+      if (n < 0.8 * sp) continue;
+      const f = on / n, g = off / n;
+      if (f >= 0.4 && g <= 0.15 && (!best || f > best.f)) best = { f, dir, x, far };
+    }
+  }
+  if (!best) return;
+  const len = best.far / sp + 0.5;
+  if (best.dir === 1) { c.up = len; c.upX = best.x; c.upEnd = Math.round(top.y - best.far); }
+  else { c.down = len; c.downX = best.x; c.downEnd = Math.round(bot.y + best.far); }
+  for (const hd of c.heads) { hd.stemDir = best.dir; hd.stem = { dir: best.dir, upX: c.upX, downX: c.downX, up: c.up, down: c.down }; }
+}
+
 // The line that opens a system (and a bracket's spine) runs down the staff's
 // left edge.  A clef printed against it fuses with it into one tall component
 // that no longer reads as a clef, so it is erased from R (barlines and heads
@@ -337,6 +374,15 @@ function* frontSteps(gray0, opts = {}) {
       if (ctx.staves.length && (q !== 0 || !tries[i + 1] || tries[i + 1][0] !== 0)) break;
     }
   }
+  // a page that found only one or two staves where a thin copy's dotted lines hid the rest (a later
+  // page of a piece the first page read in bridge mode): the fallback binarizations are tried too,
+  // and one that finds at least twice as many staves is read instead
+  if (ctx.staves.length && ctx.staves.length <= 2 && !opts.mode && estimateSkew(ctx.B).confidence >= 1.5) {
+    for (const m of MODES.slice(1)) {
+      const c = prepare(gray0, m);
+      if (!(m.bridge && c.sp.ss < 6) && plausible(c) && c.staves.length >= Math.max(3, 2 * ctx.staves.length)) { ctx = c; break; }
+    }
+  }
   // staff lines broken into dashes (thin copies of halftoned or low-resolution pages): the
   // fallback finder (staves.js detectDashedStaves), only when no staff was found at all
   if (!ctx.staves.length && opts.dashed !== false) {
@@ -447,6 +493,10 @@ function* frontSteps(gray0, opts = {}) {
   // (cue-size heads clear of the full heads that passed the ledger test, out of the staff too)
   hs = hs.filter(h => !h.small || !hs.some(o => !o.small && o.staff === h.staff && Math.abs(o.p - h.p) <= 8 && Math.abs(o.x - h.x) < 1.2 * h.sp));
   const chords = chordStems(L, hs, { minLen: 1.5, sides: true, stemGap: ctx.mode === 'bridge' ? 0.9 : 0.4 });
+  for (const c of chords) dottedStem(c, B, staves, sp.lt);
+  // filled heads still without a stem are left out, and kept aside (spare): score.js takes one into a
+  // bar whose rhythm is short of exactly it (spareFill)
+  const spare = hs.filter(h => h.stemDir === 0 && h.kind !== 'hollow' && !h.small && !staves[h.staff].inferred && !(h.chord && h.chord.accidental));
   // (on a staff inferred from washed-out music the stems faded with the lines: filled heads stay)
   hs = hs.filter(h => (h.stemDir !== 0 || h.kind === 'hollow' || staves[h.staff].inferred) && !(h.chord && h.chord.accidental));
   // cue-size heads (heads.js h.small) only with a stem of their own: a dot, a letter or a stray blob has none
@@ -469,7 +519,7 @@ function* frontSteps(gray0, opts = {}) {
   hs = hs.filter(h => h.xHead || !atStemTip(h, hs, L, ltL));
   hs = hs.filter(h => !accidentalBefore(h, chords, L, R));
   const barlines = detectBarlines(R, staves, hs, sp.ss);
-  return { gray, B, R, L, scale, skew, ss: sp.ss, lt: sp.lt, staves, systems, heads: hs, chords, beams, barlines, warnings, stacked: stacked || [],
+  return { gray, B, R, L, scale, skew, ss: sp.ss, lt: sp.lt, staves, systems, heads: hs, chords, spare, beams, barlines, warnings, stacked: stacked || [],
     orientation: (quarter % 4) * 90, mode: ctx.mode };
 }
 

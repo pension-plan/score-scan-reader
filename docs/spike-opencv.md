@@ -79,6 +79,40 @@ stays, and at σ = space / 5 … / 3 it takes the faint staff lines with it; the
 front() falls back to the plain page (2 of 6 staves). Not shipped. It would need a screen-frequency notch (the screen
 is a regular diagonal grid) that leaves the horizontal staff lines alone, not a low-pass: since shipped (L39, above).
 
+## Update: missing notes on damaged scans (faded heads, dotted stems, lost staves)
+
+Before building the gray-level head scan this section's predecessor asked for, the missing notes were traced
+(wp.py, challenge, no OCR: 2,433 missing, 1,446 extra). They are mostly not dissolved heads:
+- `twinkle-piano2p-photocopy-thin` severe (152 missing): page 2 found 1 staff of 6. Page 1 fails over to bridge mode
+  (no staff found), page 2 found one staff in the default mode, so the fallbacks never ran; bridge finds all six.
+  The cache pages are binary (five grey levels), so gray-level evidence has nothing more to read there.
+- `variations-piano-12-pages` severe (375): the heads are mostly found, then dropped by the stem test (a filled head
+  needs a stem: speckle and letters read as heads too). Keeping every stemless head: −300 missing, +711 extras.
+- thin photocopies (`andantino-piano-photocopy-thin` severe): stems survive as a column of loose dots; line removal
+  takes the dots on the lines and the gaps between the rest run past what the stem search bridges.
+
+Shipped (front.js, assemble.js, score.js):
+1. A page that found only one or two staves tries the fallback binarisations too and reads one that finds at least
+   twice as many (and three or more). Pages with 1–2 staves pay the extra modes (challenge runtime +1 %).
+2. `dottedStem`: a stemless chord of filled heads gets a stem when a column beside it (right going up, left going
+   down) has ink on ≥ 40 % of its rows off the staff lines 0.6–3 spaces from the head, and the columns half a space
+   either side have ≤ 15 %. (0.3 / 0.1 and 0.5 / 0.15 measured worse.)
+3. Rhythm budget (`spareFill`, score.js): heads still without a stem are kept aside (fr.spare); a chordal voice short
+   of its bar takes exactly one lone spare head (or exactly one pair, equal values) whose value makes up the time
+   missing and whose onset matches another voice that fills the bar, at its x. Spare "chords" of two heads are left
+   out: they were mostly a head and the flag of its lost stem (with them: −32 missing / +21 extras instead of −7 / −1).
+
+Challenge (no OCR), wp.py: missing 2,433 → 2,287, extras 1,446 → 1,465; mean aggregate 0.8466 → 0.8472
+(`twinkle-piano2p-photocopy-thin` severe +0.133, missing 152 → 82; `hymn-descant` severe +0.040; `andantino` thin
+severe +0.013; `variations` severe +0.007, missing 375 → 345; worst `agrace-satb-blur` scan −0.003, +4 extras).
+Coverage (no OCR): severe missing 2,713 → 2,681, extras 1,516 → 1,526; mean aggregate +0.0001, worst item −0.0095
+(`perf-piano-a4-150dpi` severe). regress.mjs: benchmark (OCR) 0.960 → 0.960, challenge 0.847 → 0.848, no regression.
+
+Still open: hollow heads whose thin outline is gone on thin photocopies (only the two thick crescents remain), heads
+dissolved to a few dots, `twinkle-piano2p-spread` severe (9 of 12 staves found on the two-up page), and the
+`variations` severe staff whose start bends at a barline (page 3: the staff tracked from x = 595, its first bar lost).
+The gray-level template scan was not built: on the binary-looking thin copies it has nothing to add over the binary.
+
 ## Not shipped: head template scan on degraded staves (time-boxed, one round)
 
 For heads the blob finder misses on degraded pages (faded heads broken into speckle, hollow heads whose thin outline

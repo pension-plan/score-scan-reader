@@ -1,7 +1,7 @@
 'use strict';
 // Page assemblies -> parts (closed-score split / grand staff / single), time
 // signature inference, per-measure rhythm repair, lyrics alignment, MusicXML.
-const { staffMeasureEvents, pitchOf, keyAlters, DIV } = require('./assemble');
+const { staffMeasureEvents, pitchOf, keyAlters, DIV, attrsAt, _headAccidental: headAccidental } = require('./assemble');
 const { detectRests, mergeRests, restBars } = require('./rests');
 const { readMeters, plausibleMeter } = require('./meter');
 const { readStructure } = require('./structure');
@@ -789,6 +789,41 @@ function restsFor(q) {
   return out;
 }
 
+// A voice short of its bar: stemless filled heads found in the bar (front.js spare: kept out of the
+// notes, as stray blobs read as heads too) fill it when exactly one of them, or exactly one pair of
+// them with equal values, makes up the time missing, each at the onset another voice that fills the
+// bar has at its x. Lone heads only: two stemless "heads" in one column are mostly a head and the
+// flag of its lost stem. Returns the new events, or evs itself when nothing fits.
+function spareFill(st, evs, diff, m, seg, anchors, sp) {
+  const s = m.sy.staves[st.staff];
+  const spare = s && s.spare ? s.spare.filter(h => h.x > seg.xa + 0.5 * sp && h.x < seg.xb - 0.5 * sp) : [];
+  if (!spare.length || evs.some(e => e.forward)) return evs;
+  const lone = spare.filter(h => !spare.some(o => o !== h && Math.abs(o.x - h.x) < 0.6 * sp)).sort((a, b) => a.x - b.x);
+  const onsetAt = (list, x) => { let t = 0; for (const e of list) { if (e.x != null && e.x >= x) break; t += e.q; } return t; };
+  const ok = (list, h) => { const t = onsetAt(list, h.x); return anchors.some(a => Math.abs(a.x - h.x) <= 0.8 * sp && Math.abs(a.t - t) < 1e-6); };
+  const ins = (list, e) => { const o = list.slice(); let k = o.findIndex(x => x.x != null && x.x > e.x); if (k < 0) k = o.length; o.splice(k, 0, e); return o; };
+  const note = (h, q) => {
+    const a = attrsAt(s, h.x);
+    if (a.clef !== s.hdr.clef) h.clef = a.clef;
+    if (a.fifths !== s.hdr.fifths) h.fifths = a.fifths;
+    h.dur = { q, dots: (qToType(q) || { dots: 0 }).dots };
+    try { h.acc = headAccidental(m.sy.fr.R, m.sy.comps || [], h, s.hdr ? s.hdr.end : -Infinity, 1.9); } catch (e) { h.acc = null; }
+    return { x: h.x, heads: [h], q, dots: h.dur.dots };
+  };
+  if (qToType(diff)) {
+    const fit = lone.filter(h => ok(evs, h));
+    if (fit.length === 1) return ins(evs, note(fit[0], diff));
+  }
+  if (qToType(diff / 2) && lone.length >= 2) {
+    const pairs = [];
+    for (let a = 0; a < lone.length; a++) for (let b = a + 1; b < lone.length; b++) {
+      if (ok(evs, lone[a]) && ok(ins(evs, { x: lone[a].x, q: diff / 2 }), lone[b])) pairs.push([lone[a], lone[b]]);
+    }
+    if (pairs.length === 1) return pairs[0].reduce((out, h) => ins(out, note(h, diff / 2)), evs);
+  }
+  return evs;
+}
+
 function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   const warnings = [];
   // time signatures on every system, after barlines and at system ends (meter.js; once per page)
@@ -1378,7 +1413,10 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
       let evs = st.events;
       if (sums[i] <= 1e-6 && parts[st.pi].streams[st.k].optional) evs = [];
       else if (sums[i] <= 1e-6) evs = [{ rest: true, q: target, dots: 0, whole: true }];
-      else if (Math.abs(sums[i] - target) > 1e-6) {
+      // (a short voice first takes the stemless heads its bar holds, when they fill it exactly)
+      else if (sums[i] < target - 1e-6 && !u.split && m.segs.length === 1 && parts[st.pi].streams[st.k].voice === 'chordal' &&
+        (evs = spareFill(st, evs, target - sums[i], m, segs[m.segs[0]], anchors.filter(a => a.i !== i), sp)) !== st.events) sums[i] = target;
+      if (sums[i] > 1e-6 && Math.abs(sums[i] - target) > 1e-6) {
         const r = repairStream(evs, target, anchors.filter(a => a.i !== i), sp);
         evs = r.events;
         if (r.ok) repaired++; else mismatch++;

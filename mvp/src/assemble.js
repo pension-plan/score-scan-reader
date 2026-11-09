@@ -1541,7 +1541,9 @@ function assemblePage(fr, pageIndex = 0) {
         c.heads.push(Object.assign({}, h, { stemDir: ref.stemDir, stem: ref.stem }));
         c.heads.sort((p, q) => p.y - q.y);
       }
-      const s = { st, si, chords: music, hdr };
+      // stemless filled heads (front.js spare): notes only where a bar's rhythm is short of them (score.js)
+      const spare = (fr.spare || []).filter(h => h.staff === si && h.x > hdr.end + 0.5 * st.space && !chords.some(c => Math.abs(c.x - h.x) < 0.8 * h.sp));
+      const s = { st, si, chords: music, hdr, spare };
       // durations read once here: tuplets rescale whole groups
       const spS = st.space || fr.ss;
       // dot-sized round blobs near this staff
