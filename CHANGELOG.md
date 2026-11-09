@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.44.2](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.44.1...score-scan-reader-v0.44.2) (2026-11-09)
+
+
+### Reverts
+
+* **marks:** split-staff marks back to both parts (4eb8c7c lost matched marks) ([d5e50da](https://github.com/pension-plan/score-scan-reader/commit/d5e50da8cd38a62c84722f04b96f83cdfadb4bd3))
+
 ## [0.44.1](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.44.0...score-scan-reader-v0.44.1) (2026-11-08)
 
 
