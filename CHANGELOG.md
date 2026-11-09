@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.47.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.46.0...score-scan-reader-v0.47.0) (2026-11-09)
+
+
+### Features
+
+* **staves:** faded staff ends join their staff; spreads whose staves run into the gutter split ([b60737b](https://github.com/pension-plan/score-scan-reader/commit/b60737b0342ea8d5332e885c27ebd7b42c4d8a4c))
+
 ## [0.46.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.45.0...score-scan-reader-v0.46.0) (2026-11-09)
 
 
