@@ -503,6 +503,7 @@ function readHeaders(fr, asm, opts = {}, stats = {}) {
 //   flatten    stained, yellowed or heavily damaged paper: divide by a background estimated with
 //              a large grey closing (gain capped, so a dark surround is not turned into texture)
 //   descreen   halftone screens: Gaussian low-pass before thresholding
+//   notch      coarse screens near the staff space: the screen's spectral peaks removed (FFT)
 //   thin       thick photocopies (strokes fattened, heads filled in): grow the paper by 1-3 px,
 //              until the staff lines are about a tenth of a space thick
 //   close      thin photocopies whose strokes fell apart into loose dots: grow the ink by 1 px
@@ -565,6 +566,10 @@ function precleanPlan(q, force) {
     return ops;
   }
   if (q.speck > 25000 && q.bgStd > 4) return ['descreen'];
+  // a coarse screen (its dots merged into texture, so few specks): grainy paper all over and
+  // nearly every ink pixel mid-grey; its period is close to the staff space, so it is notched
+  // out of the spectrum rather than blurred (the flatten below still applies)
+  if (q.bgStd > 19 && q.midShare > 0.93 && q.mid > 0.2) ops.push('notch');
   // stained / yellowed paper, heavy combined damage (not phone shots: the binariser handles their
   // shading better, and flattening their dark surround adds texture)
   // (severe phone shots too: dark, uneven, grainy paper; milder ones read better as they are)
@@ -659,6 +664,108 @@ function bilinearUp(src, W, H, w, h) {
   return out;
 }
 
+// ---- screen notch (coarse halftone screens whose period is close to the staff space, where a
+// low-pass strong enough to clear the screen also clears the staff lines): the screen is a regular
+// grid, so its spectrum is a few sharp peaks off the axes, while staff lines, stems and barlines
+// sit on the axes. The peaks are found in the page's mean spectrum (256 px tiles) and zeroed in
+// every tile (half-overlapping tiles, Hann-weighted overlap-add); everything else passes.
+const NT = 256;
+// in-place radix-2 FFT of n = re.length points (inverse: conjugate in, conjugate out, / n)
+function fft(re, im, inv) {
+  const n = re.length;
+  for (let i = 1, j = 0; i < n; i++) {
+    let b = n >> 1; for (; j & b; b >>= 1) j ^= b; j ^= b;
+    if (i < j) { let t = re[i]; re[i] = re[j]; re[j] = t; t = im[i]; im[i] = im[j]; im[j] = t; }
+  }
+  for (let len = 2; len <= n; len <<= 1) {
+    const a = (inv ? 2 : -2) * Math.PI / len, wr = Math.cos(a), wi = Math.sin(a), h = len >> 1;
+    for (let i = 0; i < n; i += len) {
+      let cr = 1, ci = 0;
+      for (let k = 0; k < h; k++) {
+        const p = i + k, q = p + h, tr = re[q] * cr - im[q] * ci, ti = re[q] * ci + im[q] * cr;
+        re[q] = re[p] - tr; im[q] = im[p] - ti; re[p] += tr; im[p] += ti;
+        const t = cr * wr - ci * wi; ci = cr * wi + ci * wr; cr = t;
+      }
+    }
+  }
+  if (inv) for (let i = 0; i < n; i++) { re[i] /= n; im[i] /= n; }
+}
+// 2-D FFT of an NT x NT tile (rows, then columns)
+function fft2(re, im, inv) {
+  const r = new Float64Array(NT), c = new Float64Array(NT);
+  for (let y = 0; y < NT; y++) {
+    const o = y * NT; for (let x = 0; x < NT; x++) { r[x] = re[o + x]; c[x] = im[o + x]; }
+    fft(r, c, inv); for (let x = 0; x < NT; x++) { re[o + x] = r[x]; im[o + x] = c[x]; }
+  }
+  for (let x = 0; x < NT; x++) {
+    for (let y = 0; y < NT; y++) { r[y] = re[y * NT + x]; c[y] = im[y * NT + x]; }
+    fft(r, c, inv); for (let y = 0; y < NT; y++) { re[y * NT + x] = r[y]; im[y * NT + x] = c[y]; }
+  }
+}
+const hann = Float64Array.from({ length: NT }, (_, i) => 0.5 - 0.5 * Math.cos((2 * Math.PI * (i + 0.5)) / NT));
+// the notch mask (1 pass, 0 stop): bins of the mean log spectrum more than e^1.4 (4x) above
+// their 9 x 9 neighbourhood, off the axes (|f| > 3 bins both ways: lines up to ~1° off level)
+// and outside the low frequencies (radius 8: the glyphs), grown by a bin; null when no screen
+function notchMask(d, w, h) {
+  const acc = new Float64Array(NT * NT), re = new Float64Array(NT * NT), im = new Float64Array(NT * NT);
+  let n = 0;
+  for (let y0 = 0; y0 + NT <= h; y0 += NT) for (let x0 = 0; x0 + NT <= w; x0 += NT) {
+    let m = 0; for (let y = 0; y < NT; y++) for (let x = 0; x < NT; x++) m += d[(y0 + y) * w + x0 + x];
+    m /= NT * NT;
+    for (let y = 0; y < NT; y++) for (let x = 0; x < NT; x++) { re[y * NT + x] = (d[(y0 + y) * w + x0 + x] - m) * hann[y] * hann[x]; im[y * NT + x] = 0; }
+    fft2(re, im, false);
+    for (let i = 0; i < acc.length; i++) acc[i] += Math.hypot(re[i], im[i]);
+    n++;
+  }
+  if (!n) return null;
+  const L = acc.map(v => Math.log(v / n + 1e-6)), bg = new Float64Array(NT * NT), R = 4, M = NT - 1;
+  for (let y = 0; y < NT; y++) for (let x = 0; x < NT; x++) {
+    let s = 0; for (let dy = -R; dy <= R; dy++) for (let dx = -R; dx <= R; dx++) s += L[((y + dy) & M) * NT + ((x + dx) & M)];
+    bg[y * NT + x] = s / ((2 * R + 1) ** 2);
+  }
+  const f = (i) => (i < NT / 2 ? i : i - NT), peak = new Uint8Array(NT * NT);
+  let cnt = 0;
+  for (let y = 0; y < NT; y++) for (let x = 0; x < NT; x++) {
+    const fy = f(y), fx = f(x);
+    if (Math.abs(fx) > 3 && Math.abs(fy) > 3 && fx * fx + fy * fy > 64 && L[y * NT + x] - bg[y * NT + x] > 1.4) { peak[y * NT + x] = 1; cnt++; }
+  }
+  if (!cnt) return null;
+  const mask = new Float64Array(NT * NT).fill(1);
+  for (let y = 0; y < NT; y++) for (let x = 0; x < NT; x++) if (peak[y * NT + x]) for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) mask[((y + dy) & M) * NT + ((x + dx) & M)] = 0;
+  return mask;
+}
+// the page with the mask applied: tiles every NT/2 px over the reflected page; two real tiles
+// go through one complex FFT (the mask is real and symmetric, so they come back apart)
+function notchFilter(d, w, h, mask) {
+  const st = NT / 2, out = new Float32Array(w * h), wt = new Float32Array(w * h);
+  const re = new Float64Array(NT * NT), im = new Float64Array(NT * NT);
+  const tiles = [];
+  for (let y0 = -st; y0 < h; y0 += st) for (let x0 = -st; x0 < w; x0 += st) tiles.push([x0, y0]);
+  const load = (t, buf) => {
+    const [x0, y0] = t; let m = 0;
+    for (let y = 0; y < NT; y++) { const yy = reflect(y0 + y, h) * w; for (let x = 0; x < NT; x++) { const v = d[yy + reflect(x0 + x, w)]; buf[y * NT + x] = v; m += v; } }
+    m /= NT * NT; for (let i = 0; i < buf.length; i++) buf[i] -= m;
+    return m;
+  };
+  const add = (t, buf, m) => {
+    const [x0, y0] = t;
+    for (let y = Math.max(0, -y0); y < NT && y0 + y < h; y++) for (let x = Math.max(0, -x0); x < NT && x0 + x < w; x++) {
+      const k = hann[y] * hann[x], i = (y0 + y) * w + x0 + x;
+      out[i] += (buf[y * NT + x] + m) * k; wt[i] += k;
+    }
+  };
+  for (let t = 0; t < tiles.length; t += 2) {
+    const ma = load(tiles[t], re), mb = tiles[t + 1] ? load(tiles[t + 1], im) : (im.fill(0), 0);
+    fft2(re, im, false);
+    for (let i = 0; i < mask.length; i++) { re[i] *= mask[i]; im[i] *= mask[i]; }
+    fft2(re, im, true);
+    add(tiles[t], re, ma); if (tiles[t + 1]) add(tiles[t + 1], im, mb);
+  }
+  const o = new Uint8Array(w * h);
+  for (let i = 0; i < o.length; i++) o[i] = clamp8(wt[i] > 0 ? out[i] / wt[i] : d[i]);
+  return o;
+}
+
 function applyOpsJs(gray, ops, q) {
   const { width: w, height: h } = gray;
   let d = gray.data;
@@ -681,6 +788,9 @@ function applyOpsJs(gray, ops, q) {
       const b = gaussBlur(d, w, h, Math.max(1, ss / 14)), o = new Uint8Array(w * h);
       for (let i = 0; i < o.length; i++) o[i] = clamp8(b[i]);
       d = o;
+    } else if (op === 'notch') {
+      const mask = notchMask(d, w, h);
+      if (mask) d = notchFilter(d, w, h, mask);
     } else if (op === 'thin') {
       const n = Math.max(1, Math.min(3, Math.round((q.lt - 0.11 * ss) / 2)));
       for (let i = 0; i < n; i++) d = morph1(morph1(d, w, h, 1, 1, true, true), w, h, 1, 1, false, true);

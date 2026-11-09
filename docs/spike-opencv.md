@@ -2,6 +2,34 @@
 
 Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
 
+## Update: coarse halftone screens notched out of the spectrum (L39)
+
+`lyr04-veni-latin-italic-en` severe (upside down under a coarse diagonal screen) now gets a screen notch before
+binarisation (`cv.js` `notch`, plain JS). The screen is a regular grid of period about 10 px at 200 dpi, close to the
+staff space (13.7 px), which is why no Gaussian strength separated the two (above). In the page's mean magnitude
+spectrum (256 px tiles, Hann-windowed) it shows as sharp peaks off the axes (the strongest at (±16, ∓50) and
+(±50, ±16) cycles per tile, with their combinations); staff lines, stems and barlines sit on the axes. A bin is
+notched when its log magnitude is more than 1.4 (×4) above its 9 × 9 neighbourhood, more than 3 bins off both axes
+(lines up to about 1° off level stay) and outside radius 8 (the glyphs); the notches are grown by a bin. Every
+256 px tile (half overlapping, reflected at the edges) is filtered with that mask and the tiles are put back with
+Hann weights. A small radix-2 FFT does the work, two real tiles per complex transform. The `flatten` the page already
+had still runs after it. Gate: the trigger from the round above (`bgStd > 19 && midShare > 0.93 && mid > 0.2`,
+this page alone); every other page keeps its plan.
+
+Result: the screen goes, leaving fine grain the binariser ignores, and the binary is clean. The existing turn test
+now turns the page (title below, nothing above; the clefs read clearly better turned). Score 0.384 → **0.452**
+(pitch 0.24 → 0.37, duration 0.06 → 0.20, rests 0 → 0.40), runtime 15.3 s → 3.3 s (the plain page went through every
+fail-over mode; the notch itself costs about 1.2 s on a 3.7 MP page). Challenge aggregate 0.787 → 0.788 (no OCR);
+every other challenge and benchmark MusicXML is byte-identical (111 + 14 outputs compared, 1 differs: this item).
+
+Still 2 of 6 staves. The rest are not hidden by the screen: their lines are missing from the scan itself
+(a thin line printed through a screen of nearly the same period drops out where it falls between the dots). Row
+profiles after the notch: staff 1 keeps lines 1, 4 and 5 (2 and 3 are 5–10 grey levels below the paper), staves 4
+and 6 keep four consecutive lines (the fifth a 4-level trace), staff 5 keeps lines 1 and 5. The five-line pattern
+search (`staves.js fivePatterns`) and the extent walk (four of five lines) cannot place them, and the clef-based
+inference (`staffinfer.js`) does not either (the clefs are joined to the surviving lines). Next step, a separate
+limit: a staff finder for 3–4 of 5 lines at the page's known space, on notched pages only.
+
 ## Not shipped: surplus notes on severe scans (time-boxed, one round)
 
 Severe challenge outputs carry 1,074 extra notes (wp.py). Looking at the largest items: `lyr04-veni` severe is a page
@@ -30,7 +58,7 @@ Then tried (one round): a descreen trigger for this coarser screen. Its page-qua
 the challenge pages. But the Gaussian low-pass does not rescue it: at the usual strength (σ = space / 14) the screen
 stays, and at σ = space / 5 … / 3 it takes the faint staff lines with it; the descreened page finds no staff, and
 front() falls back to the plain page (2 of 6 staves). Not shipped. It would need a screen-frequency notch (the screen
-is a regular diagonal grid) that leaves the horizontal staff lines alone, not a low-pass.
+is a regular diagonal grid) that leaves the horizontal staff lines alone, not a low-pass: since shipped (L39, above).
 
 ## Not shipped: head template scan on degraded staves (time-boxed, one round)
 

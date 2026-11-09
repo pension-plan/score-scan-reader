@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 11:10 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 11:41 AEDT.
 
 ## Events
 
@@ -197,6 +197,8 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 10:41 | voices 8001ad9: hairpin recall doubled; release 0.44.0 merged (all green). voices last item: split-staff hairpin duplicate. |
 | 11:10 | textsym 26a81c6: circled M/W/F rehearsal letters (23 to 26 of 26), chord roots rejoined (mk06 clean 59 to 61/61); L36 gate clean; textsym queue done. voices 4eb8c7c turned CI red (dynamics 168 to 122 challenge, 33 to 27 benchmark; wedge, metronome down) — not released; voices proving against truth or fixing forward. |
 | 11:10 | voices 4eb8c7c accepted with evidence (per-part deviation vs truth down on every mark type; CI's element-count drop = removed duplicates); release 0.44.1 merged as a recorded exception. All agent queues finished (opencv, structure, perf, textsym, voices). |
+| 11:41 | All earlier teammates stopped (queues finished). Three new Opus xhigh agents on the remaining larger projects: descreen (L39 notch filter), bardrift (bar-count drift on long scans), faded (gray-level head evidence with a per-bar rhythm budget on severe scans). |
+| 11:41 | voices reverted 4eb8c7c (d5e50da): matched dynamics vs truth fell 313 to 307 (challenge) and 18 to 14 (benchmark); my 0.44.1 acceptance was based on per-part deviation and was wrong. Release 0.44.2 merged (all green). Memory note corrected: 'proven' means matched counts vs truth do not fall. |
 
 ## Accuracy by round
 
