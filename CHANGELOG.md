@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.47.1](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.47.0...score-scan-reader-v0.47.1) (2026-11-09)
+
+
+### Bug Fixes
+
+* **score:** bar counts from the printed bar numbers, on by default ([2f84578](https://github.com/pension-plan/score-scan-reader/commit/2f845780c611cb3c8923f9296a1e2b05abe758ce))
+
 ## [0.47.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.46.0...score-scan-reader-v0.47.0) (2026-11-09)
 
 
