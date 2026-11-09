@@ -376,8 +376,9 @@ function* frontSteps(gray0, opts = {}) {
   }
   // a page that found only one or two staves where a thin copy's dotted lines hid the rest (a later
   // page of a piece the first page read in bridge mode): the fallback binarizations are tried too,
-  // and one that finds at least twice as many staves is read instead
-  if (ctx.staves.length && ctx.staves.length <= 2 && !opts.mode && estimateSkew(ctx.B).confidence >= 1.5) {
+  // and one that finds at least twice as many staves is read instead (not on a notched halftone page:
+  // partialStaves below completes its staves)
+  if (ctx.staves.length && ctx.staves.length <= 2 && !opts.mode && !(gray0.preclean && gray0.preclean.includes('notch')) && estimateSkew(ctx.B).confidence >= 1.5) {
     for (const m of MODES.slice(1)) {
       const c = prepare(gray0, m);
       if (!(m.bridge && c.sp.ss < 6) && plausible(c) && c.staves.length >= Math.max(3, 2 * ctx.staves.length)) { ctx = c; break; }
