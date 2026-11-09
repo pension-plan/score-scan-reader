@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.45.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.44.2...score-scan-reader-v0.45.0) (2026-11-09)
+
+
+### Features
+
+* **preclean:** notch coarse halftone screens out of the spectrum (L39) ([0db92eb](https://github.com/pension-plan/score-scan-reader/commit/0db92eb14d08749399f102a56298c6c0b5370a2c))
+* **staves:** staves from 3-4 of 5 lines on notched halftone pages (L39) ([55b193c](https://github.com/pension-plan/score-scan-reader/commit/55b193c56dba3c65cfc76398bab79d8f66d565f5))
+
 ## [0.44.2](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.44.1...score-scan-reader-v0.44.2) (2026-11-09)
 
 
