@@ -140,6 +140,23 @@ function detectStaves(bin, ss, lt, opts = {}) {
     });
     if (m) m.items.push(...t.items); else merged.push(t);
   }
+  // a stretch of staff whose lines fade (variations-12 severe p. 3: a bar of it) may be tracked over only a strip or
+  // two, too short to stand alone: those items join the staff they line up with (both outer lines
+  // within 0.4 space of the staff's nearest item, allowing for its slope)
+  for (const t of tracks) {
+    if (t.items.length >= minStrips) continue;
+    for (const m of merged) {
+      const its = m.items, a = its[0], b = its[its.length - 1];
+      const ref = t.items[t.items.length - 1].s < a.s ? a : t.items[0].s > b.s ? b : null;
+      if (!ref) continue;
+      const end = ref === a ? t.items[t.items.length - 1] : t.items[0], ds = Math.abs(end.s - ref.s);
+      const tol = 0.4 * ss + Math.abs(m.slope) * ds;
+      if (Math.abs(end.c.ys[0] - ref.c.ys[0]) < tol && Math.abs(end.c.ys[4] - ref.c.ys[4]) < tol) {
+        m.items.push(...t.items); m.items.sort((p, q) => p.s - q.s);
+        break;
+      }
+    }
+  }
   const staves = merged.map(t => buildStaff(t, strips, line, bin, w, h, ss, lt)).filter(Boolean);
   staves.sort((a, b) => a.yAt(2, w / 2) - b.yAt(2, w / 2));
   // drop overlapping / conflicting staves: two real staves never overlap

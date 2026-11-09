@@ -108,9 +108,22 @@ severe +0.013; `variations` severe +0.007, missing 375 → 345; worst `agrace-sa
 Coverage (no OCR): severe missing 2,713 → 2,681, extras 1,516 → 1,526; mean aggregate +0.0001, worst item −0.0095
 (`perf-piano-a4-150dpi` severe). regress.mjs: benchmark (OCR) 0.960 → 0.960, challenge 0.847 → 0.848, no regression.
 
-Still open: hollow heads whose thin outline is gone on thin photocopies (only the two thick crescents remain), heads
-dissolved to a few dots, `twinkle-piano2p-spread` severe (9 of 12 staves found on the two-up page), and the
-`variations` severe staff whose start bends at a barline (page 3: the staff tracked from x = 595, its first bar lost).
+Round 2 (staves): `variations` severe p. 3 was not a bend after all: the staff's lines are straight there but faded,
+so the left bar was tracked over only one or two strips, under the three a track needs, and dropped before the
+merge. Short tracks now join the staff they line up with (both outer lines within 0.4 space, allowing for its slope).
+`twinkle-piano2p-spread` severe was read as one page: the photographed spread's staves run on into the gutter's shadow
+on both sides (left pages' staves to x = 1965, a right page's from 1744), past the one-space overlap `spreadGutter`
+allowed; it now allows 8 % of the sheet, and each half finds its 6 staves (9 of 12 before). Challenge (no OCR):
+missing 2,289 → 2,246, extras 1,411 → 1,406 (`twinkle-piano2p-spread` severe +0.016, missing 139 → 111; `twinkle`
+thin severe +0.010; `variations` severe −8 missing; worst `song-one-system-poem-block` severe −0.001). Coverage:
+missing 5,801 → 5,752, extras +11; worst `perf-piano-letter-300dpi` severe −0.031, best `str05` severe +0.070.
+regress.mjs: benchmark (OCR) 0.960 → 0.960, challenge 0.848 → 0.848 (+0.001), no regression.
+
+Still open: hollow heads whose thin outline is gone on thin photocopies (only the two thick crescents of the outline
+survive: a head template scored on such a page matches speckle and accidental fragments as well, see the template-scan
+section below; a crescent-pair template anchored on a stem is the next thing to try), heads dissolved to a few dots
+(nothing left to read but the stem, where one survives; the rhythm budget above is the only safe way to accept
+those) and the rest of `twinkle-piano2p-spread` severe (111 missing on the curled pages).
 The gray-level template scan was not built: on the binary-looking thin copies it has nothing to add over the binary.
 
 ## Not shipped: head template scan on degraded staves (time-boxed, one round)

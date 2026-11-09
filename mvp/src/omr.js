@@ -100,8 +100,10 @@ function spreadGutter(fr) {
     const lr = Math.max(...L.map(s => s.right)), rl = Math.min(...R.map(s => s.left));
     // a left-page staff traced a little into the gutter's shadow (a skewed
     // photocopy of a spread) may overlap the right page's first staff by up
-    // to a staff space; the page widths below still have to fit
-    if (lr >= rl + fr.ss) continue;
+    // to a staff space; on a photographed spread both pages' staves can run
+    // on into the gutter's shadow, up to 8 % of the sheet; the page widths
+    // below still have to fit
+    if (lr >= rl + Math.max(fr.ss, 0.08 * W)) continue;
     const wl = lr - Math.min(...L.map(s => s.left)), wr = Math.max(...R.map(s => s.right)) - rl;
     if (wl < 0.6 * W && wr < 0.6 * W && Math.min(wl, wr) > 0.25 * W) return Math.round((lr + rl) / 2);
   }
