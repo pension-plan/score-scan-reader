@@ -2,6 +2,25 @@
 
 Date: 2026-11-08 (pre-clean update the same day). Scope: should OpenCV.js be added to the browser OMR app as a fallback for identifying music symbols where the classical reading (`mvp/src/*.js`) and the copista-2m ML pass are missing or weak? Everything below was measured on this machine (Linux, 192 cores, shared and heavily loaded: load average 115–170 during the runs) with the corpus as it stands on disk. Experiment code, data and logs are in `spike/opencv/`. The compact results are in `spike/opencv/results/`, and every number can be regenerated (see "Reproduce").
 
+## Update: staves from 3–4 of 5 lines on notched pages (L39, part 2)
+
+After the notch (below), `lyr04-veni` severe still read 2 of 6 staves: the screen had dropped staff lines from the
+print. `staffinfer.js partialStaves` now places the rest, on notched pages only (front.js, after the turn test, so the
+turned page is the one searched). From the staves already found it takes the space, slope and left / right ends,
+then projects the thin-line mask (`staves.js thinLineMask`) along that slope. A row counts as a line when it is inked
+over at least 40 % of that width. A 5-line grid at 0.97–1.03 × the found space is a staff when 3 or 4 of its lines
+count; the missing lines score by the faint trace they leave in the grey page (darker than the paper half a space
+either side), which decides which end of four consecutive lines is the staff's. A grid with only its two outer lines
+is taken only where the page's evenly spaced staves leave a gap of exactly two steps, at its middle. Grids within
+6 spaces of a staff are skipped. The staves are `lineStaff`s marked inferred, as the clef-inferred ones (the head
+filter's stem rule is relaxed on them; marking them uninferred measured 0.583 against 0.613).
+
+Result on the page (after the turn): 6 of 6 staves. Staff 1 from lines 1, 4 and 5; staves 4 and 6 from four lines
+plus the trace (the missing fifth line was below on one and above on the other, both matching the row profiles);
+staff 5 from its two outer lines in the gap. Score 0.452 → **0.613** (pitch 0.37 → 0.72, duration 0.20 → 0.49,
+rests 0.40 → 0.67; notes written 22 → 62 against 55). Cost about 0.25 s on the page. Challenge aggregate
+0.788 → 0.789 (no OCR); every other challenge and benchmark MusicXML byte-identical (110 + 14 compared).
+
 ## Update: coarse halftone screens notched out of the spectrum (L39)
 
 `lyr04-veni-latin-italic-en` severe (upside down under a coarse diagonal screen) now gets a screen notch before
@@ -27,8 +46,8 @@ Still 2 of 6 staves. The rest are not hidden by the screen: their lines are miss
 profiles after the notch: staff 1 keeps lines 1, 4 and 5 (2 and 3 are 5–10 grey levels below the paper), staves 4
 and 6 keep four consecutive lines (the fifth a 4-level trace), staff 5 keeps lines 1 and 5. The five-line pattern
 search (`staves.js fivePatterns`) and the extent walk (four of five lines) cannot place them, and the clef-based
-inference (`staffinfer.js`) does not either (the clefs are joined to the surviving lines). Next step, a separate
-limit: a staff finder for 3–4 of 5 lines at the page's known space, on notched pages only.
+inference (`staffinfer.js`) does not either (the clefs are joined to the surviving lines). Next step: a staff finder
+for 3–4 of 5 lines at the page's known space, on notched pages only (since shipped: part 2, above).
 
 ## Not shipped: surplus notes on severe scans (time-boxed, one round)
 

@@ -13,7 +13,7 @@ const { detectBarlines } = require('./barlines');
 const { rotateGray, makeGray } = require('./image');
 const { precleanPage, clefScore } = require('./cv');
 const { percClefOnPage, findXHeads } = require('./percussion');
-const { inferStaves, oneLineStaves, extendToMargins } = require('./staffinfer');
+const { inferStaves, oneLineStaves, extendToMargins, partialStaves } = require('./staffinfer');
 
 function resample(g, f) {
   const w = Math.max(1, Math.round(g.width * f)), h = Math.max(1, Math.round(g.height * f));
@@ -392,6 +392,16 @@ function* frontSteps(gray0, opts = {}) {
     }
   }
   if (quarter % 4) warnings.push(`Page was turned ${((quarter % 4) * 90)}\u00b0 to read it.`);
+  // a notched halftone page (cv.js) whose screen dropped staff lines: staves from 3-4 of 5 lines
+  if (opts.infer !== false && gray0.preclean && gray0.preclean.includes('notch')) {
+    const ps = partialStaves(B, gray, staves, sp.lt);
+    if (ps) {
+      staves = staves.concat(ps).sort((a, b) => a.yAt(2, a.left) - b.yAt(2, b.left));
+      staves.forEach((s, i) => { s.index = i; });
+      ctx.staves = staves;
+      R = removeStaffLines(B, staves, sp.lt).binary;
+    }
+  }
   const systems = groupSystems(B, staves, sp.ss, L0);
   eraseStartLines(R, staves, sp.ss);
   // the working page is settled here (deskewed, scaled, turned): a caller may start reading it

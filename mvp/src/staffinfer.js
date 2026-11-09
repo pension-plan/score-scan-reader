@@ -11,6 +11,7 @@
 // the page's longest one, or with a clef outside every staff.
 const { labelComponents } = require('./cc');
 const { clefBoxScores } = require('./cv');
+const { thinLineMask } = require('./staves');
 
 const G_TALL = 7.25, G_ABOVE = 1.78;
 
@@ -228,4 +229,78 @@ function oneLineStaves(B, staves, opts = {}) {
   return out;
 }
 
-module.exports = { inferStaves, oneLineStaves, extendToMargins };
+// Staves with lines missing (a thin line printed through a halftone screen of nearly its own
+// period drops out where it falls between the dots; cv.js notches the screen but cannot bring
+// the line back): placed from 3 or 4 of their 5 lines at the space of the staves already found.
+// A line counts when the thin-line mask (staves.js) inks at least `minCov` of the found staves'
+// width along the page's slope; a grid of 5 at the found space is kept with 3+ such lines, its
+// missing lines scored by the faint trace they leave in the grey page (which end of 4 consecutive
+// lines is the staff's). Only pages cv.js notched (front.js); null when nothing is added.
+function partialStaves(B, gray, staves, lt, opts = {}) {
+  if (!staves.length) return null;
+  const { width: w, height: h } = B, med = (a) => a.slice().sort((x, y) => x - y)[a.length >> 1];
+  const ss = med(staves.map(s => s.space)), L = Math.round(med(staves.map(s => s.left))), R = Math.round(med(staves.map(s => s.right)));
+  const slope = med(staves.map(s => (s.yAt(2, s.right) - s.yAt(2, s.left)) / Math.max(1, s.right - s.left)));
+  if (R - L < 16 * ss) return null;
+  const mask = thinLineMask(B, Math.max(2, Math.round(lt * 2 + 1.5)), Math.max(3, Math.round(ss * 0.8)));
+  // per row y (at x = L): share of columns with line ink within a row, and the grey darkness
+  const cov = new Float64Array(h), dark = new Float64Array(h);
+  let n = 0;
+  for (let x = L; x <= R; x += 2) {
+    n++;
+    const dy = slope * (x - L);
+    for (let y = 0; y < h; y++) {
+      const yy = Math.round(y + dy);
+      if (yy < 1 || yy >= h - 1) continue;
+      const i = yy * w + x;
+      if (mask[i] || mask[i - w] || mask[i + w]) cov[y]++;
+      dark[y] += 255 - gray.data[i];
+    }
+  }
+  for (let y = 0; y < h; y++) { cov[y] /= n; dark[y] /= n; }
+  const at = (a, y) => { const k = Math.round(y); return k < 0 || k >= h ? 0 : a[k]; };
+  const d = Math.max(2, Math.round(0.4 * ss));
+  // a line's faint trace: darker than the paper half a space either side
+  const trace = (y) => at(dark, y) - (at(dark, y - d) + at(dark, y + d)) / 2;
+  const minCov = opts.minCov || 0.4;
+  const taken = staves.map(s => s.yAt(2, L));
+  const cands = [], pairs = [];
+  for (let y0 = 0; y0 + 4 * ss < h; y0 += 0.5) {
+    for (let g = 0.97 * ss; g <= 1.031 * ss; g += 0.01 * ss) {
+      let strong = 0, sc = 0;
+      for (let k = 0; k < 5; k++) {
+        const y = y0 + k * g, c = Math.max(at(cov, y - 1), at(cov, y), at(cov, y + 1));
+        if (c >= minCov) { strong++; sc += c; } else sc += Math.max(0, trace(y)) / 10;
+      }
+      const ends = Math.max(at(cov, y0 - 1), at(cov, y0), at(cov, y0 + 1)) >= minCov && Math.max(at(cov, y0 + 4 * g - 1), at(cov, y0 + 4 * g), at(cov, y0 + 4 * g + 1)) >= minCov;
+      if (strong >= 3 && strong < 5) cands.push({ y0, g, strong, sc });
+      else if (strong === 2 && ends) pairs.push({ y0, g, strong, sc });
+    }
+  }
+  cands.sort((a, b) => b.strong - a.strong || b.sc - a.sc);
+  const out = [];
+  const place = (c) => {
+    const mid = c.y0 + 2 * c.g;
+    if (taken.some(y => Math.abs(y - mid) < 6 * ss)) return;
+    taken.push(mid);
+    const st = lineStaff(w, c.y0, c.g, slope, L, R);
+    st.partial = c.strong;
+    out.push(st);
+  };
+  cands.forEach(place);
+  // a staff left with only its outer lines: where the page's staves, evenly spaced, leave a gap
+  // of two steps, and the two lines fall a staff height apart at its middle
+  const ys = taken.slice().sort((a, b) => a - b), steps = ys.slice(1).map((y, i) => y - ys[i]).sort((a, b) => a - b);
+  const step = steps.length ? steps[steps.length >> 1] : 0;
+  if (ys.length >= 4) {
+    pairs.sort((a, b) => b.sc - a.sc);
+    for (let i = 0; i + 1 < ys.length; i++) {
+      if (Math.abs(ys[i + 1] - ys[i] - 2 * step) > 0.15 * step) continue;
+      const want = (ys[i] + ys[i + 1]) / 2, c = pairs.find(c => Math.abs(c.y0 + 2 * c.g - want) < 0.1 * step);
+      if (c) place(c);
+    }
+  }
+  return out.length ? out : null;
+}
+
+module.exports = { inferStaves, oneLineStaves, extendToMargins, partialStaves };
