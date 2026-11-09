@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.44.1](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.44.0...score-scan-reader-v0.44.1) (2026-11-08)
+
+
+### Bug Fixes
+
+* **marks:** a mark on a split staff goes to the upper voice's part, both only when printed twice ([4eb8c7c](https://github.com/pension-plan/score-scan-reader/commit/4eb8c7cae7907a428180f85d0fd47207da5d1b8a))
+* **text:** circled M/W/F rehearsal letters; chord roots taken by the note reader joined back ([26a81c6](https://github.com/pension-plan/score-scan-reader/commit/26a81c69d0f95cd715f319a95c39045fd15b16b6))
+
 ## [0.44.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.43.0...score-scan-reader-v0.44.0) (2026-11-08)
 
 
