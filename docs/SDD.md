@@ -1347,14 +1347,32 @@ disagrees on one system only (its neighbours agree with each other) and is ignor
 barline shifts every later system, and each such change becomes a warning ("Bar numbers say system 3
 starts at bar 11; the reading has it start at bar 9 (2 barlines missed before it)."). Printed numbers
 were read on 13 of 20 benchmark items (27 systems; 15 agree), 276 of 365 challenge items (842 systems;
-691 agree) and 210 of 288 coverage PDFs (520 systems; 327 agree). Feeding them back (`opts.barFix`) is a
-second pass that fixes the bar count of the system before each change of one barline, only where a clean
-fix exists (no over-full merge; a group is cut into k bars only when its contents fill exactly k; the
-first bar becomes a pickup when the numbers say so), kept only when it agrees with more printed numbers
-and leaves no more voice-measures needing rhythm repair. It raises agreement to 19/27 (benchmark) and
-340/520 (coverage); aloha-oe-full-score gains 0.011, but per-item metrics move both ways (challenge
-wind-melody: pitch +0.038, duration -0.042 on 31 variants; clara-schumann pitch -0.014), so it is off by
-default.
+691 agree) and 210 of 288 coverage PDFs (520 systems; 327 agree).
+
+**Bar counts from the printed numbers (on by default; `opts.barFix: false` turns it off).** When the numbers
+disagree with the bars read, `barSpans()` turns them into runs: a system numbered n followed in reading order
+by the next numbered system, m (up to four unnumbered systems between), starts a run of systems holding m - n
+bars that ends m - 1 bars into the piece (a first bar read as a pickup is bar 0); the systems before the first
+numbered one hold its number less one. A number out of order with its neighbours (a misread digit: 17 for 177)
+gives nothing, nor does a run more than 3 bars off the bars read. A second `buildScore` pass then groups each
+run's segments into exactly that many bars: per system the dynamic programme above gives the cheapest grouping
+for every bar count (a group whose contents fill k bars exactly counts k, about k bars at a price; an
+over-full merge is allowed here, at a price, unless every voice runs past one and a half bars), and a run's
+total is shared out where the groupings cost least, each bar away from the first reading costing 2. Runs are
+taken in reading order and aim at the run's end, so a system that cannot be brought to its count is made up
+by the next run instead of shifting every bar after it (marks are placed by bar: one bar too many early on
+moves every later hairpin, fermata and octave line into the wrong bar). Two bars of one numbered system are
+never joined across a system break, a group the numbers count as k bars is cut into k by the voice that
+comes nearest k bars, and the second reading is kept when more runs come out right. Long scans are where
+this matters: rows of beamed 32nd notes put one-staff 'barlines' on the treble staff (6, 8, 6 bars read on a
+4-bar system) and a 16th rest over a beam read as a worn 7/4 (which no longer changes the meter: a worn
+reading of a meter outside the usual set that the bars after it fit no better than the meter in force is
+ignored). On the perf documents (perf-pages-05/10/20/40, clean, scan, severe) bar counts went from up to
++7.1% off (pages-20 severe 424/396; pages-40 scan 816/796) to within +0.3% on clean and scan copies and
++0.5 to +2.3% on severe ones (where the numbers of some systems are not read); exact-bar precision of the
+marks went from 0.70 to 0.90 (hairpins), 0.46 to 0.89 (fermatas), 0.50 to 0.98 (octave lines) and 0.34 to
+0.89 (dynamics). Note values are about the same (perf aggregate -0.0005 on average: clean copies +0.001 to
++0.002, scans -0.001 to -0.004, where repairing the over-full bars costs a few durations).
 
 **Braces and the part layout (L18).** `text.js` classifies the tall narrow ink at the staves' left edge as a
 system line, a curly brace or a bracket. A brace is recognised by its tip whatever its stroke weight: the

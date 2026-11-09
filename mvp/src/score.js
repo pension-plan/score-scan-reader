@@ -1071,7 +1071,7 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
           let m = here[here.length - 1];
           // a worn signature (meter.js: candidates): the candidate whose bar length the following
           // bars fill (up to four, until the next signature or system header)
-          if (m.weak && m.cands && m.cands.length > 1) {
+          if (m.weak && m.cands) {
             const run = [];
             for (let j = i; j < segs.length && run.length < 4; j++) {
               if (j > i && (segs[j].sy !== sg.sy ? (segs[j].sy.meters || []).some(o => o.header) : (sg.sy.meters || []).some(o => !o.courtesy && o !== m && o.x > sg.xa + 0.5 * sp && o.x <= segs[j].xa + 0.5 * sp))) break;
@@ -1079,6 +1079,9 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
             }
             const fit = (c) => { const L = (c.beats * 4) / c.type; return run.filter(v => Math.abs(v - L) < 1e-6).length; };
             m = m.cands.reduce((b, c) => (fit(c) > fit(b) ? c : b), m.cands[0]);
+            // a worn reading of a rare meter that the bars after it fit no better than the
+            // meter in force is no change of meter (a rest over a beam read as 7/4)
+            if (!PRIOR[(m.beats * 4) / m.type] && fit(m) <= fit(cur)) m = cur;
           }
           cur = { beats: m.beats, type: m.type, symbol: m.symbol || '' };
         }
@@ -1116,24 +1119,45 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     return 0.1 + Math.min(1, Math.abs(S - mLen) / mLen);
   };
   const measures = []; // [{segs:[...]}]
+  // per system: the grouping that fits best (free), and, when the printed bar
+  // numbers fix bar counts (checkBarNumbers, second pass), the best grouping
+  // holding g bars for each g (byBars), a group whose contents fill k bars
+  // counting as k
+  const sysInfo = [];
+  const counted = !!opts.barSpans;
   for (let i0 = 0; i0 < segs.length;) {
     let i1 = i0;
     while (i1 + 1 < segs.length && segs[i1 + 1].sy === segs[i0].sy) i1++;
     const n = i1 - i0 + 1;
-    // the printed bar numbers may fix this system's bar count (checkBarNumbers,
-    // second pass): T bars, counting a group whose contents fill k bars as k
     const sk = segs[i0].sy.page + ':' + segs[i0].sy.index;
-    const T = opts.barTargets && opts.barTargets[sk] ? opts.barTargets[sk] : 0;
-    const cost = (i, j) => {
-      const a = i0 + i, b = i0 + j - 1;
-      const edge = a === 0 || b === segs.length - 1;
-      let c = 2 * groupDev(a, b, edge);
+    const join = (a, b) => {
+      let c = 0;
       for (let t = a; t < b; t++) {
         const sp = (segs[t].sy.staves[0] && segs[t].sy.staves[0].st.space) || 16;
         const w = Math.min(segs[t].xb - segs[t].xa, segs[t + 1].xb - segs[t + 1].xa) / sp;
         c += w < 4 ? 0.15 : 0.45;
       }
       return c;
+    };
+    const cost = (i, j) => {
+      const a = i0 + i, b = i0 + j - 1;
+      const edge = a === 0 || b === segs.length - 1;
+      return 2 * groupDev(a, b, edge) + join(a, b);
+    };
+    // an over-full merge (contents misread long), allowed only where the
+    // printed numbers ask for that many bars, at a price
+    const costOver = (i, j) => {
+      const a = i0 + i, b = i0 + j - 1, mLen = lenOf(a);
+      const sums = [];
+      for (let k = 0; k < nStreams; k++) {
+        let s = 0;
+        for (let t = a; t <= b; t++) s += segStreamSums[t][k] || 0;
+        if (s > 1e-6) sums.push(Math.round(s * 4) / 4);
+      }
+      const S = sums.length ? mode(sums) : 0;
+      // (not when every voice runs past half a bar more: that is a bar of its own)
+      if (!sums.length || Math.min(...sums) > 1.5 * mLen + 1e-6) return Infinity;
+      return 2 * (1.1 + Math.min(1, Math.abs(S - mLen) / mLen)) + join(a, b);
     };
     // bars a group holds: one, or k when its contents fill k bars (a missed barline)
     const barsIn = (i, j) => {
@@ -1143,24 +1167,42 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
       const k = Math.round(S / mLen);
       return k >= 2 && Math.abs(S - k * mLen) < 1e-6 ? k : 1;
     };
-    const groups = [], gBars = [];
-    if (T) {
-      // best[j][g]: first j segments holding g bars; the system holds exactly T
-      const best = Array.from({ length: n + 1 }, () => new Array(T + 1).fill(Infinity)), from = Array.from({ length: n + 1 }, () => new Array(T + 1).fill(-1));
+    const info = { sk, i0, n, free: [], byBars: new Map() };
+    if (counted) {
+      // best[j][g]: first j segments holding g bars
+      const G = 2 * n + 4;
+      const best = Array.from({ length: n + 1 }, () => new Array(G + 1).fill(Infinity)), from = Array.from({ length: n + 1 }, () => new Array(G + 1).fill(-1));
       best[0][0] = 0;
+      const fromK = Array.from({ length: n + 1 }, () => new Array(G + 1).fill(1));
       for (let j = 1; j <= n; j++) for (let i = Math.max(0, j - 5); i < j; i++) {
-        // only clean fixes: no over-full merge, and a group counts k bars only
-        // when its contents fill exactly k
-        const k = barsIn(i, j), c = cost(i, j);
-        if (c === Infinity) continue;
-        for (let g = k; g <= T; g++) {
-          if (best[i][g - k] === Infinity) continue;
-          if (best[i][g - k] + c < best[j][g] - 1e-9) { best[j][g] = best[i][g - k] + c; from[j][g] = i; }
+        // one bar (over-full at a price), or the k bars its contents fill
+        // exactly, a barline missed between each
+        let c1 = cost(i, j);
+        if (c1 === Infinity) c1 = costOver(i, j);
+        if (c1 === Infinity) continue;
+        const k = barsIn(i, j);
+        const opts2 = [[1, c1]];
+        if (k > 1) opts2.push([k, join(i0 + i, i0 + j - 1) + 0.45 * (k - 1)]);
+        else {
+          // about k bars (misread durations): rhythm repair cuts it where most voices agree
+          let S = 0;
+          for (let t = i0 + i; t < i0 + j; t++) S += segSum[t];
+          const mLen = lenOf(i0 + i), ka = Math.round(S / mLen);
+          if (ka > 1 && Math.abs(S - ka * mLen) <= 0.35 * mLen) opts2.push([ka, join(i0 + i, i0 + j - 1) + 0.45 * (ka - 1) + 1]);
+        }
+        for (const [kk, c] of opts2) for (let g = kk; g <= G; g++) {
+          if (best[i][g - kk] === Infinity) continue;
+          if (best[i][g - kk] + c < best[j][g] - 1e-9) { best[j][g] = best[i][g - kk] + c; from[j][g] = i; fromK[j][g] = kk; }
         }
       }
-      if (best[n][T] < Infinity) for (let j = n, g = T; j > 0;) { const i = from[j][g], k = barsIn(i, j); groups.unshift(Array.from({ length: j - i }, (_, t) => i0 + i + t)); gBars.unshift(k); g -= k; j = i; }
+      for (let T = 1; T <= G; T++) {
+        if (best[n][T] === Infinity) continue;
+        const groups = [], gBars = [];
+        for (let j = n, g = T; j > 0;) { const i = from[j][g], k = fromK[j][g]; groups.unshift(Array.from({ length: j - i }, (_, t) => i0 + i + t)); gBars.unshift(k); g -= k; j = i; }
+        info.byBars.set(T, { cost: best[n][T], groups, gBars });
+      }
     }
-    if (!groups.length) {
+    {
       const best = new Array(n + 1).fill(Infinity), from = new Array(n + 1).fill(-1);
       best[0] = 0;
       for (let j = 1; j <= n; j++) {
@@ -1170,17 +1212,67 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
           if (best[i] + c < best[j] - 1e-9) { best[j] = best[i] + c; from[j] = i; }
         }
       }
-      for (let j = n; j > 0; j = from[j]) groups.unshift(Array.from({ length: j - from[j] }, (_, t) => i0 + from[j] + t));
+      for (let j = n; j > 0; j = from[j]) info.free.unshift(Array.from({ length: j - from[j] }, (_, t) => i0 + from[j] + t));
     }
+    sysInfo.push(info);
+    i0 = i1 + 1;
+  }
+  // the bar count of each system the printed numbers fix (barSpans): a run of
+  // systems' total, shared out where the groupings cost least
+  const pick = new Map();
+  // the systems whose bar counts the printed numbers give
+  const numbered = new Set();
+  for (const sp of opts.barSpans || []) for (const k of sp.keys) { const si = sysInfo.find(x => x.sk === k); if (si) numbered.add(segs[si.i0].sy); }
+  if (counted) {
+    const at = new Map(sysInfo.map(si => [si.sk, si]));
+    // the runs in reading order, each holding the bars that bring the count up to the next
+    // printed number (end) from the bars before it as now read: a system that cannot be
+    // brought to its count leaves the difference to the runs after it
+    const pos = new Map(sysInfo.map((si, i) => [si.sk, i]));
+    const had = (si) => (pick.has(si.sk) ? pick.get(si.sk) : (opts.barRead && opts.barRead[si.sk]) || si.free.length);
+    for (const sp of (opts.barSpans || []).slice().sort((a, b) => pos.get(a.keys[0]) - pos.get(b.keys[0]))) {
+      const run = sp.keys.map(k => at.get(k));
+      if (run.some(si => !si) || run.some(si => pick.has(si.sk))) continue;
+      let before = 0;
+      for (let i = 0; i < pos.get(sp.keys[0]); i++) before += had(sysInfo[i]);
+      const readT = sp.read.reduce((a, b) => a + b, 0);
+      // (the count the printed number gives when that cannot be reached)
+      const totals = [...new Set([sp.end - before, sp.total])];
+      let r = null;
+      for (const total of totals) {
+        if (total === readT || total < run.length || Math.abs(total - readT) > 3) { if (total === readT) break; continue; }
+        // best[r][g]: first r systems of the run holding g bars
+        let best = new Map([[0, { c: 0, ts: [] }]]);
+        for (const si of run) {
+          const nx = new Map();
+          const was = sp.read[run.indexOf(si)];
+          for (const [g, v] of best) for (const [T, o] of si.byBars) {
+            if (g + T > total) continue;
+            // (each bar more or less than the first reading found costs 2)
+            const c = v.c + o.cost + 2 * Math.abs(T - was), e = nx.get(g + T);
+            if (!e || c < e.c - 1e-9) nx.set(g + T, { c, ts: v.ts.concat(T) });
+          }
+          best = nx;
+        }
+        r = best.get(total);
+        if (r) break;
+      }
+      if (r) run.forEach((si, k) => pick.set(si.sk, r.ts[k]));
+    }
+  }
+  for (const si of sysInfo) {
+    const o = pick.has(si.sk) ? si.byBars.get(pick.get(si.sk)) : null;
     // with the bar count fixed, a group is cut into its bars by contents
     // exactly when it holds several (forceSplit), never otherwise (noSplit)
-    groups.forEach((g, k) => measures.push(gBars.length ? { segs: g, forceSplit: gBars[k] > 1, noSplit: gBars[k] === 1 } : { segs: g }));
-    i0 = i1 + 1;
+    if (o) o.groups.forEach((g, k) => measures.push({ segs: g, forceSplit: o.gBars[k] > 1, noSplit: o.gBars[k] === 1, bars: o.gBars[k] }));
+    else si.free.forEach(g => measures.push({ segs: g }));
   }
   // a bar split across a system break: two short halves that make one bar
   for (let k = 1; k + 1 < measures.length; k++) {
     const a = measures[k], b = measures[k + 1];
     if (segs[a.segs[0]].sy === segs[b.segs[0]].sy || a.segs.length > 1 || b.segs.length > 1) continue;
+    // (not where the printed bar numbers count the bars of either system)
+    if (numbered.has(segs[a.segs[0]].sy) || numbered.has(segs[b.segs[0]].sy)) continue;
     const sa = segSum[a.segs[0]], sb = segSum[b.segs[0]], mLen = lenOf(a.segs[0]);
     if (sa < mLen - 1e-6 && sb > 1e-6 && Math.abs(sa + sb - mLen) < 1e-6) { a.segs.push(...b.segs); measures.splice(k + 1, 1); }
   }
@@ -1344,14 +1436,16 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     const byPart = perPart.map(pm => pm[mi]);
     const sums = [];
     byPart.forEach(sts => sts.forEach(st => { const q = qsum(st.events); if (q > 1e-6) sums.push(Math.round(q * 4) / 4); }));
-    const S = sums.length ? mode(sums) : 0;
+    let S = sums.length ? mode(sums) : 0;
+    // the bars the printed numbers fix: the voice that comes nearest k bars
+    if (m.forceSplit && m.bars > 1 && sums.length) S = sums.reduce((a, x) => (Math.abs(x - m.bars * mLen) < Math.abs(a - m.bars * mLen) ? x : a), sums[0]);
     const k = Math.round(S / mLen);
     const agree = sums.filter(x => Math.abs(x - S) <= 0.25 * mLen).length;
     // a missed barline lengthens every voice of the system alike: where as
     // many voices fill exactly one bar as run long, the long ones have false
     // notes in them (a tie end read as a half note), not a second bar
     const one = sums.filter(x => Math.abs(x - mLen) <= 0.25 * mLen).length;
-    if (k >= 2 && Math.abs(S - k * mLen) <= 0.25 * mLen && ((agree >= Math.max(1, 0.5 * sums.length) && agree > one) || (m.forceSplit && agree >= 1)) && !m.noSplit) {
+    if (k >= 2 && Math.abs(S - k * mLen) <= (m.forceSplit ? 0.35 : 0.25) * mLen && ((agree >= Math.max(1, 0.5 * sums.length) && agree > one) || (m.forceSplit && agree >= 1)) && !m.noSplit) {
       splitBars += k - 1;
       const chunks = Array.from({ length: k }, () => byPart.map(sts => sts.map(st => ({ staff: st.staff, events: [] }))));
       byPart.forEach((sts, pi) => sts.forEach((st, si) => {
@@ -1399,8 +1493,6 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
     const edge = mi === 0 || mi === units.length - 1;
     if (edge && ms > 1e-6 && ms < mLen - 1e-6 && agree >= Math.max(2, 0.5 * nz.length)) target = ms;
     else if (edge && ms > 1e-6 && ms < mLen - 1e-6 && nz.length === 1) target = ms;
-    // the printed bar numbers count the first bar as a pickup
-    else if (mi === 0 && opts.pickup && nz.length && Math.max(...nz) < mLen - 1e-6) target = Math.max(...nz);
     const implicit = mi === 0 && target < mLen - 1e-6;
     const sp = (m.sy.staves[0] && m.sy.staves[0].st.space) || 16;
     const anchors = [];
@@ -1656,21 +1748,15 @@ function buildScore(pages, lyricsBySystem = {}, opts = {}) {
   let barCheck = null;
   try { barCheck = checkBarNumbers(pages, measureMap); } catch (e) { barCheck = null; }
   // the printed bar numbers disagree with the bars read: read again with the
-  // bar counts they give (barTargets) and keep that reading when it agrees
-  // with more of them
-  // Off unless opts.barFix: on the benchmark it set the bar count right on 9 more
-  // systems but rhythm repair then did worse (duration -0.01 to -0.06 on 6 items)
-  if (opts.barFix && barCheck && barCheck.notes.length && !opts.barTargets) {
-    const hint = barHints(pages, measureMap, barCheck, partMeasures);
-    if (hint) {
-      let again = null;
-      try { again = buildScore(pages, lyricsBySystem, { ...opts, barTargets: hint.targets, pickup: hint.pickup }); } catch (e) { again = null; }
-      // and the bars it makes fill as well as before (no more voice-measures
-      // that needed repair or still do not add up)
-      if (again && again.barCheck && again.barCheck.agree > barCheck.agree && again.rhythm.repaired + again.rhythm.mismatch <= repaired + mismatch) {
-        again.warnings.unshift(`Bar count corrected from the printed bar numbers (${barCheck.agree} of ${barCheck.printed} agreed, now ${again.barCheck.agree}).`);
-        return again;
-      }
+  // bar counts they give (barSpans) and keep that reading when more of their
+  // runs come out right (opts.barFix false: off)
+  if (opts.barFix !== false && barCheck && barCheck.notes.length && !opts.barSpans) {
+    const hint = barSpans(pages, measureMap, barCheck, partMeasures);
+    let again = null;
+    if (hint) try { again = buildScore(pages, lyricsBySystem, { ...opts, barSpans: hint.spans, barRead: hint.read }); } catch (e) { again = null; }
+    if (again && spansFit(hint.spans, again.measureMap) > hint.fit) {
+      again.warnings.unshift(`Bar count corrected from the printed bar numbers (${barCheck.agree} of ${barCheck.printed} agreed, now ${again.barCheck.agree}).`);
+      return again;
     }
   }
   if (barCheck) barCheck.notes.forEach(n => warnings.push(n));
@@ -1895,13 +1981,16 @@ function checkBarNumbers(pages, measureMap) {
   return out;
 }
 
-// Bar counts per system from the printed bar numbers, where they change the
-// offset (checkBarNumbers) and the system to blame is known: the numbered
-// system before the change, when no unnumbered system lies between. A change
-// at the first numbered system with one bar too many read, and a first bar
-// not read as a pickup, makes the first bar a pickup.
-// {targets: {'page:sys': bars}, pickup} or null
-function barHints(pages, measureMap, bc, partMeasures) {
+// Bar counts from the printed bar numbers: a system numbered n, followed in
+// reading order by the next numbered one, m, with up to four unnumbered
+// systems between, starts a run of systems holding m - n bars, which ends
+// m - 1 bars into the piece (a first bar read as a pickup is bar 0). A number
+// out of order with its neighbours (a misread digit) gives nothing; nor does a
+// count more than 3 bars off the bars read. The systems before the first
+// numbered one hold its number less one.
+// {spans: [{keys: ['page:sys', ...], total, end, read: [bars read per system]}],
+// fit: the spans the bars read already fill, read: {'page:sys': bars}} or null
+function barSpans(pages, measureMap, bc, partMeasures) {
   const order = [];
   const seenFr = new Set();
   for (const pg of pages) {
@@ -1909,27 +1998,40 @@ function barHints(pages, measureMap, bc, partMeasures) {
     seenFr.add(pg.fr);
     for (const sy of pg.asm.systems) order.push(sy.page + ':' + sy.index);
   }
-  const pos = (s) => order.indexOf(s.page + ':' + s.sys);
-  const count = (key) => new Set(measureMap.filter(e => e.page + ':' + e.sys === key).map(e => e.n)).size;
-  const targets = {};
-  let pickup = false, prev = 0, any = false;
-  bc.systems.forEach((s, i) => {
-    const d = s.printed - s.read, next = bc.systems[i + 1];
-    if (d === prev || (next && next.printed - next.read === prev)) return;
-    const a = bc.systems[i - 1];
-    if (!a) {
-      // the first numbered system: the bars before it are the first system's
-      const firstImplicit = partMeasures[0] && partMeasures[0][0] && partMeasures[0][0].every(st => st.implicit);
-      if (d === -1 && !firstImplicit) { pickup = true; any = true; }
-      else if (pos(s) === 1 && Math.abs(d) === 1) { targets[order[0]] = count(order[0]) + d; if (targets[order[0]] >= 1) any = true; else delete targets[order[0]]; }
-    } else if (pos(s) - pos(a) === 1 && Math.abs(d - prev) === 1) {
-      const key = order[pos(a)];
-      targets[key] = count(key) + (d - prev);
-      if (targets[key] >= 1) any = true; else delete targets[key];
-    }
-    prev = d;
-  });
-  return any ? { targets, pickup } : null;
+  const num = new Map();
+  for (const s of bc.systems) num.set(s.page + ':' + s.sys, s.printed);
+  const counts = new Map();
+  for (const e of measureMap) { const k = e.page + ':' + e.sys; if (!counts.has(k)) counts.set(k, new Set()); counts.get(k).add(e.n); }
+  const count = (k) => (counts.has(k) ? counts.get(k).size : 0);
+  // a number is trusted when it is in order with the numbered systems on either side
+  const keys = order.filter(k => num.has(k));
+  const inOrder = (a, b) => num.get(b) > num.get(a) && num.get(b) - num.get(a) <= 16 * (order.indexOf(b) - order.indexOf(a));
+  const ok = keys.filter((k, i) => (keys[i - 1] || keys[i + 1]) && (!keys[i - 1] || inOrder(keys[i - 1], k)) && (!keys[i + 1] || inOrder(k, keys[i + 1])));
+  const spans = [];
+  const firstImplicit = partMeasures[0] && partMeasures[0][0] && partMeasures[0][0].every(st => st.implicit);
+  // end: the bars before the next numbered system (a first bar read as a pickup is bar 0)
+  const add = (run, total, end) => {
+    const read = run.reduce((a, k) => a + count(k), 0);
+    if (run.length && total >= run.length && Math.abs(total - read) <= 3) spans.push({ keys: run, total, end, read: run.map(count) });
+  };
+  for (let i = 0; i + 1 < ok.length; i++) {
+    const a = order.indexOf(ok[i]), b = order.indexOf(ok[i + 1]);
+    if (b - a <= 5) add(order.slice(a, b), num.get(ok[i + 1]) - num.get(ok[i]), num.get(ok[i + 1]) - 1 + (firstImplicit ? 1 : 0));
+  }
+  if (ok.length) {
+    const f = order.indexOf(ok[0]);
+    if (f >= 1 && f <= 3) add(order.slice(0, f), num.get(ok[0]) - 1 + (firstImplicit ? 1 : 0), num.get(ok[0]) - 1 + (firstImplicit ? 1 : 0));
+  }
+  const fit = spans.filter(s => s.read.reduce((a, b) => a + b, 0) === s.total).length;
+  const read = {};
+  for (const k of order) read[k] = count(k);
+  return spans.length > fit ? { spans, fit, read } : null;
+}
+// spans of barSpans the bars read fill
+function spansFit(spans, measureMap) {
+  const counts = new Map();
+  for (const e of measureMap) { const k = e.page + ':' + e.sys; if (!counts.has(k)) counts.set(k, new Set()); counts.get(k).add(e.n); }
+  return spans.filter(s => s.keys.reduce((a, k) => a + (counts.has(k) ? counts.get(k).size : 0), 0) === s.total).length;
 }
 
 // ------------------------------------------------------------ text and marks

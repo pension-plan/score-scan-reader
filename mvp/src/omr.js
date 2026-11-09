@@ -245,7 +245,7 @@ function createConverter(opts = {}) {
     preview(fo = {}, take = (r) => r) {
       return leaveAsIs([pages], () => {
         let score;
-        try { score = buildScore(pages, {}, { ocr: false, copyLyrics: !!opts.copyLyrics, debug: opts.debug, stanzasAsVerses: !!(fo.stanzasAsVerses ?? opts.stanzasAsVerses) }); }
+        try { score = buildScore(pages, {}, { ocr: false, copyLyrics: !!opts.copyLyrics, debug: opts.debug, barFix: opts.barFix, stanzasAsVerses: !!(fo.stanzasAsVerses ?? opts.stanzasAsVerses) }); }
         catch (e) { score = { parts: [], warnings: ['Assembly failed: ' + e.message], xml: '' }; }
         const none = pages.length ? [] : ['No staves were detected. Try a cleaner or higher-resolution scan.'];
         return take({ pages, score, lyricsBySystem: {}, warnings: warnings.concat(none, score.warnings || []), preview: true });
@@ -258,7 +258,7 @@ function createConverter(opts = {}) {
       if (allLyrics) { for (const k in lyricsBySystem) delete lyricsBySystem[k]; Object.assign(lyricsBySystem, allLyrics); }
       else allLyrics = Object.fromEntries(Object.entries(lyricsBySystem).map(([k, v]) => [k, v.slice()]));
       let score;
-      try { score = buildScore(pages, lyricsBySystem, { ocr: !!opts.ocr, copyLyrics: !!opts.copyLyrics, debug: opts.debug, stanzasAsVerses: !!(fo.stanzasAsVerses ?? opts.stanzasAsVerses) }); }
+      try { score = buildScore(pages, lyricsBySystem, { ocr: !!opts.ocr, copyLyrics: !!opts.copyLyrics, debug: opts.debug, barFix: opts.barFix, stanzasAsVerses: !!(fo.stanzasAsVerses ?? opts.stanzasAsVerses) }); }
       catch (e) { score = { parts: [], warnings: ['Assembly failed: ' + e.message], xml: '' }; }
       // show only the text lines that were attached to notes (stanza text printed
       // below the music, titles and dynamics are not underlay)
