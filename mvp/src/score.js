@@ -1975,19 +1975,7 @@ function readMarks(pages, segs, units, parts, partMeasures, slotOf = (o, k) => k
       const st = pg.asm.systems[m.sys] && pg.asm.systems[m.sys].staves[m.k];
       const placement = st && (m.box[1] + m.box[3]) / 2 < st.st.yAt(0, x) ? 'above' : 'below';
       const K = slotOf(pg.asm.systems[m.sys], m.k);
-      // a staff split into two parts: a mark goes to the upper voice's part
-      // (the transcriptions' convention for one dynamic between the staves),
-      // unless it is printed twice, above and below the staff at one place:
-      // then the one below belongs to the lower voice's part
-      let on = partsOn(K);
-      const vOf = (pi) => parts[pi].src.length === 1 && parts[pi].src[0].staff === K ? parts[pi].src[0].voice : null;
-      if (on.length === 2 && on.every(o => vOf(o.pi) === 1 || vOf(o.pi) === 2)) {
-        const sp = (st && st.st.space) || fr.ss, cx = (m.box[0] + m.box[2]) / 2;
-        const twin = placement === 'below' && [...(marks.dyns || []), ...(marks.wedges || [])].some(o => o !== m && o.sys === m.sys && o.k === m.k &&
-          (o.value || o.type) === (m.value || m.type) && Math.abs((o.box[0] + o.box[2]) / 2 - cx) <= 1.5 * sp && (o.box[1] + o.box[3]) / 2 < st.st.yAt(0, cx));
-        on = on.filter(o => vOf(o.pi) === (twin ? 2 : 1));
-      }
-      for (const { pi, staffNo, multi } of on) {
+      for (const { pi, staffNo, multi } of partsOn(K)) {
         const at = locate(fr, sysIdx(m.sys), K, x, pi);
         if (!at) continue;
         const list = dirs[pi][at.mi];

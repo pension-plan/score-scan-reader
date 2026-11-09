@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 10:41 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 11:10 AEDT.
 
 ## Events
 
@@ -195,6 +195,8 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 09:45 | Estate Status updated (SSR-4: CC BY-SA 4.0 word lists). textsym 1fc03e2: lyric spelling correction (benchmark lyrics 0.9338 level, coverage 0.9768 to 0.9770; haupt verse 1 fixed). structure 107049a: rh05 test page regenerated (queue done). Release 0.43.0 waits for green CI on 1fc03e2. |
 | 09:58 | perf 6c466f1 (in 0.43.0): ML detector reads alongside each page; browser St Anselm ML cost 1.3 s to 0.1 s, Maple 4.4 s to 3.3 s; real download 5.6 MB compressed (not 16 MB); output byte-identical with ML on and off. SSR-3 text updated. perf's queue done. |
 | 10:41 | voices 8001ad9: hairpin recall doubled; release 0.44.0 merged (all green). voices last item: split-staff hairpin duplicate. |
+| 11:10 | textsym 26a81c6: circled M/W/F rehearsal letters (23 to 26 of 26), chord roots rejoined (mk06 clean 59 to 61/61); L36 gate clean; textsym queue done. voices 4eb8c7c turned CI red (dynamics 168 to 122 challenge, 33 to 27 benchmark; wedge, metronome down) — not released; voices proving against truth or fixing forward. |
+| 11:10 | voices 4eb8c7c accepted with evidence (per-part deviation vs truth down on every mark type; CI's element-count drop = removed duplicates); release 0.44.1 merged as a recorded exception. All agent queues finished (opencv, structure, perf, textsym, voices). |
 
 ## Accuracy by round
 
