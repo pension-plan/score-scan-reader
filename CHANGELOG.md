@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.46.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.45.0...score-scan-reader-v0.46.0) (2026-11-09)
+
+
+### Features
+
+* **heads:** recover notes on damaged scans (staff fallback, dotted stems, rhythm-budget spare heads) ([0eb9ee1](https://github.com/pension-plan/score-scan-reader/commit/0eb9ee1ecf82e0edaed479797c6459656ff8309a))
+
+
+### Bug Fixes
+
+* **regress:** a run where most items crash is invalid, not 'No regression' ([c3c2f30](https://github.com/pension-plan/score-scan-reader/commit/c3c2f30137597cc0d6c57baa4c142b546564c4b5))
+* **regress:** count crashed items by eval's crash field ([e1d75a5](https://github.com/pension-plan/score-scan-reader/commit/e1d75a5d62b71bad17fc0906a5c0b0c05de05a90))
+
+
+### Performance Improvements
+
+* **front:** skip the few-staves mode retry on notched halftone pages ([55962bd](https://github.com/pension-plan/score-scan-reader/commit/55962bd1182c8699fb6f228281e7ace7d925012c))
+
 ## [0.45.0](https://github.com/pension-plan/score-scan-reader/compare/score-scan-reader-v0.44.2...score-scan-reader-v0.45.0) (2026-11-09)
 
 
