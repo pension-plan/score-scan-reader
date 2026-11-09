@@ -142,6 +142,13 @@ if (mA && mB) {
   }
 }
 const fails = [];
+// A run where most items crash on either side compares nothing (e.g. OCR failed to load in a
+// worktree without node_modules): every item "unchanged" would read as "No regression".
+const nItems = (x) => (x.items || []).length;
+const crashed = (x) => (x.items || []).filter((it) => it.crashed || it.error || typeof it.aggregate !== 'number').length;
+for (const [lbl, x] of [[base, A], ['head', B]]) {
+  if (nItems(x) && crashed(x) > nItems(x) / 2) fails.push(`INVALID RUN: ${crashed(x)} of ${nItems(x)} items failed on ${lbl} (check OCR/node_modules)`);
+}
 if (markDrops.length) fails.push(`fewer elements written: ${markDrops.join(', ')}`);
 if (sB.all.aggregate < sA.all.aggregate - 0.005) fails.push(`aggregate dropped ${d(sA.all.aggregate, sB.all.aggregate)}`);
 if (sA.real && sB.real && sB.real.aggregate < sA.real.aggregate - 0.01) fails.push(`real-scan aggregate dropped ${d(sA.real.aggregate, sB.real.aggregate)}`);

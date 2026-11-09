@@ -1,6 +1,6 @@
 # Build timeline
 
-All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 11:41 AEDT.
+All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from the status page on every push; last updated 2026-11-08 12:13 AEDT.
 
 ## Events
 
@@ -199,6 +199,8 @@ All times are Sydney daylight time (AEDT, UTC+11) on 2026-11-08. Generated from 
 | 11:10 | voices 4eb8c7c accepted with evidence (per-part deviation vs truth down on every mark type; CI's element-count drop = removed duplicates); release 0.44.1 merged as a recorded exception. All agent queues finished (opencv, structure, perf, textsym, voices). |
 | 11:41 | All earlier teammates stopped (queues finished). Three new Opus xhigh agents on the remaining larger projects: descreen (L39 notch filter), bardrift (bar-count drift on long scans), faded (gray-level head evidence with a per-bar rhythm budget on severe scans). |
 | 11:41 | voices reverted 4eb8c7c (d5e50da): matched dynamics vs truth fell 313 to 307 (challenge) and 18 to 14 (benchmark); my 0.44.1 acceptance was based on per-part deviation and was wrong. Release 0.44.2 merged (all green). Memory note corrected: 'proven' means matched counts vs truth do not fall. |
+| 12:05 | descreen 0db92eb: notch descreen (L39 partial). Next: partial-line staff finder on notched pages. |
+| 12:13 | Release 0.45.0 merged (all green): 0db92eb notch descreen, 55b193c staves from 3-4 of 5 lines on notched pages. |
 
 ## Accuracy by round
 
@@ -264,7 +266,7 @@ Scores are against the benchmark of synthetic and real scans with exact answers 
 | L36 | Lyric OCR on old print garbles words (haupt1867: I ler-zens Ci-ran-de for Herzens Grunde, T ob for Lob; demdithiglich for demuthiglich) | Lyrics (OCR) | Queued | Lexicon-based, hyphen-aware post-correction with OCR-confusion costs, queued for textsym after the ML task. |
 | L37 | Wrong-pitch notes are the largest error source: over 85% of unmatched notes are stemmed heads in the staff at the wrong pitch (coverage 4.2% of truth notes, challenge 5.8%); text and marks now cause under 1% | Pitch (clef/key/accidental/ledger) | Open | structure fhs.js (LCS alignment per item) measured it; next: classify wrong pitches by cause and fix the top one. structure wp.py cause table (challenge / coverage): missing notes 2853/1456, extra 1677/967, 1-2 step position 484/184, octave 146/95 (clef 8va/8vb 0%), clef runs 20/127, key 90/27, accidental 57/57. Routed: clef octave + tenor/alto + keys to structure; missing heads + position to opencv; fermata recall (447 of 752) to textsym. perf: of 3,555 unmatched app notes on challenge, 2,903 are wrong pitches, only 652 net surplus; net surplus (1,434 incl. coverage): severe scans 63%, part copies from voice splitting 24% (to voices), percussion written pitched vs unpitched truth 11% (perf). e7225c6 (opencv): ledger thickness limit at least 0.28 space (scan ledgers 4-5 px vs 2 px staff lines); challenge missing notes 2836 to 2618, wrong pitches 1641 to 1580; variations-12-pages scan missing 223 to 34. Remaining misses mostly severe (broken hollow outlines, faded stems). 69071d2 (opencv): heavy-scan heads not split in two; position errors 325 to 278, extra notes 1653 to 1486; choir-ttbb severe 0.271 to 0.754, lyr06 severe 0.240 to 0.561; benchmark real scans 0.931 to 0.937. Remaining ±1-2 step errors a long tail (417, mostly severe). |
 | L38 | Pages whose staff lines are washed out or partly missing yield no or partial staves, so nothing on them is read (rst08 severe, voice-piano-night-song severe, rst05 severe) | Staves | Resolved (92cf0ac) | opencv: infer staves from notes, stems, clefs, barlines and fragments when the line finders fail. 92cf0ac: staffinfer.js (clef-anchored, gated) extends partial staves and adds missing ones; rst05 severe 0.626 to 0.739, rst08 severe 0.367 to 0.538, no item down. voice-piano-night-song severe has all staves; its loss is heads/pitch. |
-| L39 | Heavy coarse halftone screens (lyr04-veni severe) defeat staff finding; Gaussian descreen strong enough to clear the screen also erases faint staff lines | Pre-clean | Open (needs a project) | opencv: trigger identified (bgStd>19, midShare>0.93, mid>0.2 picks this page alone); fix needs a screen-frequency notch filter (diagonal grid) rather than a low-pass. Written up in spike-opencv.md (f823603). |
+| L39 | Heavy coarse halftone screens (lyr04-veni severe) defeat staff finding; Gaussian descreen strong enough to clear the screen also erases faint staff lines | Pre-clean | Partial (0db92eb) | opencv: trigger identified (bgStd>19, midShare>0.93, mid>0.2 picks this page alone); fix needs a screen-frequency notch filter (diagonal grid) rather than a low-pass. Written up in spike-opencv.md (f823603). 0db92eb (descreen): FFT notch removes the screen peaks, gated by the trigger; lyr04-veni severe 0.384 to 0.452, page now turned, 15.3 to 3.3 s; byte-identical elsewhere. 2 of 6 staves still, as 4 staves lost lines in the scan itself; next: 3-4-of-5-line staff finder on notched pages. |
 
 ## Runs
 
